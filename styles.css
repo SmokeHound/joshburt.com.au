@@ -1,0 +1,74 @@
+body {
+  background-color: #222;
+  color: #eee;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header, footer {
+  background-color: #111;
+  padding: 20px;
+  text-align: center;
+}
+
+nav a {
+  color: #bbb;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+nav a:hover {
+  color: #fff;
+}
+
+main {
+  padding: 20px;
+}
+
+/* Login container styling */
+.login-container {
+  max-width: 400px;
+  margin: 50px auto;
+  background-color: #333;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.login-container h2 {
+  text-align: center;
+  color: #eee;
+}
+
+.login-container label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ccc;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 3px;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background-color: #555;
+  color: #eee;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.login-container button:hover {
+  background-color: #777;
+}
+
+.error {
+  color: red;
+  text-align: center;
+}
