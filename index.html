@@ -1,23 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dark Theme Website</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <title>Dark Theme Website</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1>Welcome to the Dark Side</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="login.php">Admin Login</a>
-    </nav>
-  </header>
-  <main>
-    <p>This is a dark-themed website example.</p>
-  </main>
-  <footer>
-    <p>&copy; 2025 Dark Theme Website</p>
-  </footer>
+    <header class="fluent-header">
+        <div class="container header-content">
+            <h1>Welcome to the Dark Side</h1>
+            <nav class="navbar">
+                <input type="checkbox" id="nav-toggle" class="nav-toggle" />
+                <label for="nav-toggle" class="nav-toggle-label">&#9776;</label>
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-btn">Home</a></li>
+                    <li><a href="login.php" class="nav-btn">Admin Login</a></li>
+                    <li><a href="#" class="nav-btn">Features</a></li>
+                    <li><a href="#" class="nav-btn">Contact</a></li>
+                    <li><a href="#" class="nav-btn">Blog</a></li>
+                    <li><a href="#" class="nav-btn">Gallery</a></li>
+                    <li><a href="#" class="nav-btn">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="container">
+        <section class="fluent-card">
+            <h2>About This Site</h2>
+            <p>
+                This is a responsive, dark-themed homepage with a Fluent Design-inspired navigation menu. Resize the window to see the menu adapt for mobile devices.
+            </p>
+        </section>
+    </main>
+    <footer class="fluent-footer">
+        <div class="container">
+            <p>&copy; 2025 Dark Theme Website</p>
+        </div>
+    </footer>
 </body>
 </html>
