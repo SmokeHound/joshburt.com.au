@@ -1,30 +1,48 @@
-/* Global Settings */
-body {
+/* Reset */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base styles */
+body {
   font-family: 'Segoe UI', sans-serif;
   background-color: #000;
   color: #f00;
-  line-height: 1.6;
+}
+
+a {
+  color: #f00;
+  text-decoration: none;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Header */
 header {
   background: #111;
-  padding: 1em;
-  text-align: center;
+  padding: 20px 0;
   border-bottom: 2px solid #f00;
 }
 
 header h1 {
-  margin: 0;
-  font-size: 2.5em;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+nav {
+  text-align: center;
 }
 
 nav a {
-  color: #f00;
   margin: 0 15px;
-  text-decoration: none;
   font-weight: bold;
+  transition: color 0.3s;
 }
 
 nav a:hover {
@@ -34,40 +52,41 @@ nav a:hover {
 /* Hero Section */
 .hero {
   background: #1a1a1a;
-  padding: 100px 20px;
+  padding: 100px 0;
   text-align: center;
 }
 
 .hero h2 {
   font-size: 2em;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
-/* Features Section */
-#features {
-  padding: 60px 20px;
+/* Section Styles */
+.section {
+  padding: 60px 0;
   background: #0d0d0d;
 }
 
-#features ul {
-  list-style-type: none;
-  padding: 0;
+.section h2 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-#features li {
+.section ul {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+}
+
+.section ul li {
   margin: 10px 0;
   font-size: 1.2em;
 }
 
-/* Contact Section */
-#contact {
-  background: #1c1c1c;
-  padding: 60px 20px;
-}
-
+/* Contact Form */
 form {
   max-width: 500px;
-  margin: auto;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
 }
@@ -78,15 +97,17 @@ input, textarea {
   border: 1px solid #f00;
   padding: 10px;
   margin-bottom: 15px;
+  resize: vertical;
 }
 
 button {
   background: #f00;
   color: #000;
   border: none;
-  padding: 10px;
+  padding: 12px;
   font-weight: bold;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
 button:hover {
@@ -95,8 +116,8 @@ button:hover {
 
 /* Footer */
 footer {
-  text-align: center;
   background: #111;
-  padding: 1em;
+  padding: 20px 0;
+  text-align: center;
   border-top: 2px solid #f00;
 }
