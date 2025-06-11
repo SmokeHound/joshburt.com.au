@@ -1,42 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Dark Theme Website</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Black & Red Theme</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <header class="fluent-header">
-        <div class="container header-content">
-            <h1>Welcome to the Dark Side</h1>
-            <nav class="navbar">
-                <input type="checkbox" id="nav-toggle" class="nav-toggle" />
-                <label for="nav-toggle" class="nav-toggle-label">&#9776;</label>
-                <ul class="nav-list">
-                    <li><a href="index.html" class="nav-btn">Home</a></li>
-                    <li><a href="login.html" class="nav-btn">Admin</a></li>
-                    <li><a href="admin-dashboard.html" class="nav-btn">Dashboard</a></li>
-                    <li><a href="oil.html" class="nav-btn">Oil</a></li>
-                    <li><a href="#" class="nav-btn">Contact</a></li>
-                    <li><a href="#" class="nav-btn">Blog</a></li>
-                    <li><a href="#" class="nav-btn">button2</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-    <main class="container">
-        <section class="fluent-card">
-            <h2>About This Site</h2>
-            <p>
-                This is a responsive, dark-themed homepage with a Fluent Design-inspired navigation menu. Resize the window to see the menu adapt for mobile devices.
-            </p>
-        </section>
-    </main>
-    <footer class="fluent-footer">
-        <div class="container">
-            <p>&copy; 2025 Josh Burt</p>
-        </div>
-    </footer>
+  <header>
+    <h1>Welcome to the Dark Zone</h1>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section id="home" class="hero">
+    <h2>Dark Design, Bold Impact</h2>
+    <p>Experience the elegance of black and the intensity of red.</p>
+  </section>
+
+  <section id="features">
+    <h2>Features</h2>
+    <ul>
+      <li>🔥 Sleek modern design</li>
+      <li>🩸 Vivid red accents</li>
+      <li>💻 Fully responsive layout</li>
+    </ul>
+  </section>
+
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <form>
+      <input type="text" placeholder="Your Name" required />
+      <input type="email" placeholder="Your Email" required />
+      <textarea placeholder="Your Message" required></textarea>
+      <button type="submit">Send</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 DarkZone. All rights reserved.</p>
+  </footer>
 </body>
 </html>
