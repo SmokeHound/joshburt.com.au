@@ -1,0 +1,182 @@
+/* Reset and base settings */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #000;
+  color: #f00;
+}
+
+/* Container */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* Header */
+header {
+  background: #111;
+  padding: 20px 0;
+  border-bottom: 2px solid #f00;
+  text-align: center;
+  position: relative;
+}
+
+header h1 {
+  margin-bottom: 10px;
+}
+
+nav {
+  margin-bottom: 10px;
+}
+
+nav a {
+  margin: 0 15px;
+  font-weight: bold;
+  color: #f00;
+  text-decoration: none;
+}
+
+nav a:hover {
+  color: #fff;
+}
+
+/* Toggle button */
+#toggle-theme {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #f00;
+  color: #000;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+#toggle-theme:hover {
+  background: #c00;
+}
+
+/* Sections */
+.section, .hero {
+  padding: 60px 0;
+  background: #1a1a1a;
+  text-align: center;
+}
+
+.section h2, .hero h2 {
+  margin-bottom: 15px;
+  font-size: 2em;
+}
+
+/* Features list */
+.section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.section ul li {
+  margin: 10px 0;
+  font-size: 1.2em;
+}
+
+/* Contact form */
+form {
+  max-width: 500px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+input, textarea {
+  background: #000;
+  color: #f00;
+  border: 1px solid #f00;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+button {
+  background: #f00;
+  color: #000;
+  border: none;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #c00;
+}
+
+/* Footer */
+footer {
+  background: #111;
+  padding: 20px 0;
+  text-align: center;
+  border-top: 2px solid #f00;
+}
+
+/* Animation */
+.animate {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 1s forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode (light-on-dark) */
+body.dark-mode {
+  background-color: #121212;
+  color: #eee;
+}
+
+body.dark-mode header,
+body.dark-mode footer {
+  background-color: #222;
+  border-color: #999;
+}
+
+body.dark-mode nav a {
+  color: #eee;
+}
+
+body.dark-mode nav a:hover {
+  color: #f00;
+}
+
+body.dark-mode .section,
+body.dark-mode .hero {
+  background-color: #1e1e1e;
+}
+
+body.dark-mode input,
+body.dark-mode textarea {
+  background: #222;
+  color: #eee;
+  border: 1px solid #666;
+}
+
+body.dark-mode button {
+  background: #eee;
+  color: #111;
+}
+
+body.dark-mode #toggle-theme {
+  background: #eee;
+  color: #111;
+}
