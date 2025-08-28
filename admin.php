@@ -12,6 +12,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+<!-- page to be updated -->
 <body>
     <header>
         <h1>Admin Dashboard</h1>
