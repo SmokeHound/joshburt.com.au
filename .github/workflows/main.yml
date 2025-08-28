@@ -15,7 +15,7 @@ jobs:
         username: ${{ secrets.ftp_username }}
         password: ${{ secrets.ftp_password }}
         server-dir: /joshburt.com.au/htdocs/
-        dry-run: true
+        dry-run: false
         exclude: |
          **/.git*
          **/.git*/**
