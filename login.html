@@ -2,50 +2,175 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Login - Dark Theme Website</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <title>Admin Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+    </style>
 </head>
-<!-- page to be updated or deleted -->
-<body>
-    <header class="fluent-header">
-        <div class="container header-content">
-            <h1>Admin Login</h1>
-            <nav class="navbar">
-                <input type="checkbox" id="nav-toggle" class="nav-toggle" />
-                <label for="nav-toggle" class="nav-toggle-label">&#9776;</label>
-                <ul class="nav-list">
-                    <li><a href="index.html" class="nav-btn">Home</a></li>
-                    <li><a href="login.html" class="nav-btn">Admin Login</a></li>
-                    <li><a href="#" class="nav-btn">Features</a></li>
-                    <li><a href="#" class="nav-btn">Contact</a></li>
-                    <li><a href="#" class="nav-btn">Blog</a></li>
-                    <li><a href="#" class="nav-btn">Gallery</a></li>
-                    <li><a href="#" class="nav-btn">Support</a></li>
-                </ul>
-            </nav>
+<body class="dark min-h-screen flex items-center justify-center font-sans p-4">
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed top-4 right-4 p-2 bg-primary text-white rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+        🌓
+    </button>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-red-500 text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+
+    <!-- Login Container -->
+    <div class="w-full max-w-md">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">Admin Login</h1>
+            <p class="text-gray-400">Please sign in to access the admin dashboard</p>
         </div>
-    </header>
-    <main class="container">
-        <section class="fluent-card">
-            <h2>Admin Login</h2>
-            <form method="post" action="admin-dashboard.php" autocomplete="off">
-                <div style="margin-bottom: 1rem;">
-                    <label for="username">Username</label><br>
-                    <input type="text" id="username" name="username" required class="input-field" autocomplete="username">
+
+        <!-- Login Card -->
+        <div class="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-700">
+            <form method="post" action="admin.php" id="login-form">
+                <!-- Username Field -->
+                <div class="mb-6">
+                    <label for="username" class="block text-sm font-medium text-white mb-2">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        required 
+                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Enter your username"
+                        autocomplete="username"
+                    >
                 </div>
-                <div style="margin-bottom: 1rem;">
-                    <label for="password">Password</label><br>
-                    <input type="password" id="password" name="password" required class="input-field" autocomplete="current-password">
+
+                <!-- Password Field -->
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-white mb-2">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                    >
                 </div>
-                <button type="submit" class="nav-btn" style="width: 100%;">Login</button>
+
+                <!-- Login Error Display -->
+                <div id="login-error" class="hidden text-red-400 text-sm mb-4"></div>
+
+                <!-- Login Button -->
+                <button 
+                    type="submit" 
+                    id="submit-login"
+                    class="w-full p-3 bg-primary text-white rounded-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-gray-800 font-medium"
+                >
+                    Sign In <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
+                </button>
             </form>
-        </section>
-    </main>
-    <footer class="fluent-footer">
-        <div class="container">
-            <p>&copy; 2025 Josh Burt</p>
+
+            <!-- Divider -->
+            <div class="mt-6 mb-6 flex items-center">
+                <div class="flex-1 border-t border-gray-600"></div>
+                <span class="px-4 text-sm text-gray-400">or</span>
+                <div class="flex-1 border-t border-gray-600"></div>
+            </div>
+
+            <!-- Back to Home -->
+            <div class="text-center">
+                <a href="index.html" class="text-primary hover:text-secondary transition-colors text-sm font-medium">
+                    ← Back to Home
+                </a>
+            </div>
         </div>
-    </footer>
+
+        <!-- Footer Info -->
+        <div class="text-center mt-6 text-sm text-gray-400">
+            <p>&copy; 2025 Josh Burt. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // Show toast notification
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `fixed bottom-4 right-4 p-4 text-white rounded shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            body.classList.toggle('light');
+            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        body.classList.add(savedTheme);
+        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+
+        // Form handling
+        const loginForm = document.getElementById('login-form');
+        const loginSpinner = document.getElementById('login-spinner');
+        const loginError = document.getElementById('login-error');
+        const submitBtn = document.getElementById('submit-login');
+
+        loginForm.addEventListener('submit', (e) => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Basic client-side validation
+            if (!username.trim() || !password.trim()) {
+                e.preventDefault();
+                showToast('Please fill in all fields');
+                return;
+            }
+
+            if (password.length < 3) {
+                e.preventDefault();
+                showToast('Password must be at least 3 characters long');
+                return;
+            }
+
+            // Show loading state
+            loginSpinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+        });
+    </script>
 </body>
 </html>

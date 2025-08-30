@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="dark min-h-screen flex flex-col font-sans">
+    <!-- Mobile Menu Toggle -->
+    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+        ☰
+    </button>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-gray-800 dark:bg-gray-800 p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+        <!-- App Branding -->
+        <h1 class="text-2xl font-bold mb-6 text-white">Admin Dashboard</h1>
+
+        <!-- Navigation -->
+        <nav>
+            <ul class="space-y-2">
+                <li><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+                <li><a href="#" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Dashboard</a></li>
+                <li><a href="#users" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Manage Users</a></li>
+                <li><a href="#analytics" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+                <li><a href="#settings" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
+                <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Theme Toggle -->
+        <div class="mt-auto">
+            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+                Toggle Light Mode
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:ml-64">
+        <!-- Sticky Header -->
+        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
+            <h2 class="text-3xl font-semibold" id="welcome-message">Welcome, Admin!</h2>
+        </header>
+
+        <!-- Content Section -->
+        <section>
+            <p class="mb-4">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
+                    <h3 class="font-semibold mb-2">User Management</h3>
+                    <p class="mb-4">Manage user accounts and permissions.</p>
+                    <button class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" onclick="showToast('User management panel loading...')">Manage Users</button>
+                </div>
+                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
+                    <h3 class="font-semibold mb-2">Analytics</h3>
+                    <p class="mb-4">View site statistics and user engagement.</p>
+                    <button class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400" onclick="showToast('Analytics dashboard loading...')">View Analytics</button>
+                </div>
+                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
+                    <h3 class="font-semibold mb-2">Site Settings</h3>
+                    <p class="mb-4">Configure website settings and preferences.</p>
+                    <button class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400" onclick="showToast('Settings panel loading...')">Site Settings</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            body.classList.toggle('light');
+            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        body.classList.add(savedTheme);
+        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            const isOpen = sidebar.classList.contains('open');
+            menuToggle.setAttribute('aria-expanded', isOpen);
+        });
+    </script>
+</body>
+</html>
