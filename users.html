@@ -19,8 +19,50 @@
     </header>
     <main class="flex-1 p-4">
         <h2 class="text-xl font-semibold mb-4">Manage Users</h2>
-        <p>This page will allow you to view, add, edit, and remove users.</p>
-        <!-- Add your user management UI here -->
+        <div class="max-w-2xl mx-auto bg-gray-800 p-6 rounded shadow">
+            <table class="w-full text-left mb-6">
+                <thead>
+                    <tr class="border-b border-gray-700">
+                        <th class="py-2">Name</th>
+                        <th class="py-2">Email</th>
+                        <th class="py-2">Role</th>
+                        <th class="py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="py-2">Josh Burt</td>
+                        <td class="py-2">josh@example.com</td>
+                        <td class="py-2">Admin</td>
+                        <td class="py-2">
+                            <button class="px-2 py-1 bg-secondary text-white rounded mr-2">Edit</button>
+                            <button class="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">Jane Doe</td>
+                        <td class="py-2">jane@example.com</td>
+                        <td class="py-2">User</td>
+                        <td class="py-2">
+                            <button class="px-2 py-1 bg-secondary text-white rounded mr-2">Edit</button>
+                            <button class="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <form class="mt-6">
+                <h3 class="font-semibold mb-2">Add New User</h3>
+                <div class="mb-2">
+                    <input type="text" placeholder="Name" class="w-full p-2 rounded bg-gray-700 text-white mb-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                    <input type="email" placeholder="Email" class="w-full p-2 rounded bg-gray-700 text-white mb-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                    <select class="w-full p-2 rounded bg-gray-700 text-white mb-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">Add User</button>
+            </form>
+        </div>
     </main>
 </body>
 </html>
