@@ -383,10 +383,50 @@
     document.getElementById('confirmSubmitBtn').addEventListener('click', submitOrder);
 
     // Initialisation
-    document.addEventListener('DOMContentLoaded', () => {
-      loadNav();
-      renderProducts();
-      renderOrder();
+    document.addEventListener('DOMContentLoaded', async () => {
+    // Load navigation bar
+    loadNav();
+
+    // Always render products, even if Firebase fails
+    renderProducts();
+
+    // Firebase Init
+    try {
+    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+    if (initialAuthToken) {
+      await signInWithCustomToken(auth, initialAuthToken);
+    } else {
+      await signInAnonymously(auth);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        userId = user.uid;
+        const orderDocPath = `artifacts/${typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'}/users/${userId}/orders/current_order`;
+        const orderRef = doc(db, orderDocPath);
+
+        onSnapshot(orderRef, (docSnap) => {
+          if (docSnap.exists() && docSnap.data().items) {
+            currentOrder = docSnap.data().items;
+          } else {
+            currentOrder = {};
+          }
+          renderOrder();
+        }, (error) => {
+          console.error("Error fetching order data: ", error);
+          showToast("Failed to sync order data.", "error");
+        });
+      }
+    });
+    } catch (e) {
+    console.error("Firebase initialization failed:", e);
+    showToast("Application failed to initialize.", "error");
+    }
     });
   </script>
 </body>
