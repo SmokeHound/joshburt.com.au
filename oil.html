@@ -285,11 +285,12 @@
 
       orderedItems.forEach(([name, item]) => {
         totalItems += item.quantity;
+        const oil = oils.find(o => o.name === name);
         const listItemHtml = `
           <li class="list-group-item d-flex justify-content-between align-items-center order-item">
             <div class="flex-grow-1 me-2">
                 <span class="fw-bold d-block">${name}</span>
-                <small class="text-muted d-block">${item.specs}</small>
+                <small class="text-muted d-block">${oil ? 'Code: ' + oil.code : ''}</small>
             </div>
             <div class="d-flex align-items-center quantity-control">
                 <button class="btn btn-sm btn-outline-secondary rounded-circle me-1 decrease-quantity" data-name="${name}">-</button>
@@ -342,10 +343,10 @@
       confirmModal.hide();
 
       // Generate CSV
-      let csv = 'Product Code,Product Name,Specs,Quantity\n';
+      let csv = 'Product Code,Quantity,Product Name\n';
       Object.values(currentOrder).forEach(item => {
         const oil = oils.find(o => o.name === item.name);
-        csv += `"${oil ? oil.code : ''}","${item.name}","${item.specs}","${item.quantity}"\n`;
+        csv += `"${oil ? oil.code : ''}","${item.quantity}","${item.name}"\n`;
       });
 
       // Create and download CSV file
