@@ -12,40 +12,61 @@
   <style>
     :root {
       --sidebar-width: 270px;
+      --primary-green: #27ae60;
+      --accent-red: #e74c3c;
+      --background-dark: #181a1b;
+      --card-dark: #232526;
+      --text-white: #f5f5f5;
+      --text-grey: #b0b3b8;
     }
     body {
       font-family: 'Inter', sans-serif;
+      background-color: var(--background-dark);
+      color: var(--text-white);
       transition: background-color 0.3s, color 0.3s;
     }
     .sidebar {
-      width: var(--sidebar-width);
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      overflow-y: auto;
-      transition: background-color 0.3s;
+      background-color: var(--card-dark);
+      color: var(--text-white);
     }
     main {
       margin-left: var(--sidebar-width);
       padding-top: 20px;
     }
+    .nav-link {
+      color: var(--text-grey);
+    }
     .nav-link.active {
+      color: var(--primary-green);
       font-weight: bold;
+      background-color: var(--card-dark);
+      border-bottom: 2px solid var(--primary-green);
     }
     .card {
+      background-color: var(--card-dark);
+      color: var(--text-white);
       border-radius: 0.75rem;
-      transition: transform 0.2s;
+      transition: transform 0.2s, background-color 0.3s;
+      border: 1px solid var(--primary-green);
     }
     .card:hover {
       transform: translateY(-5px);
+      border-color: var(--accent-red);
     }
-    .btn-add-to-cart {
+    .btn-add-to-cart, .btn-add-to-order {
+      background-color: var(--primary-green);
+      color: var(--text-white);
       border-radius: 9999px;
       padding: 0.5rem 1.5rem;
       transition: all 0.2s;
     }
+    .btn-add-to-cart:hover, .btn-add-to-order:hover {
+      background-color: var(--accent-red);
+      color: var(--text-white);
+    }
     .order-item {
+      background-color: var(--card-dark);
+      color: var(--text-white);
       transition: all 0.3s ease-in-out;
     }
     .fade-out {
@@ -53,34 +74,93 @@
       transform: translateX(20px);
     }
     #orderContainer {
+      background-color: var(--card-dark);
+      color: var(--text-white);
       position: sticky;
       top: 20px;
       max-height: calc(100vh - 40px);
       overflow-y: auto;
     }
     .quantity-control button {
-        border: none;
-        background-color: transparent;
-        color: var(--bs-primary);
-        font-size: 1.25rem;
-        padding: 0 0.5rem;
+      border: none;
+      background-color: transparent;
+      color: var(--primary-green);
+      font-size: 1.25rem;
+      padding: 0 0.5rem;
+    }
+    .quantity-control button.btn-danger {
+      color: var(--accent-red);
     }
     .quantity-control span {
-        font-size: 1.1rem;
-        font-weight: bold;
-        min-width: 2rem;
-        text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      min-width: 2rem;
+      text-align: center;
+      color: var(--text-white);
     }
     .spinner-border-sm {
-        width: 1rem;
-        height: 1rem;
-        border-width: 0.15em;
+      width: 1rem;
+      height: 1rem;
+      border-width: 0.15em;
+      color: var(--primary-green);
+    }
+    .toast-container .toast {
+      background-color: var(--card-dark);
+      color: var(--text-white);
+      border-left: 5px solid var(--primary-green);
+    }
+    .text-bg-success {
+      background-color: var(--primary-green) !important;
+      color: var(--text-white) !important;
+    }
+    .text-bg-danger {
+      background-color: var(--accent-red) !important;
+      color: var(--text-white) !important;
+    }
+    .text-bg-primary {
+      background-color: var(--card-dark) !important;
+      color: var(--text-white) !important;
+    }
+    .btn-primary {
+      background-color: var(--primary-green);
+      border-color: var(--primary-green);
+    }
+    .btn-primary:hover {
+      background-color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-secondary {
+      background-color: var(--card-dark);
+      color: var(--text-white);
+      border-color: var(--text-grey);
+    }
+    .btn-secondary:hover {
+      background-color: var(--primary-green);
+      color: var(--text-white);
+      border-color: var(--primary-green);
+    }
+    .btn-success {
+      background-color: var(--primary-green);
+      border-color: var(--primary-green);
+    }
+    .btn-success:hover {
+      background-color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger {
+      background-color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--primary-green);
+      border-color: var(--primary-green);
     }
     @media (max-width: 767.98px) {
       .sidebar {
         width: 100%;
         height: auto;
         position: relative;
+        background-color: var(--card-dark);
       }
       main {
         margin-left: 0;
