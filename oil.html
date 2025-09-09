@@ -416,10 +416,10 @@
 
     function renderProductsByType(type) {
       productsContainer.innerHTML = '';
-      oils.filter(oil => oil.type === type).forEach((oil, index) => {
+      oils.filter(oil => oil.type === type).forEach((oil) => {
         const cardHtml = `
           <div class="col">
-            <div class="card h-100 shadow-sm rounded-4 product-card" data-index="${index}">
+            <div class="card h-100 shadow-sm rounded-4 product-card" data-index="${oils.indexOf(oil)}">
               <div class="card-body">
                 <h5 class="card-title fw-bold cursor-pointer" style="cursor:pointer;">${oil.name}</h5>
                 <div class="d-flex justify-content-end mb-2">
