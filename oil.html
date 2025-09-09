@@ -155,15 +155,7 @@
 
   <!-- Firebase -->
   <script type="module">
-    // Firebase imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, addDoc, collection, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    setLogLevel('debug');
-
-    // Utility to show toast notifications
+  // Utility to show toast notifications
     const showToast = (message, type = 'info') => {
         const toastContainer = document.getElementById('toastContainer');
         const toastId = `toast-${Date.now()}`;
@@ -230,8 +222,7 @@
 
     // Global Firebase variables
     let db, auth;
-    let userId;
-    let currentOrder = {};
+  let currentOrder = {};
 
     // DOM Elements
     const productsContainer = document.getElementById('productsContainer');
@@ -312,8 +303,7 @@
     };
 
     // Add or update item in the order and Firestore
-    const updateOrder = async (name, quantityChange) => {
-      if (!userId) return;
+    const updateOrder = (name, quantityChange) => {
       loadingIndicator.style.display = 'inline-block';
       const item = currentOrder[name];
       let newQuantity = item ? item.quantity + quantityChange : 1;
@@ -336,43 +326,24 @@
           }
         }
       }
-
-      const orderRef = doc(db, 'artifacts', typeof __app_id !== 'undefined' ? __app_id : 'default-app-id', 'users', userId, 'orders', 'current_order');
-      await setDoc(orderRef, { items: currentOrder }, { merge: true });
+      renderOrder();
       loadingIndicator.style.display = 'none';
     };
 
     // Handle order submission
-    const submitOrder = async () => {
-      if (!userId || Object.keys(currentOrder).length === 0) {
+    const submitOrder = () => {
+      if (Object.keys(currentOrder).length === 0) {
         showToast('Your order is empty.', 'error');
         return;
       }
-
       loadingIndicator.style.display = 'inline-block';
       confirmModal.hide();
-
-      try {
-        const historyRef = collection(db, 'artifacts', typeof __app_id !== 'undefined' ? __app_id : 'default-app-id', 'users', userId, 'history');
-        
-        // Add order to history
-        await addDoc(historyRef, {
-          items: currentOrder,
-          submittedAt: serverTimestamp(),
-          status: 'pending'
-        });
-
-        // Clear the current order
-        const currentOrderRef = doc(db, 'artifacts', typeof __app_id !== 'undefined' ? __app_id : 'default-app-id', 'users', userId, 'orders', 'current_order');
-        await setDoc(currentOrderRef, { items: {} }); // Clear order in Firestore
-
-        showToast('Order submitted successfully!', 'success');
-      } catch (e) {
-        console.error("Error submitting order:", e);
-        showToast('Failed to submit order. Please try again.', 'error');
-      } finally {
+      setTimeout(() => {
+        showToast('Order submitted! (offline mode)', 'success');
+        currentOrder = {};
+        renderOrder();
         loadingIndicator.style.display = 'none';
-      }
+      }, 800);
     };
 
     // Event listeners for product cards (delegation)
@@ -412,49 +383,10 @@
     document.getElementById('confirmSubmitBtn').addEventListener('click', submitOrder);
 
     // Initialisation
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Load navigation bar
+    document.addEventListener('DOMContentLoaded', () => {
       loadNav();
-
-      // Firebase Init
-      try {
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        if (initialAuthToken) {
-            await signInWithCustomToken(auth, initialAuthToken);
-        } else {
-            await signInAnonymously(auth);
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-                const orderDocPath = `artifacts/${typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'}/users/${userId}/orders/current_order`;
-                const orderRef = doc(db, orderDocPath);
-
-                onSnapshot(orderRef, (docSnap) => {
-                    if (docSnap.exists() && docSnap.data().items) {
-                        currentOrder = docSnap.data().items;
-                    } else {
-                        currentOrder = {};
-                    }
-                    renderOrder();
-                }, (error) => {
-                    console.error("Error fetching order data: ", error);
-                    showToast("Failed to sync order data.", "error");
-                });
-            }
-        });
-        
-        renderProducts();
-      } catch (e) {
-        console.error("Firebase initialization failed:", e);
-        showToast("Application failed to initialize.", "error");
-      }
+      renderProducts();
+      renderOrder();
     });
   </script>
 </body>
