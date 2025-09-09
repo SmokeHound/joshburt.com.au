@@ -229,7 +229,7 @@
   <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
   <!-- Order Confirmation Modal -->
-  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -267,9 +267,21 @@
             </div>`;
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
         const toastEl = document.getElementById(toastId);
-        const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
-        toast.show();
-        toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+        
+        // Try to use Bootstrap Toast if available, otherwise use simple timeout
+        try {
+          if (typeof bootstrap !== 'undefined') {
+            const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+            toast.show();
+            toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+          } else {
+            // Fallback: show for 5 seconds then remove
+            setTimeout(() => toastEl.remove(), 5000);
+          }
+        } catch (e) {
+          // Fallback: show for 5 seconds then remove
+          setTimeout(() => toastEl.remove(), 5000);
+        }
     };
 
     // Castrol oil product data from the provided spreadsheets
@@ -354,7 +366,7 @@
     const totalItemsSpan = document.getElementById('totalItems');
     const submitOrderBtn = document.getElementById('submitOrderBtn');
     const loadingIndicator = document.getElementById('loading-indicator');
-    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    let confirmModal;
     const modalOrderSummary = document.getElementById('modalOrderSummary');
 
     // Load navigation bar
@@ -465,7 +477,11 @@
         return;
       }
       loadingIndicator.style.display = 'inline-block';
-      confirmModal.hide();
+      
+      // Hide modal if it exists
+      if (confirmModal) {
+        confirmModal.hide();
+      }
 
       // Generate CSV
       let csv = 'Product Code,Quantity,Product Name\n';
@@ -543,33 +559,100 @@
       renderProductsByType(currentType);
     });
 
-    // Replace renderProducts with renderProductsByType
+    // Initialize the page and event handlers
     document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Bootstrap modal only if Bootstrap is available
+      try {
+        if (typeof bootstrap !== 'undefined') {
+          confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        }
+      } catch (e) {
+        console.warn('Bootstrap not available, modal functionality will be limited');
+      }
+
       loadNav();
       renderProductsByType(currentType);
       renderOrder();
+      setupEventHandlers();
     });
 
-    productsContainer.addEventListener('click', (e) => {
+    // Setup all event handlers
+    const setupEventHandlers = () => {
+      // Product container events (add to order, toggle details)
+      productsContainer.addEventListener('click', (e) => {
         const button = e.target.closest('.btn-add-to-order');
         if (button) {
-            const index = button.getAttribute('data-index');
-            const oil = oils[index];
-            if (oil) {
-                updateOrder(oil.name, 1);
-            }
-            return;
+          const index = button.getAttribute('data-index');
+          const oil = oils[index];
+          if (oil) {
+            updateOrder(oil.name, 1);
+          }
+          return;
         }
         // Toggle product details when clicking the heading
         const cardTitle = e.target.closest('.card-title');
         if (cardTitle) {
-            const cardBody = cardTitle.parentElement;
-            const details = cardBody.querySelector('.product-details');
-            if (details) {
-                details.style.display = details.style.display === 'none' ? 'block' : 'none';
-            }
+          const cardBody = cardTitle.parentElement;
+          const details = cardBody.querySelector('.product-details');
+          if (details) {
+            details.style.display = details.style.display === 'none' ? 'block' : 'none';
+          }
         }
-    });
+      });
+
+      // Order items container events (quantity controls, remove items)
+      orderItemsContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('button');
+        if (!button) return;
+
+        const itemName = button.getAttribute('data-name');
+        if (!itemName) return;
+
+        if (button.classList.contains('decrease-quantity')) {
+          updateOrder(itemName, -1);
+        } else if (button.classList.contains('increase-quantity')) {
+          updateOrder(itemName, 1);
+        } else if (button.classList.contains('remove-item')) {
+          updateOrder(itemName, -currentOrder[itemName].quantity);
+        }
+      });
+
+      // Submit order button event
+      submitOrderBtn.addEventListener('click', () => {
+        if (Object.keys(currentOrder).length === 0) {
+          showToast('Your order is empty.', 'error');
+          return;
+        }
+
+        // Show confirmation modal if Bootstrap is available, otherwise submit directly
+        if (confirmModal) {
+          // Populate modal with order summary
+          modalOrderSummary.innerHTML = '';
+          Object.values(currentOrder).forEach(item => {
+            const oil = oils.find(o => o.name === item.name);
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item d-flex justify-content-between';
+            listItem.innerHTML = `
+              <span>${item.name} (${oil ? oil.code : 'N/A'})</span>
+              <span>Qty: ${item.quantity}</span>
+            `;
+            modalOrderSummary.appendChild(listItem);
+          });
+          confirmModal.show();
+        } else {
+          // Direct submit if modal not available
+          submitOrder();
+        }
+      });
+
+      // Confirmation modal submit button
+      const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
+      if (confirmSubmitBtn) {
+        confirmSubmitBtn.addEventListener('click', () => {
+          submitOrder();
+        });
+      }
+    };
   </script>
 </body>
 </html>
