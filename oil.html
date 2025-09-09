@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Castrol Order Form</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Custom Styles -->
+  <style>
+    :root {
+      --sidebar-width: 270px;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
+      transition: background-color 0.3s;
+    }
+    main {
+      margin-left: var(--sidebar-width);
+      padding-top: 20px;
+    }
+    .nav-link.active {
+      font-weight: bold;
+    }
+    .card {
+      border-radius: 0.75rem;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .btn-add-to-cart {
+      border-radius: 9999px;
+      padding: 0.5rem 1.5rem;
+      transition: all 0.2s;
+    }
+    .order-item {
+      transition: all 0.3s ease-in-out;
+    }
+    .fade-out {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    #orderContainer {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+    }
+    .quantity-control button {
+        border: none;
+        background-color: transparent;
+        color: var(--bs-primary);
+        font-size: 1.25rem;
+        padding: 0 0.5rem;
+    }
+    .quantity-control span {
+        font-size: 1.1rem;
+        font-weight: bold;
+        min-width: 2rem;
+        text-align: center;
+    }
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.15em;
+    }
+    @media (max-width: 767.98px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      main {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Nav placeholder -->
+  <div id="nav-placeholder"></div>
+
+  <!-- Main content -->
+  <main class="container-fluid mt-4">
+    <div class="row">
+      <!-- Product Selection Area -->
+      <div class="col-lg-8">
+        <h1>Castrol Products</h1>
+        <p class="text-muted">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
+        <div id="productsContainer" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+          <!-- Product cards will be dynamically inserted here -->
+          <div class="col"><div class="card p-4 text-center"><div class="spinner-border text-primary" role="status"></div><p>Loading products...</p></div></div>
+        </div>
+      </div>
+
+      <!-- Order Form Area -->
+      <div class="col-lg-4 mt-4 mt-lg-0">
+        <div id="orderContainer" class="card shadow p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 mb-0">Your Order <i class="bi bi-cart"></i></h2>
+            <div id="loading-indicator" class="spinner-border text-primary spinner-border-sm" role="status" style="display: none;"></div>
+          </div>
+          <div id="orderItems" class="list-group list-group-flush border-bottom mb-3">
+            <!-- Order items will be dynamically inserted here -->
+          </div>
+          <div id="orderSummary" class="d-flex justify-content-between fw-bold mb-3">
+            <span>Total Items:</span>
+            <span id="totalItems">0</span>
+          </div>
+          <button id="submitOrderBtn" class="btn btn-primary btn-lg w-100" disabled>
+            Submit Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Container for messages -->
+  <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+  <!-- Order Confirmation Modal -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmModalLabel">Confirm Order</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to submit this order?</p>
+          <ul id="modalOrderSummary" class="list-group list-group-flush"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" id="confirmSubmitBtn">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Firebase -->
+  <script type="module">
+    // Firebase imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc, addDoc, collection, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    setLogLevel('debug');
+
+    // Utility to show toast notifications
+    const showToast = (message, type = 'info') => {
+        const toastContainer = document.getElementById('toastContainer');
+        const toastId = `toast-${Date.now()}`;
+        const bgClass = type === 'success' ? 'text-bg-success' : type === 'error' ? 'text-bg-danger' : 'text-bg-primary';
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>`;
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+        const toastEl = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+        toast.show();
+        toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+    };
+
+    // Castrol oil product data from the provided spreadsheets
+    const oils = [
+      { name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6" },
+      { name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6, Jaguar Land Rover STJLR.03.5006, GM dexos1™ Gen 3, Chrysler MS 6395, MB-Approval 229.71" },
+      { name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+, MB-Approval 229.71/ 229.72, Porsche C20, VW 508 00/ 509 00, Ford WSS-M2C956-A1" },
+      { name: "EDGE 0W-30 C2", specs: "ACEA C2, STJLR.03.5007" },
+      { name: "EDGE 0W-30", specs: "ACEA C2/C3, API SQ, BMW Longlife-04" },
+      { name: "EDGE 0W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51" },
+      { name: "EDGE 0W-40 A3/B4", specs: "ACEA A3/B4, API SP, BMW Longlife-01, MB-Approval 229.5, Porsche A40, Renault RN 0700/RN 0710, VW 502 00/505 00" },
+      { name: "EDGE 5W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51, Porsche C30, VW 504 00/507 00" },
+      { name: "EDGE 5W-30 A3/B4", specs: "ACEA A3/B4, API SL, BMW Longlife-01, MB-Approval 229.5, VW 502 00/505 00" },
+      { name: "EDGE 5W-30 M", specs: "ACEA C3, API SQ, BMW Longlife-04" },
+      { name: "EDGE 5W-40 A3/B4", specs: "ACEA A3/B3, A3/B4, API SN/CF, BMW Longlife-01" },
+      { name: "EDGE 5W-40 M", specs: "ACEA C3, API SN, BMW Longlife-04, Porsche C40, VW 511 00" },
+      { name: "EDGE 5W-50 S", specs: "API SP, Meets Ford WSS-M2C931-C" },
+      { name: "EDGE 10W-30", specs: "API SP, CF, ILSAC GF-6" },
+      { name: "EDGE 10W-60", specs: "ACEA A3/B3, A3/B4, API SN/CF" },
+      { name: "EDGE 25W-50", specs: "API SG/CD" },
+      { name: "EDGE PROFESSIONAL A1 5W-20", specs: "ACEA A1/B1, API SL, ILSAC GF-3" },
+      { name: "EDGE PROFESSIONAL A5 0W-30", specs: "ACEA A1/B1, A5/B5, API SL/CF" },
+      { name: "EDGE PROFESSIONAL A5 5W-30", specs: "ACEA A1/B1, A5/B5, API SN/CF" },
+      { name: "EDGE PROFESSIONAL C1 5W-30", specs: "ACEA C1, STJLR.03.5005" },
+      { name: "EDGE PROFESSIONAL EC 0W-20", specs: "ACEA C5, STJLR.03.5006, STJLR.51.5122" },
+      { name: "EDGE PROFESSIONAL E 0W-30", specs: "ACEA C2, STJLR.03.5007" },
+      { name: "EDGE PROFESSIONAL V 0W-20", specs: "ACEA C5, Volvo VCC RBS0-2AE" },
+      { name: "MAGNATEC HYBRID 0W-16", specs: "API SP, ILSAC GF-6B" },
+      { name: "MAGNATEC 0W-20", specs: "API SP, ILSAC GF-6" },
+      { name: "MAGNATEC 0W-20 C5", specs: "ACEA C5, API SQ" },
+      { name: "MAGNATEC 0W-20 E", specs: "Ford WSS-M2C954-A1" },
+      { name: "MAGNATEC 0W-30 D", specs: "ACEA C2, API SN, Ford WSS-M2C950-A" },
+      { name: "MAGNATEC 5W-20", specs: "API SP, ILSAC GF-6, Ford WSS-M2C960-A1" },
+      { name: "MAGNATEC 5W-30", specs: "API SN/CF, ACEA A3/B4, MB-Approval 229.3, VW 502 00/505 00, Renault RN0700/RN0710" },
+      { name: "MAGNATEC 5W-30 A", specs: "ACEA A5/B5, API SN, ILSAC GF-5, Ford WSS-M2C913-C/D" },
+      { name: "MAGNATEC 5W-30 A5", specs: "ACEA A5/B5, API SN, Ford WSS-M2C913-D" },
+      { name: "MAGNATEC 5W-30 DX", specs: "API SN, ILSAC GF-5, GM dexos1™ Gen 2" },
+      { name: "MAGNATEC 5W-40", specs: "API SN, ACEA A3/B4, BMW Longlife-01, MB-Approval 229.3" },
+      { name: "MAGNATEC 5W-40 SN/C3", specs: "API SN, ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51, VW 502 00/505 00/505 01" },
+      { name: "MAGNATEC 5W-40 SP C3", specs: "API SP, ACEA C3, MB-Approval 229.31/229.51, VW 502 00/505 00/505 01" },
+      { name: "MAGNATEC 10W-30", specs: "API SP, ILSAC GF-6" },
+      { name: "MAGNATEC 10W-40", specs: "API SP, ACEA A3/B4" },
+      { name: "MAGNATEC 15W-40", specs: "API SP, ACEA A3/B4" },
+      { name: "MAGNATEC SUV 5W-30 C3", specs: "ACEA C2/C3, API SP" },
+      { name: "MAGNATEC DIESEL DX 5W-40", specs: "API SN/CF, ACEA C3, GM dexos® 2" },
+      { name: "MAGNATEC DIESEL 15W-40", specs: "API SP" },
+    ];
+
+    // Global Firebase variables
+    let db, auth;
+    let userId;
+    let currentOrder = {};
+
+    // DOM Elements
+    const productsContainer = document.getElementById('productsContainer');
+    const orderItemsContainer = document.getElementById('orderItems');
+    const totalItemsSpan = document.getElementById('totalItems');
+    const submitOrderBtn = document.getElementById('submitOrderBtn');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    const modalOrderSummary = document.getElementById('modalOrderSummary');
+
+    // Load navigation bar
+    async function loadNav() {
+      try {
+        const res = await fetch('nav.html');
+        if (!res.ok) throw new Error('Failed to load navigation');
+        const html = await res.text();
+        document.getElementById('nav-placeholder').innerHTML = html;
+      } catch (e) {
+        showToast('Navigation failed to load', 'error');
+      }
+    }
+
+    // Render product cards
+    const renderProducts = () => {
+      productsContainer.innerHTML = ''; // Clear loading message
+      oils.forEach((oil, index) => {
+        const cardHtml = `
+          <div class="col">
+            <div class="card h-100 shadow-sm rounded-4">
+              <div class="card-body">
+                <h5 class="card-title fw-bold">${oil.name}</h5>
+                <p class="card-text text-muted">${oil.specs}</p>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary btn-sm rounded-pill btn-add-to-order" data-index="${index}">
+                      <i class="bi bi-plus-lg me-1"></i> Add
+                    </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        productsContainer.insertAdjacentHTML('beforeend', cardHtml);
+      });
+    };
+
+    // Render the order summary
+    const renderOrder = () => {
+      orderItemsContainer.innerHTML = '';
+      let totalItems = 0;
+      const orderedItems = Object.entries(currentOrder);
+
+      if (orderedItems.length === 0) {
+        orderItemsContainer.innerHTML = '<li class="list-group-item text-muted text-center">Your order is empty.</li>';
+        submitOrderBtn.disabled = true;
+      } else {
+        submitOrderBtn.disabled = false;
+      }
+
+      orderedItems.forEach(([name, item]) => {
+        totalItems += item.quantity;
+        const listItemHtml = `
+          <li class="list-group-item d-flex justify-content-between align-items-center order-item">
+            <div class="flex-grow-1 me-2">
+                <span class="fw-bold d-block">${name}</span>
+                <small class="text-muted d-block">${item.specs}</small>
+            </div>
+            <div class="d-flex align-items-center quantity-control">
+                <button class="btn btn-sm btn-outline-secondary rounded-circle me-1 decrease-quantity" data-name="${name}">-</button>
+                <span class="fw-bold">${item.quantity}</span>
+                <button class="btn btn-sm btn-outline-secondary rounded-circle ms-1 increase-quantity" data-name="${name}">+</button>
+                <button class="btn btn-sm btn-danger rounded-circle ms-2 remove-item" data-name="${name}"><i class="bi bi-trash"></i></button>
+            </div>
+          </li>
+        `;
+        orderItemsContainer.insertAdjacentHTML('beforeend', listItemHtml);
+      });
+      totalItemsSpan.textContent = totalItems;
+    };
+
+    // Add or update item in the order and Firestore
+    const updateOrder = async (name, quantityChange) => {
+      if (!userId) return;
+      loadingIndicator.style.display = 'inline-block';
+      const item = currentOrder[name];
+      let newQuantity = item ? item.quantity + quantityChange : 1;
+
+      if (newQuantity <= 0) {
+        // Remove item if quantity is zero or less
+        delete currentOrder[name];
+        showToast(`${name} removed from order.`, 'info');
+      } else {
+        if (item) {
+          // Update existing item
+          currentOrder[name].quantity = newQuantity;
+          showToast(`Updated quantity for ${name}.`, 'info');
+        } else {
+          // Add new item
+          const oil = oils.find(o => o.name === name);
+          if (oil) {
+            currentOrder[name] = { name: oil.name, specs: oil.specs, quantity: 1 };
+            showToast(`${oil.name} added to order!`, 'success');
+          }
+        }
+      }
+
+      const orderRef = doc(db, 'artifacts', typeof __app_id !== 'undefined' ? __app_id : 'default-app-id', 'users', userId, 'orders', 'current_order');
+      await setDoc(orderRef, { items: currentOrder }, { merge: true });
+      loadingIndicator.style.display = 'none';
+    };
+
+    // Handle order submission
+    const submitOrder = async () => {
+      if (!userId || Object.keys(currentOrder).length === 0) {
+        showToast('Your order is empty.', 'error');
+        return;
+      }
+
+      loadingIndicator.style.display = 'inline-block';
+      confirmModal.hide();
+
+      try {
+        const historyRef = collection(db, 'artifacts', typeof __app_id !== 'undefined' ? __app_id : 'default-app-id', 'users', userId, 'history');
+        
+        // Add order to history
+        await addDoc(historyRef, {
+          items: currentOrder,
+          submittedAt: serverTimestamp(),
+          status: 'pending'
+        });
+
+        // Clear the current order
+        const currentOrderRef = doc(db, 'artifacts', typeof __app_id !== 'undefined' ? __app_id : 'default-app-id', 'users', userId, 'orders', 'current_order');
+        await setDoc(currentOrderRef, { items: {} }); // Clear order in Firestore
+
+        showToast('Order submitted successfully!', 'success');
+      } catch (e) {
+        console.error("Error submitting order:", e);
+        showToast('Failed to submit order. Please try again.', 'error');
+      } finally {
+        loadingIndicator.style.display = 'none';
+      }
+    };
+
+    // Event listeners for product cards (delegation)
+    productsContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('.btn-add-to-order');
+        if (button) {
+            const index = button.getAttribute('data-index');
+            const oilName = oils[index].name;
+            updateOrder(oilName, 1);
+        }
+    });
+
+    // Event listeners for order summary controls (delegation)
+    orderItemsContainer.addEventListener('click', (e) => {
+        const target = e.target.closest('button');
+        if (!target) return;
+        const name = target.getAttribute('data-name');
+        if (target.classList.contains('increase-quantity')) {
+            updateOrder(name, 1);
+        } else if (target.classList.contains('decrease-quantity')) {
+            updateOrder(name, -1);
+        } else if (target.classList.contains('remove-item')) {
+            updateOrder(name, -currentOrder[name].quantity);
+        }
+    });
+
+    // Event listener for Submit button
+    submitOrderBtn.addEventListener('click', () => {
+        modalOrderSummary.innerHTML = '';
+        Object.entries(currentOrder).forEach(([name, item]) => {
+            modalOrderSummary.innerHTML += `<li class="list-group-item d-flex justify-content-between">${name} <span class="badge bg-primary rounded-pill">${item.quantity}</span></li>`;
+        });
+        confirmModal.show();
+    });
+
+    // Event listener for Confirm button in the modal
+    document.getElementById('confirmSubmitBtn').addEventListener('click', submitOrder);
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Load navigation bar
+      loadNav();
+
+      // Firebase Init
+      try {
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        if (initialAuthToken) {
+            await signInWithCustomToken(auth, initialAuthToken);
+        } else {
+            await signInAnonymously(auth);
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                const orderDocPath = `artifacts/${typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'}/users/${userId}/orders/current_order`;
+                const orderRef = doc(db, orderDocPath);
+
+                onSnapshot(orderRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().items) {
+                        currentOrder = docSnap.data().items;
+                    } else {
+                        currentOrder = {};
+                    }
+                    renderOrder();
+                }, (error) => {
+                    console.error("Error fetching order data: ", error);
+                    showToast("Failed to sync order data.", "error");
+                });
+            }
+        });
+        
+        renderProducts();
+      } catch (e) {
+        console.error("Firebase initialization failed:", e);
+        showToast("Application failed to initialize.", "error");
+      }
+    });
+  </script>
+</body>
+</html>
