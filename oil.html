@@ -176,48 +176,47 @@
 
     // Castrol oil product data from the provided spreadsheets
     const oils = [
-      { name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6" },
-      { name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6, Jaguar Land Rover STJLR.03.5006, GM dexos1™ Gen 3, Chrysler MS 6395, MB-Approval 229.71" },
-      { name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+, MB-Approval 229.71/ 229.72, Porsche C20, VW 508 00/ 509 00, Ford WSS-M2C956-A1" },
-      { name: "EDGE 0W-30 C2", specs: "ACEA C2, STJLR.03.5007" },
-      { name: "EDGE 0W-30", specs: "ACEA C2/C3, API SQ, BMW Longlife-04" },
-      { name: "EDGE 0W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51" },
-      { name: "EDGE 0W-40 A3/B4", specs: "ACEA A3/B4, API SP, BMW Longlife-01, MB-Approval 229.5, Porsche A40, Renault RN 0700/RN 0710, VW 502 00/505 00" },
-      { name: "EDGE 5W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51, Porsche C30, VW 504 00/507 00" },
-      { name: "EDGE 5W-30 A3/B4", specs: "ACEA A3/B4, API SL, BMW Longlife-01, MB-Approval 229.5, VW 502 00/505 00" },
-      { name: "EDGE 5W-30 M", specs: "ACEA C3, API SQ, BMW Longlife-04" },
-      { name: "EDGE 5W-40 A3/B4", specs: "ACEA A3/B3, A3/B4, API SN/CF, BMW Longlife-01" },
-      { name: "EDGE 5W-40 M", specs: "ACEA C3, API SN, BMW Longlife-04, Porsche C40, VW 511 00" },
-      { name: "EDGE 5W-50 S", specs: "API SP, Meets Ford WSS-M2C931-C" },
-      { name: "EDGE 10W-30", specs: "API SP, CF, ILSAC GF-6" },
-      { name: "EDGE 10W-60", specs: "ACEA A3/B3, A3/B4, API SN/CF" },
-      { name: "EDGE 25W-50", specs: "API SG/CD" },
-      { name: "EDGE PROFESSIONAL A1 5W-20", specs: "ACEA A1/B1, API SL, ILSAC GF-3" },
-      { name: "EDGE PROFESSIONAL A5 0W-30", specs: "ACEA A1/B1, A5/B5, API SL/CF" },
-      { name: "EDGE PROFESSIONAL A5 5W-30", specs: "ACEA A1/B1, A5/B5, API SN/CF" },
-      { name: "EDGE PROFESSIONAL C1 5W-30", specs: "ACEA C1, STJLR.03.5005" },
-      { name: "EDGE PROFESSIONAL EC 0W-20", specs: "ACEA C5, STJLR.03.5006, STJLR.51.5122" },
-      { name: "EDGE PROFESSIONAL E 0W-30", specs: "ACEA C2, STJLR.03.5007" },
-      { name: "EDGE PROFESSIONAL V 0W-20", specs: "ACEA C5, Volvo VCC RBS0-2AE" },
-      { name: "MAGNATEC HYBRID 0W-16", specs: "API SP, ILSAC GF-6B" },
-      { name: "MAGNATEC 0W-20", specs: "API SP, ILSAC GF-6" },
-      { name: "MAGNATEC 0W-20 C5", specs: "ACEA C5, API SQ" },
-      { name: "MAGNATEC 0W-20 E", specs: "Ford WSS-M2C954-A1" },
-      { name: "MAGNATEC 0W-30 D", specs: "ACEA C2, API SN, Ford WSS-M2C950-A" },
-      { name: "MAGNATEC 5W-20", specs: "API SP, ILSAC GF-6, Ford WSS-M2C960-A1" },
-      { name: "MAGNATEC 5W-30", specs: "API SN/CF, ACEA A3/B4, MB-Approval 229.3, VW 502 00/505 00, Renault RN0700/RN0710" },
-      { name: "MAGNATEC 5W-30 A", specs: "ACEA A5/B5, API SN, ILSAC GF-5, Ford WSS-M2C913-C/D" },
-      { name: "MAGNATEC 5W-30 A5", specs: "ACEA A5/B5, API SN, Ford WSS-M2C913-D" },
-      { name: "MAGNATEC 5W-30 DX", specs: "API SN, ILSAC GF-5, GM dexos1™ Gen 2" },
-      { name: "MAGNATEC 5W-40", specs: "API SN, ACEA A3/B4, BMW Longlife-01, MB-Approval 229.3" },
-      { name: "MAGNATEC 5W-40 SN/C3", specs: "API SN, ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51, VW 502 00/505 00/505 01" },
-      { name: "MAGNATEC 5W-40 SP C3", specs: "API SP, ACEA C3, MB-Approval 229.31/229.51, VW 502 00/505 00/505 01" },
-      { name: "MAGNATEC 10W-30", specs: "API SP, ILSAC GF-6" },
-      { name: "MAGNATEC 10W-40", specs: "API SP, ACEA A3/B4" },
-      { name: "MAGNATEC 15W-40", specs: "API SP, ACEA A3/B4" },
-      { name: "MAGNATEC SUV 5W-30 C3", specs: "ACEA C2/C3, API SP" },
-      { name: "MAGNATEC DIESEL DX 5W-40", specs: "API SN/CF, ACEA C3, GM dexos® 2" },
-      { name: "MAGNATEC DIESEL 15W-40", specs: "API SP" },
+      { code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6" },
+      { code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6, Jaguar Land Rover STJLR.03.5006, GM dexos1™ Gen 3, Chrysler MS 6395, MB-Approval 229.71" },
+      { code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+, MB-Approval 229.71/ 229.72, Porsche C20, VW 508 00/ 509 00, Ford WSS-M2C956-A1" },
+      { code: "3436896", name: "EDGE 0W-30 C2", specs: "ACEA C2, STJLR.03.5007" },
+      { code: "3432554", name: "EDGE 0W-30", specs: "ACEA C2/C3, API SQ, BMW Longlife-04" },
+      { code: "3433646", name: "EDGE 0W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51" },
+      { code: "3431407", name: "EDGE 0W-40 A3/B4", specs: "ACEA A3/B4, API SP, BMW Longlife-01, MB-Approval 229.5, Porsche A40, Renault RN 0700/RN 0710, VW 502 00/505 00" },
+      { code: "3431128", name: "EDGE 5W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51, Porsche C30, VW 504 00/507 00" },
+      { code: "3430989", name: "EDGE 5W-30 A3/B4", specs: "ACEA A3/B4, API SL, BMW Longlife-01, MB-Approval 229.5, VW 502 00/505 00" },
+      { code: "3431108", name: "EDGE 5W-30 M", specs: "ACEA C3, API SQ, BMW Longlife-04" },
+      { code: "3421235", name: "EDGE 5W-40 A3/B4", specs: "ACEA A3/B3, A3/B4, API SN/CF, BMW Longlife-01" },
+      { code: "3426982", name: "EDGE 5W-40 M", specs: "ACEA C3, API SN, BMW Longlife-04, Porsche C40, VW 511 00" },
+      { code: "3436638", name: "EDGE 5W-50 S", specs: "API SP, Meets Ford WSS-M2C931-C" },
+      { code: "3399574", name: "EDGE 10W-30", specs: "API SP, CF, ILSAC GF-6" },
+      { code: "3412397", name: "EDGE 10W-60", specs: "ACEA A3/B3, A3/B4, API SN/CF" },
+      { code: "3383419", name: "EDGE 25W-50", specs: "API SG/CD" },
+      { code: "3374699", name: "EDGE PROFESSIONAL A1 5W-20", specs: "ACEA A1/B1, API SL, ILSAC GF-3" },
+      { code: "3386606", name: "EDGE PROFESSIONAL A5 0W-30", specs: "ACEA A1/B1, A5/B5, API SL/CF" },
+      { code: "3377780", name: "EDGE PROFESSIONAL A5 5W-30", specs: "ACEA A1/B1, A5/B5, API SN/CF" },
+      { code: "3375617", name: "EDGE PROFESSIONAL C1 5W-30", specs: "ACEA C1, STJLR.03.5005" },
+      { code: "3427866", name: "EDGE PROFESSIONAL EC 0W-20", specs: "ACEA C5, STJLR.03.5006, STJLR.51.5122" },
+      { code: "3423559", name: "EDGE PROFESSIONAL E 0W-30", specs: "ACEA C2, STJLR.03.5007" },
+      { code: "3383785", name: "EDGE PROFESSIONAL V 0W-20", specs: "ACEA C5, Volvo VCC RBS0-2AE" },
+      { code: "3428869", name: "MAGNATEC HYBRID 0W-16", specs: "API SP, ILSAC GF-6B" },
+      { code: "3439018", name: "MAGNATEC 0W-20", specs: "API SP, ILSAC GF-6" },
+      { code: "3440366", name: "MAGNATEC 0W-20 C5", specs: "ACEA C5, API SQ" },
+      { code: "3440475", name: "MAGNATEC 0W-20 E", specs: "Ford WSS-M2C954-A1" },
+      { code: "3434547", name: "MAGNATEC 0W-30 D", specs: "ACEA C2, API SN, Ford WSS-M2C950-A" },
+      { code: "3429066", name: "MAGNATEC 5W-20", specs: "API SP, ILSAC GF-6, Ford WSS-M2C960-A1" },
+      { code: "3428870", name: "MAGNATEC 5W-30", specs: "API SN/CF, ACEA A3/B4, MB-Approval 229.3, VW 502 00/505 00, Renault RN0700/RN0710" },
+      { code: "3437038", name: "MAGNATEC 5W-30 A", specs: "ACEA A5/B5, API SN, ILSAC GF-5, Ford WSS-M2C913-C/D" },
+      { code: "3437811", name: "MAGNATEC 5W-30 A5", specs: "ACEA A5/B5, API SN, Ford WSS-M2C913-D" },
+      { code: "3433354", name: "MAGNATEC 5W-30 DX", specs: "API SN, ILSAC GF-5, GM dexos1™ Gen 2" },
+      { code: "3437395", name: "MAGNATEC 5W-40", specs: "API SN, ACEA A3/B4, BMW Longlife-01, MB-Approval 229.3" },
+      { code: "3436312", name: "MAGNATEC 5W-40 SN/C3", specs: "API SN, ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51, VW 502 00/505 00/505 01" },
+      { code: "3436890", name: "MAGNATEC 10W-30", specs: "API SP, ILSAC GF-6" },
+      { code: "3437172", name: "MAGNATEC 10W-40", specs: "API SP, ACEA A3/B4" },
+      { code: "3396146", name: "MAGNATEC 15W-40", specs: "API SP, ACEA A3/B4" },
+      { code: "3433217", name: "MAGNATEC SUV 5W-30 C3", specs: "ACEA C2/C3, API SP" },
+      { code: "3384168", name: "MAGNATEC DIESEL DX 5W-40", specs: "API SN/CF, ACEA C3, GM dexos® 2" },
+      { code: "3437334", name: "MAGNATEC DIESEL 15W-40", specs: "API SP" },
     ];
 
     // Global Firebase variables
@@ -260,7 +259,8 @@
                   </button>
                 </div>
                 <div class="product-details" style="display:none;">
-                  <p class="card-text text-muted">${oil.specs}</p>
+                  <p class="card-text text-muted mb-1">${oil.specs}</p>
+                  <p class="mb-0"><strong>Product Code:</strong> ${oil.code}</p>
                 </div>
               </div>
             </div>
@@ -340,8 +340,27 @@
       }
       loadingIndicator.style.display = 'inline-block';
       confirmModal.hide();
+
+      // Generate CSV
+      let csv = 'Product Code,Product Name,Specs,Quantity\n';
+      Object.values(currentOrder).forEach(item => {
+        const oil = oils.find(o => o.name === item.name);
+        csv += `"${oil ? oil.code : ''}","${item.name}","${item.specs}","${item.quantity}"\n`;
+      });
+
+      // Create and download CSV file
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'order.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
       setTimeout(() => {
-        showToast('Order submitted! (offline mode)', 'success');
+        showToast('Order submitted! CSV downloaded.', 'success');
         currentOrder = {};
         renderOrder();
         loadingIndicator.style.display = 'none';
