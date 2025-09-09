@@ -99,6 +99,12 @@
       <div class="col-lg-8">
         <h1>Castrol Products</h1>
         <p class="text-muted">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
+        <!-- Insert tabs for product types -->
+        <ul class="nav nav-tabs mb-3" id="productTypeTabs">
+          <li class="nav-item"><a class="nav-link active" data-type="Engine oil" href="#">Engine oil</a></li>
+          <li class="nav-item"><a class="nav-link" data-type="Coolant" href="#">Coolant</a></li>
+          <li class="nav-item"><a class="nav-link" data-type="Gear Oil" href="#">Gear Oil</a></li>
+        </ul>
         <div id="productsContainer" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
           <!-- Product cards will be dynamically inserted here -->
           <div class="col"><div class="card p-4 text-center"><div class="spinner-border text-primary" role="status"></div><p>Loading products...</p></div></div>
@@ -395,97 +401,61 @@
       }, 800);
     };
 
-    // Event listeners for product cards (delegation)
-    productsContainer.addEventListener('click', (e) => {
-      const button = e.target.closest('.btn-add-to-order');
-      if (button) {
-        const index = button.getAttribute('data-index');
-        const oilName = oils[index].name;
-        updateOrder(oilName, 1);
-        return;
-      }
-      // Toggle product details when clicking the heading
-      const cardTitle = e.target.closest('.card-title');
-      if (cardTitle) {
-        const cardBody = cardTitle.parentElement;
-        const details = cardBody.querySelector('.product-details');
-        if (details) {
-          details.style.display = details.style.display === 'none' ? 'block' : 'none';
-        }
-      }
-    });
+    // Insert tabs above the productsContainer
+    const mainContainer = document.querySelector('.col-lg-8');
+    const tabHtml = `
+      <ul class="nav nav-tabs mb-3" id="productTypeTabs">
+        <li class="nav-item"><a class="nav-link active" data-type="Engine oil" href="#">Engine oil</a></li>
+        <li class="nav-item"><a class="nav-link" data-type="Coolant" href="#">Coolant</a></li>
+        <li class="nav-item"><a class="nav-link" data-type="Gear Oil" href="#">Gear Oil</a></li>
+      </ul>
+    `;
+    mainContainer.insertAdjacentHTML('afterbegin', tabHtml);
 
-    // Event listeners for order summary controls (delegation)
-    orderItemsContainer.addEventListener('click', (e) => {
-        const target = e.target.closest('button');
-        if (!target) return;
-        const name = target.getAttribute('data-name');
-        if (target.classList.contains('increase-quantity')) {
-            updateOrder(name, 1);
-        } else if (target.classList.contains('decrease-quantity')) {
-            updateOrder(name, -1);
-        } else if (target.classList.contains('remove-item')) {
-            updateOrder(name, -currentOrder[name].quantity);
-        }
-    });
+    let currentType = 'Engine oil';
 
-    // Event listener for Submit button
-    submitOrderBtn.addEventListener('click', () => {
-        modalOrderSummary.innerHTML = '';
-        Object.entries(currentOrder).forEach(([name, item]) => {
-            modalOrderSummary.innerHTML += `<li class="list-group-item d-flex justify-content-between">${name} <span class="badge bg-primary rounded-pill">${item.quantity}</span></li>`;
-        });
-        confirmModal.show();
-    });
-
-    // Event listener for Confirm button in the modal
-    document.getElementById('confirmSubmitBtn').addEventListener('click', submitOrder);
-
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', async () => {
-    // Load navigation bar
-    loadNav();
-
-    // Always render products, even if Firebase fails
-    renderProducts();
-
-    // Firebase Init
-    try {
-    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-    const app = initializeApp(firebaseConfig);
-    db = getFirestore(app);
-    auth = getAuth(app);
-
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-    if (initialAuthToken) {
-      await signInWithCustomToken(auth, initialAuthToken);
-    } else {
-      await signInAnonymously(auth);
+    function renderProductsByType(type) {
+      productsContainer.innerHTML = '';
+      oils.filter(oil => oil.type === type).forEach((oil, index) => {
+        const cardHtml = `
+          <div class="col">
+            <div class="card h-100 shadow-sm rounded-4 product-card" data-index="${index}">
+              <div class="card-body">
+                <h5 class="card-title fw-bold cursor-pointer" style="cursor:pointer;">${oil.name}</h5>
+                <div class="d-flex justify-content-end mb-2">
+                  <button class="btn btn-primary btn-sm rounded-pill btn-add-to-order" data-index="${oils.indexOf(oil)}">
+                    <i class="bi bi-plus-lg me-1"></i> Add
+                  </button>
+                </div>
+                <div class="product-details" style="display:none;">
+                  <p class="card-text text-muted mb-1">${oil.specs}</p>
+                  <p class="mb-0"><strong>Product Code:</strong> ${oil.code}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        productsContainer.insertAdjacentHTML('beforeend', cardHtml);
+      });
     }
 
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        userId = user.uid;
-        const orderDocPath = `artifacts/${typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'}/users/${userId}/orders/current_order`;
-        const orderRef = doc(db, orderDocPath);
-
-        onSnapshot(orderRef, (docSnap) => {
-          if (docSnap.exists() && docSnap.data().items) {
-            currentOrder = docSnap.data().items;
-          } else {
-            currentOrder = {};
-          }
-          renderOrder();
-        }, (error) => {
-          console.error("Error fetching order data: ", error);
-          showToast("Failed to sync order data.", "error");
-        });
-      }
+    // Update tab click event
+    const tabs = document.getElementById('productTypeTabs');
+    tabs.addEventListener('click', function(e) {
+      e.preventDefault();
+      const tab = e.target.closest('.nav-link');
+      if (!tab) return;
+      Array.from(tabs.querySelectorAll('.nav-link')).forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentType = tab.getAttribute('data-type');
+      renderProductsByType(currentType);
     });
-    } catch (e) {
-    console.error("Firebase initialization failed:", e);
-    showToast("Application failed to initialize.", "error");
-    }
+
+    // Replace renderProducts with renderProductsByType
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNav();
+      renderProductsByType(currentType);
+      renderOrder();
     });
   </script>
 </body>
