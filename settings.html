@@ -5,39 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site Settings</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
 </head>
 <body class="dark min-h-screen flex flex-col font-sans bg-gray-900 text-white">
-    <header class="sticky top-0 bg-gray-800 p-4 shadow z-40 w-full">
-        <h1 class="text-2xl font-bold">Site Settings</h1>
-        <nav class="mt-2">
-            <a href="index.html" class="mr-4 text-primary hover:underline">Home</a>
-            <a href="admin.html" class="mr-4 text-primary hover:underline">Dashboard</a>
-            <a href="users.html" class="mr-4 text-primary hover:underline">User Management</a>
-            <a href="analytics.html" class="mr-4 text-primary hover:underline">Analytics</a>
-            <a href="login.html" class="text-primary hover:underline">Logout</a>
-        </nav>
+    <header class="sticky top-0 bg-gray-800 p-4 shadow z-40 w-full flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold">Site Settings</h1>
+            <nav class="mt-2">
+                <a href="index.html" class="mr-4 text-primary hover:underline">Home</a>
+                <a href="admin.html" class="mr-4 text-primary hover:underline">Dashboard</a>
+                <a href="users.html" class="mr-4 text-primary hover:underline">User Management</a>
+                <a href="analytics.html" class="mr-4 text-primary hover:underline">Analytics</a>
+                <a href="login.html" class="text-primary hover:underline">Logout</a>
+            </nav>
+        </div>
+        <button id="theme-toggle" class="ml-4 p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary">Toggle Light Mode</button>
     </header>
     <main class="flex-1 p-4">
         <h2 class="text-xl font-semibold mb-4">Configure Site Settings</h2>
         <form class="max-w-lg mx-auto bg-gray-800 p-6 rounded shadow">
             <div class="mb-4">
                 <label for="site-title" class="block mb-2 font-medium">Site Title</label>
-                <input type="text" id="site-title" name="site-title" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter site title">
+                <input type="text" id="site-title" name="site-title" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter site title">
             </div>
             <div class="mb-4">
                 <label for="site-description" class="block mb-2 font-medium">Site Description</label>
-                <textarea id="site-description" name="site-description" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter site description"></textarea>
+                <textarea id="site-description" name="site-description" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter site description"></textarea>
             </div>
             <div class="mb-4">
                 <label for="theme" class="block mb-2 font-medium">Theme</label>
-                <select id="theme" name="theme" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                <select id="theme" name="theme" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
                     <option value="dark">Dark</option>
                     <option value="light">Light</option>
                 </select>
             </div>
             <div class="mb-4">
                 <label for="contact-email" class="block mb-2 font-medium">Contact Email</label>
-                <input type="email" id="contact-email" name="contact-email" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="admin@example.com">
+                <input type="email" id="contact-email" name="contact-email" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="admin@example.com">
             </div>
             <div class="mb-4">
                 <label for="maintenance-mode" class="block mb-2 font-medium">Maintenance Mode</label>
@@ -46,7 +65,7 @@
             </div>
             <div class="mb-4">
                 <label for="homepage-message" class="block mb-2 font-medium">Homepage Message</label>
-                <input type="text" id="homepage-message" name="homepage-message" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Welcome to our site!">
+                <input type="text" id="homepage-message" name="homepage-message" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Welcome to our site!">
             </div>
             <button type="submit" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">Save Settings</button>
         </form>
@@ -62,5 +81,20 @@
             </ul>
         </div>
     </main>
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            body.classList.toggle('light');
+            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        });
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        body.classList.add(savedTheme);
+        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+    </script>
 </body>
 </html>
