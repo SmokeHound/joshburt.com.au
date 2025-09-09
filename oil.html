@@ -251,14 +251,16 @@
       oils.forEach((oil, index) => {
         const cardHtml = `
           <div class="col">
-            <div class="card h-100 shadow-sm rounded-4">
+            <div class="card h-100 shadow-sm rounded-4 product-card" data-index="${index}">
               <div class="card-body">
-                <h5 class="card-title fw-bold">${oil.name}</h5>
-                <p class="card-text text-muted">${oil.specs}</p>
-                <div class="d-flex justify-content-end">
-                    <button class="btn btn-primary btn-sm rounded-pill btn-add-to-order" data-index="${index}">
-                      <i class="bi bi-plus-lg me-1"></i> Add
-                    </button>
+                <h5 class="card-title fw-bold cursor-pointer" style="cursor:pointer;">${oil.name}</h5>
+                <div class="d-flex justify-content-end mb-2">
+                  <button class="btn btn-primary btn-sm rounded-pill btn-add-to-order" data-index="${index}">
+                    <i class="bi bi-plus-lg me-1"></i> Add
+                  </button>
+                </div>
+                <div class="product-details" style="display:none;">
+                  <p class="card-text text-muted">${oil.specs}</p>
                 </div>
               </div>
             </div>
@@ -348,12 +350,22 @@
 
     // Event listeners for product cards (delegation)
     productsContainer.addEventListener('click', (e) => {
-        const button = e.target.closest('.btn-add-to-order');
-        if (button) {
-            const index = button.getAttribute('data-index');
-            const oilName = oils[index].name;
-            updateOrder(oilName, 1);
+      const button = e.target.closest('.btn-add-to-order');
+      if (button) {
+        const index = button.getAttribute('data-index');
+        const oilName = oils[index].name;
+        updateOrder(oilName, 1);
+        return;
+      }
+      // Toggle product details when clicking the heading
+      const cardTitle = e.target.closest('.card-title');
+      if (cardTitle) {
+        const cardBody = cardTitle.parentElement;
+        const details = cardBody.querySelector('.product-details');
+        if (details) {
+          details.style.display = details.style.display === 'none' ? 'block' : 'none';
         }
+      }
     });
 
     // Event listeners for order summary controls (delegation)
