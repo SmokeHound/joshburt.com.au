@@ -416,10 +416,10 @@
 
     function renderProductsByType(type) {
       productsContainer.innerHTML = '';
-      oils.filter(oil => oil.type === type).forEach((oil, index) => {
+      oils.filter(oil => oil.type === type).forEach((oil) => {
         const cardHtml = `
           <div class="col">
-            <div class="card h-100 shadow-sm rounded-4 product-card" data-index="${index}">
+            <div class="card h-100 shadow-sm rounded-4 product-card" data-index="${oils.indexOf(oil)}">
               <div class="card-body">
                 <h5 class="card-title fw-bold cursor-pointer" style="cursor:pointer;">${oil.name}</h5>
                 <div class="d-flex justify-content-end mb-2">
@@ -456,6 +456,27 @@
       loadNav();
       renderProductsByType(currentType);
       renderOrder();
+    });
+
+    productsContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('.btn-add-to-order');
+        if (button) {
+            const index = button.getAttribute('data-index');
+            const oil = oils[index];
+            if (oil) {
+                updateOrder(oil.name, 1);
+            }
+            return;
+        }
+        // Toggle product details when clicking the heading
+        const cardTitle = e.target.closest('.card-title');
+        if (cardTitle) {
+            const cardBody = cardTitle.parentElement;
+            const details = cardBody.querySelector('.product-details');
+            if (details) {
+                details.style.display = details.style.display === 'none' ? 'block' : 'none';
+            }
+        }
     });
   </script>
 </body>
