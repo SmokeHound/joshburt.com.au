@@ -150,19 +150,19 @@
         const loginError = document.getElementById('login-error');
         const submitBtn = document.getElementById('submit-login');
 
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             // Basic client-side validation
             if (!username.trim() || !password.trim()) {
-                e.preventDefault();
                 showToast('Please fill in all fields');
                 return;
             }
 
             if (password.length < 3) {
-                e.preventDefault();
                 showToast('Password must be at least 3 characters long');
                 return;
             }
@@ -170,6 +170,50 @@
             // Show loading state
             loginSpinner.classList.remove('hidden');
             submitBtn.disabled = true;
+
+            // Simulate API call and authenticate
+            try {
+                // Check against registered users or use default credentials
+                const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
+                const user = users.find(u => u.email === username || u.name === username);
+                
+                let authenticatedUser = null;
+                
+                if (user && password === 'password') {
+                    // Found registered user with correct password
+                    authenticatedUser = { 
+                        name: user.name, 
+                        email: user.email,
+                        avatar: 'https://via.placeholder.com/40' 
+                    };
+                } else if ((username === 'test@example.com' || username === 'admin') && password === 'password') {
+                    // Default admin credentials
+                    authenticatedUser = { 
+                        name: username.includes('@') ? username.split('@')[0] : username, 
+                        email: username.includes('@') ? username : 'admin@example.com',
+                        avatar: 'https://via.placeholder.com/40' 
+                    };
+                } else {
+                    throw new Error('Invalid credentials');
+                }
+
+                // Save user session
+                localStorage.setItem('user', JSON.stringify(authenticatedUser));
+                
+                // Show success message
+                showToast('Login successful! Redirecting...', 'success');
+                
+                // Redirect to main site after delay
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+
+            } catch (error) {
+                showToast(error.message);
+            } finally {
+                loginSpinner.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
         });
     </script>
 </body>

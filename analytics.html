@@ -140,6 +140,78 @@
             }, 3000);
         }
 
+        // Load and apply site settings
+        function loadAndApplySettings() {
+            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            
+            // Apply site title if set
+            if (settings['site-title']) {
+                const brandingElements = document.querySelectorAll('h1');
+                brandingElements.forEach(el => {
+                    if (el.textContent.includes('Josh\'s App')) {
+                        el.textContent = settings['site-title'];
+                    }
+                });
+            }
+        }
+
+        // Load dynamic analytics data
+        function loadAnalytics() {
+            const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
+            const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+            const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+            
+            // Update visitor statistics
+            const totalUsers = users.length;
+            const activeUsers = currentUser ? 1 : 0;
+            const adminUsers = users.filter(u => u.role === 'admin').length;
+            const regularUsers = users.filter(u => u.role === 'user').length;
+            
+            // Update the statistics cards
+            updateStatCard('visitor-stats', [
+                `Total Users: ${totalUsers}`,
+                `Active Session: ${activeUsers > 0 ? 'Yes' : 'No'}`,
+                `Admin Users: ${adminUsers}`
+            ]);
+            
+            updateStatCard('engagement-stats', [
+                `Regular Users: ${regularUsers}`,
+                `Settings Configured: ${Object.keys(settings).length > 0 ? 'Yes' : 'No'}`,
+                `Theme: ${settings['theme'] || 'Default'}`
+            ]);
+            
+            updateStatCard('top-pages', [
+                'Settings Page',
+                'User Management',
+                'Analytics Dashboard'
+            ]);
+        }
+        
+        function updateStatCard(cardType, items) {
+            const cards = document.querySelectorAll('.card');
+            let targetCard = null;
+            
+            if (cardType === 'visitor-stats') {
+                targetCard = cards[0];
+            } else if (cardType === 'engagement-stats') {
+                targetCard = cards[1];
+            } else if (cardType === 'top-pages') {
+                targetCard = cards[2];
+            }
+            
+            if (targetCard) {
+                const list = targetCard.querySelector('ul, ol');
+                if (list) {
+                    list.innerHTML = '';
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item;
+                        list.appendChild(li);
+                    });
+                }
+            }
+        }
+
         // Theme Toggle
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
@@ -151,8 +223,9 @@
             themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
         });
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+        // Load saved theme from settings or localStorage
+        const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+        const savedTheme = settings['theme'] || localStorage.getItem('theme') || 'dark';
         body.classList.add(savedTheme);
         themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
         themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
@@ -164,6 +237,12 @@
             sidebar.classList.toggle('open');
             const isOpen = sidebar.classList.contains('open');
             menuToggle.setAttribute('aria-expanded', isOpen);
+        });
+        
+        // Load analytics data when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAnalytics();
+            loadAndApplySettings();
         });
     </script>
 </body>

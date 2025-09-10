@@ -148,39 +148,39 @@
 
                 <div class="bg-gray-800 p-6 rounded shadow">
                     <h3 class="font-semibold mb-4">Current Settings (Preview)</h3>
-                    <div class="space-y-3 text-sm text-gray-300">
+                    <div class="space-y-3 text-sm text-gray-300 settings-preview">
                         <div class="flex justify-between">
                             <span class="font-medium text-white">Site Title:</span>
-                            <span>Josh's App</span>
+                            <span data-preview="site-title">Josh's App</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="font-medium text-white">Site Description:</span>
-                            <span>Responsive website template...</span>
+                            <span data-preview="site-description">Responsive website template...</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="font-medium text-white">Theme:</span>
-                            <span>Dark</span>
+                            <span data-preview="theme">Dark</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="font-medium text-white">Contact Email:</span>
-                            <span>admin@example.com</span>
+                            <span data-preview="contact-email">admin@example.com</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="font-medium text-white">Maintenance Mode:</span>
-                            <span class="text-green-400">Off</span>
+                            <span class="text-green-400" data-preview="maintenance-mode">Off</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="font-medium text-white">Homepage Message:</span>
-                            <span>Welcome to My Website</span>
+                            <span data-preview="homepage-message">Welcome to My Website</span>
                         </div>
                     </div>
                     
                     <div class="mt-6 pt-4 border-t border-gray-600">
                         <h4 class="font-semibold mb-2">Quick Actions</h4>
                         <div class="space-y-2">
-                            <button class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm">Clear Cache</button>
-                            <button class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm">Export Settings</button>
-                            <button class="w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm">Reset to Defaults</button>
+                            <button class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" data-action="clear-cache">Clear Cache</button>
+                            <button class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm" data-action="export-settings">Export Settings</button>
+                            <button class="w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm" data-action="reset-defaults">Reset to Defaults</button>
                         </div>
                     </div>
                 </div>
@@ -209,10 +209,15 @@
             localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
             themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
             themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+            
+            // Update settings form theme selector to match current theme
+            document.getElementById('theme').value = body.classList.contains('dark') ? 'dark' : 'light';
+            updatePreview();
         });
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+        // Load saved theme from settings or localStorage
+        const globalSettings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+        const savedTheme = globalSettings['theme'] || localStorage.getItem('theme') || 'dark';
         body.classList.add(savedTheme);
         themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
         themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
@@ -227,10 +232,139 @@
         });
 
         // Settings form handling
-        document.getElementById('settings-form').addEventListener('submit', (e) => {
-            e.preventDefault();
+        const settingsForm = document.getElementById('settings-form');
+        const previewElements = {
+            siteTitle: document.querySelector('.settings-preview [data-preview="site-title"]'),
+            siteDescription: document.querySelector('.settings-preview [data-preview="site-description"]'),
+            theme: document.querySelector('.settings-preview [data-preview="theme"]'),
+            contactEmail: document.querySelector('.settings-preview [data-preview="contact-email"]'),
+            maintenanceMode: document.querySelector('.settings-preview [data-preview="maintenance-mode"]'),
+            homepageMessage: document.querySelector('.settings-preview [data-preview="homepage-message"]')
+        };
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {
+                'site-title': 'Josh\'s App',
+                'site-description': 'Responsive website template with admin features',
+                'theme': 'dark',
+                'contact-email': 'admin@example.com',
+                'maintenance-mode': false,
+                'homepage-message': 'Welcome to My Website'
+            };
+
+            // Populate form fields
+            document.getElementById('site-title').value = settings['site-title'];
+            document.getElementById('site-description').value = settings['site-description'];
+            document.getElementById('theme').value = settings['theme'];
+            document.getElementById('contact-email').value = settings['contact-email'];
+            document.getElementById('maintenance-mode').checked = settings['maintenance-mode'];
+            document.getElementById('homepage-message').value = settings['homepage-message'];
+
+            // Update preview panel
+            updatePreview();
+            
+            // Apply settings to current page
+            applySettings(settings);
+        }
+
+        // Update the preview panel in real-time
+        function updatePreview() {
+            const settings = getFormSettings();
+            
+            // Update preview values
+            document.querySelector('[data-preview="site-title"]').textContent = settings['site-title'];
+            document.querySelector('[data-preview="site-description"]').textContent = settings['site-description'].substring(0, 30) + '...';
+            document.querySelector('[data-preview="theme"]').textContent = settings['theme'].charAt(0).toUpperCase() + settings['theme'].slice(1);
+            document.querySelector('[data-preview="contact-email"]').textContent = settings['contact-email'];
+            document.querySelector('[data-preview="maintenance-mode"]').textContent = settings['maintenance-mode'] ? 'On' : 'Off';
+            document.querySelector('[data-preview="maintenance-mode"]').className = settings['maintenance-mode'] ? 'text-red-400' : 'text-green-400';
+            document.querySelector('[data-preview="homepage-message"]').textContent = settings['homepage-message'];
+        }
+
+        // Get current form settings
+        function getFormSettings() {
+            return {
+                'site-title': document.getElementById('site-title').value,
+                'site-description': document.getElementById('site-description').value,
+                'theme': document.getElementById('theme').value,
+                'contact-email': document.getElementById('contact-email').value,
+                'maintenance-mode': document.getElementById('maintenance-mode').checked,
+                'homepage-message': document.getElementById('homepage-message').value
+            };
+        }
+
+        // Apply settings to current page
+        function applySettings(settings) {
+            // Update page title if it's the main branding
+            const brandingElements = document.querySelectorAll('h1');
+            brandingElements.forEach(el => {
+                if (el.textContent.includes('Josh\'s App')) {
+                    el.textContent = settings['site-title'];
+                }
+            });
+
+            // Update theme
+            if (settings['theme'] !== (body.classList.contains('dark') ? 'dark' : 'light')) {
+                body.classList.toggle('dark');
+                body.classList.toggle('light');
+                themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+            }
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            const settings = getFormSettings();
+            localStorage.setItem('siteSettings', JSON.stringify(settings));
             showToast('Settings saved successfully!');
+            applySettings(settings);
+        }
+
+        // Add event listeners for real-time preview updates
+        document.getElementById('site-title').addEventListener('input', updatePreview);
+        document.getElementById('site-description').addEventListener('input', updatePreview);
+        document.getElementById('theme').addEventListener('change', updatePreview);
+        document.getElementById('contact-email').addEventListener('input', updatePreview);
+        document.getElementById('maintenance-mode').addEventListener('change', updatePreview);
+        document.getElementById('homepage-message').addEventListener('input', updatePreview);
+
+        // Settings form submission
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveSettings();
         });
+
+        // Quick action buttons
+        document.querySelector('[data-action="clear-cache"]').addEventListener('click', () => {
+            localStorage.removeItem('user');
+            localStorage.removeItem('siteUsers');
+            showToast('Cache cleared successfully!');
+        });
+
+        document.querySelector('[data-action="export-settings"]').addEventListener('click', () => {
+            const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'site-settings.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Settings exported successfully!');
+        });
+
+        document.querySelector('[data-action="reset-defaults"]').addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
+                localStorage.removeItem('siteSettings');
+                loadSettings();
+                showToast('Settings reset to defaults!');
+            }
+        });
+
+        // Load settings when page loads
+        loadSettings();
 
     </script>
 </body>
