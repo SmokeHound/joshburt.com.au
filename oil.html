@@ -4,27 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Castrol Order Form</title>
-  <!-- Include shared Tailwind configuration -->
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '#3b82f6',
-                    secondary: '#10b981',
-                    accent: '#8b5cf6',
-                },
-                fontFamily: {
-                    sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                },
-            },
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#10b981',
+            accent: '#8b5cf6',
+            'primary-green': '#27ae60',
+            'accent-red': '#e74c3c',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
         },
+      },
     };
   </script>
-  <!-- Bootstrap Icons for existing icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet" />
-  <!-- Unified styles -->
   <style>
     body {
       transition: background-color 0.3s, color 0.3s;
@@ -55,114 +54,135 @@
     .card:hover {
       transform: translateY(-4px);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    }
+    .fade-out {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s ease-in-out;
+=
     }
   </style>
 </head>
 <body class="dark min-h-screen flex flex-col font-sans">
   <!-- Mobile Menu Toggle -->
   <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
-      ☰
+
+    ☰
   </button>
-
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-gray-800 dark:bg-gray-800 p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
-      <!-- App Branding -->
-      <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
-
-      <!-- Navigation -->
-      <nav>
-          <ul class="space-y-2">
-              <li><a href="index.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
-              <li><a href="admin.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
-              <li><a href="users.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-              <li><a href="analytics.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-              <li><a href="settings.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
-              <li><a href="oil.html" class="nav-link block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Orders</a></li>
-              <li><a href="login.html" class="nav-link block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
-          </ul>
-      </nav>
-
-      <!-- Theme Toggle -->
-      <div class="mt-auto">
-          <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
-              Toggle Light Mode
-          </button>
-      </div>
-  </aside>
 
   <!-- Toast Notification -->
   <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
-  <!-- Main content -->
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-gray-800 dark:bg-gray-800 p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+    <!-- App Branding -->
+    <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
+
+    <!-- Navigation -->
+    <nav>
+      <ul class="space-y-2">
+        <li><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+        <li><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+        <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+        <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+        <li><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
+        <li><a href="oil.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Products</a></li>
+        <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+      </ul>
+    </nav>
+
+    <!-- Theme Toggle -->
+    <div class="mt-auto">
+      <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+        Toggle Light Mode
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
   <main class="flex-1 p-4 md:ml-64">
     <!-- Sticky Header -->
-    <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40">
-      <h2 class="text-3xl font-semibold">Castrol Products</h2>
-      <p class="text-gray-300 mt-2">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
+    <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
+      <h2 class="text-3xl font-semibold" id="welcome-message">Castrol Products</h2>
     </header>
 
-    <div class="flex flex-col lg:flex-row gap-6">
-      <!-- Product Selection Area -->
-      <div class="flex-1">
-        <!-- Product tabs will be dynamically inserted here -->
-        <div id="productTypeTabs" class="mb-3">
-          <!-- Tabs for product types -->
-        </div>
-        <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          <!-- Product cards will be dynamically inserted here -->
-          <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p class="mt-2">Loading products...</p>
+    <!-- Content Section -->
+    <section>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Product Selection Area -->
+        <div class="lg:col-span-2">
+          <p class="mb-4 text-gray-300">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
+          
+          <!-- Product tabs -->
+          <div id="productTypeTabs" class="mb-6">
+            <nav class="flex space-x-1 rounded-lg bg-gray-800 p-1">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-white bg-primary" data-type="Engine oil">
+                Engine Oil
+              </button>
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" data-type="Coolant">
+                Coolant
+              </button>
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" data-type="Gear Oil">
+                Gear Oil
+              </button>
+            </nav>
+          </div>
+          
+          <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Product cards will be dynamically inserted here -->
+            <div class="p-4 bg-gray-700 rounded shadow text-center">
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p class="mt-2">Loading products...</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Order Form Area -->
-      <div class="w-full lg:w-80 mt-4 lg:mt-0">
-        <div id="orderContainer" class="card shadow p-6 bg-gray-700 dark:bg-gray-700 sticky top-24">
-          <div class="flex justify-content-between items-center mb-3">
-            <h2 class="text-xl font-semibold mb-0 flex items-center">
-              Your Order <i class="bi bi-cart ml-2"></i>
-            </h2>
-            <div id="loading-indicator" class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary" style="display: none;"></div>
+        <!-- Order Form Area -->
+        <div class="lg:col-span-1">
+          <div id="orderContainer" class="bg-gray-800 rounded shadow p-4 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-semibold">Your Order 🛒</h3>
+              <div id="loading-indicator" class="hidden">
+                <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+              </div>
+            </div>
+            
+            <div id="orderItems" class="space-y-2 mb-4 min-h-[200px]">
+              <!-- Order items will be dynamically inserted here -->
+              <p class="text-gray-400 text-center py-8">Your order is empty.</p>
+            </div>
+            
+            <div id="orderSummary" class="flex justify-between font-bold mb-4 pt-4 border-t border-gray-600">
+              <span>Total Items:</span>
+              <span id="totalItems">0</span>
+            </div>
+            
+            <button id="submitOrderBtn" class="w-full p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              Submit Order
+            </button>
           </div>
-          <div id="orderItems" class="space-y-2 border-b border-gray-600 pb-3 mb-3">
-            <!-- Order items will be dynamically inserted here -->
-          </div>
-          <div id="orderSummary" class="flex justify-between font-bold mb-3">
-            <span>Total Items:</span>
-            <span id="totalItems">0</span>
-          </div>
-          <button id="submitOrderBtn" class="w-full p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-medium" disabled>
-            Submit Order
-          </button>
         </div>
       </div>
-    </div>
+    </section>
   </main>
 
-  <!-- Toast Container for messages -->
-  <div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
 
   <!-- Order Confirmation Modal -->
-  <div class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalLabel">
+  <div id="confirmModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
     <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-      <div class="flex justify-between items-center mb-4">
-        <h5 class="text-xl font-semibold" id="confirmModalLabel">Confirm Order</h5>
-        <button type="button" class="text-gray-400 hover:text-white" id="closeConfirmModal" aria-label="Close">
-          <span class="text-2xl">&times;</span>
-        </button>
+      <h3 id="confirm-modal-title" class="text-xl font-semibold mb-4 text-white">Confirm Order</h3>
+      <p class="mb-4 text-gray-300">Are you sure you want to submit this order?</p>
+      <div id="modalOrderSummary" class="mb-4 max-h-60 overflow-y-auto">
+        <!-- Order summary will be populated here -->
       </div>
-      <div class="mb-4">
-        <p>Are you sure you want to submit this order?</p>
-        <ul id="modalOrderSummary" class="space-y-2 mt-3"></ul>
-      </div>
-      <div class="flex space-x-3">
-        <button type="button" class="flex-1 p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400" id="cancelConfirmModal">Cancel</button>
-        <button type="button" class="flex-1 p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400" id="confirmSubmitBtn">Confirm</button>
+      <div class="flex space-x-4">
+        <button id="cancelModal" class="flex-1 p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400">Cancel</button>
+        <button id="confirmSubmitBtn" class="flex-1 p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">Confirm</button>
       </div>
     </div>
   </div>
+
 
   <script>
     // Shared theme functionality
@@ -226,27 +246,46 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
 
   <!-- Firebase -->
+
   <script type="module">
-  // Utility to show toast notifications
+    // Utility to show toast notifications
     const showToast = (message, type = 'info') => {
-        const toastContainer = document.getElementById('toastContainer');
-        const toastId = `toast-${Date.now()}`;
-        const bgClass = type === 'success' ? 'bg-secondary' : type === 'error' ? 'bg-red-500' : 'bg-accent';
-        const toastHtml = `
-            <div id="${toastId}" class="p-4 rounded shadow-lg text-white ${bgClass} transition-opacity duration-300">
-                <div class="flex justify-between items-center">
-                    <div>${message}</div>
-                    <button type="button" class="ml-3 text-white hover:text-gray-200 focus:outline-none" onclick="document.getElementById('${toastId}').remove()">
-                        <span class="text-lg">&times;</span>
-                    </button>
-                </div>
-            </div>`;
-        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-        const toastEl = document.getElementById(toastId);
-        
-        // Auto-remove after 5 seconds
-        setTimeout(() => toastEl.remove(), 5000);
+
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `fixed bottom-4 right-4 p-4 text-white rounded shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-secondary' : type === 'error' ? 'bg-red-500' : 'bg-accent'}`;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+
     };
+
+    // Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      body.classList.toggle('light');
+      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+      themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+      themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+    });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    body.classList.add(savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+    themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      const isOpen = sidebar.classList.contains('open');
+      menuToggle.setAttribute('aria-expanded', isOpen);
+    });
 
     // Castrol oil product data from the provided spreadsheets
     const oils = [
@@ -320,9 +359,6 @@
       { code: "3430310", name: "Transmax Universal 80W-90", specs: "API GL-4 / GL-5", type: "Gear Oil" },
     ];
 
-    // Global variables
-    let db, auth;
-    let currentOrder = {};
 
     // DOM Elements
     const productsContainer = document.getElementById('productsContainer');
@@ -331,34 +367,13 @@
     const submitOrderBtn = document.getElementById('submitOrderBtn');
     const loadingIndicator = document.getElementById('loading-indicator');
     const modalOrderSummary = document.getElementById('modalOrderSummary');
+    const confirmModal = document.getElementById('confirmModal');
 
-    // Load navigation bar - no longer needed since nav is embedded
-    async function loadNav() {
-      // Navigation is now embedded directly in the HTML
-      return Promise.resolve();
-    }
 
-    // Render product cards
-    const renderProducts = () => {
-      productsContainer.innerHTML = ''; // Clear loading message
-      oils.forEach((oil, index) => {
-        const cardHtml = `
-          <div class="bg-gray-700 dark:bg-gray-700 rounded shadow card p-4 h-full flex flex-col" data-index="${index}">
-            <h5 class="font-bold text-lg mb-3 cursor-pointer flex-grow" style="cursor:pointer;">${oil.name}</h5>
-            <div class="flex justify-end mb-2">
-              <button class="px-4 py-2 bg-primary text-white rounded-full hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary btn-add-to-order" data-index="${index}">
-                <i class="bi bi-plus-lg mr-1"></i> Add
-              </button>
-            </div>
-            <div class="product-details text-sm text-gray-300 mt-2" style="display:none;">
-              <p class="mb-1">${oil.specs}</p>
-              <p class="mb-0"><strong>Product Code:</strong> ${oil.code}</p>
-            </div>
-          </div>
-        `;
-        productsContainer.insertAdjacentHTML('beforeend', cardHtml);
-      });
-    };
+    // Global variables
+    let currentOrder = {};
+    let currentType = 'Engine oil';
+
 
     // Render the order summary
     const renderOrder = () => {
@@ -367,26 +382,32 @@
       const orderedItems = Object.entries(currentOrder);
 
       if (orderedItems.length === 0) {
-        orderItemsContainer.innerHTML = '<div class="text-gray-400 text-center py-4">Your order is empty.</div>';
+
+        orderItemsContainer.innerHTML = '<p class="text-gray-400 text-center py-8">Your order is empty.</p>';
+
         submitOrderBtn.disabled = true;
+        submitOrderBtn.classList.add('opacity-50', 'cursor-not-allowed');
       } else {
         submitOrderBtn.disabled = false;
+        submitOrderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
       }
 
       orderedItems.forEach(([name, item]) => {
         totalItems += item.quantity;
         const oil = oils.find(o => o.name === name);
         const listItemHtml = `
-          <div class="p-3 bg-gray-800 rounded flex justify-between items-center order-item">
-            <div class="flex-grow mr-2">
-                <span class="font-bold block">${name}</span>
-                <small class="text-gray-400 block">${oil ? 'Code: ' + oil.code : ''}</small>
+
+          <div class="flex items-center justify-between p-3 bg-gray-700 rounded order-item">
+            <div class="flex-1 mr-2">
+              <span class="font-semibold block">${name}</span>
+              <small class="text-gray-400 block">${oil ? 'Code: ' + oil.code : ''}</small>
             </div>
-            <div class="flex items-center space-x-2 quantity-control">
-                <button class="w-6 h-6 bg-gray-600 hover:bg-gray-500 text-white rounded-full flex items-center justify-center decrease-quantity" data-name="${name}">-</button>
-                <span class="font-bold min-w-8 text-center">${item.quantity}</span>
-                <button class="w-6 h-6 bg-gray-600 hover:bg-gray-500 text-white rounded-full flex items-center justify-center increase-quantity" data-name="${name}">+</button>
-                <button class="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center remove-item" data-name="${name}"><i class="bi bi-trash text-xs"></i></button>
+            <div class="flex items-center space-x-2">
+              <button class="w-6 h-6 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm decrease-quantity" data-name="${name}">-</button>
+              <span class="font-bold min-w-[2rem] text-center">${item.quantity}</span>
+              <button class="w-6 h-6 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm increase-quantity" data-name="${name}">+</button>
+              <button class="w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white text-sm remove-item" data-name="${name}">×</button>
+
             </div>
           </div>
         `;
@@ -395,9 +416,9 @@
       totalItemsSpan.textContent = totalItems;
     };
 
-    // Add or update item in the order and Firestore
+    // Add or update item in the order
     const updateOrder = (name, quantityChange) => {
-      loadingIndicator.style.display = 'inline-block';
+      loadingIndicator.classList.remove('hidden');
       const item = currentOrder[name];
       let newQuantity = item ? item.quantity + quantityChange : 1;
 
@@ -420,7 +441,7 @@
         }
       }
       renderOrder();
-      loadingIndicator.style.display = 'none';
+      loadingIndicator.classList.add('hidden');
     };
 
     // Handle order submission
@@ -429,12 +450,12 @@
         showToast('Your order is empty.', 'error');
         return;
       }
-      loadingIndicator.style.display = 'inline-block';
+      loadingIndicator.classList.remove('hidden');
       
       // Hide modal
-      if (window.hideConfirmModal) {
-        window.hideConfirmModal();
-      }
+
+      confirmModal.classList.add('hidden');
+
 
       // Generate CSV
       let csv = 'Product Code,Quantity,Product Name\n';
@@ -458,37 +479,28 @@
         showToast('Order submitted! CSV downloaded.', 'success');
         currentOrder = {};
         renderOrder();
-        loadingIndicator.style.display = 'none';
+        loadingIndicator.classList.add('hidden');
       }, 800);
     };
 
-    // Insert tabs above the productsContainer
-    const mainContainer = document.querySelector('.flex-1');
-    const tabHtml = `
-      <div class="flex space-x-1 mb-4 bg-gray-700 rounded p-1" id="productTypeTabs">
-        <button class="nav-tab flex-1 px-3 py-2 rounded bg-primary text-white font-medium" data-type="Engine oil">Engine oil</button>
-        <button class="nav-tab flex-1 px-3 py-2 rounded hover:bg-gray-600 text-gray-300 font-medium" data-type="Coolant">Coolant</button>
-        <button class="nav-tab flex-1 px-3 py-2 rounded hover:bg-gray-600 text-gray-300 font-medium" data-type="Gear Oil">Gear Oil</button>
-      </div>
-    `;
-    mainContainer.insertAdjacentHTML('afterbegin', tabHtml);
 
-    let currentType = 'Engine oil';
-
+    // Render products by type
     function renderProductsByType(type) {
       productsContainer.innerHTML = '';
       oils.filter(oil => oil.type === type).forEach((oil) => {
         const cardHtml = `
-          <div class="bg-gray-700 dark:bg-gray-700 rounded shadow card p-4 h-full flex flex-col" data-index="${oils.indexOf(oil)}">
-            <h5 class="font-bold text-lg mb-3 cursor-pointer flex-grow" style="cursor:pointer;">${oil.name}</h5>
+
+          <div class="p-4 bg-gray-700 rounded shadow card product-card" data-index="${oils.indexOf(oil)}">
+            <h5 class="font-bold text-white mb-2 cursor-pointer">${oil.name}</h5>
             <div class="flex justify-end mb-2">
-              <button class="px-4 py-2 bg-primary text-white rounded-full hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary btn-add-to-order" data-index="${oils.indexOf(oil)}">
-                <i class="bi bi-plus-lg mr-1"></i> Add
+              <button class="px-4 py-2 bg-primary text-white rounded-full text-sm hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary btn-add-to-order" data-index="${oils.indexOf(oil)}">
+                + Add
               </button>
             </div>
-            <div class="product-details text-sm text-gray-300 mt-2" style="display:none;">
-              <p class="mb-1">${oil.specs}</p>
-              <p class="mb-0"><strong>Product Code:</strong> ${oil.code}</p>
+            <div class="product-details hidden">
+              <p class="text-gray-300 text-sm mb-1">${oil.specs}</p>
+              <p class="text-sm"><strong>Product Code:</strong> ${oil.code}</p>
+
             </div>
           </div>
         `;
@@ -496,56 +508,31 @@
       });
     }
 
-    // Update tab click event
+    // Tab functionality
     const tabs = document.getElementById('productTypeTabs');
     tabs.addEventListener('click', function(e) {
       e.preventDefault();
-      const tab = e.target.closest('.nav-tab');
+
+      const tab = e.target.closest('.tab-button');
       if (!tab) return;
-      Array.from(tabs.querySelectorAll('.nav-tab')).forEach(t => {
+      
+      // Update tab styles
+      tabs.querySelectorAll('.tab-button').forEach(t => {
         t.classList.remove('bg-primary', 'text-white');
-        t.classList.add('hover:bg-gray-600', 'text-gray-300');
+        t.classList.add('text-gray-300', 'hover:text-white');
       });
       tab.classList.add('bg-primary', 'text-white');
-      tab.classList.remove('hover:bg-gray-600', 'text-gray-300');
+      tab.classList.remove('text-gray-300', 'hover:text-white');
+      
+
       currentType = tab.getAttribute('data-type');
       renderProductsByType(currentType);
     });
 
     // Initialize the page and event handlers
     document.addEventListener('DOMContentLoaded', () => {
-      // Modal functionality
-      const confirmModal = document.getElementById('confirmModal');
-      const closeConfirmModal = document.getElementById('closeConfirmModal');
-      const cancelConfirmModal = document.getElementById('cancelConfirmModal');
 
-      function showModal() {
-        confirmModal.classList.remove('hidden');
-      }
 
-      function hideModal() {
-        confirmModal.classList.add('hidden');
-      }
-
-      if (closeConfirmModal) {
-        closeConfirmModal.addEventListener('click', hideModal);
-      }
-      if (cancelConfirmModal) {
-        cancelConfirmModal.addEventListener('click', hideModal);
-      }
-
-      // Close modal when clicking outside
-      confirmModal.addEventListener('click', (e) => {
-        if (e.target === confirmModal) {
-          hideModal();
-        }
-      });
-
-      // Store modal functions globally for later use
-      window.showConfirmModal = showModal;
-      window.hideConfirmModal = hideModal;
-
-      loadNav();
       renderProductsByType(currentType);
       renderOrder();
       setupEventHandlers();
@@ -567,10 +554,12 @@
         // Toggle product details when clicking the heading
         const cardTitle = e.target.closest('h5');
         if (cardTitle) {
-          const card = cardTitle.closest('.card');
+
+          const card = cardTitle.closest('.product-card');
+
           const details = card.querySelector('.product-details');
           if (details) {
-            details.style.display = details.style.display === 'none' ? 'block' : 'none';
+            details.classList.toggle('hidden');
           }
         }
       });
@@ -593,40 +582,44 @@
       });
 
       // Submit order button event
-      submitOrderBtn.addEventListener('click', () => {
+      submitOrderBtn.addEventListenr('click', () => {
         if (Object.keys(currentOrder).length === 0) {
           showToast('Your order is empty.', 'error');
           return;
         }
 
-        // Show confirmation modal
-        if (window.showConfirmModal) {
-          // Populate modal with order summary
-          modalOrderSummary.innerHTML = '';
-          Object.values(currentOrder).forEach(item => {
-            const oil = oils.find(o => o.name === item.name);
-            const listItem = document.createElement('div');
-            listItem.className = 'flex justify-between p-2 bg-gray-700 rounded';
-            listItem.innerHTML = `
-              <span>${item.name} (${oil ? oil.code : 'N/A'})</span>
-              <span>Qty: ${item.quantity}</span>
-            `;
-            modalOrderSummary.appendChild(listItem);
-          });
-          window.showConfirmModal();
-        } else {
-          // Direct submit if modal not available
-          submitOrder();
-        }
+
+        // Populate modal with order summary
+        modalOrderSummary.innerHTML = '';
+        Object.values(currentOrder).forEach(item => {
+          const oil = oils.find(o => o.name === item.name);
+          const listItem = document.createElement('div');
+          listItem.className = 'flex justify-between items-center p-2 bg-gray-700 rounded mb-2';
+          listItem.innerHTML = `
+            <span class="text-white">${item.name} (${oil ? oil.code : 'N/A'})</span>
+            <span class="text-gray-300">Qty: ${item.quantity}</span>
+          `;
+          modalOrderSummary.appendChild(listItem);
+        });
+        confirmModal.classList.remove('hidden');
+
       });
 
-      // Confirmation modal submit button
-      const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
-      if (confirmSubmitBtn) {
-        confirmSubmitBtn.addEventListener('click', () => {
-          submitOrder();
-        });
-      }
+      // Modal event handlers
+      document.getElementById('cancelModal').addEventListener('click', () => {
+        confirmModal.classList.add('hidden');
+      });
+
+      document.getElementById('confirmSubmitBtn').addEventListener('click', () => {
+        submitOrder();
+      });
+
+      // Close modal when clicking outside
+      confirmModal.addEventListener('click', (e) => {
+        if (e.target === confirmModal) {
+          confirmModal.classList.add('hidden');
+        }
+      });
     };
   </script>
 </body>

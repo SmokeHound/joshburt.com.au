@@ -1,11 +1,7 @@
-// LEGACY SCRIPT - NO LONGER IN USE
-// This script has been replaced by the unified theme system in shared-theme.html
-// All pages now use the shared theme functionality for consistency
+// copilot/fix-8e025bec-f682-4068-8ecd-267145215f15
+// Legacy script.js - no longer used after consistent design implementation
+// All pages now use inline JavaScript with consistent theme toggle functionality
+// This file kept for reference only - TODO: Remove in future cleanup
 
-// Legacy theme toggle - REPLACED by unified theme system
-// document.getElementById('toggle-theme').addEventListener('click', () => {
-//   document.body.classList.toggle('dark-mode');
-// });
-
-// NOTE: New theme system is embedded in each HTML file using shared components
-// See shared-theme.html for the current implementation
+// Original theme toggle functionality was here
+// Replaced with consistent theme toggle implementation across all pages
