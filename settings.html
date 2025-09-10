@@ -22,6 +22,12 @@
         };
     </script>
     <style>
+        :root {
+            --color-primary: #3b82f6;
+            --color-secondary: #10b981;
+            --color-accent: #8b5cf6;
+        }
+        
         body {
             transition: background-color 0.3s, color 0.3s;
         }
@@ -51,6 +57,20 @@
             transform: translateY(-4px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Custom color support for elements that use bg-primary, bg-secondary, bg-accent */
+        .bg-primary-custom { background-color: var(--color-primary) !important; }
+        .bg-secondary-custom { background-color: var(--color-secondary) !important; }
+        .bg-accent-custom { background-color: var(--color-accent) !important; }
+        .text-primary-custom { color: var(--color-primary) !important; }
+        .text-secondary-custom { color: var(--color-secondary) !important; }
+        .text-accent-custom { color: var(--color-accent) !important; }
+        .border-primary-custom { border-color: var(--color-primary) !important; }
+        
+        /* Color scheme transition effects */
+        button, .preset-theme {
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body class="dark min-h-screen flex flex-col font-sans">
@@ -77,6 +97,7 @@
                 <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
                 <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
                 <li><a href="settings.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Settings</a></li>
+                <li><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Products</a></li>
                 <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
 
             </ul>
@@ -87,8 +108,6 @@
             <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
                 Toggle Light Mode
             </button>
- id="theme" name="theme" required 
-                               
         </div>
     </aside>
 
@@ -101,11 +120,12 @@
 
         <!-- Content Section -->
         <section>
-            <p class="mb-4">Configure website settings and preferences. Changes will be saved automatically.</p>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-gray-800 p-6 rounded shadow">
-                    <form id="settings-form">
-                        <h3 class="font-semibold mb-4">General Settings</h3>
+            <p class="mb-6">Configure website settings and preferences. Changes will be saved automatically.</p>
+            
+            <!-- General Settings -->
+            <div class="bg-gray-800 p-6 rounded shadow mb-6">
+                <form id="settings-form">
+                    <h3 class="font-semibold mb-4 text-xl">General Settings</h3>
                         
                         <div class="mb-4">
                             <label for="site-title" class="block mb-2 font-medium">Site Title</label>
@@ -184,7 +204,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
         </section>
     </main>
 

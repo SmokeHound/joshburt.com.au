@@ -28,6 +28,7 @@
     body {
       transition: background-color 0.3s, color 0.3s;
       font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
+      position: relative;
     }
     .dark {
       background-color: #1f2937;
@@ -38,14 +39,32 @@
       color: #1f2937;
     }
     .sidebar {
-      transition: transform 0.3s ease-in-out;
+      width: var(--sidebar-width);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
+      transition: background-color 0.3s;
+      z-index: 100;
     }
-    @media (max-width: 768px) {
+    main {
+      margin-left: var(--sidebar-width);
+      padding-top: 20px;
+      min-height: 100vh;
+      display: block;
+      position: relative;
+    }
+    @media (max-width: 991.98px) {
       .sidebar {
-        transform: translateX(-100%);
+        width: 100%;
+        height: auto;
+        position: relative;
+        z-index: 100;
       }
-      .sidebar.open {
-        transform: translateX(0);
+      main {
+        margin-left: 0;
+        min-height: auto;
       }
     }
     .card {
@@ -60,7 +79,6 @@
       opacity: 0;
       transform: translateX(20px);
       transition: all 0.3s ease-in-out;
-=
     }
   </style>
 </head>
