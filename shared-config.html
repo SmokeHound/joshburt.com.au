@@ -1,0 +1,49 @@
+<!-- Shared Tailwind CSS Configuration and Common Styles -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#3b82f6',
+                    secondary: '#10b981',
+                    accent: '#8b5cf6',
+                },
+                fontFamily: {
+                    sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                },
+            },
+        },
+    };
+</script>
+<style>
+    body {
+        transition: background-color 0.3s, color 0.3s;
+    }
+    .dark {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+    .light {
+        background-color: #f9fafb;
+        color: #1f2937;
+    }
+    .sidebar {
+        transition: transform 0.3s ease-in-out;
+    }
+    @media (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-100%);
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+    }
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
