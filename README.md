@@ -1,6 +1,6 @@
  https://joshburt.com.au/
-
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fjoshburt.com.au%2Findex.html&up_message=Online&up_color=green) - joshburt.com.au
+ 
+[![🚀 Deploy website via FTP on push.](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml)
 
 ## Design System
 
