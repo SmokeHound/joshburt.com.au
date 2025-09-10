@@ -600,7 +600,7 @@
       });
 
       // Submit order button event
-      submitOrderBtn.addEventListenr('click', () => {
+      submitOrderBtn.addEventListener('click', () => {
         if (Object.keys(currentOrder).length === 0) {
           showToast('Your order is empty.', 'error');
           return;

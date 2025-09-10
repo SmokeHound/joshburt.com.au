@@ -166,175 +166,41 @@
                     </form>
                 </div>
 
-                <!-- Color Scheme Settings -->
-                <div class="bg-gray-800 p-6 rounded shadow mb-6">
-                    <h3 class="font-semibold mb-4 text-xl">Color Scheme Settings</h3>
+                <div class="bg-gray-800 p-6 rounded shadow">
+                    <h3 class="font-semibold mb-4">Current Settings (Preview)</h3>
+                    <div class="space-y-3 text-sm text-gray-300 settings-preview">
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Site Title:</span>
+                            <span data-preview="site-title">Josh's App</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Site Description:</span>
+                            <span data-preview="site-description">Responsive website template...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Theme:</span>
+                            <span data-preview="theme">Dark</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Contact Email:</span>
+                            <span data-preview="contact-email">admin@example.com</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Maintenance Mode:</span>
+                            <span class="text-green-400" data-preview="maintenance-mode">Off</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Homepage Message:</span>
+                            <span data-preview="homepage-message">Welcome to My Website</span>
+                        </div>
+                    </div>
                     
-                    <!-- Preset Themes -->
-                    <div class="mb-6">
-                        <h4 class="font-medium mb-3">Preset Themes</h4>
-                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                            <button class="preset-theme p-3 rounded border-2 border-transparent hover:border-primary focus:outline-none focus:border-primary transition-colors" data-theme="blue">
-                                <div class="w-full h-8 rounded flex overflow-hidden shadow-sm">
-                                    <div class="w-1/3 bg-blue-600"></div>
-                                    <div class="w-1/3 bg-blue-500"></div>
-                                    <div class="w-1/3 bg-blue-400"></div>
-                                </div>
-                                <span class="block text-sm mt-2 text-center">Blue (Default)</span>
-                            </button>
-                            <button class="preset-theme p-3 rounded border-2 border-transparent hover:border-primary focus:outline-none focus:border-primary transition-colors" data-theme="green">
-                                <div class="w-full h-8 rounded flex overflow-hidden shadow-sm">
-                                    <div class="w-1/3 bg-green-600"></div>
-                                    <div class="w-1/3 bg-green-500"></div>
-                                    <div class="w-1/3 bg-green-400"></div>
-                                </div>
-                                <span class="block text-sm mt-2 text-center">Green</span>
-                            </button>
-                            <button class="preset-theme p-3 rounded border-2 border-transparent hover:border-primary focus:outline-none focus:border-primary transition-colors" data-theme="purple">
-                                <div class="w-full h-8 rounded flex overflow-hidden shadow-sm">
-                                    <div class="w-1/3 bg-purple-600"></div>
-                                    <div class="w-1/3 bg-purple-500"></div>
-                                    <div class="w-1/3 bg-purple-400"></div>
-                                </div>
-                                <span class="block text-sm mt-2 text-center">Purple</span>
-                            </button>
-                            <button class="preset-theme p-3 rounded border-2 border-transparent hover:border-primary focus:outline-none focus:border-primary transition-colors" data-theme="red">
-                                <div class="w-full h-8 rounded flex overflow-hidden shadow-sm">
-                                    <div class="w-1/3 bg-red-600"></div>
-                                    <div class="w-1/3 bg-red-500"></div>
-                                    <div class="w-1/3 bg-red-400"></div>
-                                </div>
-                                <span class="block text-sm mt-2 text-center">Red</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Custom Colors -->
-                    <div class="mb-6">
-                        <h4 class="font-medium mb-3">Custom Colors</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label for="primary-color" class="block mb-2 font-medium text-sm">Primary Color</label>
-                                <div class="flex items-center gap-2">
-                                    <input type="color" id="primary-color" value="#3b82f6" class="w-12 h-10 rounded border border-gray-600 cursor-pointer">
-                                    <input type="text" id="primary-color-text" value="#3b82f6" class="flex-1 p-2 rounded bg-gray-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                            </div>
-                            <div>
-                                <label for="secondary-color" class="block mb-2 font-medium text-sm">Secondary Color</label>
-                                <div class="flex items-center gap-2">
-                                    <input type="color" id="secondary-color" value="#10b981" class="w-12 h-10 rounded border border-gray-600 cursor-pointer">
-                                    <input type="text" id="secondary-color-text" value="#10b981" class="flex-1 p-2 rounded bg-gray-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                            </div>
-                            <div>
-                                <label for="accent-color" class="block mb-2 font-medium text-sm">Accent Color</label>
-                                <div class="flex items-center gap-2">
-                                    <input type="color" id="accent-color" value="#8b5cf6" class="w-12 h-10 rounded border border-gray-600 cursor-pointer">
-                                    <input type="text" id="accent-color-text" value="#8b5cf6" class="flex-1 p-2 rounded bg-gray-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Color Preview -->
-                    <div class="mb-6">
-                        <h4 class="font-medium mb-3">Color Preview</h4>
-                        <div class="bg-gray-700 p-4 rounded">
-                            <div class="flex gap-2 mb-3">
-                                <button id="primary-preview" class="flex-1 p-2 bg-primary text-white rounded font-medium">Primary Button</button>
-                                <button id="secondary-preview" class="flex-1 p-2 bg-secondary text-white rounded font-medium">Secondary Button</button>
-                                <button id="accent-preview" class="flex-1 p-2 bg-accent text-white rounded font-medium">Accent Button</button>
-                            </div>
-                            <p class="text-sm text-gray-300">Preview how your selected colors will look on buttons and interface elements.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3">
-                        <button id="apply-colors" class="flex-1 p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">Apply Colors</button>
-                        <button id="reset-colors" class="px-4 p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400">Reset</button>
-                    </div>
-                </div>
-
-                <!-- Current Settings Preview -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-gray-800 p-6 rounded shadow">
-                        <h3 class="font-semibold mb-4">Current Settings (Preview)</h3>
-                        <div class="space-y-3 text-sm text-gray-300">
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Site Title:</span>
-                                <span id="preview-site-title">Josh's App</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Site Description:</span>
-                                <span>Responsive website template...</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Theme:</span>
-                                <span id="preview-theme">Dark</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Contact Email:</span>
-                                <span id="preview-contact-email">admin@example.com</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Maintenance Mode:</span>
-                                <span class="text-green-400" id="preview-maintenance">Off</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Homepage Message:</span>
-                                <span id="preview-homepage-message">Welcome to My Website</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6 pt-4 border-t border-gray-600">
-                            <h4 class="font-semibold mb-2">Quick Actions</h4>
-                            <div class="space-y-2">
-                                <button class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm">Clear Cache</button>
-                                <button class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm">Export Settings</button>
-                                <button class="w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm">Reset to Defaults</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Color Scheme Preview -->
-                    <div class="bg-gray-800 p-6 rounded shadow">
-                        <h3 class="font-semibold mb-4">Color Scheme (Live Preview)</h3>
-                        <div class="space-y-3 text-sm text-gray-300">
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Primary Color:</span>
-                                <span id="preview-primary-color">#3b82f6</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Secondary Color:</span>
-                                <span id="preview-secondary-color">#10b981</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Accent Color:</span>
-                                <span id="preview-accent-color">#8b5cf6</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-medium text-white">Selected Theme:</span>
-                                <span id="preview-color-theme">Blue (Default)</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6 pt-4 border-t border-gray-600">
-                            <h4 class="font-semibold mb-2">Live Color Test</h4>
-                            <div class="space-y-2">
-                                <div class="flex gap-2">
-                                    <div class="w-4 h-4 rounded" id="color-sample-primary" style="background-color: #3b82f6;"></div>
-                                    <span class="text-xs">Primary</span>
-                                </div>
-                                <div class="flex gap-2">
-                                    <div class="w-4 h-4 rounded" id="color-sample-secondary" style="background-color: #10b981;"></div>
-                                    <span class="text-xs">Secondary</span>
-                                </div>
-                                <div class="flex gap-2">
-                                    <div class="w-4 h-4 rounded" id="color-sample-accent" style="background-color: #8b5cf6;"></div>
-                                    <span class="text-xs">Accent</span>
-                                </div>
-                            </div>
+                    <div class="mt-6 pt-4 border-t border-gray-600">
+                        <h4 class="font-semibold mb-2">Quick Actions</h4>
+                        <div class="space-y-2">
+                            <button class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" data-action="clear-cache">Clear Cache</button>
+                            <button class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm" data-action="export-settings">Export Settings</button>
+                            <button class="w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm" data-action="reset-defaults">Reset to Defaults</button>
                         </div>
                     </div>
                 </div>
@@ -362,10 +228,15 @@
             localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
             themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
             themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+            
+            // Update settings form theme selector to match current theme
+            document.getElementById('theme').value = body.classList.contains('dark') ? 'dark' : 'light';
+            updatePreview();
         });
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+        // Load saved theme from settings or localStorage
+        const globalSettings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+        const savedTheme = globalSettings['theme'] || localStorage.getItem('theme') || 'dark';
         body.classList.add(savedTheme);
         themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
         themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
@@ -380,241 +251,139 @@
         });
 
         // Settings form handling
-        document.getElementById('settings-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            showToast('Settings saved successfully!');
-            updatePreview();
-        });
-
-        // Color Scheme Management
-        const colorSchemes = {
-            blue: {
-                primary: '#3b82f6',
-                secondary: '#10b981',
-                accent: '#8b5cf6'
-            },
-            green: {
-                primary: '#10b981',
-                secondary: '#059669',
-                accent: '#34d399'
-            },
-            purple: {
-                primary: '#8b5cf6',
-                secondary: '#7c3aed',
-                accent: '#a78bfa'
-            },
-            red: {
-                primary: '#ef4444',
-                secondary: '#dc2626',
-                accent: '#f87171'
-            }
+        const settingsForm = document.getElementById('settings-form');
+        const previewElements = {
+            siteTitle: document.querySelector('.settings-preview [data-preview="site-title"]'),
+            siteDescription: document.querySelector('.settings-preview [data-preview="site-description"]'),
+            theme: document.querySelector('.settings-preview [data-preview="theme"]'),
+            contactEmail: document.querySelector('.settings-preview [data-preview="contact-email"]'),
+            maintenanceMode: document.querySelector('.settings-preview [data-preview="maintenance-mode"]'),
+            homepageMessage: document.querySelector('.settings-preview [data-preview="homepage-message"]')
         };
 
-        // Get color input elements
-        const primaryColorPicker = document.getElementById('primary-color');
-        const primaryColorText = document.getElementById('primary-color-text');
-        const secondaryColorPicker = document.getElementById('secondary-color');
-        const secondaryColorText = document.getElementById('secondary-color-text');
-        const accentColorPicker = document.getElementById('accent-color');
-        const accentColorText = document.getElementById('accent-color-text');
+        // Load settings from localStorage
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {
+                'site-title': 'Josh\'s App',
+                'site-description': 'Responsive website template with admin features',
+                'theme': 'dark',
+                'contact-email': 'admin@example.com',
+                'maintenance-mode': false,
+                'homepage-message': 'Welcome to My Website'
+            };
 
-        // Sync color picker with text input
-        function syncColorInputs() {
-            primaryColorPicker.addEventListener('input', () => {
-                primaryColorText.value = primaryColorPicker.value;
-                updateColorPreview();
-            });
+            // Populate form fields
+            document.getElementById('site-title').value = settings['site-title'];
+            document.getElementById('site-description').value = settings['site-description'];
+            document.getElementById('theme').value = settings['theme'];
+            document.getElementById('contact-email').value = settings['contact-email'];
+            document.getElementById('maintenance-mode').checked = settings['maintenance-mode'];
+            document.getElementById('homepage-message').value = settings['homepage-message'];
 
-            primaryColorText.addEventListener('input', () => {
-                if (isValidHexColor(primaryColorText.value)) {
-                    primaryColorPicker.value = primaryColorText.value;
-                    updateColorPreview();
-                }
-            });
-
-            secondaryColorPicker.addEventListener('input', () => {
-                secondaryColorText.value = secondaryColorPicker.value;
-                updateColorPreview();
-            });
-
-            secondaryColorText.addEventListener('input', () => {
-                if (isValidHexColor(secondaryColorText.value)) {
-                    secondaryColorPicker.value = secondaryColorText.value;
-                    updateColorPreview();
-                }
-            });
-
-            accentColorPicker.addEventListener('input', () => {
-                accentColorText.value = accentColorPicker.value;
-                updateColorPreview();
-            });
-
-            accentColorText.addEventListener('input', () => {
-                if (isValidHexColor(accentColorText.value)) {
-                    accentColorPicker.value = accentColorText.value;
-                    updateColorPreview();
-                }
-            });
+            // Update preview panel
+            updatePreview();
+            
+            // Apply settings to current page
+            applySettings(settings);
         }
 
-        // Validate hex color
-        function isValidHexColor(hex) {
-            return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex);
-        }
-
-        // Update color preview
-        function updateColorPreview() {
-            const primaryColor = primaryColorText.value;
-            const secondaryColor = secondaryColorText.value;
-            const accentColor = accentColorText.value;
-
-            // Update preview buttons
-            document.getElementById('primary-preview').style.backgroundColor = primaryColor;
-            document.getElementById('secondary-preview').style.backgroundColor = secondaryColor;
-            document.getElementById('accent-preview').style.backgroundColor = accentColor;
-
-            // Update color samples
-            document.getElementById('color-sample-primary').style.backgroundColor = primaryColor;
-            document.getElementById('color-sample-secondary').style.backgroundColor = secondaryColor;
-            document.getElementById('color-sample-accent').style.backgroundColor = accentColor;
-
-            // Update preview text
-            document.getElementById('preview-primary-color').textContent = primaryColor;
-            document.getElementById('preview-secondary-color').textContent = secondaryColor;
-            document.getElementById('preview-accent-color').textContent = accentColor;
-        }
-
-        // Handle preset theme selection
-        document.querySelectorAll('.preset-theme').forEach(button => {
-            button.addEventListener('click', () => {
-                const theme = button.dataset.theme;
-                const colors = colorSchemes[theme];
-
-                // Update color inputs
-                primaryColorPicker.value = colors.primary;
-                primaryColorText.value = colors.primary;
-                secondaryColorPicker.value = colors.secondary;
-                secondaryColorText.value = colors.secondary;
-                accentColorPicker.value = colors.accent;
-                accentColorText.value = colors.accent;
-
-                // Update preview
-                updateColorPreview();
-
-                // Update selected theme preview
-                document.getElementById('preview-color-theme').textContent = 
-                    button.querySelector('span').textContent;
-
-                // Update active theme indicator
-                document.querySelectorAll('.preset-theme').forEach(btn => {
-                    btn.classList.remove('border-primary');
-                    btn.classList.add('border-transparent');
-                });
-                button.classList.remove('border-transparent');
-                button.classList.add('border-primary');
-            });
-        });
-
-        // Apply colors to the site
-        document.getElementById('apply-colors').addEventListener('click', () => {
-            const primaryColor = primaryColorText.value;
-            const secondaryColor = secondaryColorText.value;
-            const accentColor = accentColorText.value;
-
-            // Apply colors using CSS custom properties
-            document.documentElement.style.setProperty('--color-primary', primaryColor);
-            document.documentElement.style.setProperty('--color-secondary', secondaryColor);
-            document.documentElement.style.setProperty('--color-accent', accentColor);
-
-            // Update Tailwind config dynamically (for elements that use the config)
-            if (typeof tailwind !== 'undefined' && tailwind.config) {
-                tailwind.config.theme.extend.colors.primary = primaryColor;
-                tailwind.config.theme.extend.colors.secondary = secondaryColor;
-                tailwind.config.theme.extend.colors.accent = accentColor;
-            }
-
-            // Store colors in localStorage for persistence
-            localStorage.setItem('customColors', JSON.stringify({
-                primary: primaryColor,
-                secondary: secondaryColor,
-                accent: accentColor
-            }));
-
-            showToast('Colors applied successfully! Changes will persist for all visitors.');
-        });
-
-        // Reset colors to default
-        document.getElementById('reset-colors').addEventListener('click', () => {
-            const defaultColors = colorSchemes.blue;
-            
-            primaryColorPicker.value = defaultColors.primary;
-            primaryColorText.value = defaultColors.primary;
-            secondaryColorPicker.value = defaultColors.secondary;
-            secondaryColorText.value = defaultColors.secondary;
-            accentColorPicker.value = defaultColors.accent;
-            accentColorText.value = defaultColors.accent;
-
-            updateColorPreview();
-
-            // Reset active theme
-            document.querySelectorAll('.preset-theme').forEach(btn => {
-                btn.classList.remove('border-primary');
-                btn.classList.add('border-transparent');
-            });
-            document.querySelector('[data-theme="blue"]').classList.remove('border-transparent');
-            document.querySelector('[data-theme="blue"]').classList.add('border-primary');
-            
-            document.getElementById('preview-color-theme').textContent = 'Blue (Default)';
-            
-            showToast('Colors reset to defaults!');
-        });
-
-        // Update settings preview
+        // Update the preview panel in real-time
         function updatePreview() {
-            document.getElementById('preview-site-title').textContent = 
-                document.getElementById('site-title').value;
-            document.getElementById('preview-theme').textContent = 
-                document.getElementById('theme').selectedOptions[0].text;
-            document.getElementById('preview-contact-email').textContent = 
-                document.getElementById('contact-email').value;
-            document.getElementById('preview-maintenance').textContent = 
-                document.getElementById('maintenance-mode').checked ? 'On' : 'Off';
-            document.getElementById('preview-maintenance').className = 
-                document.getElementById('maintenance-mode').checked ? 'text-red-400' : 'text-green-400';
-            document.getElementById('preview-homepage-message').textContent = 
-                document.getElementById('homepage-message').value;
+            const settings = getFormSettings();
+            
+            // Update preview values
+            document.querySelector('[data-preview="site-title"]').textContent = settings['site-title'];
+            document.querySelector('[data-preview="site-description"]').textContent = settings['site-description'].substring(0, 30) + '...';
+            document.querySelector('[data-preview="theme"]').textContent = settings['theme'].charAt(0).toUpperCase() + settings['theme'].slice(1);
+            document.querySelector('[data-preview="contact-email"]').textContent = settings['contact-email'];
+            document.querySelector('[data-preview="maintenance-mode"]').textContent = settings['maintenance-mode'] ? 'On' : 'Off';
+            document.querySelector('[data-preview="maintenance-mode"]').className = settings['maintenance-mode'] ? 'text-red-400' : 'text-green-400';
+            document.querySelector('[data-preview="homepage-message"]').textContent = settings['homepage-message'];
         }
 
-        // Load saved colors on page load
-        function loadSavedColors() {
-            const savedColors = localStorage.getItem('customColors');
-            if (savedColors) {
-                const colors = JSON.parse(savedColors);
-                primaryColorPicker.value = colors.primary;
-                primaryColorText.value = colors.primary;
-                secondaryColorPicker.value = colors.secondary;
-                secondaryColorText.value = colors.secondary;
-                accentColorPicker.value = colors.accent;
-                accentColorText.value = colors.accent;
-                
-                updateColorPreview();
-                
-                // Apply the colors immediately
-                document.documentElement.style.setProperty('--color-primary', colors.primary);
-                document.documentElement.style.setProperty('--color-secondary', colors.secondary);
-                document.documentElement.style.setProperty('--color-accent', colors.accent);
+        // Get current form settings
+        function getFormSettings() {
+            return {
+                'site-title': document.getElementById('site-title').value,
+                'site-description': document.getElementById('site-description').value,
+                'theme': document.getElementById('theme').value,
+                'contact-email': document.getElementById('contact-email').value,
+                'maintenance-mode': document.getElementById('maintenance-mode').checked,
+                'homepage-message': document.getElementById('homepage-message').value
+            };
+        }
+
+        // Apply settings to current page
+        function applySettings(settings) {
+            // Update page title if it's the main branding
+            const brandingElements = document.querySelectorAll('h1');
+            brandingElements.forEach(el => {
+                if (el.textContent.includes('Josh\'s App')) {
+                    el.textContent = settings['site-title'];
+                }
+            });
+
+            // Update theme
+            if (settings['theme'] !== (body.classList.contains('dark') ? 'dark' : 'light')) {
+                body.classList.toggle('dark');
+                body.classList.toggle('light');
+                themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
             }
         }
 
-        // Initialize color scheme functionality
-        syncColorInputs();
-        loadSavedColors();
-        updateColorPreview();
-        updatePreview();
+        // Save settings to localStorage
+        function saveSettings() {
+            const settings = getFormSettings();
+            localStorage.setItem('siteSettings', JSON.stringify(settings));
+            showToast('Settings saved successfully!');
+            applySettings(settings);
+        }
 
-        // Set default active theme
-        document.querySelector('[data-theme="blue"]').classList.add('border-primary');
-        document.querySelector('[data-theme="blue"]').classList.remove('border-transparent');
+        // Add event listeners for real-time preview updates
+        document.getElementById('site-title').addEventListener('input', updatePreview);
+        document.getElementById('site-description').addEventListener('input', updatePreview);
+        document.getElementById('theme').addEventListener('change', updatePreview);
+        document.getElementById('contact-email').addEventListener('input', updatePreview);
+        document.getElementById('maintenance-mode').addEventListener('change', updatePreview);
+        document.getElementById('homepage-message').addEventListener('input', updatePreview);
+
+        // Settings form submission
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveSettings();
+        });
+
+        // Quick action buttons
+        document.querySelector('[data-action="clear-cache"]').addEventListener('click', () => {
+            localStorage.removeItem('user');
+            localStorage.removeItem('siteUsers');
+            showToast('Cache cleared successfully!');
+        });
+
+        document.querySelector('[data-action="export-settings"]').addEventListener('click', () => {
+            const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'site-settings.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Settings exported successfully!');
+        });
+
+        document.querySelector('[data-action="reset-defaults"]').addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
+                localStorage.removeItem('siteSettings');
+                loadSettings();
+                showToast('Settings reset to defaults!');
+            }
+        });
+
+        // Load settings when page loads
+        loadSettings();
 
     </script>
 </body>

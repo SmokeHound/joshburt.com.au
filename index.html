@@ -149,6 +149,30 @@
     </main>
 
     <script>
+        // Load and apply site settings
+        function loadAndApplySettings() {
+            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            
+            // Apply site title if set
+            if (settings['site-title']) {
+                const brandingElements = document.querySelectorAll('h1');
+                brandingElements.forEach(el => {
+                    if (el.textContent.includes('Josh\'s App')) {
+                        el.textContent = settings['site-title'];
+                    }
+                });
+            }
+            
+            // Apply homepage message if set
+            if (settings['homepage-message']) {
+                const welcomeMessage = document.getElementById('welcome-message');
+                const currentUser = JSON.parse(localStorage.getItem('user'));
+                if (welcomeMessage && !currentUser) {
+                    welcomeMessage.textContent = settings['homepage-message'];
+                }
+            }
+        }
+
         // Theme Toggle
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
@@ -160,8 +184,9 @@
             themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
         });
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+        // Load saved theme from settings or localStorage
+        const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+        const savedTheme = settings['theme'] || localStorage.getItem('theme') || 'dark';
         body.classList.add(savedTheme);
         themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
         themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
@@ -207,6 +232,9 @@
             userName.textContent = user.name;
             userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
             welcomeMessage.textContent = `Welcome, ${user.name}!`;
+        } else {
+            // Apply homepage message from settings if no user is logged in
+            loadAndApplySettings();
         }
 
         // Open login modal
@@ -232,24 +260,40 @@
 
             // Simulate backend API call (replace with actual Render API endpoint)
             try {
-                // Example: const response = await fetch('https://your-render-backend/api/login', { method: 'POST', body: JSON.stringify({ email, password }) });
-                // const data = await response.json();
-                // Simulate successful login
-                const data = { name: email.split('@')[0], avatar: 'https://via.placeholder.com/40' }; // Mock response
-                if (email === 'test@example.com' && password === 'password') {
-                    localStorage.setItem('user', JSON.stringify(data));
-                    userInfo.classList.remove('hidden');
-                    loginBtn.classList.add('hidden');
-                    logoutBtn.classList.remove('hidden');
-                    userName.textContent = data.name;
-                    userAvatar.src = data.avatar;
-                    welcomeMessage.textContent = `Welcome, ${data.name}!`;
-                    loginModal.classList.add('hidden');
-                    loginForm.reset();
-                    showToast('Login successful!');
+                // Check against registered users or use default credentials
+                const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
+                const registeredUser = users.find(u => u.email === email);
+                
+                let authenticatedUser = null;
+                
+                if (registeredUser && password === 'password') {
+                    // Found registered user
+                    authenticatedUser = { 
+                        name: registeredUser.name, 
+                        email: registeredUser.email,
+                        avatar: 'https://via.placeholder.com/40' 
+                    };
+                } else if (email === 'test@example.com' && password === 'password') {
+                    // Default credentials
+                    authenticatedUser = { 
+                        name: email.split('@')[0], 
+                        email: email,
+                        avatar: 'https://via.placeholder.com/40' 
+                    };
                 } else {
                     throw new Error('Invalid credentials');
                 }
+
+                localStorage.setItem('user', JSON.stringify(authenticatedUser));
+                userInfo.classList.remove('hidden');
+                loginBtn.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                userName.textContent = authenticatedUser.name;
+                userAvatar.src = authenticatedUser.avatar;
+                welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
+                loginModal.classList.add('hidden');
+                loginForm.reset();
+                showToast('Login successful!');
             } catch (error) {
                 loginError.textContent = error.message;
                 loginError.classList.remove('hidden');
@@ -266,9 +310,15 @@
             userInfo.classList.add('hidden');
             loginBtn.classList.remove('hidden');
             logoutBtn.classList.add('hidden');
-            welcomeMessage.textContent = 'Welcome to My Website';
+            
+            // Restore homepage message from settings
+            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
             showToast('Logged out successfully!');
         });
+
+        // Apply settings on page load
+        document.addEventListener('DOMContentLoaded', loadAndApplySettings);
     </script>
 </body>
 </html>

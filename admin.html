@@ -119,6 +119,21 @@
     </main>
 
     <script>
+        // Load and apply site settings
+        function loadAndApplySettings() {
+            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            
+            // Apply site title if set
+            if (settings['site-title']) {
+                const brandingElements = document.querySelectorAll('h1');
+                brandingElements.forEach(el => {
+                    if (el.textContent.includes('Admin Dashboard') || el.textContent.includes('Josh\'s App')) {
+                        el.textContent = settings['site-title'] + ' - Admin';
+                    }
+                });
+            }
+        }
+
         // Show toast notification
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -140,8 +155,9 @@
             themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
         });
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+        // Load saved theme from settings or localStorage
+        const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+        const savedTheme = settings['theme'] || localStorage.getItem('theme') || 'dark';
         body.classList.add(savedTheme);
         themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
         themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
@@ -154,6 +170,9 @@
             const isOpen = sidebar.classList.contains('open');
             menuToggle.setAttribute('aria-expanded', isOpen);
         });
+        
+        // Apply settings on page load
+        document.addEventListener('DOMContentLoaded', loadAndApplySettings);
     </script>
 </body>
 </html>
