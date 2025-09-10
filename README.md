@@ -1,6 +1,6 @@
-# joshburt.com.au
+ https://joshburt.com.au/
 
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fjoshburt.com.au%2Findex.html&up_message=Online&up_color=Green&down_message=Offline&down_color=Red) - joshburt.com.au
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fjoshburt.com.au%2Findex.html&up_message=Online&up_color=green) - joshburt.com.au
 
 ## Design System
 
@@ -27,5 +27,3 @@ This website uses a unified design system based on **Tailwind CSS** with consist
 - **Settings** (`settings.html`) - Site configuration
 - **Oil Orders** (`oil.html`) - Castrol product ordering system
 - **Login** (`login.html`) - Authentication page
-
-Code reviews by: coderabbit.ai
