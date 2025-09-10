@@ -21,80 +21,223 @@
             },
         };
     </script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body class="dark min-h-screen flex flex-col font-sans bg-gray-900 text-white">
-    <header class="sticky top-0 bg-gray-800 p-4 shadow z-40 w-full flex items-center justify-between">
-        <div>
-            <h1 class="text-2xl font-bold">Site Settings</h1>
-            <nav class="mt-2">
-                <a href="index.html" class="mr-4 text-primary hover:underline">Home</a>
-                <a href="admin.html" class="mr-4 text-primary hover:underline">Dashboard</a>
-                <a href="users.html" class="mr-4 text-primary hover:underline">User Management</a>
-                <a href="analytics.html" class="mr-4 text-primary hover:underline">Analytics</a>
-                <a href="login.html" class="text-primary hover:underline">Logout</a>
-            </nav>
-        </div>
-        <button id="theme-toggle" class="ml-4 p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary">Toggle Light Mode</button>
-    </header>
-    <main class="flex-1 p-4">
-        <h2 class="text-xl font-semibold mb-4">Configure Site Settings</h2>
-        <form class="max-w-lg mx-auto bg-gray-800 p-6 rounded shadow">
-            <div class="mb-4">
-                <label for="site-title" class="block mb-2 font-medium">Site Title</label>
-                <input type="text" id="site-title" name="site-title" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter site title">
-            </div>
-            <div class="mb-4">
-                <label for="site-description" class="block mb-2 font-medium">Site Description</label>
-                <textarea id="site-description" name="site-description" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter site description"></textarea>
-            </div>
-            <div class="mb-4">
-                <label for="theme" class="block mb-2 font-medium">Theme</label>
-                <select id="theme" name="theme" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="contact-email" class="block mb-2 font-medium">Contact Email</label>
-                <input type="email" id="contact-email" name="contact-email" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="admin@example.com">
-            </div>
-            <div class="mb-4">
-                <label for="maintenance-mode" class="block mb-2 font-medium">Maintenance Mode</label>
-                <input type="checkbox" id="maintenance-mode" name="maintenance-mode" class="mr-2 align-middle">
-                <span>Enable maintenance mode</span>
-            </div>
-            <div class="mb-4">
-                <label for="homepage-message" class="block mb-2 font-medium">Homepage Message</label>
-                <input type="text" id="homepage-message" name="homepage-message" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Welcome to our site!">
-            </div>
-            <button type="submit" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">Save Settings</button>
-        </form>
-        <div class="mt-8 max-w-lg mx-auto text-sm text-gray-400">
-            <h3 class="font-semibold mb-2">Current Settings (Preview)</h3>
-            <ul class="list-disc pl-5">
-                <li>Site Title: Josh's App</li>
-                <li>Site Description: Responsive website template with admin features</li>
-                <li>Theme: Dark</li>
-                <li>Contact Email: admin@example.com</li>
-                <li>Maintenance Mode: Off</li>
-                <li>Homepage Message: Welcome to our site!</li>
+<body class="dark min-h-screen flex flex-col font-sans">
+    <!-- Mobile Menu Toggle -->
+    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+        ☰
+    </button>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-gray-800 dark:bg-gray-800 p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+        <!-- App Branding -->
+        <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
+
+        <!-- Navigation -->
+        <nav>
+            <ul class="space-y-2">
+                <li><a href="index.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+                <li><a href="admin.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+                <li><a href="users.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+                <li><a href="analytics.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+                <li><a href="settings.html" class="nav-link block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Settings</a></li>
+                <li><a href="oil.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
+                <li><a href="login.html" class="nav-link block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
             </ul>
+        </nav>
+
+        <!-- Theme Toggle -->
+        <div class="mt-auto">
+            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+                Toggle Light Mode
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:ml-64">
+        <!-- Sticky Header -->
+        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40">
+            <h2 class="text-3xl font-semibold">Site Settings</h2>
+        </header>
+
+        <div class="max-w-2xl mx-auto">
+            <form class="bg-gray-700 dark:bg-gray-700 p-6 rounded shadow card">
+                <h2 class="text-xl font-semibold mb-6">Configure Site Settings</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="site-title" class="block mb-2 font-medium text-gray-300">Site Title</label>
+                        <input type="text" id="site-title" name="site-title" required 
+                               class="w-full p-3 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
+                               placeholder="Enter site title" value="Josh's App">
+                    </div>
+                    
+                    <div>
+                        <label for="site-description" class="block mb-2 font-medium text-gray-300">Site Description</label>
+                        <textarea id="site-description" name="site-description" required 
+                                  class="w-full p-3 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
+                                  rows="3" placeholder="Enter site description">Responsive website template with admin features</textarea>
+                    </div>
+                    
+                    <div>
+                        <label for="theme" class="block mb-2 font-medium text-gray-300">Theme</label>
+                        <select id="theme" name="theme" required 
+                                class="w-full p-3 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="dark" selected>Dark</option>
+                            <option value="light">Light</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="contact-email" class="block mb-2 font-medium text-gray-300">Contact Email</label>
+                        <input type="email" id="contact-email" name="contact-email" required 
+                               class="w-full p-3 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
+                               placeholder="admin@example.com" value="admin@example.com">
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" id="maintenance-mode" name="maintenance-mode" 
+                               class="mr-3 w-4 h-4 text-primary bg-gray-600 border-gray-500 rounded focus:ring-primary focus:ring-2">
+                        <label for="maintenance-mode" class="font-medium text-gray-300">Enable maintenance mode</label>
+                    </div>
+                    
+                    <div>
+                        <label for="homepage-message" class="block mb-2 font-medium text-gray-300">Homepage Message</label>
+                        <input type="text" id="homepage-message" name="homepage-message" required 
+                               class="w-full p-3 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
+                               placeholder="Welcome to our site!" value="Welcome to our site!">
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full mt-6 p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">
+                    Save Settings
+                </button>
+            </form>
+            
+            <div class="mt-8 bg-gray-700 dark:bg-gray-700 p-6 rounded shadow card">
+                <h3 class="font-semibold mb-4 text-lg">Current Settings (Preview)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Site Title:</span>
+                            <span class="font-medium">Josh's App</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Theme:</span>
+                            <span class="font-medium">Dark</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Maintenance Mode:</span>
+                            <span class="font-medium text-secondary">Off</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Contact Email:</span>
+                            <span class="font-medium">admin@example.com</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Homepage Message:</span>
+                            <span class="font-medium">Welcome to our site!</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3 border-t border-gray-600">
+                    <div class="text-gray-400 text-xs">
+                        <strong>Site Description:</strong> Responsive website template with admin features
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
     <script>
-        // Theme Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-        });
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        body.classList.add(savedTheme);
-        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        // Shared theme functionality
+        (function() {
+            function initTheme() {
+                const themeToggle = document.getElementById('theme-toggle');
+                const body = document.body;
+                
+                if (!themeToggle) return;
+                
+                themeToggle.addEventListener('click', () => {
+                    body.classList.toggle('dark');
+                    body.classList.toggle('light');
+                    localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+                    themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+                    themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+                });
+
+                // Load saved theme
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                body.classList.add(savedTheme);
+                themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+                themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+            }
+
+            // Initialize theme when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initTheme);
+            } else {
+                initTheme();
+            }
+        })();
+
+        // Shared navigation functionality
+        (function() {
+            // Set active navigation link based on current page
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+                    link.classList.add('bg-primary', 'text-white');
+                    link.setAttribute('aria-current', 'page');
+                }
+            });
+
+            // Mobile menu toggle functionality
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    const isOpen = sidebar.classList.contains('open');
+                    menuToggle.setAttribute('aria-expanded', isOpen);
+                });
+            }
+        })();
     </script>
 </body>
 </html>

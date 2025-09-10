@@ -5,46 +5,207 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body class="dark min-h-screen flex flex-col font-sans bg-gray-900 text-white">
-    <header class="sticky top-0 bg-gray-800 p-4 shadow z-40 w-full">
-        <h1 class="text-2xl font-bold">Analytics</h1>
-        <nav class="mt-2">
-            <a href="index.html" class="mr-4 text-primary hover:underline">Home</a>
-            <a href="admin.html" class="mr-4 text-primary hover:underline">Dashboard</a>
-            <a href="users.html" class="mr-4 text-primary hover:underline">User Management</a>
-            <a href="settings.html" class="mr-4 text-primary hover:underline">Settings</a>
-            <a href="login.html" class="text-primary hover:underline">Logout</a>
+<body class="dark min-h-screen flex flex-col font-sans">
+    <!-- Mobile Menu Toggle -->
+    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+        ☰
+    </button>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-gray-800 dark:bg-gray-800 p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+        <!-- App Branding -->
+        <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
+
+        <!-- Navigation -->
+        <nav>
+            <ul class="space-y-2">
+                <li><a href="index.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+                <li><a href="admin.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+                <li><a href="users.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+                <li><a href="analytics.html" class="nav-link block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Analytics</a></li>
+                <li><a href="settings.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
+                <li><a href="oil.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
+                <li><a href="login.html" class="nav-link block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+            </ul>
         </nav>
-    </header>
-    <main class="flex-1 p-4">
-        <h2 class="text-xl font-semibold mb-4">Site Analytics</h2>
-        <div class="max-w-2xl mx-auto bg-gray-800 p-6 rounded shadow">
-            <div class="mb-6">
-                <h3 class="font-semibold mb-2">Visitor Statistics</h3>
-                <ul class="list-disc pl-5 text-gray-300">
-                    <li>Total Visitors: 1,234</li>
-                    <li>Active Users: 56</li>
-                    <li>New Signups (this month): 12</li>
-                </ul>
-            </div>
-            <div class="mb-6">
-                <h3 class="font-semibold mb-2">User Engagement</h3>
-                <ul class="list-disc pl-5 text-gray-300">
-                    <li>Average Session Duration: 5m 23s</li>
-                    <li>Bounce Rate: 42%</li>
-                    <li>Pages per Session: 3.1</li>
-                </ul>
-            </div>
-            <div class="mb-6">
-                <h3 class="font-semibold mb-2">Top Pages</h3>
-                <ol class="list-decimal pl-5 text-gray-300">
-                    <li>Home</li>
-                    <li>Dashboard</li>
-                    <li>User Management</li>
-                </ol>
+
+        <!-- Theme Toggle -->
+        <div class="mt-auto">
+            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+                Toggle Light Mode
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:ml-64">
+        <!-- Sticky Header -->
+        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40">
+            <h2 class="text-3xl font-semibold">Site Analytics</h2>
+        </header>
+
+        <div class="max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-gray-700 dark:bg-gray-700 p-6 rounded shadow card">
+                    <h3 class="font-semibold mb-4 text-lg text-primary">Visitor Statistics</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex justify-between">
+                            <span>Total Visitors:</span>
+                            <span class="font-semibold">1,234</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Active Users:</span>
+                            <span class="font-semibold">56</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>New Signups (this month):</span>
+                            <span class="font-semibold">12</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-700 dark:bg-gray-700 p-6 rounded shadow card">
+                    <h3 class="font-semibold mb-4 text-lg text-secondary">User Engagement</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex justify-between">
+                            <span>Avg Session Duration:</span>
+                            <span class="font-semibold">5m 23s</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Bounce Rate:</span>
+                            <span class="font-semibold">42%</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Pages per Session:</span>
+                            <span class="font-semibold">3.1</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-700 dark:bg-gray-700 p-6 rounded shadow card">
+                    <h3 class="font-semibold mb-4 text-lg text-accent">Top Pages</h3>
+                    <ol class="space-y-2 text-gray-300">
+                        <li class="flex justify-between">
+                            <span>1. Home</span>
+                            <span class="font-semibold">45%</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>2. Dashboard</span>
+                            <span class="font-semibold">28%</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>3. User Management</span>
+                            <span class="font-semibold">15%</span>
+                        </li>
+                    </ol>
+                </div>
             </div>
         </div>
     </main>
+    <script>
+        // Shared theme functionality
+        (function() {
+            function initTheme() {
+                const themeToggle = document.getElementById('theme-toggle');
+                const body = document.body;
+                
+                if (!themeToggle) return;
+                
+                themeToggle.addEventListener('click', () => {
+                    body.classList.toggle('dark');
+                    body.classList.toggle('light');
+                    localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+                    themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+                    themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+                });
+
+                // Load saved theme
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                body.classList.add(savedTheme);
+                themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+                themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+            }
+
+            // Initialize theme when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initTheme);
+            } else {
+                initTheme();
+            }
+        })();
+
+        // Shared navigation functionality
+        (function() {
+            // Set active navigation link based on current page
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+                    link.classList.add('bg-primary', 'text-white');
+                    link.setAttribute('aria-current', 'page');
+                }
+            });
+
+            // Mobile menu toggle functionality
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    const isOpen = sidebar.classList.contains('open');
+                    menuToggle.setAttribute('aria-expanded', isOpen);
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
