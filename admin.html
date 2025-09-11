@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
+    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
+    
     <link rel="stylesheet" href="./assets/css/styles.css">
     <script>
         // Configuration for dynamic color updates from settings
@@ -15,6 +24,18 @@
             document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
         }
         applyDynamicColors();
+        // Service Worker Registration for PWA
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(registration => {
+                        console.log("SW registered: ", registration);
+                    })
+                    .catch(registrationError => {
+                        console.log("SW registration failed: ", registrationError);
+                    });
+            });
+        }
     </script>
     <style>
         body {
@@ -168,6 +189,18 @@
         
         // Apply settings on page load
         document.addEventListener('DOMContentLoaded', loadAndApplySettings);
+        // Service Worker Registration for PWA
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(registration => {
+                        console.log("SW registered: ", registration);
+                    })
+                    .catch(registrationError => {
+                        console.log("SW registration failed: ", registrationError);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
