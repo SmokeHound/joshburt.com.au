@@ -51,21 +51,55 @@
             transform: translateY(-4px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+        /* Screen reader only class */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        .focus\:not-sr-only:focus {
+            position: static;
+            width: auto;
+            height: auto;
+            padding: 0.5rem;
+            margin: 0;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+        }
+        /* High contrast focus indicators */
+        .focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+    <!-- Skip Links -->
+    <div class="sr-only">
+        <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
+        <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
+    </div>
+
     <!-- Mobile Menu Toggle -->
-    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
-        ☰
+    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
+        <span aria-hidden="true">☰</span>
+        <span class="sr-only">Menu</span>
     </button>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
         <!-- App Branding -->
         <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
         <!-- User Profile Section -->
-        <div id="user-profile" class="mb-6">
+        <div id="user-profile" class="mb-6" role="region" aria-label="User profile">
             <div id="user-info" class="hidden flex items-center space-x-2">
                 <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
                 <span id="user-name" class="text-white"></span>
@@ -75,42 +109,45 @@
         </div>
 
         <!-- Navigation -->
-        <nav>
-            <ul class="space-y-2">
-                <li><a href="index.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Home</a></li>
-                <li><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
-                <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-                <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-                <li><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
-                <li><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
-                <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+        <nav role="navigation" aria-label="Main navigation">
+            <ul class="space-y-2" role="list">
+                <li role="listitem"><a href="index.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Home</a></li>
+                <li role="listitem"><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+                <li role="listitem"><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+                <li role="listitem"><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+                <li role="listitem"><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
+                <li role="listitem"><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
+                <li role="listitem"><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
             </ul>
         </nav>
 
         <!-- Theme Toggle -->
         <div class="mt-auto">
-            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode" aria-pressed="false">
                 Toggle Light Mode
             </button>
         </div>
     </aside>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
-        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
+    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title" aria-describedby="login-modal-description">
+        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md" role="document">
             <h2 id="login-modal-title" class="text-xl font-semibold mb-4 text-white">Login</h2>
-            <form id="login-form">
+            <p id="login-modal-description" class="sr-only">Please enter your email and password to login</p>
+            <form id="login-form" role="form" aria-labelledby="login-modal-title">
                 <div class="mb-4">
                     <label for="email" class="block text-sm text-white">Email</label>
-                    <input type="email" id="email" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
+                    <input type="email" id="email" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true" aria-describedby="email-error">
+                    <div id="email-error" class="sr-only" role="alert" aria-live="polite"></div>
                 </div>
                 <div class="mb-4">
                     <label for="password" class="block text-sm text-white">Password</label>
-                    <input type="password" id="password" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
+                    <input type="password" id="password" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true" aria-describedby="password-error">
+                    <div id="password-error" class="sr-only" role="alert" aria-live="polite"></div>
                 </div>
-                <div id="login-error" class="hidden text-red-500 text-sm mb-4"></div>
+                <div id="login-error" class="hidden text-red-500 text-sm mb-4" role="alert" aria-live="polite"></div>
                 <button type="submit" id="submit-login" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Submit login">
-                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></span>
+                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin" aria-hidden="true"></span>
                 </button>
             </form>
             <button id="close-modal" class="mt-4 w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400" aria-label="Close login modal">Close</button>
@@ -121,29 +158,29 @@
     <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4">
+    <main id="main-content" class="flex-1 p-4" role="main">
 
         <!-- Sticky Header -->
-        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40" style="position:sticky;top:0;left:0;right:0;">
+        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40" style="position:sticky;top:0;left:0;right:0;" role="banner">
             <h2 class="text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
         </header>
 
         <!-- Content Section -->
-        <section>
+        <section role="region" aria-label="Main content">
             <p class="mb-4">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" role="group" aria-label="Content cards">
+                <article class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card" role="article">
                     <h3 class="font-semibold">Card 1</h3>
                     <p>Sample content for a card.</p>
-                </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
+                </article>
+                <article class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card" role="article">
                     <h3 class="font-semibold">Card 2</h3>
                     <p>Sample content for a card.</p>
-                </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
+                </article>
+                <article class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card" role="article">
                     <h3 class="font-semibold">Card 3</h3>
                     <p>Sample content for a card.</p>
-                </div>
+                </article>
             </div>
         </section>
     </main>
@@ -179,26 +216,97 @@
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('dark');
             body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.textContent = isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+            themeToggle.setAttribute('aria-label', isDark ? 'Toggle light mode' : 'Toggle dark mode');
+            themeToggle.setAttribute('aria-pressed', isDark ? 'false' : 'true');
+        });
+
+        // Keyboard support for theme toggle
+        themeToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                themeToggle.click();
+            }
         });
 
         // Load saved theme from settings or localStorage
         const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
         const savedTheme = settings['theme'] || localStorage.getItem('theme') || 'dark';
         body.classList.add(savedTheme);
-        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+        const isDark = savedTheme === 'dark';
+        themeToggle.textContent = isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        themeToggle.setAttribute('aria-label', isDark ? 'Toggle light mode' : 'Toggle dark mode');
+        themeToggle.setAttribute('aria-pressed', isDark ? 'false' : 'true');
 
-        // Mobile Menu Toggle
+        // Mobile Menu Toggle with enhanced accessibility
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('open');
             const isOpen = sidebar.classList.contains('open');
             menuToggle.setAttribute('aria-expanded', isOpen);
+            
+            // Announce state change to screen readers
+            const announcement = isOpen ? 'Navigation menu opened' : 'Navigation menu closed';
+            announceToScreenReader(announcement);
         });
+
+        // Keyboard support for mobile menu toggle
+        menuToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                menuToggle.click();
+            }
+        });
+
+        // Focus trap for mobile sidebar when open
+        function trapFocus(element) {
+            const focusableElements = element.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstFocusableElement = focusableElements[0];
+            const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+            element.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusableElement) {
+                            lastFocusableElement.focus();
+                            e.preventDefault();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusableElement) {
+                            firstFocusableElement.focus();
+                            e.preventDefault();
+                        }
+                    }
+                }
+                if (e.key === 'Escape') {
+                    if (sidebar.classList.contains('open')) {
+                        menuToggle.click();
+                        menuToggle.focus();
+                    }
+                }
+            });
+        }
+
+        // Apply focus trap to sidebar
+        trapFocus(sidebar);
+
+        // Screen reader announcement function
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.setAttribute('aria-atomic', 'true');
+            announcement.className = 'sr-only';
+            announcement.textContent = message;
+            document.body.appendChild(announcement);
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
 
         // User Management
         const loginBtn = document.getElementById('login-btn');
@@ -237,19 +345,60 @@
             loadAndApplySettings();
         }
 
-        // Open login modal
+        // Open login modal with focus management
         loginBtn.addEventListener('click', () => {
             loginModal.classList.remove('hidden');
+            // Focus first input field
+            document.getElementById('email').focus();
+            // Trap focus in modal
+            trapFocusInModal(loginModal);
         });
 
-        // Close login modal
-        closeModal.addEventListener('click', () => {
+        // Close login modal with focus management
+        function closeLoginModal() {
             loginModal.classList.add('hidden');
             loginForm.reset();
             loginError.classList.add('hidden');
+            // Return focus to login button
+            loginBtn.focus();
+            announceToScreenReader('Login modal closed');
+        }
+
+        closeModal.addEventListener('click', closeLoginModal);
+
+        // Escape key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !loginModal.classList.contains('hidden')) {
+                closeLoginModal();
+            }
         });
 
-        // Handle login
+        // Focus trap for modal
+        function trapFocusInModal(modal) {
+            const focusableElements = modal.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstFocusableElement = focusableElements[0];
+            const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+            modal.addEventListener('keydown', function modalKeydownHandler(e) {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusableElement) {
+                            lastFocusableElement.focus();
+                            e.preventDefault();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusableElement) {
+                            firstFocusableElement.focus();
+                            e.preventDefault();
+                        }
+                    }
+                }
+            });
+        }
+
+        // Handle login with enhanced error handling
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             loginSpinner.classList.remove('hidden');
@@ -257,6 +406,10 @@
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+
+            // Clear previous error states
+            document.getElementById('email-error').textContent = '';
+            document.getElementById('password-error').textContent = '';
 
             // Simulate backend API call (replace with actual Render API endpoint)
             try {
@@ -291,18 +444,21 @@
                 userName.textContent = authenticatedUser.name;
                 userAvatar.src = authenticatedUser.avatar;
                 welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
-                loginModal.classList.add('hidden');
-                loginForm.reset();
+                closeLoginModal();
                 showToast('Login successful!');
+                announceToScreenReader(`Login successful. Welcome ${authenticatedUser.name}`);
             } catch (error) {
                 loginError.textContent = error.message;
                 loginError.classList.remove('hidden');
+                // Focus the email field for retry
+                document.getElementById('email').focus();
+                announceToScreenReader(`Login failed: ${error.message}`);
             } finally {
                 loginSpinner.classList.add('hidden');
             }
         });
 
-        // Handle logout
+        // Handle logout with screen reader announcement
         logoutBtn.addEventListener('click', async () => {
             // Simulate backend API call (replace with actual Render API endpoint)
             // Example: await fetch('https://your-render-backend/api/logout', { method: 'POST' });
@@ -315,6 +471,7 @@
             const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
             welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
             showToast('Logged out successfully!');
+            announceToScreenReader('Successfully logged out');
         });
 
         // Apply settings on page load

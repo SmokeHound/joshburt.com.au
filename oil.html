@@ -87,88 +87,116 @@
       transform: translateX(20px);
       transition: all 0.3s ease-in-out;
     }
+    /* Screen reader only class */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .focus\:not-sr-only:focus {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 0.5rem;
+      margin: 0;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+    }
   </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-  <!-- Mobile Menu Toggle -->
-  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+  <!-- Skip Links -->
+  <div class="sr-only">
+    <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
+    <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
+  </div>
 
-    ☰
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
+    <span aria-hidden="true">☰</span>
+    <span class="sr-only">Menu</span>
   </button>
 
   <!-- Toast Notification -->
   <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
   <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+  <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
     <!-- App Branding -->
     <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
     <!-- Navigation -->
-    <nav>
-      <ul class="space-y-2">
-        <li><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
-        <li><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
-        <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-        <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-        <li><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
-        <li><a href="oil.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Orders</a></li>
-        <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+    <nav role="navigation" aria-label="Main navigation">
+      <ul class="space-y-2" role="list">
+        <li role="listitem"><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+        <li role="listitem"><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+        <li role="listitem"><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+        <li role="listitem"><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+        <li role="listitem"><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
+        <li role="listitem"><a href="oil.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Orders</a></li>
+        <li role="listitem"><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
       </ul>
     </nav>
 
     <!-- Theme Toggle -->
     <div class="mt-auto">
-      <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+      <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode" aria-pressed="false">
         Toggle Light Mode
       </button>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-4">
+  <main id="main-content" class="flex-1 p-4" role="main">
     <!-- Sticky Header -->
-    <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
+    <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10" role="banner">
       <h2 class="text-3xl font-semibold" id="welcome-message">Castrol Products</h2>
     </header>
 
     <!-- Content Section -->
-    <section>
+    <section role="region" aria-label="Product ordering system">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Product Selection Area -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-2" role="region" aria-label="Product selection">
           <p class="mb-4 text-gray-300">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
           
           <!-- Product tabs -->
-          <div id="productTypeTabs" class="mb-6">
+          <div id="productTypeTabs" class="mb-6" role="tablist" aria-label="Product categories">
             <nav class="flex space-x-1 rounded-lg bg-gray-800 p-1">
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-white bg-primary" data-type="Engine oil">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-white bg-primary focus:outline-none focus:ring-2 focus:ring-secondary" data-type="Engine oil" role="tab" aria-selected="true" aria-controls="products-engine-oil" id="tab-engine-oil">
                 Engine Oil
               </button>
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" data-type="Coolant">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary" data-type="Coolant" role="tab" aria-selected="false" aria-controls="products-coolant" id="tab-coolant">
                 Coolant
               </button>
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" data-type="Gear Oil">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary" data-type="Gear Oil" role="tab" aria-selected="false" aria-controls="products-gear-oil" id="tab-gear-oil">
                 Gear Oil
               </button>
             </nav>
           </div>
           
-          <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" role="tabpanel" aria-labelledby="tab-engine-oil" aria-live="polite">
             <!-- Product cards will be dynamically inserted here -->
             <div class="p-4 bg-gray-700 rounded shadow text-center">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary" aria-hidden="true"></div>
               <p class="mt-2">Loading products...</p>
             </div>
           </div>
         </div>
 
         <!-- Order Form Area -->
-        <div class="lg:col-span-1">
+        <div class="lg:col-span-1" role="region" aria-label="Order summary">
           <div id="orderContainer" class="bg-gray-800 rounded shadow p-4 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-semibold">Your Order 🛒</h3>
-              <div id="loading-indicator" class="hidden">
+              <h3 class="text-xl font-semibold">Your Order <span aria-hidden="true">🛒</span></h3>
+              <div id="loading-indicator" class="hidden" aria-hidden="true">
                 <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
               </div>
             </div>
