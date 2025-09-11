@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const authRoutes = require('./api/auth');
 const userRoutes = require('./api/users');
+const oauthRoutes = require('./api/oauth');
 const { initializeDatabase } = require('./config/database');
 
 const app = express();
@@ -61,6 +62,7 @@ app.use(express.static('.', {
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', oauthRoutes);
 app.use('/api/users', userRoutes);
 
 // Health check endpoint
@@ -112,12 +114,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Frontend available at: ${process.env.FRONTEND_URL || `http://localhost:${PORT}`}`);
-  console.log(`🔒 API available at: http://localhost:${PORT}/api`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// Start server only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📱 Frontend available at: ${process.env.FRONTEND_URL || `http://localhost:${PORT}`}`);
+    console.log(`🔒 API available at: http://localhost:${PORT}/api`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
 
 module.exports = app;
