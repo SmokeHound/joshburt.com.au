@@ -103,12 +103,61 @@
             </ul>
         </nav>
 
-        <!-- Theme Toggle -->
-        <div class="mt-auto">
+        <!-- Theme Toggle & Advanced Color Scheme -->
+        <div class="mt-auto space-y-4">
             <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
                 Toggle Light Mode
             </button>
+            <div class="bg-gray-800 p-4 rounded shadow">
+                <h2 class="text-lg font-semibold mb-2 text-white">Advanced Color Scheme</h2>
+                <form id="colorSchemeForm" class="space-y-2">
+                    <div>
+                        <label for="primaryColor" class="block text-gray-300 mb-1">Primary Color</label>
+                        <input type="color" id="primaryColor" name="primaryColor" value="#3b82f6" class="w-12 h-8 border-none rounded">
+                    </div>
+                    <div>
+                        <label for="secondaryColor" class="block text-gray-300 mb-1">Secondary Color</label>
+                        <input type="color" id="secondaryColor" name="secondaryColor" value="#10b981" class="w-12 h-8 border-none rounded">
+                    </div>
+                    <div>
+                        <label for="accentColor" class="block text-gray-300 mb-1">Accent Color</label>
+                        <input type="color" id="accentColor" name="accentColor" value="#8b5cf6" class="w-12 h-8 border-none rounded">
+                    </div>
+                    <button type="submit" class="w-full p-2 bg-accent text-white rounded hover:bg-primary focus:outline-none focus:ring-2 focus:ring-accent font-semibold">Apply Colors</button>
+                </form>
+            </div>
         </div>
+        <script>
+        // Advanced Color Scheme Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorForm = document.getElementById('colorSchemeForm');
+            if (colorForm) {
+                // Load saved colors
+                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+                colorForm.primaryColor.value = settings.primaryColor || '#3b82f6';
+                colorForm.secondaryColor.value = settings.secondaryColor || '#10b981';
+                colorForm.accentColor.value = settings.accentColor || '#8b5cf6';
+
+                colorForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    // Save colors to localStorage
+                    settings.primaryColor = colorForm.primaryColor.value;
+                    settings.secondaryColor = colorForm.secondaryColor.value;
+                    settings.accentColor = colorForm.accentColor.value;
+                    localStorage.setItem('siteSettings', JSON.stringify(settings));
+                    // Apply colors immediately
+                    applyColors(settings);
+                });
+                // Apply colors on load
+                applyColors(settings);
+            }
+            function applyColors(settings) {
+                document.documentElement.style.setProperty('--tw-color-primary', settings.primaryColor || '#3b82f6');
+                document.documentElement.style.setProperty('--tw-color-secondary', settings.secondaryColor || '#10b981');
+                document.documentElement.style.setProperty('--tw-color-accent', settings.accentColor || '#8b5cf6');
+            }
+        });
+        </script>
     </aside>
 
     <!-- Main Content -->
