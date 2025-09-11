@@ -42,9 +42,9 @@ This is a static HTML website for joshburt.com.au featuring a unified Tailwind C
 - All functionality is client-side; no server/database
 
 ## Maintenance
-- All legacy CSS and JS files are deprecated (see style.css, script.js)
+- All styling is handled by Tailwind CSS (inline styles)
 - Shared components should be updated for all pages
-- Remove TODOs once all layouts are aligned
+- Layout consistency maintained across all pages
 
 ## Security
 - FTP credentials are stored in GitHub Secrets (never exposed in repo)
