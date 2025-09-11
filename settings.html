@@ -126,6 +126,37 @@
                     <button type="submit" class="w-full p-2 bg-accent text-white rounded hover:bg-primary focus:outline-none focus:ring-2 focus:ring-accent font-semibold">Apply Colors</button>
                 </form>
             </div>
+
+            <!-- Theme Schedule Settings -->
+            <div id="theme-schedule-settings" class="bg-gray-800 p-4 rounded shadow">
+                <h2 class="text-lg font-semibold mb-2 text-white">Theme Schedule</h2>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="schedule-enabled" class="mr-2 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-300">Auto Dark Mode</span>
+                        </label>
+                        <span id="schedule-status" class="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">Disabled</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Dark mode starts at</label>
+                            <input type="time" id="dark-mode-start" value="18:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Light mode starts at</label>
+                            <input type="time" id="light-mode-start" value="06:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-gray-500 pt-2 border-t border-gray-600">
+                        Current time: <span id="current-time">--:--</span><br>
+                        Scheduled mode: <span id="scheduled-mode" class="text-gray-400">Manual</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <script>
         // Advanced Color Scheme Logic
@@ -433,6 +464,145 @@
 
         // Load settings when page loads
         loadSettings();
+
+        // Theme Schedule System
+        const defaultSchedule = { enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' };
+        let themeSchedule = JSON.parse(localStorage.getItem('themeSchedule') || JSON.stringify(defaultSchedule));
+        let schedulerInterval = null;
+
+        function updateThemeSchedule(newSchedule) {
+            themeSchedule = { ...themeSchedule, ...newSchedule };
+            localStorage.setItem('themeSchedule', JSON.stringify(themeSchedule));
+            
+            if (themeSchedule.enabled) {
+                startThemeScheduler();
+            } else {
+                stopThemeScheduler();
+            }
+            
+            updateScheduleUI();
+            showToast(themeSchedule.enabled ? 'Theme scheduling enabled' : 'Theme scheduling disabled');
+        }
+
+        function isDarkModeTime() {
+            if (!themeSchedule.enabled) return null;
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            const darkStart = parseTimeString(themeSchedule.darkModeStart);
+            const lightStart = parseTimeString(themeSchedule.lightModeStart);
+
+            return darkStart > lightStart ? 
+                (currentTime >= darkStart || currentTime < lightStart) :
+                (currentTime >= darkStart && currentTime < lightStart);
+        }
+
+        function parseTimeString(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        function applyScheduledTheme() {
+            if (!themeSchedule.enabled) return;
+            const shouldBeDark = isDarkModeTime();
+            const body = document.body;
+            const currentlyDark = body.classList.contains('dark');
+
+            if (shouldBeDark !== null && shouldBeDark !== currentlyDark) {
+                if (shouldBeDark) {
+                    body.classList.remove('light');
+                    body.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    body.classList.remove('dark');
+                    body.classList.add('light');
+                    localStorage.setItem('theme', 'light');
+                }
+
+                const themeToggle = document.getElementById('theme-toggle');
+                if (themeToggle) {
+                    themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+                }
+
+                showToast(`Automatically switched to ${shouldBeDark ? 'dark' : 'light'} mode`);
+            }
+        }
+
+        function startThemeScheduler() {
+            if (schedulerInterval) clearInterval(schedulerInterval);
+            if (themeSchedule.enabled) {
+                schedulerInterval = setInterval(applyScheduledTheme, 60000);
+                applyScheduledTheme();
+            }
+        }
+
+        function stopThemeScheduler() {
+            if (schedulerInterval) {
+                clearInterval(schedulerInterval);
+                schedulerInterval = null;
+            }
+        }
+
+        function updateScheduleUI() {
+            const enabledCheckbox = document.getElementById('schedule-enabled');
+            const darkStartInput = document.getElementById('dark-mode-start');
+            const lightStartInput = document.getElementById('light-mode-start');
+            const statusSpan = document.getElementById('schedule-status');
+
+            if (enabledCheckbox) enabledCheckbox.checked = themeSchedule.enabled;
+            if (darkStartInput) darkStartInput.value = themeSchedule.darkModeStart;
+            if (lightStartInput) lightStartInput.value = themeSchedule.lightModeStart;
+            
+            if (statusSpan) {
+                statusSpan.textContent = themeSchedule.enabled ? 'Enabled' : 'Disabled';
+                statusSpan.className = `text-xs px-2 py-1 rounded ${
+                    themeSchedule.enabled ? 'bg-green-900 text-green-200' : 'bg-gray-700 text-gray-300'
+                }`;
+            }
+        }
+
+        function updateTimeDisplay() {
+            const currentTimeEl = document.getElementById('current-time');
+            const scheduledModeEl = document.getElementById('scheduled-mode');
+
+            if (currentTimeEl) {
+                const now = new Date();
+                currentTimeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            if (scheduledModeEl) {
+                if (!themeSchedule.enabled) {
+                    scheduledModeEl.textContent = 'Manual';
+                    scheduledModeEl.className = 'text-gray-400';
+                } else {
+                    const isDark = isDarkModeTime();
+                    scheduledModeEl.textContent = isDark ? 'Dark' : 'Light';
+                    scheduledModeEl.className = isDark ? 'text-blue-400' : 'text-yellow-400';
+                }
+            }
+        }
+
+        // Initialize theme scheduler
+        document.getElementById('schedule-enabled').addEventListener('change', (e) => {
+            updateThemeSchedule({ enabled: e.target.checked });
+        });
+
+        document.getElementById('dark-mode-start').addEventListener('change', (e) => {
+            updateThemeSchedule({ darkModeStart: e.target.value });
+        });
+
+        document.getElementById('light-mode-start').addEventListener('change', (e) => {
+            updateThemeSchedule({ lightModeStart: e.target.value });
+        });
+
+        // Initialize scheduler
+        updateScheduleUI();
+        if (themeSchedule.enabled) {
+            startThemeScheduler();
+        }
+        
+        // Update time display every second
+        updateTimeDisplay();
+        setInterval(updateTimeDisplay, 1000);
 
     </script>
 </body>
