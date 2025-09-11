@@ -26,30 +26,61 @@
             transition: background-color 0.3s, color 0.3s;
         }
         .dark {
-                const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                tailwind.config = {
-                    theme: {
-                        extend: {
-                            colors: {
-                                primary: settingsHead.primaryColor || '#3b82f6',
-                                secondary: settingsHead.secondaryColor || '#10b981',
-                                accent: settingsHead.accentColor || '#8b5cf6',
-                            },
-                            fontFamily: {
-                                sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                            },
-                        },
-                    },
-                };
-                // Apply CSS variables for instant color update
-                document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-                document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-                document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        .card {
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Mobile sidebar styles */
+        @media (max-width: 767px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                z-index: 40;
+                background-color: #374151;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 30;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease-in-out;
+            }
+            .sidebar-backdrop.show {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            body.sidebar-open {
+                overflow: hidden;
+            }
+        }
+        
+        /* Tablet optimizations */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .sidebar {
+                width: 200px;
+            }
+            main {
+                margin-left: 200px;
+            }
         }
     </style>
 </head>
@@ -59,8 +90,11 @@
         ☰
     </button>
 
+    <!-- Mobile sidebar backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+    
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+    <aside id="sidebar" class="sidebar w-64 md:w-64 lg:w-64 fixed md:static top-0 left-0 h-full bg-gray-800 p-4 flex flex-col shadow-lg" aria-label="Main navigation">
         <!-- App Branding -->
         <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
@@ -96,24 +130,24 @@
     </aside>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
-        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
+    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md mx-auto">
             <h2 id="login-modal-title" class="text-xl font-semibold mb-4 text-white">Login</h2>
             <form id="login-form">
                 <div class="mb-4">
-                    <label for="email" class="block text-sm text-white">Email</label>
-                    <input type="email" id="email" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
+                    <label for="email" class="block text-sm text-white mb-2">Email</label>
+                    <input type="email" id="email" class="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary text-base" required aria-required="true">
                 </div>
-                <div class="mb-4">
-                    <label for="password" class="block text-sm text-white">Password</label>
-                    <input type="password" id="password" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
+                <div class="mb-6">
+                    <label for="password" class="block text-sm text-white mb-2">Password</label>
+                    <input type="password" id="password" class="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary text-base" required aria-required="true">
                 </div>
                 <div id="login-error" class="hidden text-red-500 text-sm mb-4"></div>
-                <button type="submit" id="submit-login" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Submit login">
-                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></span>
+                <button type="submit" id="submit-login" class="w-full p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary text-base font-medium" aria-label="Submit login">
+                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
                 </button>
             </form>
-            <button id="close-modal" class="mt-4 w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400" aria-label="Close login modal">Close</button>
+            <button id="close-modal" class="mt-4 w-full p-3 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-base" aria-label="Close login modal">Close</button>
         </div>
     </div>
 
@@ -121,28 +155,28 @@
     <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4">
+    <main class="flex-1 p-4 md:p-6 transition-all duration-300">
 
         <!-- Sticky Header -->
-        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40" style="position:sticky;top:0;left:0;right:0;">
-            <h2 class="text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
+        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
+            <h2 class="text-2xl md:text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
         </header>
 
         <!-- Content Section -->
         <section>
-            <p class="mb-4">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold">Card 1</h3>
-                    <p>Sample content for a card.</p>
+            <p class="mb-6 text-sm md:text-base leading-relaxed">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div class="p-4 md:p-6 bg-gray-700 dark:bg-gray-700 rounded-lg shadow-md card">
+                    <h3 class="font-semibold text-lg mb-2">Card 1</h3>
+                    <p class="text-sm md:text-base text-gray-300">Sample content for a card with improved responsive design.</p>
                 </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold">Card 2</h3>
-                    <p>Sample content for a card.</p>
+                <div class="p-4 md:p-6 bg-gray-700 dark:bg-gray-700 rounded-lg shadow-md card">
+                    <h3 class="font-semibold text-lg mb-2">Card 2</h3>
+                    <p class="text-sm md:text-base text-gray-300">Sample content for a card with improved responsive design.</p>
                 </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold">Card 3</h3>
-                    <p>Sample content for a card.</p>
+                <div class="p-4 md:p-6 bg-gray-700 dark:bg-gray-700 rounded-lg shadow-md card">
+                    <h3 class="font-semibold text-lg mb-2">Card 3</h3>
+                    <p class="text-sm md:text-base text-gray-300">Sample content for a card with improved responsive design.</p>
                 </div>
             </div>
         </section>
@@ -194,10 +228,49 @@
         // Mobile Menu Toggle
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        
+        function toggleSidebar() {
             const isOpen = sidebar.classList.contains('open');
-            menuToggle.setAttribute('aria-expanded', isOpen);
+            
+            if (isOpen) {
+                // Close sidebar
+                sidebar.classList.remove('open');
+                sidebarBackdrop.classList.remove('show');
+                document.body.classList.remove('sidebar-open');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            } else {
+                // Open sidebar
+                sidebar.classList.add('open');
+                sidebarBackdrop.classList.add('show');
+                document.body.classList.add('sidebar-open');
+                menuToggle.setAttribute('aria-expanded', 'true');
+            }
+        }
+        
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', toggleSidebar);
+            
+            // Close sidebar when clicking backdrop
+            if (sidebarBackdrop) {
+                sidebarBackdrop.addEventListener('click', toggleSidebar);
+            }
+            
+            // Handle keyboard navigation
+            menuToggle.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleSidebar();
+                }
+            });
+            
+            // Close sidebar on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                    toggleSidebar();
+                }
+            });
+        }
         });
 
         // User Management
