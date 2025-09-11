@@ -1,29 +1,53 @@
- https://joshburt.com.au/
+https://joshburt.com.au/
  
 [![🚀 Deploy website via FTP on push.](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml)
 
-## Design System
+# Josh Burt - Static Website
 
-This website uses a unified design system based on **Tailwind CSS** with consistent navigation and theming across all pages.
+## Overview
+This is a static HTML website for joshburt.com.au featuring a unified Tailwind CSS design system, responsive sidebar navigation, dark/light mode, admin dashboard, user management, analytics, site settings, and a Castrol oil product ordering system.
 
-### Features
-- **Responsive sidebar navigation** with mobile-friendly hamburger menu
-- **Dark/Light mode toggle** with persistent localStorage preferences
-- **Consistent color scheme**: Primary blue, Secondary green, Accent purple
-- **Unified typography** using Inter font family
-- **Responsive grid layouts** and consistent spacing
+## Features
+- Responsive sidebar navigation with mobile hamburger menu
+- Dark/Light mode toggle (persistent via localStorage)
+- Consistent color scheme: green, red, white, dark grey
+- Unified typography (Inter font family)
+- Responsive grid layouts and spacing
+- Shared components: `shared-nav.html`, `shared-config.html`, `shared-theme.html`
+- No build process or dependencies (pure static site)
 
-### Architecture
-- **Shared Components**: `shared-nav.html`, `shared-config.html`, `shared-theme.html`
-- **Framework**: Tailwind CSS for consistent styling
-- **Navigation**: Fixed sidebar with active page highlighting
-- **Theme System**: Unified dark/light mode with smooth transitions
+## Pages
+- **Home** (`index.html`): Landing page, login modal
+- **Admin** (`admin.html`): Dashboard, management links
+- **User Management** (`users.html`): User CRUD
+- **Analytics** (`analytics.html`): Site metrics
+- **Settings** (`settings.html`): Site configuration
+- **Oil Orders** (`oil.html`): Castrol product ordering, CSV export
+- **Login** (`login.html`): Authentication
 
-### Pages
-- **Home** (`index.html`) - Landing page with authentication features
-- **Admin** (`admin.html`) - Dashboard with management links
-- **User Management** (`users.html`) - User CRUD interface
-- **Analytics** (`analytics.html`) - Site statistics and metrics
-- **Settings** (`settings.html`) - Site configuration
-- **Oil Orders** (`oil.html`) - Castrol product ordering system
-- **Login** (`login.html`) - Authentication page
+## Architecture
+- **Tailwind CSS** for all styling
+- **Navigation**: Fixed sidebar, active page highlighting
+- **Theme System**: Unified dark/light mode
+- **State**: All user/session/settings data stored in localStorage
+
+## Manual Testing
+- Validate sidebar navigation, theme toggle, mobile menu, login modal, and all page layouts
+- Test oil ordering system, CSV export, and order summary
+- Confirm settings and user management features work end-to-end
+
+## Known Limitations
+- CDN blocking may affect styling in restricted environments
+- Placeholder images may not load if blocked
+- All functionality is client-side; no server/database
+
+## Maintenance
+- All legacy CSS and JS files are deprecated (see style.css, script.js)
+- Shared components should be updated for all pages
+- Remove TODOs once all layouts are aligned
+
+## Security
+- FTP credentials are stored in GitHub Secrets (never exposed in repo)
+
+---
+For more details, see copilot-instructions.md and comments in shared-nav.html.

@@ -5,3 +5,6 @@
 
 // Original theme toggle functionality was here
 // Replaced with consistent theme toggle implementation across all pages
+
+// This file is no longer used. All theme and navigation logic is now handled in shared-nav.html and shared-theme.html.
+// Safe to delete or ignore.
