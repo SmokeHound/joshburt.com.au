@@ -4,28 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./assets/css/styles.css">
     <script>
-        // Load color scheme from localStorage
-        const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: settingsHead.primaryColor || '#3b82f6',
-                        secondary: settingsHead.secondaryColor || '#10b981',
-                        accent: settingsHead.accentColor || '#8b5cf6',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                },
-            },
-        };
-        // Apply CSS variables for instant color update
-        document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-        document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-        document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+        // Configuration for dynamic color updates from settings
+        function applyDynamicColors() {
+            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            // Apply CSS variables for instant color update
+            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
+            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
+            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+        }
+        applyDynamicColors();
     </script>
     <style>
         body {

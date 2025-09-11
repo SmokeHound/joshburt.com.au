@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS for enhanced styling */
+body {
+  transition: background-color 0.3s, color 0.3s;
+  font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
+}
+
+.dark {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+.light {
+  background-color: #f9fafb;
+  color: #1f2937;
+}
+
+.sidebar {
+  width: var(--sidebar-width, 16rem);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  transition: background-color 0.3s, transform 0.3s;
+  z-index: 100;
+  transform: translateX(-100%);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    transform: translateX(0);
+  }
+  
+  main {
+    margin-left: var(--sidebar-width, 16rem);
+  }
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    width: 100%;
+  }
+  
+  main {
+    margin-left: 0;
+  }
+}
+
+.card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.fade-out {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
