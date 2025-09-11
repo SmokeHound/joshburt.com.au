@@ -155,6 +155,25 @@
             </div>
         </section>
 
+        <!-- Bulk Operations -->
+        <section class="mt-6">
+            <div class="bg-gray-800 p-6 rounded shadow">
+                <h3 class="text-xl font-semibold mb-4">Bulk Operations</h3>
+                <div class="flex flex-wrap gap-4">
+                    <button id="export-users-csv" class="px-4 py-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">Export Users (CSV)</button>
+                    <button id="export-users-excel" class="px-4 py-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400">Export Users (Excel)</button>
+                    <label for="import-users-csv" class="px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
+                        Import Users (CSV)
+                        <input type="file" id="import-users-csv" accept=".csv" class="hidden">
+                    </label>
+                </div>
+                <div class="mt-4 text-sm text-gray-400">
+                    <p><strong>CSV Format:</strong> Name,Email,Role</p>
+                    <p><strong>Example:</strong> John Doe,john@example.com,user</p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script>
@@ -303,6 +322,117 @@
             document.getElementById('cancel-edit').classList.add('hidden');
         }
 
+        // Export users to CSV
+        function exportUsersCSV() {
+            const headers = ['Name', 'Email', 'Role'];
+            const csvContent = [
+                headers.join(','),
+                ...users.map(user => [
+                    `"${user.name}"`,
+                    `"${user.email}"`,
+                    `"${user.role}"`
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'users.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Users exported to CSV successfully!');
+        }
+
+        // Export users to Excel format (actually CSV with different extension)
+        function exportUsersExcel() {
+            const headers = ['Name', 'Email', 'Role'];
+            const csvContent = [
+                headers.join('\t'), // Use tabs for better Excel compatibility
+                ...users.map(user => [
+                    user.name,
+                    user.email,
+                    user.role
+                ].join('\t'))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'users.xls';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Users exported to Excel successfully!');
+        }
+
+        // Import users from CSV
+        function importUsersCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const lines = csv.split('\n');
+                    const importedUsers = [];
+
+                    // Skip header row if it exists
+                    const startIndex = lines[0].toLowerCase().includes('name') ? 1 : 0;
+                    
+                    for (let i = startIndex; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (!line) continue;
+
+                        const fields = line.split(',').map(field => field.replace(/^"|"$/g, '').trim());
+                        if (fields.length >= 3) {
+                            const name = fields[0];
+                            const email = fields[1];
+                            const role = fields[2].toLowerCase();
+
+                            // Validate email format
+                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (!emailRegex.test(email)) {
+                                continue; // Skip invalid emails
+                            }
+
+                            // Validate role
+                            if (!['user', 'admin'].includes(role)) {
+                                continue; // Skip invalid roles
+                            }
+
+                            // Check if user already exists
+                            const existingUser = users.find(u => u.email === email);
+                            if (!existingUser) {
+                                importedUsers.push({
+                                    id: Date.now() + i,
+                                    name,
+                                    email,
+                                    role
+                                });
+                            }
+                        }
+                    }
+
+                    if (importedUsers.length > 0) {
+                        users.push(...importedUsers);
+                        saveUsers();
+                        renderUsers();
+                        showToast(`${importedUsers.length} users imported successfully!`);
+                    } else {
+                        showToast('No valid new users found in CSV file');
+                    }
+                } catch (error) {
+                    showToast('Error importing CSV file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset input
+            event.target.value = '';
+        }
+
         // Theme Toggle
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
@@ -349,6 +479,11 @@
                     deleteUser(parseInt(e.target.dataset.id));
                 }
             });
+
+            // Bulk operations
+            document.getElementById('export-users-csv').addEventListener('click', exportUsersCSV);
+            document.getElementById('export-users-excel').addEventListener('click', exportUsersExcel);
+            document.getElementById('import-users-csv').addEventListener('change', importUsersCSV);
         });
  
     </script>

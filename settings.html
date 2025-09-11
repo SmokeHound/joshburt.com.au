@@ -211,6 +211,31 @@
                             <input type="text" id="homepage-message" name="homepage-message" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Welcome to our site!" value="Welcome to My Website">
                         </div>
                         
+                        <div class="mb-4">
+                            <label for="homepage-subtitle" class="block mb-2 font-medium">Homepage Subtitle</label>
+                            <input type="text" id="homepage-subtitle" name="homepage-subtitle" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Your subtitle here" value="">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="homepage-content" class="block mb-2 font-medium">Homepage Content</label>
+                            <textarea id="homepage-content" name="homepage-content" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="4" placeholder="Main content for your homepage...">This is a modern, responsive website template built with the latest web technologies.</textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="site-announcement" class="block mb-2 font-medium">Site Announcement</label>
+                            <textarea id="site-announcement" name="site-announcement" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="2" placeholder="Important announcement for users..."></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="announcement-type" class="block mb-2 font-medium">Announcement Type</label>
+                            <select id="announcement-type" name="announcement-type" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="info">Info (Blue)</option>
+                                <option value="success">Success (Green)</option>
+                                <option value="warning">Warning (Yellow)</option>
+                                <option value="error">Error (Red)</option>
+                            </select>
+                        </div>
+                        
                         <button type="submit" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">Save Settings</button>
                     </form>
                 </div>
@@ -241,6 +266,22 @@
                         <div class="flex justify-between">
                             <span class="font-medium text-white">Homepage Message:</span>
                             <span data-preview="homepage-message">Welcome to My Website</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Homepage Subtitle:</span>
+                            <span data-preview="homepage-subtitle">None</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Homepage Content:</span>
+                            <span data-preview="homepage-content">Modern responsive template...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Site Announcement:</span>
+                            <span data-preview="site-announcement">None</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Announcement Type:</span>
+                            <span data-preview="announcement-type">Info</span>
                         </div>
                     </div>
                     
@@ -307,7 +348,11 @@
             theme: document.querySelector('.settings-preview [data-preview="theme"]'),
             contactEmail: document.querySelector('.settings-preview [data-preview="contact-email"]'),
             maintenanceMode: document.querySelector('.settings-preview [data-preview="maintenance-mode"]'),
-            homepageMessage: document.querySelector('.settings-preview [data-preview="homepage-message"]')
+            homepageMessage: document.querySelector('.settings-preview [data-preview="homepage-message"]'),
+            homepageSubtitle: document.querySelector('.settings-preview [data-preview="homepage-subtitle"]'),
+            homepageContent: document.querySelector('.settings-preview [data-preview="homepage-content"]'),
+            siteAnnouncement: document.querySelector('.settings-preview [data-preview="site-announcement"]'),
+            announcementType: document.querySelector('.settings-preview [data-preview="announcement-type"]')
         };
 
         // Load settings from localStorage
@@ -318,7 +363,11 @@
                 'theme': 'dark',
                 'contact-email': 'admin@example.com',
                 'maintenance-mode': false,
-                'homepage-message': 'Welcome to My Website'
+                'homepage-message': 'Welcome to My Website',
+                'homepage-subtitle': '',
+                'homepage-content': 'This is a modern, responsive website template built with the latest web technologies.',
+                'site-announcement': '',
+                'announcement-type': 'info'
             };
 
             // Populate form fields
@@ -328,6 +377,10 @@
             document.getElementById('contact-email').value = settings['contact-email'];
             document.getElementById('maintenance-mode').checked = settings['maintenance-mode'];
             document.getElementById('homepage-message').value = settings['homepage-message'];
+            document.getElementById('homepage-subtitle').value = settings['homepage-subtitle'];
+            document.getElementById('homepage-content').value = settings['homepage-content'];
+            document.getElementById('site-announcement').value = settings['site-announcement'];
+            document.getElementById('announcement-type').value = settings['announcement-type'];
 
             // Update preview panel
             updatePreview();
@@ -348,6 +401,10 @@
             document.querySelector('[data-preview="maintenance-mode"]').textContent = settings['maintenance-mode'] ? 'On' : 'Off';
             document.querySelector('[data-preview="maintenance-mode"]').className = settings['maintenance-mode'] ? 'text-red-400' : 'text-green-400';
             document.querySelector('[data-preview="homepage-message"]').textContent = settings['homepage-message'];
+            document.querySelector('[data-preview="homepage-subtitle"]').textContent = settings['homepage-subtitle'] || 'None';
+            document.querySelector('[data-preview="homepage-content"]').textContent = settings['homepage-content'].substring(0, 30) + '...';
+            document.querySelector('[data-preview="site-announcement"]').textContent = settings['site-announcement'] || 'None';
+            document.querySelector('[data-preview="announcement-type"]').textContent = settings['announcement-type'].charAt(0).toUpperCase() + settings['announcement-type'].slice(1);
         }
 
         // Get current form settings
@@ -358,7 +415,11 @@
                 'theme': document.getElementById('theme').value,
                 'contact-email': document.getElementById('contact-email').value,
                 'maintenance-mode': document.getElementById('maintenance-mode').checked,
-                'homepage-message': document.getElementById('homepage-message').value
+                'homepage-message': document.getElementById('homepage-message').value,
+                'homepage-subtitle': document.getElementById('homepage-subtitle').value,
+                'homepage-content': document.getElementById('homepage-content').value,
+                'site-announcement': document.getElementById('site-announcement').value,
+                'announcement-type': document.getElementById('announcement-type').value
             };
         }
 
@@ -395,6 +456,10 @@
         document.getElementById('contact-email').addEventListener('input', updatePreview);
         document.getElementById('maintenance-mode').addEventListener('change', updatePreview);
         document.getElementById('homepage-message').addEventListener('input', updatePreview);
+        document.getElementById('homepage-subtitle').addEventListener('input', updatePreview);
+        document.getElementById('homepage-content').addEventListener('input', updatePreview);
+        document.getElementById('site-announcement').addEventListener('input', updatePreview);
+        document.getElementById('announcement-type').addEventListener('change', updatePreview);
 
         // Settings form submission
         settingsForm.addEventListener('submit', (e) => {

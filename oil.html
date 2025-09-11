@@ -113,6 +113,7 @@
         <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
         <li><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
         <li><a href="oil.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Orders</a></li>
+        <li><a href="oil-products-management.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Product Management</a></li>
         <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
       </ul>
     </nav>
@@ -309,60 +310,25 @@
       menuToggle.setAttribute('aria-expanded', isOpen);
     });
 
-    // Castrol oil product data from the provided spreadsheets
-    const oils = [
-      { code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil" },
-      { code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6, Jaguar Land Rover STJLR.03.5006, GM dexos1™ Gen 3, Chrysler MS 6395, MB-Approval 229.71", type: "Engine oil" },
-      { code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+, MB-Approval 229.71/ 229.72, Porsche C20, VW 508 00/ 509 00, Ford WSS-M2C956-A1", type: "Engine oil" },
-      { code: "3436896", name: "EDGE 0W-30 C2", specs: "ACEA C2, STJLR.03.5007", type: "Engine oil" },
-      { code: "3432554", name: "EDGE 0W-30", specs: "ACEA C2/C3, API SQ, BMW Longlife-04", type: "Engine oil" },
-      { code: "3433646", name: "EDGE 0W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51", type: "Engine oil" },
-      { code: "3431407", name: "EDGE 0W-40 A3/B4", specs: "ACEA A3/B4, API SP, BMW Longlife-01, MB-Approval 229.5, Porsche A40, Renault RN 0700/RN 0710, VW 502 00/505 00", type: "Engine oil" },
-      { code: "3431128", name: "EDGE 5W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51, Porsche C30, VW 504 00/507 00", type: "Engine oil" },
-      { code: "3430989", name: "EDGE 5W-30 A3/B4", specs: "ACEA A3/B4, API SL, BMW Longlife-01, MB-Approval 229.5, VW 502 00/505 00", type: "Engine oil" },
-      { code: "3431108", name: "EDGE 5W-30 M", specs: "ACEA C3, API SQ, BMW Longlife-04", type: "Engine oil" },
-      { code: "3421235", name: "EDGE 5W-40 A3/B4", specs: "ACEA A3/B3, A3/B4, API SN/CF, BMW Longlife-01", type: "Engine oil" },
-      { code: "3426982", name: "EDGE 5W-40 M", specs: "ACEA C3, API SN, BMW Longlife-04, Porsche C40, VW 511 00", type: "Engine oil" },
-      { code: "3436638", name: "EDGE 5W-50 S", specs: "API SP, Meets Ford WSS-M2C931-C", type: "Engine oil" },
-      { code: "3399574", name: "EDGE 10W-30", specs: "API SP, CF, ILSAC GF-6", type: "Engine oil" },
-      { code: "3412397", name: "EDGE 10W-60", specs: "ACEA A3/B3, A3/B4, API SN/CF", type: "Engine oil" },
-      { code: "3383419", name: "EDGE 25W-50", specs: "API SG/CD", type: "Engine oil" },
-      { code: "3374699", name: "EDGE PROFESSIONAL A1 5W-20", specs: "ACEA A1/B1, API SL, ILSAC GF-3", type: "Engine oil" },
-      { code: "3386606", name: "EDGE PROFESSIONAL A5 0W-30", specs: "ACEA A1/B1, A5/B5, API SL/CF", type: "Engine oil" },
-      { code: "3377780", name: "EDGE PROFESSIONAL A5 5W-30", specs: "ACEA A1/B1, A5/B5, API SN/CF", type: "Engine oil" },
-      { code: "3375617", name: "EDGE PROFESSIONAL C1 5W-30", specs: "ACEA C1, STJLR.03.5005", type: "Engine oil" },
-      { code: "3427866", name: "EDGE PROFESSIONAL EC 0W-20", specs: "ACEA C5, STJLR.03.5006, STJLR.51.5122", type: "Engine oil" },
-      { code: "3423559", name: "EDGE PROFESSIONAL E 0W-30", specs: "ACEA C2, STJLR.03.5007", type: "Engine oil" },
-      { code: "3383785", name: "EDGE PROFESSIONAL V 0W-20", specs: "ACEA C5, Volvo VCC RBS0-2AE", type: "Engine oil" },
-      { code: "3428869", name: "MAGNATEC HYBRID 0W-16", specs: "API SP, ILSAC GF-6B", type: "Engine oil" },
-      { code: "3439018", name: "MAGNATEC 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil" },
-      { code: "3440366", name: "MAGNATEC 0W-20 C5", specs: "ACEA C5, API SQ", type: "Engine oil" },
-      { code: "3440475", name: "MAGNATEC 0W-20 E", specs: "Ford WSS-M2C954-A1", type: "Engine oil" },
-      { code: "3434547", name: "MAGNATEC 0W-30 D", specs: "ACEA C2, API SN, Ford WSS-M2C950-A", type: "Engine oil" },
-      { code: "3429066", name: "MAGNATEC 5W-20", specs: "API SP, ILSAC GF-6, Ford WSS-M2C960-A1", type: "Engine oil" },
-      { code: "3428870", name: "MAGNATEC 5W-30", specs: "API SN/CF, ACEA A3/B4, MB-Approval 229.3, VW 502 00/505 00, Renault RN0700/RN0710", type: "Engine oil" },
-      { code: "3437038", name: "MAGNATEC 5W-30 A", specs: "ACEA A5/B5, API SN, ILSAC GF-5, Ford WSS-M2C913-C/D", type: "Engine oil" },
-      { code: "3437811", name: "MAGNATEC 5W-30 A5", specs: "ACEA A5/B5, API SN, Ford WSS-M2C913-D", type: "Engine oil" },
-      { code: "3433354", name: "MAGNATEC 5W-30 DX", specs: "API SN, ILSAC GF-5, GM dexos1™ Gen 2", type: "Engine oil" },
-      { code: "3437395", name: "MAGNATEC 5W-40", specs: "API SN, ACEA A3/B4, BMW Longlife-01, MB-Approval 229.3", type: "Engine oil" },
-      { code: "3436312", name: "MAGNATEC 5W-40 SN/C3", specs: "API SN, ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51, VW 502 00/505 00/505 01", type: "Engine oil" },
-      { code: "3436890", name: "MAGNATEC 10W-30", specs: "API SP, ILSAC GF-6", type: "Engine oil" },
-      { code: "3437172", name: "MAGNATEC 10W-40", specs: "API SP, ACEA A3/B4", type: "Engine oil" },
-      { code: "3396146", name: "MAGNATEC 15W-40", specs: "API SP, ACEA A3/B4", type: "Engine oil" },
-      { code: "3433217", name: "MAGNATEC SUV 5W-30 C3", specs: "ACEA C2/C3, API SP", type: "Engine oil" },
-      { code: "3424712", name: "Radicool SF", specs: "ASTM D3306, BS 6580:2010", type: "Coolant" },
-      { code: "3429903", name: "Radicool P-OAT", specs: "ASTM D3306", type: "Coolant" },
-      { code: "3437791", name: "Radicool Si-OAT", specs: "VW TL-774G (G12++), MAN 324 Si-OAT, ASTM D3306", type: "Coolant" },
-      { code: "3376394", name: "Radicool NF", specs: "ASTM D3306, BS 6580:2010", type: "Coolant" },
-      { code: "3424670", name: "Radicool Concentrate", specs: "ASTM D3306, BS 6580:2010", type: "Coolant" },
-      { code: "3429062", name: "Transmax ATF Dex/Merc Multivehicle", specs: "Dexron III, Mercon, JASO 1A, Allison C4", type: "Gear Oil" },
-      { code: "3425325", name: "Transmax CVT", specs: "CVT fluids for Japanese, Hyundai, Kia, Chrysler, Ford", type: "Gear Oil" },
-      { code: "3439145", name: "Transmax Dual Multivehicle", specs: "BMW, Ford, VW, MB, Porsche, PSA, Renault, Volvo DCT", type: "Gear Oil" },
-      { code: "3430280", name: "Transmax Universal LL 75W-90", specs: "API GL-4/GL-5/MT-1, MB 235.8, MAN, ZF, Scania", type: "Gear Oil" },
-      { code: "3429677", name: "Transmax Manual VMX 80W", specs: "API GL-4", type: "Gear Oil" },
-      { code: "3432318", name: "Transmax Manual Long Life 75W-85", specs: "API GL-4, MB 235.4, Volvo, Eaton", type: "Gear Oil" },
-      { code: "3430310", name: "Transmax Universal 80W-90", specs: "API GL-4 / GL-5", type: "Gear Oil" },
-    ];
+    // Load oil products from localStorage (managed via Product Management page)
+    function loadOilProducts() {
+      const savedProducts = localStorage.getItem('oilProducts');
+      if (savedProducts) {
+        return JSON.parse(savedProducts);
+      }
+      
+      // Fallback to default products if none exist in localStorage
+      return [
+        { id: 1, code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil", description: "High-performance synthetic engine oil", image: "" },
+        { id: 2, code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6", type: "Engine oil", description: "Advanced formula for fuel economy", image: "" },
+        { id: 3, code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+", type: "Engine oil", description: "Specialized for European vehicles", image: "" },
+        { id: 4, code: "3424712", name: "Radicool SF", specs: "ASTM D3306, BS 6580:2010", type: "Coolant", description: "Premium engine coolant", image: "" },
+        { id: 5, code: "3429062", name: "Transmax ATF Dex/Merc", specs: "Dexron III, Mercon, JASO 1A", type: "Transmission fluid", description: "Multi-vehicle transmission fluid", image: "" },
+      ];
+    }
+
+    // Initialize products array
+    let oils = loadOilProducts();
 
 
     // DOM Elements
@@ -493,19 +459,27 @@
     function renderProductsByType(type) {
       productsContainer.innerHTML = '';
       oils.filter(oil => oil.type === type).forEach((oil) => {
-        const cardHtml = `
+        const imageHtml = oil.image ? 
+          `<div class="mb-2"><img src="${oil.image}" alt="${oil.name}" class="w-full h-32 object-cover rounded" onerror="this.style.display='none'"></div>` : 
+          '';
+        
+        const descriptionHtml = oil.description ? 
+          `<p class="text-gray-300 text-sm mb-2">${oil.description}</p>` : 
+          '';
 
+        const cardHtml = `
           <div class="p-4 bg-gray-700 rounded shadow card product-card" data-index="${oils.indexOf(oil)}">
+            ${imageHtml}
             <h5 class="font-bold text-white mb-2 cursor-pointer">${oil.name}</h5>
+            ${descriptionHtml}
             <div class="flex justify-end mb-2">
               <button class="px-4 py-2 bg-primary text-white rounded-full text-sm hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary btn-add-to-order" data-index="${oils.indexOf(oil)}">
                 + Add
               </button>
             </div>
             <div class="product-details hidden">
-              <p class="text-gray-300 text-sm mb-1">${oil.specs}</p>
+              <p class="text-gray-300 text-sm mb-1"><strong>Specifications:</strong> ${oil.specs}</p>
               <p class="text-sm"><strong>Product Code:</strong> ${oil.code}</p>
-
             </div>
           </div>
         `;
