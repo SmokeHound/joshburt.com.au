@@ -149,6 +149,109 @@
     </main>
 
     <script>
+        // API Configuration
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+
+        // HTTP client with token management
+        async function apiRequest(url, options = {}) {
+            const token = localStorage.getItem('accessToken');
+            
+            const config = {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` }),
+                    ...options.headers
+                }
+            };
+
+            try {
+                let response = await fetch(`${API_BASE}${url}`, config);
+                
+                // If token expired, try to refresh
+                if (response.status === 401 && token) {
+                    const refreshed = await refreshAuthToken();
+                    if (refreshed) {
+                        // Retry with new token
+                        config.headers['Authorization'] = `Bearer ${localStorage.getItem('accessToken')}`;
+                        response = await fetch(`${API_BASE}${url}`, config);
+                    }
+                }
+                
+                return response;
+            } catch (error) {
+                console.error('API request failed:', error);
+                throw error;
+            }
+        }
+
+        // Refresh authentication token
+        async function refreshAuthToken() {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) return false;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/refresh`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('accessToken', data.accessToken);
+                    localStorage.setItem('refreshToken', data.refreshToken);
+                    return true;
+                }
+            } catch (error) {
+                console.error('Token refresh failed:', error);
+            }
+
+            // If refresh fails, logout user
+            logout();
+            return false;
+        }
+
+        // Logout function
+        async function logout() {
+            const refreshToken = localStorage.getItem('refreshToken');
+            
+            // Call logout API
+            try {
+                await apiRequest('/auth/logout', {
+                    method: 'POST',
+                    body: JSON.stringify({ refreshToken })
+                });
+            } catch (error) {
+                console.error('Logout API call failed:', error);
+            }
+
+            // Clear local storage
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            
+            // Update UI
+            updateUIForLoggedOutState();
+            showToast('Logged out successfully!');
+        }
+
+        // Update UI for logged out state
+        function updateUIForLoggedOutState() {
+            const userInfo = document.getElementById('user-info');
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const welcomeMessage = document.getElementById('welcome-message');
+
+            userInfo.classList.add('hidden');
+            loginBtn.classList.remove('hidden');
+            logoutBtn.classList.add('hidden');
+            
+            // Restore homepage message from settings
+            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
+        }
+
         // Load and apply site settings
         function loadAndApplySettings() {
             const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
@@ -223,18 +326,52 @@
             }, 3000);
         }
 
-        // Check if user is logged in
+        // Check if user is logged in and load user profile
+        async function checkAuthStatus() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                updateUIForLoggedOutState();
+                loadAndApplySettings();
+                return;
+            }
+
+            try {
+                const response = await apiRequest('/auth/me');
+                if (response.ok) {
+                    const data = await response.json();
+                    const user = data.user;
+                    
+                    // Update localStorage with fresh user data
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    // Update UI
+                    userInfo.classList.remove('hidden');
+                    loginBtn.classList.add('hidden');
+                    logoutBtn.classList.remove('hidden');
+                    userName.textContent = user.name;
+                    userAvatar.src = user.avatarUrl || 'https://via.placeholder.com/40';
+                    welcomeMessage.textContent = `Welcome, ${user.name}! (${user.role})`;
+                } else {
+                    // Token invalid, logout
+                    updateUIForLoggedOutState();
+                    loadAndApplySettings();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                updateUIForLoggedOutState();
+                loadAndApplySettings();
+            }
+        }
+
+        // Check if user is logged in (legacy support)
         const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-            userInfo.classList.remove('hidden');
-            loginBtn.classList.add('hidden');
-            logoutBtn.classList.remove('hidden');
-            userName.textContent = user.name;
-            userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
-            welcomeMessage.textContent = `Welcome, ${user.name}!`;
-        } else {
-            // Apply homepage message from settings if no user is logged in
+        if (user && !localStorage.getItem('accessToken')) {
+            // Legacy user session, clear it
+            localStorage.removeItem('user');
             loadAndApplySettings();
+        } else {
+            // Check authentication status with backend
+            checkAuthStatus();
         }
 
         // Open login modal
@@ -258,42 +395,34 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Simulate backend API call (replace with actual Render API endpoint)
+            // Simulate backend API call using new API
             try {
-                // Check against registered users or use default credentials
-                const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
-                const registeredUser = users.find(u => u.email === email);
-                
-                let authenticatedUser = null;
-                
-                if (registeredUser && password === 'password') {
-                    // Found registered user
-                    authenticatedUser = { 
-                        name: registeredUser.name, 
-                        email: registeredUser.email,
-                        avatar: 'https://via.placeholder.com/40' 
-                    };
-                } else if (email === 'test@example.com' && password === 'password') {
-                    // Default credentials
-                    authenticatedUser = { 
-                        name: email.split('@')[0], 
-                        email: email,
-                        avatar: 'https://via.placeholder.com/40' 
-                    };
-                } else {
-                    throw new Error('Invalid credentials');
-                }
+                const response = await apiRequest('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
 
-                localStorage.setItem('user', JSON.stringify(authenticatedUser));
-                userInfo.classList.remove('hidden');
-                loginBtn.classList.add('hidden');
-                logoutBtn.classList.remove('hidden');
-                userName.textContent = authenticatedUser.name;
-                userAvatar.src = authenticatedUser.avatar;
-                welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
-                loginModal.classList.add('hidden');
-                loginForm.reset();
-                showToast('Login successful!');
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store tokens and user info
+                    localStorage.setItem('accessToken', data.accessToken);
+                    localStorage.setItem('refreshToken', data.refreshToken);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Update UI
+                    userInfo.classList.remove('hidden');
+                    loginBtn.classList.add('hidden');
+                    logoutBtn.classList.remove('hidden');
+                    userName.textContent = data.user.name;
+                    userAvatar.src = data.user.avatarUrl || 'https://via.placeholder.com/40';
+                    welcomeMessage.textContent = `Welcome, ${data.user.name}! (${data.user.role})`;
+                    loginModal.classList.add('hidden');
+                    loginForm.reset();
+                    showToast('Login successful!');
+                } else {
+                    throw new Error(data.error || 'Login failed');
+                }
             } catch (error) {
                 loginError.textContent = error.message;
                 loginError.classList.remove('hidden');
@@ -303,19 +432,7 @@
         });
 
         // Handle logout
-        logoutBtn.addEventListener('click', async () => {
-            // Simulate backend API call (replace with actual Render API endpoint)
-            // Example: await fetch('https://your-render-backend/api/logout', { method: 'POST' });
-            localStorage.removeItem('user');
-            userInfo.classList.add('hidden');
-            loginBtn.classList.remove('hidden');
-            logoutBtn.classList.add('hidden');
-            
-            // Restore homepage message from settings
-            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
-            showToast('Logged out successfully!');
-        });
+        logoutBtn.addEventListener('click', logout);
 
         // Apply settings on page load
         document.addEventListener('DOMContentLoaded', loadAndApplySettings);
