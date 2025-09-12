@@ -4,22 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
+    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
+    
+    <link rel="stylesheet" href="./assets/css/styles.css">
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        secondary: '#10b981',
-                        accent: '#8b5cf6',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                },
-            },
-        };
+        // Configuration for dynamic color updates from settings
+        function applyDynamicColors() {
+            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            // Apply CSS variables for instant color update
+            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
+            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
+            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+        }
+        applyDynamicColors();
+        // Service Worker Registration for PWA
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(registration => {
+                        console.log("SW registered: ", registration);
+                    })
+                    .catch(registrationError => {
+                        console.log("SW registration failed: ", registrationError);
+                    });
+            });
+        }
     </script>
     <style>
         body {
@@ -62,8 +78,11 @@
     <!-- Toast Notification -->
     <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
+    <!-- Mobile sidebar backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+    <aside id="sidebar" class="sidebar w-64 md:w-64 lg:w-64 fixed md:static top-0 left-0 h-full bg-gray-800 p-4 flex flex-col shadow-lg" aria-label="Main navigation">
         <!-- App Branding -->
         <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
@@ -89,15 +108,15 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4">
+    <main class="flex-1 p-4 md:p-6 transition-all duration-300">
         <!-- Sticky Header -->
         <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
-            <h2 class="text-3xl font-semibold" id="welcome-message">Welcome, Admin!</h2>
+            <h2 class="text-2xl md:text-3xl font-semibold" id="welcome-message">Welcome, Admin!</h2>
         </header>
 
         <!-- Content Section -->
         <section>
-            <p class="mb-4">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
+            <p class="mb-6 text-sm md:text-base leading-relaxed">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                     <h3 class="font-semibold mb-2">User Management</h3>
@@ -113,6 +132,11 @@
                     <h3 class="font-semibold mb-2">Site Settings</h3>
                     <p class="mb-4">Configure website settings and preferences.</p>
                     <a href="settings.html" class="w-full block p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-center">Site Settings</a>
+                </div>
+                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
+                    <h3 class="font-semibold mb-2">Product Management</h3>
+                    <p class="mb-4">Manage oil products, add descriptions and images.</p>
+                    <a href="oil-products-management.html" class="w-full block p-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 text-center">Manage Products</a>
                 </div>
             </div>
         </section>
@@ -173,6 +197,18 @@
         
         // Apply settings on page load
         document.addEventListener('DOMContentLoaded', loadAndApplySettings);
+        // Service Worker Registration for PWA
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(registration => {
+                        console.log("SW registered: ", registration);
+                    })
+                    .catch(registrationError => {
+                        console.log("SW registration failed: ", registrationError);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
