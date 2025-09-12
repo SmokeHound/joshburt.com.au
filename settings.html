@@ -5,22 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site Settings</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="api-integration.js"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        secondary: '#10b981',
-                        accent: '#8b5cf6',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                },
-            },
-        };
+        // Configuration for dynamic color updates from settings
+        function applyDynamicColors() {
+            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            // Apply CSS variables for instant color update
+            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
+            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
+            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+        }
+        applyDynamicColors();
+        // Service Worker Registration for PWA
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(registration => {
+                        console.log("SW registered: ", registration);
+                    })
+                    .catch(registrationError => {
+                        console.log("SW registration failed: ", registrationError);
+                    });
+            });
+        }
     </script>
     <style>
         :root {
@@ -158,6 +164,18 @@
                 document.documentElement.style.setProperty('--tw-color-accent', settings.accentColor || '#8b5cf6');
             }
         });
+        // Service Worker Registration for PWA
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(registration => {
+                        console.log("SW registered: ", registration);
+                    })
+                    .catch(registrationError => {
+                        console.log("SW registration failed: ", registrationError);
+                    });
+            });
+        }
         </script>
     </aside>
 
@@ -631,315 +649,6 @@
 
         // Load settings when page loads
         loadSettings();
-
-        // === API INTEGRATION MANAGEMENT ===
-        
-        // Load API settings
-        function loadAPISettings() {
-            const apiSettings = JSON.parse(localStorage.getItem('apiSettings') || '{}');
-            
-            // Inventory API
-            document.getElementById('inventory-enabled').checked = apiSettings.inventoryEnabled || false;
-            document.getElementById('inventory-endpoint').value = apiSettings.inventoryEndpoint || 'https://api.example.com/inventory';
-            document.getElementById('inventory-api-key').value = apiSettings.inventoryApiKey || '';
-            
-            // Payment API
-            document.getElementById('payment-enabled').checked = apiSettings.paymentEnabled || false;
-            document.getElementById('payment-endpoint').value = apiSettings.paymentEndpoint || 'https://api.stripe.com/v1';
-            document.getElementById('payment-api-key').value = apiSettings.paymentApiKey || '';
-            
-            // Notification API
-            document.getElementById('notification-enabled').checked = apiSettings.notificationEnabled || false;
-            document.getElementById('notification-endpoint').value = apiSettings.notificationEndpoint || 'https://api.sendgrid.com/v3';
-            document.getElementById('notification-api-key').value = apiSettings.notificationApiKey || '';
-            
-            // Cloud Backup
-            document.getElementById('cloud-backup-enabled').checked = apiSettings.cloudBackupEnabled || false;
-            document.getElementById('auto-backup-enabled').checked = apiSettings.autoBackupEnabled || false;
-            document.getElementById('cloud-backup-endpoint').value = apiSettings.cloudBackupEndpoint || 'https://api.jsonbin.io/v3';
-            document.getElementById('cloud-backup-api-key').value = apiSettings.cloudBackupApiKey || '';
-            document.getElementById('auto-backup-interval').value = apiSettings.autoBackupInterval || 60;
-        }
-
-        // Save API settings
-        function saveAPISettings() {
-            const apiSettings = {
-                inventoryEnabled: document.getElementById('inventory-enabled').checked,
-                inventoryEndpoint: document.getElementById('inventory-endpoint').value,
-                inventoryApiKey: document.getElementById('inventory-api-key').value,
-                
-                paymentEnabled: document.getElementById('payment-enabled').checked,
-                paymentEndpoint: document.getElementById('payment-endpoint').value,
-                paymentApiKey: document.getElementById('payment-api-key').value,
-                
-                notificationEnabled: document.getElementById('notification-enabled').checked,
-                notificationEndpoint: document.getElementById('notification-endpoint').value,
-                notificationApiKey: document.getElementById('notification-api-key').value,
-                
-                cloudBackupEnabled: document.getElementById('cloud-backup-enabled').checked,
-                autoBackupEnabled: document.getElementById('auto-backup-enabled').checked,
-                cloudBackupEndpoint: document.getElementById('cloud-backup-endpoint').value,
-                cloudBackupApiKey: document.getElementById('cloud-backup-api-key').value,
-                autoBackupInterval: document.getElementById('auto-backup-interval').value
-            };
-            
-            localStorage.setItem('apiSettings', JSON.stringify(apiSettings));
-            
-            // Update API service configuration if available
-            if (window.apiService) {
-                window.apiService.saveAPIConfig(apiSettings);
-                
-                // Restart auto backup if settings changed
-                if (apiSettings.autoBackupEnabled && apiSettings.autoBackupInterval) {
-                    window.apiService.startAutoBackup(parseInt(apiSettings.autoBackupInterval));
-                } else {
-                    window.apiService.stopAutoBackup();
-                }
-            }
-            
-            showToast('API settings saved successfully!');
-        }
-
-        // Test all APIs
-        async function testAllAPIs() {
-            const button = document.getElementById('test-apis');
-            const originalText = button.textContent;
-            button.textContent = 'Testing...';
-            button.disabled = true;
-            
-            try {
-                if (!window.apiService) {
-                    throw new Error('API service not available');
-                }
-                
-                const results = await window.apiService.testConnections();
-                updateAPIStatus(results);
-                
-                const successCount = Object.values(results).filter(Boolean).length;
-                const totalCount = Object.keys(results).length;
-                
-                showToast(`API tests completed: ${successCount}/${totalCount} services working`);
-            } catch (error) {
-                console.error('API testing failed:', error);
-                showToast('API testing failed: ' + error.message);
-            } finally {
-                button.textContent = originalText;
-                button.disabled = false;
-            }
-        }
-
-        // Update API status display
-        function updateAPIStatus(results) {
-            const statusContainer = document.getElementById('api-status');
-            const statuses = [
-                { name: 'Inventory API', key: 'inventory' },
-                { name: 'Payment API', key: 'payment' },
-                { name: 'Notification API', key: 'notifications' },
-                { name: 'Cloud Backup', key: 'cloudBackup' }
-            ];
-            
-            statusContainer.innerHTML = '';
-            
-            statuses.forEach(status => {
-                const isWorking = results[status.key];
-                const statusClass = isWorking ? 'bg-green-600 text-green-100' : 'bg-red-600 text-red-100';
-                const statusText = isWorking ? 'Working' : 'Failed';
-                
-                const statusDiv = document.createElement('div');
-                statusDiv.className = 'flex justify-between items-center p-2 bg-gray-700 rounded';
-                statusDiv.innerHTML = `
-                    <span>${status.name}</span>
-                    <span class="px-2 py-1 rounded text-xs ${statusClass}">${statusText}</span>
-                `;
-                statusContainer.appendChild(statusDiv);
-            });
-        }
-
-        // Webhook management
-        function loadWebhooks() {
-            const endpoints = JSON.parse(localStorage.getItem('webhookEndpoints') || '[]');
-            const container = document.getElementById('webhook-list');
-            
-            if (endpoints.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-sm">No webhooks registered</p>';
-                return;
-            }
-            
-            container.innerHTML = '';
-            endpoints.forEach((webhook, index) => {
-                const webhookDiv = document.createElement('div');
-                webhookDiv.className = 'flex justify-between items-center p-3 bg-gray-700 rounded';
-                webhookDiv.innerHTML = `
-                    <div>
-                        <div class="font-medium">${webhook.endpoint}</div>
-                        <div class="text-sm text-gray-400">Events: ${webhook.events.join(', ')}</div>
-                    </div>
-                    <button class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 remove-webhook" data-index="${index}">
-                        Remove
-                    </button>
-                `;
-                container.appendChild(webhookDiv);
-            });
-
-            // Add remove event listeners
-            container.querySelectorAll('.remove-webhook').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    removeWebhook(index);
-                });
-            });
-        }
-
-        function addWebhook() {
-            const endpoint = document.getElementById('webhook-endpoint').value;
-            const eventsStr = document.getElementById('webhook-events').value;
-            
-            if (!endpoint || !eventsStr) {
-                showToast('Please enter both endpoint URL and events');
-                return;
-            }
-            
-            const events = eventsStr.split(',').map(e => e.trim()).filter(e => e);
-            const webhooks = JSON.parse(localStorage.getItem('webhookEndpoints') || '[]');
-            
-            webhooks.push({ endpoint, events });
-            localStorage.setItem('webhookEndpoints', JSON.stringify(webhooks));
-            
-            // Register with API service if available
-            if (window.apiService) {
-                window.apiService.registerWebhook(endpoint, events);
-            }
-            
-            // Clear form
-            document.getElementById('webhook-endpoint').value = '';
-            document.getElementById('webhook-events').value = '*';
-            
-            loadWebhooks();
-            showToast('Webhook added successfully!');
-        }
-
-        function removeWebhook(index) {
-            const webhooks = JSON.parse(localStorage.getItem('webhookEndpoints') || '[]');
-            webhooks.splice(index, 1);
-            localStorage.setItem('webhookEndpoints', JSON.stringify(webhooks));
-            loadWebhooks();
-            showToast('Webhook removed!');
-        }
-
-        // Load and display webhook log
-        function loadWebhookLog() {
-            const log = window.apiService ? window.apiService.getWebhookLog() : [];
-            const container = document.getElementById('webhook-log');
-            
-            if (log.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-sm">No webhook events yet</p>';
-                return;
-            }
-            
-            container.innerHTML = '';
-            log.slice(-10).reverse().forEach(event => {
-                const eventDiv = document.createElement('div');
-                eventDiv.className = 'mb-2 p-2 bg-gray-800 rounded text-sm';
-                eventDiv.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="font-medium text-blue-400">${event.event}</span>
-                        <span class="text-gray-400">${new Date(event.timestamp).toLocaleTimeString()}</span>
-                    </div>
-                    <div class="text-gray-300 text-xs mt-1">${JSON.stringify(event.data, null, 2).substring(0, 100)}...</div>
-                `;
-                container.appendChild(eventDiv);
-            });
-        }
-
-        // Load and display backup history
-        function loadBackupHistory() {
-            const history = window.apiService ? window.apiService.getBackupHistory() : [];
-            const container = document.getElementById('backup-history');
-            
-            if (history.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-sm">No backups yet</p>';
-                return;
-            }
-            
-            container.innerHTML = '';
-            history.slice(-5).reverse().forEach(backup => {
-                const backupDiv = document.createElement('div');
-                backupDiv.className = 'flex justify-between items-center p-2 bg-gray-700 rounded text-sm';
-                backupDiv.innerHTML = `
-                    <div>
-                        <div class="font-medium">${backup.id}</div>
-                        <div class="text-gray-400">${new Date(backup.timestamp).toLocaleString()}</div>
-                    </div>
-                    <div class="text-gray-400">${Math.round(backup.size / 1024)} KB</div>
-                `;
-                container.appendChild(backupDiv);
-            });
-        }
-
-        // Manual backup
-        async function performManualBackup() {
-            const button = document.getElementById('manual-backup');
-            const originalText = button.textContent;
-            button.textContent = 'Backing up...';
-            button.disabled = true;
-            
-            try {
-                if (!window.apiService) {
-                    throw new Error('API service not available');
-                }
-                
-                const result = await window.apiService.backupToCloud();
-                
-                if (result.success) {
-                    showToast('Backup completed successfully!');
-                    loadBackupHistory();
-                } else {
-                    throw new Error(result.error || result.reason || 'Backup failed');
-                }
-            } catch (error) {
-                console.error('Manual backup failed:', error);
-                showToast('Backup failed: ' + error.message);
-            } finally {
-                button.textContent = originalText;
-                button.disabled = false;
-            }
-        }
-
-        // Event listeners for API settings
-        document.getElementById('api-settings-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            saveAPISettings();
-        });
-
-        document.getElementById('test-apis').addEventListener('click', testAllAPIs);
-        document.getElementById('add-webhook').addEventListener('click', addWebhook);
-        document.getElementById('manual-backup').addEventListener('click', performManualBackup);
-        
-        document.getElementById('clear-webhook-log').addEventListener('click', () => {
-            if (window.apiService) {
-                window.apiService.clearWebhookLog();
-            }
-            loadWebhookLog();
-            showToast('Webhook log cleared!');
-        });
-
-        // Initialize API settings when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAPISettings();
-            loadWebhooks();
-            
-            // Load logs and history every 30 seconds
-            setInterval(() => {
-                loadWebhookLog();
-                loadBackupHistory();
-            }, 30000);
-            
-            // Initial load
-            setTimeout(() => {
-                loadWebhookLog();
-                loadBackupHistory();
-            }, 1000);
-        });
 
     </script>
 </body>

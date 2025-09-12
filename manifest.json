@@ -1,0 +1,22 @@
+{
+  "name": "Josh Burt - Business Website",
+  "short_name": "JoshBurt.com.au",
+  "description": "Josh Burt's professional website with admin dashboard and oil ordering system",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./assets/images/logo-placeholder.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "en",
+  "scope": "/",
+  "id": "joshburt-webapp"
+}
