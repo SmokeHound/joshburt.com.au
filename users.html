@@ -184,9 +184,33 @@
             }
         }
 
-        // User management functionality
+        // User management functionality with audit logging
         let users = [];
         let editingUserId = null;
+
+        // Audit Logger for users page
+        class AuditLogger {
+            static log(action, details, userId = 'admin') {
+                const auditLogs = JSON.parse(localStorage.getItem('auditLogs') || '[]');
+                const logEntry = {
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    userId: userId,
+                    action: action,
+                    details: details,
+                    ip: 'localhost'
+                };
+                
+                auditLogs.unshift(logEntry);
+                
+                if (auditLogs.length > 1000) {
+                    auditLogs.splice(1000);
+                }
+                
+                localStorage.setItem('auditLogs', JSON.stringify(auditLogs));
+                window.dispatchEvent(new CustomEvent('auditLogUpdated', { detail: logEntry }));
+            }
+        }
 
         // Load users from localStorage
         function loadUsers() {
@@ -224,7 +248,7 @@
             });
         }
 
-        // Add or update user
+        // Add or update user with audit logging
         function addOrUpdateUser(event) {
             event.preventDefault();
             
@@ -242,10 +266,17 @@
                 // Update existing user
                 const userIndex = users.findIndex(u => u.id === editingUserId);
                 if (userIndex !== -1) {
+                    const oldUser = users[userIndex];
                     users[userIndex] = { id: editingUserId, name, email, role };
+                    
+                    // Log user update
+                    AuditLogger.log('user_update', `Updated user: ${oldUser.name} (${oldUser.email}) → ${name} (${email}), Role: ${oldUser.role} → ${role}`);
+                    
                     showToast('User updated successfully!');
                     editingUserId = null;
                     form.querySelector('button[type="submit"]').textContent = 'Add User';
+                    form.querySelector('h3').textContent = 'Add New User';
+                    document.getElementById('cancel-edit').classList.add('hidden');
                 }
             } else {
                 // Add new user
@@ -256,6 +287,10 @@
                     role
                 };
                 users.push(newUser);
+                
+                // Log user creation
+                AuditLogger.log('user_create', `Created new user: ${name} (${email}) with role: ${role}`);
+                
                 showToast('User added successfully!');
             }
             
@@ -283,10 +318,15 @@
             form.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Delete user
+        // Delete user with audit logging
         function deleteUser(userId) {
-            if (confirm('Are you sure you want to delete this user?')) {
+            const user = users.find(u => u.id === userId);
+            if (user && confirm('Are you sure you want to delete this user?')) {
                 users = users.filter(u => u.id !== userId);
+                
+                // Log user deletion
+                AuditLogger.log('user_delete', `Deleted user: ${user.name} (${user.email}) with role: ${user.role}`);
+                
                 saveUsers();
                 renderUsers();
                 showToast('User deleted successfully!');
@@ -332,6 +372,11 @@
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
+            // Log page access
+            if (typeof AuditLogger !== 'undefined') {
+                AuditLogger.log('page_access', 'Accessed User Management page');
+            }
+            
             loadUsers();
             loadAndApplySettings();
             
