@@ -4,18 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Castrol Order Form</title>
-    
-    <!-- PWA Configuration -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
-    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
-    
 
-  <!-- Local TailwindCSS instead of CDN -->
-  <link rel="stylesheet" href="./assets/css/styles.css">
+  <!-- Remove Bootstrap CSS and use Tailwind CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
       // Configuration for dynamic color updates from settings
       function applyDynamicColors() {
@@ -94,8 +87,16 @@
   <!-- Toast Notification -->
   <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+    ☰
+  </button>
+
+  <!-- Mobile sidebar backdrop -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+
   <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+  <aside id="sidebar" class="sidebar w-64 md:w-64 lg:w-64 fixed md:static top-0 left-0 h-full bg-gray-800 p-4 flex flex-col shadow-lg" aria-label="Main navigation">
     <!-- App Branding -->
     <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
@@ -121,56 +122,56 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-4">
+  <main class="flex-1 p-4 md:p-6 transition-all duration-300">
     <!-- Sticky Header -->
     <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
-      <h2 class="text-3xl font-semibold" id="welcome-message">Castrol Products</h2>
+      <h2 class="text-2xl md:text-3xl font-semibold" id="welcome-message">Castrol Products</h2>
     </header>
 
     <!-- Content Section -->
     <section>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6">
         <!-- Product Selection Area -->
-        <div class="lg:col-span-2">
-          <p class="mb-4 text-gray-300">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
+        <div class="lg:col-span-2 order-2 lg:order-1">
+          <p class="mb-4 text-gray-300 text-sm md:text-base">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
           
           <!-- Product tabs -->
           <div id="productTypeTabs" class="mb-6">
-            <nav class="flex space-x-1 rounded-lg bg-gray-800 p-1">
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-white bg-primary" data-type="Engine oil">
+            <nav class="flex flex-wrap gap-1 rounded-lg bg-gray-800 p-1">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-white bg-primary flex-1 sm:flex-none" data-type="Engine oil">
                 Engine Oil
               </button>
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" data-type="Coolant">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white flex-1 sm:flex-none" data-type="Coolant">
                 Coolant
               </button>
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" data-type="Gear Oil">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white flex-1 sm:flex-none" data-type="Gear Oil">
                 Gear Oil
               </button>
             </nav>
           </div>
           
-          <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div id="productsContainer" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
             <!-- Product cards will be dynamically inserted here -->
             <div class="p-4 bg-gray-700 rounded shadow text-center">
               <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p class="mt-2">Loading products...</p>
+              <p class="mt-2 text-sm">Loading products...</p>
             </div>
           </div>
         </div>
 
         <!-- Order Form Area -->
-        <div class="lg:col-span-1">
-          <div id="orderContainer" class="bg-gray-800 rounded shadow p-4 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
+        <div class="lg:col-span-1 order-1 lg:order-2">
+          <div id="orderContainer" class="bg-gray-800 rounded shadow p-4 lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-semibold">Your Order 🛒</h3>
+              <h3 class="text-lg md:text-xl font-semibold">Your Order 🛒</h3>
               <div id="loading-indicator" class="hidden">
                 <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
               </div>
             </div>
             
-            <div id="orderItems" class="space-y-2 mb-4 min-h-[200px]">
+            <div id="orderItems" class="space-y-2 mb-4 min-h-[100px] lg:min-h-[200px]">
               <!-- Order items will be dynamically inserted here -->
-              <p class="text-gray-400 text-center py-8">Your order is empty.</p>
+              <p class="text-gray-400 text-center py-4 lg:py-8 text-sm">Your order is empty.</p>
             </div>
             
             <div id="orderSummary" class="flex justify-between font-bold mb-4 pt-4 border-t border-gray-600">
@@ -178,7 +179,7 @@
               <span id="totalItems">0</span>
             </div>
             
-            <button id="submitOrderBtn" class="w-full p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <button id="submitOrderBtn" class="w-full p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-base" disabled>
               Submit Order
             </button>
           </div>
@@ -444,63 +445,218 @@
       loadingIndicator.classList.add('hidden');
     };
 
-    // Handle order submission
-    const submitOrder = () => {
+    // Handle order submission with API integration
+    const submitOrder = async () => {
       if (Object.keys(currentOrder).length === 0) {
         showToast('Your order is empty.', 'error');
         return;
       }
-      loadingIndicator.classList.remove('hidden');
       
-      // Hide modal
-
+      loadingIndicator.classList.remove('hidden');
       confirmModal.classList.add('hidden');
 
+      try {
+        // Generate order ID
+        const orderId = 'ORD-' + Date.now();
+        
+        // Calculate total amount (mock pricing for now)
+        let totalAmount = 0;
+        const orderItems = [];
+        
+        for (const [name, item] of Object.entries(currentOrder)) {
+          const oil = oils.find(o => o.name === name);
+          const price = Math.floor(Math.random() * 50) + 25; // Mock price between $25-$75
+          totalAmount += price * item.quantity;
+          orderItems.push({
+            productCode: oil ? oil.code : '',
+            productName: name,
+            quantity: item.quantity,
+            price: price,
+            specs: oil ? oil.specs : ''
+          });
+        }
 
-      // Generate CSV
-      let csv = 'Product Code,Quantity,Product Name\n';
-      Object.values(currentOrder).forEach(item => {
-        const oil = oils.find(o => o.name === item.name);
-        csv += `"${oil ? oil.code : ''}","${item.quantity}","${item.name}"\n`;
-      });
+        const orderData = {
+          orderId,
+          items: orderItems,
+          totalAmount,
+          customerEmail: getCurrentUserEmail(),
+          timestamp: new Date().toISOString(),
+          status: 'pending'
+        };
 
-      // Create and download CSV file
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'order.csv';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+        // Trigger order created webhook
+        if (window.apiService) {
+          await window.apiService.triggerWebhook('order.created', orderData);
+        }
 
-      setTimeout(() => {
-        showToast('Order submitted! CSV downloaded.', 'success');
+        // Check inventory for all products
+        const productCodes = orderItems.map(item => item.productCode);
+        let inventoryCheck = null;
+        
+        if (window.apiService) {
+          try {
+            inventoryCheck = await window.apiService.checkInventory(productCodes);
+            
+            // Check if all items are in stock
+            const outOfStockItems = orderItems.filter(item => {
+              const inventory = inventoryCheck[item.productCode];
+              return !inventory || !inventory.inStock || inventory.quantity < item.quantity;
+            });
+
+            if (outOfStockItems.length > 0) {
+              const itemNames = outOfStockItems.map(item => item.productName).join(', ');
+              throw new Error(`Some items are out of stock: ${itemNames}`);
+            }
+          } catch (error) {
+            console.warn('Inventory check failed, proceeding with order:', error.message);
+            showToast('Warning: Could not verify inventory. Order will be processed manually.', 'warning');
+          }
+        }
+
+        // Process payment (simplified - in real implementation, you'd collect payment details)
+        let paymentResult = null;
+        if (window.apiService) {
+          try {
+            const paymentDetails = { token: 'mock_payment_token' }; // In real app, get from payment form
+            paymentResult = await window.apiService.processPayment(orderData, paymentDetails);
+            
+            if (!paymentResult.success) {
+              throw new Error('Payment processing failed');
+            }
+          } catch (error) {
+            console.warn('Payment processing failed:', error.message);
+            showToast('Payment processing unavailable. Order saved for manual processing.', 'warning');
+          }
+        }
+
+        // Update order status
+        orderData.status = paymentResult && paymentResult.success ? 'paid' : 'pending_payment';
+        orderData.paymentId = paymentResult ? paymentResult.transactionId : null;
+
+        // Save order to localStorage
+        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        orders.push(orderData);
+        localStorage.setItem('orders', JSON.stringify(orders));
+
+        // Send confirmation notification
+        if (window.apiService && orderData.customerEmail) {
+          try {
+            await window.apiService.sendNotification('order.confirmation', {
+              orderId: orderData.orderId,
+              customerEmail: orderData.customerEmail,
+              totalAmount: orderData.totalAmount,
+              items: orderData.items
+            });
+          } catch (error) {
+            console.warn('Notification sending failed:', error.message);
+          }
+        }
+
+        // Generate CSV file (keeping original functionality)
+        let csv = 'Order ID,Product Code,Quantity,Product Name,Price,Total\n';
+        csv += `${orderId},,,Order Total,,${totalAmount.toFixed(2)}\n`;
+        orderItems.forEach(item => {
+          csv += `${orderId},"${item.productCode}","${item.quantity}","${item.productName}","${item.price.toFixed(2)}","${(item.price * item.quantity).toFixed(2)}"\n`;
+        });
+
+        // Create and download CSV file
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `order-${orderId}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // Trigger order processed webhook
+        if (window.apiService) {
+          await window.apiService.triggerWebhook('order.processed', orderData);
+        }
+
+        // Success feedback
+        showToast(`Order ${orderId} submitted successfully! ${paymentResult ? 'Payment processed.' : 'Awaiting payment.'} CSV downloaded.`, 'success');
+        
+        // Clear current order
         currentOrder = {};
         renderOrder();
+
+      } catch (error) {
+        console.error('Order submission failed:', error);
+        showToast(`Order submission failed: ${error.message}`, 'error');
+        
+        // Trigger error webhook
+        if (window.apiService) {
+          await window.apiService.triggerWebhook('order.failed', { 
+            error: error.message, 
+            orderData: Object.keys(currentOrder) 
+          });
+        }
+      } finally {
         loadingIndicator.classList.add('hidden');
-      }, 800);
+      }
+    };
+
+    // Helper function to get current user email
+    const getCurrentUserEmail = () => {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user.email || 'guest@joshburt.com.au';
     };
 
 
-    // Render products by type
-    function renderProductsByType(type) {
-      productsContainer.innerHTML = '';
-      oils.filter(oil => oil.type === type).forEach((oil) => {
-        const cardHtml = `
+    // Render products by type with inventory integration
+    async function renderProductsByType(type) {
+      productsContainer.innerHTML = '<p class="text-center text-gray-400">Loading products...</p>';
+      
+      const filteredOils = oils.filter(oil => oil.type === type);
+      const productCodes = filteredOils.map(oil => oil.code);
+      
+      // Check inventory for all products
+      let inventory = {};
+      if (window.apiService) {
+        try {
+          inventory = await window.apiService.checkInventory(productCodes);
+          // Cache inventory data
+          localStorage.setItem('cachedInventory', JSON.stringify(inventory));
+        } catch (error) {
+          console.warn('Could not load inventory data:', error.message);
+          // Use cached inventory as fallback
+          inventory = JSON.parse(localStorage.getItem('cachedInventory') || '{}');
+        }
+      }
 
+      // Clear loading message
+      productsContainer.innerHTML = '';
+      
+      filteredOils.forEach((oil) => {
+        const inventoryInfo = inventory[oil.code] || { inStock: true, quantity: '?', price: 50 };
+        const stockStatus = inventoryInfo.inStock ? 'In Stock' : 'Out of Stock';
+        const stockClass = inventoryInfo.inStock ? 'text-green-400' : 'text-red-400';
+        const buttonDisabled = !inventoryInfo.inStock ? 'disabled opacity-50 cursor-not-allowed' : '';
+        const priceDisplay = inventoryInfo.price ? `$${inventoryInfo.price.toFixed(2)}` : 'Price TBD';
+        
+        const cardHtml = `
           <div class="p-4 bg-gray-700 rounded shadow card product-card" data-index="${oils.indexOf(oil)}">
             <h5 class="font-bold text-white mb-2 cursor-pointer">${oil.name}</h5>
+            <div class="flex justify-between items-center mb-2">
+              <div class="text-sm">
+                <span class="${stockClass}">${stockStatus}</span>
+                ${inventoryInfo.quantity !== '?' ? `<span class="text-gray-400 ml-2">(${inventoryInfo.quantity} units)</span>` : ''}
+                ${inventoryInfo.cached ? '<span class="text-yellow-400 ml-2">(Cached)</span>' : ''}
+              </div>
+              <span class="text-lg font-bold text-white">${priceDisplay}</span>
+            </div>
             <div class="flex justify-end mb-2">
-              <button class="px-4 py-2 bg-primary text-white rounded-full text-sm hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary btn-add-to-order" data-index="${oils.indexOf(oil)}">
+              <button class="px-4 py-2 bg-primary text-white rounded-full text-sm hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary btn-add-to-order ${buttonDisabled}" 
+                      data-index="${oils.indexOf(oil)}" ${!inventoryInfo.inStock ? 'disabled' : ''}>
                 + Add
               </button>
             </div>
             <div class="product-details hidden">
               <p class="text-gray-300 text-sm mb-1">${oil.specs}</p>
               <p class="text-sm"><strong>Product Code:</strong> ${oil.code}</p>
-
             </div>
           </div>
         `;

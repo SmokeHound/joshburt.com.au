@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Josh Burt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body class="dark min-h-screen flex items-center justify-center font-sans p-4">
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed top-4 right-4 p-2 bg-primary text-white rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+        🌓
+    </button>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-red-500 text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+
+    <!-- Register Container -->
+    <div class="w-full max-w-md">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">Create Account</h1>
+            <p class="text-gray-400">Join Josh Burt's website</p>
+        </div>
+
+        <!-- Register Card -->
+        <div class="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-700">
+            <form id="register-form">
+                <!-- Name Field -->
+                <div class="mb-6">
+                    <label for="name" class="block text-sm font-medium text-white mb-2">Full Name</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        required 
+                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                    >
+                </div>
+
+                <!-- Email Field -->
+                <div class="mb-6">
+                    <label for="email" class="block text-sm font-medium text-white mb-2">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                    >
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-white mb-2">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Enter your password"
+                        autocomplete="new-password"
+                    >
+                    <div class="mt-2 text-xs text-gray-400">
+                        Password must contain at least 8 characters with uppercase, lowercase, number, and special character.
+                    </div>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="mb-6">
+                    <label for="confirm-password" class="block text-sm font-medium text-white mb-2">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="confirm-password" 
+                        name="confirm-password" 
+                        required 
+                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Confirm your password"
+                        autocomplete="new-password"
+                    >
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="mb-6">
+                    <label class="flex items-start">
+                        <input type="checkbox" id="terms" required class="mt-1 mr-3 rounded border-gray-600 bg-gray-700 text-primary focus:ring-primary focus:ring-offset-gray-800">
+                        <span class="text-sm text-gray-300">
+                            I agree to the <a href="#" class="text-primary hover:text-secondary">Terms of Service</a> and <a href="#" class="text-primary hover:text-secondary">Privacy Policy</a>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Error Display -->
+                <div id="register-error" class="hidden text-red-400 text-sm mb-4"></div>
+
+                <!-- Success Display -->
+                <div id="register-success" class="hidden text-green-400 text-sm mb-4"></div>
+
+                <!-- Register Button -->
+                <button 
+                    type="submit" 
+                    id="submit-register"
+                    class="w-full p-3 bg-primary text-white rounded-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-gray-800 font-medium"
+                >
+                    Create Account <span id="register-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="mt-6 mb-6 flex items-center">
+                <div class="flex-1 border-t border-gray-600"></div>
+                <span class="px-4 text-sm text-gray-400">or</span>
+                <div class="flex-1 border-t border-gray-600"></div>
+            </div>
+
+            <!-- OAuth Options -->
+            <div class="space-y-3">
+                <button id="google-oauth" class="w-full p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 font-medium">
+                    Continue with Google
+                </button>
+                <button id="github-oauth" class="w-full p-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 font-medium">
+                    Continue with GitHub
+                </button>
+            </div>
+
+            <!-- Back to Login -->
+            <div class="text-center mt-6">
+                <span class="text-sm text-gray-400">Already have an account? </span>
+                <a href="login.html" class="text-primary hover:text-secondary transition-colors text-sm font-medium">
+                    Sign In
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="text-center mt-6 text-sm text-gray-400">
+            <p>&copy; 2025 Josh Burt. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+
+        // Show toast notification
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `fixed bottom-4 right-4 p-4 text-white rounded shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            body.classList.toggle('light');
+            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        body.classList.add(savedTheme);
+        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+
+        // Form handling
+        const registerForm = document.getElementById('register-form');
+        const registerSpinner = document.getElementById('register-spinner');
+        const registerError = document.getElementById('register-error');
+        const registerSuccess = document.getElementById('register-success');
+        const submitBtn = document.getElementById('submit-register');
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const termsAccepted = document.getElementById('terms').checked;
+
+            // Reset previous states
+            registerError.classList.add('hidden');
+            registerSuccess.classList.add('hidden');
+
+            // Client-side validation
+            if (!name || !email || !password || !confirmPassword) {
+                registerError.textContent = 'Please fill in all fields';
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            if (name.length < 2) {
+                registerError.textContent = 'Name must be at least 2 characters long';
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                registerError.textContent = 'Passwords do not match';
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            if (password.length < 8) {
+                registerError.textContent = 'Password must be at least 8 characters long';
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            // Check password complexity
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+            if (!passwordRegex.test(password)) {
+                registerError.textContent = 'Password must contain uppercase, lowercase, number, and special character';
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            if (!termsAccepted) {
+                registerError.textContent = 'Please accept the terms and conditions';
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            // Show loading state
+            registerSpinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    registerSuccess.textContent = 'Account created successfully! Redirecting to login...';
+                    registerSuccess.classList.remove('hidden');
+                    
+                    // Redirect to login after delay
+                    setTimeout(() => {
+                        window.location.href = 'login.html?message=registration-success';
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Registration failed');
+                }
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                registerError.textContent = error.message;
+                registerError.classList.remove('hidden');
+            } finally {
+                registerSpinner.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // OAuth handlers
+        document.getElementById('google-oauth').addEventListener('click', () => {
+            window.location.href = `${API_BASE}/auth/google`;
+        });
+
+        document.getElementById('github-oauth').addEventListener('click', () => {
+            window.location.href = `${API_BASE}/auth/github`;
+        });
+    </script>
+</body>
+</html>

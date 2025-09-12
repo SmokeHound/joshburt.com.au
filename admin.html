@@ -78,8 +78,11 @@
     <!-- Toast Notification -->
     <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
+    <!-- Mobile sidebar backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+    <aside id="sidebar" class="sidebar w-64 md:w-64 lg:w-64 fixed md:static top-0 left-0 h-full bg-gray-800 p-4 flex flex-col shadow-lg" aria-label="Main navigation">
         <!-- App Branding -->
         <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
@@ -105,15 +108,15 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4">
+    <main class="flex-1 p-4 md:p-6 transition-all duration-300">
         <!-- Sticky Header -->
         <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
-            <h2 class="text-3xl font-semibold" id="welcome-message">Welcome, Admin!</h2>
+            <h2 class="text-2xl md:text-3xl font-semibold" id="welcome-message">Welcome, Admin!</h2>
         </header>
 
         <!-- Content Section -->
         <section>
-            <p class="mb-4">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
+            <p class="mb-6 text-sm md:text-base leading-relaxed">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                     <h3 class="font-semibold mb-2">User Management</h3>
