@@ -49,28 +49,58 @@
             background-color: #f9fafb;
             color: #1f2937;
         }
+        /* Screen reader only class */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        .focus\:not-sr-only:focus {
+            position: static;
+            width: auto;
+            height: auto;
+            padding: 0.5rem;
+            margin: 0;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+        }
     </style>
 </head>
 <body class="dark min-h-screen flex items-center justify-center font-sans p-4">
+    <!-- Skip Links -->
+    <div class="sr-only">
+        <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
+    </div>
+
     <!-- Theme Toggle Button -->
-    <button id="theme-toggle" class="fixed top-4 right-4 p-2 bg-primary text-white rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
-        🌓
+    <button id="theme-toggle" class="fixed top-4 right-4 p-2 bg-primary text-white rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode" aria-pressed="false">
+        <span aria-hidden="true">🌓</span>
+        <span class="sr-only">Toggle theme</span>
     </button>
 
     <!-- Toast Notification -->
     <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-red-500 text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
     <!-- Login Container -->
-    <div class="w-full max-w-md">
+    <main id="main-content" class="w-full max-w-md" role="main">
         <!-- Header -->
-        <div class="text-center mb-8">
+        <header class="text-center mb-8" role="banner">
             <h1 class="text-4xl font-bold mb-2">Admin Login</h1>
             <p class="text-gray-400">Please sign in to access the admin dashboard</p>
-        </div>
+        </header>
 
         <!-- Login Card -->
-        <div class="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-700">
-            <form method="post" action="admin.php" id="login-form">
+        <section class="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-700" role="region" aria-label="Login form">
+            <form method="post" action="admin.php" id="login-form" role="form" aria-labelledby="login-heading">
+                <h2 id="login-heading" class="sr-only">Login credentials</h2>
+                
                 <!-- Username Field -->
                 <div class="mb-6">
                     <label for="username" class="block text-sm font-medium text-white mb-2">Username</label>
@@ -79,10 +109,13 @@
                         id="username" 
                         name="username" 
                         required 
+                        aria-required="true"
+                        aria-describedby="username-error"
                         class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="Enter your username"
                         autocomplete="username"
                     >
+                    <div id="username-error" class="sr-only" role="alert" aria-live="polite"></div>
                 </div>
 
                 <!-- Password Field -->
@@ -93,10 +126,13 @@
                         id="password" 
                         name="password" 
                         required 
+                        aria-required="true"
+                        aria-describedby="password-error"
                         class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="Enter your password"
                         autocomplete="current-password"
                     >
+                    <div id="password-error" class="sr-only" role="alert" aria-live="polite"></div>
                 </div>
 
                 <!-- Login Error Display -->
