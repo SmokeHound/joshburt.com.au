@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Website Template</title>
+    <title>Josh's App - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -26,25 +26,25 @@
             transition: background-color 0.3s, color 0.3s;
         }
         .dark {
-                const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                tailwind.config = {
-                    theme: {
-                        extend: {
-                            colors: {
-                                primary: settingsHead.primaryColor || '#3b82f6',
-                                secondary: settingsHead.secondaryColor || '#10b981',
-                                accent: settingsHead.accentColor || '#8b5cf6',
-                            },
-                            fontFamily: {
-                                sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                            },
-                        },
-                    },
-                };
-                // Apply CSS variables for instant color update
-                document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-                document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-                document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        .card {
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .card:hover {
@@ -96,56 +96,21 @@
     </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-    <!-- Skip Links -->
-    <div class="sr-only">
-        <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
-        <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
-    </div>
-
-    <!-- Mobile Menu Toggle -->
-    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
-        <span aria-hidden="true">☰</span>
-        <span class="sr-only">Menu</span>
-    </button>
-
-    <!-- Mobile sidebar backdrop -->
-    <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
-    
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
-        <!-- App Branding -->
-        <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
-
-        <!-- User Profile Section -->
-        <div id="user-profile" class="mb-6" role="region" aria-label="User profile">
-            <div id="user-info" class="hidden flex items-center space-x-2">
-                <img id="user-avatar" src="./assets/images/avatar-placeholder.svg" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
-                <span id="user-name" class="text-white"></span>
-            </div>
-            <button id="login-btn" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Open login modal">Login</button>
-            <button id="logout-btn" class="hidden w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" aria-label="Logout">Logout</button>
-        </div>
-
-        <!-- Navigation -->
-        <nav role="navigation" aria-label="Main navigation">
-            <ul class="space-y-2" role="list">
-                <li role="listitem"><a href="index.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Home</a></li>
-                <li role="listitem"><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
-                <li role="listitem"><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-                <li role="listitem"><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-                <li role="listitem"><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
-                <li role="listitem"><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
-                <li role="listitem"><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
-            </ul>
-        </nav>
-
-        <!-- Theme Toggle -->
-        <div class="mt-auto">
-            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode" aria-pressed="false">
-                Toggle Light Mode
-            </button>
-        </div>
-    </aside>
+    <!-- Load shared navigation component -->
+    <div id="shared-navigation"></div>
+    <script>
+        fetch('shared-nav.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('shared-navigation').innerHTML = html;
+                // Initialize page-specific functionality after navigation loads
+                initializeHomePage();
+            })
+            .catch(() => {
+                // Fallback if fetch fails - initialize anyway
+                setTimeout(initializeHomePage, 100);
+            });
+    </script>
 
     <!-- Login Modal -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
@@ -175,13 +140,8 @@
 
     <!-- Main Content -->
     <main class="flex-1 p-4">
-        <!-- Site Announcement (hidden by default, shown if content exists) -->
-        <div id="site-announcement" class="hidden mb-6 p-4 rounded shadow-lg">
-            <p id="announcement-text"></p>
-        </div>
-
         <!-- Sticky Header -->
-        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40" style="position:sticky;top:0;left:0;right:0;">
+        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40">
             <h2 class="text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
             <h3 class="text-lg text-gray-300 mt-2" id="homepage-subtitle" style="display: none;"></h3>
         </header>
@@ -206,399 +166,174 @@
         </section>
     </main>
 
+    <!-- Load shared theme functionality -->
     <script>
-        // API Configuration
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
-
-        // HTTP client with token management
-        async function apiRequest(url, options = {}) {
-            const token = localStorage.getItem('accessToken');
-            
-            const config = {
-                ...options,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token && { 'Authorization': `Bearer ${token}` }),
-                    ...options.headers
+        fetch('shared-theme.html')
+            .then(response => response.text())
+            .then(html => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const scripts = tempDiv.getElementsByTagName('script');
+                for (let script of scripts) {
+                    const newScript = document.createElement('script');
+                    newScript.textContent = script.textContent;
+                    document.body.appendChild(newScript);
                 }
-            };
+            });
+    </script>
 
-            try {
-                let response = await fetch(`${API_BASE}${url}`, config);
+    <!-- Home-specific functionality -->
+    <script>
+        function initializeHomePage() {
+            // Load and apply site settings
+            function loadAndApplySettings() {
+                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
                 
-                // If token expired, try to refresh
-                if (response.status === 401 && token) {
-                    const refreshed = await refreshAuthToken();
-                    if (refreshed) {
-                        // Retry with new token
-                        config.headers['Authorization'] = `Bearer ${localStorage.getItem('accessToken')}`;
-                        response = await fetch(`${API_BASE}${url}`, config);
+                // Apply site title if set
+                if (settings['site-title']) {
+                    const brandingElements = document.querySelectorAll('h1');
+                    brandingElements.forEach(el => {
+                        if (el.textContent.includes('Josh\'s App')) {
+                            el.textContent = settings['site-title'];
+                        }
+                    });
+                }
+                
+                // Apply homepage message if set
+                if (settings['homepage-message']) {
+                    const welcomeMessage = document.getElementById('welcome-message');
+                    const currentUser = JSON.parse(localStorage.getItem('user'));
+                    if (welcomeMessage && !currentUser) {
+                        welcomeMessage.textContent = settings['homepage-message'];
                     }
                 }
-                
-                return response;
-            } catch (error) {
-                console.error('API request failed:', error);
-                throw error;
-            }
-        }
-
-        // Refresh authentication token
-        async function refreshAuthToken() {
-            const refreshToken = localStorage.getItem('refreshToken');
-            if (!refreshToken) return false;
-
-            try {
-                const response = await fetch(`${API_BASE}/auth/refresh`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ refreshToken })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('accessToken', data.accessToken);
-                    localStorage.setItem('refreshToken', data.refreshToken);
-                    return true;
-                }
-            } catch (error) {
-                console.error('Token refresh failed:', error);
             }
 
-            // If refresh fails, logout user
-            logout();
-            return false;
-        }
-
-        // Logout function
-        async function logout() {
-            const refreshToken = localStorage.getItem('refreshToken');
-            
-            // Call logout API
-            try {
-                await apiRequest('/auth/logout', {
-                    method: 'POST',
-                    body: JSON.stringify({ refreshToken })
-                });
-            } catch (error) {
-                console.error('Logout API call failed:', error);
-            }
-
-            // Clear local storage
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('user');
-            
-            // Update UI
-            updateUIForLoggedOutState();
-            showToast('Logged out successfully!');
-        }
-
-        // Update UI for logged out state
-        function updateUIForLoggedOutState() {
-            const userInfo = document.getElementById('user-info');
+            // User Management
             const loginBtn = document.getElementById('login-btn');
             const logoutBtn = document.getElementById('logout-btn');
+            const userInfo = document.getElementById('user-info');
+            const userName = document.getElementById('user-name');
+            const userAvatar = document.getElementById('user-avatar');
+            const loginModal = document.getElementById('login-modal');
+            const loginForm = document.getElementById('login-form');
+            const closeModal = document.getElementById('close-modal');
+            const loginSpinner = document.getElementById('login-spinner');
+            const loginError = document.getElementById('login-error');
+            const toast = document.getElementById('toast');
             const welcomeMessage = document.getElementById('welcome-message');
 
-            userInfo.classList.add('hidden');
-            loginBtn.classList.remove('hidden');
-            logoutBtn.classList.add('hidden');
-            
-            // Restore homepage message from settings
-            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
-        }
+            // Show toast notification
+            function showToast(message) {
+                if (toast) {
+                    toast.textContent = message;
+                    toast.classList.remove('hidden');
+                    setTimeout(() => {
+                        toast.classList.add('hidden');
+                    }, 3000);
+                }
+            }
 
-        // Load and apply site settings
-        function loadAndApplySettings() {
-            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            
-            // Apply site title if set
-            if (settings['site-title']) {
-                const brandingElements = document.querySelectorAll('h1');
-                brandingElements.forEach(el => {
-                    if (el.textContent.includes('Josh\'s App')) {
-                        el.textContent = settings['site-title'];
-                    }
-                });
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                userInfo?.classList.remove('hidden');
+                loginBtn?.classList.add('hidden');
+                logoutBtn?.classList.remove('hidden');
+                if (userName) userName.textContent = user.name;
+                if (userAvatar) userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
+                if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${user.name}!`;
+            } else {
+                loadAndApplySettings();
             }
-            
-            // Apply homepage message if set
-            if (settings['homepage-message']) {
-                const welcomeMessage = document.getElementById('welcome-message');
-                const currentUser = JSON.parse(localStorage.getItem('user'));
-                if (welcomeMessage && !currentUser) {
-                    welcomeMessage.textContent = settings['homepage-message'];
-                }
-            }
-            
-            // Apply homepage subtitle if set
-            if (settings['homepage-subtitle']) {
-                const subtitle = document.getElementById('homepage-subtitle');
-                if (subtitle) {
-                    subtitle.textContent = settings['homepage-subtitle'];
-                    subtitle.style.display = 'block';
-                }
-            }
-            
-            // Apply homepage content if set
-            if (settings['homepage-content']) {
-                const content = document.getElementById('homepage-content');
-                if (content) {
-                    content.textContent = settings['homepage-content'];
-                }
-            }
-            
-            // Apply site announcement if set
-            if (settings['site-announcement']) {
-                const announcementContainer = document.getElementById('site-announcement');
-                const announcementText = document.getElementById('announcement-text');
-                if (announcementContainer && announcementText) {
-                    announcementText.textContent = settings['site-announcement'];
-                    
-                    // Apply announcement type styling
-                    const type = settings['announcement-type'] || 'info';
-                    announcementContainer.className = `mb-6 p-4 rounded shadow-lg ${getAnnouncementClasses(type)}`;
-                    announcementContainer.classList.remove('hidden');
-                }
-            }
-        }
-        
-        // Get CSS classes for announcement type
-        function getAnnouncementClasses(type) {
-            switch(type) {
-                case 'success': return 'bg-green-600 text-white border-l-4 border-green-400';
-                case 'warning': return 'bg-yellow-600 text-white border-l-4 border-yellow-400';
-                case 'error': return 'bg-red-600 text-white border-l-4 border-red-400';
-                case 'info':
-                default: return 'bg-blue-600 text-white border-l-4 border-blue-400';
-            }
-        }
 
-        // Theme Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            const isDark = body.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            themeToggle.textContent = isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-            themeToggle.setAttribute('aria-label', isDark ? 'Toggle light mode' : 'Toggle dark mode');
-            themeToggle.setAttribute('aria-pressed', isDark ? 'false' : 'true');
-        });
+            // Open login modal
+            loginBtn?.addEventListener('click', () => {
+                loginModal?.classList.remove('hidden');
+            });
 
-        // Keyboard support for theme toggle
-        themeToggle.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+            // Close login modal
+            closeModal?.addEventListener('click', () => {
+                loginModal?.classList.add('hidden');
+                loginForm?.reset();
+                loginError?.classList.add('hidden');
+            });
+
+            // Handle login
+            loginForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                themeToggle.click();
-            }
-        });
+                loginSpinner?.classList.remove('hidden');
+                loginError?.classList.add('hidden');
 
-        // Load saved theme from settings or localStorage
-        const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-        const savedTheme = settings['theme'] || localStorage.getItem('theme') || 'dark';
-        body.classList.add(savedTheme);
-        const isDark = savedTheme === 'dark';
-        themeToggle.textContent = isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-        themeToggle.setAttribute('aria-label', isDark ? 'Toggle light mode' : 'Toggle dark mode');
-        themeToggle.setAttribute('aria-pressed', isDark ? 'false' : 'true');
+                const email = document.getElementById('email')?.value;
+                const password = document.getElementById('password')?.value;
 
-        // Mobile Menu Toggle with enhanced accessibility
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        
-        function toggleSidebar() {
-            const isOpen = sidebar.classList.contains('open');
-            menuToggle.setAttribute('aria-expanded', isOpen);
-        });
-
-        // User Management
-        const loginBtn = document.getElementById('login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const userInfo = document.getElementById('user-info');
-        const userName = document.getElementById('user-name');
-        const userAvatar = document.getElementById('user-avatar');
-        const loginModal = document.getElementById('login-modal');
-        const loginForm = document.getElementById('login-form');
-        const closeModal = document.getElementById('close-modal');
-        const loginSpinner = document.getElementById('login-spinner');
-        const loginError = document.getElementById('login-error');
-        const toast = document.getElementById('toast');
-        const welcomeMessage = document.getElementById('welcome-message');
-
-        // Show toast notification
-        function showToast(message) {
-            toast.textContent = message;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
-
-        // Check if user is logged in
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-            userInfo.classList.remove('hidden');
-            loginBtn.classList.add('hidden');
-            logoutBtn.classList.remove('hidden');
-            userName.textContent = user.name;
-            userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
-            welcomeMessage.textContent = `Welcome, ${user.name}!`;
-        } else {
-            // Apply homepage message from settings if no user is logged in
-            loadAndApplySettings();
-        } else {
-            // Check authentication status with backend
-            checkAuthStatus();
-        }
-
-        // Open login modal with focus management
-        loginBtn.addEventListener('click', () => {
-            loginModal.classList.remove('hidden');
-            // Focus first input field
-            document.getElementById('email').focus();
-            // Trap focus in modal
-            trapFocusInModal(loginModal);
-        });
-
-        // Close login modal with focus management
-        function closeLoginModal() {
-            loginModal.classList.add('hidden');
-            loginForm.reset();
-            loginError.classList.add('hidden');
-            // Return focus to login button
-            loginBtn.focus();
-            announceToScreenReader('Login modal closed');
-        }
-
-        closeModal.addEventListener('click', closeLoginModal);
-
-        // Escape key to close modal
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !loginModal.classList.contains('hidden')) {
-                closeLoginModal();
-            }
-        });
-
-        // Focus trap for modal
-        function trapFocusInModal(modal) {
-            const focusableElements = modal.querySelectorAll(
-                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-            );
-            const firstFocusableElement = focusableElements[0];
-            const lastFocusableElement = focusableElements[focusableElements.length - 1];
-
-            modal.addEventListener('keydown', function modalKeydownHandler(e) {
-                if (e.key === 'Tab') {
-                    if (e.shiftKey) {
-                        if (document.activeElement === firstFocusableElement) {
-                            lastFocusableElement.focus();
-                            e.preventDefault();
-                        }
+                try {
+                    const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
+                    const registeredUser = users.find(u => u.email === email);
+                    
+                    let authenticatedUser = null;
+                    
+                    if (registeredUser && password === 'password') {
+                        authenticatedUser = { 
+                            name: registeredUser.name, 
+                            email: registeredUser.email,
+                            avatar: 'https://via.placeholder.com/40' 
+                        };
+                    } else if (email === 'test@example.com' && password === 'password') {
+                        authenticatedUser = { 
+                            name: email.split('@')[0], 
+                            email: email,
+                            avatar: 'https://via.placeholder.com/40' 
+                        };
                     } else {
-                        if (document.activeElement === lastFocusableElement) {
-                            firstFocusableElement.focus();
-                            e.preventDefault();
-                        }
+                        throw new Error('Invalid credentials');
                     }
+
+                    localStorage.setItem('user', JSON.stringify(authenticatedUser));
+                    userInfo?.classList.remove('hidden');
+                    loginBtn?.classList.add('hidden');
+                    logoutBtn?.classList.remove('hidden');
+                    if (userName) userName.textContent = authenticatedUser.name;
+                    if (userAvatar) userAvatar.src = authenticatedUser.avatar;
+                    if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
+                    loginModal?.classList.add('hidden');
+                    loginForm?.reset();
+                    showToast('Login successful!');
+                } catch (error) {
+                    if (loginError) {
+                        loginError.textContent = error.message;
+                        loginError.classList.remove('hidden');
+                    }
+                } finally {
+                    loginSpinner?.classList.add('hidden');
                 }
             });
-        }
 
-        // Handle login with enhanced error handling
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loginSpinner.classList.remove('hidden');
-            loginError.classList.add('hidden');
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            // Clear previous error states
-            document.getElementById('email-error').textContent = '';
-            document.getElementById('password-error').textContent = '';
-
-            // Simulate backend API call using new API
-            try {
-                // Check against registered users or use default credentials
-                const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
-                const registeredUser = users.find(u => u.email === email);
+            // Handle logout
+            logoutBtn?.addEventListener('click', async () => {
+                localStorage.removeItem('user');
+                userInfo?.classList.add('hidden');
+                loginBtn?.classList.remove('hidden');
+                logoutBtn?.classList.add('hidden');
                 
-                let authenticatedUser = null;
-                
-                if (registeredUser && password === 'password') {
-                    // Found registered user
-                    authenticatedUser = { 
-                        name: registeredUser.name, 
-                        email: registeredUser.email,
-                        avatar: 'https://via.placeholder.com/40' 
-                    };
-                } else if (email === 'test@example.com' && password === 'password') {
-                    // Default credentials
-                    authenticatedUser = { 
-                        name: email.split('@')[0], 
-                        email: email,
-                        avatar: 'https://via.placeholder.com/40' 
-                    };
-                } else {
-                    throw new Error('Invalid credentials');
-                }
-
-                localStorage.setItem('user', JSON.stringify(authenticatedUser));
-                userInfo.classList.remove('hidden');
-                loginBtn.classList.add('hidden');
-                logoutBtn.classList.remove('hidden');
-                userName.textContent = authenticatedUser.name;
-                userAvatar.src = authenticatedUser.avatar;
-                welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
-                loginModal.classList.add('hidden');
-                loginForm.reset();
-                showToast('Login successful!');
-            } catch (error) {
-                loginError.textContent = error.message;
-                loginError.classList.remove('hidden');
-                // Focus the email field for retry
-                document.getElementById('email').focus();
-                announceToScreenReader(`Login failed: ${error.message}`);
-            } finally {
-                loginSpinner.classList.add('hidden');
-            }
-        });
-
-        // Handle logout
-        logoutBtn.addEventListener('click', async () => {
-            // Simulate backend API call (replace with actual Render API endpoint)
-            // Example: await fetch('https://your-render-backend/api/logout', { method: 'POST' });
-            localStorage.removeItem('user');
-            userInfo.classList.add('hidden');
-            loginBtn.classList.remove('hidden');
-            logoutBtn.classList.add('hidden');
-            
-            // Restore homepage message from settings
-            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
-            showToast('Logged out successfully!');
-        });
-
-        // Apply settings on page load
-        document.addEventListener('DOMContentLoaded', loadAndApplySettings);
-
-        // Service Worker Registration for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch(registrationError => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
+                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+                if (welcomeMessage) welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
+                showToast('Logged out successfully!');
             });
+
+            loadAndApplySettings();
         }
+
+        // Fallback initialization if navigation doesn't load via fetch
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (!document.getElementById('menu-toggle')) {
+                    // Navigation didn't load, initialize without it
+                    initializeHomePage();
+                }
+            }, 1000);
+        });
     </script>
 </body>
 </html>
