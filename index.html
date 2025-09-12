@@ -175,15 +175,20 @@
 
     <!-- Main Content -->
     <main class="flex-1 p-4">
+        <!-- Site Announcement (hidden by default, shown if content exists) -->
+        <div id="site-announcement" class="hidden mb-6 p-4 rounded shadow-lg">
+            <p id="announcement-text"></p>
+        </div>
 
         <!-- Sticky Header -->
         <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40" style="position:sticky;top:0;left:0;right:0;">
             <h2 class="text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
+            <h3 class="text-lg text-gray-300 mt-2" id="homepage-subtitle" style="display: none;"></h3>
         </header>
 
         <!-- Content Section -->
         <section>
-            <p class="mb-4">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
+            <p class="mb-4" id="homepage-content">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                     <h3 class="font-semibold">Card 1</h3>
@@ -326,6 +331,48 @@
                 if (welcomeMessage && !currentUser) {
                     welcomeMessage.textContent = settings['homepage-message'];
                 }
+            }
+            
+            // Apply homepage subtitle if set
+            if (settings['homepage-subtitle']) {
+                const subtitle = document.getElementById('homepage-subtitle');
+                if (subtitle) {
+                    subtitle.textContent = settings['homepage-subtitle'];
+                    subtitle.style.display = 'block';
+                }
+            }
+            
+            // Apply homepage content if set
+            if (settings['homepage-content']) {
+                const content = document.getElementById('homepage-content');
+                if (content) {
+                    content.textContent = settings['homepage-content'];
+                }
+            }
+            
+            // Apply site announcement if set
+            if (settings['site-announcement']) {
+                const announcementContainer = document.getElementById('site-announcement');
+                const announcementText = document.getElementById('announcement-text');
+                if (announcementContainer && announcementText) {
+                    announcementText.textContent = settings['site-announcement'];
+                    
+                    // Apply announcement type styling
+                    const type = settings['announcement-type'] || 'info';
+                    announcementContainer.className = `mb-6 p-4 rounded shadow-lg ${getAnnouncementClasses(type)}`;
+                    announcementContainer.classList.remove('hidden');
+                }
+            }
+        }
+        
+        // Get CSS classes for announcement type
+        function getAnnouncementClasses(type) {
+            switch(type) {
+                case 'success': return 'bg-green-600 text-white border-l-4 border-green-400';
+                case 'warning': return 'bg-yellow-600 text-white border-l-4 border-yellow-400';
+                case 'error': return 'bg-red-600 text-white border-l-4 border-red-400';
+                case 'info':
+                default: return 'bg-blue-600 text-white border-l-4 border-blue-400';
             }
         }
 

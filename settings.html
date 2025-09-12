@@ -210,7 +210,32 @@
                         
                         <div class="mb-4">
                             <label for="homepage-message" class="block mb-2 font-medium">Homepage Message</label>
-                            <input type="text" id="homepage-message" name="homepage-message" required maxlength="200" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Welcome to our site!" value="Welcome to My Website">
+                            <input type="text" id="homepage-message" name="homepage-message" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Welcome to our site!" value="Welcome to My Website">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="homepage-subtitle" class="block mb-2 font-medium">Homepage Subtitle</label>
+                            <input type="text" id="homepage-subtitle" name="homepage-subtitle" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Your subtitle here" value="">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="homepage-content" class="block mb-2 font-medium">Homepage Content</label>
+                            <textarea id="homepage-content" name="homepage-content" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="4" placeholder="Main content for your homepage...">This is a modern, responsive website template built with the latest web technologies.</textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="site-announcement" class="block mb-2 font-medium">Site Announcement</label>
+                            <textarea id="site-announcement" name="site-announcement" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="2" placeholder="Important announcement for users..."></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="announcement-type" class="block mb-2 font-medium">Announcement Type</label>
+                            <select id="announcement-type" name="announcement-type" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="info">Info (Blue)</option>
+                                <option value="success">Success (Green)</option>
+                                <option value="warning">Warning (Yellow)</option>
+                                <option value="error">Error (Red)</option>
+                            </select>
                         </div>
                         
                         <button type="submit" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">Save Settings</button>
@@ -404,6 +429,22 @@
                         <div class="flex justify-between">
                             <span class="font-medium text-white">Homepage Message:</span>
                             <span data-preview="homepage-message">Welcome to My Website</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Homepage Subtitle:</span>
+                            <span data-preview="homepage-subtitle">None</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Homepage Content:</span>
+                            <span data-preview="homepage-content">Modern responsive template...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Site Announcement:</span>
+                            <span data-preview="site-announcement">None</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-white">Announcement Type:</span>
+                            <span data-preview="announcement-type">Info</span>
                         </div>
                     </div>
                     
@@ -809,7 +850,11 @@
             theme: document.querySelector('.settings-preview [data-preview="theme"]'),
             contactEmail: document.querySelector('.settings-preview [data-preview="contact-email"]'),
             maintenanceMode: document.querySelector('.settings-preview [data-preview="maintenance-mode"]'),
-            homepageMessage: document.querySelector('.settings-preview [data-preview="homepage-message"]')
+            homepageMessage: document.querySelector('.settings-preview [data-preview="homepage-message"]'),
+            homepageSubtitle: document.querySelector('.settings-preview [data-preview="homepage-subtitle"]'),
+            homepageContent: document.querySelector('.settings-preview [data-preview="homepage-content"]'),
+            siteAnnouncement: document.querySelector('.settings-preview [data-preview="site-announcement"]'),
+            announcementType: document.querySelector('.settings-preview [data-preview="announcement-type"]')
         };
 
         // Load settings from localStorage
@@ -820,7 +865,11 @@
                 'theme': 'dark',
                 'contact-email': 'admin@example.com',
                 'maintenance-mode': false,
-                'homepage-message': 'Welcome to My Website'
+                'homepage-message': 'Welcome to My Website',
+                'homepage-subtitle': '',
+                'homepage-content': 'This is a modern, responsive website template built with the latest web technologies.',
+                'site-announcement': '',
+                'announcement-type': 'info'
             };
 
             // Populate form fields
@@ -830,6 +879,10 @@
             document.getElementById('contact-email').value = settings['contact-email'];
             document.getElementById('maintenance-mode').checked = settings['maintenance-mode'];
             document.getElementById('homepage-message').value = settings['homepage-message'];
+            document.getElementById('homepage-subtitle').value = settings['homepage-subtitle'];
+            document.getElementById('homepage-content').value = settings['homepage-content'];
+            document.getElementById('site-announcement').value = settings['site-announcement'];
+            document.getElementById('announcement-type').value = settings['announcement-type'];
 
             // Update preview panel
             updatePreview();
@@ -850,6 +903,10 @@
             document.querySelector('[data-preview="maintenance-mode"]').textContent = settings['maintenance-mode'] ? 'On' : 'Off';
             document.querySelector('[data-preview="maintenance-mode"]').className = settings['maintenance-mode'] ? 'text-red-400' : 'text-green-400';
             document.querySelector('[data-preview="homepage-message"]').textContent = settings['homepage-message'];
+            document.querySelector('[data-preview="homepage-subtitle"]').textContent = settings['homepage-subtitle'] || 'None';
+            document.querySelector('[data-preview="homepage-content"]').textContent = settings['homepage-content'].substring(0, 30) + '...';
+            document.querySelector('[data-preview="site-announcement"]').textContent = settings['site-announcement'] || 'None';
+            document.querySelector('[data-preview="announcement-type"]').textContent = settings['announcement-type'].charAt(0).toUpperCase() + settings['announcement-type'].slice(1);
         }
 
         // Get current form settings
@@ -860,7 +917,11 @@
                 'theme': document.getElementById('theme').value,
                 'contact-email': document.getElementById('contact-email').value,
                 'maintenance-mode': document.getElementById('maintenance-mode').checked,
-                'homepage-message': document.getElementById('homepage-message').value
+                'homepage-message': document.getElementById('homepage-message').value,
+                'homepage-subtitle': document.getElementById('homepage-subtitle').value,
+                'homepage-content': document.getElementById('homepage-content').value,
+                'site-announcement': document.getElementById('site-announcement').value,
+                'announcement-type': document.getElementById('announcement-type').value
             };
         }
 
@@ -968,240 +1029,11 @@
             updatePreview();
         });
         document.getElementById('maintenance-mode').addEventListener('change', updatePreview);
-        document.getElementById('homepage-message').addEventListener('input', (e) => {
-            clearFieldStatus('homepage-message');
-            updatePreview();
-        });
-
-        // Theme customization functionality
-        function initThemeCustomization() {
-            // Color picker synchronization
-            const colorInputs = [
-                { picker: 'primaryColor', text: 'primaryColorText' },
-                { picker: 'secondaryColor', text: 'secondaryColorText' },
-                { picker: 'accentColor', text: 'accentColorText' }
-            ];
-            
-            colorInputs.forEach(({ picker, text }) => {
-                const pickerEl = document.getElementById(picker);
-                const textEl = document.getElementById(text);
-                
-                pickerEl.addEventListener('input', () => {
-                    textEl.value = pickerEl.value;
-                    applyColorPreview();
-                });
-                
-                textEl.addEventListener('input', () => {
-                    if (validateColor(textEl.value)) {
-                        pickerEl.value = textEl.value;
-                        textEl.classList.remove('input-error');
-                        applyColorPreview();
-                    } else {
-                        textEl.classList.add('input-error');
-                    }
-                });
-            });
-            
-            // Preset theme buttons
-            document.querySelectorAll('.preset-theme').forEach(button => {
-                button.addEventListener('click', () => {
-                    const preset = button.getAttribute('data-preset');
-                    applyPresetTheme(preset);
-                });
-            });
-            
-            // Logo upload
-            const logoUpload = document.getElementById('logo-upload');
-            const logoPreview = document.getElementById('logo-preview');
-            const logoPreviewImg = document.getElementById('logo-preview-img');
-            const removeLogo = document.getElementById('remove-logo');
-            
-            logoUpload.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    if (file.size > 2 * 1024 * 1024) { // 2MB limit
-                        showToast('Logo file size must be less than 2MB');
-                        return;
-                    }
-                    
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        logoPreviewImg.src = e.target.result;
-                        logoPreview.classList.remove('hidden');
-                        
-                        // Save logo to localStorage
-                        localStorage.setItem('siteLogo', e.target.result);
-                        AuditLogger.log('theme_change', 'Logo uploaded');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            removeLogo.addEventListener('click', () => {
-                logoPreview.classList.add('hidden');
-                logoUpload.value = '';
-                localStorage.removeItem('siteLogo');
-                AuditLogger.log('theme_change', 'Logo removed');
-            });
-            
-            // Apply theme button
-            document.getElementById('apply-theme').addEventListener('click', () => {
-                const settings = {
-                    primaryColor: document.getElementById('primaryColor').value,
-                    secondaryColor: document.getElementById('secondaryColor').value,
-                    accentColor: document.getElementById('accentColor').value
-                };
-                
-                localStorage.setItem('themeSettings', JSON.stringify(settings));
-                applyColors(settings);
-                AuditLogger.log('theme_change', `Applied custom theme: Primary=${settings.primaryColor}, Secondary=${settings.secondaryColor}, Accent=${settings.accentColor}`);
-                showToast('Theme applied successfully!');
-            });
-            
-            // Load saved logo
-            const savedLogo = localStorage.getItem('siteLogo');
-            if (savedLogo) {
-                logoPreviewImg.src = savedLogo;
-                logoPreview.classList.remove('hidden');
-            }
-        }
-        
-        function applyPresetTheme(preset) {
-            const presets = {
-                default: { primary: '#3b82f6', secondary: '#10b981', accent: '#8b5cf6' },
-                ocean: { primary: '#0ea5e9', secondary: '#06b6d4', accent: '#3b82f6' },
-                forest: { primary: '#059669', secondary: '#16a34a', accent: '#65a30d' },
-                sunset: { primary: '#ea580c', secondary: '#dc2626', accent: '#c2410c' }
-            };
-            
-            const colors = presets[preset];
-            if (colors) {
-                document.getElementById('primaryColor').value = colors.primary;
-                document.getElementById('primaryColorText').value = colors.primary;
-                document.getElementById('secondaryColor').value = colors.secondary;
-                document.getElementById('secondaryColorText').value = colors.secondary;
-                document.getElementById('accentColor').value = colors.accent;
-                document.getElementById('accentColorText').value = colors.accent;
-                
-                applyColorPreview();
-                AuditLogger.log('theme_change', `Applied preset theme: ${preset}`);
-            }
-        }
-        
-        function applyColorPreview() {
-            const primary = document.getElementById('primaryColor').value;
-            const secondary = document.getElementById('secondaryColor').value;
-            const accent = document.getElementById('accentColor').value;
-            
-            document.documentElement.style.setProperty('--color-primary', primary);
-            document.documentElement.style.setProperty('--color-secondary', secondary);
-            document.documentElement.style.setProperty('--color-accent', accent);
-        }
-
-        // Security settings functionality
-        function initSecuritySettings() {
-            document.getElementById('save-security').addEventListener('click', () => {
-                const securitySettings = {
-                    sessionTimeout: document.getElementById('session-timeout').value,
-                    maxLoginAttempts: document.getElementById('max-login-attempts').value,
-                    enable2FA: document.getElementById('enable-2fa').checked,
-                    auditAllActions: document.getElementById('audit-all-actions').checked
-                };
-                
-                localStorage.setItem('securitySettings', JSON.stringify(securitySettings));
-                AuditLogger.log('security_change', `Updated security settings: Session timeout=${securitySettings.sessionTimeout}min, Max attempts=${securitySettings.maxLoginAttempts}, 2FA=${securitySettings.enable2FA}, Audit logging=${securitySettings.auditAllActions}`);
-                showToast('Security settings saved successfully!');
-            });
-            
-            // Load saved security settings
-            const savedSecurity = JSON.parse(localStorage.getItem('securitySettings') || '{}');
-            if (savedSecurity.sessionTimeout) {
-                document.getElementById('session-timeout').value = savedSecurity.sessionTimeout;
-            }
-            if (savedSecurity.maxLoginAttempts) {
-                document.getElementById('max-login-attempts').value = savedSecurity.maxLoginAttempts;
-            }
-            document.getElementById('enable-2fa').checked = savedSecurity.enable2FA || false;
-            document.getElementById('audit-all-actions').checked = savedSecurity.auditAllActions !== false; // Default to true
-        }
-
-        // Audit log functionality
-        function initAuditLog() {
-            const auditLogList = document.getElementById('audit-log-list');
-            const auditFilter = document.getElementById('audit-filter');
-            const auditDateFilter = document.getElementById('audit-date-filter');
-            
-            function renderAuditLog() {
-                const filter = auditFilter.value;
-                const dateFilter = auditDateFilter.value;
-                const logs = AuditLogger.getLogs(filter, dateFilter);
-                
-                if (logs.length === 0) {
-                    auditLogList.innerHTML = '<div class="p-4 text-gray-400 text-center">No audit log entries found.</div>';
-                    return;
-                }
-                
-                auditLogList.innerHTML = logs.map(log => `
-                    <div class="p-4 hover:bg-gray-600 transition-colors">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="font-semibold text-white">${formatAction(log.action)}</span>
-                            <span class="text-sm text-gray-400">${formatTimestamp(log.timestamp)}</span>
-                        </div>
-                        <div class="text-sm text-gray-300 mb-1">${log.details}</div>
-                        <div class="text-xs text-gray-500">User: ${log.userId} | IP: ${log.ip}</div>
-                    </div>
-                `).join('');
-            }
-            
-            function formatAction(action) {
-                return action.replace(/_/g, ' ')
-                    .replace(/\b\w/g, l => l.toUpperCase());
-            }
-            
-            function formatTimestamp(timestamp) {
-                return new Date(timestamp).toLocaleString();
-            }
-            
-            // Event listeners
-            auditFilter.addEventListener('change', renderAuditLog);
-            auditDateFilter.addEventListener('change', renderAuditLog);
-            
-            document.getElementById('export-audit-log').addEventListener('click', () => {
-                const logs = AuditLogger.getLogs();
-                const csvContent = [
-                    'Timestamp,User,Action,Details,IP',
-                    ...logs.map(log => `"${log.timestamp}","${log.userId}","${log.action}","${log.details.replace(/"/g, '""')}","${log.ip}"`)
-                ].join('\n');
-                
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `audit-log-${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                AuditLogger.log('audit_export', 'Exported audit log to CSV');
-                showToast('Audit log exported successfully!');
-            });
-            
-            document.getElementById('clear-audit-log').addEventListener('click', () => {
-                if (confirm('Are you sure you want to clear the entire audit log? This action cannot be undone.')) {
-                    AuditLogger.clearLogs();
-                    renderAuditLog();
-                    showToast('Audit log cleared successfully!');
-                }
-            });
-            
-            // Listen for audit log updates
-            window.addEventListener('auditLogUpdated', renderAuditLog);
-            window.addEventListener('auditLogCleared', renderAuditLog);
-            
-            // Initial render
-            renderAuditLog();
-        }
+        document.getElementById('homepage-message').addEventListener('input', updatePreview);
+        document.getElementById('homepage-subtitle').addEventListener('input', updatePreview);
+        document.getElementById('homepage-content').addEventListener('input', updatePreview);
+        document.getElementById('site-announcement').addEventListener('input', updatePreview);
+        document.getElementById('announcement-type').addEventListener('change', updatePreview);
 
         // Settings form submission
         settingsForm.addEventListener('submit', (e) => {
