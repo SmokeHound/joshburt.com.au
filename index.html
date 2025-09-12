@@ -96,46 +96,21 @@
     </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-    <!-- Mobile Menu Toggle -->
-    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
-        ☰
-    </button>
-
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
-        <!-- App Branding -->
-        <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
-
-        <!-- User Profile Section -->
-        <div id="user-profile" class="mb-6">
-            <div id="user-info" class="hidden flex items-center space-x-2">
-                <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
-                <span id="user-name" class="text-white"></span>
-            </div>
-            <button id="login-btn" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Open login modal">Login</button>
-            <button id="logout-btn" class="hidden w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" aria-label="Logout">Logout</button>
-        </div>
-
-        <!-- Navigation -->
-        <nav>
-            <ul class="space-y-2">
-                <li><a href="index.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Home</a></li>
-                <li><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
-                <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-                <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-                <li><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
-                <li><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
-                <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
-            </ul>
-        </nav>
-
-        <!-- Theme Toggle -->
-        <div class="mt-auto">
-            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
-                Toggle Light Mode
-            </button>
-        </div>
-    </aside>
+    <!-- Load shared navigation component -->
+    <div id="shared-navigation"></div>
+    <script>
+        fetch('shared-nav.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('shared-navigation').innerHTML = html;
+                // Initialize page-specific functionality after navigation loads
+                initializeHomePage();
+            })
+            .catch(() => {
+                // Fallback if fetch fails - initialize anyway
+                setTimeout(initializeHomePage, 100);
+            });
+    </script>
 
     <!-- Login Modal -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
@@ -165,7 +140,6 @@
 
     <!-- Main Content -->
     <main class="flex-1 p-4">
-
         <!-- Sticky Header -->
         <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40">
             <h2 class="text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
@@ -210,56 +184,30 @@
 
     <!-- Home-specific functionality -->
     <script>
-        // Load and apply site settings
-        function loadAndApplySettings() {
-            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            
-            // Apply site title if set
-            if (settings['site-title']) {
-                const brandingElements = document.querySelectorAll('h1');
-                brandingElements.forEach(el => {
-                    if (el.textContent.includes('Josh\'s App')) {
-                        el.textContent = settings['site-title'];
+        function initializeHomePage() {
+            // Load and apply site settings
+            function loadAndApplySettings() {
+                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+                
+                // Apply site title if set
+                if (settings['site-title']) {
+                    const brandingElements = document.querySelectorAll('h1');
+                    brandingElements.forEach(el => {
+                        if (el.textContent.includes('Josh\'s App')) {
+                            el.textContent = settings['site-title'];
+                        }
+                    });
+                }
+                
+                // Apply homepage message if set
+                if (settings['homepage-message']) {
+                    const welcomeMessage = document.getElementById('welcome-message');
+                    const currentUser = JSON.parse(localStorage.getItem('user'));
+                    if (welcomeMessage && !currentUser) {
+                        welcomeMessage.textContent = settings['homepage-message'];
                     }
-                });
-            }
-            
-            // Apply homepage message if set
-            if (settings['homepage-message']) {
-                const welcomeMessage = document.getElementById('welcome-message');
-                const currentUser = JSON.parse(localStorage.getItem('user'));
-                if (welcomeMessage && !currentUser) {
-                    welcomeMessage.textContent = settings['homepage-message'];
                 }
             }
-        }
-
-        // Theme Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-        });
-
-        // Load saved theme from settings or localStorage
-        const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-        const savedTheme = settings['theme'] || localStorage.getItem('theme') || 'dark';
-        body.classList.add(savedTheme);
-        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
-
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            const isOpen = sidebar.classList.contains('open');
-            menuToggle.setAttribute('aria-expanded', isOpen);
-        });
 
             // User Management
             const loginBtn = document.getElementById('login-btn');
@@ -286,84 +234,81 @@
                 }
             }
 
-        // Check if user is logged in
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-            userInfo.classList.remove('hidden');
-            loginBtn.classList.add('hidden');
-            logoutBtn.classList.remove('hidden');
-            userName.textContent = user.name;
-            userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
-            welcomeMessage.textContent = `Welcome, ${user.name}!`;
-        } else {
-            // Apply homepage message from settings if no user is logged in
-            loadAndApplySettings();
-        }
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                userInfo?.classList.remove('hidden');
+                loginBtn?.classList.add('hidden');
+                logoutBtn?.classList.remove('hidden');
+                if (userName) userName.textContent = user.name;
+                if (userAvatar) userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
+                if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${user.name}!`;
+            } else {
+                loadAndApplySettings();
+            }
 
-        // Open login modal
-        loginBtn.addEventListener('click', () => {
-            loginModal.classList.remove('hidden');
-        });
+            // Open login modal
+            loginBtn?.addEventListener('click', () => {
+                loginModal?.classList.remove('hidden');
+            });
 
-        // Close login modal
-        closeModal.addEventListener('click', () => {
-            loginModal.classList.add('hidden');
-            loginForm.reset();
-            loginError.classList.add('hidden');
-        });
+            // Close login modal
+            closeModal?.addEventListener('click', () => {
+                loginModal?.classList.add('hidden');
+                loginForm?.reset();
+                loginError?.classList.add('hidden');
+            });
 
-        // Handle login
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loginSpinner.classList.remove('hidden');
-            loginError.classList.add('hidden');
+            // Handle login
+            loginForm?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                loginSpinner?.classList.remove('hidden');
+                loginError?.classList.add('hidden');
 
                 const email = document.getElementById('email')?.value;
                 const password = document.getElementById('password')?.value;
 
-            // Simulate backend API call (replace with actual Render API endpoint)
-            try {
-                // Check against registered users or use default credentials
-                const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
-                const registeredUser = users.find(u => u.email === email);
-                
-                let authenticatedUser = null;
-                
-                if (registeredUser && password === 'password') {
-                    // Found registered user
-                    authenticatedUser = { 
-                        name: registeredUser.name, 
-                        email: registeredUser.email,
-                        avatar: 'https://via.placeholder.com/40' 
-                    };
-                } else if (email === 'test@example.com' && password === 'password') {
-                    // Default credentials
-                    authenticatedUser = { 
-                        name: email.split('@')[0], 
-                        email: email,
-                        avatar: 'https://via.placeholder.com/40' 
-                    };
-                } else {
-                    throw new Error('Invalid credentials');
-                }
+                try {
+                    const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
+                    const registeredUser = users.find(u => u.email === email);
+                    
+                    let authenticatedUser = null;
+                    
+                    if (registeredUser && password === 'password') {
+                        authenticatedUser = { 
+                            name: registeredUser.name, 
+                            email: registeredUser.email,
+                            avatar: 'https://via.placeholder.com/40' 
+                        };
+                    } else if (email === 'test@example.com' && password === 'password') {
+                        authenticatedUser = { 
+                            name: email.split('@')[0], 
+                            email: email,
+                            avatar: 'https://via.placeholder.com/40' 
+                        };
+                    } else {
+                        throw new Error('Invalid credentials');
+                    }
 
-                localStorage.setItem('user', JSON.stringify(authenticatedUser));
-                userInfo.classList.remove('hidden');
-                loginBtn.classList.add('hidden');
-                logoutBtn.classList.remove('hidden');
-                userName.textContent = authenticatedUser.name;
-                userAvatar.src = authenticatedUser.avatar;
-                welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
-                loginModal.classList.add('hidden');
-                loginForm.reset();
-                showToast('Login successful!');
-            } catch (error) {
-                loginError.textContent = error.message;
-                loginError.classList.remove('hidden');
-            } finally {
-                loginSpinner.classList.add('hidden');
-            }
-        });
+                    localStorage.setItem('user', JSON.stringify(authenticatedUser));
+                    userInfo?.classList.remove('hidden');
+                    loginBtn?.classList.add('hidden');
+                    logoutBtn?.classList.remove('hidden');
+                    if (userName) userName.textContent = authenticatedUser.name;
+                    if (userAvatar) userAvatar.src = authenticatedUser.avatar;
+                    if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
+                    loginModal?.classList.add('hidden');
+                    loginForm?.reset();
+                    showToast('Login successful!');
+                } catch (error) {
+                    if (loginError) {
+                        loginError.textContent = error.message;
+                        loginError.classList.remove('hidden');
+                    }
+                } finally {
+                    loginSpinner?.classList.add('hidden');
+                }
+            });
 
             // Handle logout
             logoutBtn?.addEventListener('click', async () => {
@@ -377,8 +322,18 @@
                 showToast('Logged out successfully!');
             });
 
-        // Apply settings on page load
-        document.addEventListener('DOMContentLoaded', loadAndApplySettings);
+            loadAndApplySettings();
+        }
+
+        // Fallback initialization if navigation doesn't load via fetch
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (!document.getElementById('menu-toggle')) {
+                    // Navigation didn't load, initialize without it
+                    initializeHomePage();
+                }
+            }, 1000);
+        });
     </script>
 </body>
 </html>
