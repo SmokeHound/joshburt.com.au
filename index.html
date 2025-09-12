@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Website Template</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="api-integration.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -26,57 +27,19 @@
             transition: background-color 0.3s, color 0.3s;
         }
         .dark {
-                const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                tailwind.config = {
-                    theme: {
-                        extend: {
-                            colors: {
-                                primary: settingsHead.primaryColor || '#3b82f6',
-                                secondary: settingsHead.secondaryColor || '#10b981',
-                                accent: settingsHead.accentColor || '#8b5cf6',
-                            },
-                            fontFamily: {
-                                sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                            },
-                        },
-                    },
-                };
-                // Apply CSS variables for instant color update
-                document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-                document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-                document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        .card {
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        /* Screen reader only class */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-        .focus\:not-sr-only:focus {
-            position: static;
-            width: auto;
-            height: auto;
-            padding: 0.5rem;
-            margin: 0;
-            overflow: visible;
-            clip: auto;
-            white-space: normal;
-        }
-        /* High contrast focus indicators */
-        .focus-visible {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
         }
     </style>
 </head>
@@ -93,8 +56,11 @@
         <span class="sr-only">Menu</span>
     </button>
 
+    <!-- Mobile sidebar backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+    
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
+    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
         <!-- App Branding -->
         <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
@@ -130,27 +96,25 @@
     </aside>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title" aria-describedby="login-modal-description">
-        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md" role="document">
+    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
             <h2 id="login-modal-title" class="text-xl font-semibold mb-4 text-white">Login</h2>
             <p id="login-modal-description" class="sr-only">Please enter your email and password to login</p>
             <form id="login-form" role="form" aria-labelledby="login-modal-title">
                 <div class="mb-4">
                     <label for="email" class="block text-sm text-white">Email</label>
-                    <input type="email" id="email" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true" aria-describedby="email-error">
-                    <div id="email-error" class="sr-only" role="alert" aria-live="polite"></div>
+                    <input type="email" id="email" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
                 </div>
                 <div class="mb-4">
                     <label for="password" class="block text-sm text-white">Password</label>
-                    <input type="password" id="password" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true" aria-describedby="password-error">
-                    <div id="password-error" class="sr-only" role="alert" aria-live="polite"></div>
+                    <input type="password" id="password" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
                 </div>
-                <div id="login-error" class="hidden text-red-500 text-sm mb-4" role="alert" aria-live="polite"></div>
+                <div id="login-error" class="hidden text-red-500 text-sm mb-4"></div>
                 <button type="submit" id="submit-login" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Submit login">
-                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin" aria-hidden="true"></span>
+                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></span>
                 </button>
             </form>
-            <button id="close-modal" class="mt-4 w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400" aria-label="Close login modal">Close</button>
+            <button id="close-modal" class="mt-4 w-full p-3 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-base" aria-label="Close login modal">Close</button>
         </div>
     </div>
 
@@ -158,34 +122,137 @@
     <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
     <!-- Main Content -->
-    <main id="main-content" class="flex-1 p-4" role="main">
+    <main class="flex-1 p-4">
 
         <!-- Sticky Header -->
-        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40" style="position:sticky;top:0;left:0;right:0;" role="banner">
+        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40" style="position:sticky;top:0;left:0;right:0;">
             <h2 class="text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
         </header>
 
         <!-- Content Section -->
-        <section role="region" aria-label="Main content">
+        <section>
             <p class="mb-4">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" role="group" aria-label="Content cards">
-                <article class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card" role="article">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                     <h3 class="font-semibold">Card 1</h3>
                     <p>Sample content for a card.</p>
-                </article>
-                <article class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card" role="article">
+                </div>
+                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                     <h3 class="font-semibold">Card 2</h3>
                     <p>Sample content for a card.</p>
-                </article>
-                <article class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card" role="article">
+                </div>
+                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                     <h3 class="font-semibold">Card 3</h3>
                     <p>Sample content for a card.</p>
-                </article>
+                </div>
             </div>
         </section>
     </main>
 
     <script>
+        // API Configuration
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+
+        // HTTP client with token management
+        async function apiRequest(url, options = {}) {
+            const token = localStorage.getItem('accessToken');
+            
+            const config = {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` }),
+                    ...options.headers
+                }
+            };
+
+            try {
+                let response = await fetch(`${API_BASE}${url}`, config);
+                
+                // If token expired, try to refresh
+                if (response.status === 401 && token) {
+                    const refreshed = await refreshAuthToken();
+                    if (refreshed) {
+                        // Retry with new token
+                        config.headers['Authorization'] = `Bearer ${localStorage.getItem('accessToken')}`;
+                        response = await fetch(`${API_BASE}${url}`, config);
+                    }
+                }
+                
+                return response;
+            } catch (error) {
+                console.error('API request failed:', error);
+                throw error;
+            }
+        }
+
+        // Refresh authentication token
+        async function refreshAuthToken() {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) return false;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/refresh`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('accessToken', data.accessToken);
+                    localStorage.setItem('refreshToken', data.refreshToken);
+                    return true;
+                }
+            } catch (error) {
+                console.error('Token refresh failed:', error);
+            }
+
+            // If refresh fails, logout user
+            logout();
+            return false;
+        }
+
+        // Logout function
+        async function logout() {
+            const refreshToken = localStorage.getItem('refreshToken');
+            
+            // Call logout API
+            try {
+                await apiRequest('/auth/logout', {
+                    method: 'POST',
+                    body: JSON.stringify({ refreshToken })
+                });
+            } catch (error) {
+                console.error('Logout API call failed:', error);
+            }
+
+            // Clear local storage
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            
+            // Update UI
+            updateUIForLoggedOutState();
+            showToast('Logged out successfully!');
+        }
+
+        // Update UI for logged out state
+        function updateUIForLoggedOutState() {
+            const userInfo = document.getElementById('user-info');
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const welcomeMessage = document.getElementById('welcome-message');
+
+            userInfo.classList.add('hidden');
+            loginBtn.classList.remove('hidden');
+            logoutBtn.classList.add('hidden');
+            
+            // Restore homepage message from settings
+            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
+        }
+
         // Load and apply site settings
         function loadAndApplySettings() {
             const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
@@ -243,70 +310,12 @@
         // Mobile Menu Toggle with enhanced accessibility
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        
+        function toggleSidebar() {
             const isOpen = sidebar.classList.contains('open');
             menuToggle.setAttribute('aria-expanded', isOpen);
-            
-            // Announce state change to screen readers
-            const announcement = isOpen ? 'Navigation menu opened' : 'Navigation menu closed';
-            announceToScreenReader(announcement);
         });
-
-        // Keyboard support for mobile menu toggle
-        menuToggle.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                menuToggle.click();
-            }
-        });
-
-        // Focus trap for mobile sidebar when open
-        function trapFocus(element) {
-            const focusableElements = element.querySelectorAll(
-                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-            );
-            const firstFocusableElement = focusableElements[0];
-            const lastFocusableElement = focusableElements[focusableElements.length - 1];
-
-            element.addEventListener('keydown', (e) => {
-                if (e.key === 'Tab') {
-                    if (e.shiftKey) {
-                        if (document.activeElement === firstFocusableElement) {
-                            lastFocusableElement.focus();
-                            e.preventDefault();
-                        }
-                    } else {
-                        if (document.activeElement === lastFocusableElement) {
-                            firstFocusableElement.focus();
-                            e.preventDefault();
-                        }
-                    }
-                }
-                if (e.key === 'Escape') {
-                    if (sidebar.classList.contains('open')) {
-                        menuToggle.click();
-                        menuToggle.focus();
-                    }
-                }
-            });
-        }
-
-        // Apply focus trap to sidebar
-        trapFocus(sidebar);
-
-        // Screen reader announcement function
-        function announceToScreenReader(message) {
-            const announcement = document.createElement('div');
-            announcement.setAttribute('aria-live', 'polite');
-            announcement.setAttribute('aria-atomic', 'true');
-            announcement.className = 'sr-only';
-            announcement.textContent = message;
-            document.body.appendChild(announcement);
-            setTimeout(() => {
-                document.body.removeChild(announcement);
-            }, 1000);
-        }
 
         // User Management
         const loginBtn = document.getElementById('login-btn');
@@ -331,18 +340,52 @@
             }, 3000);
         }
 
-        // Check if user is logged in
+        // Check if user is logged in and load user profile
+        async function checkAuthStatus() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                updateUIForLoggedOutState();
+                loadAndApplySettings();
+                return;
+            }
+
+            try {
+                const response = await apiRequest('/auth/me');
+                if (response.ok) {
+                    const data = await response.json();
+                    const user = data.user;
+                    
+                    // Update localStorage with fresh user data
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    // Update UI
+                    userInfo.classList.remove('hidden');
+                    loginBtn.classList.add('hidden');
+                    logoutBtn.classList.remove('hidden');
+                    userName.textContent = user.name;
+                    userAvatar.src = user.avatarUrl || 'https://via.placeholder.com/40';
+                    welcomeMessage.textContent = `Welcome, ${user.name}! (${user.role})`;
+                } else {
+                    // Token invalid, logout
+                    updateUIForLoggedOutState();
+                    loadAndApplySettings();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                updateUIForLoggedOutState();
+                loadAndApplySettings();
+            }
+        }
+
+        // Check if user is logged in (legacy support)
         const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-            userInfo.classList.remove('hidden');
-            loginBtn.classList.add('hidden');
-            logoutBtn.classList.remove('hidden');
-            userName.textContent = user.name;
-            userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
-            welcomeMessage.textContent = `Welcome, ${user.name}!`;
-        } else {
-            // Apply homepage message from settings if no user is logged in
+        if (user && !localStorage.getItem('accessToken')) {
+            // Legacy user session, clear it
+            localStorage.removeItem('user');
             loadAndApplySettings();
+        } else {
+            // Check authentication status with backend
+            checkAuthStatus();
         }
 
         // Open login modal with focus management
@@ -411,7 +454,7 @@
             document.getElementById('email-error').textContent = '';
             document.getElementById('password-error').textContent = '';
 
-            // Simulate backend API call (replace with actual Render API endpoint)
+            // Simulate backend API call using new API
             try {
                 // Check against registered users or use default credentials
                 const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
@@ -444,9 +487,9 @@
                 userName.textContent = authenticatedUser.name;
                 userAvatar.src = authenticatedUser.avatar;
                 welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
-                closeLoginModal();
+                loginModal.classList.add('hidden');
+                loginForm.reset();
                 showToast('Login successful!');
-                announceToScreenReader(`Login successful. Welcome ${authenticatedUser.name}`);
             } catch (error) {
                 loginError.textContent = error.message;
                 loginError.classList.remove('hidden');
@@ -458,7 +501,7 @@
             }
         });
 
-        // Handle logout with screen reader announcement
+        // Handle logout
         logoutBtn.addEventListener('click', async () => {
             // Simulate backend API call (replace with actual Render API endpoint)
             // Example: await fetch('https://your-render-backend/api/logout', { method: 'POST' });
@@ -471,7 +514,6 @@
             const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
             welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
             showToast('Logged out successfully!');
-            announceToScreenReader('Successfully logged out');
         });
 
         // Apply settings on page load

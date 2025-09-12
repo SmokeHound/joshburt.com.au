@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Success - Josh Burt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body class="dark min-h-screen flex items-center justify-center font-sans p-4">
+    <div class="w-full max-w-md text-center">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-700">
+            <div id="loading" class="text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <h1 class="text-2xl font-bold mb-2">Completing Sign In</h1>
+                <p class="text-gray-400">Please wait while we complete your authentication...</p>
+            </div>
+            
+            <div id="error" class="hidden text-center">
+                <div class="text-red-500 text-4xl mb-4">❌</div>
+                <h1 class="text-2xl font-bold mb-2 text-red-500">Authentication Failed</h1>
+                <p class="text-gray-400 mb-4">There was an error completing your sign in.</p>
+                <a href="login.html" class="inline-block bg-primary text-white px-6 py-2 rounded hover:bg-secondary transition-colors">
+                    Try Again
+                </a>
+            </div>
+        </div>
+        
+        <div class="text-center mt-6 text-sm text-gray-400">
+            <p>&copy; 2025 Josh Burt. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // Extract tokens from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessToken = urlParams.get('token');
+        const refreshToken = urlParams.get('refresh');
+        
+        if (accessToken && refreshToken) {
+            // Store tokens
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+            
+            // Fetch user info
+            fetch('/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.user) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    // Redirect to home page
+                    window.location.href = 'index.html';
+                } else {
+                    throw new Error('Failed to get user info');
+                }
+            })
+            .catch(error => {
+                console.error('OAuth completion error:', error);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+            });
+        } else {
+            // No tokens, show error
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

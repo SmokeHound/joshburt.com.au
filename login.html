@@ -139,11 +139,34 @@
                 <div class="flex-1 border-t border-gray-600"></div>
             </div>
 
-            <!-- Back to Home -->
-            <div class="text-center">
-                <a href="index.html" class="text-primary hover:text-secondary transition-colors text-sm font-medium">
-                    ← Back to Home
-                </a>
+            <!-- OAuth Options -->
+            <div class="space-y-3">
+                <button id="google-oauth" class="w-full p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 font-medium">
+                    Continue with Google
+                </button>
+                <button id="github-oauth" class="w-full p-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 font-medium">
+                    Continue with GitHub
+                </button>
+            </div>
+
+            <!-- Links -->
+            <div class="text-center space-y-2 mt-6">
+                <div>
+                    <a href="#" id="forgot-password" class="text-primary hover:text-secondary transition-colors text-sm font-medium">
+                        Forgot Password?
+                    </a>
+                </div>
+                <div>
+                    <span class="text-sm text-gray-400">Don't have an account? </span>
+                    <a href="register.html" class="text-primary hover:text-secondary transition-colors text-sm font-medium">
+                        Sign Up
+                    </a>
+                </div>
+                <div>
+                    <a href="index.html" class="text-primary hover:text-secondary transition-colors text-sm font-medium">
+                        ← Back to Home
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -153,7 +176,29 @@
         </div>
     </div>
 
+    <!-- Forgot Password Modal -->
+    <div id="forgot-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true">
+        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
+            <h2 class="text-xl font-semibold mb-4 text-white">Reset Password</h2>
+            <form id="forgot-form">
+                <div class="mb-4">
+                    <label for="forgot-email" class="block text-sm text-white">Email Address</label>
+                    <input type="email" id="forgot-email" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required>
+                </div>
+                <div id="forgot-error" class="hidden text-red-500 text-sm mb-4"></div>
+                <div id="forgot-success" class="hidden text-green-500 text-sm mb-4"></div>
+                <button type="submit" id="submit-forgot" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary">
+                    Send Reset Link <span id="forgot-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
+                </button>
+            </form>
+            <button id="close-forgot-modal" class="mt-4 w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400">Close</button>
+        </div>
+    </div>
+
     <script>
+        // API Configuration
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+
         // Show toast notification
         function showToast(message, type = 'error') {
             const toast = document.getElementById('toast');
@@ -162,7 +207,16 @@
             toast.classList.remove('hidden');
             setTimeout(() => {
                 toast.classList.add('hidden');
-            }, 3000);
+            }, 5000);
+        }
+
+        // Check for URL messages
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message === 'registration-success') {
+            showToast('Registration successful! Please log in.', 'success');
+        } else if (message === 'password-reset-success') {
+            showToast('Password reset successful! Please log in with your new password.', 'success');
         }
 
         // Theme Toggle
@@ -207,49 +261,111 @@
             loginSpinner.classList.remove('hidden');
             submitBtn.disabled = true;
 
-            // Simulate API call and authenticate
             try {
-                // Check against registered users or use default credentials
-                const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
-                const user = users.find(u => u.email === username || u.name === username);
-                
-                let authenticatedUser = null;
-                
-                if (user && password === 'password') {
-                    // Found registered user with correct password
-                    authenticatedUser = { 
-                        name: user.name, 
-                        email: user.email,
-                        avatar: 'https://via.placeholder.com/40' 
-                    };
-                } else if ((username === 'test@example.com' || username === 'admin') && password === 'password') {
-                    // Default admin credentials
-                    authenticatedUser = { 
-                        name: username.includes('@') ? username.split('@')[0] : username, 
-                        email: username.includes('@') ? username : 'admin@example.com',
-                        avatar: 'https://via.placeholder.com/40' 
-                    };
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: username, // API expects email field
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store tokens and user info
+                    localStorage.setItem('accessToken', data.accessToken);
+                    localStorage.setItem('refreshToken', data.refreshToken);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showToast('Login successful! Redirecting...', 'success');
+                    
+                    // Redirect to main site after delay
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
                 } else {
-                    throw new Error('Invalid credentials');
+                    throw new Error(data.error || 'Login failed');
                 }
 
-                // Save user session
-                localStorage.setItem('user', JSON.stringify(authenticatedUser));
-                
-                // Show success message
-                showToast('Login successful! Redirecting...', 'success');
-                
-                // Redirect to main site after delay
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-
             } catch (error) {
+                console.error('Login error:', error);
                 showToast(error.message);
             } finally {
                 loginSpinner.classList.add('hidden');
                 submitBtn.disabled = false;
             }
+        });
+
+        // Forgot password modal handling
+        const forgotPasswordLink = document.getElementById('forgot-password');
+        const forgotModal = document.getElementById('forgot-modal');
+        const forgotForm = document.getElementById('forgot-form');
+        const closeForgotModal = document.getElementById('close-forgot-modal');
+        const forgotSpinner = document.getElementById('forgot-spinner');
+        const forgotError = document.getElementById('forgot-error');
+        const forgotSuccess = document.getElementById('forgot-success');
+
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            forgotModal.classList.remove('hidden');
+        });
+
+        closeForgotModal.addEventListener('click', () => {
+            forgotModal.classList.add('hidden');
+            forgotForm.reset();
+            forgotError.classList.add('hidden');
+            forgotSuccess.classList.add('hidden');
+        });
+
+        forgotForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('forgot-email').value;
+            
+            forgotError.classList.add('hidden');
+            forgotSuccess.classList.add('hidden');
+            forgotSpinner.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    forgotSuccess.textContent = data.message;
+                    forgotSuccess.classList.remove('hidden');
+                    setTimeout(() => {
+                        forgotModal.classList.add('hidden');
+                    }, 3000);
+                } else {
+                    throw new Error(data.error || 'Request failed');
+                }
+
+            } catch (error) {
+                forgotError.textContent = error.message;
+                forgotError.classList.remove('hidden');
+            } finally {
+                forgotSpinner.classList.add('hidden');
+            }
+        });
+
+        // OAuth handlers
+        document.getElementById('google-oauth').addEventListener('click', () => {
+            window.location.href = `${API_BASE}/auth/google`;
+        });
+
+        document.getElementById('github-oauth').addEventListener('click', () => {
+            window.location.href = `${API_BASE}/auth/github`;
         });
     </script>
 </body>

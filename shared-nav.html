@@ -4,8 +4,11 @@
     <span class="sr-only">Menu</span>
 </button>
 
+<!-- Mobile sidebar backdrop -->
+<div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+
 <!-- Sidebar -->
-<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" style="width:var(--sidebar-width);min-width:var(--sidebar-width);max-width:var(--sidebar-width);" aria-label="Main navigation" role="navigation">
+<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" style="width:var(--sidebar-width);min-width:var(--sidebar-width);max-width:var(--sidebar-width);" aria-label="Main navigation">
     <!-- App Branding -->
     <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
@@ -57,22 +60,43 @@
     // Mobile menu toggle functionality with enhanced accessibility
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    
+    function toggleSidebar() {
+        const isOpen = sidebar.classList.contains('open');
+        
+        if (isOpen) {
+            // Close sidebar
+            sidebar.classList.remove('open');
+            if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+            document.body.classList.remove('sidebar-open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+        } else {
+            // Open sidebar
+            sidebar.classList.add('open');
+            if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
+            document.body.classList.add('sidebar-open');
+            menuToggle.setAttribute('aria-expanded', 'true');
+        }
+    }
+    
     if (menuToggle && sidebar) {
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('open');
             const isOpen = sidebar.classList.contains('open');
             menuToggle.setAttribute('aria-expanded', isOpen);
-            
-            // Announce state change to screen readers
-            const announcement = isOpen ? 'Navigation menu opened' : 'Navigation menu closed';
-            announceToScreenReader(announcement);
         });
-        
-        // Keyboard support for mobile menu toggle
         menuToggle.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                menuToggle.click();
+                toggleSidebar();
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                toggleSidebar();
             }
         });
 
