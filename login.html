@@ -4,22 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
+    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
+    
+    <link rel="stylesheet" href="./assets/css/styles.css">
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        secondary: '#10b981',
-                        accent: '#8b5cf6',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                },
-            },
-        };
+        // Configuration for dynamic color updates from settings
+        function applyDynamicColors() {
+            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            // Apply CSS variables for instant color update
+            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
+            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
+            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+        }
+        applyDynamicColors();
+        // Service Worker Registration for PWA
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(registration => {
+                        console.log("SW registered: ", registration);
+                    })
+                    .catch(registrationError => {
+                        console.log("SW registration failed: ", registrationError);
+                    });
+            });
+        }
     </script>
     <style>
         body {
@@ -298,74 +314,6 @@
                 loginSpinner.classList.add('hidden');
                 submitBtn.disabled = false;
             }
-        });
-
-        // Forgot password modal handling
-        const forgotPasswordLink = document.getElementById('forgot-password');
-        const forgotModal = document.getElementById('forgot-modal');
-        const forgotForm = document.getElementById('forgot-form');
-        const closeForgotModal = document.getElementById('close-forgot-modal');
-        const forgotSpinner = document.getElementById('forgot-spinner');
-        const forgotError = document.getElementById('forgot-error');
-        const forgotSuccess = document.getElementById('forgot-success');
-
-        forgotPasswordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            forgotModal.classList.remove('hidden');
-        });
-
-        closeForgotModal.addEventListener('click', () => {
-            forgotModal.classList.add('hidden');
-            forgotForm.reset();
-            forgotError.classList.add('hidden');
-            forgotSuccess.classList.add('hidden');
-        });
-
-        forgotForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('forgot-email').value;
-            
-            forgotError.classList.add('hidden');
-            forgotSuccess.classList.add('hidden');
-            forgotSpinner.classList.remove('hidden');
-
-            try {
-                const response = await fetch(`${API_BASE}/auth/forgot-password`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    forgotSuccess.textContent = data.message;
-                    forgotSuccess.classList.remove('hidden');
-                    setTimeout(() => {
-                        forgotModal.classList.add('hidden');
-                    }, 3000);
-                } else {
-                    throw new Error(data.error || 'Request failed');
-                }
-
-            } catch (error) {
-                forgotError.textContent = error.message;
-                forgotError.classList.remove('hidden');
-            } finally {
-                forgotSpinner.classList.add('hidden');
-            }
-        });
-
-        // OAuth handlers
-        document.getElementById('google-oauth').addEventListener('click', () => {
-            window.location.href = `${API_BASE}/auth/google`;
-        });
-
-        document.getElementById('github-oauth').addEventListener('click', () => {
-            window.location.href = `${API_BASE}/auth/github`;
         });
     </script>
 </body>

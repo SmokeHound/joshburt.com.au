@@ -9,29 +9,16 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="api-integration.js"></script>
   <script>
-      const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: settingsHead.primaryColor || '#3b82f6',
-              secondary: settingsHead.secondaryColor || '#10b981',
-              accent: settingsHead.accentColor || '#8b5cf6',
-              'primary-green': '#27ae60',
-              'accent-red': '#e74c3c',
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            },
-          },
-        },
-      };
-      // Apply CSS variables for instant color update
-      document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-      document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-      document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+      // Configuration for dynamic color updates from settings
+      function applyDynamicColors() {
+          const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
+          // Apply CSS variables for instant color update
+          document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
+          document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
+          document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+      }
+      applyDynamicColors();
   </script>
   <style>
     body {
