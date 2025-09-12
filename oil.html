@@ -10,27 +10,15 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-      const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: settingsHead.primaryColor || '#3b82f6',
-              secondary: settingsHead.secondaryColor || '#10b981',
-              accent: settingsHead.accentColor || '#8b5cf6',
-              'primary-green': '#27ae60',
-              'accent-red': '#e74c3c',
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            },
-          },
-        },
-      };
-      // Apply CSS variables for instant color update
-      document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-      document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-      document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+      // Configuration for dynamic color updates from settings
+      function applyDynamicColors() {
+          const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
+          // Apply CSS variables for instant color update
+          document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
+          document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
+          document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+      }
+      applyDynamicColors();
   </script>
   <style>
     body {
@@ -87,95 +75,131 @@
       transform: translateX(20px);
       transition: all 0.3s ease-in-out;
     }
+    /* Screen reader only class */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .focus\:not-sr-only:focus {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 0.5rem;
+      margin: 0;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+    }
   </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-  <!-- Mobile Menu Toggle -->
-  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+  <!-- Skip Links -->
+  <div class="sr-only">
+    <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
+    <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
+  </div>
 
-    ☰
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
+    <span aria-hidden="true">☰</span>
+    <span class="sr-only">Menu</span>
   </button>
 
   <!-- Toast Notification -->
   <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+    ☰
+  </button>
+
+  <!-- Mobile sidebar backdrop -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+
   <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+  <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
     <!-- App Branding -->
     <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
     <!-- Navigation -->
-    <nav>
-      <ul class="space-y-2">
-        <li><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
-        <li><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
-        <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-        <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-        <li><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
-        <li><a href="oil.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Orders</a></li>
-        <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+    <nav role="navigation" aria-label="Main navigation">
+      <ul class="space-y-2" role="list">
+        <li role="listitem"><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+        <li role="listitem"><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+        <li role="listitem"><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+        <li role="listitem"><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+        <li role="listitem"><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
+        <li role="listitem"><a href="oil.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Orders</a></li>
+        <li role="listitem"><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
       </ul>
     </nav>
 
     <!-- Theme Toggle -->
     <div class="mt-auto">
-      <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+      <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode" aria-pressed="false">
         Toggle Light Mode
       </button>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-4">
+  <main id="main-content" class="flex-1 p-4" role="main">
     <!-- Sticky Header -->
-    <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
+    <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10" role="banner">
       <h2 class="text-3xl font-semibold" id="welcome-message">Castrol Products</h2>
     </header>
 
     <!-- Content Section -->
-    <section>
+    <section role="region" aria-label="Product ordering system">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Product Selection Area -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-2" role="region" aria-label="Product selection">
           <p class="mb-4 text-gray-300">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
           
           <!-- Product tabs -->
-          <div id="productTypeTabs" class="mb-6">
+          <div id="productTypeTabs" class="mb-6" role="tablist" aria-label="Product categories">
             <nav class="flex space-x-1 rounded-lg bg-gray-800 p-1">
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-white bg-primary" data-type="Engine oil">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-white bg-primary focus:outline-none focus:ring-2 focus:ring-secondary" data-type="Engine oil" role="tab" aria-selected="true" aria-controls="products-engine-oil" id="tab-engine-oil">
                 Engine Oil
               </button>
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" data-type="Coolant">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary" data-type="Coolant" role="tab" aria-selected="false" aria-controls="products-coolant" id="tab-coolant">
                 Coolant
               </button>
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" data-type="Gear Oil">
+              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary" data-type="Gear Oil" role="tab" aria-selected="false" aria-controls="products-gear-oil" id="tab-gear-oil">
                 Gear Oil
               </button>
             </nav>
           </div>
           
-          <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" role="tabpanel" aria-labelledby="tab-engine-oil" aria-live="polite">
             <!-- Product cards will be dynamically inserted here -->
             <div class="p-4 bg-gray-700 rounded shadow text-center">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary" aria-hidden="true"></div>
               <p class="mt-2">Loading products...</p>
             </div>
           </div>
         </div>
 
         <!-- Order Form Area -->
-        <div class="lg:col-span-1">
+        <div class="lg:col-span-1" role="region" aria-label="Order summary">
           <div id="orderContainer" class="bg-gray-800 rounded shadow p-4 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-semibold">Your Order 🛒</h3>
-              <div id="loading-indicator" class="hidden">
+              <h3 class="text-xl font-semibold">Your Order <span aria-hidden="true">🛒</span></h3>
+              <div id="loading-indicator" class="hidden" aria-hidden="true">
                 <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
               </div>
             </div>
             
-            <div id="orderItems" class="space-y-2 mb-4 min-h-[200px]">
+            <div id="orderItems" class="space-y-2 mb-4 min-h-[100px] lg:min-h-[200px]">
               <!-- Order items will be dynamically inserted here -->
-              <p class="text-gray-400 text-center py-8">Your order is empty.</p>
+              <p class="text-gray-400 text-center py-4 lg:py-8 text-sm">Your order is empty.</p>
             </div>
             
             <div id="orderSummary" class="flex justify-between font-bold mb-4 pt-4 border-t border-gray-600">
@@ -183,7 +207,7 @@
               <span id="totalItems">0</span>
             </div>
             
-            <button id="submitOrderBtn" class="w-full p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <button id="submitOrderBtn" class="w-full p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-base" disabled>
               Submit Order
             </button>
           </div>
@@ -309,60 +333,25 @@
       menuToggle.setAttribute('aria-expanded', isOpen);
     });
 
-    // Castrol oil product data from the provided spreadsheets
-    const oils = [
-      { code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil" },
-      { code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6, Jaguar Land Rover STJLR.03.5006, GM dexos1™ Gen 3, Chrysler MS 6395, MB-Approval 229.71", type: "Engine oil" },
-      { code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+, MB-Approval 229.71/ 229.72, Porsche C20, VW 508 00/ 509 00, Ford WSS-M2C956-A1", type: "Engine oil" },
-      { code: "3436896", name: "EDGE 0W-30 C2", specs: "ACEA C2, STJLR.03.5007", type: "Engine oil" },
-      { code: "3432554", name: "EDGE 0W-30", specs: "ACEA C2/C3, API SQ, BMW Longlife-04", type: "Engine oil" },
-      { code: "3433646", name: "EDGE 0W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51", type: "Engine oil" },
-      { code: "3431407", name: "EDGE 0W-40 A3/B4", specs: "ACEA A3/B4, API SP, BMW Longlife-01, MB-Approval 229.5, Porsche A40, Renault RN 0700/RN 0710, VW 502 00/505 00", type: "Engine oil" },
-      { code: "3431128", name: "EDGE 5W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51, Porsche C30, VW 504 00/507 00", type: "Engine oil" },
-      { code: "3430989", name: "EDGE 5W-30 A3/B4", specs: "ACEA A3/B4, API SL, BMW Longlife-01, MB-Approval 229.5, VW 502 00/505 00", type: "Engine oil" },
-      { code: "3431108", name: "EDGE 5W-30 M", specs: "ACEA C3, API SQ, BMW Longlife-04", type: "Engine oil" },
-      { code: "3421235", name: "EDGE 5W-40 A3/B4", specs: "ACEA A3/B3, A3/B4, API SN/CF, BMW Longlife-01", type: "Engine oil" },
-      { code: "3426982", name: "EDGE 5W-40 M", specs: "ACEA C3, API SN, BMW Longlife-04, Porsche C40, VW 511 00", type: "Engine oil" },
-      { code: "3436638", name: "EDGE 5W-50 S", specs: "API SP, Meets Ford WSS-M2C931-C", type: "Engine oil" },
-      { code: "3399574", name: "EDGE 10W-30", specs: "API SP, CF, ILSAC GF-6", type: "Engine oil" },
-      { code: "3412397", name: "EDGE 10W-60", specs: "ACEA A3/B3, A3/B4, API SN/CF", type: "Engine oil" },
-      { code: "3383419", name: "EDGE 25W-50", specs: "API SG/CD", type: "Engine oil" },
-      { code: "3374699", name: "EDGE PROFESSIONAL A1 5W-20", specs: "ACEA A1/B1, API SL, ILSAC GF-3", type: "Engine oil" },
-      { code: "3386606", name: "EDGE PROFESSIONAL A5 0W-30", specs: "ACEA A1/B1, A5/B5, API SL/CF", type: "Engine oil" },
-      { code: "3377780", name: "EDGE PROFESSIONAL A5 5W-30", specs: "ACEA A1/B1, A5/B5, API SN/CF", type: "Engine oil" },
-      { code: "3375617", name: "EDGE PROFESSIONAL C1 5W-30", specs: "ACEA C1, STJLR.03.5005", type: "Engine oil" },
-      { code: "3427866", name: "EDGE PROFESSIONAL EC 0W-20", specs: "ACEA C5, STJLR.03.5006, STJLR.51.5122", type: "Engine oil" },
-      { code: "3423559", name: "EDGE PROFESSIONAL E 0W-30", specs: "ACEA C2, STJLR.03.5007", type: "Engine oil" },
-      { code: "3383785", name: "EDGE PROFESSIONAL V 0W-20", specs: "ACEA C5, Volvo VCC RBS0-2AE", type: "Engine oil" },
-      { code: "3428869", name: "MAGNATEC HYBRID 0W-16", specs: "API SP, ILSAC GF-6B", type: "Engine oil" },
-      { code: "3439018", name: "MAGNATEC 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil" },
-      { code: "3440366", name: "MAGNATEC 0W-20 C5", specs: "ACEA C5, API SQ", type: "Engine oil" },
-      { code: "3440475", name: "MAGNATEC 0W-20 E", specs: "Ford WSS-M2C954-A1", type: "Engine oil" },
-      { code: "3434547", name: "MAGNATEC 0W-30 D", specs: "ACEA C2, API SN, Ford WSS-M2C950-A", type: "Engine oil" },
-      { code: "3429066", name: "MAGNATEC 5W-20", specs: "API SP, ILSAC GF-6, Ford WSS-M2C960-A1", type: "Engine oil" },
-      { code: "3428870", name: "MAGNATEC 5W-30", specs: "API SN/CF, ACEA A3/B4, MB-Approval 229.3, VW 502 00/505 00, Renault RN0700/RN0710", type: "Engine oil" },
-      { code: "3437038", name: "MAGNATEC 5W-30 A", specs: "ACEA A5/B5, API SN, ILSAC GF-5, Ford WSS-M2C913-C/D", type: "Engine oil" },
-      { code: "3437811", name: "MAGNATEC 5W-30 A5", specs: "ACEA A5/B5, API SN, Ford WSS-M2C913-D", type: "Engine oil" },
-      { code: "3433354", name: "MAGNATEC 5W-30 DX", specs: "API SN, ILSAC GF-5, GM dexos1™ Gen 2", type: "Engine oil" },
-      { code: "3437395", name: "MAGNATEC 5W-40", specs: "API SN, ACEA A3/B4, BMW Longlife-01, MB-Approval 229.3", type: "Engine oil" },
-      { code: "3436312", name: "MAGNATEC 5W-40 SN/C3", specs: "API SN, ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51, VW 502 00/505 00/505 01", type: "Engine oil" },
-      { code: "3436890", name: "MAGNATEC 10W-30", specs: "API SP, ILSAC GF-6", type: "Engine oil" },
-      { code: "3437172", name: "MAGNATEC 10W-40", specs: "API SP, ACEA A3/B4", type: "Engine oil" },
-      { code: "3396146", name: "MAGNATEC 15W-40", specs: "API SP, ACEA A3/B4", type: "Engine oil" },
-      { code: "3433217", name: "MAGNATEC SUV 5W-30 C3", specs: "ACEA C2/C3, API SP", type: "Engine oil" },
-      { code: "3424712", name: "Radicool SF", specs: "ASTM D3306, BS 6580:2010", type: "Coolant" },
-      { code: "3429903", name: "Radicool P-OAT", specs: "ASTM D3306", type: "Coolant" },
-      { code: "3437791", name: "Radicool Si-OAT", specs: "VW TL-774G (G12++), MAN 324 Si-OAT, ASTM D3306", type: "Coolant" },
-      { code: "3376394", name: "Radicool NF", specs: "ASTM D3306, BS 6580:2010", type: "Coolant" },
-      { code: "3424670", name: "Radicool Concentrate", specs: "ASTM D3306, BS 6580:2010", type: "Coolant" },
-      { code: "3429062", name: "Transmax ATF Dex/Merc Multivehicle", specs: "Dexron III, Mercon, JASO 1A, Allison C4", type: "Gear Oil" },
-      { code: "3425325", name: "Transmax CVT", specs: "CVT fluids for Japanese, Hyundai, Kia, Chrysler, Ford", type: "Gear Oil" },
-      { code: "3439145", name: "Transmax Dual Multivehicle", specs: "BMW, Ford, VW, MB, Porsche, PSA, Renault, Volvo DCT", type: "Gear Oil" },
-      { code: "3430280", name: "Transmax Universal LL 75W-90", specs: "API GL-4/GL-5/MT-1, MB 235.8, MAN, ZF, Scania", type: "Gear Oil" },
-      { code: "3429677", name: "Transmax Manual VMX 80W", specs: "API GL-4", type: "Gear Oil" },
-      { code: "3432318", name: "Transmax Manual Long Life 75W-85", specs: "API GL-4, MB 235.4, Volvo, Eaton", type: "Gear Oil" },
-      { code: "3430310", name: "Transmax Universal 80W-90", specs: "API GL-4 / GL-5", type: "Gear Oil" },
-    ];
+    // Load oil products from localStorage (managed via Product Management page)
+    function loadOilProducts() {
+      const savedProducts = localStorage.getItem('oilProducts');
+      if (savedProducts) {
+        return JSON.parse(savedProducts);
+      }
+      
+      // Fallback to default products if none exist in localStorage
+      return [
+        { id: 1, code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil", description: "High-performance synthetic engine oil", image: "" },
+        { id: 2, code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6", type: "Engine oil", description: "Advanced formula for fuel economy", image: "" },
+        { id: 3, code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+", type: "Engine oil", description: "Specialized for European vehicles", image: "" },
+        { id: 4, code: "3424712", name: "Radicool SF", specs: "ASTM D3306, BS 6580:2010", type: "Coolant", description: "Premium engine coolant", image: "" },
+        { id: 5, code: "3429062", name: "Transmax ATF Dex/Merc", specs: "Dexron III, Mercon, JASO 1A", type: "Transmission fluid", description: "Multi-vehicle transmission fluid", image: "" },
+      ];
+    }
+
+    // Initialize products array
+    let oils = loadOilProducts();
 
 
     // DOM Elements
@@ -449,63 +438,219 @@
       loadingIndicator.classList.add('hidden');
     };
 
-    // Handle order submission
-    const submitOrder = () => {
+    // Handle order submission with API integration
+    const submitOrder = async () => {
       if (Object.keys(currentOrder).length === 0) {
         showToast('Your order is empty.', 'error');
         return;
       }
-      loadingIndicator.classList.remove('hidden');
       
-      // Hide modal
-
+      loadingIndicator.classList.remove('hidden');
       confirmModal.classList.add('hidden');
 
+      try {
+        // Generate order ID
+        const orderId = 'ORD-' + Date.now();
+        
+        // Calculate total amount (mock pricing for now)
+        let totalAmount = 0;
+        const orderItems = [];
+        
+        for (const [name, item] of Object.entries(currentOrder)) {
+          const oil = oils.find(o => o.name === name);
+          const price = Math.floor(Math.random() * 50) + 25; // Mock price between $25-$75
+          totalAmount += price * item.quantity;
+          orderItems.push({
+            productCode: oil ? oil.code : '',
+            productName: name,
+            quantity: item.quantity,
+            price: price,
+            specs: oil ? oil.specs : ''
+          });
+        }
 
-      // Generate CSV
-      let csv = 'Product Code,Quantity,Product Name\n';
-      Object.values(currentOrder).forEach(item => {
-        const oil = oils.find(o => o.name === item.name);
-        csv += `"${oil ? oil.code : ''}","${item.quantity}","${item.name}"\n`;
-      });
+        const orderData = {
+          orderId,
+          items: orderItems,
+          totalAmount,
+          customerEmail: getCurrentUserEmail(),
+          timestamp: new Date().toISOString(),
+          status: 'pending'
+        };
 
-      // Create and download CSV file
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'order.csv';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+        // Trigger order created webhook
+        if (window.apiService) {
+          await window.apiService.triggerWebhook('order.created', orderData);
+        }
 
-      setTimeout(() => {
-        showToast('Order submitted! CSV downloaded.', 'success');
+        // Check inventory for all products
+        const productCodes = orderItems.map(item => item.productCode);
+        let inventoryCheck = null;
+        
+        if (window.apiService) {
+          try {
+            inventoryCheck = await window.apiService.checkInventory(productCodes);
+            
+            // Check if all items are in stock
+            const outOfStockItems = orderItems.filter(item => {
+              const inventory = inventoryCheck[item.productCode];
+              return !inventory || !inventory.inStock || inventory.quantity < item.quantity;
+            });
+
+            if (outOfStockItems.length > 0) {
+              const itemNames = outOfStockItems.map(item => item.productName).join(', ');
+              throw new Error(`Some items are out of stock: ${itemNames}`);
+            }
+          } catch (error) {
+            console.warn('Inventory check failed, proceeding with order:', error.message);
+            showToast('Warning: Could not verify inventory. Order will be processed manually.', 'warning');
+          }
+        }
+
+        // Process payment (simplified - in real implementation, you'd collect payment details)
+        let paymentResult = null;
+        if (window.apiService) {
+          try {
+            const paymentDetails = { token: 'mock_payment_token' }; // In real app, get from payment form
+            paymentResult = await window.apiService.processPayment(orderData, paymentDetails);
+            
+            if (!paymentResult.success) {
+              throw new Error('Payment processing failed');
+            }
+          } catch (error) {
+            console.warn('Payment processing failed:', error.message);
+            showToast('Payment processing unavailable. Order saved for manual processing.', 'warning');
+          }
+        }
+
+        // Update order status
+        orderData.status = paymentResult && paymentResult.success ? 'paid' : 'pending_payment';
+        orderData.paymentId = paymentResult ? paymentResult.transactionId : null;
+
+        // Save order to localStorage
+        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        orders.push(orderData);
+        localStorage.setItem('orders', JSON.stringify(orders));
+
+        // Send confirmation notification
+        if (window.apiService && orderData.customerEmail) {
+          try {
+            await window.apiService.sendNotification('order.confirmation', {
+              orderId: orderData.orderId,
+              customerEmail: orderData.customerEmail,
+              totalAmount: orderData.totalAmount,
+              items: orderData.items
+            });
+          } catch (error) {
+            console.warn('Notification sending failed:', error.message);
+          }
+        }
+
+        // Generate CSV file (keeping original functionality)
+        let csv = 'Order ID,Product Code,Quantity,Product Name,Price,Total\n';
+        csv += `${orderId},,,Order Total,,${totalAmount.toFixed(2)}\n`;
+        orderItems.forEach(item => {
+          csv += `${orderId},"${item.productCode}","${item.quantity}","${item.productName}","${item.price.toFixed(2)}","${(item.price * item.quantity).toFixed(2)}"\n`;
+        });
+
+        // Create and download CSV file
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `order-${orderId}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // Trigger order processed webhook
+        if (window.apiService) {
+          await window.apiService.triggerWebhook('order.processed', orderData);
+        }
+
+        // Success feedback
+        showToast(`Order ${orderId} submitted successfully! ${paymentResult ? 'Payment processed.' : 'Awaiting payment.'} CSV downloaded.`, 'success');
+        
+        // Clear current order
         currentOrder = {};
         renderOrder();
+
+      } catch (error) {
+        console.error('Order submission failed:', error);
+        showToast(`Order submission failed: ${error.message}`, 'error');
+        
+        // Trigger error webhook
+        if (window.apiService) {
+          await window.apiService.triggerWebhook('order.failed', { 
+            error: error.message, 
+            orderData: Object.keys(currentOrder) 
+          });
+        }
+      } finally {
         loadingIndicator.classList.add('hidden');
-      }, 800);
+      }
+    };
+
+    // Helper function to get current user email
+    const getCurrentUserEmail = () => {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user.email || 'guest@joshburt.com.au';
     };
 
 
-    // Render products by type
-    function renderProductsByType(type) {
-      productsContainer.innerHTML = '';
-      oils.filter(oil => oil.type === type).forEach((oil) => {
-        const cardHtml = `
+    // Render products by type with inventory integration
+    async function renderProductsByType(type) {
+      productsContainer.innerHTML = '<p class="text-center text-gray-400">Loading products...</p>';
+      
+      const filteredOils = oils.filter(oil => oil.type === type);
+      const productCodes = filteredOils.map(oil => oil.code);
+      
+      // Check inventory for all products
+      let inventory = {};
+      if (window.apiService) {
+        try {
+          inventory = await window.apiService.checkInventory(productCodes);
+          // Cache inventory data
+          localStorage.setItem('cachedInventory', JSON.stringify(inventory));
+        } catch (error) {
+          console.warn('Could not load inventory data:', error.message);
+          // Use cached inventory as fallback
+          inventory = JSON.parse(localStorage.getItem('cachedInventory') || '{}');
+        }
+      }
 
+      // Clear loading message
+      productsContainer.innerHTML = '';
+      
+      filteredOils.forEach((oil) => {
+        const inventoryInfo = inventory[oil.code] || { inStock: true, quantity: '?', price: 50 };
+        const stockStatus = inventoryInfo.inStock ? 'In Stock' : 'Out of Stock';
+        const stockClass = inventoryInfo.inStock ? 'text-green-400' : 'text-red-400';
+        const buttonDisabled = !inventoryInfo.inStock ? 'disabled opacity-50 cursor-not-allowed' : '';
+        const priceDisplay = inventoryInfo.price ? `$${inventoryInfo.price.toFixed(2)}` : 'Price TBD';
+        
+        const cardHtml = `
           <div class="p-4 bg-gray-700 rounded shadow card product-card" data-index="${oils.indexOf(oil)}">
+            ${imageHtml}
             <h5 class="font-bold text-white mb-2 cursor-pointer">${oil.name}</h5>
+            <div class="flex justify-between items-center mb-2">
+              <div class="text-sm">
+                <span class="${stockClass}">${stockStatus}</span>
+                ${inventoryInfo.quantity !== '?' ? `<span class="text-gray-400 ml-2">(${inventoryInfo.quantity} units)</span>` : ''}
+                ${inventoryInfo.cached ? '<span class="text-yellow-400 ml-2">(Cached)</span>' : ''}
+              </div>
+              <span class="text-lg font-bold text-white">${priceDisplay}</span>
+            </div>
             <div class="flex justify-end mb-2">
-              <button class="px-4 py-2 bg-primary text-white rounded-full text-sm hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary btn-add-to-order" data-index="${oils.indexOf(oil)}">
+              <button class="px-4 py-2 bg-primary text-white rounded-full text-sm hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary btn-add-to-order ${buttonDisabled}" 
+                      data-index="${oils.indexOf(oil)}" ${!inventoryInfo.inStock ? 'disabled' : ''}>
                 + Add
               </button>
             </div>
             <div class="product-details hidden">
-              <p class="text-gray-300 text-sm mb-1">${oil.specs}</p>
+              <p class="text-gray-300 text-sm mb-1"><strong>Specifications:</strong> ${oil.specs}</p>
               <p class="text-sm"><strong>Product Code:</strong> ${oil.code}</p>
-
             </div>
           </div>
         `;
