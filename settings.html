@@ -147,7 +147,87 @@
             <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
                 Toggle Light Mode
             </button>
+            <div class="bg-gray-800 p-4 rounded shadow">
+                <h2 class="text-lg font-semibold mb-2 text-white">Advanced Color Scheme</h2>
+                <form id="colorSchemeForm" class="space-y-2">
+                    <div>
+                        <label for="primaryColor" class="block text-gray-300 mb-1">Primary Color</label>
+                        <input type="color" id="primaryColor" name="primaryColor" value="#3b82f6" class="w-12 h-8 border-none rounded">
+                    </div>
+                    <div>
+                        <label for="secondaryColor" class="block text-gray-300 mb-1">Secondary Color</label>
+                        <input type="color" id="secondaryColor" name="secondaryColor" value="#10b981" class="w-12 h-8 border-none rounded">
+                    </div>
+                    <div>
+                        <label for="accentColor" class="block text-gray-300 mb-1">Accent Color</label>
+                        <input type="color" id="accentColor" name="accentColor" value="#8b5cf6" class="w-12 h-8 border-none rounded">
+                    </div>
+                    <button type="submit" class="w-full p-2 bg-accent text-white rounded hover:bg-primary focus:outline-none focus:ring-2 focus:ring-accent font-semibold">Apply Colors</button>
+                </form>
+            </div>
+
+            <!-- Theme Schedule Settings -->
+            <div id="theme-schedule-settings" class="bg-gray-800 p-4 rounded shadow">
+                <h2 class="text-lg font-semibold mb-2 text-white">Theme Schedule</h2>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="schedule-enabled" class="mr-2 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-300">Auto Dark Mode</span>
+                        </label>
+                        <span id="schedule-status" class="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">Disabled</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Dark mode starts at</label>
+                            <input type="time" id="dark-mode-start" value="18:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Light mode starts at</label>
+                            <input type="time" id="light-mode-start" value="06:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-gray-500 pt-2 border-t border-gray-600">
+                        Current time: <span id="current-time">--:--</span><br>
+                        Scheduled mode: <span id="scheduled-mode" class="text-gray-400">Manual</span>
+                    </div>
+                </div>
+            </div>
         </div>
+        <script>
+        // Advanced Color Scheme Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorForm = document.getElementById('colorSchemeForm');
+            if (colorForm) {
+                // Load saved colors
+                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+                colorForm.primaryColor.value = settings.primaryColor || '#3b82f6';
+                colorForm.secondaryColor.value = settings.secondaryColor || '#10b981';
+                colorForm.accentColor.value = settings.accentColor || '#8b5cf6';
+
+                colorForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    // Save colors to localStorage
+                    settings.primaryColor = colorForm.primaryColor.value;
+                    settings.secondaryColor = colorForm.secondaryColor.value;
+                    settings.accentColor = colorForm.accentColor.value;
+                    localStorage.setItem('siteSettings', JSON.stringify(settings));
+                    // Apply colors immediately
+                    applyColors(settings);
+                });
+                // Apply colors on load
+                applyColors(settings);
+            }
+            function applyColors(settings) {
+                document.documentElement.style.setProperty('--tw-color-primary', settings.primaryColor || '#3b82f6');
+                document.documentElement.style.setProperty('--tw-color-secondary', settings.secondaryColor || '#10b981');
+                document.documentElement.style.setProperty('--tw-color-accent', settings.accentColor || '#8b5cf6');
+            }
+        });
+        </script>
     </aside>
 
     <!-- Main Content -->
@@ -1104,314 +1184,144 @@
         // Load settings when page loads
         loadSettings();
 
-        // === API INTEGRATION MANAGEMENT ===
-        
-        // Load API settings
-        function loadAPISettings() {
-            const apiSettings = JSON.parse(localStorage.getItem('apiSettings') || '{}');
+        // Theme Schedule System
+        const defaultSchedule = { enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' };
+        let themeSchedule = JSON.parse(localStorage.getItem('themeSchedule') || JSON.stringify(defaultSchedule));
+        let schedulerInterval = null;
+
+        function updateThemeSchedule(newSchedule) {
+            themeSchedule = { ...themeSchedule, ...newSchedule };
+            localStorage.setItem('themeSchedule', JSON.stringify(themeSchedule));
             
-            // Inventory API
-            document.getElementById('inventory-enabled').checked = apiSettings.inventoryEnabled || false;
-            document.getElementById('inventory-endpoint').value = apiSettings.inventoryEndpoint || 'https://api.example.com/inventory';
-            document.getElementById('inventory-api-key').value = apiSettings.inventoryApiKey || '';
+            if (themeSchedule.enabled) {
+                startThemeScheduler();
+            } else {
+                stopThemeScheduler();
+            }
             
-            // Payment API
-            document.getElementById('payment-enabled').checked = apiSettings.paymentEnabled || false;
-            document.getElementById('payment-endpoint').value = apiSettings.paymentEndpoint || 'https://api.stripe.com/v1';
-            document.getElementById('payment-api-key').value = apiSettings.paymentApiKey || '';
-            
-            // Notification API
-            document.getElementById('notification-enabled').checked = apiSettings.notificationEnabled || false;
-            document.getElementById('notification-endpoint').value = apiSettings.notificationEndpoint || 'https://api.sendgrid.com/v3';
-            document.getElementById('notification-api-key').value = apiSettings.notificationApiKey || '';
-            
-            // Cloud Backup
-            document.getElementById('cloud-backup-enabled').checked = apiSettings.cloudBackupEnabled || false;
-            document.getElementById('auto-backup-enabled').checked = apiSettings.autoBackupEnabled || false;
-            document.getElementById('cloud-backup-endpoint').value = apiSettings.cloudBackupEndpoint || 'https://api.jsonbin.io/v3';
-            document.getElementById('cloud-backup-api-key').value = apiSettings.cloudBackupApiKey || '';
-            document.getElementById('auto-backup-interval').value = apiSettings.autoBackupInterval || 60;
+            updateScheduleUI();
+            showToast(themeSchedule.enabled ? 'Theme scheduling enabled' : 'Theme scheduling disabled');
         }
 
-        // Save API settings
-        function saveAPISettings() {
-            const apiSettings = {
-                inventoryEnabled: document.getElementById('inventory-enabled').checked,
-                inventoryEndpoint: document.getElementById('inventory-endpoint').value,
-                inventoryApiKey: document.getElementById('inventory-api-key').value,
-                
-                paymentEnabled: document.getElementById('payment-enabled').checked,
-                paymentEndpoint: document.getElementById('payment-endpoint').value,
-                paymentApiKey: document.getElementById('payment-api-key').value,
-                
-                notificationEnabled: document.getElementById('notification-enabled').checked,
-                notificationEndpoint: document.getElementById('notification-endpoint').value,
-                notificationApiKey: document.getElementById('notification-api-key').value,
-                
-                cloudBackupEnabled: document.getElementById('cloud-backup-enabled').checked,
-                autoBackupEnabled: document.getElementById('auto-backup-enabled').checked,
-                cloudBackupEndpoint: document.getElementById('cloud-backup-endpoint').value,
-                cloudBackupApiKey: document.getElementById('cloud-backup-api-key').value,
-                autoBackupInterval: document.getElementById('auto-backup-interval').value
-            };
-            
-            localStorage.setItem('apiSettings', JSON.stringify(apiSettings));
-            
-            // Update API service configuration if available
-            if (window.apiService) {
-                window.apiService.saveAPIConfig(apiSettings);
-                
-                // Restart auto backup if settings changed
-                if (apiSettings.autoBackupEnabled && apiSettings.autoBackupInterval) {
-                    window.apiService.startAutoBackup(parseInt(apiSettings.autoBackupInterval));
+        function isDarkModeTime() {
+            if (!themeSchedule.enabled) return null;
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            const darkStart = parseTimeString(themeSchedule.darkModeStart);
+            const lightStart = parseTimeString(themeSchedule.lightModeStart);
+
+            return darkStart > lightStart ? 
+                (currentTime >= darkStart || currentTime < lightStart) :
+                (currentTime >= darkStart && currentTime < lightStart);
+        }
+
+        function parseTimeString(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        function applyScheduledTheme() {
+            if (!themeSchedule.enabled) return;
+            const shouldBeDark = isDarkModeTime();
+            const body = document.body;
+            const currentlyDark = body.classList.contains('dark');
+
+            if (shouldBeDark !== null && shouldBeDark !== currentlyDark) {
+                if (shouldBeDark) {
+                    body.classList.remove('light');
+                    body.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
                 } else {
-                    window.apiService.stopAutoBackup();
+                    body.classList.remove('dark');
+                    body.classList.add('light');
+                    localStorage.setItem('theme', 'light');
                 }
-            }
-            
-            showToast('API settings saved successfully!');
-        }
 
-        // Test all APIs
-        async function testAllAPIs() {
-            const button = document.getElementById('test-apis');
-            const originalText = button.textContent;
-            button.textContent = 'Testing...';
-            button.disabled = true;
-            
-            try {
-                if (!window.apiService) {
-                    throw new Error('API service not available');
+                const themeToggle = document.getElementById('theme-toggle');
+                if (themeToggle) {
+                    themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
                 }
-                
-                const results = await window.apiService.testConnections();
-                updateAPIStatus(results);
-                
-                const successCount = Object.values(results).filter(Boolean).length;
-                const totalCount = Object.keys(results).length;
-                
-                showToast(`API tests completed: ${successCount}/${totalCount} services working`);
-            } catch (error) {
-                console.error('API testing failed:', error);
-                showToast('API testing failed: ' + error.message);
-            } finally {
-                button.textContent = originalText;
-                button.disabled = false;
+
+                showToast(`Automatically switched to ${shouldBeDark ? 'dark' : 'light'} mode`);
             }
         }
 
-        // Update API status display
-        function updateAPIStatus(results) {
-            const statusContainer = document.getElementById('api-status');
-            const statuses = [
-                { name: 'Inventory API', key: 'inventory' },
-                { name: 'Payment API', key: 'payment' },
-                { name: 'Notification API', key: 'notifications' },
-                { name: 'Cloud Backup', key: 'cloudBackup' }
-            ];
-            
-            statusContainer.innerHTML = '';
-            
-            statuses.forEach(status => {
-                const isWorking = results[status.key];
-                const statusClass = isWorking ? 'bg-green-600 text-green-100' : 'bg-red-600 text-red-100';
-                const statusText = isWorking ? 'Working' : 'Failed';
-                
-                const statusDiv = document.createElement('div');
-                statusDiv.className = 'flex justify-between items-center p-2 bg-gray-700 rounded';
-                statusDiv.innerHTML = `
-                    <span>${status.name}</span>
-                    <span class="px-2 py-1 rounded text-xs ${statusClass}">${statusText}</span>
-                `;
-                statusContainer.appendChild(statusDiv);
-            });
-        }
-
-        // Webhook management
-        function loadWebhooks() {
-            const endpoints = JSON.parse(localStorage.getItem('webhookEndpoints') || '[]');
-            const container = document.getElementById('webhook-list');
-            
-            if (endpoints.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-sm">No webhooks registered</p>';
-                return;
+        function startThemeScheduler() {
+            if (schedulerInterval) clearInterval(schedulerInterval);
+            if (themeSchedule.enabled) {
+                schedulerInterval = setInterval(applyScheduledTheme, 60000);
+                applyScheduledTheme();
             }
-            
-            container.innerHTML = '';
-            endpoints.forEach((webhook, index) => {
-                const webhookDiv = document.createElement('div');
-                webhookDiv.className = 'flex justify-between items-center p-3 bg-gray-700 rounded';
-                webhookDiv.innerHTML = `
-                    <div>
-                        <div class="font-medium">${webhook.endpoint}</div>
-                        <div class="text-sm text-gray-400">Events: ${webhook.events.join(', ')}</div>
-                    </div>
-                    <button class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 remove-webhook" data-index="${index}">
-                        Remove
-                    </button>
-                `;
-                container.appendChild(webhookDiv);
-            });
-
-            // Add remove event listeners
-            container.querySelectorAll('.remove-webhook').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    removeWebhook(index);
-                });
-            });
         }
 
-        function addWebhook() {
-            const endpoint = document.getElementById('webhook-endpoint').value;
-            const eventsStr = document.getElementById('webhook-events').value;
-            
-            if (!endpoint || !eventsStr) {
-                showToast('Please enter both endpoint URL and events');
-                return;
+        function stopThemeScheduler() {
+            if (schedulerInterval) {
+                clearInterval(schedulerInterval);
+                schedulerInterval = null;
             }
+        }
+
+        function updateScheduleUI() {
+            const enabledCheckbox = document.getElementById('schedule-enabled');
+            const darkStartInput = document.getElementById('dark-mode-start');
+            const lightStartInput = document.getElementById('light-mode-start');
+            const statusSpan = document.getElementById('schedule-status');
+
+            if (enabledCheckbox) enabledCheckbox.checked = themeSchedule.enabled;
+            if (darkStartInput) darkStartInput.value = themeSchedule.darkModeStart;
+            if (lightStartInput) lightStartInput.value = themeSchedule.lightModeStart;
             
-            const events = eventsStr.split(',').map(e => e.trim()).filter(e => e);
-            const webhooks = JSON.parse(localStorage.getItem('webhookEndpoints') || '[]');
-            
-            webhooks.push({ endpoint, events });
-            localStorage.setItem('webhookEndpoints', JSON.stringify(webhooks));
-            
-            // Register with API service if available
-            if (window.apiService) {
-                window.apiService.registerWebhook(endpoint, events);
+            if (statusSpan) {
+                statusSpan.textContent = themeSchedule.enabled ? 'Enabled' : 'Disabled';
+                statusSpan.className = `text-xs px-2 py-1 rounded ${
+                    themeSchedule.enabled ? 'bg-green-900 text-green-200' : 'bg-gray-700 text-gray-300'
+                }`;
             }
-            
-            // Clear form
-            document.getElementById('webhook-endpoint').value = '';
-            document.getElementById('webhook-events').value = '*';
-            
-            loadWebhooks();
-            showToast('Webhook added successfully!');
         }
 
-        function removeWebhook(index) {
-            const webhooks = JSON.parse(localStorage.getItem('webhookEndpoints') || '[]');
-            webhooks.splice(index, 1);
-            localStorage.setItem('webhookEndpoints', JSON.stringify(webhooks));
-            loadWebhooks();
-            showToast('Webhook removed!');
-        }
+        function updateTimeDisplay() {
+            const currentTimeEl = document.getElementById('current-time');
+            const scheduledModeEl = document.getElementById('scheduled-mode');
 
-        // Load and display webhook log
-        function loadWebhookLog() {
-            const log = window.apiService ? window.apiService.getWebhookLog() : [];
-            const container = document.getElementById('webhook-log');
-            
-            if (log.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-sm">No webhook events yet</p>';
-                return;
+            if (currentTimeEl) {
+                const now = new Date();
+                currentTimeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
-            
-            container.innerHTML = '';
-            log.slice(-10).reverse().forEach(event => {
-                const eventDiv = document.createElement('div');
-                eventDiv.className = 'mb-2 p-2 bg-gray-800 rounded text-sm';
-                eventDiv.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="font-medium text-blue-400">${event.event}</span>
-                        <span class="text-gray-400">${new Date(event.timestamp).toLocaleTimeString()}</span>
-                    </div>
-                    <div class="text-gray-300 text-xs mt-1">${JSON.stringify(event.data, null, 2).substring(0, 100)}...</div>
-                `;
-                container.appendChild(eventDiv);
-            });
-        }
 
-        // Load and display backup history
-        function loadBackupHistory() {
-            const history = window.apiService ? window.apiService.getBackupHistory() : [];
-            const container = document.getElementById('backup-history');
-            
-            if (history.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-sm">No backups yet</p>';
-                return;
-            }
-            
-            container.innerHTML = '';
-            history.slice(-5).reverse().forEach(backup => {
-                const backupDiv = document.createElement('div');
-                backupDiv.className = 'flex justify-between items-center p-2 bg-gray-700 rounded text-sm';
-                backupDiv.innerHTML = `
-                    <div>
-                        <div class="font-medium">${backup.id}</div>
-                        <div class="text-gray-400">${new Date(backup.timestamp).toLocaleString()}</div>
-                    </div>
-                    <div class="text-gray-400">${Math.round(backup.size / 1024)} KB</div>
-                `;
-                container.appendChild(backupDiv);
-            });
-        }
-
-        // Manual backup
-        async function performManualBackup() {
-            const button = document.getElementById('manual-backup');
-            const originalText = button.textContent;
-            button.textContent = 'Backing up...';
-            button.disabled = true;
-            
-            try {
-                if (!window.apiService) {
-                    throw new Error('API service not available');
-                }
-                
-                const result = await window.apiService.backupToCloud();
-                
-                if (result.success) {
-                    showToast('Backup completed successfully!');
-                    loadBackupHistory();
+            if (scheduledModeEl) {
+                if (!themeSchedule.enabled) {
+                    scheduledModeEl.textContent = 'Manual';
+                    scheduledModeEl.className = 'text-gray-400';
                 } else {
-                    throw new Error(result.error || result.reason || 'Backup failed');
+                    const isDark = isDarkModeTime();
+                    scheduledModeEl.textContent = isDark ? 'Dark' : 'Light';
+                    scheduledModeEl.className = isDark ? 'text-blue-400' : 'text-yellow-400';
                 }
-            } catch (error) {
-                console.error('Manual backup failed:', error);
-                showToast('Backup failed: ' + error.message);
-            } finally {
-                button.textContent = originalText;
-                button.disabled = false;
             }
         }
 
-        // Event listeners for API settings
-        document.getElementById('api-settings-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            saveAPISettings();
+        // Initialize theme scheduler
+        document.getElementById('schedule-enabled').addEventListener('change', (e) => {
+            updateThemeSchedule({ enabled: e.target.checked });
         });
 
-        document.getElementById('test-apis').addEventListener('click', testAllAPIs);
-        document.getElementById('add-webhook').addEventListener('click', addWebhook);
-        document.getElementById('manual-backup').addEventListener('click', performManualBackup);
+        document.getElementById('dark-mode-start').addEventListener('change', (e) => {
+            updateThemeSchedule({ darkModeStart: e.target.value });
+        });
+
+        document.getElementById('light-mode-start').addEventListener('change', (e) => {
+            updateThemeSchedule({ lightModeStart: e.target.value });
+        });
+
+        // Initialize scheduler
+        updateScheduleUI();
+        if (themeSchedule.enabled) {
+            startThemeScheduler();
+        }
         
-        document.getElementById('clear-webhook-log').addEventListener('click', () => {
-            if (window.apiService) {
-                window.apiService.clearWebhookLog();
-            }
-            loadWebhookLog();
-            showToast('Webhook log cleared!');
-        });
-
-        // Initialize API settings when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAPISettings();
-            loadWebhooks();
-            
-            // Load logs and history every 30 seconds
-            setInterval(() => {
-                loadWebhookLog();
-                loadBackupHistory();
-            }, 30000);
-            
-            // Initial load
-            setTimeout(() => {
-                loadWebhookLog();
-                loadBackupHistory();
-            }, 1000);
-        });
+        // Update time display every second
+        updateTimeDisplay();
+        setInterval(updateTimeDisplay, 1000);
 
     </script>
 </body>

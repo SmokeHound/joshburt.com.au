@@ -96,21 +96,46 @@
     </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-    <!-- Load shared navigation component -->
-    <div id="shared-navigation"></div>
-    <script>
-        fetch('shared-nav.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('shared-navigation').innerHTML = html;
-                // Initialize page-specific functionality after navigation loads
-                initializeHomePage();
-            })
-            .catch(() => {
-                // Fallback if fetch fails - initialize anyway
-                setTimeout(initializeHomePage, 100);
-            });
-    </script>
+    <!-- Mobile Menu Toggle -->
+    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+        ☰
+    </button>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+        <!-- App Branding -->
+        <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
+
+        <!-- User Profile Section -->
+        <div id="user-profile" class="mb-6">
+            <div id="user-info" class="hidden flex items-center space-x-2">
+                <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
+                <span id="user-name" class="text-white"></span>
+            </div>
+            <button id="login-btn" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Open login modal">Login</button>
+            <button id="logout-btn" class="hidden w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" aria-label="Logout">Logout</button>
+        </div>
+
+        <!-- Navigation -->
+        <nav>
+            <ul class="space-y-2">
+                <li><a href="index.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Home</a></li>
+                <li><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+                <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+                <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+                <li><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
+                <li><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
+                <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Theme Toggle -->
+        <div class="mt-auto">
+            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+                Toggle Light Mode
+            </button>
+        </div>
+    </aside>
 
     <!-- Login Modal -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
@@ -148,7 +173,7 @@
 
         <!-- Content Section -->
         <section>
-            <p class="mb-4" id="homepage-content">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
+            <p class="mb-4">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                     <h3 class="font-semibold">Card 1</h3>
@@ -334,6 +359,230 @@
                 }
             }, 1000);
         });
+    </script>
+
+    <!-- Future Features Implementation -->
+    <script>
+        // Multi-language Support System
+        (function() {
+            const languages = {
+                en: { name: 'English', flag: '🇺🇸', translations: {
+                    'nav.home': 'Home', 'nav.admin': 'Admin', 'nav.users': 'User Management',
+                    'nav.analytics': 'Analytics', 'nav.settings': 'Settings', 'nav.oil': 'Oil Orders',
+                    'nav.logout': 'Logout', 'app.title': "Josh's App", 'language.label': 'Language',
+                    'dashboard.welcome': 'Welcome to My Website', 'notifications.title': 'Notifications',
+                    'notifications.empty': 'No new notifications'
+                }},
+                es: { name: 'Español', flag: '🇪🇸', translations: {
+                    'nav.home': 'Inicio', 'nav.admin': 'Administración', 'nav.users': 'Gestión de Usuarios',
+                    'nav.analytics': 'Analíticas', 'nav.settings': 'Configuración', 'nav.oil': 'Pedidos de Aceite',
+                    'nav.logout': 'Cerrar Sesión', 'app.title': 'Aplicación de Josh', 'language.label': 'Idioma',
+                    'dashboard.welcome': 'Bienvenido a Mi Sitio Web', 'notifications.title': 'Notificaciones',
+                    'notifications.empty': 'No hay notificaciones nuevas'
+                }}
+            };
+
+            let currentLanguage = localStorage.getItem('siteLanguage') || 'en';
+            
+            window.t = function(key, fallback = key) {
+                return languages[currentLanguage]?.translations[key] || fallback;
+            };
+
+            function updateTranslations() {
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    element.textContent = window.t(key);
+                });
+            }
+
+            // Language selector handler
+            document.addEventListener('DOMContentLoaded', function() {
+                const selector = document.getElementById('language-selector');
+                if (selector) {
+                    selector.value = currentLanguage;
+                    selector.addEventListener('change', function(e) {
+                        currentLanguage = e.target.value;
+                        localStorage.setItem('siteLanguage', currentLanguage);
+                        updateTranslations();
+                        if (window.showNotification) {
+                            window.showNotification(`Language changed to ${languages[currentLanguage].name}`, 'success');
+                        }
+                    });
+                }
+                updateTranslations();
+            });
+        })();
+
+        // Notifications System
+        (function() {
+            let notifications = JSON.parse(localStorage.getItem('siteNotifications') || '[]');
+            let notificationId = parseInt(localStorage.getItem('notificationId') || '1');
+
+            window.showNotification = function(message, type = 'info', duration = 5000) {
+                const notification = {
+                    id: notificationId++,
+                    message, type,
+                    timestamp: Date.now()
+                };
+
+                notifications.unshift(notification);
+                notifications = notifications.slice(0, 20); // Keep only 20
+                localStorage.setItem('siteNotifications', JSON.stringify(notifications));
+                localStorage.setItem('notificationId', notificationId.toString());
+
+                // Show toast
+                const toast = document.createElement('div');
+                const colors = {
+                    info: 'bg-blue-600', success: 'bg-green-600', 
+                    warning: 'bg-yellow-600', error: 'bg-red-600'
+                };
+                
+                toast.className = `fixed bottom-4 right-4 p-4 ${colors[type] || colors.info} text-white rounded-lg shadow-lg flex items-center gap-3 transform translate-x-full transition-transform duration-300 z-50`;
+                toast.innerHTML = `
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.remove()" class="text-white hover:text-gray-200 font-bold">&times;</button>
+                `;
+
+                document.body.appendChild(toast);
+                setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+
+                updateNotificationBell();
+                return notification.id;
+            };
+
+            function updateNotificationBell() {
+                let bell = document.getElementById('notification-bell');
+                if (!bell) {
+                    // Create notification bell in sidebar
+                    const nav = document.querySelector('#sidebar nav ul');
+                    if (nav) {
+                        const li = document.createElement('li');
+                        li.className = 'relative';
+                        li.innerHTML = `
+                            <button id="notification-bell" class="w-full flex items-center justify-between p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">
+                                <span data-i18n="notifications.title">Notifications</span>
+                                <span class="flex items-center gap-1">
+                                    🔔
+                                    <span id="notification-badge" class="bg-red-500 text-white text-xs rounded-full px-1 hidden">0</span>
+                                </span>
+                            </button>
+                            <div id="notification-dropdown" class="hidden absolute left-full top-0 ml-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                                    <h3 class="font-semibold" data-i18n="notifications.title">Notifications</h3>
+                                </div>
+                                <div id="notification-list" class="max-h-64 overflow-y-auto p-2">
+                                    <div class="text-center text-gray-500 p-4" data-i18n="notifications.empty">No new notifications</div>
+                                </div>
+                            </div>
+                        `;
+                        nav.appendChild(li);
+                        
+                        bell = document.getElementById('notification-bell');
+                        const dropdown = document.getElementById('notification-dropdown');
+                        
+                        bell.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            dropdown.classList.toggle('hidden');
+                        });
+                        
+                        document.addEventListener('click', () => {
+                            dropdown.classList.add('hidden');
+                        });
+                    }
+                }
+
+                const badge = document.getElementById('notification-badge');
+                if (badge && notifications.length > 0) {
+                    badge.textContent = notifications.length > 99 ? '99+' : notifications.length;
+                    badge.classList.remove('hidden');
+                } else if (badge) {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            // Initialize notifications
+            document.addEventListener('DOMContentLoaded', function() {
+                updateNotificationBell();
+                
+                // Demo: Add some sample notifications
+                setTimeout(() => {
+                    window.showNotification('Welcome! Future features are now active.', 'success');
+                }, 2000);
+                
+                // Simulate periodic notifications (every 60 seconds)
+                setInterval(() => {
+                    if (Math.random() < 0.3) {
+                        const messages = [
+                            'New system update available',
+                            'User login detected',
+                            'Backup completed successfully',
+                            'New order received'
+                        ];
+                        const types = ['info', 'success', 'warning'];
+                        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                        const randomType = types[Math.floor(Math.random() * types.length)];
+                        window.showNotification(randomMessage, randomType);
+                    }
+                }, 60000);
+            });
+        })();
+
+        // Role-based Dashboard System
+        (function() {
+            const userRoles = {
+                admin: { name: 'Administrator', dashboards: ['admin', 'analytics'] },
+                manager: { name: 'Manager', dashboards: ['manager'] },
+                user: { name: 'User', dashboards: ['user'] }
+            };
+
+            let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"role": "admin", "name": "Josh"}');
+
+            window.setUserRole = function(role) {
+                if (userRoles[role]) {
+                    currentUser.role = role;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    updateDashboard();
+                    if (window.showNotification) {
+                        window.showNotification(`Switched to ${userRoles[role].name} role`, 'success');
+                    }
+                }
+            };
+
+            function updateDashboard() {
+                const welcomeMessage = document.getElementById('welcome-message');
+                if (welcomeMessage) {
+                    const roleName = userRoles[currentUser.role]?.name || 'User';
+                    welcomeMessage.textContent = `Welcome ${currentUser.name} - ${roleName} Dashboard`;
+                }
+            }
+
+            // Create role switcher
+            document.addEventListener('DOMContentLoaded', function() {
+                const roleSwitcher = document.getElementById('role-switcher');
+                if (roleSwitcher) {
+                    roleSwitcher.classList.remove('hidden');
+                    roleSwitcher.innerHTML = `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Role (Demo)</label>
+                            <select id="role-selector" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                                ${Object.entries(userRoles).map(([key, role]) => 
+                                    `<option value="${key}" ${key === currentUser.role ? 'selected' : ''}>${role.name}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                    `;
+
+                    document.getElementById('role-selector').addEventListener('change', function(e) {
+                        window.setUserRole(e.target.value);
+                    });
+                }
+                updateDashboard();
+            });
+        })();
     </script>
 </body>
 </html>
