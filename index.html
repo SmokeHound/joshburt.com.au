@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Website Template</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="api-integration.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -27,14 +26,25 @@
             transition: background-color 0.3s, color 0.3s;
         }
         .dark {
-            background-color: #1f2937;
-            color: #f9fafb;
-        }
-        .light {
-            background-color: #f9fafb;
-            color: #1f2937;
-        }
-        .card {
+                const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            colors: {
+                                primary: settingsHead.primaryColor || '#3b82f6',
+                                secondary: settingsHead.secondaryColor || '#10b981',
+                                accent: settingsHead.accentColor || '#8b5cf6',
+                            },
+                            fontFamily: {
+                                sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                            },
+                        },
+                    },
+                };
+                // Apply CSS variables for instant color update
+                document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
+                document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
+                document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .card:hover {
@@ -109,7 +119,7 @@
         <!-- User Profile Section -->
         <div id="user-profile" class="mb-6" role="region" aria-label="User profile">
             <div id="user-info" class="hidden flex items-center space-x-2">
-                <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
+                <img id="user-avatar" src="./assets/images/avatar-placeholder.svg" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
                 <span id="user-name" class="text-white"></span>
             </div>
             <button id="login-btn" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Open login modal">Login</button>
@@ -429,48 +439,17 @@
             }, 3000);
         }
 
-        // Check if user is logged in and load user profile
-        async function checkAuthStatus() {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                updateUIForLoggedOutState();
-                loadAndApplySettings();
-                return;
-            }
-
-            try {
-                const response = await apiRequest('/auth/me');
-                if (response.ok) {
-                    const data = await response.json();
-                    const user = data.user;
-                    
-                    // Update localStorage with fresh user data
-                    localStorage.setItem('user', JSON.stringify(user));
-                    
-                    // Update UI
-                    userInfo.classList.remove('hidden');
-                    loginBtn.classList.add('hidden');
-                    logoutBtn.classList.remove('hidden');
-                    userName.textContent = user.name;
-                    userAvatar.src = user.avatarUrl || 'https://via.placeholder.com/40';
-                    welcomeMessage.textContent = `Welcome, ${user.name}! (${user.role})`;
-                } else {
-                    // Token invalid, logout
-                    updateUIForLoggedOutState();
-                    loadAndApplySettings();
-                }
-            } catch (error) {
-                console.error('Auth check failed:', error);
-                updateUIForLoggedOutState();
-                loadAndApplySettings();
-            }
-        }
-
-        // Check if user is logged in (legacy support)
+        // Check if user is logged in
         const user = JSON.parse(localStorage.getItem('user'));
-        if (user && !localStorage.getItem('accessToken')) {
-            // Legacy user session, clear it
-            localStorage.removeItem('user');
+        if (user) {
+            userInfo.classList.remove('hidden');
+            loginBtn.classList.add('hidden');
+            logoutBtn.classList.remove('hidden');
+            userName.textContent = user.name;
+            userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
+            welcomeMessage.textContent = `Welcome, ${user.name}!`;
+        } else {
+            // Apply homepage message from settings if no user is logged in
             loadAndApplySettings();
         } else {
             // Check authentication status with backend
@@ -607,6 +586,19 @@
 
         // Apply settings on page load
         document.addEventListener('DOMContentLoaded', loadAndApplySettings);
+
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
     </script>
 </body>
 </html>

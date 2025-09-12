@@ -5,22 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site Settings</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="api-integration.js"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        secondary: '#10b981',
-                        accent: '#8b5cf6',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                },
-            },
-        };
+        // Configuration for dynamic color updates from settings
+        function applyDynamicColors() {
+            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
+            // Apply CSS variables for instant color update
+            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
+            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
+            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+        }
+        applyDynamicColors();
+        // Service Worker Registration for PWA
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(registration => {
+                        console.log("SW registered: ", registration);
+                    })
+                    .catch(registrationError => {
+                        console.log("SW registration failed: ", registrationError);
+                    });
+            });
+        }
     </script>
     <style>
         :root {
@@ -72,6 +78,38 @@
         button, .preset-theme {
             transition: all 0.3s ease;
         }
+        
+        /* Tab styling */
+        .tab-btn.active {
+            background-color: var(--color-primary);
+            color: white;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Input validation styles */
+        .input-error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+        
+        .input-success {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Logo preview styles */
+        #logo-preview img {
+            object-fit: contain;
+        }
     </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
@@ -104,61 +142,12 @@
             </ul>
         </nav>
 
-        <!-- Theme Toggle & Advanced Color Scheme -->
-        <div class="mt-auto space-y-4">
+        <!-- Theme Toggle -->
+        <div class="mt-auto">
             <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
                 Toggle Light Mode
             </button>
-            <div class="bg-gray-800 p-4 rounded shadow">
-                <h2 class="text-lg font-semibold mb-2 text-white">Advanced Color Scheme</h2>
-                <form id="colorSchemeForm" class="space-y-2">
-                    <div>
-                        <label for="primaryColor" class="block text-gray-300 mb-1">Primary Color</label>
-                        <input type="color" id="primaryColor" name="primaryColor" value="#3b82f6" class="w-12 h-8 border-none rounded">
-                    </div>
-                    <div>
-                        <label for="secondaryColor" class="block text-gray-300 mb-1">Secondary Color</label>
-                        <input type="color" id="secondaryColor" name="secondaryColor" value="#10b981" class="w-12 h-8 border-none rounded">
-                    </div>
-                    <div>
-                        <label for="accentColor" class="block text-gray-300 mb-1">Accent Color</label>
-                        <input type="color" id="accentColor" name="accentColor" value="#8b5cf6" class="w-12 h-8 border-none rounded">
-                    </div>
-                    <button type="submit" class="w-full p-2 bg-accent text-white rounded hover:bg-primary focus:outline-none focus:ring-2 focus:ring-accent font-semibold">Apply Colors</button>
-                </form>
-            </div>
         </div>
-        <script>
-        // Advanced Color Scheme Logic
-        document.addEventListener('DOMContentLoaded', function() {
-            const colorForm = document.getElementById('colorSchemeForm');
-            if (colorForm) {
-                // Load saved colors
-                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                colorForm.primaryColor.value = settings.primaryColor || '#3b82f6';
-                colorForm.secondaryColor.value = settings.secondaryColor || '#10b981';
-                colorForm.accentColor.value = settings.accentColor || '#8b5cf6';
-
-                colorForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    // Save colors to localStorage
-                    settings.primaryColor = colorForm.primaryColor.value;
-                    settings.secondaryColor = colorForm.secondaryColor.value;
-                    settings.accentColor = colorForm.accentColor.value;
-                    localStorage.setItem('siteSettings', JSON.stringify(settings));
-                    // Apply colors immediately
-                    applyColors(settings);
-                });
-                // Apply colors on load
-                applyColors(settings);
-            }
-            function applyColors(settings) {
-                document.documentElement.style.setProperty('--tw-color-primary', settings.primaryColor || '#3b82f6');
-                document.documentElement.style.setProperty('--tw-color-secondary', settings.secondaryColor || '#10b981');
-                document.documentElement.style.setProperty('--tw-color-accent', settings.accentColor || '#8b5cf6');
-            }
-        });
-        </script>
     </aside>
 
     <!-- Main Content -->
@@ -172,19 +161,31 @@
         <section>
             <p class="mb-6">Configure website settings and preferences. Changes will be saved automatically.</p>
             
-            <!-- General Settings -->
-            <div class="bg-gray-800 p-6 rounded shadow mb-6">
-                <form id="settings-form">
-                    <h3 class="font-semibold mb-4 text-xl">General Settings</h3>
+            <!-- Tab Navigation -->
+            <div class="bg-gray-800 rounded-t shadow mb-0">
+                <div class="flex border-b border-gray-600">
+                    <button class="tab-btn px-6 py-3 font-semibold text-white bg-primary rounded-tl" data-tab="general">General</button>
+                    <button class="tab-btn px-6 py-3 font-semibold text-gray-300 hover:text-white hover:bg-gray-700" data-tab="theme">Theme</button>
+                    <button class="tab-btn px-6 py-3 font-semibold text-gray-300 hover:text-white hover:bg-gray-700" data-tab="security">Security</button>
+                    <button class="tab-btn px-6 py-3 font-semibold text-gray-300 hover:text-white hover:bg-gray-700" data-tab="audit">Audit Log</button>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="bg-gray-800 rounded-b shadow mb-6">
+                <!-- General Settings Tab -->
+                <div id="general-tab" class="tab-content p-6">
+                    <form id="settings-form">
+                        <h3 class="font-semibold mb-4 text-xl">General Settings</h3>
                         
                         <div class="mb-4">
                             <label for="site-title" class="block mb-2 font-medium">Site Title</label>
-                            <input type="text" id="site-title" name="site-title" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter site title" value="Josh's App">
+                            <input type="text" id="site-title" name="site-title" required maxlength="100" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter site title" value="Josh's App">
                         </div>
                         
                         <div class="mb-4">
                             <label for="site-description" class="block mb-2 font-medium">Site Description</label>
-                            <textarea id="site-description" name="site-description" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter site description">Responsive website template with admin features</textarea>
+                            <textarea id="site-description" name="site-description" required maxlength="500" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter site description">Responsive website template with admin features</textarea>
                         </div>
                         
                         <div class="mb-4">
@@ -241,7 +242,168 @@
                     </form>
                 </div>
 
-                <div class="bg-gray-800 p-6 rounded shadow">
+                <!-- Theme Customization Tab -->
+                <div id="theme-tab" class="tab-content p-6 hidden">
+                    <h3 class="font-semibold mb-4 text-xl">Theme Customization</h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold mb-3">Color Scheme</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-3">
+                                    <label for="primaryColor" class="block text-gray-300 w-32">Primary Color</label>
+                                    <input type="color" id="primaryColor" name="primaryColor" value="#3b82f6" class="w-16 h-10 border-none rounded cursor-pointer">
+                                    <input type="text" id="primaryColorText" value="#3b82f6" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary">
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <label for="secondaryColor" class="block text-gray-300 w-32">Secondary Color</label>
+                                    <input type="color" id="secondaryColor" name="secondaryColor" value="#10b981" class="w-16 h-10 border-none rounded cursor-pointer">
+                                    <input type="text" id="secondaryColorText" value="#10b981" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary">
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <label for="accentColor" class="block text-gray-300 w-32">Accent Color</label>
+                                    <input type="color" id="accentColor" name="accentColor" value="#8b5cf6" class="w-16 h-10 border-none rounded cursor-pointer">
+                                    <input type="text" id="accentColorText" value="#8b5cf6" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <h4 class="font-semibold mb-3">Preset Themes</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="default">
+                                        <div class="flex space-x-2 mb-1">
+                                            <div class="w-4 h-4 rounded" style="background: #3b82f6"></div>
+                                            <div class="w-4 h-4 rounded" style="background: #10b981"></div>
+                                            <div class="w-4 h-4 rounded" style="background: #8b5cf6"></div>
+                                        </div>
+                                        Default
+                                    </button>
+                                    <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="ocean">
+                                        <div class="flex space-x-2 mb-1">
+                                            <div class="w-4 h-4 rounded" style="background: #0ea5e9"></div>
+                                            <div class="w-4 h-4 rounded" style="background: #06b6d4"></div>
+                                            <div class="w-4 h-4 rounded" style="background: #3b82f6"></div>
+                                        </div>
+                                        Ocean
+                                    </button>
+                                    <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="forest">
+                                        <div class="flex space-x-2 mb-1">
+                                            <div class="w-4 h-4 rounded" style="background: #059669"></div>
+                                            <div class="w-4 h-4 rounded" style="background: #16a34a"></div>
+                                            <div class="w-4 h-4 rounded" style="background: #65a30d"></div>
+                                        </div>
+                                        Forest
+                                    </button>
+                                    <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="sunset">
+                                        <div class="flex space-x-2 mb-1">
+                                            <div class="w-4 h-4 rounded" style="background: #ea580c"></div>
+                                            <div class="w-4 h-4 rounded" style="background: #dc2626"></div>
+                                            <div class="w-4 h-4 rounded" style="background: #c2410c"></div>
+                                        </div>
+                                        Sunset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-3">Logo & Branding</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="logo-upload" class="block text-gray-300 mb-2">Upload Logo</label>
+                                    <input type="file" id="logo-upload" accept="image/*" class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-primary file:text-white hover:file:bg-secondary">
+                                    <p class="text-xs text-gray-400 mt-1">Recommended: 200x50px, PNG or SVG</p>
+                                </div>
+                                <div id="logo-preview" class="hidden">
+                                    <label class="block text-gray-300 mb-2">Logo Preview</label>
+                                    <div class="p-4 bg-gray-700 rounded flex items-center justify-center">
+                                        <img id="logo-preview-img" src="" alt="Logo Preview" class="max-h-16 max-w-48">
+                                    </div>
+                                    <button type="button" id="remove-logo" class="mt-2 text-sm text-red-400 hover:text-red-300">Remove Logo</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-600">
+                        <button type="button" id="apply-theme" class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 font-semibold">Apply Theme Changes</button>
+                    </div>
+                </div>
+
+                <!-- Security Settings Tab -->
+                <div id="security-tab" class="tab-content p-6 hidden">
+                    <h3 class="font-semibold mb-4 text-xl">Security Settings</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label for="session-timeout" class="block mb-2 font-medium">Session Timeout (minutes)</label>
+                            <select id="session-timeout" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="30">30 minutes</option>
+                                <option value="60" selected>1 hour</option>
+                                <option value="120">2 hours</option>
+                                <option value="240">4 hours</option>
+                                <option value="480">8 hours</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="max-login-attempts" class="block mb-2 font-medium">Max Login Attempts</label>
+                            <input type="number" id="max-login-attempts" min="3" max="10" value="5" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="enable-2fa" class="mr-2 text-primary focus:ring-primary">
+                                <span class="font-medium">Enable Two-Factor Authentication (Future Feature)</span>
+                            </label>
+                        </div>
+                        
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="audit-all-actions" class="mr-2 text-primary focus:ring-primary" checked>
+                                <span class="font-medium">Log all administrative actions</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-600">
+                        <button type="button" id="save-security" class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 font-semibold">Save Security Settings</button>
+                    </div>
+                </div>
+
+                <!-- Audit Log Tab -->
+                <div id="audit-tab" class="tab-content p-6 hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-xl">Audit Log</h3>
+                        <div class="flex space-x-2">
+                            <button type="button" id="export-audit-log" class="px-4 py-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm">Export Log</button>
+                            <button type="button" id="clear-audit-log" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm">Clear Log</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex space-x-4">
+                            <select id="audit-filter" class="p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="all">All Actions</option>
+                                <option value="settings">Settings Changes</option>
+                                <option value="users">User Management</option>
+                                <option value="orders">Order Management</option>
+                                <option value="login">Login/Logout</option>
+                            </select>
+                            <input type="date" id="audit-date-filter" class="p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+                    
+                    <div id="audit-log-container" class="bg-gray-700 rounded max-h-96 overflow-y-auto">
+                        <div id="audit-log-list" class="divide-y divide-gray-600">
+                            <!-- Audit log entries will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Preview Panel -->
+            <div class="bg-gray-800 p-6 rounded shadow">
                     <h3 class="font-semibold mb-4">Current Settings (Preview)</h3>
                     <div class="space-y-3 text-sm text-gray-300 settings-preview">
                         <div class="flex justify-between">
@@ -497,6 +659,148 @@
 
     <script>
 
+        // Audit Logging System
+        class AuditLogger {
+            static log(action, details, userId = 'admin') {
+                const auditLogs = JSON.parse(localStorage.getItem('auditLogs') || '[]');
+                const logEntry = {
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    userId: userId,
+                    action: action,
+                    details: details,
+                    ip: 'localhost' // In a real app, this would be the actual IP
+                };
+                
+                auditLogs.unshift(logEntry); // Add to beginning
+                
+                // Keep only last 1000 entries to prevent storage bloat
+                if (auditLogs.length > 1000) {
+                    auditLogs.splice(1000);
+                }
+                
+                localStorage.setItem('auditLogs', JSON.stringify(auditLogs));
+                
+                // Trigger custom event for real-time updates
+                window.dispatchEvent(new CustomEvent('auditLogUpdated', { detail: logEntry }));
+            }
+            
+            static getLogs(filter = 'all', dateFilter = null) {
+                const auditLogs = JSON.parse(localStorage.getItem('auditLogs') || '[]');
+                
+                return auditLogs.filter(log => {
+                    // Filter by action type
+                    if (filter !== 'all' && !log.action.toLowerCase().includes(filter)) {
+                        return false;
+                    }
+                    
+                    // Filter by date
+                    if (dateFilter) {
+                        const logDate = new Date(log.timestamp).toDateString();
+                        const filterDate = new Date(dateFilter).toDateString();
+                        if (logDate !== filterDate) {
+                            return false;
+                        }
+                    }
+                    
+                    return true;
+                });
+            }
+            
+            static clearLogs() {
+                localStorage.removeItem('auditLogs');
+                window.dispatchEvent(new CustomEvent('auditLogCleared'));
+            }
+        }
+
+        // Input validation functions
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        function validateRequired(value) {
+            return value && value.trim().length > 0;
+        }
+        
+        function validateLength(value, min = 0, max = 255) {
+            return value.length >= min && value.length <= max;
+        }
+        
+        function validateColor(color) {
+            const re = /^#[0-9A-F]{6}$/i;
+            return re.test(color);
+        }
+        
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const existingError = field.parentNode.querySelector('.error-message');
+            
+            field.classList.add('input-error');
+            field.classList.remove('input-success');
+            
+            if (existingError) {
+                existingError.textContent = message;
+            } else {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                field.parentNode.appendChild(errorDiv);
+            }
+        }
+        
+        function showFieldSuccess(fieldId) {
+            const field = document.getElementById(fieldId);
+            const existingError = field.parentNode.querySelector('.error-message');
+            
+            field.classList.remove('input-error');
+            field.classList.add('input-success');
+            
+            if (existingError) {
+                existingError.remove();
+            }
+        }
+        
+        function clearFieldStatus(fieldId) {
+            const field = document.getElementById(fieldId);
+            const existingError = field.parentNode.querySelector('.error-message');
+            
+            field.classList.remove('input-error', 'input-success');
+            
+            if (existingError) {
+                existingError.remove();
+            }
+        }
+
+        // Tab functionality
+        function initTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.getAttribute('data-tab');
+                    
+                    // Update button states
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active', 'bg-primary', 'text-white');
+                        btn.classList.add('text-gray-300', 'hover:text-white', 'hover:bg-gray-700');
+                    });
+                    button.classList.add('active', 'bg-primary', 'text-white');
+                    button.classList.remove('text-gray-300', 'hover:text-white', 'hover:bg-gray-700');
+                    
+                    // Update content visibility
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    document.getElementById(targetTab + '-tab').classList.remove('hidden');
+                    
+                    // Log tab change
+                    AuditLogger.log('settings_navigation', `Accessed ${targetTab} settings tab`);
+                });
+            });
+        }
+
         // Show toast notification
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -639,19 +943,91 @@
             }
         }
 
-        // Save settings to localStorage
+        // Save settings to localStorage with validation and audit logging
         function saveSettings() {
             const settings = getFormSettings();
+            
+            // Validate settings
+            let isValid = true;
+            
+            if (!validateRequired(settings['site-title'])) {
+                showFieldError('site-title', 'Site title is required');
+                isValid = false;
+            } else if (!validateLength(settings['site-title'], 1, 100)) {
+                showFieldError('site-title', 'Site title must be 1-100 characters');
+                isValid = false;
+            } else {
+                showFieldSuccess('site-title');
+            }
+            
+            if (!validateRequired(settings['site-description'])) {
+                showFieldError('site-description', 'Site description is required');
+                isValid = false;
+            } else if (!validateLength(settings['site-description'], 1, 500)) {
+                showFieldError('site-description', 'Site description must be 1-500 characters');
+                isValid = false;
+            } else {
+                showFieldSuccess('site-description');
+            }
+            
+            if (!validateEmail(settings['contact-email'])) {
+                showFieldError('contact-email', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                showFieldSuccess('contact-email');
+            }
+            
+            if (!validateRequired(settings['homepage-message'])) {
+                showFieldError('homepage-message', 'Homepage message is required');
+                isValid = false;
+            } else if (!validateLength(settings['homepage-message'], 1, 200)) {
+                showFieldError('homepage-message', 'Homepage message must be 1-200 characters');
+                isValid = false;
+            } else {
+                showFieldSuccess('homepage-message');
+            }
+            
+            if (!isValid) {
+                showToast('Please fix validation errors before saving');
+                return;
+            }
+            
+            // Get previous settings for comparison
+            const previousSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+            
+            // Save settings
             localStorage.setItem('siteSettings', JSON.stringify(settings));
+            
+            // Log changes
+            const changes = [];
+            Object.keys(settings).forEach(key => {
+                if (previousSettings[key] !== settings[key]) {
+                    changes.push(`${key}: "${previousSettings[key] || 'none'}" → "${settings[key]}"`);
+                }
+            });
+            
+            if (changes.length > 0) {
+                AuditLogger.log('settings_change', `Modified settings: ${changes.join(', ')}`);
+            }
+            
             showToast('Settings saved successfully!');
             applySettings(settings);
         }
 
-        // Add event listeners for real-time preview updates
-        document.getElementById('site-title').addEventListener('input', updatePreview);
-        document.getElementById('site-description').addEventListener('input', updatePreview);
+        // Add event listeners for real-time preview updates with validation
+        document.getElementById('site-title').addEventListener('input', (e) => {
+            clearFieldStatus('site-title');
+            updatePreview();
+        });
+        document.getElementById('site-description').addEventListener('input', (e) => {
+            clearFieldStatus('site-description');
+            updatePreview();
+        });
         document.getElementById('theme').addEventListener('change', updatePreview);
-        document.getElementById('contact-email').addEventListener('input', updatePreview);
+        document.getElementById('contact-email').addEventListener('input', (e) => {
+            clearFieldStatus('contact-email');
+            updatePreview();
+        });
         document.getElementById('maintenance-mode').addEventListener('change', updatePreview);
         document.getElementById('homepage-message').addEventListener('input', updatePreview);
         document.getElementById('homepage-subtitle').addEventListener('input', updatePreview);
@@ -665,10 +1041,11 @@
             saveSettings();
         });
 
-        // Quick action buttons
+        // Quick action buttons with audit logging
         document.querySelector('[data-action="clear-cache"]').addEventListener('click', () => {
             localStorage.removeItem('user');
             localStorage.removeItem('siteUsers');
+            AuditLogger.log('cache_clear', 'Cleared user cache and site users data');
             showToast('Cache cleared successfully!');
         });
 
@@ -683,14 +1060,44 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            AuditLogger.log('settings_export', 'Exported site settings configuration');
             showToast('Settings exported successfully!');
         });
 
         document.querySelector('[data-action="reset-defaults"]').addEventListener('click', () => {
             if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
+                const previousSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
                 localStorage.removeItem('siteSettings');
                 loadSettings();
+                AuditLogger.log('settings_reset', `Reset all settings to defaults. Previous settings: ${JSON.stringify(previousSettings)}`);
                 showToast('Settings reset to defaults!');
+            }
+        });
+
+        // Initialize all functionality when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Log page access
+            AuditLogger.log('page_access', 'Accessed Settings page');
+            
+            // Initialize components
+            initTabs();
+            initThemeCustomization();
+            initSecuritySettings();
+            initAuditLog();
+            
+            // Load settings
+            loadSettings();
+            
+            // Load and apply saved theme colors
+            const savedTheme = JSON.parse(localStorage.getItem('themeSettings') || '{}');
+            if (savedTheme.primaryColor) {
+                document.getElementById('primaryColor').value = savedTheme.primaryColor;
+                document.getElementById('primaryColorText').value = savedTheme.primaryColor;
+                document.getElementById('secondaryColor').value = savedTheme.secondaryColor;
+                document.getElementById('secondaryColorText').value = savedTheme.secondaryColor;
+                document.getElementById('accentColor').value = savedTheme.accentColor;
+                document.getElementById('accentColorText').value = savedTheme.accentColor;
+                applyColors(savedTheme);
             }
         });
 
