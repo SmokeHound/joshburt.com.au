@@ -163,14 +163,9 @@
         <div class="lg:col-span-2" role="region" aria-label="Product selection">
           <p class="mb-4 text-gray-300">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
           
-          <!-- Search and Filter Controls -->
+          <!-- Filter Controls -->
           <div class="mb-4 bg-gray-800 p-4 rounded">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label for="product-search" class="block text-sm font-medium text-gray-300 mb-1">Search Products</label>
-                <input type="text" id="product-search" placeholder="Search by name, code, or specs..." 
-                       class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-primary">
-              </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label for="sort-by" class="block text-sm font-medium text-gray-300 mb-1">Sort By</label>
                 <select id="sort-by" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-primary">
@@ -405,7 +400,6 @@
     let currentOrder = {};
     let currentType = 'Engine oil';
     let currentFilters = {
-      search: '',
       sortBy: 'name',
       stockFilter: 'all'
     };
@@ -641,20 +635,9 @@
     };
 
 
-    // Filter and search products
+    // Filter products
     function filterProducts(products) {
       let filtered = [...products];
-      
-      // Apply search filter
-      if (currentFilters.search) {
-        const searchTerm = currentFilters.search.toLowerCase();
-        filtered = filtered.filter(product => 
-          product.name.toLowerCase().includes(searchTerm) ||
-          product.code.toLowerCase().includes(searchTerm) ||
-          product.specs.toLowerCase().includes(searchTerm) ||
-          product.description.toLowerCase().includes(searchTerm)
-        );
-      }
       
       // Apply stock filter
       const inventory = JSON.parse(localStorage.getItem('cachedInventory') || '{}');
@@ -895,18 +878,10 @@
         }
       });
       
-      // Search and filter event handlers
-      const searchInput = document.getElementById('product-search');
+      // Filter event handlers
       const sortSelect = document.getElementById('sort-by');
       const stockSelect = document.getElementById('stock-filter');
       const clearFiltersBtn = document.getElementById('clear-filters');
-      
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          currentFilters.search = e.target.value;
-          renderProductsByType(currentType);
-        });
-      }
       
       if (sortSelect) {
         sortSelect.addEventListener('change', (e) => {
@@ -925,12 +900,10 @@
       if (clearFiltersBtn) {
         clearFiltersBtn.addEventListener('click', () => {
           currentFilters = {
-            search: '',
             sortBy: 'name',
             stockFilter: 'all'
           };
           
-          searchInput.value = '';
           sortSelect.value = 'name';
           stockSelect.value = 'all';
           
