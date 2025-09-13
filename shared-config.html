@@ -1,5 +1,15 @@
 <!-- Shared Tailwind CSS Configuration and Common Styles -->
 <link rel="stylesheet" href="./assets/css/styles.css">
+<!-- Ensure proper viewport meta tag is present -->
+<script>
+    // Verify viewport meta tag exists
+    if (!document.querySelector('meta[name="viewport"]')) {
+        const viewport = document.createElement('meta');
+        viewport.name = 'viewport';
+        viewport.content = 'width=device-width, initial-scale=1.0, user-scalable=yes';
+        document.head.appendChild(viewport);
+    }
+</script>
 <script>
     // Configuration for dynamic color updates from settings
     function applyDynamicColors() {
@@ -24,8 +34,8 @@
         color: #1f2937;
     }
     
-    /* Mobile sidebar styles */
-    @media (max-width: 767px) {
+    /* Mobile sidebar styles - Unified for all pages */
+    @media (max-width: 768px) {
         .sidebar {
             transform: translateX(-100%);
             transition: transform 0.3s ease-in-out;
@@ -54,19 +64,65 @@
         body.sidebar-open {
             overflow: hidden;
         }
+        
+        /* Enhanced touch targets for mobile */
+        button, input, select, textarea {
+            min-height: 44px;
+        }
+        
+        /* Mobile-specific content adjustments */
+        main {
+            margin-left: 0;
+        }
+        
+        /* Oil ordering system mobile adjustments */
+        .lg\:col-span-2 {
+            grid-column: span 1;
+        }
+        .lg\:col-span-1 {
+            grid-column: span 1;
+        }
     }
     
-    /* Tablet optimizations */
+    /* Tablet optimizations - Enhanced for better tablet experience */
     @media (min-width: 768px) and (max-width: 1023px) {
         .sidebar {
             width: 200px;
         }
+        main {
+            margin-left: 200px;
+        }
+        
+        /* Tablet grid density improvements */
+        .grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        
+        /* Better card spacing for tablets */
+        .card {
+            min-height: 120px;
+        }
     }
     
-    /* Enhanced touch targets for mobile */
-    @media (max-width: 767px) {
-        button, input, select, textarea {
-            min-height: 44px;
+    /* Large mobile/small tablet specific */
+    @media (min-width: 480px) and (max-width: 767px) {
+        .grid-cols-1 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+    
+    /* Wide desktop optimizations */
+    @media (min-width: 1200px) {
+        .sidebar {
+            width: 280px;
+        }
+        main {
+            margin-left: 280px;
+        }
+        
+        /* Better use of screen real estate */
+        .lg\:grid-cols-3 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
         }
     }
     
@@ -76,5 +132,38 @@
     .card:hover {
         transform: translateY(-4px);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Responsive image handling */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    /* Progressive image loading */
+    img[data-src] {
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    img[data-src].loaded {
+        opacity: 1;
+    }
+    
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+        
+        .card {
+            transition: none;
+        }
+        
+        .card:hover {
+            transform: none;
+        }
     }
 </style>
