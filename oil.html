@@ -152,6 +152,38 @@
         <div class="lg:col-span-2" role="region" aria-label="Product selection">
           <p class="mb-4 text-gray-300">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
           
+          <!-- Filter Controls -->
+          <div class="mb-4 bg-gray-800 p-4 rounded">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="sort-by" class="block text-sm font-medium text-gray-300 mb-1">Sort By</label>
+                <select id="sort-by" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="name">Name (A-Z)</option>
+                  <option value="code">Product Code</option>
+                  <option value="price">Price (Low to High)</option>
+                  <option value="stock">Stock Status</option>
+                </select>
+              </div>
+              <div>
+                <label for="stock-filter" class="block text-sm font-medium text-gray-300 mb-1">Stock Filter</label>
+                <select id="stock-filter" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="all">All Products</option>
+                  <option value="in-stock">In Stock Only</option>
+                  <option value="low-stock">Low Stock</option>
+                  <option value="out-of-stock">Out of Stock</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+              <div class="text-sm text-gray-400">
+                <span id="product-count">Loading...</span> products found
+              </div>
+              <button id="clear-filters" class="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                Clear Filters
+              </button>
+            </div>
+          </div>
+          
           <!-- Product tabs -->
           <div id="productTypeTabs" class="mb-6" role="tablist" aria-label="Product categories">
             <nav class="flex space-x-1 rounded-lg bg-gray-800 p-1">
@@ -356,6 +388,10 @@
     // Global variables
     let currentOrder = {};
     let currentType = 'Engine oil';
+    let currentFilters = {
+      sortBy: 'name',
+      stockFilter: 'all'
+    };
 
 
     // Render the order summary
@@ -588,11 +624,69 @@
     };
 
 
+    // Filter products
+    function filterProducts(products) {
+      let filtered = [...products];
+      
+      // Apply stock filter
+      const inventory = JSON.parse(localStorage.getItem('cachedInventory') || '{}');
+      if (currentFilters.stockFilter !== 'all') {
+        filtered = filtered.filter(product => {
+          const stock = inventory[product.code] || { inStock: true, quantity: '?' };
+          switch (currentFilters.stockFilter) {
+            case 'in-stock':
+              return stock.inStock && stock.quantity !== '0';
+            case 'low-stock':
+              return stock.inStock && typeof stock.quantity === 'number' && stock.quantity <= 10;
+            case 'out-of-stock':
+              return !stock.inStock || stock.quantity === '0';
+            default:
+              return true;
+          }
+        });
+      }
+      
+      // Apply sorting
+      filtered.sort((a, b) => {
+        const stockA = inventory[a.code] || { inStock: true, quantity: '?', price: 50 };
+        const stockB = inventory[b.code] || { inStock: true, quantity: '?', price: 50 };
+        
+        switch (currentFilters.sortBy) {
+          case 'name':
+            return a.name.localeCompare(b.name);
+          case 'code':
+            return a.code.localeCompare(b.code);
+          case 'price':
+            return (stockA.price || 50) - (stockB.price || 50);
+          case 'stock':
+            if (stockA.inStock !== stockB.inStock) {
+              return stockB.inStock - stockA.inStock; // In stock first
+            }
+            return (stockB.quantity || 0) - (stockA.quantity || 0); // Higher quantity first
+          default:
+            return 0;
+        }
+      });
+      
+      return filtered;
+    }
+
+    // Update product count display
+    function updateProductCount(count) {
+      const productCountElement = document.getElementById('product-count');
+      if (productCountElement) {
+        productCountElement.textContent = count;
+      }
+    }
+
     // Render products by type with inventory integration
     async function renderProductsByType(type) {
       productsContainer.innerHTML = '<p class="text-center text-gray-400">Loading products...</p>';
       
-      const filteredOils = oils.filter(oil => oil.type === type);
+      const typeFilteredOils = oils.filter(oil => oil.type === type);
+      const filteredOils = filterProducts(typeFilteredOils);
+      updateProductCount(filteredOils.length);
+      
       const productCodes = filteredOils.map(oil => oil.code);
       
       // Check inventory for all products
@@ -612,12 +706,24 @@
       // Clear loading message
       productsContainer.innerHTML = '';
       
+      if (filteredOils.length === 0) {
+        productsContainer.innerHTML = '<p class="text-center text-gray-400 py-8">No products found matching your criteria.</p>';
+        return;
+      }
+      
       filteredOils.forEach((oil) => {
         const inventoryInfo = inventory[oil.code] || { inStock: true, quantity: '?', price: 50 };
         const stockStatus = inventoryInfo.inStock ? 'In Stock' : 'Out of Stock';
         const stockClass = inventoryInfo.inStock ? 'text-green-400' : 'text-red-400';
         const buttonDisabled = !inventoryInfo.inStock ? 'disabled opacity-50 cursor-not-allowed' : '';
         const priceDisplay = inventoryInfo.price ? `$${inventoryInfo.price.toFixed(2)}` : 'Price TBD';
+        
+        // Generate responsive image HTML
+        const imageHtml = oil.image ? 
+            `<img src="${oil.image}" alt="${oil.name}" class="w-full h-32 object-cover rounded mb-2" loading="lazy" onerror="this.style.display='none'">` :
+            `<div class="w-full h-32 bg-gray-600 rounded mb-2 flex items-center justify-center text-gray-400">
+                <span class="text-sm">🛢️ ${oil.name}</span>
+            </div>`;
         
         const cardHtml = `
           <div class="p-4 bg-gray-700 rounded shadow card product-card" data-index="${oils.indexOf(oil)}">
@@ -639,6 +745,7 @@
             </div>
             <div class="product-details hidden">
               <p class="text-gray-300 text-sm mb-1"><strong>Specifications:</strong> ${oil.specs}</p>
+              <p class="text-gray-300 text-sm mb-1"><strong>Description:</strong> ${oil.description}</p>
               <p class="text-sm"><strong>Product Code:</strong> ${oil.code}</p>
             </div>
           </div>
@@ -759,6 +866,40 @@
           confirmModal.classList.add('hidden');
         }
       });
+      
+      // Filter event handlers
+      const sortSelect = document.getElementById('sort-by');
+      const stockSelect = document.getElementById('stock-filter');
+      const clearFiltersBtn = document.getElementById('clear-filters');
+      
+      if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+          currentFilters.sortBy = e.target.value;
+          renderProductsByType(currentType);
+        });
+      }
+      
+      if (stockSelect) {
+        stockSelect.addEventListener('change', (e) => {
+          currentFilters.stockFilter = e.target.value;
+          renderProductsByType(currentType);
+        });
+      }
+      
+      if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', () => {
+          currentFilters = {
+            sortBy: 'name',
+            stockFilter: 'all'
+          };
+          
+          sortSelect.value = 'name';
+          stockSelect.value = 'all';
+          
+          renderProductsByType(currentType);
+          showToast('Filters cleared', 'info');
+        });
+      }
     };
   </script>
 </body>
