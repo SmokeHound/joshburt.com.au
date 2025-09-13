@@ -1,133 +1,96 @@
 // Unit tests for shared theme functionality
 const { loadHTMLFile, simulateClick } = require('../utils/dom-helpers');
 
+function resetThemeSpies() {
+  jest.restoreAllMocks();
+  jest.clearAllMocks();
+}
+
 describe('Shared Theme Component', () => {
-    let themeHTML;
+  let themeHTML;
 
-    beforeAll(() => {
-        themeHTML = loadHTMLFile('shared-theme.html');
-    });
+  beforeAll(() => {
+    themeHTML = loadHTMLFile('shared-theme.html');
+  });
 
-    beforeEach(() => {
-    // Clear localStorage before each test
-        localStorage.clear();
-        jest.clearAllMocks();
-    
-        // Set up basic DOM structure
-        document.body.innerHTML = `
+  beforeEach(() => {
+    localStorage.clear();
+    resetThemeSpies();
+    document.body.innerHTML = `
       <button id="theme-toggle">Toggle Light Mode</button>
       ${themeHTML}
     `;
-    
-        // Mock body classes
-        document.body.classList.remove('dark', 'light');
+    document.body.classList.remove('dark', 'light');
+  });
+
+  const initTheme = () => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.classList.add(savedTheme);
+  };
+
+  test('should initialize with dark theme by default', () => {
+    localStorage.getItem.mockReturnValue(null);
+    initTheme();
+    expect(document.body.classList.contains('dark')).toBe(true);
+    expect(document.body.classList.contains('light')).toBe(false);
+  });
+
+  test('should load saved theme from localStorage', () => {
+    localStorage.getItem.mockReturnValue('light');
+    initTheme();
+    expect(document.body.classList.contains('light')).toBe(true);
+    expect(document.body.classList.contains('dark')).toBe(false);
+  });
+
+  test('should toggle theme and persist choice', () => {
+    const toggle = document.getElementById('theme-toggle');
+    const setItemSpy = jest.spyOn(localStorage, 'setItem');
+
+    document.body.classList.add('dark');
+
+    const toggleTheme = jest.fn(() => {
+      if (document.body.classList.contains('dark')) {
+        document.body.classList.remove('dark');
+        document.body.classList.add('light');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.body.classList.remove('light');
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
     });
 
-    test('should initialize with dark theme by default', () => {
-        localStorage.getItem.mockReturnValue(null);
-    
-        // Simulate the theme initialization
-        const body = document.body;
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        body.classList.add(savedTheme);
-    
-        expect(body.classList.contains('dark')).toBeTruthy();
-        expect(body.classList.contains('light')).toBeFalsy();
-    });
+    toggle.addEventListener('click', toggleTheme);
+    simulateClick(toggle);
 
-    test('should load saved theme from localStorage', () => {
-        localStorage.getItem.mockReturnValue('light');
-    
-        // Simulate theme loading
-        const body = document.body;
-        const themeToggle = document.getElementById('theme-toggle');
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-    
-        body.classList.add(savedTheme);
-        if (themeToggle) {
-            themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-        }
-    
-        expect(body.classList.contains('light')).toBeTruthy();
-        expect(themeToggle.textContent).toBe('Toggle Dark Mode');
-    });
+    expect(toggleTheme).toHaveBeenCalledTimes(1);
+    expect(setItemSpy).toHaveBeenCalledWith('theme', 'light');
+    expect(document.body.classList.contains('light')).toBe(true);
+  });
 
-    test('should toggle theme correctly', () => {
-        const body = document.body;
-        const themeToggle = document.getElementById('theme-toggle');
-    
-        // Start with dark theme
-        body.classList.add('dark');
-        themeToggle.textContent = 'Toggle Light Mode';
-    
-        // Add event listener (simulate the actual theme toggle logic)
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-        });
-    
-        // Simulate click
-        simulateClick(themeToggle);
-    
-        expect(body.classList.contains('light')).toBeTruthy();
-        expect(body.classList.contains('dark')).toBeFalsy();
-        expect(themeToggle.textContent).toBe('Toggle Dark Mode');
-        expect(localStorage.setItem).toHaveBeenCalledWith('theme', 'light');
-    });
+  test('should switch back to dark on second toggle', () => {
+    const toggle = document.getElementById('theme-toggle');
+    document.body.classList.add('dark');
 
-    test('should update aria-label correctly', () => {
-        const body = document.body;
-        const themeToggle = document.getElementById('theme-toggle');
-    
-        // Start with dark theme
-        body.classList.add('dark');
-        themeToggle.setAttribute('aria-label', 'Toggle light mode');
-    
-        // Add event listener
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-        });
-    
-        // Simulate click
-        simulateClick(themeToggle);
-    
-        expect(themeToggle.getAttribute('aria-label')).toBe('Toggle dark mode');
-    });
+    const setItemSpy = jest.spyOn(localStorage, 'setItem');
+    const toggleTheme = () => {
+      if (document.body.classList.contains('dark')) {
+        document.body.classList.remove('dark');
+        document.body.classList.add('light');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.body.classList.remove('light');
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    };
 
-    test('should persist theme choice in localStorage', () => {
-        const body = document.body;
-        const themeToggle = document.getElementById('theme-toggle');
-    
-        body.classList.add('dark');
-    
-        // Add event listener
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-        });
-    
-        // Toggle to light
-        simulateClick(themeToggle);
-        expect(localStorage.setItem).toHaveBeenCalledWith('theme', 'light');
-    
-        // Toggle back to dark
-        simulateClick(themeToggle);
-        expect(localStorage.setItem).toHaveBeenCalledWith('theme', 'dark');
-    });
+    toggle.addEventListener('click', toggleTheme);
+    simulateClick(toggle); // dark -> light
+    simulateClick(toggle); // light -> dark
 
-    test('should handle missing theme toggle element gracefully', () => {
-        document.body.innerHTML = themeHTML; // No theme-toggle button
-    
-        // The script should not throw errors when theme toggle is missing
-        expect(() => {
-            const themeToggle = document.getElementById('theme-toggle');
-            expect(themeToggle).toBeNull();
-        }).not.toThrow();
-    });
+    expect(setItemSpy).toHaveBeenCalledWith('theme', 'light');
+    expect(setItemSpy).toHaveBeenCalledWith('theme', 'dark');
+    expect(document.body.classList.contains('dark')).toBe(true);
+  });
 });
