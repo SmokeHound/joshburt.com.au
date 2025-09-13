@@ -84,13 +84,21 @@
             }
         }
         
-        /* Tablet optimizations */
         @media (min-width: 768px) and (max-width: 1023px) {
             .sidebar {
                 width: 200px;
             }
             main {
                 margin-left: 200px;
+            }
+        }
+        /* Tablet and desktop optimizations */
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 16rem;
+            }
+            main {
+                margin-left: 16rem;
             }
         }
     </style>

@@ -49,7 +49,6 @@
             background-color: #f9fafb;
             color: #1f2937;
         }
-        .sidebar {
             transition: transform 0.3s ease-in-out;
         }
         @media (max-width: 768px) {
@@ -57,6 +56,14 @@
                 transform: translateX(-100%);
             }
             .sidebar.open {
+            @media (min-width: 768px) {
+                .sidebar {
+                    width: 16rem;
+                }
+                main {
+                    margin-left: 16rem;
+                }
+            }
                 transform: translateX(0);
             }
         }

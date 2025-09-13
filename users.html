@@ -52,7 +52,6 @@
         .sidebar {
             transition: transform 0.3s ease-in-out;
         }
-        @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
             }
@@ -66,6 +65,29 @@
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 16rem;
+            }
+            main {
+                margin-left: 16rem;
+            }
         }
     </style>
 </head>

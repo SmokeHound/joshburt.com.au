@@ -133,7 +133,6 @@
                             <option value="admin">Admin Users</option>
                             <option value="user">Regular Users</option>
                         </select>
-                    </div>
                     
                     <!-- Export Options -->
                     <div class="flex flex-col gap-2">
@@ -141,6 +140,14 @@
                         <div class="flex gap-2">
                             <button id="export-csv" class="px-3 py-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary">
                                 Export CSV
+                            @media (min-width: 768px) {
+                                .sidebar {
+                                    width: 16rem;
+                                }
+                                main {
+                                    margin-left: 16rem;
+                                }
+                            }
                             </button>
                             <button id="export-pdf" class="px-3 py-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-accent">
                                 Export PDF

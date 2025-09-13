@@ -107,7 +107,7 @@
   </div>
 
   <!-- Mobile Menu Toggle -->
-  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
     <span aria-hidden="true">☰</span>
     <span class="sr-only">Menu</span>
   </button>
@@ -115,42 +115,31 @@
   <!-- Toast Notification -->
   <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
-  <!-- Mobile Menu Toggle -->
-  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
-    ☰
-  </button>
-
   <!-- Mobile sidebar backdrop -->
   <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
 
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
-    <!-- App Branding -->
-    <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
-
-    <!-- Navigation -->
-    <nav role="navigation" aria-label="Main navigation">
-      <ul class="space-y-2" role="list">
-        <li role="listitem"><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
-        <li role="listitem"><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
-        <li role="listitem"><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-        <li role="listitem"><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-        <li role="listitem"><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
-        <li role="listitem"><a href="oil.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Orders</a></li>
-        <li role="listitem"><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
-      </ul>
-    </nav>
-
-    <!-- Theme Toggle -->
-    <div class="mt-auto">
-      <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode" aria-pressed="false">
-        Toggle Light Mode
-      </button>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main id="main-content" class="flex-1 p-4" role="main">
+    .sidebar {
+      transition: transform 0.3s ease-in-out;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      main {
+        margin-left: 0;
+      }
+    }
+    @media (min-width: 768px) {
+      .sidebar {
+        width: 16rem;
+      }
+      main {
+        margin-left: 16rem;
+      }
+    }
     <!-- Sticky Header -->
     <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10" role="banner">
       <h2 class="text-3xl font-semibold" id="welcome-message">Castrol Products</h2>
