@@ -52,26 +52,15 @@
         .sidebar {
             transition: transform 0.3s ease-in-out;
         }
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-                    const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
             }
             .sidebar.open {
                 transform: translateX(0);
+            }
+            main {
+                margin-left: 0;
             }
         }
         .card {
