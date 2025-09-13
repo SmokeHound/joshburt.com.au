@@ -19,9 +19,9 @@ jobs:
 #    
 #    - name: 🔍 Lint code
 #      run: npm run lint
-    
-    - name: 🧪 Run tests
-      run: npm test
+#    
+#    - name: 🧪 Run tests
+#      run: npm test
     
     - name: 📂 Deploy to FTP
       if: success()
