@@ -192,12 +192,12 @@
                     <div class="grid grid-cols-1 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-400 mb-1">Dark mode starts at</label>
-                            <input type="time" id="dark-mode-start" value="18:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="time" id="dark-mode-start" value="18:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500" title="Set dark mode start time" placeholder="18:00" aria-label="Dark mode start time">
                         </div>
                         
                         <div>
                             <label class="block text-xs font-medium text-gray-400 mb-1">Light mode starts at</label>
-                            <input type="time" id="light-mode-start" value="06:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="time" id="light-mode-start" value="06:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500" title="Set light mode start time" placeholder="06:00" aria-label="Light mode start time">
                         </div>
                     </div>
 
@@ -344,17 +344,17 @@
                                 <div class="flex items-center space-x-3">
                                     <label for="primaryColor" class="block text-gray-300 w-32">Primary Color</label>
                                     <input type="color" id="primaryColor" name="primaryColor" value="#3b82f6" class="w-16 h-10 border-none rounded cursor-pointer">
-                                    <input type="text" id="primaryColorText" value="#3b82f6" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary">
+                                    <input type="text" id="primaryColorText" value="#3b82f6" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary" title="Primary color hex code" placeholder="#3b82f6" aria-label="Primary color hex">
                                 </div>
                                 <div class="flex items-center space-x-3">
                                     <label for="secondaryColor" class="block text-gray-300 w-32">Secondary Color</label>
                                     <input type="color" id="secondaryColor" name="secondaryColor" value="#10b981" class="w-16 h-10 border-none rounded cursor-pointer">
-                                    <input type="text" id="secondaryColorText" value="#10b981" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary">
+                                    <input type="text" id="secondaryColorText" value="#10b981" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary" title="Secondary color hex code" placeholder="#10b981" aria-label="Secondary color hex">
                                 </div>
                                 <div class="flex items-center space-x-3">
                                     <label for="accentColor" class="block text-gray-300 w-32">Accent Color</label>
                                     <input type="color" id="accentColor" name="accentColor" value="#8b5cf6" class="w-16 h-10 border-none rounded cursor-pointer">
-                                    <input type="text" id="accentColorText" value="#8b5cf6" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary">
+                                    <input type="text" id="accentColorText" value="#8b5cf6" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary" title="Accent color hex code" placeholder="#8b5cf6" aria-label="Accent color hex">
                                 </div>
                             </div>
                             
@@ -363,33 +363,33 @@
                                 <div class="grid grid-cols-2 gap-3">
                                     <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="default">
                                         <div class="flex space-x-2 mb-1">
-                                            <div class="w-4 h-4 rounded" style="background: #3b82f6"></div>
-                                            <div class="w-4 h-4 rounded" style="background: #10b981"></div>
-                                            <div class="w-4 h-4 rounded" style="background: #8b5cf6"></div>
+                                            <div class="w-4 h-4 rounded bg-primary-custom" title="#3b82f6" aria-label="Primary color"></div>
+                                            <div class="w-4 h-4 rounded bg-secondary-custom" title="#10b981" aria-label="Secondary color"></div>
+                                            <div class="w-4 h-4 rounded bg-accent-custom" title="#8b5cf6" aria-label="Accent color"></div>
                                         </div>
                                         Default
                                     </button>
                                     <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="ocean">
                                         <div class="flex space-x-2 mb-1">
-                                            <div class="w-4 h-4 rounded" style="background: #0ea5e9"></div>
-                                            <div class="w-4 h-4 rounded" style="background: #06b6d4"></div>
-                                            <div class="w-4 h-4 rounded" style="background: #3b82f6"></div>
+                                            <div class="w-4 h-4 rounded" style="background-color: #0ea5e9" title="#0ea5e9" aria-label="Ocean color 1"></div>
+                                            <div class="w-4 h-4 rounded" style="background-color: #06b6d4" title="#06b6d4" aria-label="Ocean color 2"></div>
+                                            <div class="w-4 h-4 rounded bg-primary-custom" title="#3b82f6" aria-label="Ocean color 3"></div>
                                         </div>
                                         Ocean
                                     </button>
                                     <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="forest">
                                         <div class="flex space-x-2 mb-1">
-                                            <div class="w-4 h-4 rounded" style="background: #059669"></div>
-                                            <div class="w-4 h-4 rounded" style="background: #16a34a"></div>
-                                            <div class="w-4 h-4 rounded" style="background: #65a30d"></div>
+                                            <div class="w-4 h-4 rounded" style="background-color: #059669" title="#059669" aria-label="Forest color 1"></div>
+                                            <div class="w-4 h-4 rounded" style="background-color: #16a34a" title="#16a34a" aria-label="Forest color 2"></div>
+                                            <div class="w-4 h-4 rounded" style="background-color: #65a30d" title="#65a30d" aria-label="Forest color 3"></div>
                                         </div>
                                         Forest
                                     </button>
                                     <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="sunset">
                                         <div class="flex space-x-2 mb-1">
-                                            <div class="w-4 h-4 rounded" style="background: #ea580c"></div>
-                                            <div class="w-4 h-4 rounded" style="background: #dc2626"></div>
-                                            <div class="w-4 h-4 rounded" style="background: #c2410c"></div>
+                                            <div class="w-4 h-4 rounded" style="background-color: #ea580c" title="#ea580c" aria-label="Sunset color 1"></div>
+                                            <div class="w-4 h-4 rounded" style="background-color: #dc2626" title="#dc2626" aria-label="Sunset color 2"></div>
+                                            <div class="w-4 h-4 rounded" style="background-color: #c2410c" title="#c2410c" aria-label="Sunset color 3"></div>
                                         </div>
                                         Sunset
                                     </button>
@@ -481,7 +481,7 @@
                                 <option value="orders">Order Management</option>
                                 <option value="login">Login/Logout</option>
                             </select>
-                            <input type="date" id="audit-date-filter" class="p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-primary">
+                            <input type="date" id="audit-date-filter" class="p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-primary" title="Filter audit log by date" placeholder="Select date" aria-label="Audit log date filter">
                         </div>
                     </div>
                     

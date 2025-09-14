@@ -49,7 +49,7 @@
     <style>
         body {
             transition: background-color 0.3s, color 0.3s;
-        }
+    /* End of .sr-only and focus:not-sr-only styles */
         .dark {
             background-color: #1f2937;
             color: #f9fafb;
@@ -74,7 +74,6 @@
             white-space: nowrap;
             border: 0;
         }
-<<<<<<< HEAD
         .card {
             transition: transform 0.2s, box-shadow 0.2s;
         }
@@ -82,7 +81,6 @@
             transform: translateY(-4px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
         /* Mobile sidebar styles */
         @media (max-width: 767px) {
             .sidebar {
@@ -114,7 +112,6 @@
                 overflow: hidden;
             }
         }
-        
         @media (min-width: 768px) and (max-width: 1023px) {
             .sidebar {
                 width: 200px;
@@ -122,17 +119,7 @@
             main {
                 margin-left: 200px;
             }
-=======
-        .focus\:not-sr-only:focus {
-            position: static;
-            width: auto;
-            height: auto;
-            padding: 0.5rem;
-            margin: 0;
-            overflow: visible;
-            clip: auto;
-            white-space: normal;
->>>>>>> 9321898138c1e62d7070f88f174ec73addf78181
+        }
         }
         /* Tablet and desktop optimizations */
         @media (min-width: 768px) {
@@ -224,7 +211,7 @@
         <!-- Sticky Header -->
         <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40">
             <h2 class="text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
-            <h3 class="text-lg text-gray-300 mt-2" id="homepage-subtitle" style="display: none;"></h3>
+            <h3 class="text-lg text-gray-300 mt-2 hidden" id="homepage-subtitle"></h3>
         </header>
 
         <!-- Content Section -->

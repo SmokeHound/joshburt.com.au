@@ -7,7 +7,7 @@
     
     <!-- PWA Configuration -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#3b82f6">
+    <!-- Theme color meta removed for Firefox/Opera compatibility -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
@@ -49,6 +49,7 @@
             background-color: #f9fafb;
             color: #1f2937;
         }
+        .sidebar {
             transition: transform 0.3s ease-in-out;
         }
         @media (max-width: 768px) {
@@ -56,15 +57,15 @@
                 transform: translateX(-100%);
             }
             .sidebar.open {
-            @media (min-width: 768px) {
-                .sidebar {
-                    width: 16rem;
-                }
-                main {
-                    margin-left: 16rem;
-                }
-            }
                 transform: translateX(0);
+            }
+        }
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 16rem;
+            }
+            main {
+                margin-left: 16rem;
             }
         }
         .card {
