@@ -484,7 +484,6 @@
       });
     }
 
-      // ...existing code...
 
         // Populate modal with order summary
         modalOrderSummary.innerHTML = '';
@@ -499,7 +498,6 @@
           modalOrderSummary.appendChild(listItem);
         });
         confirmModal.classList.remove('hidden');
-      });
 
       // Modal event handlers
       document.getElementById('cancelModal').addEventListener('click', () => {
@@ -516,7 +514,7 @@
           confirmModal.classList.add('hidden');
         }
       });
-    }
+    
 
     // Submit order function
     function submitOrder() {
