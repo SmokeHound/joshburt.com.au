@@ -97,27 +97,7 @@
       clip: auto;
       white-space: normal;
     }
-  </style>
-</head>
-<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-  <!-- Skip Links -->
-  <div class="sr-only">
-    <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
-    <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
-  </div>
-
-  <!-- Mobile Menu Toggle -->
-  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
-    <span aria-hidden="true">☰</span>
-    <span class="sr-only">Menu</span>
-  </button>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
-
-  <!-- Mobile sidebar backdrop -->
-  <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
-
+    /* Mobile sidebar styles */
     .sidebar {
       transition: transform 0.3s ease-in-out;
     }
@@ -140,6 +120,65 @@
         margin-left: 16rem;
       }
     }
+  </style>
+</head>
+<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+  <!-- Skip Links -->
+  <div class="sr-only">
+    <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
+    <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
+  </div>
+
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+    <span aria-hidden="true">☰</span>
+    <span class="sr-only">Menu</span>
+  </button>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+
+  <!-- Mobile sidebar backdrop -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
+    <!-- App Branding -->
+    <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
+
+    <!-- User Profile Section -->
+    <div id="user-profile" class="mb-6">
+      <div id="user-info" class="hidden flex items-center space-x-2">
+        <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
+        <span id="user-name" class="text-white"></span>
+      </div>
+      <button id="login-btn" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Open login modal">Login</button>
+      <button id="logout-btn" class="hidden w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" aria-label="Logout">Logout</button>
+    </div>
+
+    <!-- Navigation -->
+    <nav role="navigation" aria-label="Main navigation">
+      <ul class="space-y-2" role="list">
+        <li role="listitem"><a href="index.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+        <li role="listitem"><a href="admin.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+        <li role="listitem"><a href="users.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+        <li role="listitem"><a href="analytics.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+        <li role="listitem"><a href="settings.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
+        <li role="listitem"><a href="oil.html" class="nav-link block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Orders</a></li>
+        <li role="listitem"><a href="login.html" class="nav-link block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+      </ul>
+    </nav>
+
+    <!-- Theme Toggle -->
+    <div class="mt-auto">
+      <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode" aria-pressed="false">
+        Toggle Light Mode
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main id="main-content" class="flex-1 p-6" role="main">
     <!-- Sticky Header -->
     <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10" role="banner">
       <h2 class="text-3xl font-semibold" id="welcome-message">Castrol Products</h2>
@@ -285,45 +324,229 @@
   <!-- Firebase -->
 
   <script type="module">
+    // Global variables
+    let oils = []; // Will be loaded from API instead of localStorage
+    let currentOrder = JSON.parse(localStorage.getItem('currentOrder')) || {};
+    let activeProductType = 'Engine oil';
+
     // Utility to show toast notifications
     const showToast = (message, type = 'info') => {
-        // ...existing code...
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300 ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 
+        'bg-blue-500'
+      } text-white`;
+      toast.classList.remove('hidden');
+      
       setTimeout(() => {
         toast.classList.add('hidden');
       }, 3000);
-
     };
 
-    // Theme Toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
-    themeToggle.addEventListener('click', () => {
-      body.classList.toggle('dark');
-      body.classList.toggle('light');
-      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-      themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-      themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-    });
+    // Load products from Netlify function instead of localStorage
+    async function loadProducts() {
+      try {
+        showToast('Loading products...', 'info');
+        const response = await fetch('/.netlify/functions/products');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        oils = await response.json();
+        console.log('Products loaded from database:', oils);
+        showToast('Products loaded successfully!', 'success');
+        
+        // Initialize the UI after loading products
+        renderProducts();
+        setupEventListeners();
+        
+      } catch (error) {
+        console.error('Error loading products from API:', error);
+        showToast('Failed to load products. Using fallback data.', 'error');
+        
+        // Fallback to default products if API fails
+        oils = [
+          { id: 1, code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil", description: "High-performance synthetic engine oil for modern vehicles", image: "" },
+          { id: 2, code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6", type: "Engine oil", description: "Advanced formula for fuel economy and engine protection", image: "" },
+          { id: 3, code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+", type: "Engine oil", description: "Specialized formula for European vehicles", image: "" },
+        ];
+        renderProducts();
+        setupEventListeners();
+      }
+    }
 
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    body.classList.add(savedTheme);
-    themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-    themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+    // Render products based on selected type
+    function renderProducts(productType = activeProductType) {
+      const container = document.getElementById('productsContainer');
+      const filteredOils = oils.filter(oil => oil.type === productType);
 
-    // Mobile Menu Toggle
-    const menuToggle = document.getElementById('menu-toggle');
-    const sidebar = document.getElementById('sidebar');
-    menuToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      const isOpen = sidebar.classList.contains('open');
-      menuToggle.setAttribute('aria-expanded', isOpen);
-    });
-    // ...existing code...
+      if (filteredOils.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-8 text-center text-gray-400">
+            <p class="text-lg">No ${productType.toLowerCase()} products available</p>
+            <p class="text-sm mt-2">Check back later for new products</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredOils.map(oil => `
+        <div class="card bg-gray-800 border border-gray-700 rounded shadow p-4 cursor-pointer hover:border-primary transition-colors" 
+             data-oil='${JSON.stringify(oil)}' 
+             role="button" 
+             tabindex="0" 
+             aria-label="Add ${oil.name} to order">
+          <div class="text-center">
+            ${oil.image ? `<img src="${oil.image}" alt="${oil.name}" class="w-full h-32 object-cover rounded mb-3" loading="lazy">` : ''}
+            <h4 class="text-lg font-semibold text-white mb-2">${oil.name}</h4>
+            <p class="text-sm text-gray-400 mb-2">Code: ${oil.code}</p>
+            <p class="text-xs text-gray-500 mb-3">${oil.specs}</p>
+            ${oil.description ? `<p class="text-xs text-gray-400 mb-3">${oil.description}</p>` : ''}
+            <button class="w-full bg-primary text-white py-2 px-4 rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary transition-colors">
+              Add to Order
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      // Add click event listeners to product cards
+      container.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', handleProductClick);
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleProductClick.call(card, e);
+          }
+        });
+      });
+    }
+
+    // Handle product selection
+    function handleProductClick(event) {
+      event.preventDefault();
+      const oilData = JSON.parse(this.dataset.oil);
+      
+      if (currentOrder[oilData.name]) {
+        currentOrder[oilData.name].quantity += 1;
+      } else {
+        currentOrder[oilData.name] = {
+          name: oilData.name,
+          code: oilData.code,
+          quantity: 1
+        };
+      }
+      
+      // Save order to localStorage (user-specific data stays in localStorage)
+      localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
+      updateOrderDisplay();
+      showToast(`Added ${oilData.name} to order`, 'success');
+    }
+
+    // Update order display
+    function updateOrderDisplay() {
+      const orderItems = document.getElementById('orderItems');
+      const totalItems = document.getElementById('totalItems');
+      const submitBtn = document.getElementById('submitOrderBtn');
+
+      if (Object.keys(currentOrder).length === 0) {
+        orderItems.innerHTML = '<p class="text-gray-400 text-center py-4 lg:py-8 text-sm">Your order is empty.</p>';
+        totalItems.textContent = '0';
+        submitBtn.disabled = true;
+        return;
+      }
+
+      orderItems.innerHTML = Object.values(currentOrder).map(item => `
+        <div class="flex justify-between items-center p-2 bg-gray-700 rounded">
+          <div class="flex-1">
+            <span class="text-white text-sm">${item.name}</span>
+            <span class="text-gray-400 text-xs block">${item.code}</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="decrease-quantity text-gray-400 hover:text-white w-6 h-6 flex items-center justify-center rounded" 
+                    data-name="${item.name}" aria-label="Decrease quantity">-</button>
+            <span class="text-white text-sm w-8 text-center">${item.quantity}</span>
+            <button class="increase-quantity text-gray-400 hover:text-white w-6 h-6 flex items-center justify-center rounded" 
+                    data-name="${item.name}" aria-label="Increase quantity">+</button>
+            <button class="remove-item text-red-400 hover:text-red-300 w-6 h-6 flex items-center justify-center rounded" 
+                    data-name="${item.name}" aria-label="Remove item">×</button>
+          </div>
+        </div>
+      `).join('');
+
+      const totalCount = Object.values(currentOrder).reduce((sum, item) => sum + item.quantity, 0);
+      totalItems.textContent = totalCount;
+      submitBtn.disabled = totalCount === 0;
+
+      // Add event listeners for quantity controls
+      orderItems.querySelectorAll('.increase-quantity').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const name = e.target.dataset.name;
+          currentOrder[name].quantity += 1;
+          localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
+          updateOrderDisplay();
+        });
+      });
+
+      orderItems.querySelectorAll('.decrease-quantity').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const name = e.target.dataset.name;
+          if (currentOrder[name].quantity > 1) {
+            currentOrder[name].quantity -= 1;
+          } else {
+            delete currentOrder[name];
+          }
+          localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
+          updateOrderDisplay();
+        });
+      });
+
+      orderItems.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const name = e.target.dataset.name;
+          delete currentOrder[name];
+          localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
+          updateOrderDisplay();
+          showToast('Item removed from order', 'info');
+        });
+      });
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Product type tabs
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const productType = e.target.dataset.type;
+          
+          // Update active tab
+          document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('bg-primary', 'text-white');
+            btn.classList.add('text-gray-300');
+            btn.setAttribute('aria-selected', 'false');
+          });
+          
+          e.target.classList.add('bg-primary', 'text-white');
+          e.target.classList.remove('text-gray-300');
+          e.target.setAttribute('aria-selected', 'true');
+          
+          activeProductType = productType;
+          renderProducts(productType);
+        });
+      });
+
+      // Submit order button
+      const submitBtn = document.getElementById('submitOrderBtn');
+      const confirmModal = document.getElementById('confirmModal');
+      const modalOrderSummary = document.getElementById('modalOrderSummary');
+
+      submitBtn.addEventListener('click', () => {
+        if (Object.keys(currentOrder).length === 0) {
           showToast('Your order is empty.', 'error');
           return;
         }
-
 
         // Populate modal with order summary
         modalOrderSummary.innerHTML = '';
@@ -338,7 +561,6 @@
           modalOrderSummary.appendChild(listItem);
         });
         confirmModal.classList.remove('hidden');
-
       });
 
       // Modal event handlers
@@ -356,9 +578,30 @@
           confirmModal.classList.add('hidden');
         }
       });
+    }
+
+    // Submit order function
+    function submitOrder() {
+      const confirmModal = document.getElementById('confirmModal');
       
-      // ...existing code...
-    };
+      // Here you would typically send the order to a server
+      console.log('Submitting order:', currentOrder);
+      
+      // For now, we'll just show a success message and clear the order
+      showToast('Order submitted successfully!', 'success');
+      
+      // Clear the order
+      currentOrder = {};
+      localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
+      updateOrderDisplay();
+      confirmModal.classList.add('hidden');
+    }
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProducts();
+      updateOrderDisplay();
+    });
   </script>
 </body>
 </html>
