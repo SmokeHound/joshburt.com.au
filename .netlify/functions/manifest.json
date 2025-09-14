@@ -1,0 +1,1 @@
+{"functions":[{"bundler":"esbuild","buildData":{"runtimeAPIVersion":1},"mainFile":"C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions\\products.js","name":"products","priority":10,"path":"C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions\\products.zip","runtime":"js"}],"system":{"arch":"x64","platform":"win32"},"timestamp":1757887457126,"version":1}

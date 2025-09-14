@@ -20,12 +20,12 @@ exports.handler = async function(event, context) {
 
   try {
     // Make sure NEON_DATABASE_URL is set in Netlify Environment Variables
-    if (!process.env.NEON_DATABASE_URL) {
+    if (!process.env.NETLIFY_DATABASE_URL) {
       throw new Error('NEON_DATABASE_URL environment variable is not set');
     }
 
     const client = new Client({
-      connectionString: process.env.NEON_DATABASE_URL,
+      connectionString: process.env.NETLIFY_DATABASE_URL,
     });
 
     await client.connect();
