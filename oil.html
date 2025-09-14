@@ -330,8 +330,7 @@
         showToast('Products loaded successfully!', 'success');
         
         // Initialize the UI after loading products
-        renderProducts();
-        setupEventListeners();
+  renderProducts();
         
       } catch (error) {
         console.error('Error loading products from API:', error);
@@ -343,8 +342,7 @@
           { id: 2, code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6", type: "Engine oil", description: "Advanced formula for fuel economy and engine protection", image: "" },
           { id: 3, code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+", type: "Engine oil", description: "Specialized formula for European vehicles", image: "" },
         ];
-        renderProducts();
-        setupEventListeners();
+  renderProducts();
       }
     }
 
