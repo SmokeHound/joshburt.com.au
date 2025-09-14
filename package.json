@@ -31,11 +31,13 @@
     "node-fetch": "^2.7.0"
   },
   "dependencies": {
-    "pg": "^8.11.3"
+    "pg": "^8.16.3"
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
     "testMatch": [
       "<rootDir>/tests/**/*.test.js"
     ],
