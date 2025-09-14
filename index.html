@@ -5,31 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Josh's App - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Include shared configuration -->
-    <script>
-        fetch('shared-config.html')
-            .then(response => response.text())
-            .then(html => {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                // Inject styles and scripts into head
-                const styles = tempDiv.getElementsByTagName('style');
-                const scripts = tempDiv.getElementsByTagName('script');
-                const links = tempDiv.getElementsByTagName('link');
-                
-                for (let link of links) {
-                    document.head.appendChild(link.cloneNode(true));
-                }
-                for (let style of styles) {
-                    document.head.appendChild(style.cloneNode(true));
-                }
-                for (let script of scripts) {
-                    const newScript = document.createElement('script');
-                    newScript.textContent = script.textContent;
-                    document.head.appendChild(newScript);
-                }
-            });
-    </script>
+    <!-- Shared Tailwind CSS Configuration and Common Styles (inlined) -->
+    <link rel="stylesheet" href="./assets/css/styles.css">
+    <!-- Configuration for dynamic color updates from settings -->
     <script>
         tailwind.config = {
             theme: {
@@ -247,20 +225,70 @@
         </section>
     </main>
 
-    <!-- Load shared theme functionality -->
+    <!-- Shared Theme Toggle Functionality (inlined) -->
     <script>
-        fetch('shared-theme.html')
-            .then(response => response.text())
-            .then(html => {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                const scripts = tempDiv.getElementsByTagName('script');
-                for (let script of scripts) {
-                    const newScript = document.createElement('script');
-                    newScript.textContent = script.textContent;
-                    document.body.appendChild(newScript);
-                }
-            });
+(function() {
+    // Theme Toggle with enhanced accessibility
+    function initTheme() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        if (!themeToggle) return;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            body.classList.toggle('light');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.textContent = isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+            themeToggle.setAttribute('aria-label', isDark ? 'Toggle light mode' : 'Toggle dark mode');
+            themeToggle.setAttribute('aria-pressed', isDark ? 'false' : 'true');
+            
+            // Announce theme change to screen readers
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader(`Switched to ${isDark ? 'dark' : 'light'} theme`);
+            }
+        });
+
+        // Keyboard support for theme toggle
+        themeToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                themeToggle.click();
+            }
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        body.classList.add(savedTheme);
+        const isDark = savedTheme === 'dark';
+        themeToggle.textContent = isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        themeToggle.setAttribute('aria-label', isDark ? 'Toggle light mode' : 'Toggle dark mode');
+        themeToggle.setAttribute('aria-pressed', isDark ? 'false' : 'true');
+    }
+
+    // Screen reader announcement function
+    window.announceToScreenReader = function(message) {
+        const announcement = document.createElement('div');
+        announcement.setAttribute('aria-live', 'polite');
+        announcement.setAttribute('aria-atomic', 'true');
+        announcement.className = 'sr-only';
+        announcement.textContent = message;
+        document.body.appendChild(announcement);
+        setTimeout(() => {
+            if (document.body.contains(announcement)) {
+                document.body.removeChild(announcement);
+            }
+        }, 1000);
+    };
+
+    // Initialize theme when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTheme);
+    } else {
+        initTheme();
+    }
+})();
     </script>
 
     <!-- Home-specific functionality -->
