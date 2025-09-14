@@ -177,37 +177,7 @@
     </div>
   </aside>
 
-  <!-- Main Content -->
-  <main id="main-content" class="flex-1 p-6" role="main">
-    <!-- Sticky Header -->
-    <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10" role="banner">
-      <h2 class="text-3xl font-semibold" id="welcome-message">Castrol Products</h2>
-    </header>
-
-    <!-- Content Section -->
-    <section role="region" aria-label="Product ordering system">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Product Selection Area -->
-        <div class="lg:col-span-2" role="region" aria-label="Product selection">
-          <p class="mb-4 text-gray-300">Select the oil products you wish to order. Click on a product to add it to your order form.</p>
-          
           <!-- ...existing code... -->
-          
-          <!-- Product tabs -->
-          <div id="productTypeTabs" class="mb-6" role="tablist" aria-label="Product categories">
-            <nav class="flex space-x-1 rounded-lg bg-gray-800 p-1">
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-white bg-primary focus:outline-none focus:ring-2 focus:ring-secondary" data-type="Engine oil" role="tab" aria-selected="true" aria-controls="products-engine-oil" id="tab-engine-oil">
-                Engine Oil
-              </button>
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary" data-type="Coolant" role="tab" aria-selected="false" aria-controls="products-coolant" id="tab-coolant">
-                Coolant
-              </button>
-              <button class="tab-button rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary" data-type="Gear Oil" role="tab" aria-selected="false" aria-controls="products-gear-oil" id="tab-gear-oil">
-                Gear Oil
-              </button>
-            </nav>
-          </div>
-          
           <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" role="tabpanel" aria-labelledby="tab-engine-oil" aria-live="polite">
             <!-- Product cards will be dynamically inserted here -->
             <div class="p-4 bg-gray-700 rounded shadow text-center">
@@ -514,39 +484,7 @@
       });
     }
 
-    // Setup event listeners
-    function setupEventListeners() {
-      // Product type tabs
-      document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', (e) => {
-          const productType = e.target.dataset.type;
-          
-          // Update active tab
-          document.querySelectorAll('.tab-button').forEach(btn => {
-            btn.classList.remove('bg-primary', 'text-white');
-            btn.classList.add('text-gray-300');
-            btn.setAttribute('aria-selected', 'false');
-          });
-          
-          e.target.classList.add('bg-primary', 'text-white');
-          e.target.classList.remove('text-gray-300');
-          e.target.setAttribute('aria-selected', 'true');
-          
-          activeProductType = productType;
-          renderProducts(productType);
-        });
-      });
-
-      // Submit order button
-      const submitBtn = document.getElementById('submitOrderBtn');
-      const confirmModal = document.getElementById('confirmModal');
-      const modalOrderSummary = document.getElementById('modalOrderSummary');
-
-      submitBtn.addEventListener('click', () => {
-        if (Object.keys(currentOrder).length === 0) {
-          showToast('Your order is empty.', 'error');
-          return;
-        }
+      // ...existing code...
 
         // Populate modal with order summary
         modalOrderSummary.innerHTML = '';
