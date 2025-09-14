@@ -397,3 +397,6 @@ ehthumbs.db
 Thumbs.db
 # Local Netlify folder
 #.netlify
+
+# Local Netlify folder
+.netlify

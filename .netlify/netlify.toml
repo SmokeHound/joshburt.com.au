@@ -1,47 +1,22 @@
-redirectsOrigin = "config"
-plugins = []
-functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
-functionsDirectoryOrigin = "config-v1"
-headers = []
+[build]
+  publish = "."
+  functions = ".netlify/functions"
 
 [dev]
-command = "netlify dev"
-port = 8000.0
-targetPort = 8000.0
-
-[functions]
-
-[functions."*"]
-node_bundler = "esbuild"
-
-[build]
-publish = "C:\\DEV\\joshburt.com.au\\joshburt.com.au"
-publishOrigin = "config"
-functions = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
-
-[build.environment]
-NEON_DATABASE_URL = "postgresql://neondb_owner:npg_RCwEhZ2pm6vx@ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
-
-[build.processing]
-
-[build.processing.css]
-
-[build.processing.html]
-
-[build.processing.images]
-
-[build.processing.js]
-
-[build.services]
+  command = "netlify dev"
+  port = 8888
+  targetPort = 8000
 
 [[redirects]]
-from = "/api/*"
-to = "/.netlify/functions/:splat"
-status = 200.0
-force = false
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
 
-[redirects.query]
+[functions]
+  node_bundler = "esbuild"
 
-[redirects.conditions]
+[context.production.environment]
+  NEON_DATABASE_URL = "postgresql://neondb_owner:npg_RCwEhZ2pm6vx@ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
 
-[redirects.headers]
+[context.dev.environment]
+  NEON_DATABASE_URL = "postgresql://neondb_owner:npg_RCwEhZ2pm6vx@ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
