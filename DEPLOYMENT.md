@@ -1,167 +1,108 @@
-# Deployment Instructions for Neon DB Integration
+# Deployment Guide
 
-This document explains how to deploy the joshburt.com.au website with Neon DB integration using Netlify Functions.
+This application now includes both a static frontend and a Node.js backend with authentication. Here are the deployment options:
 
-## Prerequisites
+## Option 1: Combined Server Deployment (Recommended)
 
-1. **Neon DB Account**: You need a Neon DB account with the provided connection string
-2. **Netlify Account**: For hosting the website and functions
-3. **GitHub Repository**: Connected to Netlify for automatic deployments
+Deploy the entire application as a Node.js app that serves both the API and static files.
 
-## Database Setup
+### Render.com (Recommended)
+1. Connect your GitHub repository to Render
+2. Create a new Web Service
+3. Configure:
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+   - Environment Variables:
+     ```
+     NODE_ENV=production
+     JWT_SECRET=your-super-secure-jwt-secret-change-this
+     JWT_EXPIRES_IN=7d
+     JWT_REFRESH_EXPIRES_IN=30d
+     FRONTEND_URL=https://your-render-app.onrender.com
+     PRODUCTION_URL=https://joshburt.com.au
+     BCRYPT_ROUNDS=12
+     ```
 
-### 1. Create Database Tables
-
-Run the SQL commands from `database-schema.sql` in your Neon DB console:
-
-```bash
-# Copy the contents of database-schema.sql and execute in Neon DB SQL Editor
-```
-
-This will create:
-- `products` table with Castrol oil products
-- `orders` table for customer orders
-- `order_items` table for individual order items
-- `users` table for future authentication
-- Sample product data pre-populated
-
-### 2. Environment Variables
-
-Set the following environment variable in your Netlify dashboard:
-
-**Netlify Dashboard → Site Settings → Environment Variables:**
-
-```
-NEON_DATABASE_URL = postgresql://neondb_owner:npg_RCwEhZ2pm6vx@ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-```
-
-## Netlify Deployment
-
-### 1. Connect Repository
-
-1. Go to [Netlify Dashboard](https://app.netlify.com/)
-2. Click "New site from Git"
-3. Connect your GitHub account
-4. Select the `joshburt.com.au` repository
-5. Configure build settings:
-   - **Build command**: `echo "No build required for static site"`
-   - **Publish directory**: `/` (root directory)
-   - **Functions directory**: `netlify/functions`
-
-### 2. Enable Netlify Functions
-
-Netlify will automatically detect the `netlify/functions` directory and deploy the serverless functions.
-
-Available endpoints after deployment:
-- `/.netlify/functions/products` - GET/POST for products
-- `/.netlify/functions/orders` - GET/POST for orders
-
-### 3. Install Dependencies
-
-Create a `netlify.toml` file if automatic dependency detection doesn't work:
-
-```toml
-[build]
-  command = "npm install"
-  functions = "netlify/functions"
-  publish = "."
-
-[build.environment]
-  NODE_VERSION = "18"
-```
-
-## Testing
-
-### Local Development
-
-1. Install Netlify CLI:
+### Heroku
+1. Create new Heroku app: `heroku create your-app-name`
+2. Set environment variables:
    ```bash
-   npm install -g netlify-cli
+   heroku config:set NODE_ENV=production
+   heroku config:set JWT_SECRET=your-super-secure-jwt-secret
+   # ... add other environment variables
    ```
+3. Deploy: `git push heroku main`
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+### Railway
+1. Connect GitHub repository
+2. Deploy automatically with environment variables set
 
-3. Run locally with functions:
-   ```bash
-   netlify dev
-   ```
+## Option 2: Separate Frontend/Backend Deployment
 
-4. Access at: http://localhost:8888
+### Frontend (Static Files)
+Keep existing FTP deployment for static files:
+- GitHub Actions already configured in `.github/workflows/main.yml`
+- Deploys to joshburt.com.au via FTP
 
-### Production Testing
+### Backend (API Server)
+Deploy Node.js backend separately on:
+- Render.com, Heroku, Railway, or VPS
+- Update `API_BASE` in frontend JavaScript files to point to backend URL
 
-After deployment, test the API endpoints:
+## Environment Variables
 
-```bash
-# Test products endpoint
-curl https://your-site.netlify.app/.netlify/functions/products
+### Required
+- `JWT_SECRET`: Secure random string for JWT signing
+- `NODE_ENV`: Set to 'production' for production deployment
 
-# Test orders endpoint
-curl -X POST https://your-site.netlify.app/.netlify/functions/orders \
-  -H "Content-Type: application/json" \
-  -d '{"items":[{"name":"Test Product","code":"TEST123","quantity":1}]}'
-```
+### Optional
+- `PORT`: Server port (default: 3000)
+- `DB_PATH`: SQLite database file path (default: ./database.sqlite)
+- `FRONTEND_URL`: Frontend URL for CORS and redirects
+- `PRODUCTION_URL`: Production domain
+- `BCRYPT_ROUNDS`: Password hashing rounds (default: 12)
 
-## Features
+### Email (for password reset)
+- `SMTP_HOST`: SMTP server host
+- `SMTP_PORT`: SMTP server port  
+- `SMTP_USER`: SMTP username
+- `SMTP_PASS`: SMTP password
+- `FROM_EMAIL`: From email address
 
-### Oil Ordering System (`oil.html`)
+### OAuth (optional)
+- `GOOGLE_CLIENT_ID`: Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
+- `GITHUB_CLIENT_ID`: GitHub OAuth client ID
+- `GITHUB_CLIENT_SECRET`: GitHub OAuth client secret
 
-- **Products Loading**: Fetches products from Neon DB via `/products` API
-- **Order Submission**: Saves orders to Neon DB via `/orders` API
-- **CSV Download**: Still generates CSV files for local record keeping
-- **Error Handling**: Shows user-friendly error messages if API calls fail
+## Database
 
-### API Functions
+The application uses SQLite by default, which is suitable for small to medium applications. For production with higher traffic, consider:
 
-#### Products Function (`/netlify/functions/products.js`)
-- **GET**: Retrieve all products or filter by type
-- **POST**: Add new products (admin functionality)
-- **CORS**: Properly configured for browser requests
-
-#### Orders Function (`/netlify/functions/orders.js`)
-- **POST**: Submit new orders with multiple items
-- **GET**: Retrieve order history (admin functionality)
-- **Database Transactions**: Ensures data consistency
-
-## Troubleshooting
-
-### Common Issues
-
-1. **"Failed to load products from database"**
-   - Check Neon DB connection string in environment variables
-   - Verify database tables exist by running the schema SQL
-   - Check Netlify function logs for detailed error messages
-
-2. **"Failed to submit order"**
-   - Ensure orders and order_items tables exist
-   - Check CORS configuration if testing from different domain
-   - Verify API endpoint URL is correct
-
-3. **Functions not deploying**
-   - Ensure `netlify/functions` directory structure is correct
-   - Check that `package.json` includes `pg` dependency
-   - Verify Node.js version compatibility (use Node 18+)
-
-### Monitoring
-
-- **Netlify Function Logs**: Monitor function execution and errors
-- **Neon DB Monitoring**: Track database queries and performance
-- **Browser Console**: Check for JavaScript errors on frontend
+1. **PostgreSQL**: Update database configuration in `config/database.js`
+2. **MySQL**: Install mysql2 and update configuration
+3. **MongoDB**: Restructure to use MongoDB with Mongoose
 
 ## Security Considerations
 
-- Database connection string is stored as environment variable
-- CORS headers configured for security
-- SQL injection prevention through parameterized queries
-- Consider adding rate limiting for production use
+1. **HTTPS**: Ensure HTTPS is enabled in production
+2. **CORS**: Configure CORS origins for your production domains
+3. **Rate Limiting**: Already configured, adjust limits as needed
+4. **JWT Secret**: Use a strong, unique secret key
+5. **Database**: Secure database access and regular backups
 
-## Future Enhancements
+## Performance Optimization
 
-- User authentication and order history
-- Admin panel for product management
-- Email notifications for orders
-- Real-time inventory tracking
-- Enhanced error reporting and monitoring
+1. **Database**: Add indexes for frequently queried fields
+2. **Caching**: Implement Redis for session storage in high-traffic scenarios
+3. **CDN**: Use CDN for static assets
+4. **Monitoring**: Add application monitoring (New Relic, DataDog, etc.)
+
+## Monitoring
+
+Default users for testing:
+- Admin: admin@joshburt.com.au / admin123!
+- Test User: test@example.com / password
+- Manager: manager@example.com / manager123
+
+Change these credentials in production!

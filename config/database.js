@@ -6,13 +6,13 @@ const DB_TYPE = process.env.DB_TYPE || 'sqlite';
 
 // PostgreSQL configuration
 const pgConfig = {
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'joshburt_website',
-  password: process.env.DB_PASSWORD || '',
+  user: process.env.DB_USER || 'neondb_owner',
+  host: process.env.DB_HOST || 'ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech',
+  database: process.env.DB_NAME || 'neondb',
+  password: process.env.DB_PASSWORD || 'npg_RCwEhZ2pm6vx',
   port: process.env.DB_PORT || 5432,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-  max: 20,
+  max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 };
