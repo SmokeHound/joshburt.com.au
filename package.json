@@ -4,15 +4,21 @@
   "description": "Static website for joshburt.com.au with responsive design and admin features",
   "main": "index.html",
   "scripts": {
+    "start": "node scripts/start.js",
+    "dev": "NODE_ENV=development DB_TYPE=sqlite node server.js",
+    "prod": "NODE_ENV=production DB_TYPE=postgres node scripts/start.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:integration": "jest tests/integration",
     "test:unit": "jest tests/unit",
+    "test:auth": "NODE_ENV=test DB_TYPE=sqlite jest tests/auth.test.js",
     "lint": "npx htmlhint index.html admin.html users.html analytics.html settings.html oil.html login.html",
     "lint:js": "eslint tests/**/*.js",
     "lint:fix": "eslint --ext .js *.html --fix",
     "serve": "python3 -m http.server 8000",
-    "validate": "npm run lint && npm run lint:js && npm run test"
+    "validate": "npm run lint && npm run lint:js && npm run test",
+    "db:init": "node -e \"const { initializeDatabase } = require('./config/database'); initializeDatabase();\"",
+    "db:reset": "rm -f database.sqlite test_database.sqlite && npm run db:init"
   },
   "keywords": [
     "static-website",
