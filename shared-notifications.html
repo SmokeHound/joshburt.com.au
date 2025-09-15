@@ -1,0 +1,292 @@
+<!-- Real-time Notifications Framework -->
+<script>
+(function() {
+    // Notification types and their configurations
+    const notificationTypes = {
+        info: {
+            icon: 'ℹ️',
+            bgColor: 'bg-blue-600',
+            borderColor: 'border-blue-500'
+        },
+        success: {
+            icon: '✅',
+            bgColor: 'bg-green-600',
+            borderColor: 'border-green-500'
+        },
+        warning: {
+            icon: '⚠️',
+            bgColor: 'bg-yellow-600',
+            borderColor: 'border-yellow-500'
+        },
+        error: {
+            icon: '❌',
+            bgColor: 'bg-red-600',
+            borderColor: 'border-red-500'
+        }
+    };
+
+    // Notification storage
+    let notifications = JSON.parse(localStorage.getItem('siteNotifications') || '[]');
+    let notificationId = parseInt(localStorage.getItem('notificationId') || '1');
+
+    // Create notification center UI
+    function createNotificationCenter() {
+        // Create notification bell button
+        const bellButton = document.createElement('button');
+        bellButton.id = 'notification-bell';
+        bellButton.className = 'relative p-2 text-white hover:bg-primary-600 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary';
+        bellButton.innerHTML = `
+            🔔
+            <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">
+                0
+            </span>
+        `;
+        bellButton.setAttribute('aria-label', 'Open notifications');
+
+        // Create notification dropdown
+        const dropdown = document.createElement('div');
+        dropdown.id = 'notification-dropdown';
+        dropdown.className = 'hidden absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50';
+        dropdown.innerHTML = `
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold" data-i18n="notifications.title">Notifications</h3>
+            </div>
+            <div id="notification-list" class="max-h-96 overflow-y-auto">
+                <!-- Notifications will be inserted here -->
+            </div>
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                <button id="clear-all-notifications" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                    Clear All
+                </button>
+            </div>
+        `;
+
+        // Find a suitable container for the notification system
+        let container = document.querySelector('#sidebar nav ul');
+        if (container) {
+            const listItem = document.createElement('li');
+            listItem.className = 'relative';
+            listItem.appendChild(bellButton);
+            listItem.appendChild(dropdown);
+            container.appendChild(listItem);
+        }
+
+        return { bellButton, dropdown };
+    }
+
+    // Show notification function
+    window.showNotification = function(message, type = 'info', persistent = false) {
+        const notification = {
+            id: notificationId++,
+            message,
+            type,
+            timestamp: Date.now(),
+            persistent,
+            read: false
+        };
+
+        notifications.unshift(notification);
+        
+        // Keep only last 50 notifications
+        notifications = notifications.slice(0, 50);
+        
+        // Save to localStorage
+        localStorage.setItem('siteNotifications', JSON.stringify(notifications));
+        localStorage.setItem('notificationId', notificationId.toString());
+
+        // Update UI
+        updateNotificationUI();
+
+        // Show toast notification if not persistent
+        if (!persistent) {
+            showToastNotification(notification);
+        }
+
+        return notification.id;
+    };
+
+    // Show toast notification
+    function showToastNotification(notification) {
+        const toast = document.createElement('div');
+        const config = notificationTypes[notification.type];
+        
+        toast.className = `fixed bottom-4 right-4 p-4 ${config.bgColor} text-white rounded-lg shadow-lg flex items-center gap-3 transform translate-x-full transition-transform duration-300 z-50`;
+        toast.innerHTML = `
+            <span class="text-xl">${config.icon}</span>
+            <span class="flex-1">${notification.message}</span>
+            <button class="text-white hover:text-gray-200 text-xl font-bold" onclick="this.parentElement.remove()">&times;</button>
+        `;
+
+        document.body.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+        }, 100);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 300);
+        }, 5000);
+    }
+
+    // Update notification UI
+    function updateNotificationUI() {
+        const badge = document.getElementById('notification-badge');
+        const notificationList = document.getElementById('notification-list');
+        
+        if (!badge || !notificationList) return;
+
+        const unreadCount = notifications.filter(n => !n.read).length;
+        
+        // Update badge
+        if (unreadCount > 0) {
+            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+
+        // Update notification list
+        if (notifications.length === 0) {
+            notificationList.innerHTML = `
+                <div class="p-4 text-center text-gray-500 dark:text-gray-400" data-i18n="notifications.empty">
+                    No new notifications
+                </div>
+            `;
+        } else {
+            notificationList.innerHTML = notifications.map(notification => {
+                const config = notificationTypes[notification.type];
+                const timeAgo = getTimeAgo(notification.timestamp);
+                
+                return `
+                    <div class="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${!notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''}">
+                        <div class="flex items-start gap-3">
+                            <span class="text-lg">${config.icon}</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm ${!notification.read ? 'font-semibold' : ''}">${notification.message}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${timeAgo}</p>
+                            </div>
+                            <button onclick="window.removeNotification(${notification.id})" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm">
+                                ×
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    // Get time ago string
+    function getTimeAgo(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+
+        if (days > 0) return `${days}d ago`;
+        if (hours > 0) return `${hours}h ago`;
+        if (minutes > 0) return `${minutes}m ago`;
+        return 'Just now';
+    }
+
+    // Remove notification
+    window.removeNotification = function(id) {
+        notifications = notifications.filter(n => n.id !== id);
+        localStorage.setItem('siteNotifications', JSON.stringify(notifications));
+        updateNotificationUI();
+    };
+
+    // Clear all notifications
+    window.clearAllNotifications = function() {
+        notifications = [];
+        localStorage.setItem('siteNotifications', JSON.stringify(notifications));
+        updateNotificationUI();
+    };
+
+    // Mark notification as read
+    function markAsRead(id) {
+        const notification = notifications.find(n => n.id === id);
+        if (notification) {
+            notification.read = true;
+            localStorage.setItem('siteNotifications', JSON.stringify(notifications));
+            updateNotificationUI();
+        }
+    }
+
+    // Simulate real-time notifications (for demo purposes)
+    function simulateRealtimeNotifications() {
+        const demoNotifications = [
+            { message: "New user registration", type: "info" },
+            { message: "System backup completed", type: "success" },
+            { message: "Server load is high", type: "warning" },
+            { message: "Failed login attempt detected", type: "error" },
+            { message: "New oil order received", type: "info" }
+        ];
+
+        // Add a random notification every 30 seconds (for demo)
+        setInterval(() => {
+            if (Math.random() < 0.3) { // 30% chance
+                const randomNotification = demoNotifications[Math.floor(Math.random() * demoNotifications.length)];
+                window.showNotification(randomNotification.message, randomNotification.type);
+            }
+        }, 30000);
+    }
+
+    // Initialize notification system
+    function initNotificationSystem() {
+        const { bellButton, dropdown } = createNotificationCenter();
+        
+        if (bellButton && dropdown) {
+            // Toggle dropdown
+            bellButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+                
+                // Mark all as read when opened
+                if (!dropdown.classList.contains('hidden')) {
+                    notifications.forEach(n => n.read = true);
+                    localStorage.setItem('siteNotifications', JSON.stringify(notifications));
+                    updateNotificationUI();
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !bellButton.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+
+            // Clear all button
+            document.getElementById('clear-all-notifications')?.addEventListener('click', () => {
+                window.clearAllNotifications();
+            });
+        }
+
+        // Update UI with existing notifications
+        updateNotificationUI();
+
+        // Start demo notifications (remove in production)
+        simulateRealtimeNotifications();
+
+        // Show welcome notification
+        setTimeout(() => {
+            window.showNotification("Notification system activated!", "success");
+        }, 2000);
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNotificationSystem);
+    } else {
+        initNotificationSystem();
+    }
+})();
+</script>

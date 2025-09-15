@@ -1,0 +1,308 @@
+<!-- Role-based Custom Dashboards Framework -->
+<script>
+(function() {
+    // User roles configuration
+    const userRoles = {
+        admin: {
+            name: 'Administrator',
+            permissions: ['all'],
+            defaultDashboard: 'admin',
+            availableDashboards: ['admin', 'analytics', 'users']
+        },
+        manager: {
+            name: 'Manager',
+            permissions: ['view_analytics', 'manage_users', 'view_orders'],
+            defaultDashboard: 'manager',
+            availableDashboards: ['manager', 'analytics']
+        },
+        user: {
+            name: 'User',
+            permissions: ['view_own_data', 'place_orders'],
+            defaultDashboard: 'user',
+            availableDashboards: ['user']
+        },
+        viewer: {
+            name: 'Viewer',
+            permissions: ['view_only'],
+            defaultDashboard: 'viewer',
+            availableDashboards: ['viewer']
+        }
+    };
+
+    // Dashboard configurations
+    const dashboardConfigs = {
+        admin: {
+            name: 'Admin Dashboard',
+            icon: '⚙️',
+            widgets: [
+                { type: 'welcome', title: 'Welcome Administrator', content: 'Full system access granted' },
+                { type: 'stats', title: 'System Stats', data: { users: 156, orders: 243, revenue: '$12,456' } },
+                { type: 'recent-activity', title: 'Recent Activity', items: ['User login: john@example.com', 'New order #1234', 'System backup completed'] },
+                { type: 'quick-actions', title: 'Quick Actions', actions: ['Add User', 'View Orders', 'System Settings', 'Generate Reports'] }
+            ]
+        },
+        manager: {
+            name: 'Manager Dashboard',
+            icon: '👔',
+            widgets: [
+                { type: 'welcome', title: 'Welcome Manager', content: 'Manage your team and view analytics' },
+                { type: 'stats', title: 'Team Stats', data: { team_members: 12, active_projects: 8, completed_tasks: 45 } },
+                { type: 'team-activity', title: 'Team Activity', items: ['Sarah completed Task #123', 'New project assigned', 'Weekly meeting scheduled'] },
+                { type: 'quick-actions', title: 'Quick Actions', actions: ['Assign Task', 'View Team', 'Reports', 'Schedule Meeting'] }
+            ]
+        },
+        user: {
+            name: 'User Dashboard',
+            icon: '👤',
+            widgets: [
+                { type: 'welcome', title: 'Welcome User', content: 'View your personal dashboard' },
+                { type: 'stats', title: 'Your Stats', data: { orders: 5, pending: 2, completed: 3 } },
+                { type: 'personal-activity', title: 'Your Activity', items: ['Order #1001 shipped', 'Profile updated', 'New message received'] },
+                { type: 'quick-actions', title: 'Quick Actions', actions: ['Place Order', 'View Profile', 'Contact Support', 'View History'] }
+            ]
+        },
+        viewer: {
+            name: 'Viewer Dashboard',
+            icon: '👁️',
+            widgets: [
+                { type: 'welcome', title: 'Welcome Viewer', content: 'View-only access to data' },
+                { type: 'stats', title: 'Overview', data: { total_users: 156, total_orders: 243, system_status: 'Online' } },
+                { type: 'system-status', title: 'System Status', items: ['All systems operational', 'Last update: 2 minutes ago', 'Uptime: 99.9%'] }
+            ]
+        }
+    };
+
+    // Current user state
+    let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"role": "admin", "name": "Josh", "email": "josh@example.com"}');
+    let dashboardSettings = JSON.parse(localStorage.getItem('dashboardSettings') || '{}');
+
+    // Set current user role
+    window.setUserRole = function(role, userData = {}) {
+        if (userRoles[role]) {
+            currentUser = {
+                role,
+                name: userData.name || currentUser.name || 'User',
+                email: userData.email || currentUser.email || 'user@example.com',
+                ...userData
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Update dashboard
+            renderDashboard();
+            
+            if (window.showNotification) {
+                window.showNotification(
+                    `Switched to ${userRoles[role].name} role`,
+                    'success'
+                );
+            }
+        }
+    };
+
+    // Get current user
+    window.getCurrentUser = function() {
+        return { ...currentUser };
+    };
+
+    // Check permission
+    window.hasPermission = function(permission) {
+        const role = userRoles[currentUser.role];
+        if (!role) return false;
+        
+        return role.permissions.includes('all') || role.permissions.includes(permission);
+    };
+
+    // Render widget
+    function renderWidget(widget) {
+        let content = '';
+        
+        switch (widget.type) {
+            case 'welcome':
+                content = `
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg">
+                        <h3 class="text-xl font-bold mb-2">${widget.title}</h3>
+                        <p>${widget.content}</p>
+                        <p class="text-sm mt-2 opacity-90">Logged in as: ${currentUser.name} (${currentUser.email})</p>
+                    </div>
+                `;
+                break;
+                
+            case 'stats':
+                content = `
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4">${widget.title}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            ${Object.entries(widget.data).map(([key, value]) => `
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">${value}</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400 capitalize">${key.replace('_', ' ')}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'recent-activity':
+            case 'team-activity':
+            case 'personal-activity':
+            case 'system-status':
+                content = `
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4">${widget.title}</h3>
+                        <div class="space-y-3">
+                            ${widget.items.map(item => `
+                                <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                                    <div class="text-sm">${item}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'quick-actions':
+                content = `
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4">${widget.title}</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            ${widget.actions.map(action => `
+                                <button class="p-3 text-left text-sm bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded border border-blue-200 dark:border-blue-800 transition-colors">
+                                    ${action}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            default:
+                content = `
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold">${widget.title}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">${widget.content || 'No content available'}</p>
+                    </div>
+                `;
+        }
+        
+        return content;
+    }
+
+    // Render dashboard
+    function renderDashboard(dashboardType = null) {
+        const container = document.getElementById('dashboard-content');
+        if (!container) return;
+
+        const role = userRoles[currentUser.role];
+        const dashboardKey = dashboardType || role.defaultDashboard;
+        const dashboard = dashboardConfigs[dashboardKey];
+
+        if (!dashboard) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <p class="text-gray-500 dark:text-gray-400">Dashboard not found</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Update page title if available
+        const titleElement = document.querySelector('h1[data-dashboard-title]');
+        if (titleElement) {
+            titleElement.innerHTML = `${dashboard.icon} <span data-i18n="dashboard.${dashboardKey}">${dashboard.name}</span>`;
+        }
+
+        // Render widgets
+        container.innerHTML = `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold">${dashboard.icon} ${dashboard.name}</h2>
+                    <div class="flex items-center gap-3">
+                        <select id="dashboard-selector" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm">
+                            ${role.availableDashboards.map(dbKey => {
+                                const db = dashboardConfigs[dbKey];
+                                return `<option value="${dbKey}" ${dbKey === dashboardKey ? 'selected' : ''}>${db.icon} ${db.name}</option>`;
+                            }).join('')}
+                        </select>
+                        <button id="customize-dashboard" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                            Customize
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    ${dashboard.widgets.map(widget => renderWidget(widget)).join('')}
+                </div>
+            </div>
+        `;
+
+        // Add event listeners
+        const dashboardSelector = document.getElementById('dashboard-selector');
+        const customizeButton = document.getElementById('customize-dashboard');
+
+        dashboardSelector?.addEventListener('change', (e) => {
+            renderDashboard(e.target.value);
+        });
+
+        customizeButton?.addEventListener('click', () => {
+            if (window.showNotification) {
+                window.showNotification('Dashboard customization coming soon!', 'info');
+            }
+        });
+    }
+
+    // Create role switcher for demo
+    function createRoleSwitcher() {
+        const container = document.getElementById('role-switcher');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h4 class="font-semibold mb-3">Switch Role (Demo)</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    ${Object.entries(userRoles).map(([roleKey, role]) => `
+                        <button 
+                            onclick="window.setUserRole('${roleKey}')"
+                            class="p-2 text-sm rounded border transition-colors ${
+                                currentUser.role === roleKey 
+                                ? 'bg-blue-600 text-white border-blue-600' 
+                                : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            }"
+                        >
+                            ${role.name}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // Initialize dashboard system
+    function initDashboardSystem() {
+        // Create role switcher if container exists
+        createRoleSwitcher();
+        
+        // Render initial dashboard
+        renderDashboard();
+
+        // Show welcome notification
+        setTimeout(() => {
+            if (window.showNotification) {
+                const roleName = userRoles[currentUser.role].name;
+                window.showNotification(
+                    `Dashboard loaded for ${roleName} role`,
+                    'success'
+                );
+            }
+        }, 1500);
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDashboardSystem);
+    } else {
+        initDashboardSystem();
+    }
+})();
+</script>

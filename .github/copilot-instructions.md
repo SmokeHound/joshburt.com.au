@@ -93,20 +93,17 @@ No build steps required - files deploy as-is from repository root.
 ├── settings.html        # Settings configuration
 ├── users.html           # User management
 ├── login.html           # Login page
-├── style.css           # Custom CSS (note: has TODO for layout alignment)
-├── script.js           # Theme toggle functionality
+
 └── README.md           # Basic project info
 ```
 
 ### Key Files Reference
 - **index.html**: Main website template with TailwindCSS, responsive design, login system
 - **oil.html**: Specialized Castrol product ordering with Bootstrap, CSV export functionality  
-- **script.js**: Simple theme toggle: `document.body.classList.toggle('dark-mode')`
-- **style.css**: Contains TODO note about aligning all pages with index.html layout
 
 ### Development Notes
-- TODO identified in style.css: "Align all pages with index.html layout. Remove once complete. (PR #3, 2025-08-28)"
-- All pages use different styling approaches (some TailwindCSS, some Bootstrap, some custom CSS)
+- All pages now use consistent TailwindCSS styling with inline styles
+- All pages use unified navigation and theme toggle implementations
 - No linting, testing, or build tools configured - pure static website
 - FTP credentials stored in GitHub Secrets for deployment
 
