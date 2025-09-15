@@ -1,12 +1,8 @@
 const request = require('supertest');
 
-// Prefer app.js (if you refactored) otherwise fall back to server.js
-let app;
-try {
-  app = require('../app');
-} catch {
-  app = require('../server');
-}
+// Use server.js and make sure it doesn't start a real server in test mode
+process.env.NODE_ENV = 'test';
+const app = require('../server');
 
 /**
  * Authentication & User Management API Tests
