@@ -287,77 +287,40 @@
       menuToggle.setAttribute('aria-expanded', isOpen);
     });
 
-    // Castrol oil product data from the provided spreadsheets
-    const oils = [
-      { code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil" },
-      { code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6, Jaguar Land Rover STJLR.03.5006, GM dexos1™ Gen 3, Chrysler MS 6395, MB-Approval 229.71", type: "Engine oil" },
-      { code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+, MB-Approval 229.71/ 229.72, Porsche C20, VW 508 00/ 509 00, Ford WSS-M2C956-A1", type: "Engine oil" },
-      { code: "3436896", name: "EDGE 0W-30 C2", specs: "ACEA C2, STJLR.03.5007", type: "Engine oil" },
-      { code: "3432554", name: "EDGE 0W-30", specs: "ACEA C2/C3, API SQ, BMW Longlife-04", type: "Engine oil" },
-      { code: "3433646", name: "EDGE 0W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51", type: "Engine oil" },
-      { code: "3431407", name: "EDGE 0W-40 A3/B4", specs: "ACEA A3/B4, API SP, BMW Longlife-01, MB-Approval 229.5, Porsche A40, Renault RN 0700/RN 0710, VW 502 00/505 00", type: "Engine oil" },
-      { code: "3431128", name: "EDGE 5W-30 LL", specs: "ACEA C3, BMW Longlife-04, MB-Approval 229.31/ 229.51, Porsche C30, VW 504 00/507 00", type: "Engine oil" },
-      { code: "3430989", name: "EDGE 5W-30 A3/B4", specs: "ACEA A3/B4, API SL, BMW Longlife-01, MB-Approval 229.5, VW 502 00/505 00", type: "Engine oil" },
-      { code: "3431108", name: "EDGE 5W-30 M", specs: "ACEA C3, API SQ, BMW Longlife-04", type: "Engine oil" },
-      { code: "3421235", name: "EDGE 5W-40 A3/B4", specs: "ACEA A3/B3, A3/B4, API SN/CF, BMW Longlife-01", type: "Engine oil" },
-      { code: "3426982", name: "EDGE 5W-40 M", specs: "ACEA C3, API SN, BMW Longlife-04, Porsche C40, VW 511 00", type: "Engine oil" },
-      { code: "3436638", name: "EDGE 5W-50 S", specs: "API SP, Meets Ford WSS-M2C931-C", type: "Engine oil" },
-      { code: "3399574", name: "EDGE 10W-30", specs: "API SP, CF, ILSAC GF-6", type: "Engine oil" },
-      { code: "3412397", name: "EDGE 10W-60", specs: "ACEA A3/B3, A3/B4, API SN/CF", type: "Engine oil" },
-      { code: "3383419", name: "EDGE 25W-50", specs: "API SG/CD", type: "Engine oil" },
-      { code: "3374699", name: "EDGE PROFESSIONAL A1 5W-20", specs: "ACEA A1/B1, API SL, ILSAC GF-3", type: "Engine oil" },
-      { code: "3386606", name: "EDGE PROFESSIONAL A5 0W-30", specs: "ACEA A1/B1, A5/B5, API SL/CF", type: "Engine oil" },
-      { code: "3377780", name: "EDGE PROFESSIONAL A5 5W-30", specs: "ACEA A1/B1, A5/B5, API SN/CF", type: "Engine oil" },
-      { code: "3375617", name: "EDGE PROFESSIONAL C1 5W-30", specs: "ACEA C1, STJLR.03.5005", type: "Engine oil" },
-      { code: "3427866", name: "EDGE PROFESSIONAL EC 0W-20", specs: "ACEA C5, STJLR.03.5006, STJLR.51.5122", type: "Engine oil" },
-      { code: "3423559", name: "EDGE PROFESSIONAL E 0W-30", specs: "ACEA C2, STJLR.03.5007", type: "Engine oil" },
-      { code: "3383785", name: "EDGE PROFESSIONAL V 0W-20", specs: "ACEA C5, Volvo VCC RBS0-2AE", type: "Engine oil" },
-      { code: "3428869", name: "MAGNATEC HYBRID 0W-16", specs: "API SP, ILSAC GF-6B", type: "Engine oil" },
-      { code: "3439018", name: "MAGNATEC 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil" },
-      { code: "3440366", name: "MAGNATEC 0W-20 C5", specs: "ACEA C5, API SQ", type: "Engine oil" },
-      { code: "3440475", name: "MAGNATEC 0W-20 E", specs: "Ford WSS-M2C954-A1", type: "Engine oil" },
-      { code: "3434547", name: "MAGNATEC 0W-30 D", specs: "ACEA C2, API SN, Ford WSS-M2C950-A", type: "Engine oil" },
-      { code: "3429066", name: "MAGNATEC 5W-20", specs: "API SP, ILSAC GF-6, Ford WSS-M2C960-A1", type: "Engine oil" },
-      { code: "3428870", name: "MAGNATEC 5W-30", specs: "API SN/CF, ACEA A3/B4, MB-Approval 229.3, VW 502 00/505 00, Renault RN0700/RN0710", type: "Engine oil" },
-      { code: "3437038", name: "MAGNATEC 5W-30 A", specs: "ACEA A5/B5, API SN, ILSAC GF-5, Ford WSS-M2C913-C/D", type: "Engine oil" },
-      { code: "3437811", name: "MAGNATEC 5W-30 A5", specs: "ACEA A5/B5, API SN, Ford WSS-M2C913-D", type: "Engine oil" },
-      { code: "3433354", name: "MAGNATEC 5W-30 DX", specs: "API SN, ILSAC GF-5, GM dexos1™ Gen 2", type: "Engine oil" },
-      { code: "3437395", name: "MAGNATEC 5W-40", specs: "API SN, ACEA A3/B4, BMW Longlife-01, MB-Approval 229.3", type: "Engine oil" },
-      { code: "3436312", name: "MAGNATEC 5W-40 SN/C3", specs: "API SN, ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51, VW 502 00/505 00/505 01", type: "Engine oil" },
-      { code: "3436890", name: "MAGNATEC 10W-30", specs: "API SP, ILSAC GF-6", type: "Engine oil" },
-      { code: "3437172", name: "MAGNATEC 10W-40", specs: "API SP, ACEA A3/B4", type: "Engine oil" },
-      { code: "3396146", name: "MAGNATEC 15W-40", specs: "API SP, ACEA A3/B4", type: "Engine oil" },
-      { code: "3433217", name: "MAGNATEC SUV 5W-30 C3", specs: "ACEA C2/C3, API SP", type: "Engine oil" },
-      { code: "3384168", name: "MAGNATEC DIESEL DX 5W-40", specs: "API SN/CF, ACEA C3, GM dexos® 2", type: "Engine oil" },
-      { code: "3437334", name: "MAGNATEC DIESEL 15W-40", specs: "API SP", type: "Engine oil" },
-      { code: "3424712", name: "Radicool SF", specs: "ASTM D3306, BS 6580:2010", type: "Coolant" },
-      { code: "3429903", name: "Radicool P-OAT", specs: "ASTM D3306", type: "Coolant" },
-      { code: "3437791", name: "Radicool Si-OAT", specs: "VW TL-774G (G12++), MAN 324 Si-OAT, ASTM D3306", type: "Coolant" },
-      { code: "3376394", name: "Radicool NF", specs: "ASTM D3306, BS 6580:2010", type: "Coolant" },
-      { code: "3424670", name: "Radicool Concentrate", specs: "ASTM D3306, BS 6580:2010", type: "Coolant" },
-      { code: "3430536", name: "Transmax ATF Heavy Duty", specs: "Allison TES 389, GM Dexron IIIH, Ford Mercon", type: "Gear Oil" },
-      { code: "3429062", name: "Transmax ATF Dex/Merc Multivehicle", specs: "Dexron III, Mercon, JASO 1A, Allison C4", type: "Gear Oil" },
-      { code: "3425325", name: "Transmax CVT", specs: "CVT fluids for Japanese, Hyundai, Kia, Chrysler, Ford", type: "Gear Oil" },
-      { code: "3380380", name: "Transmax Dual", specs: "VW TL 52529, Ford WSS-M2C936-A, Mitsubishi SSTF-1", type: "Gear Oil" },
-      { code: "3439145", name: "Transmax Dual Multivehicle", specs: "BMW, Ford, VW, MB, Porsche, PSA, Renault, Volvo DCT", type: "Gear Oil" },
-      { code: "3381057", name: "Transmax Mercon V", specs: "Ford Mercon V", type: "Gear Oil" },
-      { code: "3430516", name: "Transmax ATF Z", specs: "ZF TE-ML 04D/11B/14C/16M, MB 236.x, Voith, MAN", type: "Gear Oil" },
-      { code: "3430859", name: "TranSynd 668", specs: "Allison TES 668, Voith, Volvo, MAN", type: "Gear Oil" },
-      { code: "3430290", name: "Transmax Axle EPX 80W-90", specs: "API GL-5, MAN 342 M2, ZF TE-ML 05A/12E/16B/17B/19B/21A", type: "Gear Oil" },
-      { code: "3430302", name: "Transmax Axle AP 85W-140", specs: "API GL-5/MT-1, Mack GO-J, SAE J2360", type: "Gear Oil" },
-      { code: "3430298", name: "Transmax Limited Slip 85W-140", specs: "API GL-5, Hino & Isuzu axles", type: "Gear Oil" },
-      { code: "3431245", name: "Transmax Limited Slip 80W-90", specs: "API GL-5, Limited Slip", type: "Gear Oil" },
-      { code: "3431006", name: "Transmax Limited Slip 80W-140", specs: "API GL-5, Competition & severe duty", type: "Gear Oil" },
-      { code: "3430280", name: "Transmax Universal LL 75W-90", specs: "API GL-4/GL-5/MT-1, MB 235.8, MAN, ZF, Scania", type: "Gear Oil" },
-      { code: "3430676", name: "Transmax Limited Slip 75W-85", specs: "API GL-5, Limited Slip", type: "Gear Oil" },
-      { code: "3430285", name: "Transmax Dynadrive Long Life 80W-90", specs: "API GL-4/GL-5, Volvo, Mack, ArvinMeritor", type: "Gear Oil" },
-      { code: "3429677", name: "Transmax Manual VMX 80W", specs: "API GL-4", type: "Gear Oil" },
-      { code: "3432318", name: "Transmax Manual Long Life 75W-85", specs: "API GL-4, MB 235.4, Volvo, Eaton", type: "Gear Oil" },
-      { code: "3429964", name: "Transmax Manual AT 75W-90", specs: "API GL-4, MB 235.21", type: "Gear Oil" },
-      { code: "3430335", name: "Transmax Manual Heavy Duty 75W-90", specs: "API GL-4, Volvo 97315:002 / 97319:007", type: "Gear Oil" },
-      { code: "3429956", name: "Transmax Manual Z Long Life 75W-80", specs: "API GL-4, MAN 341 Z5, ZF TE-ML 01E/02E/16P", type: "Gear Oil" },
-      { code: "3430310", name: "Transmax Universal 80W-90", specs: "API GL-4 / GL-5", type: "Gear Oil" },
-    ];
+    // Global variables for products and orders
+    let oils = []; // Will be loaded from API
+    let currentOrder = {};
+    let currentType = 'Engine oil';
+
+    // API Configuration
+    const API_BASE = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8888/.netlify/functions' 
+      : '/.netlify/functions';
+
+    // Load products from API
+    async function loadProducts() {
+      try {
+        const response = await fetch(`${API_BASE}/products`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        oils = await response.json();
+        console.log('Products loaded:', oils.length);
+        renderProductsByType(currentType);
+      } catch (error) {
+        console.error('Failed to load products:', error);
+        // Show error message and provide fallback
+        productsContainer.innerHTML = `
+          <div class="col-span-full p-6 bg-red-900/20 border border-red-500 rounded-lg text-center">
+            <p class="text-red-400 mb-2">⚠️ Failed to load products from database</p>
+            <p class="text-gray-300 text-sm">Error: ${error.message}</p>
+            <button onclick="loadProducts()" class="mt-3 px-4 py-2 bg-primary text-white rounded hover:bg-secondary">
+              Try Again
+            </button>
+          </div>
+        `;
+      }
+    }
 
 
     // DOM Elements
@@ -445,42 +408,75 @@
     };
 
     // Handle order submission
-    const submitOrder = () => {
+    // Submit order to database via API
+    const submitOrder = async () => {
       if (Object.keys(currentOrder).length === 0) {
         showToast('Your order is empty.', 'error');
         return;
       }
+      
       loadingIndicator.classList.remove('hidden');
       
       // Hide modal
-
       confirmModal.classList.add('hidden');
 
+      try {
+        // Prepare order data for API
+        const orderData = {
+          customer_email: 'anonymous@example.com', // Could be enhanced with user input
+          items: Object.values(currentOrder).map(item => {
+            const oil = oils.find(o => o.name === item.name);
+            return {
+              name: item.name,
+              code: oil ? oil.code : '',
+              quantity: item.quantity
+            };
+          })
+        };
 
-      // Generate CSV
-      let csv = 'Product Code,Quantity,Product Name\n';
-      Object.values(currentOrder).forEach(item => {
-        const oil = oils.find(o => o.name === item.name);
-        csv += `"${oil ? oil.code : ''}","${item.quantity}","${item.name}"\n`;
-      });
+        // Send order to API
+        const response = await fetch(`${API_BASE}/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderData)
+        });
 
-      // Create and download CSV file
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'order.csv';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-      setTimeout(() => {
-        showToast('Order submitted! CSV downloaded.', 'success');
+        const result = await response.json();
+        console.log('Order submitted successfully:', result);
+
+        // Generate CSV for download (keeping existing functionality)
+        let csv = 'Product Code,Quantity,Product Name\n';
+        orderData.items.forEach(item => {
+          csv += `"${item.code}","${item.quantity}","${item.name}"\n`;
+        });
+
+        // Create and download CSV file
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `order-${result.orderId || 'unknown'}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast(`Order submitted successfully! Order ID: ${result.orderId}`, 'success');
         currentOrder = {};
         renderOrder();
+        
+      } catch (error) {
+        console.error('Failed to submit order:', error);
+        showToast(`Failed to submit order: ${error.message}`, 'error');
+      } finally {
         loadingIndicator.classList.add('hidden');
-      }, 800);
+      }
     };
 
 
@@ -531,9 +527,8 @@
 
     // Initialize the page and event handlers
     document.addEventListener('DOMContentLoaded', () => {
-
-
-      renderProductsByType(currentType);
+      // Load products from API instead of using hardcoded data
+      loadProducts();
       renderOrder();
       setupEventHandlers();
     });
@@ -582,7 +577,7 @@
       });
 
       // Submit order button event
-      submitOrderBtn.addEventListenr('click', () => {
+      submitOrderBtn.addEventListener('click', () => {
         if (Object.keys(currentOrder).length === 0) {
           showToast('Your order is empty.', 'error');
           return;
