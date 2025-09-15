@@ -1,404 +1,167 @@
-# Deployment Guide
+# Deployment Instructions for Neon DB Integration
 
-## Overview
+This document explains how to deploy the joshburt.com.au website with Neon DB integration using Netlify Functions.
 
-This guide covers deploying the joshburt.com.au application with database integration support.
+## Prerequisites
 
-## Quick Start Commands
+1. **Neon DB Account**: You need a Neon DB account with the provided connection string
+2. **Netlify Account**: For hosting the website and functions
+3. **GitHub Repository**: Connected to Netlify for automatic deployments
 
-```bash
-# Development (SQLite)
-npm run dev
+## Database Setup
 
-# Production (PostgreSQL)
-npm run prod
+### 1. Create Database Tables
 
-# Initialize database manually
-npm run db:init
-
-# Reset database (development only)
-npm run db:reset
-
-# Run tests
-npm run test:auth
-```
-
-## Production Deployment
-
-### 1. PostgreSQL Setup
+Run the SQL commands from `database-schema.sql` in your Neon DB console:
 
 ```bash
-# Install PostgreSQL
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-
-# Create database and user
-sudo -u postgres psql
-CREATE DATABASE joshburt_website;
-CREATE USER joshburt_user WITH PASSWORD 'your_secure_password';
-GRANT ALL PRIVILEGES ON DATABASE joshburt_website TO joshburt_user;
-\q
+# Copy the contents of database-schema.sql and execute in Neon DB SQL Editor
 ```
 
-### 2. Environment Configuration
+This will create:
+- `products` table with Castrol oil products
+- `orders` table for customer orders
+- `order_items` table for individual order items
+- `users` table for future authentication
+- Sample product data pre-populated
 
-Create `.env` file in production:
+### 2. Environment Variables
 
-```env
-# Production Environment
-NODE_ENV=production
-PORT=3000
+Set the following environment variable in your Netlify dashboard:
 
-# Database Configuration
-DB_TYPE=postgres
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=joshburt_website
-DB_USER=joshburt_user
-DB_PASSWORD=your_secure_password
-DB_SSL=true
+**Netlify Dashboard → Site Settings → Environment Variables:**
 
-# JWT Configuration (CHANGE THESE!)
-JWT_SECRET=your-super-secure-jwt-secret-at-least-32-characters-long
-JWT_EXPIRES_IN=7d
-JWT_REFRESH_EXPIRES_IN=30d
-
-# Email Configuration (optional - for password reset)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-FROM_EMAIL=noreply@joshburt.com.au
-
-# OAuth Configuration (optional)
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-GITHUB_CLIENT_ID=your-github-client-id
-GITHUB_CLIENT_SECRET=your-github-client-secret
-
-# URLs
-FRONTEND_URL=https://joshburt.com.au
-PRODUCTION_URL=https://joshburt.com.au
-
-# Security
-BCRYPT_ROUNDS=12
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
 ```
+NEON_DATABASE_URL = postgresql://neondb_owner:npg_RCwEhZ2pm6vx@ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+```
+
+## Netlify Deployment
+
+### 1. Connect Repository
+
+1. Go to [Netlify Dashboard](https://app.netlify.com/)
+2. Click "New site from Git"
+3. Connect your GitHub account
+4. Select the `joshburt.com.au` repository
+5. Configure build settings:
+   - **Build command**: `echo "No build required for static site"`
+   - **Publish directory**: `/` (root directory)
+   - **Functions directory**: `netlify/functions`
+
+### 2. Enable Netlify Functions
+
+Netlify will automatically detect the `netlify/functions` directory and deploy the serverless functions.
+
+Available endpoints after deployment:
+- `/.netlify/functions/products` - GET/POST for products
+- `/.netlify/functions/orders` - GET/POST for orders
 
 ### 3. Install Dependencies
 
-```bash
-npm install --production
+Create a `netlify.toml` file if automatic dependency detection doesn't work:
+
+```toml
+[build]
+  command = "npm install"
+  functions = "netlify/functions"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "18"
 ```
 
-### 4. Start Application
+## Testing
 
-```bash
-# Using npm script (recommended)
-npm run prod
+### Local Development
 
-# Or directly
-NODE_ENV=production node scripts/start.js
-```
+1. Install Netlify CLI:
+   ```bash
+   npm install -g netlify-cli
+   ```
 
-## Development Setup
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### 1. Clone Repository
+3. Run locally with functions:
+   ```bash
+   netlify dev
+   ```
 
-```bash
-git clone https://github.com/SmokeHound/joshburt.com.au.git
-cd joshburt.com.au
-```
+4. Access at: http://localhost:8888
 
-### 2. Install Dependencies
+### Production Testing
 
-```bash
-npm install
-```
-
-### 3. Start Development Server
-
-```bash
-npm run dev
-```
-
-The application will start with SQLite database at `http://localhost:3000`
-
-## Database Migration
-
-### From SQLite to PostgreSQL
-
-1. **Export SQLite data**:
-```bash
-sqlite3 database.sqlite .dump > export.sql
-```
-
-2. **Convert SQL syntax** (manual process):
-   - Change `INTEGER PRIMARY KEY AUTOINCREMENT` to `SERIAL PRIMARY KEY`
-   - Change `DATETIME` to `TIMESTAMP`
-   - Convert boolean values (1/0 to true/false)
-   - Update constraint syntax
-
-3. **Import to PostgreSQL**:
-```bash
-psql -h localhost -U joshburt_user -d joshburt_website < converted_export.sql
-```
-
-## Process Management
-
-### Using PM2 (Recommended)
+After deployment, test the API endpoints:
 
 ```bash
-# Install PM2
-npm install -g pm2
+# Test products endpoint
+curl https://your-site.netlify.app/.netlify/functions/products
 
-# Start application
-pm2 start scripts/start.js --name "joshburt-api"
-
-# Save PM2 configuration
-pm2 save
-pm2 startup
-
-# Monitor
-pm2 status
-pm2 logs joshburt-api
+# Test orders endpoint
+curl -X POST https://your-site.netlify.app/.netlify/functions/orders \
+  -H "Content-Type: application/json" \
+  -d '{"items":[{"name":"Test Product","code":"TEST123","quantity":1}]}'
 ```
 
-### Using systemd
+## Features
 
-Create `/etc/systemd/system/joshburt-api.service`:
+### Oil Ordering System (`oil.html`)
 
-```ini
-[Unit]
-Description=Josh Burt Website API
-After=network.target
+- **Products Loading**: Fetches products from Neon DB via `/products` API
+- **Order Submission**: Saves orders to Neon DB via `/orders` API
+- **CSV Download**: Still generates CSV files for local record keeping
+- **Error Handling**: Shows user-friendly error messages if API calls fail
 
-[Service]
-Type=simple
-User=www-data
-WorkingDirectory=/var/www/joshburt.com.au
-ExecStart=/usr/bin/node scripts/start.js
-Restart=on-failure
-RestartSec=5s
-Environment=NODE_ENV=production
+### API Functions
 
-[Install]
-WantedBy=multi-user.target
-```
+#### Products Function (`/netlify/functions/products.js`)
+- **GET**: Retrieve all products or filter by type
+- **POST**: Add new products (admin functionality)
+- **CORS**: Properly configured for browser requests
 
-```bash
-sudo systemctl enable joshburt-api
-sudo systemctl start joshburt-api
-sudo systemctl status joshburt-api
-```
-
-## Reverse Proxy Configuration
-
-### Nginx
-
-```nginx
-server {
-    listen 80;
-    server_name api.joshburt.com.au;
-
-    # Redirect to HTTPS
-    return 301 https://$server_name$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name api.joshburt.com.au;
-
-    # SSL Configuration
-    ssl_certificate /path/to/certificate.pem;
-    ssl_certificate_key /path/to/private-key.pem;
-
-    # API Proxy
-    location /api/ {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-        proxy_read_timeout 90;
-    }
-
-    # Static files (if serving from same domain)
-    location / {
-        root /var/www/joshburt.com.au;
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
-
-## Monitoring and Logging
-
-### Health Checks
-
-```bash
-# Check API health
-curl https://api.joshburt.com.au/api/health
-
-# Expected response:
-{
-  "status": "healthy",
-  "timestamp": "2023-XX-XXTXX:XX:XX.XXXZ",
-  "environment": "production"
-}
-```
-
-### Database Monitoring
-
-```sql
--- Check user count
-SELECT COUNT(*) as total_users FROM users;
-
--- Check active sessions
-SELECT COUNT(*) as active_tokens FROM refresh_tokens WHERE expires_at > NOW();
-
--- Recent activity
-SELECT action, COUNT(*) as count 
-FROM audit_logs 
-WHERE created_at >= NOW() - INTERVAL '24 hours' 
-GROUP BY action;
-```
-
-### Log Management
-
-```bash
-# PM2 logs
-pm2 logs joshburt-api --lines 100
-
-# System logs
-journalctl -u joshburt-api -f
-
-# Application logs
-tail -f /var/log/joshburt-api.log
-```
-
-## Security Checklist
-
-- [ ] Strong JWT secret (32+ characters)
-- [ ] Database credentials secured
-- [ ] Default user passwords changed
-- [ ] SSL/TLS enabled
-- [ ] Firewall configured
-- [ ] Rate limiting enabled
-- [ ] Regular security updates
-- [ ] Backup procedures in place
-- [ ] Audit logging enabled
-- [ ] Error logging configured
-
-## Backup and Recovery
-
-### Database Backup
-
-```bash
-# PostgreSQL backup
-pg_dump -h localhost -U joshburt_user joshburt_website > backup_$(date +%Y%m%d_%H%M%S).sql
-
-# Automated backup script
-#!/bin/bash
-BACKUP_DIR="/var/backups/joshburt"
-DATE=$(date +%Y%m%d_%H%M%S)
-mkdir -p $BACKUP_DIR
-pg_dump -h localhost -U joshburt_user joshburt_website > $BACKUP_DIR/backup_$DATE.sql
-find $BACKUP_DIR -name "backup_*.sql" -mtime +7 -delete
-```
-
-### Application Backup
-
-```bash
-# Backup application files
-tar -czf joshburt_app_$(date +%Y%m%d).tar.gz \
-  --exclude=node_modules \
-  --exclude=*.sqlite \
-  --exclude=.git \
-  /var/www/joshburt.com.au/
-```
+#### Orders Function (`/netlify/functions/orders.js`)
+- **POST**: Submit new orders with multiple items
+- **GET**: Retrieve order history (admin functionality)
+- **Database Transactions**: Ensures data consistency
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Database connection failed**
-   ```bash
-   # Check PostgreSQL status
-   sudo systemctl status postgresql
-   
-   # Check connection
-   psql -h localhost -U joshburt_user -d joshburt_website
-   ```
+1. **"Failed to load products from database"**
+   - Check Neon DB connection string in environment variables
+   - Verify database tables exist by running the schema SQL
+   - Check Netlify function logs for detailed error messages
 
-2. **Permission denied**
-   ```sql
-   -- Grant permissions
-   GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO joshburt_user;
-   GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO joshburt_user;
-   ```
+2. **"Failed to submit order"**
+   - Ensure orders and order_items tables exist
+   - Check CORS configuration if testing from different domain
+   - Verify API endpoint URL is correct
 
-3. **JWT errors**
-   - Ensure JWT_SECRET is set and consistent
-   - Check token expiration settings
+3. **Functions not deploying**
+   - Ensure `netlify/functions` directory structure is correct
+   - Check that `package.json` includes `pg` dependency
+   - Verify Node.js version compatibility (use Node 18+)
 
-4. **Rate limiting issues**
-   - Check RATE_LIMIT_* environment variables
-   - Monitor request patterns
+### Monitoring
 
-### Performance Tuning
+- **Netlify Function Logs**: Monitor function execution and errors
+- **Neon DB Monitoring**: Track database queries and performance
+- **Browser Console**: Check for JavaScript errors on frontend
 
-1. **Database optimization**
-   ```sql
-   -- Create additional indexes if needed
-   CREATE INDEX idx_users_created_at ON users(created_at);
-   CREATE INDEX idx_audit_logs_action ON audit_logs(action);
-   ```
+## Security Considerations
 
-2. **Connection pooling**
-   - Default pool size: 20 connections
-   - Adjust based on load requirements
+- Database connection string is stored as environment variable
+- CORS headers configured for security
+- SQL injection prevention through parameterized queries
+- Consider adding rate limiting for production use
 
-3. **Caching**
-   - Consider Redis for session storage
-   - Implement API response caching
+## Future Enhancements
 
-## Updates and Maintenance
-
-### Application Updates
-
-```bash
-# Pull latest changes
-git pull origin main
-
-# Install dependencies
-npm install --production
-
-# Run database migrations (if any)
-npm run db:init
-
-# Restart application
-pm2 restart joshburt-api
-```
-
-### Database Maintenance
-
-```sql
--- Clean up expired tokens (manual)
-DELETE FROM refresh_tokens WHERE expires_at < NOW();
-
--- Vacuum database (PostgreSQL)
-VACUUM ANALYZE;
-```
-
-## Support
-
-For issues and questions:
-- Check logs: `pm2 logs joshburt-api`
-- Review database health: `curl /api/health`
-- Check documentation: `DATABASE.md`
-- GitHub Issues: Create issue in repository
+- User authentication and order history
+- Admin panel for product management
+- Email notifications for orders
+- Real-time inventory tracking
+- Enhanced error reporting and monitoring

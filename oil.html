@@ -315,41 +315,88 @@
       }, 3000);
     };
 
-    // Load products from Netlify function instead of localStorage
+    // Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      body.classList.toggle('light');
+      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+      themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+      themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+    });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    body.classList.add(savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+    themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      const isOpen = sidebar.classList.contains('open');
+      menuToggle.setAttribute('aria-expanded', isOpen);
+    });
+
+    // Global variables for products and orders
+    let oils = []; // Will be loaded from API
+    let currentOrder = {};
+    let currentType = 'Engine oil';
+
+    // API Configuration
+    const API_BASE = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8888/.netlify/functions' 
+      : '/.netlify/functions';
+
+    // Load products from API
     async function loadProducts() {
       try {
-        showToast('Loading products...', 'info');
-        const response = await fetch('/.netlify/functions/products');
-        
+        const response = await fetch(`${API_BASE}/products`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
         oils = await response.json();
-        console.log('Products loaded from database:', oils);
-        showToast('Products loaded successfully!', 'success');
-        
-        // Initialize the UI after loading products
-  renderProducts();
-        
+        console.log('Products loaded:', oils.length);
+        renderProductsByType(currentType);
       } catch (error) {
-        console.error('Error loading products from API:', error);
-        showToast('Failed to load products. Using fallback data.', 'error');
-        
-        // Fallback to default products if API fails
-        oils = [
-          { id: 1, code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil", description: "High-performance synthetic engine oil for modern vehicles", image: "" },
-          { id: 2, code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6", type: "Engine oil", description: "Advanced formula for fuel economy and engine protection", image: "" },
-          { id: 3, code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+", type: "Engine oil", description: "Specialized formula for European vehicles", image: "" },
-        ];
-  renderProducts();
+        console.error('Failed to load products:', error);
+        // Show error message and provide fallback
+        productsContainer.innerHTML = `
+          <div class="col-span-full p-6 bg-red-900/20 border border-red-500 rounded-lg text-center">
+            <p class="text-red-400 mb-2">⚠️ Failed to load products from database</p>
+            <p class="text-gray-300 text-sm">Error: ${error.message}</p>
+            <button onclick="loadProducts()" class="mt-3 px-4 py-2 bg-primary text-white rounded hover:bg-secondary">
+              Try Again
+            </button>
+          </div>
+        `;
       }
     }
 
-    // Render products based on selected type
-    function renderProducts(productType = activeProductType) {
-      const container = document.getElementById('productsContainer');
-      const filteredOils = oils.filter(oil => oil.type === productType);
+
+    // DOM Elements
+    const productsContainer = document.getElementById('productsContainer');
+    const orderItemsContainer = document.getElementById('orderItems');
+    const totalItemsSpan = document.getElementById('totalItems');
+    const submitOrderBtn = document.getElementById('submitOrderBtn');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const modalOrderSummary = document.getElementById('modalOrderSummary');
+    const confirmModal = document.getElementById('confirmModal');
+
+
+    // Global variables
+    let currentOrder = {};
+    let currentType = 'Engine oil';
+
+
+    // Render the order summary
+    const renderOrder = () => {
+      orderItemsContainer.innerHTML = '';
+      let totalItems = 0;
+      const orderedItems = Object.entries(currentOrder);
 
       if (filteredOils.length === 0) {
         container.innerHTML = `
@@ -400,87 +447,200 @@
       if (currentOrder[oilData.name]) {
         currentOrder[oilData.name].quantity += 1;
       } else {
-        currentOrder[oilData.name] = {
-          name: oilData.name,
-          code: oilData.code,
-          quantity: 1
-        };
+        if (item) {
+          // Update existing item
+          currentOrder[name].quantity = newQuantity;
+          showToast(`Updated quantity for ${name}.`, 'info');
+        } else {
+          // Add new item
+          const oil = oils.find(o => o.name === name);
+          if (oil) {
+            currentOrder[name] = { name: oil.name, specs: oil.specs, quantity: 1 };
+            showToast(`${oil.name} added to order!`, 'success');
+          }
+        }
       }
-      
-      // Save order to localStorage (user-specific data stays in localStorage)
-      localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
-      updateOrderDisplay();
-      showToast(`Added ${oilData.name} to order`, 'success');
-    }
+      renderOrder();
+      loadingIndicator.classList.add('hidden');
+    };
 
-    // Update order display
-    function updateOrderDisplay() {
-      const orderItems = document.getElementById('orderItems');
-      const totalItems = document.getElementById('totalItems');
-      const submitBtn = document.getElementById('submitOrderBtn');
-
+    // Handle order submission
+    // Submit order to database via API
+    const submitOrder = async () => {
       if (Object.keys(currentOrder).length === 0) {
         orderItems.innerHTML = '<p class="text-gray-400 text-center py-4 lg:py-8 text-sm">Your order is empty.</p>';
         totalItems.textContent = '0';
         submitBtn.disabled = true;
         return;
       }
+      
+      loadingIndicator.classList.remove('hidden');
+      
+      // Hide modal
+      confirmModal.classList.add('hidden');
 
-      orderItems.innerHTML = Object.values(currentOrder).map(item => `
-        <div class="flex justify-between items-center p-2 bg-gray-700 rounded">
-          <div class="flex-1">
-            <span class="text-white text-sm">${item.name}</span>
-            <span class="text-gray-400 text-xs block">${item.code}</span>
+      try {
+        // Prepare order data for API
+        const orderData = {
+          customer_email: 'anonymous@example.com', // Could be enhanced with user input
+          items: Object.values(currentOrder).map(item => {
+            const oil = oils.find(o => o.name === item.name);
+            return {
+              name: item.name,
+              code: oil ? oil.code : '',
+              quantity: item.quantity
+            };
+          })
+        };
+
+        // Send order to API
+        const response = await fetch(`${API_BASE}/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderData)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Order submitted successfully:', result);
+
+        // Generate CSV for download (keeping existing functionality)
+        let csv = 'Product Code,Quantity,Product Name\n';
+        orderData.items.forEach(item => {
+          csv += `"${item.code}","${item.quantity}","${item.name}"\n`;
+        });
+
+        // Create and download CSV file
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `order-${result.orderId || 'unknown'}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast(`Order submitted successfully! Order ID: ${result.orderId}`, 'success');
+        currentOrder = {};
+        renderOrder();
+        
+      } catch (error) {
+        console.error('Failed to submit order:', error);
+        showToast(`Failed to submit order: ${error.message}`, 'error');
+      } finally {
+        loadingIndicator.classList.add('hidden');
+      }
+    };
+
+
+    // Render products by type
+    function renderProductsByType(type) {
+      productsContainer.innerHTML = '';
+      oils.filter(oil => oil.type === type).forEach((oil) => {
+        const cardHtml = `
+
+          <div class="p-4 bg-gray-700 rounded shadow card product-card" data-index="${oils.indexOf(oil)}">
+            <h5 class="font-bold text-white mb-2 cursor-pointer">${oil.name}</h5>
+            <div class="flex justify-end mb-2">
+              <button class="px-4 py-2 bg-primary text-white rounded-full text-sm hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary btn-add-to-order" data-index="${oils.indexOf(oil)}">
+                + Add
+              </button>
+            </div>
+            <div class="product-details hidden">
+              <p class="text-gray-300 text-sm mb-1">${oil.specs}</p>
+              <p class="text-sm"><strong>Product Code:</strong> ${oil.code}</p>
+
+            </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <button class="decrease-quantity text-gray-400 hover:text-white w-6 h-6 flex items-center justify-center rounded" 
-                    data-name="${item.name}" aria-label="Decrease quantity">-</button>
-            <span class="text-white text-sm w-8 text-center">${item.quantity}</span>
-            <button class="increase-quantity text-gray-400 hover:text-white w-6 h-6 flex items-center justify-center rounded" 
-                    data-name="${item.name}" aria-label="Increase quantity">+</button>
-            <button class="remove-item text-red-400 hover:text-red-300 w-6 h-6 flex items-center justify-center rounded" 
-                    data-name="${item.name}" aria-label="Remove item">×</button>
-          </div>
-        </div>
-      `).join('');
-
-      const totalCount = Object.values(currentOrder).reduce((sum, item) => sum + item.quantity, 0);
-      totalItems.textContent = totalCount;
-      submitBtn.disabled = totalCount === 0;
-
-      // Add event listeners for quantity controls
-      orderItems.querySelectorAll('.increase-quantity').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const name = e.target.dataset.name;
-          currentOrder[name].quantity += 1;
-          localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
-          updateOrderDisplay();
-        });
-      });
-
-      orderItems.querySelectorAll('.decrease-quantity').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const name = e.target.dataset.name;
-          if (currentOrder[name].quantity > 1) {
-            currentOrder[name].quantity -= 1;
-          } else {
-            delete currentOrder[name];
-          }
-          localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
-          updateOrderDisplay();
-        });
-      });
-
-      orderItems.querySelectorAll('.remove-item').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const name = e.target.dataset.name;
-          delete currentOrder[name];
-          localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
-          updateOrderDisplay();
-          showToast('Item removed from order', 'info');
-        });
+        `;
+        productsContainer.insertAdjacentHTML('beforeend', cardHtml);
       });
     }
+
+    // Tab functionality
+    const tabs = document.getElementById('productTypeTabs');
+    tabs.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      const tab = e.target.closest('.tab-button');
+      if (!tab) return;
+      
+      // Update tab styles
+      tabs.querySelectorAll('.tab-button').forEach(t => {
+        t.classList.remove('bg-primary', 'text-white');
+        t.classList.add('text-gray-300', 'hover:text-white');
+      });
+      tab.classList.add('bg-primary', 'text-white');
+      tab.classList.remove('text-gray-300', 'hover:text-white');
+      
+
+      currentType = tab.getAttribute('data-type');
+      renderProductsByType(currentType);
+    });
+
+    // Initialize the page and event handlers
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load products from API instead of using hardcoded data
+      loadProducts();
+      renderOrder();
+      setupEventHandlers();
+    });
+
+    // Setup all event handlers
+    const setupEventHandlers = () => {
+      // Product container events (add to order, toggle details)
+      productsContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('.btn-add-to-order');
+        if (button) {
+          const index = button.getAttribute('data-index');
+          const oil = oils[index];
+          if (oil) {
+            updateOrder(oil.name, 1);
+          }
+          return;
+        }
+        // Toggle product details when clicking the heading
+        const cardTitle = e.target.closest('h5');
+        if (cardTitle) {
+
+          const card = cardTitle.closest('.product-card');
+
+          const details = card.querySelector('.product-details');
+          if (details) {
+            details.classList.toggle('hidden');
+          }
+        }
+      });
+
+      // Order items container events (quantity controls, remove items)
+      orderItemsContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('button');
+        if (!button) return;
+
+        const itemName = button.getAttribute('data-name');
+        if (!itemName) return;
+
+        if (button.classList.contains('decrease-quantity')) {
+          updateOrder(itemName, -1);
+        } else if (button.classList.contains('increase-quantity')) {
+          updateOrder(itemName, 1);
+        } else if (button.classList.contains('remove-item')) {
+          updateOrder(itemName, -currentOrder[itemName].quantity);
+        }
+      });
+
+      // Submit order button event
+      submitOrderBtn.addEventListener('click', () => {
+        if (Object.keys(currentOrder).length === 0) {
+          showToast('Your order is empty.', 'error');
+          return;
+        }
 
 
         // Populate modal with order summary
