@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@netlify/functions": "^4.2.5",
-    "pg": "^8.11.3"
+    "pg": "^8.11.3",
+    "tailwindcss": "^4.1.13"
   },
   "author": "Josh Burt",
   "license": "MIT"
