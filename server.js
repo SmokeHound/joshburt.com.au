@@ -74,11 +74,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Catch all handler for SPA routing
-app.get('*', (req, res) => {
-  // If it's an API route that doesn't exist, return 404
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
+// Handle static files and SPA routing
+app.get(/^\/(?!api\/).*/, (req, res) => {
+  // Check if the requested file exists
+  const filePath = path.join(__dirname, req.path);
+  const fs = require('fs');
+  
+  // If it's a file request and the file exists, serve it
+  if (req.path.includes('.') && fs.existsSync(filePath)) {
+    return res.sendFile(filePath);
   }
   
   // Otherwise serve index.html for client-side routing
