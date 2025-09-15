@@ -1,22 +1,20 @@
 [build]
+  command = "npm install"
+  functions = "netlify/functions"
   publish = "."
-  functions = ".netlify/functions"
 
-[dev]
-  command = "netlify dev"
-  port = 8888
-  targetPort = 8000
+[build.environment]
+  NODE_VERSION = "18"
 
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+
+# Redirect API calls to functions (optional, for cleaner URLs)
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
-
-[functions]
-  node_bundler = "esbuild"
-
-[context.production.environment]
-  NEON_DATABASE_URL = "postgresql://neondb_owner:npg_RCwEhZ2pm6vx@ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
-
-[context.dev.environment]
-  NEON_DATABASE_URL = "postgresql://neondb_owner:npg_RCwEhZ2pm6vx@ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
