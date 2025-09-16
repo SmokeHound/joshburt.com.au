@@ -1,11 +1,7 @@
 // Netlify Function: products.js
 // Handles Castrol product data from Neon DB
 
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL || 'postgresql://neondb_owner:npg_RCwEhZ2pm6vx@ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
-});
+const { database } = require('../../config/database');
 
 exports.handler = async function(event, context) {
   // Add CORS headers for browser requests
@@ -35,16 +31,16 @@ exports.handler = async function(event, context) {
       let params = [];
       
       if (type) {
-        query = 'SELECT * FROM products WHERE type = $1 ORDER BY name';
+        query = 'SELECT * FROM products WHERE type = ? ORDER BY name';
         params = [type];
       }
       
-      const result = await pool.query(query, params);
+      const products = await database.all(query, params);
       
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(result.rows)
+        body: JSON.stringify(products)
       };
       
     } else if (event.httpMethod === 'POST') {
@@ -60,15 +56,15 @@ exports.handler = async function(event, context) {
         };
       }
       
-      const result = await pool.query(
-        'INSERT INTO products (name, code, type, specs, description) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      const result = await database.run(
+        'INSERT INTO products (name, code, type, specs, description) VALUES (?, ?, ?, ?, ?)',
         [product.name, product.code, product.type, product.specs || '', product.description || '']
       );
       
       return {
         statusCode: 201,
         headers,
-        body: JSON.stringify({ success: true, productId: result.rows[0].id })
+        body: JSON.stringify({ success: true, productId: result.id })
       };
     }
     
