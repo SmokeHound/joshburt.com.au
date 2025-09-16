@@ -20,11 +20,14 @@ const pgConfig = {
 
 // MySQL configuration
 const mysqlConfig = {
-  host: process.env.DB_HOST || 'sql109.infinityfree.com',
-  user: process.env.DB_USER || 'if0_38625972',
-  password: process.env.DB_PASSWORD || 'MmN1ztIkTGRG',
-  database: process.env.DB_NAME || 'if0_38625972_db',
-  port: process.env.DB_PORT || 3306,
+  host: process.env.DB_HOST || 'mysql-28ad5375-joshburt.g.aivencloud.com',
+  user: process.env.DB_USER || 'avnadmin',
+  password: process.env.DB_PASSWORD || 'AVNS_ftCWIkMaUvsojeBNmAh',
+  database: process.env.DB_NAME || 'defaultdb',
+  port: process.env.DB_PORT || 12667,
+  ssl: {
+    rejectUnauthorized: true
+  },
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0

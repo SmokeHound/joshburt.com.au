@@ -1,81 +1,87 @@
-# joshburt.com.au - Static Website
 
-This is a static HTML website for joshburt.com.au featuring a responsive design with dark/light mode support, admin dashboard functionality, and a specialized Castrol oil product ordering system.
+# joshburt.com.au - Dynamic Website & API
 
-Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
+This site now includes both static HTML pages and dynamic backend functionality:
+- Responsive design with dark/light mode support
+- Admin dashboard and user management
+- Castrol oil product ordering system
+- **Dynamic backend**: Netlify serverless functions, Express API endpoints, and MySQL database integration
+
+Always reference these instructions first. Fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
+
 
 ## Working Effectively
 
 ### Bootstrap and Run the Website
-- **CRITICAL**: ALWAYS start server with adequate timeout - NEVER CANCEL server commands
-- Start a local HTTP server: `cd /home/runner/work/joshburt.com.au/joshburt.com.au && python3 -m http.server 8000`
-  - Server starts immediately (< 1 second)
-  - Website accessible at http://localhost:8000
-  - NEVER CANCEL: Server runs indefinitely until manually stopped - set timeout to 300+ seconds
-  - Stop server when done: `pkill -f "python3 -m http.server"`
+- **Static site**: Start local HTTP server as before
+   - `python3 -m http.server 8000`
+- **Dynamic backend**:
+   - Set environment variables for MySQL (DB_TYPE, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT)
+   - Start API server: `node api/server.js` (if present)
+   - Netlify functions auto-deploy on push
+   - Test database: `node test-mysql-init.js`
+
 
 ### Build and Deploy Information
-- **No build process required** - this is a pure static website
-- **No dependencies to install** - uses CDN resources only
-- **No compilation needed** - HTML/CSS/JS files used directly
-- **Deployment time**: Instant via GitHub Actions (< 30 seconds for FTP upload)
+- **Static files**: No build required
+- **Backend/API**: Requires Node.js dependencies (run `npm install`)
+- **Database**: MySQL (see config/database.js for credentials)
+- **Deployment**: GitHub Actions for FTP and Netlify; API/serverless functions deploy automatically
 
-### Test Website Functionality  
-- **Response time**: ~0.004 seconds per page load (measured)
-- **Main website**: Navigate to http://localhost:8000/ 
-- **Oil ordering system**: Navigate to http://localhost:8000/oil.html
-- **Admin dashboard**: Navigate to http://localhost:8000/admin.html
-- **All 7 pages load instantly** with static content
-- **Test command**: `curl -s -o /dev/null -w "HTTP response: %{time_total}s\n" http://localhost:8000/`
+
+### Test Website & API Functionality
+- **Static pages**: As before
+- **API endpoints**:
+   - Products: `/api/products` (GET, POST)
+   - Orders: `/api/orders` (GET, POST)
+   - Users: `/api/users` (GET, POST, PUT, DELETE)
+   - Auth: `/api/auth` (register, login, OAuth)
+- **Database**: Test with `node test-mysql-init.js`
+- **Netlify functions**: Test via deployed endpoints or local Netlify dev
+
 
 ## Validation
 
 ### Manual Testing Requirements
 ALWAYS manually validate changes by running through these complete end-to-end scenarios:
 
-1. **Homepage Functionality Test**:
-   - Start HTTP server: `python3 -m http.server 8000`
-   - Navigate to http://localhost:8000
-   - Verify sidebar navigation works (click Home, Admin, User Management, Analytics, Settings links)
-   - Test dark/light mode toggle button - button text should change from "Toggle Light Mode" to "Toggle Dark Mode"
-   - Test mobile menu toggle (hamburger button in mobile view)
-   - Click Login button - verify modal opens with Email and Password fields
-   - Click Close button - verify modal closes
-   - Confirm all 3 sample cards display correctly (Card 1, Card 2, Card 3)
+1. **Homepage Functionality Test** (static):
+   - As before
 
-2. **Oil Ordering System Test** (Critical Feature):
-   - Navigate to http://localhost:8000/oil.html
-   - **NOTE**: Due to CDN blocking, products may not load and you'll see "Loading products..." permanently
-   - **This is expected behavior in restricted environments**
-   - Verify page structure loads with "Castrol Products" heading and "Your Order" sidebar
-   - Order summary shows "Total Items: 0" and disabled "Submit Order" button
-   - **In production environment**: Products would load, allowing add to cart and CSV export functionality
+2. **Oil Ordering System Test** (dynamic):
+   - Navigate to oil.html and test product API (`/api/products`)
+   - Add product, view, and order via API
 
-3. **Admin Dashboard Test**:
-   - Navigate to http://localhost:8000/admin.html
-   - Verify admin dashboard loads with "Welcome, Admin!" message
-   - Test navigation to User Management - click "Manage Users" button
-   - On users.html page, verify user table displays with sample data (Josh Burt, Jane Doe)
-   - Verify "Add New User" form displays with Name, Email, Role fields
-   - Test "Toggle Dark Mode" button functionality across pages
+3. **Admin Dashboard & User Management**:
+   - Test user CRUD via `/api/users`
+   - Test login, registration, and OAuth via `/api/auth`
 
-### Known Limitations in Sandboxed Environments
-- **CDN resources blocked**: TailwindCSS and Bootstrap CDN resources are blocked, causing:
-  - Limited styling on pages (functional but not fully styled)
-  - JavaScript errors for `tailwind` and `bootstrap` objects
-  - Oil ordering system products don't load (requires Bootstrap)
-- **Image loading blocked**: Placeholder images from via.placeholder.com won't display
-- **Core functionality remains intact**: All navigation, forms, and basic interactions work
-- **Production deployment works perfectly**: These issues only occur in restricted dev environments
+4. **Orders API Test**:
+   - Submit and list orders via `/api/orders`
+
+5. **Database Test**:
+   - Run `node test-mysql-init.js` to verify MySQL connection and table creation
+
+
+### Known Limitations
+- **CDN resources blocked**: Styling may be limited in restricted environments
+- **Image loading blocked**: Placeholder images may not display
+- **MySQL connection**: Requires valid credentials and network access
+- **API/serverless**: Only works in supported environments (Netlify, Node.js)
+
 
 ## Deployment
 
 ### GitHub Actions Workflows
 Two deployment workflows are configured:
-1. **GitHub Pages** (`.github/workflows/static.yml`): Deploys to GitHub Pages on push to main
-2. **FTP Deployment** (`.github/workflows/main.yml`): Deploys to joshburt.com.au via FTP on any push
+1. **GitHub Pages** (`.github/workflows/static.yml`): Deploys static site on push to main
+2. **FTP Deployment** (`.github/workflows/main.yml`): Deploys static and backend files to joshburt.com.au via FTP on any push
+3. **Netlify Functions**: Deploys serverless API endpoints automatically
 
-No build steps required - files deploy as-is from repository root.
+**Build steps:**
+- Static: No build required
+- Backend/API: Run `npm install` before deploy
+
 
 ## Common Tasks
 
@@ -86,32 +92,51 @@ No build steps required - files deploy as-is from repository root.
 │   └── workflows/
 │       ├── main.yml      # FTP deployment
 │       └── static.yml    # GitHub Pages deployment
-├── index.html           # Main homepage with responsive template
-├── oil.html             # Castrol oil ordering system (key feature)
+├── index.html           # Main homepage
+├── oil.html             # Castrol oil ordering system
 ├── admin.html           # Admin dashboard
 ├── analytics.html       # Analytics page
 ├── settings.html        # Settings configuration
 ├── users.html           # User management
 ├── login.html           # Login page
-
-└── README.md           # Basic project info
+├── netlify/functions/   # Serverless API endpoints (products.js, orders.js, etc.)
+├── api/                 # Express API endpoints (users.js, auth.js, oauth.js)
+├── config/database.js   # Database abstraction (MySQL, PostgreSQL, SQLite)
+├── test-mysql-init.js   # MySQL test script
+└── README.md            # Basic project info
 ```
 
+
 ### Key Files Reference
-- **index.html**: Main website template with TailwindCSS, responsive design, login system
-- **oil.html**: Specialized Castrol product ordering with Bootstrap, CSV export functionality  
+- **index.html**: Main website template
+- **oil.html**: Castrol product ordering (uses API)
+- **netlify/functions/**: Serverless API endpoints (products.js, orders.js)
+- **api/**: Express API endpoints (users.js, auth.js, oauth.js)
+- **config/database.js**: Database abstraction
+- **test-mysql-init.js**: MySQL test script
+
 
 ### Development Notes
-- All pages now use consistent TailwindCSS styling with inline styles
-- All pages use unified navigation and theme toggle implementations
-- No linting, testing, or build tools configured - pure static website
+- Static pages use TailwindCSS and unified navigation
+- Backend/API uses Node.js, Express, Netlify functions
+- Database: MySQL (default), PostgreSQL, SQLite supported
+- Run `npm install` for backend dependencies
 - FTP credentials stored in GitHub Secrets for deployment
+
 
 ### Quick Commands Reference
 ```bash
-# Start development server
-cd /home/runner/work/joshburt.com.au/joshburt.com.au
+# Start static development server
 python3 -m http.server 8000
+
+# Start API server (if present)
+node api/server.js
+
+# Test MySQL database
+node test-mysql-init.js
+
+# Install backend dependencies
+npm install
 
 # Check website responds
 curl -s -o /dev/null -w "HTTP response: %{time_total}s\n" http://localhost:8000/
@@ -122,6 +147,7 @@ ls -1 *.html | wc -l  # Returns: 7
 # Stop server (if running in background)
 pkill -f "python3 -m http.server"
 ```
+
 
 ### File Contents Reference
 ```bash
@@ -134,7 +160,9 @@ grep -A10 "<nav>" index.html
 # Shows sidebar navigation with Home, Admin, User Management, Analytics, Settings, Logout
 ```
 
+
 ## Error Handling
 - If CDN resources fail to load, website remains functional but may have styling issues
-- No server-side dependencies means no database or API connection issues
-- Static files mean no runtime errors beyond JavaScript console warnings for blocked CDNs
+- If MySQL connection fails, check credentials and network access
+- API/serverless errors: check logs and endpoint responses
+- Static files: no runtime errors beyond JavaScript console warnings for blocked CDNs
