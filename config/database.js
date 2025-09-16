@@ -1,8 +1,9 @@
 const { Pool } = require('pg');
+const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 
-// Database configuration - support both local SQLite fallback and PostgreSQL
-const DB_TYPE = process.env.DB_TYPE || 'sqlite';
+// Database configuration - support PostgreSQL, MySQL, and SQLite fallback
+const DB_TYPE = process.env.DB_TYPE || 'mysql';
 
 // PostgreSQL configuration
 const pgConfig = {
@@ -15,6 +16,18 @@ const pgConfig = {
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
+};
+
+// MySQL configuration
+const mysqlConfig = {
+  host: process.env.DB_HOST || 'sql109.infinityfree.com',
+  user: process.env.DB_USER || 'if0_38625972',
+  password: process.env.DB_PASSWORD || 'MmN1ztIkTGRG',
+  database: process.env.DB_NAME || 'if0_38625972_db',
+  port: process.env.DB_PORT || 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 };
 
 // SQLite fallback for development
@@ -30,28 +43,33 @@ const DB_PATH = process.env.DB_PATH || path.join(__dirname, '..', 'database.sqli
 
 class Database {
   constructor() {
-    this.pool = null;
-    this.db = null;
+    this.pool = null; // PostgreSQL
+    this.db = null;   // SQLite
+    this.mysqlPool = null; // MySQL
     this.type = DB_TYPE;
   }
 
   async connect() {
     try {
-      if (this.type === 'postgres' || this.type === 'postgresql') {
+      if (this.type === 'mysql') {
+        this.mysqlPool = await mysql.createPool(mysqlConfig);
+        // Test connection
+        const conn = await this.mysqlPool.getConnection();
+        await conn.query('SELECT 1');
+        conn.release();
+        console.log('🐬 Connected to MySQL database');
+      } else if (this.type === 'postgres' || this.type === 'postgresql') {
         this.pool = new Pool(pgConfig);
-        
         // Test the connection
         const client = await this.pool.connect();
         await client.query('SELECT NOW()');
         client.release();
-        
         console.log('📚 Connected to PostgreSQL database');
       } else {
         // Fallback to SQLite for development
         if (!sqlite3) {
-          throw new Error('SQLite3 not available and PostgreSQL not configured');
+          throw new Error('SQLite3 not available and PostgreSQL/MySQL not configured');
         }
-        
         return new Promise((resolve, reject) => {
           this.db = new sqlite3.Database(DB_PATH, (err) => {
             if (err) {
@@ -95,7 +113,10 @@ class Database {
 
   // Utility to convert SQL with placeholders to the correct format
   _prepareQuery(sql, params = []) {
-    if (this.pool) {
+    if (this.mysqlPool) {
+      // MySQL uses ?
+      return { sql, params };
+    } else if (this.pool) {
       // PostgreSQL uses $1, $2, etc.
       let pgSql = sql;
       let paramIndex = 1;
@@ -109,8 +130,15 @@ class Database {
 
   async run(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
-    
-    if (this.pool) {
+    if (this.mysqlPool) {
+      // MySQL
+      const [result] = await this.mysqlPool.execute(preparedSql, preparedParams);
+      return {
+        id: result.insertId || null,
+        changes: result.affectedRows || 0,
+        rows: result
+      };
+    } else if (this.pool) {
       // PostgreSQL
       const client = await this.pool.connect();
       try {
@@ -143,8 +171,11 @@ class Database {
 
   async get(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
-    
-    if (this.pool) {
+    if (this.mysqlPool) {
+      // MySQL
+      const [rows] = await this.mysqlPool.execute(preparedSql, preparedParams);
+      return rows[0] || null;
+    } else if (this.pool) {
       // PostgreSQL
       const client = await this.pool.connect();
       try {
@@ -173,8 +204,11 @@ class Database {
 
   async all(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
-    
-    if (this.pool) {
+    if (this.mysqlPool) {
+      // MySQL
+      const [rows] = await this.mysqlPool.execute(preparedSql, preparedParams);
+      return rows;
+    } else if (this.pool) {
       // PostgreSQL
       const client = await this.pool.connect();
       try {
