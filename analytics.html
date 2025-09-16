@@ -38,6 +38,14 @@
         body {
             transition: background-color 0.3s, color 0.3s;
         }
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+        .sales-chart-container {
+            height: 350px;
+            width: 100%;
+        }
         .dark {
             background-color: #1f2937;
             color: #f9fafb;
@@ -197,13 +205,13 @@
                 <!-- Visitor Trends Chart -->
                 <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                     <h3 class="font-semibold mb-4">Visitor Trends</h3>
-                    <canvas id="visitor-chart" width="400" height="200"></canvas>
+                    <div class="chart-container"><canvas id="visitor-chart"></canvas></div>
                 </div>
                 
                 <!-- User Engagement Chart -->
                 <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                     <h3 class="font-semibold mb-4">User Engagement</h3>
-                    <canvas id="engagement-chart" width="400" height="200"></canvas>
+                    <div class="chart-container"><canvas id="engagement-chart"></canvas></div>
                 </div>
             </div>
         </section>
@@ -212,7 +220,7 @@
         <section class="mb-6">
             <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
                 <h3 class="font-semibold mb-4">Product Sales Analytics</h3>
-                <canvas id="sales-chart" width="800" height="300"></canvas>
+                <div class="sales-chart-container"><canvas id="sales-chart"></canvas></div>
             </div>
         </section>
 
@@ -479,7 +487,8 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
                     plugins: {
                         legend: {
                             labels: { color: '#f9fafb' }
@@ -521,7 +530,8 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
                     plugins: {
                         legend: {
                             labels: { color: '#f9fafb' }
@@ -558,7 +568,8 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
                     plugins: {
                         legend: {
                             labels: { color: '#f9fafb' }
