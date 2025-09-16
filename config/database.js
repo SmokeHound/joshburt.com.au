@@ -236,20 +236,75 @@ class Database {
   }
 }
 
+// MySQL table creation
+async function createMySQLTables() {
+  // Create users table for MySQL
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      email VARCHAR(255) UNIQUE NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      password_hash VARCHAR(255),
+      role VARCHAR(50) DEFAULT 'user',
+      is_active BOOLEAN DEFAULT true,
+      email_verified BOOLEAN DEFAULT false,
+      oauth_provider VARCHAR(50),
+      oauth_id VARCHAR(255),
+      avatar_url TEXT,
+      reset_token VARCHAR(255),
+      reset_token_expires BIGINT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Create refresh tokens table for MySQL
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS refresh_tokens (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      token_hash VARCHAR(255) NOT NULL,
+      expires_at TIMESTAMP NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
+  // Create audit log table for MySQL
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS audit_logs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT,
+      action VARCHAR(255) NOT NULL,
+      details TEXT,
+      ip_address VARCHAR(45),
+      user_agent TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    )
+  `);
+
+  // Create indexes for better performance
+  await database.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
+  await database.run(`CREATE INDEX IF NOT EXISTS idx_users_oauth ON users(oauth_provider, oauth_id)`);
+  await database.run(`CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)`);
+  await database.run(`CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at)`);
+  await database.run(`CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id)`);
+  await database.run(`CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at)`);
+}
+
 const database = new Database();
 
 async function initializeDatabase() {
   try {
     await database.connect();
-    
-    if (database.type === 'postgres' || database.type === 'postgresql') {
-      // PostgreSQL table creation
+    if (database.type === 'mysql') {
+      await createMySQLTables();
+    } else if (database.type === 'postgres' || database.type === 'postgresql') {
       await createPostgreSQLTables();
     } else {
-      // SQLite table creation (fallback)
       await createSQLiteTables();
     }
-    
     await createDefaultUsers();
     console.log('✅ Database initialized successfully');
   } catch (error) {
