@@ -84,7 +84,7 @@
     </button>
 
     <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
     <!-- Mobile sidebar backdrop -->
     <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
@@ -118,33 +118,36 @@
     <!-- Main Content -->
     <main class="flex-1 p-4 md:p-6 transition-all duration-300">
         <!-- Sticky Header -->
-        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
-            <h2 class="text-2xl md:text-3xl font-semibold" id="welcome-message">Welcome, Admin!</h2>
+        <header class="sticky top-0 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 z-40 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white" id="welcome-message">Welcome, Admin!</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">Administrative Dashboard & Controls</p>
         </header>
 
         <!-- Content Section -->
-        <section>
-            <p class="mb-6 text-sm md:text-base leading-relaxed">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold mb-2">User Management</h3>
-                    <p class="mb-4">Manage user accounts and permissions.</p>
-                    <a href="users.html" class="w-full block p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary text-center">Manage Users</a>
+        <section aria-label="Administrative functions" class="space-y-6">
+            <p class="mb-6 text-gray-600 dark:text-gray-300 leading-relaxed">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
+            
+            <!-- Admin Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
+                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">User Management</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Manage user accounts and permissions.</p>
+                    <a href="users.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Users</a>
                 </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold mb-2">Analytics</h3>
-                    <p class="mb-4">View site statistics and user engagement.</p>
-                    <a href="analytics.html" class="w-full block p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-center">View Analytics</a>
+                <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Analytics</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">View site statistics and user engagement.</p>
+                    <a href="analytics.html" class="w-full block p-3 bg-secondary text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 text-center transition-colors duration-200">View Analytics</a>
                 </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold mb-2">Site Settings</h3>
-                    <p class="mb-4">Configure website settings and preferences.</p>
-                    <a href="settings.html" class="w-full block p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-center">Site Settings</a>
+                <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Site Settings</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Configure website settings and preferences.</p>
+                    <a href="settings.html" class="w-full block p-3 bg-accent text-white rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 text-center transition-colors duration-200">Site Settings</a>
                 </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold mb-2">Product Management</h3>
-                    <p class="mb-4">Manage oil products, add descriptions and images.</p>
-                    <a href="oil-products-management.html" class="w-full block p-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 text-center">Manage Products</a>
+                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Product Management</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Manage oil products, add descriptions and images.</p>
+                    <a href="oil-products-management.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Products</a>
                 </div>
             </div>
         </section>

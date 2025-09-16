@@ -136,7 +136,7 @@
   </button>
 
   <!-- Toast Notification -->
-  <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+  <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
   <!-- Mobile sidebar backdrop -->
   <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
@@ -178,20 +178,22 @@
   </aside>
 
           <!-- ...existing code... -->
-          <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" role="tabpanel" aria-labelledby="tab-engine-oil" aria-live="polite">
+          <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" role="tabpanel" aria-labelledby="tab-engine-oil" aria-live="polite">
             <!-- Product cards will be dynamically inserted here -->
-            <div class="p-4 bg-gray-700 rounded shadow text-center">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary" aria-hidden="true"></div>
-              <p class="mt-2">Loading products...</p>
+            <div class="card widget-primary p-6 rounded-lg shadow-md text-center">
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3" aria-hidden="true"></div>
+              <p class="text-gray-600 dark:text-gray-300">Loading products...</p>
+              <div class="loading-skeleton h-4 rounded mt-2"></div>
+              <div class="loading-skeleton h-4 rounded mt-2 w-3/4"></div>
             </div>
           </div>
         </div>
 
         <!-- Order Form Area -->
         <div class="lg:col-span-1" role="region" aria-label="Order summary">
-          <div id="orderContainer" class="bg-gray-800 rounded shadow p-4 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
+          <div id="orderContainer" class="widget-secondary rounded-lg shadow-md p-6 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto border border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-semibold">Your Order <span aria-hidden="true">🛒</span></h3>
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Your Order <span aria-hidden="true">🛒</span></h3>
               <div id="loading-indicator" class="hidden" aria-hidden="true">
                 <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
               </div>
@@ -199,15 +201,15 @@
             
             <div id="orderItems" class="space-y-2 mb-4 min-h-[100px] lg:min-h-[200px]">
               <!-- Order items will be dynamically inserted here -->
-              <p class="text-gray-400 text-center py-4 lg:py-8 text-sm">Your order is empty.</p>
+              <p class="text-gray-500 dark:text-gray-400 text-center py-4 lg:py-8 text-sm">Your order is empty.</p>
             </div>
             
-            <div id="orderSummary" class="flex justify-between font-bold mb-4 pt-4 border-t border-gray-600">
+            <div id="orderSummary" class="flex justify-between font-bold mb-4 pt-4 border-t border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100">
               <span>Total Items:</span>
               <span id="totalItems">0</span>
             </div>
             
-            <button id="submitOrderBtn" class="w-full p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-base" disabled>
+            <button id="submitOrderBtn" class="w-full p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-base transition-colors duration-200" disabled>
               Submit Order
             </button>
           </div>
@@ -218,16 +220,16 @@
 
 
   <!-- Order Confirmation Modal -->
-  <div id="confirmModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
-    <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-      <h3 id="confirm-modal-title" class="text-xl font-semibold mb-4 text-white">Confirm Order</h3>
-      <p class="mb-4 text-gray-300">Are you sure you want to submit this order?</p>
-      <div id="modalOrderSummary" class="mb-4 max-h-60 overflow-y-auto">
+  <div id="confirmModal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md shadow-xl border border-gray-200 dark:border-gray-700">
+      <h3 id="confirm-modal-title" class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Confirm Order</h3>
+      <p class="mb-4 text-gray-600 dark:text-gray-300">Are you sure you want to submit this order?</p>
+      <div id="modalOrderSummary" class="mb-4 max-h-60 overflow-y-auto widget-primary p-4 rounded-lg">
         <!-- Order summary will be populated here -->
       </div>
       <div class="flex space-x-4">
-        <button id="cancelModal" class="flex-1 p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400">Cancel</button>
-        <button id="confirmSubmitBtn" class="flex-1 p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">Confirm</button>
+        <button id="cancelModal" class="flex-1 p-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors duration-200">Cancel</button>
+        <button id="confirmSubmitBtn" class="flex-1 p-3 bg-secondary text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-colors duration-200">Confirm</button>
       </div>
     </div>
   </div>

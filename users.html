@@ -86,7 +86,7 @@
     </button>
 
     <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
 
     <!-- Sidebar -->
@@ -117,25 +117,27 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4">
+    <main class="flex-1 p-4 md:p-6">
         <!-- Sticky Header -->
-
-        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
-            <h2 class="text-3xl font-semibold" id="welcome-message">User Management</h2>
+        <header class="sticky top-0 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 z-40 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white" id="welcome-message">User Management</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">Manage accounts, permissions, and user roles</p>
         </header>
 
         <!-- Content Section -->
-        <section>
-            <p class="mb-4">Manage user accounts and permissions. Add, edit, or remove users from the system.</p>
-            <div class="bg-gray-800 p-6 rounded shadow">
+        <section aria-label="User management" class="space-y-6">
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Manage user accounts and permissions. Add, edit, or remove users from the system.</p>
+            
+            <!-- User Table Card -->
+            <div class="widget-primary rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left mb-6">
+                    <table class="w-full text-left mb-6" role="table" aria-label="User accounts table">
                         <thead>
-                            <tr class="border-b border-gray-700">
-                                <th class="py-2 px-3">Name</th>
-                                <th class="py-2 px-3">Email</th>
-                                <th class="py-2 px-3">Role</th>
-                                <th class="py-2 px-3">Actions</th>
+                            <tr class="border-b-2 border-gray-300 dark:border-gray-600">
+                                <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Name</th>
+                                <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Email</th>
+                                <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Role</th>
+                                <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -144,29 +146,30 @@
                     </table>
                 </div>
                 
-                <form class="mt-6" id="user-form">
-                    <h3 class="font-semibold mb-4">Add New User</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <input type="text" placeholder="Name" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" aria-label="User name">
-                        <input type="email" placeholder="Email" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" aria-label="User email">
-                        <select required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" aria-label="User role">
+                <!-- Add User Form -->
+                <form class="mt-6 pt-6 border-t border-gray-300 dark:border-gray-600" id="user-form" role="form" aria-label="Add new user form">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Add New User</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <input type="text" placeholder="Name" required class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="User name">
+                        <input type="email" placeholder="Email" required class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="User email">
+                        <select required class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="User role">
                             <option value="">Select Role</option>
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>
                     <div class="flex gap-4">
-                        <button type="submit" class="flex-1 p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">Add User</button>
-                        <button type="button" id="cancel-edit" class="px-4 p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 font-semibold hidden">Cancel</button>
+                        <button type="submit" class="flex-1 p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 font-semibold transition-colors duration-200">Add User</button>
+                        <button type="button" id="cancel-edit" class="px-6 p-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 font-semibold hidden transition-colors duration-200">Cancel</button>
                     </div>
                 </form>
             </div>
         </section>
 
         <!-- Bulk Operations -->
-        <section class="mt-6">
-            <div class="bg-gray-800 p-6 rounded shadow">
-                <h3 class="text-xl font-semibold mb-4">Bulk Operations</h3>
+        <section class="mt-6" aria-label="Bulk operations">
+            <div class="widget-secondary rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Bulk Operations</h3>
                 <div class="flex flex-wrap gap-4">
                     <button id="export-users-csv" class="px-4 py-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">Export Users (CSV)</button>
                     <button id="export-users-excel" class="px-4 py-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400">Export Users (Excel)</button>

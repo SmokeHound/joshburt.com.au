@@ -34,6 +34,83 @@
         color: #1f2937;
     }
     
+    /* Enhanced card styling with proper dark/light mode support */
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+        min-height: 120px;
+    }
+    
+    .card:hover, .card:focus-within {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark .card:hover, .dark .card:focus-within {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Widget background variations for better separation */
+    .widget-primary {
+        background-color: #f8fafc;
+    }
+    .dark .widget-primary {
+        background-color: #374151;
+    }
+    
+    .widget-secondary {
+        background-color: #f1f5f9;
+    }
+    .dark .widget-secondary {
+        background-color: #4b5563;
+    }
+    
+    .widget-accent {
+        background-color: #fefbff;
+    }
+    .dark .widget-accent {
+        background-color: #6b7280;
+    }
+    
+    /* Enhanced focus states for accessibility */
+    .focus-visible, [tabindex]:focus-visible, button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    
+    .dark .focus-visible, .dark [tabindex]:focus-visible, .dark button:focus-visible, .dark a:focus-visible, .dark input:focus-visible, .dark select:focus-visible, .dark textarea:focus-visible {
+        outline-color: #60a5fa;
+        box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+    }
+    
+    /* Toast notifications with high z-index */
+    .toast {
+        z-index: 9999;
+        position: fixed;
+    }
+    
+    /* Modal overlay */
+    .modal-overlay {
+        z-index: 9990;
+    }
+    
+    /* Loading states */
+    .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+    
+    .dark .loading-skeleton {
+        background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+        background-size: 200% 100%;
+    }
+    
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+    
     /* Mobile sidebar styles - Unified for all pages */
     @media (max-width: 768px) {
         .sidebar {

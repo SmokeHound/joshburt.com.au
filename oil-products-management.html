@@ -5,6 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oil Products Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Include shared configuration -->
+    <script>
+        fetch('shared-config.html')
+            .then(response => response.text())
+            .then(html => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                // Inject styles and scripts into head
+                const styles = tempDiv.getElementsByTagName('style');
+                const scripts = tempDiv.getElementsByTagName('script');
+                const links = tempDiv.getElementsByTagName('link');
+                
+                for (let link of links) {
+                    document.head.appendChild(link.cloneNode(true));
+                }
+                for (let style of styles) {
+                    document.head.appendChild(style.cloneNode(true));
+                }
+                for (let script of scripts) {
+                    const newScript = document.createElement('script');
+                    newScript.textContent = script.textContent;
+                    document.head.appendChild(newScript);
+                }
+            });
+    </script>
+    
     <script>
         tailwind.config = {
             theme: {

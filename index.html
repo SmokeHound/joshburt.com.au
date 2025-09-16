@@ -181,54 +181,56 @@
     </aside>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
-        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 id="login-modal-title" class="text-xl font-semibold mb-4 text-white">Login</h2>
+    <div id="login-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md shadow-xl border border-gray-200 dark:border-gray-700">
+            <h2 id="login-modal-title" class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Login</h2>
             <p id="login-modal-description" class="sr-only">Please enter your email and password to login</p>
             <form id="login-form" role="form" aria-labelledby="login-modal-title">
                 <div class="mb-4">
-                    <label for="email" class="block text-sm text-white">Email</label>
-                    <input type="email" id="email" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
+                    <label for="email" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                    <input type="email" id="email" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required aria-required="true">
                 </div>
                 <div class="mb-4">
-                    <label for="password" class="block text-sm text-white">Password</label>
-                    <input type="password" id="password" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
+                    <label for="password" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                    <input type="password" id="password" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required aria-required="true">
                 </div>
-                <div id="login-error" class="hidden text-red-500 text-sm mb-4"></div>
-                <button type="submit" id="submit-login" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Submit login">
-                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></span>
+                <div id="login-error" class="hidden text-red-600 dark:text-red-400 text-sm mb-4 p-2 bg-red-50 dark:bg-red-900/20 rounded-md"></div>
+                <button type="submit" id="submit-login" class="w-full p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200" aria-label="Submit login">
+                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
                 </button>
             </form>
-            <button id="close-modal" class="mt-4 w-full p-3 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-base" aria-label="Close login modal">Close</button>
+            <button id="close-modal" class="mt-4 w-full p-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 text-base transition-colors duration-200" aria-label="Close login modal">Close</button>
         </div>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
     <!-- Main Content -->
     <main id="main-content" class="flex-1 p-4" role="main">
         <!-- Sticky Header -->
-        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40">
-            <h2 class="text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
-            <h3 class="text-lg text-gray-300 mt-2 hidden" id="homepage-subtitle"></h3>
+        <header class="sticky top-0 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 z-40 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white" id="welcome-message">Welcome to My Website</h2>
+            <h3 class="text-lg text-gray-600 dark:text-gray-300 mt-2" id="homepage-subtitle">Your personalized dashboard and control center</h3>
         </header>
 
         <!-- Content Section -->
-        <section>
-            <p class="mb-4">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold">Card 1</h3>
-                    <p>Sample content for a card.</p>
+        <section aria-label="Main content" class="space-y-6">
+            <p class="mb-6 text-gray-600 dark:text-gray-300">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
+            
+            <!-- Sample Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Sample cards">
+                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Card 1</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Sample content for a card with enhanced styling and accessibility.</p>
                 </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold">Card 2</h3>
-                    <p>Sample content for a card.</p>
+                <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Card 2</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Sample content for a card with different background shade.</p>
                 </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold">Card 3</h3>
-                    <p>Sample content for a card.</p>
+                <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Card 3</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Sample content for a card with accent background styling.</p>
                 </div>
             </div>
         </section>

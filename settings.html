@@ -131,7 +131,7 @@
 
 
     <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
@@ -242,41 +242,42 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4">
+    <main class="flex-1 p-4 md:p-6">
         <!-- Sticky Header -->
-        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
-            <h2 class="text-3xl font-semibold" id="welcome-message">Site Settings</h2>
+        <header class="sticky top-0 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 z-40 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white" id="welcome-message">Site Settings</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">Configure appearance, behavior, and preferences</p>
         </header>
 
         <!-- Content Section -->
-        <section>
-            <p class="mb-6">Configure website settings and preferences. Changes will be saved automatically.</p>
+        <section aria-label="Settings configuration" class="space-y-6">
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Configure website settings and preferences. Changes will be saved automatically.</p>
             
             <!-- Tab Navigation -->
-            <div class="bg-gray-800 rounded-t shadow mb-0">
-                <div class="flex border-b border-gray-600">
-                    <button class="tab-btn px-6 py-3 font-semibold text-white bg-primary rounded-tl" data-tab="general">General</button>
-                    <button class="tab-btn px-6 py-3 font-semibold text-gray-300 hover:text-white hover:bg-gray-700" data-tab="theme">Theme</button>
-                    <button class="tab-btn px-6 py-3 font-semibold text-gray-300 hover:text-white hover:bg-gray-700" data-tab="security">Security</button>
-                    <button class="tab-btn px-6 py-3 font-semibold text-gray-300 hover:text-white hover:bg-gray-700" data-tab="audit">Audit Log</button>
+            <div class="widget-primary rounded-t-lg shadow-md border border-gray-200 dark:border-gray-700 border-b-0">
+                <div class="flex border-b border-gray-300 dark:border-gray-600">
+                    <button class="tab-btn px-6 py-3 font-semibold text-white bg-primary rounded-tl-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="general">General</button>
+                    <button class="tab-btn px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="theme">Theme</button>
+                    <button class="tab-btn px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="security">Security</button>
+                    <button class="tab-btn px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="audit">Audit Log</button>
                 </div>
             </div>
 
             <!-- Tab Content -->
-            <div class="bg-gray-800 rounded-b shadow mb-6">
+            <div class="widget-primary rounded-b-lg shadow-md border border-gray-200 dark:border-gray-700 border-t-0">
                 <!-- General Settings Tab -->
                 <div id="general-tab" class="tab-content p-6">
-                    <form id="settings-form">
-                        <h3 class="font-semibold mb-4 text-xl">General Settings</h3>
+                    <form id="settings-form" role="form" aria-label="General settings form">
+                        <h3 class="font-semibold mb-6 text-xl text-gray-900 dark:text-gray-100">General Settings</h3>
                         
-                        <div class="mb-4">
-                            <label for="site-title" class="block mb-2 font-medium">Site Title</label>
-                            <input type="text" id="site-title" name="site-title" required maxlength="100" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter site title" value="Josh's App">
+                        <div class="mb-6">
+                            <label for="site-title" class="block mb-2 font-semibold text-gray-900 dark:text-gray-100">Site Title</label>
+                            <input type="text" id="site-title" name="site-title" required maxlength="100" class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter site title" value="Josh's App">
                         </div>
                         
-                        <div class="mb-4">
-                            <label for="site-description" class="block mb-2 font-medium">Site Description</label>
-                            <textarea id="site-description" name="site-description" required maxlength="500" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter site description">Responsive website template with admin features</textarea>
+                        <div class="mb-6">
+                            <label for="site-description" class="block mb-2 font-semibold text-gray-900 dark:text-gray-100">Site Description</label>
+                            <textarea id="site-description" name="site-description" required maxlength="500" class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="3" placeholder="Enter site description">Responsive website template with admin features</textarea>
                         </div>
                         
                         <div class="mb-4">
