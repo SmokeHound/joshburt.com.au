@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Josh's App - Home</title>
+    <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Include shared configuration -->
     <script>
@@ -210,27 +210,35 @@
     <main id="main-content" class="flex-1 p-4" role="main">
         <!-- Sticky Header -->
         <header class="sticky top-0 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 z-40 border border-gray-200 dark:border-gray-700">
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white" id="welcome-message">Welcome to My Website</h2>
-            <h3 class="text-lg text-gray-600 dark:text-gray-300 mt-2" id="homepage-subtitle">Your personalized dashboard and control center</h3>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white" id="welcome-message">Welcome, Admin!</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">Administrative Dashboard & Controls</p>
         </header>
 
         <!-- Content Section -->
-        <section aria-label="Main content" class="space-y-6">
-            <p class="mb-6 text-gray-600 dark:text-gray-300">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
+        <section aria-label="Administrative functions" class="space-y-6">
+            <p class="mb-6 text-gray-600 dark:text-gray-300 leading-relaxed">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
             
-            <!-- Sample Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Sample cards">
+            <!-- Admin Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
                 <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Card 1</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Sample content for a card with enhanced styling and accessibility.</p>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">User Management</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Manage user accounts and permissions.</p>
+                    <a href="users.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Users</a>
                 </div>
                 <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Card 2</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Sample content for a card with different background shade.</p>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Analytics</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">View site statistics and user engagement.</p>
+                    <a href="analytics.html" class="w-full block p-3 bg-secondary text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 text-center transition-colors duration-200">View Analytics</a>
                 </div>
                 <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Card 3</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Sample content for a card with accent background styling.</p>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Site Settings</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Configure website settings and preferences.</p>
+                    <a href="settings.html" class="w-full block p-3 bg-accent text-white rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 text-center transition-colors duration-200">Site Settings</a>
+                </div>
+                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Product Management</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Manage oil products, add descriptions and images.</p>
+                    <a href="oil-products-management.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Products</a>
                 </div>
             </div>
         </section>
@@ -312,7 +320,7 @@
                 logoutBtn?.classList.remove('hidden');
                 if (userName) userName.textContent = user.name;
                 if (userAvatar) userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
-                if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${user.name}!`;
+                if (welcomeMessage) welcomeMessage.textContent = `Welcome, Admin!`;
             } else {
                 loadAndApplySettings();
             }
@@ -366,7 +374,7 @@
                     logoutBtn?.classList.remove('hidden');
                     if (userName) userName.textContent = authenticatedUser.name;
                     if (userAvatar) userAvatar.src = authenticatedUser.avatar;
-                    if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
+                    if (welcomeMessage) welcomeMessage.textContent = `Welcome, Admin!`;
                     loginModal?.classList.add('hidden');
                     loginForm?.reset();
                     showToast('Login successful!');
@@ -388,7 +396,7 @@
                 logoutBtn?.classList.add('hidden');
                 
                 const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                if (welcomeMessage) welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
+                if (welcomeMessage) welcomeMessage.textContent = settings['homepage-message'] || 'Welcome, Admin!';
                 showToast('Logged out successfully!');
             });
 
@@ -601,7 +609,7 @@
                 const welcomeMessage = document.getElementById('welcome-message');
                 if (welcomeMessage) {
                     const roleName = userRoles[currentUser.role]?.name || 'User';
-                    welcomeMessage.textContent = `Welcome ${currentUser.name} - ${roleName} Dashboard`;
+                    welcomeMessage.textContent = `Welcome, Admin!`;
                 }
             }
 
