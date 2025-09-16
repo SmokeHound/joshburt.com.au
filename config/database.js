@@ -12,7 +12,7 @@ const pgConfig = {
   database: process.env.DB_NAME || 'neondb',
   password: process.env.DB_PASSWORD || 'npg_RCwEhZ2pm6vx',
   port: process.env.DB_PORT || 5432,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  ssl: { rejectUnauthorized: false },
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
