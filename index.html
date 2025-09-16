@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Josh's App - Home</title>
+    <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Include shared configuration -->
     <script>
@@ -144,26 +144,21 @@
         ☰
     </button>
 
+    <!-- Mobile sidebar backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
+    <aside id="sidebar" class="sidebar w-64 md:w-64 lg:w-64 fixed md:static top-0 left-0 h-full bg-gray-800 p-4 flex flex-col shadow-lg" aria-label="Main navigation">
         <!-- App Branding -->
         <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
 
-        <!-- User Profile Section -->
-        <div id="user-profile" class="mb-6">
-            <div id="user-info" class="hidden flex items-center space-x-2">
-                <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
-                <span id="user-name" class="text-white"></span>
-            </div>
-            <button id="login-btn" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Open login modal">Login</button>
-            <button id="logout-btn" class="hidden w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" aria-label="Logout">Logout</button>
-        </div>
+
 
         <!-- Navigation -->
         <nav role="navigation" aria-label="Main navigation">
             <ul class="space-y-2" role="list">
-                <li role="listitem"><a href="index.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Home</a></li>
-                <li role="listitem"><a href="admin.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+                <li role="listitem"><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+                <li role="listitem"><a href="admin.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Admin</a></li>
                 <li role="listitem"><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
                 <li role="listitem"><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
                 <li role="listitem"><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
@@ -180,452 +175,126 @@
         </div>
     </aside>
 
-    <!-- Login Modal -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
-        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 id="login-modal-title" class="text-xl font-semibold mb-4 text-white">Login</h2>
-            <p id="login-modal-description" class="sr-only">Please enter your email and password to login</p>
-            <form id="login-form" role="form" aria-labelledby="login-modal-title">
-                <div class="mb-4">
-                    <label for="email" class="block text-sm text-white">Email</label>
-                    <input type="email" id="email" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
-                </div>
-                <div class="mb-4">
-                    <label for="password" class="block text-sm text-white">Password</label>
-                    <input type="password" id="password" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" required aria-required="true">
-                </div>
-                <div id="login-error" class="hidden text-red-500 text-sm mb-4"></div>
-                <button type="submit" id="submit-login" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Submit login">
-                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></span>
-                </button>
-            </form>
-            <button id="close-modal" class="mt-4 w-full p-3 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-base" aria-label="Close login modal">Close</button>
-        </div>
-    </div>
+
 
     <!-- Toast Notification -->
     <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
 
     <!-- Main Content -->
-    <main id="main-content" class="flex-1 p-4" role="main">
+    <main id="main-content" class="flex-1 p-4 md:p-6 transition-all duration-300" role="main">
         <!-- Sticky Header -->
-        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-40">
-            <h2 class="text-3xl font-semibold" id="welcome-message">Welcome to My Website</h2>
-            <h3 class="text-lg text-gray-300 mt-2 hidden" id="homepage-subtitle"></h3>
+        <header class="sticky top-0 bg-gray-700 dark:bg-gray-700 p-4 rounded shadow mb-6 z-10">
+            <h2 class="text-2xl md:text-3xl font-semibold" id="welcome-message">Welcome, Admin!</h2>
         </header>
 
         <!-- Content Section -->
         <section>
-            <p class="mb-4">This is a responsive website template with a sidebar, dark/light mode support, and enhanced user authentication.</p>
+            <p class="mb-6 text-sm md:text-base leading-relaxed">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold">Card 1</h3>
-                    <p>Sample content for a card.</p>
+                    <h3 class="font-semibold mb-2">User Management</h3>
+                    <p class="mb-4">Manage user accounts and permissions.</p>
+                    <a href="users.html" class="w-full block p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary text-center">Manage Users</a>
                 </div>
                 <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold">Card 2</h3>
-                    <p>Sample content for a card.</p>
+                    <h3 class="font-semibold mb-2">Analytics</h3>
+                    <p class="mb-4">View site statistics and user engagement.</p>
+                    <a href="analytics.html" class="w-full block p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-center">View Analytics</a>
                 </div>
                 <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold">Card 3</h3>
-                    <p>Sample content for a card.</p>
+                    <h3 class="font-semibold mb-2">Site Settings</h3>
+                    <p class="mb-4">Configure website settings and preferences.</p>
+                    <a href="settings.html" class="w-full block p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-center">Site Settings</a>
+                </div>
+                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
+                    <h3 class="font-semibold mb-2">Oil Product Management</h3>
+                    <p class="mb-4">Manage oil products, add descriptions and images.</p>
+                    <a href="oil-products-management.html" class="w-full block p-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 text-center">Manage Products</a>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Load shared theme functionality -->
     <script>
-        fetch('shared-theme.html')
-            .then(response => response.text())
-            .then(html => {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                const scripts = tempDiv.getElementsByTagName('script');
-                for (let script of scripts) {
-                    const newScript = document.createElement('script');
-                    newScript.textContent = script.textContent;
-                    document.body.appendChild(newScript);
-                }
-            });
-    </script>
-
-    <!-- Home-specific functionality -->
-    <script>
-        function initializeHomePage() {
-            // Load and apply site settings
-            function loadAndApplySettings() {
-                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                
-                // Apply site title if set
-                if (settings['site-title']) {
-                    const brandingElements = document.querySelectorAll('h1');
-                    brandingElements.forEach(el => {
-                        if (el.textContent.includes('Josh\'s App')) {
-                            el.textContent = settings['site-title'];
-                        }
-                    });
-                }
-                
-                // Apply homepage message if set
-                if (settings['homepage-message']) {
-                    const welcomeMessage = document.getElementById('welcome-message');
-                    const currentUser = JSON.parse(localStorage.getItem('user'));
-                    if (welcomeMessage && !currentUser) {
-                        welcomeMessage.textContent = settings['homepage-message'];
-                    }
-                }
-            }
-
-            // User Management
-            const loginBtn = document.getElementById('login-btn');
-            const logoutBtn = document.getElementById('logout-btn');
-            const userInfo = document.getElementById('user-info');
-            const userName = document.getElementById('user-name');
-            const userAvatar = document.getElementById('user-avatar');
-            const loginModal = document.getElementById('login-modal');
-            const loginForm = document.getElementById('login-form');
-            const closeModal = document.getElementById('close-modal');
-            const loginSpinner = document.getElementById('login-spinner');
-            const loginError = document.getElementById('login-error');
-            const toast = document.getElementById('toast');
-            const welcomeMessage = document.getElementById('welcome-message');
-
-            // Show toast notification
-            function showToast(message) {
-                if (toast) {
-                    toast.textContent = message;
-                    toast.classList.remove('hidden');
-                    setTimeout(() => {
-                        toast.classList.add('hidden');
-                    }, 3000);
-                }
-            }
-
-            // Check if user is logged in
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user) {
-                userInfo?.classList.remove('hidden');
-                loginBtn?.classList.add('hidden');
-                logoutBtn?.classList.remove('hidden');
-                if (userName) userName.textContent = user.name;
-                if (userAvatar) userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
-                if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${user.name}!`;
-            } else {
-                loadAndApplySettings();
-            }
-
-            // Open login modal
-            loginBtn?.addEventListener('click', () => {
-                loginModal?.classList.remove('hidden');
-            });
-
-            // Close login modal
-            closeModal?.addEventListener('click', () => {
-                loginModal?.classList.add('hidden');
-                loginForm?.reset();
-                loginError?.classList.add('hidden');
-            });
-
-            // Handle login
-            loginForm?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                loginSpinner?.classList.remove('hidden');
-                loginError?.classList.add('hidden');
-
-                const email = document.getElementById('email')?.value;
-                const password = document.getElementById('password')?.value;
-
-                try {
-                    const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
-                    const registeredUser = users.find(u => u.email === email);
-                    
-                    let authenticatedUser = null;
-                    
-                    if (registeredUser && password === 'password') {
-                        authenticatedUser = { 
-                            name: registeredUser.name, 
-                            email: registeredUser.email,
-                            avatar: 'https://via.placeholder.com/40' 
-                        };
-                    } else if (email === 'test@example.com' && password === 'password') {
-                        authenticatedUser = { 
-                            name: email.split('@')[0], 
-                            email: email,
-                            avatar: 'https://via.placeholder.com/40' 
-                        };
-                    } else {
-                        throw new Error('Invalid credentials');
-                    }
-
-                    localStorage.setItem('user', JSON.stringify(authenticatedUser));
-                    userInfo?.classList.remove('hidden');
-                    loginBtn?.classList.add('hidden');
-                    logoutBtn?.classList.remove('hidden');
-                    if (userName) userName.textContent = authenticatedUser.name;
-                    if (userAvatar) userAvatar.src = authenticatedUser.avatar;
-                    if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${authenticatedUser.name}!`;
-                    loginModal?.classList.add('hidden');
-                    loginForm?.reset();
-                    showToast('Login successful!');
-                } catch (error) {
-                    if (loginError) {
-                        loginError.textContent = error.message;
-                        loginError.classList.remove('hidden');
-                    }
-                } finally {
-                    loginSpinner?.classList.add('hidden');
-                }
-            });
-
-            // Handle logout
-            logoutBtn?.addEventListener('click', async () => {
-                localStorage.removeItem('user');
-                userInfo?.classList.add('hidden');
-                loginBtn?.classList.remove('hidden');
-                logoutBtn?.classList.add('hidden');
-                
-                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                if (welcomeMessage) welcomeMessage.textContent = settings['homepage-message'] || 'Welcome to My Website';
-                showToast('Logged out successfully!');
-            });
-
-            loadAndApplySettings();
-        }
-
-        // Fallback initialization if navigation doesn't load via fetch
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                if (!document.getElementById('menu-toggle')) {
-                    // Navigation didn't load, initialize without it
-                    initializeHomePage();
-                }
-            }, 1000);
-        });
-    </script>
-
-    <!-- Future Features Implementation -->
-    <script>
-        // Multi-language Support System
-        (function() {
-            const languages = {
-                en: { name: 'English', flag: '🇺🇸', translations: {
-                    'nav.home': 'Home', 'nav.admin': 'Admin', 'nav.users': 'User Management',
-                    'nav.analytics': 'Analytics', 'nav.settings': 'Settings', 'nav.oil': 'Oil Orders',
-                    'nav.logout': 'Logout', 'app.title': "Josh's App", 'language.label': 'Language',
-                    'dashboard.welcome': 'Welcome to My Website', 'notifications.title': 'Notifications',
-                    'notifications.empty': 'No new notifications'
-                }},
-                es: { name: 'Español', flag: '🇪🇸', translations: {
-                    'nav.home': 'Inicio', 'nav.admin': 'Administración', 'nav.users': 'Gestión de Usuarios',
-                    'nav.analytics': 'Analíticas', 'nav.settings': 'Configuración', 'nav.oil': 'Pedidos de Aceite',
-                    'nav.logout': 'Cerrar Sesión', 'app.title': 'Aplicación de Josh', 'language.label': 'Idioma',
-                    'dashboard.welcome': 'Bienvenido a Mi Sitio Web', 'notifications.title': 'Notificaciones',
-                    'notifications.empty': 'No hay notificaciones nuevas'
-                }}
-            };
-
-            let currentLanguage = localStorage.getItem('siteLanguage') || 'en';
+        // Load and apply site settings
+        function loadAndApplySettings() {
+            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
             
-            window.t = function(key, fallback = key) {
-                return languages[currentLanguage]?.translations[key] || fallback;
-            };
-
-            function updateTranslations() {
-                document.querySelectorAll('[data-i18n]').forEach(element => {
-                    const key = element.getAttribute('data-i18n');
-                    element.textContent = window.t(key);
+            // Apply site title if set
+            if (settings['site-title']) {
+                const brandingElements = document.querySelectorAll('h1');
+                brandingElements.forEach(el => {
+                    if (el.textContent.includes('Admin Dashboard') || el.textContent.includes('Josh\'s App')) {
+                        el.textContent = settings['site-title'] + ' - Admin';
+                    }
                 });
             }
+        }
 
-            // Language selector handler
-            document.addEventListener('DOMContentLoaded', function() {
-                const selector = document.getElementById('language-selector');
-                if (selector) {
-                    selector.value = currentLanguage;
-                    selector.addEventListener('change', function(e) {
-                        currentLanguage = e.target.value;
-                        localStorage.setItem('siteLanguage', currentLanguage);
-                        updateTranslations();
-                        if (window.showNotification) {
-                            window.showNotification(`Language changed to ${languages[currentLanguage].name}`, 'success');
-                        }
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            body.classList.toggle('light');
+            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
+        });
+
+        // Load saved theme from settings or localStorage
+        const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+        const savedTheme = settings['theme'] || localStorage.getItem('theme') || 'dark';
+        body.classList.add(savedTheme);
+        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            sidebarBackdrop.classList.toggle('show');
+            body.classList.toggle('sidebar-open');
+            const isOpen = sidebar.classList.contains('open');
+            menuToggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        // Close sidebar when clicking backdrop
+        sidebarBackdrop.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            sidebarBackdrop.classList.remove('show');
+            body.classList.remove('sidebar-open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+        });
+        
+        // Apply settings on page load
+        document.addEventListener('DOMContentLoaded', loadAndApplySettings);
+        
+        // Service Worker Registration for PWA
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(registration => {
+                        console.log("SW registered: ", registration);
+                    })
+                    .catch(registrationError => {
+                        console.log("SW registration failed: ", registrationError);
                     });
-                }
-                updateTranslations();
             });
-        })();
-
-        // Notifications System
-        (function() {
-            let notifications = JSON.parse(localStorage.getItem('siteNotifications') || '[]');
-            let notificationId = parseInt(localStorage.getItem('notificationId') || '1');
-
-            window.showNotification = function(message, type = 'info', duration = 5000) {
-                const notification = {
-                    id: notificationId++,
-                    message, type,
-                    timestamp: Date.now()
-                };
-
-                notifications.unshift(notification);
-                notifications = notifications.slice(0, 20); // Keep only 20
-                localStorage.setItem('siteNotifications', JSON.stringify(notifications));
-                localStorage.setItem('notificationId', notificationId.toString());
-
-                // Show toast
-                const toast = document.createElement('div');
-                const colors = {
-                    info: 'bg-blue-600', success: 'bg-green-600', 
-                    warning: 'bg-yellow-600', error: 'bg-red-600'
-                };
-                
-                toast.className = `fixed bottom-4 right-4 p-4 ${colors[type] || colors.info} text-white rounded-lg shadow-lg flex items-center gap-3 transform translate-x-full transition-transform duration-300 z-50`;
-                toast.innerHTML = `
-                    <span>${message}</span>
-                    <button onclick="this.parentElement.remove()" class="text-white hover:text-gray-200 font-bold">&times;</button>
-                `;
-
-                document.body.appendChild(toast);
-                setTimeout(() => toast.classList.remove('translate-x-full'), 100);
-                setTimeout(() => {
-                    toast.classList.add('translate-x-full');
-                    setTimeout(() => toast.remove(), 300);
-                }, duration);
-
-                updateNotificationBell();
-                return notification.id;
-            };
-
-            function updateNotificationBell() {
-                let bell = document.getElementById('notification-bell');
-                if (!bell) {
-                    // Create notification bell in sidebar
-                    const nav = document.querySelector('#sidebar nav ul');
-                    if (nav) {
-                        const li = document.createElement('li');
-                        li.className = 'relative';
-                        li.innerHTML = `
-                            <button id="notification-bell" class="w-full flex items-center justify-between p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">
-                                <span data-i18n="notifications.title">Notifications</span>
-                                <span class="flex items-center gap-1">
-                                    🔔
-                                    <span id="notification-badge" class="bg-red-500 text-white text-xs rounded-full px-1 hidden">0</span>
-                                </span>
-                            </button>
-                            <div id="notification-dropdown" class="hidden absolute left-full top-0 ml-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
-                                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-                                    <h3 class="font-semibold" data-i18n="notifications.title">Notifications</h3>
-                                </div>
-                                <div id="notification-list" class="max-h-64 overflow-y-auto p-2">
-                                    <div class="text-center text-gray-500 p-4" data-i18n="notifications.empty">No new notifications</div>
-                                </div>
-                            </div>
-                        `;
-                        nav.appendChild(li);
-                        
-                        bell = document.getElementById('notification-bell');
-                        const dropdown = document.getElementById('notification-dropdown');
-                        
-                        bell.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            dropdown.classList.toggle('hidden');
-                        });
-                        
-                        document.addEventListener('click', () => {
-                            dropdown.classList.add('hidden');
-                        });
-                    }
-                }
-
-                const badge = document.getElementById('notification-badge');
-                if (badge && notifications.length > 0) {
-                    badge.textContent = notifications.length > 99 ? '99+' : notifications.length;
-                    badge.classList.remove('hidden');
-                } else if (badge) {
-                    badge.classList.add('hidden');
-                }
-            }
-
-            // Initialize notifications
-            document.addEventListener('DOMContentLoaded', function() {
-                updateNotificationBell();
-                
-                // Demo: Add some sample notifications
-                setTimeout(() => {
-                    window.showNotification('Welcome! Future features are now active.', 'success');
-                }, 2000);
-                
-                // Simulate periodic notifications (every 60 seconds)
-                setInterval(() => {
-                    if (Math.random() < 0.3) {
-                        const messages = [
-                            'New system update available',
-                            'User login detected',
-                            'Backup completed successfully',
-                            'New order received'
-                        ];
-                        const types = ['info', 'success', 'warning'];
-                        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                        const randomType = types[Math.floor(Math.random() * types.length)];
-                        window.showNotification(randomMessage, randomType);
-                    }
-                }, 60000);
-            });
-        })();
-
-        // Role-based Dashboard System
-        (function() {
-            const userRoles = {
-                admin: { name: 'Administrator', dashboards: ['admin', 'analytics'] },
-                manager: { name: 'Manager', dashboards: ['manager'] },
-                user: { name: 'User', dashboards: ['user'] }
-            };
-
-            let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"role": "admin", "name": "Josh"}');
-
-            window.setUserRole = function(role) {
-                if (userRoles[role]) {
-                    currentUser.role = role;
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    updateDashboard();
-                    if (window.showNotification) {
-                        window.showNotification(`Switched to ${userRoles[role].name} role`, 'success');
-                    }
-                }
-            };
-
-            function updateDashboard() {
-                const welcomeMessage = document.getElementById('welcome-message');
-                if (welcomeMessage) {
-                    const roleName = userRoles[currentUser.role]?.name || 'User';
-                    welcomeMessage.textContent = `Welcome ${currentUser.name} - ${roleName} Dashboard`;
-                }
-            }
-
-            // Create role switcher
-            document.addEventListener('DOMContentLoaded', function() {
-                const roleSwitcher = document.getElementById('role-switcher');
-                if (roleSwitcher) {
-                    roleSwitcher.classList.remove('hidden');
-                    roleSwitcher.innerHTML = `
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">Role (Demo)</label>
-                            <select id="role-selector" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-secondary">
-                                ${Object.entries(userRoles).map(([key, role]) => 
-                                    `<option value="${key}" ${key === currentUser.role ? 'selected' : ''}>${role.name}</option>`
-                                ).join('')}
-                            </select>
-                        </div>
-                    `;
-
-                    document.getElementById('role-selector').addEventListener('change', function(e) {
-                        window.setUserRole(e.target.value);
-                    });
-                }
-                updateDashboard();
-            });
-        })();
+        }
     </script>
 </body>
 </html>
