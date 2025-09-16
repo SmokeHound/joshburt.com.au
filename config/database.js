@@ -25,9 +25,9 @@ const mysqlConfig = {
   password: process.env.DB_PASSWORD || 'AVNS_ftCWIkMaUvsojeBNmAh',
   database: process.env.DB_NAME || 'defaultdb',
   port: process.env.DB_PORT || 12667,
-  ssl: {
-    rejectUnauthorized: true
-  },
+  // ssl: {
+  //   rejectUnauthorized: true
+  // },
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
