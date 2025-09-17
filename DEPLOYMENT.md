@@ -18,7 +18,7 @@ Deploy the entire application as a Node.js app that serves both the API and stat
      JWT_SECRET=your-super-secure-jwt-secret-change-this
      JWT_EXPIRES_IN=7d
      JWT_REFRESH_EXPIRES_IN=30d
-     FRONTEND_URL=https://your-render-app.onrender.com
+     FRONTEND_URL=https://joshburt-com-au.onrender.com
      PRODUCTION_URL=https://joshburt.com.au
      BCRYPT_ROUNDS=12
      ```
