@@ -4,9 +4,10 @@
 [![⬆️ Deploy to GitHub Pages](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/static.yml/badge.svg)](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/static.yml)
 
 # Links to site
-- http://joshburt.netlify.app/
-- http://joshburt.com.au/
-- http://
+- https://joshburt.netlify.app/
+- https://joshburt.com.au/
+- https://smokehound.github.io/joshburt.com.au/
+- 
 
 ## Overview
 This is a modern static HTML website for joshburt.com.au featuring a modular component architecture, comprehensive testing, and responsive design with dark/light mode support, admin dashboard functionality, and a specialized Castrol oil product ordering system.
