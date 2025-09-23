@@ -3,17 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Castrol Order Form</title>
+  <title>Oil Stock Order Request</title>
 
-  <!-- Remove Bootstrap CSS and use Tailwind CSS CDN -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet" />
-
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
       // Configuration for dynamic color updates from settings
       function applyDynamicColors() {
           const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-          // Apply CSS variables for instant color update
           document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
           document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
           document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
@@ -24,7 +21,6 @@
     body {
       transition: background-color 0.3s, color 0.3s;
       font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
-      position: relative;
     }
     .dark {
       background-color: #1f2937;
@@ -35,7 +31,7 @@
       color: #1f2937;
     }
     .sidebar {
-      width: var(--sidebar-width);
+      width: 16rem;
       height: 100vh;
       position: fixed;
       top: 0;
@@ -45,37 +41,27 @@
       z-index: 100;
     }
     main {
-      margin-left: var(--sidebar-width);
-      padding-top: 20px;
+      margin-left: 16rem;
       min-height: 100vh;
-      display: block;
-      position: relative;
     }
-    @media (max-width: 991.98px) {
+    @media (max-width: 768px) {
       .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+      }
+      .sidebar.open {
+        transform: translateX(0);
       }
       main {
         margin-left: 0;
       }
     }
-    .card {
-      transition: transform 0.2s, box-shadow 0.2s;
+    .oil-item {
+      transition: all 0.2s ease;
     }
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
+    .oil-item:hover {
+      background-color: rgba(59, 130, 246, 0.1);
     }
-    .fade-out {
-      opacity: 0;
-      transform: translateX(20px);
-      transition: all 0.3s ease-in-out;
-    }
-    /* Screen reader only class */
     .sr-only {
       position: absolute;
       width: 1px;
@@ -97,28 +83,10 @@
       clip: auto;
       white-space: normal;
     }
-    /* Mobile sidebar styles */
-    .sidebar {
-      transition: transform 0.3s ease-in-out;
-    }
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      main {
-        margin-left: 0;
-      }
-    }
-    @media (min-width: 768px) {
-      .sidebar {
-        width: 16rem;
-      }
-      main {
-        margin-left: 16rem;
-      }
+    @media print {
+      .sidebar, .no-print { display: none !important; }
+      main { margin-left: 0 !important; }
+      body { background: white !important; color: black !important; }
     }
   </style>
 </head>
@@ -130,42 +98,29 @@
   </div>
 
   <!-- Mobile Menu Toggle -->
-  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary no-print" aria-label="Toggle sidebar" aria-expanded="false">
     <span aria-hidden="true">☰</span>
     <span class="sr-only">Menu</span>
   </button>
 
   <!-- Toast Notification -->
-  <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
-
-  <!-- Mobile sidebar backdrop -->
-  <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+  <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300 no-print" role="alert" aria-live="polite"></div>
 
   <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
+  <aside id="sidebar" class="sidebar bg-gray-800 dark:bg-gray-900 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg" aria-label="Main navigation" role="navigation">
     <!-- App Branding -->
-    <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
-
-    <!-- User Profile Section -->
-    <div id="user-profile" class="mb-6">
-      <div id="user-info" class="hidden flex items-center space-x-2">
-        <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
-        <span id="user-name" class="text-white"></span>
-      </div>
-      <button id="login-btn" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Open login modal">Login</button>
-      <button id="logout-btn" class="hidden w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" aria-label="Logout">Logout</button>
-    </div>
+    <h1 class="text-2xl font-bold mb-6 text-white">Workshop Admin</h1>
 
     <!-- Navigation -->
     <nav role="navigation" aria-label="Main navigation">
       <ul class="space-y-2" role="list">
-        <li role="listitem"><a href="index.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
-        <li role="listitem"><a href="admin.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
-        <li role="listitem"><a href="users.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-        <li role="listitem"><a href="analytics.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-        <li role="listitem"><a href="settings.html" class="nav-link block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
-        <li role="listitem"><a href="oil.html" class="nav-link block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Orders</a></li>
-        <li role="listitem"><a href="login.html" class="nav-link block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+        <li role="listitem"><a href="index.html" class="nav-link block p-2 text-gray-300 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+        <li role="listitem"><a href="admin.html" class="nav-link block p-2 text-gray-300 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Admin</a></li>
+        <li role="listitem"><a href="users.html" class="nav-link block p-2 text-gray-300 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+        <li role="listitem"><a href="analytics.html" class="nav-link block p-2 text-gray-300 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+        <li role="listitem"><a href="settings.html" class="nav-link block p-2 text-gray-300 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
+        <li role="listitem"><a href="oil.html" class="nav-link block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Oil Stock Orders</a></li>
+        <li role="listitem"><a href="login.html" class="nav-link block p-2 text-gray-300 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
       </ul>
     </nav>
 
@@ -177,62 +132,120 @@
     </div>
   </aside>
 
-          <!-- ...existing code... -->
-          <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" role="tabpanel" aria-labelledby="tab-engine-oil" aria-live="polite">
-            <!-- Product cards will be dynamically inserted here -->
-            <div class="card widget-primary p-6 rounded-lg shadow-md text-center">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3" aria-hidden="true"></div>
-              <p class="text-gray-600 dark:text-gray-300">Loading products...</p>
-              <div class="loading-skeleton h-4 rounded mt-2"></div>
-              <div class="loading-skeleton h-4 rounded mt-2 w-3/4"></div>
-            </div>
-          </div>
+  <!-- Main Content -->
+  <main id="main-content" class="p-6 bg-gray-50 dark:bg-gray-800 min-h-screen">
+    <!-- Header -->
+    <header class="mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Oil Stock Order Request</h1>
+          <p class="text-gray-600 dark:text-gray-300">Prepare oil inventory order list for purchasing department</p>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-4 md:mt-0 no-print">
+          <button id="clearAllBtn" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+            Clear All
+          </button>
+          <button id="saveOrderBtn" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">
+            Save Draft
+          </button>
+          <button id="printOrderBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            Print Order
+          </button>
+          <button id="emailOrderBtn" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400">
+            Email to Purchasing
+          </button>
+        </div>
       </div>
-
-        <!-- Order Form Area -->
-        <div class="lg:col-span-1" role="region" aria-label="Order summary">
-          <div id="orderContainer" class="widget-secondary rounded-lg shadow-md p-6 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto border border-gray-200 dark:border-gray-700">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Your Order <span aria-hidden="true">🛒</span></h3>
-              <div id="loading-indicator" class="hidden" aria-hidden="true">
-                <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-              </div>
-            </div>
-            
-            <div id="orderItems" class="space-y-2 mb-4 min-h-[100px] lg:min-h-[200px]">
-              <!-- Order items will be dynamically inserted here -->
-              <p class="text-gray-500 dark:text-gray-400 text-center py-4 lg:py-8 text-sm">Your order is empty.</p>
-            </div>
-            
-            <div id="orderSummary" class="flex justify-between font-bold mb-4 pt-4 border-t border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100">
-              <span>Total Items:</span>
-              <span id="totalItems">0</span>
-            </div>
-            
-            <button id="submitOrderBtn" class="w-full p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-base transition-colors duration-200" disabled>
-              Submit Order
-            </button>
+      
+      <!-- Order Info Form -->
+      <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="requestedBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requested By</label>
+            <input type="text" id="requestedBy" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white" placeholder="Your name">
+          </div>
+          <div>
+            <label for="orderDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Order Date</label>
+            <input type="date" id="orderDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+          </div>
+          <div>
+            <label for="priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
+            <select id="priority" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+              <option value="normal">Normal</option>
+              <option value="urgent">Urgent</option>
+              <option value="low">Low Priority</option>
+            </select>
           </div>
         </div>
-    </div>
-  </section>
- </main>
-
-
-  <!-- Order Confirmation Modal -->
-  <div id="confirmModal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md shadow-xl border border-gray-200 dark:border-gray-700">
-      <h3 id="confirm-modal-title" class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Confirm Order</h3>
-      <p class="mb-4 text-gray-600 dark:text-gray-300">Are you sure you want to submit this order?</p>
-      <div id="modalOrderSummary" class="mb-4 max-h-60 overflow-y-auto widget-primary p-4 rounded-lg">
-        <!-- Order summary will be populated here -->
+        <div class="mt-4">
+          <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+          <textarea id="notes" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white" placeholder="Additional notes or special requirements"></textarea>
+        </div>
       </div>
-      <div class="flex space-x-4">
-        <button id="cancelModal" class="flex-1 p-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors duration-200">Cancel</button>
-        <button id="confirmSubmitBtn" class="flex-1 p-3 bg-secondary text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-colors duration-200">Confirm</button>
+    </header>
+
+    <!-- Oil Selection and Order List -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Available Oils -->
+      <div class="bg-white dark:bg-gray-700 rounded-lg shadow">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-600">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Available Oil Products</h2>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Click on items to add to order list</p>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="p-4 border-b border-gray-200 dark:border-gray-600 no-print">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="text" id="searchOils" placeholder="Search oils..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+            <select id="filterType" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+              <option value="">All Types</option>
+              <option value="Engine oil">Engine Oil</option>
+              <option value="Gear oil">Gear Oil</option>
+              <option value="Hydraulic oil">Hydraulic Oil</option>
+              <option value="Motorcycle oil">Motorcycle Oil</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Oil List -->
+        <div id="oilsList" class="max-h-96 overflow-y-auto">
+          <!-- Oil items will be loaded here -->
+          <div class="p-6 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
+            <p class="text-gray-600 dark:text-gray-300">Loading oil products...</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Order List -->
+      <div class="bg-white dark:bg-gray-700 rounded-lg shadow">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-600">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Order List</h2>
+            <span id="orderCount" class="bg-primary text-white px-3 py-1 rounded-full text-sm">0 items</span>
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Items to be ordered</p>
+        </div>
+        
+        <div id="orderList" class="max-h-96 overflow-y-auto">
+          <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+            <p>No items added to order yet</p>
+            <p class="text-sm mt-1">Click on oils from the left panel to add them</p>
+          </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="p-6 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
+          <div class="flex justify-between items-center text-lg font-semibold text-gray-900 dark:text-white">
+            <span>Total Items:</span>
+            <span id="totalOrderItems">0</span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
+
 
 
   <script>
@@ -293,120 +306,218 @@
     })();
   </script>
 
-  <!-- Firebase -->
+  <script>
+    // Workshop Oil Stock Order Application
+    document.addEventListener('DOMContentLoaded', function() {
+      // State management
+      const orderItems = [];
+      let products = [];
+      let filteredProducts = [];
 
-  <script type="module">
-    // Global variables
-    let oils = []; // Will be loaded from API instead of localStorage
-    let currentOrder = JSON.parse(localStorage.getItem('currentOrder')) || {};
-    let currentType = 'Engine oil';
-
-    // Utility to show toast notifications
-    const showToast = (message, type = 'info') => {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = `fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300 ${
-        type === 'success' ? 'bg-green-500' : 
-        type === 'error' ? 'bg-red-500' : 
-        'bg-blue-500'
-      } text-white`;
-      toast.classList.remove('hidden');
       
-      setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 3000);
-    };
-
-    // Theme Toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
-    themeToggle.addEventListener('click', () => {
-      body.classList.toggle('dark');
-      body.classList.toggle('light');
-      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-      themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-      themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-    });
-
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    body.classList.add(savedTheme);
-    themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-    themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
-
-    // Mobile Menu Toggle
-    const menuToggle = document.getElementById('menu-toggle');
-    const sidebar = document.getElementById('sidebar');
-    menuToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      const isOpen = sidebar.classList.contains('open');
-      menuToggle.setAttribute('aria-expanded', isOpen);
-    });
-
-    // Reset global variables for products and orders 
-    currentOrder = JSON.parse(localStorage.getItem('currentOrder')) || {};
-    // currentType = 'Engine oil'; // Already declared above
-
-    // API Configuration
-    const API_BASE = window.location.hostname === 'localhost' 
-      ? 'http://localhost:8888/.netlify/functions' 
-      : 'https://joshburt.netlify.app/.netlify/functions';
-
-    // Initialize default products if none exist in localStorage
-    function initializeDefaultProducts() {
-      const defaultProducts = [
-        { id: 1, code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil", description: "High-performance synthetic engine oil for modern vehicles", image: "" },
-        { id: 2, code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6", type: "Engine oil", description: "Advanced formula for fuel economy and engine protection", image: "" },
-        { id: 3, code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+", type: "Engine oil", description: "Specialized formula for European vehicles", image: "" },
-        { id: 4, code: "3424932", name: "EDGE 5W-30", specs: "API SP, ILSAC GF-6", type: "Engine oil", description: "Premium synthetic engine oil for optimal performance", image: "" },
-        { id: 5, code: "3437298", name: "EDGE 5W-40", specs: "ACEA A3/B4, API SP", type: "Engine oil", description: "High-performance engine oil for sports and performance vehicles", image: "" },
-        { id: 6, code: "3425001", name: "GTX 10W-40", specs: "API SN, ACEA A3/B4", type: "Engine oil", description: "Conventional motor oil for everyday driving", image: "" },
-        { id: 7, code: "3433850", name: "Magnatec 5W-30", specs: "API SP, ILSAC GF-6", type: "Engine oil", description: "Intelligent molecules that cling to engine parts", image: "" },
-        { id: 8, code: "3425220", name: "Power 1 Racing 4T 10W-50", specs: "API SN, JASO MA2", type: "Motorcycle oil", description: "Fully synthetic motorcycle engine oil", image: "" },
-        { id: 9, code: "3433821", name: "Actevo X-tra 4T 20W-50", specs: "API SL, JASO MA", type: "Motorcycle oil", description: "High-performance motorcycle oil for all conditions", image: "" },
-        { id: 10, code: "3425002", name: "EPX 80W-90", specs: "API GL-5", type: "Gear oil", description: "Heavy-duty gear oil for manual transmissions", image: "" }
-      ];
+      // DOM elements
+      const oilsList = document.getElementById('oilsList');
+      const orderList = document.getElementById('orderList');
+      const orderCount = document.getElementById('orderCount');
+      const totalOrderItems = document.getElementById('totalOrderItems');
+      const searchOils = document.getElementById('searchOils');
+      const filterType = document.getElementById('filterType');
+      const requestedBy = document.getElementById('requestedBy');
+      const orderDate = document.getElementById('orderDate');
+      const priority = document.getElementById('priority');
+      const notes = document.getElementById('notes');
       
-      const savedProducts = localStorage.getItem('oilProducts');
-      if (!savedProducts) {
-        localStorage.setItem('oilProducts', JSON.stringify(defaultProducts));
-        return defaultProducts;
-      }
-      return JSON.parse(savedProducts);
-    }
+      // Set default date to today
+      orderDate.value = new Date().toISOString().split('T')[0];
 
-    // Load products from localStorage as fallback
-    function loadProductsFromLocalStorage() {
-      try {
-        const savedProducts = localStorage.getItem('oilProducts');
-        if (savedProducts) {
-          oils = JSON.parse(savedProducts);
+      
+      // Order management functions
+      function addToOrder(productId, productName, productType, unitSize) {
+        const existingItem = orderItems.find(item => item.id === productId);
+        
+        if (existingItem) {
+          existingItem.quantity++;
         } else {
-          oils = initializeDefaultProducts();
+          orderItems.push({
+            id: productId,
+            name: productName,
+            type: productType || 'Unknown',
+            unit_size: unitSize || 'N/A',
+            quantity: 1,
+            currentStock: Math.floor(Math.random() * 50), // Mock current stock
+            reorderPoint: Math.floor(Math.random() * 10) + 5 // Mock reorder point
+          });
         }
-        console.log('Products loaded from localStorage:', oils.length);
-        renderProductsByType(currentType);
-        return true;
-      } catch (error) {
-        console.error('Failed to load products from localStorage:', error);
-        return false;
+        
+        updateOrderDisplay();
       }
-    }
-
-    // Load products from API with localStorage fallback
-    async function loadProducts() {
-      console.log('Loading products from API...');
       
-      try {
-        const response = await fetch(`${API_BASE}/products`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+      function removeFromOrder(productId) {
+        const index = orderItems.findIndex(item => item.id === productId);
+        if (index > -1) {
+          orderItems.splice(index, 1);
+          updateOrderDisplay();
         }
-        oils = await response.json();
+      }
+      
+      function updateQuantity(productId, newQuantity) {
+        const item = orderItems.find(item => item.id === productId);
+        if (item) {
+          if (newQuantity <= 0) {
+            removeFromOrder(productId);
+          } else {
+            item.quantity = newQuantity;
+            updateOrderDisplay();
+          }
+        }
+      }
+      
+      function updateOrderDisplay() {
+        const itemCount = orderItems.length;
+        const totalQty = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+        
+        orderCount.textContent = `${itemCount} items`;
+        totalOrderItems.textContent = totalQty;
+        
+        if (itemCount === 0) {
+          orderList.innerHTML = `
+            <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+              <p>No items added to order yet</p>
+              <p class="text-sm mt-1">Click on oils from the left panel to add them</p>
+            </div>
+          `;
+          return;
+        }
+        
+        const orderHTML = orderItems.map(item => `
+          <div class="p-4 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
+            <div class="flex justify-between items-start mb-3">
+              <div class="flex-1 min-w-0">
+                <h4 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(item.name)}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(item.type)} • ${escapeHtml(item.unit_size)}</p>
+              </div>
+              <button onclick="removeFromOrder(${item.id})" class="text-red-500 hover:text-red-700 p-1 no-print" title="Remove item">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-4 text-sm mb-3">
+              <div>
+                <span class="text-gray-500 dark:text-gray-400 block">Current Stock</span>
+                <span class="font-medium ${item.currentStock <= item.reorderPoint ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${item.currentStock}</span>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400 block">Reorder Point</span>
+                <span class="font-medium text-gray-900 dark:text-gray-100">${item.reorderPoint}</span>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400 block">Status</span>
+                <span class="inline-block px-2 py-1 rounded-full text-xs ${item.currentStock <= item.reorderPoint ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}">
+                  ${item.currentStock <= item.reorderPoint ? 'Low Stock' : 'In Stock'}
+                </span>
+              </div>
+            </div>
+            
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-300">Order Quantity:</span>
+              <div class="flex items-center space-x-2 no-print">
+                <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" class="w-8 h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500">−</button>
+                <span class="font-medium text-gray-900 dark:text-gray-100 min-w-[3rem] text-center">${item.quantity}</span>
+                <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})" class="w-8 h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500">+</button>
+              </div>
+              <span class="print-only font-medium text-gray-900 dark:text-gray-100">${item.quantity}</span>
+            </div>
+          </div>
+        `).join('');
+        
+        orderList.innerHTML = orderHTML;
+      }
+      
+      // Product loading and display
+      async function loadProducts() {
+        try {
+          const response = await fetch('/.netlify/functions/products');
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          products = data.products || [];
+          filteredProducts = [...products];
+          displayProducts();
+        } catch (error) {
+          console.error('Error loading products:', error);
+          oilsList.innerHTML = `
+            <div class="p-6 text-center text-red-600 dark:text-red-400">
+              <p class="mb-4">Unable to load oil products</p>
+              <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                Retry
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      
+      function displayProducts() {
+        if (!filteredProducts || filteredProducts.length === 0) {
+          oilsList.innerHTML = `
+            <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+              <p>No oil products found</p>
+            </div>
+          `;
+          return;
+        }
+        
+        const productsHTML = filteredProducts.map(product => `
+          <div class="p-4 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors" onclick="addToOrder(${product.id}, '${escapeHtml(product.name)}', '${escapeHtml(product.type || '')}', '${escapeHtml(product.unit_size || '')}')">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <h3 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(product.name)}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(product.type || 'Oil Product')}</p>
+                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  ${product.unit_size ? `Size: ${escapeHtml(product.unit_size)}` : ''}
+                  ${product.viscosity ? ` • ${escapeHtml(product.viscosity)}` : ''}
+                </div>
+              </div>
+              <div class="text-primary hover:text-blue-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        
+        oilsList.innerHTML = productsHTML;
+      }
+
+      
+      // Search and filter functionality
+      function filterProducts() {
+        const searchTerm = searchOils.value.toLowerCase();
+        const typeFilter = filterType.value;
+        
+        filteredProducts = products.filter(product => {
+          const matchesSearch = !searchTerm || 
+            product.name.toLowerCase().includes(searchTerm) ||
+            (product.type && product.type.toLowerCase().includes(searchTerm)) ||
+            (product.viscosity && product.viscosity.toLowerCase().includes(searchTerm));
+          
+          const matchesType = !typeFilter || product.type === typeFilter;
+          
+          return matchesSearch && matchesType;
+        });
+        
+        displayProducts();
+      }
+
+
         console.log('Products loaded from API:', oils.length);
-        renderProductsByType(currentType);
-      } catch (error) {
-        console.error('Failed to load products from API:', error);
+
         console.log('Attempting to load products from localStorage...');
         
         // Try to load from localStorage as fallback
@@ -667,12 +778,123 @@
     // Alias for renderOrder to maintain compatibility
     const updateOrderDisplay = renderOrder;
 
-    // Initialize the application - always load products from API first
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('Page loaded - initializing application...');
-      loadProducts(); // Always try API first, with localStorage fallback
-      renderOrder();
-      setupEventHandlers();
+      
+      // Action handlers
+      function clearAll() {
+        if (orderItems.length === 0) return;
+        
+        if (confirm('Are you sure you want to clear all items from the order?')) {
+          orderItems.length = 0;
+          updateOrderDisplay();
+        }
+      }
+      
+      function saveOrder() {
+        if (orderItems.length === 0) {
+          alert('No items to save');
+          return;
+        }
+        
+        const orderData = {
+          requestedBy: requestedBy.value,
+          orderDate: orderDate.value,
+          priority: priority.value,
+          notes: notes.value,
+          items: orderItems,
+          totalItems: orderItems.reduce((sum, item) => sum + item.quantity, 0),
+          timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem('oilOrderDraft', JSON.stringify(orderData));
+        alert('Order draft saved successfully!');
+      }
+      
+      function loadSavedOrder() {
+        const saved = localStorage.getItem('oilOrderDraft');
+        if (saved) {
+          try {
+            const orderData = JSON.parse(saved);
+            requestedBy.value = orderData.requestedBy || '';
+            orderDate.value = orderData.orderDate || '';
+            priority.value = orderData.priority || 'normal';
+            notes.value = orderData.notes || '';
+            
+            orderItems.length = 0;
+            orderItems.push(...(orderData.items || []));
+            updateOrderDisplay();
+          } catch (error) {
+            console.error('Error loading saved order:', error);
+          }
+        }
+      }
+      
+      function printOrder() {
+        if (orderItems.length === 0) {
+          alert('No items to print');
+          return;
+        }
+        window.print();
+      }
+      
+      function emailOrder() {
+        if (orderItems.length === 0) {
+          alert('No items to email');
+          return;
+        }
+        
+        const orderSummary = orderItems.map(item => 
+          `${item.name} (${item.type}) - Qty: ${item.quantity} - Current Stock: ${item.currentStock}`
+        ).join('\n');
+        
+        const emailBody = `Oil Stock Order Request
+
+Requested by: ${requestedBy.value}
+Order Date: ${orderDate.value}
+Priority: ${priority.value}
+Notes: ${notes.value}
+
+Items to Order:
+${orderSummary}
+
+Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
+`;
+        
+        const subject = `Oil Stock Order Request - ${new Date().toLocaleDateString()}`;
+        const mailtoLink = `mailto:purchasing@workshop.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+        
+        window.location.href = mailtoLink;
+      }
+      
+      // Utility functions
+      function escapeHtml(text) {
+        if (!text) return '';
+        const map = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        };
+        return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
+      }
+      
+      // Make functions globally available
+      window.addToOrder = addToOrder;
+      window.removeFromOrder = removeFromOrder;
+      window.updateQuantity = updateQuantity;
+      
+      // Event listeners
+      document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+      document.getElementById('saveOrderBtn').addEventListener('click', saveOrder);
+      document.getElementById('printOrderBtn').addEventListener('click', printOrder);
+      document.getElementById('emailOrderBtn').addEventListener('click', emailOrder);
+      
+      searchOils.addEventListener('input', filterProducts);
+      filterType.addEventListener('change', filterProducts);
+      
+      // Load products and any saved draft
+      loadProducts();
+      loadSavedOrder();
     });
   </script>
 </body>
