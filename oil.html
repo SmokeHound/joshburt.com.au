@@ -88,6 +88,24 @@
       main { margin-left: 0 !important; }
       body { background: white !important; color: black !important; }
     }
+    
+    /* Custom toggle switch styles */
+    .switch-bg {
+      transition: background-color 0.2s ease-in-out;
+    }
+    .switch-toggle {
+      transition: transform 0.2s ease-in-out;
+    }
+    #useLocalData:checked + div .switch-bg {
+      background-color: #10b981;
+    }
+    #useLocalData:checked + div .switch-toggle {
+      transform: translateX(16px);
+    }
+    #useLocalData:focus + div {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+      border-radius: 9999px;
+    }
   </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
@@ -195,6 +213,28 @@
           <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Click on items to add to order list</p>
         </div>
         
+        <!-- Data Source Switch -->
+        <div class="p-4 border-b border-gray-200 dark:border-gray-600 no-print bg-gray-50 dark:bg-gray-800">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Data Source:</span>
+              <label class="inline-flex items-center">
+                <input type="checkbox" id="useLocalData" class="sr-only">
+                <div class="relative">
+                  <div class="w-10 h-6 bg-gray-200 dark:bg-gray-600 rounded-full shadow-inner transition-colors duration-200 ease-in-out switch-bg"></div>
+                  <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out switch-toggle"></div>
+                </div>
+                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400 switch-label">API (Online)</span>
+              </label>
+            </div>
+            <button id="reloadDataBtn" class="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400" title="Reload products">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
         <!-- Search and Filter -->
         <div class="p-4 border-b border-gray-200 dark:border-gray-600 no-print">
           <div class="flex flex-col sm:flex-row gap-2">
@@ -327,6 +367,9 @@
       const orderDate = document.getElementById('orderDate');
       const priority = document.getElementById('priority');
       const notes = document.getElementById('notes');
+      const useLocalData = document.getElementById('useLocalData');
+      const switchLabel = document.querySelector('.switch-label');
+      const reloadDataBtn = document.getElementById('reloadDataBtn');
       
       // Set default date to today
       orderDate.value = new Date().toISOString().split('T')[0];
@@ -438,8 +481,27 @@
       
       // Product loading and display
       async function loadProducts() {
+        // Show loading state
+        oilsList.innerHTML = `
+          <div class="p-6 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
+            <p class="text-gray-600 dark:text-gray-300">Loading oil products...</p>
+          </div>
+        `;
+
+        const useLocal = useLocalData.checked;
+        
+        if (useLocal) {
+          // Load from JSON file directly
+          await loadFromJSON();
+        } else {
+          // Try API first, fallback to JSON
+          await loadFromAPI();
+        }
+      }
+
+      async function loadFromAPI() {
         try {
-          // First try to load from API endpoint
           const response = await fetch('/.netlify/functions/products');
           
           if (!response.ok) {
@@ -456,38 +518,47 @@
           filteredProducts = [...products];
           displayProducts();
           console.log('Products loaded from API:', products.length);
+          showToast('Products loaded from API successfully', 'success');
+          
         } catch (error) {
           console.warn('API unavailable, loading local backup:', error.message);
+          showToast('API unavailable, switching to local data', 'warning');
+          await loadFromJSON();
+        }
+      }
+
+      async function loadFromJSON() {
+        try {
+          const backupResponse = await fetch('./data/products.json');
           
-          try {
-            // Fallback to local backup data
-            const backupResponse = await fetch('./data/products.json');
-            
-            if (!backupResponse.ok) {
-              throw new Error(`Local backup error! status: ${backupResponse.status}`);
-            }
-            
-            const backupData = await backupResponse.json();
-            products = Array.isArray(backupData) ? backupData : [];
-            filteredProducts = [...products];
-            displayProducts();
-            console.log('Products loaded from local backup:', products.length);
-            
-            // Show user notification about offline mode
-            showToast('Using local product data (offline mode)', 'info');
-            
-          } catch (backupError) {
-            console.error('Error loading backup products:', backupError);
-            oilsList.innerHTML = `
-              <div class="p-6 text-center text-red-600 dark:text-red-400">
-                <p class="mb-2">Unable to load oil products</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Both API and local backup failed</p>
-                <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                  Retry Loading
-                </button>
-              </div>
-            `;
+          if (!backupResponse.ok) {
+            throw new Error(`Local backup error! status: ${backupResponse.status}`);
           }
+          
+          const backupData = await backupResponse.json();
+          products = Array.isArray(backupData) ? backupData : (backupData.products || []);
+          
+          if (products.length === 0) {
+            throw new Error('No products found in backup data');
+          }
+          
+          filteredProducts = [...products];
+          displayProducts();
+          console.log('Products loaded from local backup:', products.length);
+          showToast('Products loaded from local JSON file', 'info');
+          
+        } catch (backupError) {
+          console.error('Error loading backup products:', backupError);
+          oilsList.innerHTML = `
+            <div class="p-6 text-center text-red-600 dark:text-red-400">
+              <p class="mb-2">Unable to load oil products</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Failed to load from ${useLocalData.checked ? 'JSON file' : 'API and local backup'}</p>
+              <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+                Retry Loading
+              </button>
+            </div>
+          `;
+          showToast('Failed to load product data. Please check your files.', 'error');
         }
       }
 
@@ -690,7 +761,23 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
       window.addToOrder = addToOrder;
       window.removeFromOrder = removeFromOrder;
       window.updateQuantity = updateQuantity;
+      window.loadProducts = loadProducts;
       
+      // Data source switch functionality
+      function updateSwitchLabel() {
+        switchLabel.textContent = useLocalData.checked ? 'JSON (Local)' : 'API (Online)';
+        // Save preference
+        localStorage.setItem('oilDataSource', useLocalData.checked ? 'local' : 'api');
+      }
+
+      function loadDataSourcePreference() {
+        const savedPreference = localStorage.getItem('oilDataSource');
+        if (savedPreference === 'local') {
+          useLocalData.checked = true;
+        }
+        updateSwitchLabel();
+      }
+
       // Event listeners
       document.getElementById('clearAllBtn').addEventListener('click', clearAll);
       document.getElementById('saveOrderBtn').addEventListener('click', saveOrder);
@@ -700,7 +787,19 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
       searchOils.addEventListener('input', filterProducts);
       filterType.addEventListener('change', filterProducts);
       
-      // Load products and any saved draft
+      // Data source controls
+      useLocalData.addEventListener('change', () => {
+        updateSwitchLabel();
+        showToast(`Switched to ${useLocalData.checked ? 'local JSON' : 'API'} data source`, 'info');
+      });
+      
+      reloadDataBtn.addEventListener('click', () => {
+        showToast('Reloading products...', 'info');
+        loadProducts();
+      });
+      
+      // Initialize data source preference and load products
+      loadDataSourcePreference();
       loadProducts();
       loadSavedOrder();
     });
