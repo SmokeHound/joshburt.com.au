@@ -644,7 +644,7 @@
         }
         
         const orderSummary = orderItems.map(item => 
-          `${item.name} (${item.type}) - Code: ${item.code} - Qty: ${item.quantity} - Current Stock: ${item.currentStock}`
+          `${item.name} - Code: ${item.code} - Qty: ${item.quantity}`
         ).join('\n');
         
         const emailBody = `Consumables Stock Order Request
