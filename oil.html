@@ -200,10 +200,10 @@
             <input type="text" id="searchOils" placeholder="Search oils..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
             <select id="filterType" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
               <option value="">All Types</option>
-              <option value="Engine oil">Engine Oil</option>
-              <option value="Gear oil">Gear Oil</option>
-              <option value="Hydraulic oil">Hydraulic Oil</option>
-              <option value="Motorcycle oil">Motorcycle Oil</option>
+              <option value="Engine Oil">Engine Oil</option>
+              <option value="Gear Oil">Gear Oil</option>
+              <option value="Coolant">Coolant</option>
+              <option value="Brake Fluid">Brake Fluid</option>
             </select>
           </div>
         </div>
@@ -332,7 +332,7 @@
 
       
       // Order management functions
-      function addToOrder(productId, productName, productType, unitSize) {
+      function addToOrder(productId, productName, productType, productCode) {
         const existingItem = orderItems.find(item => item.id === productId);
         
         if (existingItem) {
@@ -342,7 +342,7 @@
             id: productId,
             name: productName,
             type: productType || 'Unknown',
-            unit_size: unitSize || 'N/A',
+            code: productCode || 'N/A',
             quantity: 1,
             currentStock: Math.floor(Math.random() * 50), // Mock current stock
             reorderPoint: Math.floor(Math.random() * 10) + 5 // Mock reorder point
@@ -394,7 +394,7 @@
             <div class="flex justify-between items-start mb-3">
               <div class="flex-1 min-w-0">
                 <h4 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(item.name)}</h4>
-                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(item.type)} • ${escapeHtml(item.unit_size)}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(item.type)} • Code: ${escapeHtml(item.code)}</p>
               </div>
               <button onclick="removeFromOrder(${item.id})" class="text-red-500 hover:text-red-700 p-1 no-print" title="Remove item">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -438,6 +438,7 @@
       // Product loading and display
       async function loadProducts() {
         try {
+          // First try to load from API endpoint
           const response = await fetch('/.netlify/functions/products');
           
           if (!response.ok) {
@@ -446,18 +447,46 @@
           
           const data = await response.json();
           products = data.products || [];
+          
+          if (products.length === 0) {
+            throw new Error('No products returned from API');
+          }
+          
           filteredProducts = [...products];
           displayProducts();
+          console.log('Products loaded from API:', products.length);
         } catch (error) {
-          console.error('Error loading products:', error);
-          oilsList.innerHTML = `
-            <div class="p-6 text-center text-red-600 dark:text-red-400">
-              <p class="mb-4">Unable to load oil products</p>
-              <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                Retry
-              </button>
-            </div>
-          `;
+          console.warn('API unavailable, loading local backup:', error.message);
+          
+          try {
+            // Fallback to local backup data
+            const backupResponse = await fetch('./data/products.json');
+            
+            if (!backupResponse.ok) {
+              throw new Error(`Local backup error! status: ${backupResponse.status}`);
+            }
+            
+            const backupData = await backupResponse.json();
+            products = Array.isArray(backupData) ? backupData : [];
+            filteredProducts = [...products];
+            displayProducts();
+            console.log('Products loaded from local backup:', products.length);
+            
+            // Show user notification about offline mode
+            showToast('Using local product data (offline mode)', 'info');
+            
+          } catch (backupError) {
+            console.error('Error loading backup products:', backupError);
+            oilsList.innerHTML = `
+              <div class="p-6 text-center text-red-600 dark:text-red-400">
+                <p class="mb-2">Unable to load oil products</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Both API and local backup failed</p>
+                <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                  Retry Loading
+                </button>
+              </div>
+            `;
+          }
         }
       }
 
@@ -473,14 +502,14 @@
         }
         
         const productsHTML = filteredProducts.map(product => `
-          <div class="p-4 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors" onclick="addToOrder(${product.id}, '${escapeHtml(product.name)}', '${escapeHtml(product.type || '')}', '${escapeHtml(product.unit_size || '')}')">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors" onclick="addToOrder(${product.id}, '${escapeHtml(product.name)}', '${escapeHtml(product.type || '')}', '${escapeHtml(product.code || '')}')">
             <div class="flex justify-between items-start">
               <div class="flex-1">
                 <h3 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(product.name)}</h3>
                 <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(product.type || 'Oil Product')}</p>
                 <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  ${product.unit_size ? `Size: ${escapeHtml(product.unit_size)}` : ''}
-                  ${product.viscosity ? ` • ${escapeHtml(product.viscosity)}` : ''}
+                  ${product.code ? `Code: ${escapeHtml(product.code)}` : ''}
+                  ${product.specs ? ` • ${escapeHtml(product.specs)}` : ''}
                 </div>
               </div>
               <div class="text-primary hover:text-blue-600">
@@ -505,7 +534,8 @@
           const matchesSearch = !searchTerm || 
             product.name.toLowerCase().includes(searchTerm) ||
             (product.type && product.type.toLowerCase().includes(searchTerm)) ||
-            (product.viscosity && product.viscosity.toLowerCase().includes(searchTerm));
+            (product.code && product.code.toLowerCase().includes(searchTerm)) ||
+            (product.specs && product.specs.toLowerCase().includes(searchTerm));
           
           const matchesType = !typeFilter || product.type === typeFilter;
           
@@ -622,6 +652,37 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
           "'": '&#039;'
         };
         return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
+      }
+      
+      function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+        
+        // Set toast styling based on type
+        toast.className = 'toast fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300';
+        switch (type) {
+          case 'success':
+            toast.classList.add('bg-green-500', 'text-white');
+            break;
+          case 'error':
+            toast.classList.add('bg-red-500', 'text-white');
+            break;
+          case 'warning':
+            toast.classList.add('bg-yellow-500', 'text-white');
+            break;
+          case 'info':
+          default:
+            toast.classList.add('bg-blue-500', 'text-white');
+            break;
+        }
+        
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        
+        // Auto-hide after 4 seconds
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 4000);
       }
       
       // Make functions globally available
