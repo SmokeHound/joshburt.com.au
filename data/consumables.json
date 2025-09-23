@@ -1,0 +1,826 @@
+[
+  {
+    "id": 1,
+    "code": "2048810",
+    "name": "ALLOY FN WHEEL WEIGHT 10G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Alloy clip-on wheel weight for alloy wheels - 10 grams"
+  },
+  {
+    "id": 2,
+    "code": "2048815",
+    "name": "ALLOY FN WHEEL WEIGHT 15G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Alloy clip-on wheel weight for alloy wheels - 15 grams"
+  },
+  {
+    "id": 3,
+    "code": "2048820",
+    "name": "ALLOY FN WHEEL WEIGHT 20G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Alloy clip-on wheel weight for alloy wheels - 20 grams"
+  },
+  {
+    "id": 4,
+    "code": "2048825",
+    "name": "ALLOY FN WHEEL WEIGHT 25G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Alloy clip-on wheel weight for alloy wheels - 25 grams"
+  },
+  {
+    "id": 5,
+    "code": "2048830",
+    "name": "ALLOY FN WHEEL WEIGHT 30G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Alloy clip-on wheel weight for alloy wheels - 30 grams"
+  },
+  {
+    "id": 6,
+    "code": "2048835",
+    "name": "ALLOY FN WHEEL WEIGHT 35G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Alloy clip-on wheel weight for alloy wheels - 35 grams"
+  },
+  {
+    "id": 7,
+    "code": "2048840",
+    "name": "ALLOY FN WHEEL WEIGHT 40G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Alloy clip-on wheel weight for alloy wheels - 40 grams"
+  },
+  {
+    "id": 8,
+    "code": "2048850",
+    "name": "ALLOY FN WHEEL WEIGHT 50G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Alloy clip-on wheel weight for alloy wheels - 50 grams"
+  },
+  {
+    "id": 9,
+    "code": "500010",
+    "name": "STEEL WHEEL WEIGHT 10G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Steel clip-on wheel weight for steel wheels - 10 grams"
+  },
+  {
+    "id": 10,
+    "code": "500015",
+    "name": "STEEL WHEEL WEIGHT 15G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Steel clip-on wheel weight for steel wheels - 15 grams"
+  },
+  {
+    "id": 11,
+    "code": "500020",
+    "name": "STEEL WHEEL WEIGHT 20G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Steel clip-on wheel weight for steel wheels - 20 grams"
+  },
+  {
+    "id": 12,
+    "code": "500025",
+    "name": "STEEL WHEEL WEIGHT 25G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Steel clip-on wheel weight for steel wheels - 25 grams"
+  },
+  {
+    "id": 13,
+    "code": "500030",
+    "name": "STEEL WHEEL WEIGHT 30G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Steel clip-on wheel weight for steel wheels - 30 grams"
+  },
+  {
+    "id": 14,
+    "code": "500035",
+    "name": "STEEL WHEEL WEIGHT 35G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Steel clip-on wheel weight for steel wheels - 35 grams"
+  },
+  {
+    "id": 15,
+    "code": "500040",
+    "name": "STEEL WHEEL WEIGHT 40G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Steel clip-on wheel weight for steel wheels - 40 grams"
+  },
+  {
+    "id": 16,
+    "code": "500050",
+    "name": "STEEL WHEEL WEIGHT 50G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Steel clip-on wheel weight for steel wheels - 50 grams"
+  },
+  {
+    "id": 17,
+    "code": "CSC5/10B",
+    "name": "BLACK STICK ON WEIGHTS 5/10G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Black adhesive stick-on wheel weights - 5g and 10g"
+  },
+  {
+    "id": 18,
+    "code": "CSC5/10SIL",
+    "name": "SILVER STICK ON WEIGHTS 5/10G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Silver adhesive stick-on wheel weights - 5g and 10g"
+  },
+  {
+    "id": 19,
+    "code": "71100",
+    "name": "STICK ON WEIGHT 25G",
+    "type": "Tyre Consumables",
+    "category": "Wheel Weights",
+    "description": "Adhesive stick-on wheel weight - 25 grams"
+  },
+  {
+    "id": 20,
+    "code": "418DD",
+    "name": "VALVE - LONG - CORE OUT",
+    "type": "Tyre Consumables",
+    "category": "Valves",
+    "description": "Long tyre valve with removable core"
+  },
+  {
+    "id": 21,
+    "code": "413DD",
+    "name": "VALVE - SHORT - CORE OUT",
+    "type": "Tyre Consumables",
+    "category": "Valves",
+    "description": "Short tyre valve with removable core"
+  },
+  {
+    "id": 22,
+    "code": "21532",
+    "name": "VALVE CAPS - METAL",
+    "type": "Tyre Consumables",
+    "category": "Valves",
+    "description": "Metal valve caps for tyre valves"
+  },
+  {
+    "id": 23,
+    "code": "21532/21539",
+    "name": "VALVE CAPS - PLASTIC",
+    "type": "Tyre Consumables",
+    "category": "Valves",
+    "description": "Plastic valve caps for tyre valves"
+  },
+  {
+    "id": 24,
+    "code": "21546",
+    "name": "VALVE CORES - SHORT",
+    "type": "Tyre Consumables",
+    "category": "Valves",
+    "description": "Short valve cores for tyre valves"
+  },
+  {
+    "id": 25,
+    "code": "6-210H",
+    "name": "VALVE - TPMS SNAP-IN",
+    "type": "Tyre Consumables",
+    "category": "Valves",
+    "description": "TPMS snap-in valve for pressure monitoring systems"
+  },
+  {
+    "id": 26,
+    "code": "26118",
+    "name": "VALVE T/LESS CAR TR412 SHORT",
+    "type": "Tyre Consumables",
+    "category": "Valves",
+    "description": "Tubeless car valve TR412 short type"
+  },
+  {
+    "id": 27,
+    "code": "MC-06",
+    "name": "6MM COMBI PLUG",
+    "type": "Tyre Consumables",
+    "category": "Repairs",
+    "description": "6mm combination tyre repair plug"
+  },
+  {
+    "id": 28,
+    "code": "MC-08",
+    "name": "8MM COMBI PLUG",
+    "type": "Tyre Consumables",
+    "category": "Repairs",
+    "description": "8mm combination tyre repair plug"
+  },
+  {
+    "id": 29,
+    "code": "BJ460",
+    "name": "JACK BOX BLACK PLUG",
+    "type": "Tyre Consumables",
+    "category": "Repairs",
+    "description": "Jack box black tyre repair plug"
+  },
+  {
+    "id": 30,
+    "code": "97041",
+    "name": "BEAD SEALER",
+    "type": "Tyre Consumables",
+    "category": "Chemicals",
+    "description": "Tyre bead sealer compound"
+  },
+  {
+    "id": 31,
+    "code": "16472",
+    "name": "LIQUID BUFFER",
+    "type": "Tyre Consumables",
+    "category": "Chemicals",
+    "description": "Liquid buffer solution for tyre work"
+  },
+  {
+    "id": 32,
+    "code": "SV-01",
+    "name": "PATCH REPAIR SEALER",
+    "type": "Tyre Consumables",
+    "category": "Chemicals",
+    "description": "Patch repair sealer for tyre repairs"
+  },
+  {
+    "id": 33,
+    "code": "CV-00",
+    "name": "VULCANIZING CEMENT",
+    "type": "Tyre Consumables",
+    "category": "Chemicals",
+    "description": "Vulcanizing cement for tyre patches"
+  },
+  {
+    "id": 34,
+    "code": "46-249",
+    "name": "TYRE MOUNTING PASTE",
+    "type": "Tyre Consumables",
+    "category": "Chemicals",
+    "description": "Tyre mounting paste lubricant"
+  },
+  {
+    "id": 35,
+    "code": "900415249",
+    "name": "TYRE LUBE BRUSHES",
+    "type": "Tyre Consumables",
+    "category": "Tools",
+    "description": "Brushes for applying tyre lubricant"
+  },
+  {
+    "id": 36,
+    "code": "5930443",
+    "name": "HAND CLEANER",
+    "type": "Tyre Consumables",
+    "category": "Chemicals",
+    "description": "Hand cleaner for workshop use"
+  },
+  {
+    "id": 37,
+    "code": "RAC-10",
+    "name": "RADIAL PATCH 75x55MM",
+    "type": "Tyre Consumables",
+    "category": "Repairs",
+    "description": "Radial tyre patch 75mm x 55mm"
+  },
+  {
+    "id": 38,
+    "code": "54861",
+    "name": "HD Air Chuck Open Clip On HT-360",
+    "type": "Tyre Consumables",
+    "category": "Tools",
+    "description": "Heavy duty air chuck with clip-on connection"
+  },
+  {
+    "id": 39,
+    "code": "45121",
+    "name": "WHITE PAINT STICK",
+    "type": "Tyre Consumables",
+    "category": "Tools",
+    "description": "White paint stick for marking"
+  },
+  {
+    "id": 40,
+    "code": "BJN4",
+    "name": "PLUG NEEDLE 100MM",
+    "type": "Tyre Consumables",
+    "category": "Tools",
+    "description": "100mm plug needle for tyre repairs"
+  },
+  {
+    "id": 41,
+    "code": "EOF",
+    "name": "ENGINE OIL FLUSH (6pk)",
+    "type": "Mechanical Consumables",
+    "category": "Engine Treatments",
+    "description": "Engine oil flush treatment - 6 pack"
+  },
+  {
+    "id": 42,
+    "code": "PIC",
+    "name": "INJECTOR CLEANER - PETROL (6pk)",
+    "type": "Mechanical Consumables",
+    "category": "Engine Treatments",
+    "description": "Petrol injector cleaner - 6 pack"
+  },
+  {
+    "id": 43,
+    "code": "DIC",
+    "name": "INJECTOR CLEANER - DIESEL (6pk)",
+    "type": "Mechanical Consumables",
+    "category": "Engine Treatments",
+    "description": "Diesel injector cleaner - 6 pack"
+  },
+  {
+    "id": 44,
+    "code": "BC20",
+    "name": "BRAKE CLEANER 20L",
+    "type": "Mechanical Consumables",
+    "category": "Cleaners",
+    "description": "Brake cleaner - 20 litre container"
+  },
+  {
+    "id": 45,
+    "code": "D20",
+    "name": "DEGREASER 20L",
+    "type": "Mechanical Consumables",
+    "category": "Cleaners",
+    "description": "Industrial degreaser - 20 litre container"
+  },
+  {
+    "id": 46,
+    "code": "TS20",
+    "name": "TYRE SHINE 20L",
+    "type": "Mechanical Consumables",
+    "category": "Appearance",
+    "description": "Tyre shine product - 20 litre container"
+  },
+  {
+    "id": 47,
+    "code": "A90020-20",
+    "name": "W/SCREEN WASH 20L",
+    "type": "Mechanical Consumables",
+    "category": "Fluids",
+    "description": "Windscreen wash fluid - 20 litre container"
+  },
+  {
+    "id": 48,
+    "code": "6601N-240",
+    "name": "THREE BOND ENG. CONDITIONER",
+    "type": "Mechanical Consumables",
+    "category": "Engine Treatments",
+    "description": "Three Bond engine conditioner treatment"
+  },
+  {
+    "id": 49,
+    "code": "EZI330",
+    "name": "SILICON SPRAY (EZI-GLIDE)",
+    "type": "Mechanical Consumables",
+    "category": "Lubricants",
+    "description": "EZI-GLIDE silicon spray lubricant"
+  },
+  {
+    "id": 50,
+    "code": "MX3-300",
+    "name": "INOX MX3 LUBRICANT 300GM",
+    "type": "Mechanical Consumables",
+    "category": "Lubricants",
+    "description": "INOX MX3 multi-purpose lubricant - 300 grams"
+  },
+  {
+    "id": 51,
+    "code": "CARB",
+    "name": "CARBY T/ BODY CLEANER",
+    "type": "Mechanical Consumables",
+    "category": "Cleaners",
+    "description": "Carburetor and throttle body cleaner"
+  },
+  {
+    "id": 52,
+    "code": "SS1-330",
+    "name": "RTV SILICON 330G - GREY",
+    "type": "Mechanical Consumables",
+    "category": "Sealants",
+    "description": "RTV silicon sealant - 330g grey"
+  },
+  {
+    "id": 53,
+    "code": "BR6",
+    "name": "WIPER BLADE REFILL 6MM",
+    "type": "Mechanical Consumables",
+    "category": "Wipers",
+    "description": "Wiper blade refill - 6mm width"
+  },
+  {
+    "id": 54,
+    "code": "BR8",
+    "name": "WIPER BLADE REFILL 8MM",
+    "type": "Mechanical Consumables",
+    "category": "Wipers",
+    "description": "Wiper blade refill - 8mm width"
+  },
+  {
+    "id": 55,
+    "code": "NGXL",
+    "name": "GLOVES - EXTRA LARGE",
+    "type": "Mechanical Consumables",
+    "category": "Safety",
+    "description": "Disposable gloves - extra large size"
+  },
+  {
+    "id": 56,
+    "code": "NGL",
+    "name": "GLOVES - LARGE",
+    "type": "Mechanical Consumables",
+    "category": "Safety",
+    "description": "Disposable gloves - large size"
+  },
+  {
+    "id": 57,
+    "code": "2825",
+    "name": "W5W WEDGE T-10",
+    "type": "Globes",
+    "category": "Interior Lights",
+    "description": "W5W wedge globe T-10 base"
+  },
+  {
+    "id": 58,
+    "code": "921",
+    "name": "W16W WEDGE T-15",
+    "type": "Globes",
+    "category": "Indicator Lights",
+    "description": "W16W wedge globe T-15 base"
+  },
+  {
+    "id": 59,
+    "code": "3893",
+    "name": "BA9s BAYONET SINGLE",
+    "type": "Globes",
+    "category": "Interior Lights",
+    "description": "BA9s bayonet single contact globe"
+  },
+  {
+    "id": 60,
+    "code": "7504",
+    "name": "WY21W AMBER WEDGE",
+    "type": "Globes",
+    "category": "Indicator Lights",
+    "description": "WY21W amber wedge indicator globe"
+  },
+  {
+    "id": 61,
+    "code": "7505",
+    "name": "W21W WEDGE SINGLE",
+    "type": "Globes",
+    "category": "Brake/Reverse",
+    "description": "W21W wedge single contact globe"
+  },
+  {
+    "id": 62,
+    "code": "7515",
+    "name": "W21/5W WEDGE STOP/TAIL",
+    "type": "Globes",
+    "category": "Brake/Reverse",
+    "description": "W21/5W wedge stop and tail globe"
+  },
+  {
+    "id": 63,
+    "code": "7506",
+    "name": "BA15s BAYONET SINGLE",
+    "type": "Globes",
+    "category": "Brake/Reverse",
+    "description": "BA15s bayonet single contact globe"
+  },
+  {
+    "id": 64,
+    "code": "7507",
+    "name": "BAU15s AMBER BAYONET OFFSET",
+    "type": "Globes",
+    "category": "Indicator Lights",
+    "description": "BAU15s amber bayonet offset pins globe"
+  },
+  {
+    "id": 65,
+    "code": "7528",
+    "name": "BAY15d BAYONET STOP/TAIL",
+    "type": "Globes",
+    "category": "Brake/Reverse",
+    "description": "BAY15d bayonet dual contact stop/tail globe"
+  },
+  {
+    "id": 66,
+    "code": "64150",
+    "name": "H1 HEAD LIGHT",
+    "type": "Globes",
+    "category": "Headlights",
+    "description": "H1 halogen headlight globe"
+  },
+  {
+    "id": 67,
+    "code": "64151",
+    "name": "H3 HEAD LIGHT",
+    "type": "Globes",
+    "category": "Headlights",
+    "description": "H3 halogen headlight globe"
+  },
+  {
+    "id": 68,
+    "code": "64193",
+    "name": "H4 HEAD LIGHT",
+    "type": "Globes",
+    "category": "Headlights",
+    "description": "H4 halogen headlight globe"
+  },
+  {
+    "id": 69,
+    "code": "64210",
+    "name": "H7 HEAD LIGHT",
+    "type": "Globes",
+    "category": "Headlights",
+    "description": "H7 halogen headlight globe"
+  },
+  {
+    "id": 70,
+    "code": "64212",
+    "name": "H8 HEAD LIGHT",
+    "type": "Globes",
+    "category": "Headlights",
+    "description": "H8 halogen headlight globe"
+  },
+  {
+    "id": 71,
+    "code": "64211",
+    "name": "H11 HEAD LIGHT",
+    "type": "Globes",
+    "category": "Headlights",
+    "description": "H11 halogen headlight globe"
+  },
+  {
+    "id": 72,
+    "code": "9005",
+    "name": "HB3 HEAD LIGHT",
+    "type": "Globes",
+    "category": "Headlights",
+    "description": "HB3 halogen headlight globe"
+  },
+  {
+    "id": 73,
+    "code": "9006",
+    "name": "HB4 HEAD LIGHT",
+    "type": "Globes",
+    "category": "Headlights",
+    "description": "HB4 halogen headlight globe"
+  },
+  {
+    "id": 74,
+    "code": "9012",
+    "name": "HIR2 HEAD LIGHT",
+    "type": "Globes",
+    "category": "Headlights",
+    "description": "HIR2 halogen infrared headlight globe"
+  },
+  {
+    "id": 75,
+    "code": "Z79A",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter Z79A"
+  },
+  {
+    "id": 76,
+    "code": "Z632",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter Z632"
+  },
+  {
+    "id": 77,
+    "code": "Z547",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter Z547"
+  },
+  {
+    "id": 78,
+    "code": "Z445",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter Z445"
+  },
+  {
+    "id": 79,
+    "code": "Z436",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter Z436"
+  },
+  {
+    "id": 80,
+    "code": "Z432",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter Z432"
+  },
+  {
+    "id": 81,
+    "code": "Z418",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter Z418"
+  },
+  {
+    "id": 82,
+    "code": "Z411",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter Z411"
+  },
+  {
+    "id": 83,
+    "code": "Z386",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter Z386"
+  },
+  {
+    "id": 84,
+    "code": "CO4",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO4"
+  },
+  {
+    "id": 85,
+    "code": "CO17",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO17"
+  },
+  {
+    "id": 86,
+    "code": "CO22",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO22"
+  },
+  {
+    "id": 87,
+    "code": "CO54",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO54"
+  },
+  {
+    "id": 88,
+    "code": "CO67",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO67"
+  },
+  {
+    "id": 89,
+    "code": "CO68",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO68"
+  },
+  {
+    "id": 90,
+    "code": "CO78",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO78"
+  },
+  {
+    "id": 91,
+    "code": "CO79",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO79"
+  },
+  {
+    "id": 92,
+    "code": "CO91",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO91"
+  },
+  {
+    "id": 93,
+    "code": "CO135",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO135"
+  },
+  {
+    "id": 94,
+    "code": "CO142",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO142"
+  },
+  {
+    "id": 95,
+    "code": "CO170",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO170"
+  },
+  {
+    "id": 96,
+    "code": "CO179",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO179"
+  },
+  {
+    "id": 97,
+    "code": "CO189",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO189"
+  },
+  {
+    "id": 98,
+    "code": "CO191",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO191"
+  },
+  {
+    "id": 99,
+    "code": "CO192",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO192"
+  },
+  {
+    "id": 100,
+    "code": "CO194",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO194"
+  },
+  {
+    "id": 101,
+    "code": "CO198",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO198"
+  },
+  {
+    "id": 102,
+    "code": "CO217",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO217"
+  },
+  {
+    "id": 103,
+    "code": "CO286",
+    "name": "Oil Filter",
+    "type": "Filters",
+    "category": "Oil Filters",
+    "description": "Engine oil filter CO286"
+  }
+]
