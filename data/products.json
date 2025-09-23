@@ -1,1 +1,425 @@
-[{"id":1,"name":"Radicool SF","code":"3424712","specs":"ASTM D3306, BS 6580:2010","type":"Coolant","description":"Long-life OAT coolant suitable for modern engines including those requiring G12+ specification.","image":""},{"id":2,"name":"Radicool P-OAT","code":"3429903","specs":"ASTM D3306","type":"Coolant","description":"Phosphated OAT coolant designed for Japanese and Korean vehicles requiring enhanced aluminium protection.","image":""},{"id":3,"name":"Radicool Si-OAT","code":"3437791","specs":"VW TL-774G (G12++), MAN 324 Si-OAT, ASTM D3306","type":"Coolant","description":"Silicated OAT coolant approved for VW G12++ and MAN Si-OAT systems; ideal for high-performance aluminium engines.","image":""},{"id":4,"name":"Radicool NF","code":"3376394","specs":"ASTM D3306, BS 6580:2010","type":"Coolant","description":"Hybrid OAT coolant suitable for European vehicles; phosphate-free and compatible with mixed-metal systems.","image":""},{"id":5,"name":"Radicool Concentrate","code":"3424670","specs":"ASTM D3306, BS 6580:2010","type":"Coolant","description":"General-purpose ethylene glycol-based coolant for older petrol and diesel engines.","image":""},{"id":12,"name":"Transmax ATF Dex/Merc Multivehicle","code":"3429062","specs":"Dexron III, Mercon, JASO 1A, Allison C4","type":"Gear Oil","description":"Multi-vehicle ATF for older GM and Ford models; compatible with Dexron III and Mercon specs.","image":""},{"id":13,"name":"Transmax CVT","code":"3425325","specs":"CVT fluids for Japanese, Hyundai, Kia, Chrysler, Ford","type":"Gear Oil","description":"Continuously Variable Transmission fluid designed for a wide range of Asian and domestic CVTs.","image":""},{"id":14,"name":"Transmax Dual","code":"3380380","specs":"VW TL 52529, Ford WSS-M2C936-A, Mitsubishi SSTF-1","type":"Gear Oil","description":"Dual clutch transmission fluid for VW, Ford, and Mitsubishi wet clutch systems.","image":""},{"id":15,"name":"Transmax Dual Multivehicle","code":"3439145","specs":"BMW, Ford, VW, MB, Porsche, PSA, Renault, Volvo DCT","type":"Gear Oil","description":"Multi-vehicle DCT fluid compatible with European dual clutch systems including BMW and VW.","image":""},{"id":24,"name":"Transmax Universal LL 75W-90","code":"3430280","specs":"API GL-4/GL-5/MT-1, MB 235.8, MAN, ZF, Scania","type":"Gear Oil","description":"Long-life synthetic gear oil for manual transmissions and axles across European OEMs.","image":""},{"id":25,"name":"Transmax Limited Slip 75W-85","code":"3430676","specs":"API GL-5, Limited Slip","type":"Gear Oil","description":"Low-viscosity limited slip oil for modern differentials requiring GL-5.","image":""},{"id":27,"name":"Transmax Manual VMX 80W","code":"3429677","specs":"API GL-4","type":"Gear Oil","description":"Smooth-shifting manual transmission oil for passenger vehicles.","image":""},{"id":28,"name":"Transmax Manual Long Life 75W-85","code":"3432318","specs":"API GL-4, MB 235.4, Volvo, Eaton","type":"Gear Oil","description":"Extended drain manual transmission oil for European and heavy-duty gearboxes.","image":""},{"id":32,"name":"Transmax Universal 80W-90","code":"3430310","specs":"API GL-4 / GL-5","type":"Gear Oil","description":"Universal gear oil for manual transmissions and axles requiring GL-4 or GL-5.","image":""},{"id":33,"name":"EDGE 0W-20","code":"3437297","specs":"API SP, ILSAC GF-6","type":"Engine Oil","description":"Fully synthetic engine oil meeting API SP and ILSAC GF-6 standards.","image":""},{"id":34,"name":"EDGE 0W-20 C5","code":"3425218","specs":"ACEA C5, ACEA C6, API SQ, ILSAC GF-7, STJLR.03.5006, Chrysler MS 6395, GM dexos1™ Gen 3, MB-Approval 229.71, Fiat 9.55535-CR1, Fiat 9.55535-GSX, Ford WSS-M2C947-A, Ford WSS-M2C947-B1, Ford WSS-M2C962-A1","type":"Engine Oil","description":"Advanced synthetic oil compatible with ACEA C5/C6 and multiple OEM approvals including Ford, GM, MB, Fiat, and Jaguar Land Rover.","image":""},{"id":35,"name":"EDGE 0W-20 LL IV","code":"3433822","specs":"ACEA C5, ACEA C6, BMW Longlife-17FE+, MB-Approval 229.71/229.72, Porsche C20, VW 508 00/509 00, Ford WSS-M2C956-A1","type":"Engine Oil","description":"Low-viscosity long-life oil approved for VW 508/509, BMW LL-17FE+, and Porsche C20.","image":""},{"id":36,"name":"EDGE 0W-30 C2","code":"3436896","specs":"ACEA C2, STJLR.03.5007","type":"Engine Oil","description":"Synthetic oil for Jaguar Land Rover engines requiring ACEA C2 and STJLR.03.5007.","image":""},{"id":37,"name":"EDGE 0W-30","code":"3432554","specs":"ACEA C2/C3, API SQ, BMW Longlife-04, BMW Longlife-19 FE, MB-Approval 226.5/229.31/229.51, Renault RN0700/RN0710","type":"Engine Oil","description":"Versatile synthetic oil for Euro vehicles including BMW, MB, and Renault.","image":""},{"id":38,"name":"EDGE 0W-30 LL","code":"3433646","specs":"ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51/229.52, Porsche C30, VW 504 00/507 00","type":"Engine Oil","description":"Long-life oil for modern Euro engines including VW, Porsche, and MB.","image":""},{"id":39,"name":"EDGE 0W-40 A3/B4","code":"3431407","specs":"ACEA A3/B4, API SP, BMW Longlife-01, MB-Approval 229.5/229.3, Porsche A40, Renault RN0700/RN0710, VW 502 00/505 00, Ford WSS-M2C937-A","type":"Engine Oil","description":"High-performance synthetic oil for premium Euro engines including Porsche and BMW.","image":""},{"id":40,"name":"EDGE 5W-30 LL","code":"3431128","specs":"ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51, Porsche C30, VW 504 00/507 00","type":"Engine Oil","description":"Low-ash oil for Euro vehicles with diesel particulate filters and extended drain intervals.","image":""},{"id":41,"name":"EDGE 5W-30 A3/B4","code":"3430989","specs":"ACEA A3/B4, API SL, BMW Longlife-01, MB-Approval 229.5, VW 502 00/505 00","type":"Engine Oil","description":"Robust synthetic oil for high-performance petrol and diesel engines.","image":""},{"id":42,"name":"EDGE 5W-30 M","code":"3431108","specs":"ACEA C3, API SQ, BMW Longlife-04, MB-Approval 229.51/229.52","type":"Engine Oil","description":"Mid-SAPS oil for modern Euro engines with emission control systems.","image":""},{"id":43,"name":"EDGE 5W-40 A3/B4","code":"3421235","specs":"ACEA A3/B3, ACEA A3/B4, API SN/CF, BMW Longlife-01, MB-Approval 229.5, Porsche A40, Renault RN0700/RN0710, VW 502 00/505 00, MB-Approval 226.5/229.3","type":"Engine Oil","description":"High-performance oil for turbocharged and high-output engines across Euro OEMs.","image":""},{"id":44,"name":"EDGE 5W-40 M","code":"3426982","specs":"ACEA C3, API SN, BMW Longlife-04, Fiat 9.55535-S2, Porsche C40, VW 511 00","type":"Engine Oil","description":"Mid-SAPS oil for modern Euro engines including VW 511 00 and Porsche C40.","image":""},{"id":45,"name":"EDGE 5W-50 S","code":"3436638","specs":"API SP, Ford WSS-M2C931-C","type":"Engine Oil","description":"High-viscosity synthetic oil for performance and racing applications.","image":""},{"id":46,"name":"EDGE 10W-30","code":"3399574","specs":"API SP, API CF, ILSAC GF-6","type":"Engine Oil","description":"Synthetic oil for light-duty petrol and diesel engines requiring GF-6.","image":""},{"id":47,"name":"EDGE 10W-60","code":"3412397","specs":"ACEA A3/B3, ACEA A3/B4, API SN/CF, Approved for BMW M-Models, VW 501 01/505 00","type":"Engine Oil","description":"Ultra-high performance oil for BMW M engines and high-load applications.","image":""},{"id":48,"name":"EDGE 25W-50","code":"3383419","specs":"API SG/CD","type":"Engine Oil","description":"Mineral-based oil for older engines requiring SG/CD performance.","image":""},{"id":49,"name":"EDGE PROFESSIONAL A1 5W-20","code":"3374699","specs":"ACEA A1/B1, API SL, ILSAC GF-3, STJLR.03.5004","type":"Engine Oil","description":"Professional-grade oil for Jaguar Land Rover and Ford engines requiring 5W-20.","image":""},{"id":50,"name":"EDGE PROFESSIONAL A5 0W-30","code":"3386606","specs":"ACEA A1/B1, ACEA A5/B5, API SL/CF, Volvo EDGE Professional","type":"Engine Oil","description":"Low-viscosity oil for Volvo and Ford engines requiring A5/B5 performance.","image":""},{"id":51,"name":"EDGE PROFESSIONAL A5 5W-30","code":"3377780","specs":"ACEA A1/B1, ACEA A5/B5, API SN/CF, ILSAC GF-4, Ford WSS-M2C913-C, STJLR.03.5003","type":"Engine Oil","description":"Fuel-efficient oil for Ford and Jaguar Land Rover engines requiring A5/B5.","image":""},{"id":52,"name":"EDGE PROFESSIONAL C1 5W-30","code":"3375617","specs":"ACEA C1, STJLR.03.5005","type":"Engine Oil","description":"Low-SAPS oil for Jaguar Land Rover engines with emission control systems.","image":""},{"id":53,"name":"EDGE PROFESSIONAL EC 0W-20","code":"3427866","specs":"ACEA C5, STJLR.03.5006, STJLR.51.5122","type":"Engine Oil","description":"Advanced synthetic oil for Jaguar Land Rover engines requiring C5 and STJLR approvals.","image":""},{"id":54,"name":"EDGE PROFESSIONAL E 0W-30","code":"3423559","specs":"ACEA C2, STJLR.03.5007","type":"Engine Oil","description":"Synthetic oil for Jaguar Land Rover engines requiring ACEA C2 and STJLR.03.5007.","image":""},{"id":55,"name":"EDGE PROFESSIONAL V 0W-20","code":"3383785","specs":"ACEA C5, Volvo VCC RBS0-2AE","type":"Engine Oil","description":"Low-viscosity oil for Volvo engines requiring VCC RBS0-2AE spec.","image":""},{"id":56,"name":"MAGNATEC HYBRID 0W-16","code":"3428869","specs":"API SP, ILSAC GF-6B","type":"Engine Oil","description":"Ultra-low viscosity oil for hybrid engines requiring GF-6B performance.","image":""},{"id":57,"name":"MAGNATEC 0W-20","code":"3439018","specs":"API SP, ILSAC GF-6","type":"Engine Oil","description":"Synthetic oil for modern petrol engines requiring API SP and GF-6.","image":""},{"id":58,"name":"MAGNATEC 0W-20 C5","code":"3440366","specs":"ACEA C5, API SQ","type":"Engine Oil","description":"Low-SAPS oil for Euro engines requiring ACEA C5 and API SQ.","image":""},{"id":59,"name":"MAGNATEC 0W-20 E","code":"3440475","specs":"Ford WSS-M2C954-A1","type":"Engine Oil","description":"Ford-approved oil for engines requiring WSS-M2C954-A1.","image":""},{"id":60,"name":"MAGNATEC 0W-30 D","code":"3434547","specs":"ACEA C2, API SN, Ford WSS-M2C950-A","type":"Engine Oil","description":"Synthetic oil for Ford engines requiring ACEA C2 and WSS-M2C950-A.","image":""},{"id":61,"name":"MAGNATEC 5W-20","code":"3429066","specs":"API SP, ILSAC GF-6, Ford WSS-M2C960-A1","type":"Engine Oil","description":"Fuel-efficient oil for Ford engines requiring WSS-M2C960-A","image":""},{"id":62,"name":"React Performance DOT 4","code":"3430314","specs":"FMVSS 116 DOT 4, SAE J1704, ISO 4925 Class 4","type":"Brake Fluid","description":"High-performance glycol-based brake fluid for ABS, ESP, and disc/drum systems requiring DOT 4.","image":""},{"id":63,"name":"React DOT 4 Low Temp","code":"3430315","specs":"FMVSS 116 DOT 4, SAE J1704, ISO 4925 Class 6","type":"Brake Fluid","description":"Low viscosity DOT 4 brake fluid for modern vehicles with advanced braking systems including ABS and ESP.","image":""},{"id":64,"name":"React DOT 4","code":"3430316","specs":"FMVSS 116 DOT 4, SAE J1704, ISO 4925 Class 4","type":"Brake Fluid","description":"Standard DOT 4 brake fluid suitable for most passenger vehicles and light commercial applications.","image":""},{"id":65,"name":"React DOT 3","code":"3430317","specs":"FMVSS 116 DOT 3, SAE J1703, ISO 4925 Class 3","type":"Brake Fluid","description":"DOT 3 brake fluid for older vehicles and systems not requiring low viscosity performance.","image":""}]
+[
+    {
+        "id": 1,
+        "name": "Radicool SF",
+        "code": "3424712",
+        "specs": "ASTM D3306, BS 6580:2010",
+        "type": "Coolant",
+        "description": "Long-life OAT coolant suitable for modern engines including those requiring G12+ specification.",
+        "image": ""
+    },
+    {
+        "id": 2,
+        "name": "Radicool P-OAT",
+        "code": "3429903",
+        "specs": "ASTM D3306",
+        "type": "Coolant",
+        "description": "Phosphated OAT coolant designed for Japanese and Korean vehicles requiring enhanced aluminium protection.",
+        "image": ""
+    },
+    {
+        "id": 3,
+        "name": "Radicool Si-OAT",
+        "code": "3437791",
+        "specs": "VW TL-774G (G12++), MAN 324 Si-OAT, ASTM D3306",
+        "type": "Coolant",
+        "description": "Silicated OAT coolant approved for VW G12++ and MAN Si-OAT systems; ideal for high-performance aluminium engines.",
+        "image": ""
+    },
+    {
+        "id": 4,
+        "name": "Radicool NF",
+        "code": "3376394",
+        "specs": "ASTM D3306, BS 6580:2010",
+        "type": "Coolant",
+        "description": "Hybrid OAT coolant suitable for European vehicles; phosphate-free and compatible with mixed-metal systems.",
+        "image": ""
+    },
+    {
+        "id": 5,
+        "name": "Radicool Concentrate",
+        "code": "3424670",
+        "specs": "ASTM D3306, BS 6580:2010",
+        "type": "Coolant",
+        "description": "General-purpose ethylene glycol-based coolant for older petrol and diesel engines.",
+        "image": ""
+    },
+    {
+        "id": 12,
+        "name": "Transmax ATF Dex/Merc Multivehicle",
+        "code": "3429062",
+        "specs": "Dexron III, Mercon, JASO 1A, Allison C4",
+        "type": "Gear Oil",
+        "description": "Multi-vehicle ATF for older GM and Ford models; compatible with Dexron III and Mercon specs.",
+        "image": ""
+    },
+    {
+        "id": 13,
+        "name": "Transmax CVT",
+        "code": "3425325",
+        "specs": "CVT fluids for Japanese, Hyundai, Kia, Chrysler, Ford",
+        "type": "Gear Oil",
+        "description": "Continuously Variable Transmission fluid designed for a wide range of Asian and domestic CVTs.",
+        "image": ""
+    },
+    {
+        "id": 14,
+        "name": "Transmax Dual",
+        "code": "3380380",
+        "specs": "VW TL 52529, Ford WSS-M2C936-A, Mitsubishi SSTF-1",
+        "type": "Gear Oil",
+        "description": "Dual clutch transmission fluid for VW, Ford, and Mitsubishi wet clutch systems.",
+        "image": ""
+    },
+    {
+        "id": 15,
+        "name": "Transmax Dual Multivehicle",
+        "code": "3439145",
+        "specs": "BMW, Ford, VW, MB, Porsche, PSA, Renault, Volvo DCT",
+        "type": "Gear Oil",
+        "description": "Multi-vehicle DCT fluid compatible with European dual clutch systems including BMW and VW.",
+        "image": ""
+    },
+    {
+        "id": 24,
+        "name": "Transmax Universal LL 75W-90",
+        "code": "3430280",
+        "specs": "API GL-4/GL-5/MT-1, MB 235.8, MAN, ZF, Scania",
+        "type": "Gear Oil",
+        "description": "Long-life synthetic gear oil for manual transmissions and axles across European OEMs.",
+        "image": ""
+    },
+    {
+        "id": 25,
+        "name": "Transmax Limited Slip 75W-85",
+        "code": "3430676",
+        "specs": "API GL-5, Limited Slip",
+        "type": "Gear Oil",
+        "description": "Low-viscosity limited slip oil for modern differentials requiring GL-5.",
+        "image": ""
+    },
+    {
+        "id": 27,
+        "name": "Transmax Manual VMX 80W",
+        "code": "3429677",
+        "specs": "API GL-4",
+        "type": "Gear Oil",
+        "description": "Smooth-shifting manual transmission oil for passenger vehicles.",
+        "image": ""
+    },
+    {
+        "id": 28,
+        "name": "Transmax Manual Long Life 75W-85",
+        "code": "3432318",
+        "specs": "API GL-4, MB 235.4, Volvo, Eaton",
+        "type": "Gear Oil",
+        "description": "Extended drain manual transmission oil for European and heavy-duty gearboxes.",
+        "image": ""
+    },
+    {
+        "id": 32,
+        "name": "Transmax Universal 80W-90",
+        "code": "3430310",
+        "specs": "API GL-4 / GL-5",
+        "type": "Gear Oil",
+        "description": "Universal gear oil for manual transmissions and axles requiring GL-4 or GL-5.",
+        "image": ""
+    },
+    {
+        "id": 33,
+        "name": "EDGE 0W-20",
+        "code": "3437297",
+        "specs": "API SP, ILSAC GF-6",
+        "type": "Engine Oil",
+        "description": "Fully synthetic engine oil meeting API SP and ILSAC GF-6 standards.",
+        "image": ""
+    },
+    {
+        "id": 34,
+        "name": "EDGE 0W-20 C5",
+        "code": "3425218",
+        "specs": "ACEA C5, ACEA C6, API SQ, ILSAC GF-7, STJLR.03.5006, Chrysler MS 6395, GM dexos1™ Gen 3, MB-Approval 229.71, Fiat 9.55535-CR1, Fiat 9.55535-GSX, Ford WSS-M2C947-A, Ford WSS-M2C947-B1, Ford WSS-M2C962-A1",
+        "type": "Engine Oil",
+        "description": "Advanced synthetic oil compatible with ACEA C5/C6 and multiple OEM approvals including Ford, GM, MB, Fiat, and Jaguar Land Rover.",
+        "image": ""
+    },
+    {
+        "id": 35,
+        "name": "EDGE 0W-20 LL IV",
+        "code": "3433822",
+        "specs": "ACEA C5, ACEA C6, BMW Longlife-17FE+, MB-Approval 229.71/229.72, Porsche C20, VW 508 00/509 00, Ford WSS-M2C956-A1",
+        "type": "Engine Oil",
+        "description": "Low-viscosity long-life oil approved for VW 508/509, BMW LL-17FE+, and Porsche C20.",
+        "image": ""
+    },
+    {
+        "id": 36,
+        "name": "EDGE 0W-30 C2",
+        "code": "3436896",
+        "specs": "ACEA C2, STJLR.03.5007",
+        "type": "Engine Oil",
+        "description": "Synthetic oil for Jaguar Land Rover engines requiring ACEA C2 and STJLR.03.5007.",
+        "image": ""
+    },
+    {
+        "id": 37,
+        "name": "EDGE 0W-30",
+        "code": "3432554",
+        "specs": "ACEA C2/C3, API SQ, BMW Longlife-04, BMW Longlife-19 FE, MB-Approval 226.5/229.31/229.51, Renault RN0700/RN0710",
+        "type": "Engine Oil",
+        "description": "Versatile synthetic oil for Euro vehicles including BMW, MB, and Renault.",
+        "image": ""
+    },
+    {
+        "id": 38,
+        "name": "EDGE 0W-30 LL",
+        "code": "3433646",
+        "specs": "ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51/229.52, Porsche C30, VW 504 00/507 00",
+        "type": "Engine Oil",
+        "description": "Long-life oil for modern Euro engines including VW, Porsche, and MB.",
+        "image": ""
+    },
+    {
+        "id": 39,
+        "name": "EDGE 0W-40 A3/B4",
+        "code": "3431407",
+        "specs": "ACEA A3/B4, API SP, BMW Longlife-01, MB-Approval 229.5/229.3, Porsche A40, Renault RN0700/RN0710, VW 502 00/505 00, Ford WSS-M2C937-A",
+        "type": "Engine Oil",
+        "description": "High-performance synthetic oil for premium Euro engines including Porsche and BMW.",
+        "image": ""
+    },
+    {
+        "id": 40,
+        "name": "EDGE 5W-30 LL",
+        "code": "3431128",
+        "specs": "ACEA C3, BMW Longlife-04, MB-Approval 229.31/229.51, Porsche C30, VW 504 00/507 00",
+        "type": "Engine Oil",
+        "description": "Low-ash oil for Euro vehicles with diesel particulate filters and extended drain intervals.",
+        "image": ""
+    },
+    {
+        "id": 41,
+        "name": "EDGE 5W-30 A3/B4",
+        "code": "3430989",
+        "specs": "ACEA A3/B4, API SL, BMW Longlife-01, MB-Approval 229.5, VW 502 00/505 00",
+        "type": "Engine Oil",
+        "description": "Robust synthetic oil for high-performance petrol and diesel engines.",
+        "image": ""
+    },
+    {
+        "id": 42,
+        "name": "EDGE 5W-30 M",
+        "code": "3431108",
+        "specs": "ACEA C3, API SQ, BMW Longlife-04, MB-Approval 229.51/229.52",
+        "type": "Engine Oil",
+        "description": "Mid-SAPS oil for modern Euro engines with emission control systems.",
+        "image": ""
+    },
+    {
+        "id": 43,
+        "name": "EDGE 5W-40 A3/B4",
+        "code": "3421235",
+        "specs": "ACEA A3/B3, ACEA A3/B4, API SN/CF, BMW Longlife-01, MB-Approval 229.5, Porsche A40, Renault RN0700/RN0710, VW 502 00/505 00, MB-Approval 226.5/229.3",
+        "type": "Engine Oil",
+        "description": "High-performance oil for turbocharged and high-output engines across Euro OEMs.",
+        "image": ""
+    },
+    {
+        "id": 44,
+        "name": "EDGE 5W-40 M",
+        "code": "3426982",
+        "specs": "ACEA C3, API SN, BMW Longlife-04, Fiat 9.55535-S2, Porsche C40, VW 511 00",
+        "type": "Engine Oil",
+        "description": "Mid-SAPS oil for modern Euro engines including VW 511 00 and Porsche C40.",
+        "image": ""
+    },
+    {
+        "id": 45,
+        "name": "EDGE 5W-50 S",
+        "code": "3436638",
+        "specs": "API SP, Ford WSS-M2C931-C",
+        "type": "Engine Oil",
+        "description": "High-viscosity synthetic oil for performance and racing applications.",
+        "image": ""
+    },
+    {
+        "id": 46,
+        "name": "EDGE 10W-30",
+        "code": "3399574",
+        "specs": "API SP, API CF, ILSAC GF-6",
+        "type": "Engine Oil",
+        "description": "Synthetic oil for light-duty petrol and diesel engines requiring GF-6.",
+        "image": ""
+    },
+    {
+        "id": 47,
+        "name": "EDGE 10W-60",
+        "code": "3412397",
+        "specs": "ACEA A3/B3, ACEA A3/B4, API SN/CF, Approved for BMW M-Models, VW 501 01/505 00",
+        "type": "Engine Oil",
+        "description": "Ultra-high performance oil for BMW M engines and high-load applications.",
+        "image": ""
+    },
+    {
+        "id": 48,
+        "name": "EDGE 25W-50",
+        "code": "3383419",
+        "specs": "API SG/CD",
+        "type": "Engine Oil",
+        "description": "Mineral-based oil for older engines requiring SG/CD performance.",
+        "image": ""
+    },
+    {
+        "id": 49,
+        "name": "EDGE PROFESSIONAL A1 5W-20",
+        "code": "3374699",
+        "specs": "ACEA A1/B1, API SL, ILSAC GF-3, STJLR.03.5004",
+        "type": "Engine Oil",
+        "description": "Professional-grade oil for Jaguar Land Rover and Ford engines requiring 5W-20.",
+        "image": ""
+    },
+    {
+        "id": 50,
+        "name": "EDGE PROFESSIONAL A5 0W-30",
+        "code": "3386606",
+        "specs": "ACEA A1/B1, ACEA A5/B5, API SL/CF, Volvo EDGE Professional",
+        "type": "Engine Oil",
+        "description": "Low-viscosity oil for Volvo and Ford engines requiring A5/B5 performance.",
+        "image": ""
+    },
+    {
+        "id": 51,
+        "name": "EDGE PROFESSIONAL A5 5W-30",
+        "code": "3377780",
+        "specs": "ACEA A1/B1, ACEA A5/B5, API SN/CF, ILSAC GF-4, Ford WSS-M2C913-C, STJLR.03.5003",
+        "type": "Engine Oil",
+        "description": "Fuel-efficient oil for Ford and Jaguar Land Rover engines requiring A5/B5.",
+        "image": ""
+    },
+    {
+        "id": 52,
+        "name": "EDGE PROFESSIONAL C1 5W-30",
+        "code": "3375617",
+        "specs": "ACEA C1, STJLR.03.5005",
+        "type": "Engine Oil",
+        "description": "Low-SAPS oil for Jaguar Land Rover engines with emission control systems.",
+        "image": ""
+    },
+    {
+        "id": 53,
+        "name": "EDGE PROFESSIONAL EC 0W-20",
+        "code": "3427866",
+        "specs": "ACEA C5, STJLR.03.5006, STJLR.51.5122",
+        "type": "Engine Oil",
+        "description": "Advanced synthetic oil for Jaguar Land Rover engines requiring C5 and STJLR approvals.",
+        "image": ""
+    },
+    {
+        "id": 54,
+        "name": "EDGE PROFESSIONAL E 0W-30",
+        "code": "3423559",
+        "specs": "ACEA C2, STJLR.03.5007",
+        "type": "Engine Oil",
+        "description": "Synthetic oil for Jaguar Land Rover engines requiring ACEA C2 and STJLR.03.5007.",
+        "image": ""
+    },
+    {
+        "id": 55,
+        "name": "EDGE PROFESSIONAL V 0W-20",
+        "code": "3383785",
+        "specs": "ACEA C5, Volvo VCC RBS0-2AE",
+        "type": "Engine Oil",
+        "description": "Low-viscosity oil for Volvo engines requiring VCC RBS0-2AE spec.",
+        "image": ""
+    },
+    {
+        "id": 56,
+        "name": "MAGNATEC HYBRID 0W-16",
+        "code": "3428869",
+        "specs": "API SP, ILSAC GF-6B",
+        "type": "Engine Oil",
+        "description": "Ultra-low viscosity oil for hybrid engines requiring GF-6B performance.",
+        "image": ""
+    },
+    {
+        "id": 57,
+        "name": "MAGNATEC 0W-20",
+        "code": "3439018",
+        "specs": "API SP, ILSAC GF-6",
+        "type": "Engine Oil",
+        "description": "Synthetic oil for modern petrol engines requiring API SP and GF-6.",
+        "image": ""
+    },
+    {
+        "id": 58,
+        "name": "MAGNATEC 0W-20 C5",
+        "code": "3440366",
+        "specs": "ACEA C5, API SQ",
+        "type": "Engine Oil",
+        "description": "Low-SAPS oil for Euro engines requiring ACEA C5 and API SQ.",
+        "image": ""
+    },
+    {
+        "id": 59,
+        "name": "MAGNATEC 0W-20 E",
+        "code": "3440475",
+        "specs": "Ford WSS-M2C954-A1",
+        "type": "Engine Oil",
+        "description": "Ford-approved oil for engines requiring WSS-M2C954-A1.",
+        "image": ""
+    },
+    {
+        "id": 60,
+        "name": "MAGNATEC 0W-30 D",
+        "code": "3434547",
+        "specs": "ACEA C2, API SN, Ford WSS-M2C950-A",
+        "type": "Engine Oil",
+        "description": "Synthetic oil for Ford engines requiring ACEA C2 and WSS-M2C950-A.",
+        "image": ""
+    },
+    {
+        "id": 61,
+        "name": "MAGNATEC 5W-20",
+        "code": "3429066",
+        "specs": "API SP, ILSAC GF-6, Ford WSS-M2C960-A1",
+        "type": "Engine Oil",
+        "description": "Fuel-efficient oil for Ford engines requiring WSS-M2C960-A",
+        "image": ""
+    },
+    {
+        "id": 62,
+        "name": "React Performance DOT 4",
+        "code": "3430314",
+        "specs": "FMVSS 116 DOT 4, SAE J1704, ISO 4925 Class 4",
+        "type": "Brake Fluid",
+        "description": "High-performance glycol-based brake fluid for ABS, ESP, and disc/drum systems requiring DOT 4.",
+        "image": ""
+    },
+    {
+        "id": 63,
+        "name": "React DOT 4 Low Temp",
+        "code": "3430315",
+        "specs": "FMVSS 116 DOT 4, SAE J1704, ISO 4925 Class 6",
+        "type": "Brake Fluid",
+        "description": "Low viscosity DOT 4 brake fluid for modern vehicles with advanced braking systems including ABS and ESP.",
+        "image": ""
+    },
+    {
+        "id": 64,
+        "name": "React DOT 4",
+        "code": "3430316",
+        "specs": "FMVSS 116 DOT 4, SAE J1704, ISO 4925 Class 4",
+        "type": "Brake Fluid",
+        "description": "Standard DOT 4 brake fluid suitable for most passenger vehicles and light commercial applications.",
+        "image": ""
+    },
+    {
+        "id": 65,
+        "name": "React DOT 3",
+        "code": "3430317",
+        "specs": "FMVSS 116 DOT 3, SAE J1703, ISO 4925 Class 3",
+        "type": "Brake Fluid",
+        "description": "DOT 3 brake fluid for older vehicles and systems not requiring low viscosity performance.",
+        "image": ""
+    }
+]
