@@ -534,27 +534,27 @@
       async function loadFromJSON() {
         try {
           console.log('Attempting to load from JSON file...');
-          const backupResponse = await fetch('./data/products.json');
-          
+          const backupResponse = await fetch('data/products.json'); // <-- fixed path
+
           if (!backupResponse.ok) {
             throw new Error(`Local backup error! status: ${backupResponse.status}`);
           }
-          
+
           const backupData = await backupResponse.json();
           console.log('JSON response:', backupData);
-          
+
           // Handle both array and object responses
           products = Array.isArray(backupData) ? backupData : (backupData.products || []);
-          
+
           if (products.length === 0) {
             throw new Error('No products found in backup data');
           }
-          
+
           filteredProducts = [...products];
           displayProducts();
           console.log('Products loaded from JSON backup:', products.length);
           showToast('Products loaded from local JSON file', 'info');
-          
+
         } catch (backupError) {
           console.error('Error loading backup products:', backupError);
           oilsList.innerHTML = `
