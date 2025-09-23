@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS products (
     type VARCHAR(100) NOT NULL,
     specs TEXT,
     description TEXT,
+    image TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

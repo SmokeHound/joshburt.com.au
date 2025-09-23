@@ -502,6 +502,7 @@
 
       async function loadFromAPI() {
         try {
+          console.log('Attempting to load from API...');
           const response = await fetch('/.netlify/functions/products');
           
           if (!response.ok) {
@@ -509,7 +510,10 @@
           }
           
           const data = await response.json();
-          products = data.products || [];
+          console.log('API response:', data);
+          
+          // Handle both array and object responses
+          products = Array.isArray(data) ? data : (data.products || []);
           
           if (products.length === 0) {
             throw new Error('No products returned from API');
@@ -529,6 +533,7 @@
 
       async function loadFromJSON() {
         try {
+          console.log('Attempting to load from JSON file...');
           const backupResponse = await fetch('./data/products.json');
           
           if (!backupResponse.ok) {
@@ -536,6 +541,9 @@
           }
           
           const backupData = await backupResponse.json();
+          console.log('JSON response:', backupData);
+          
+          // Handle both array and object responses
           products = Array.isArray(backupData) ? backupData : (backupData.products || []);
           
           if (products.length === 0) {
@@ -544,7 +552,7 @@
           
           filteredProducts = [...products];
           displayProducts();
-          console.log('Products loaded from local backup:', products.length);
+          console.log('Products loaded from JSON backup:', products.length);
           showToast('Products loaded from local JSON file', 'info');
           
         } catch (backupError) {
@@ -561,20 +569,22 @@
           showToast('Failed to load product data. Please check your files.', 'error');
         }
       }
-
       
       function displayProducts() {
+        console.log('Displaying products:', filteredProducts.length);
+        
         if (!filteredProducts || filteredProducts.length === 0) {
           oilsList.innerHTML = `
             <div class="p-6 text-center text-gray-500 dark:text-gray-400">
               <p>No oil products found</p>
+              <p class="text-sm mt-2">Check console for loading details</p>
             </div>
           `;
           return;
         }
         
         const productsHTML = filteredProducts.map(product => `
-          <div class="p-4 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors" onclick="addToOrder(${product.id}, '${escapeHtml(product.name)}', '${escapeHtml(product.type || '')}', '${escapeHtml(product.code || '')}')">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors oil-item" onclick="addToOrder(${product.id}, '${escapeHtml(product.name)}', '${escapeHtml(product.type || '')}', '${escapeHtml(product.code || '')}')">
             <div class="flex justify-between items-start">
               <div class="flex-1">
                 <h3 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(product.name)}</h3>
@@ -594,6 +604,7 @@
         `).join('');
         
         oilsList.innerHTML = productsHTML;
+        console.log('Products displayed successfully');
       }
 
       
