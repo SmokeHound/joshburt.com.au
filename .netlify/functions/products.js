@@ -32,10 +32,13 @@ exports.handler = async function(event, context) {
     const res = await client.query('SELECT * FROM products ORDER BY id');
     await client.end();
 
+    const products = res.rows;
+    console.log('Products loaded from API:', products.length);
+
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify(res.rows),
+      body: JSON.stringify(products),
     };
   } catch (error) {
     console.error('Database error:', error);
