@@ -13,6 +13,7 @@
     "url": "https://github.com/SmokeHound/joshburt.com.au"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
     "@netlify/functions": "^4.2.5",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
