@@ -445,45 +445,35 @@
       // Product loading and display
       async function loadProducts() {
         try {
-          // First try to load from API endpoint
+          // Try to load from Netlify function (database)
           const response = await fetch('/.netlify/functions/consumables');
-          
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
-          
           const data = await response.json();
-          products = data.products || [];
-          
+          products = Array.isArray(data) ? data : (data.products || []);
           if (products.length === 0) {
             throw new Error('No products returned from API');
           }
-          
           filteredProducts = [...products];
           extractCategories();
           displayProducts();
           console.log('Consumables loaded from API:', products.length);
         } catch (error) {
           console.warn('API unavailable, loading local backup:', error.message);
-          
           try {
             // Fallback to local backup data
             const backupResponse = await fetch('./data/consumables.json');
-            
             if (!backupResponse.ok) {
               throw new Error(`Local backup error! status: ${backupResponse.status}`);
             }
-            
             const backupData = await backupResponse.json();
-            products = Array.isArray(backupData) ? backupData : [];
+            products = Array.isArray(backupData) ? backupData : (backupData.products || []);
             filteredProducts = [...products];
             extractCategories();
             displayProducts();
             console.log('Consumables loaded from local backup:', products.length);
-            
-            // Show user notification about offline mode
             showToast('Using local consumables data (offline mode)', 'info');
-            
           } catch (backupError) {
             console.error('Error loading backup consumables:', backupError);
             consumablesList.innerHTML = `
