@@ -1,0 +1,52 @@
+functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
+functionsDirectoryOrigin = "config-v1"
+headersOrigin = "config"
+redirectsOrigin = "config"
+plugins = []
+
+[build]
+publish = "C:\\DEV\\joshburt.com.au\\joshburt.com.au"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "npm install"
+functions = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
+
+[build.environment]
+NODE_VERSION = "22"
+NEON_DATABASE_URL = "mysql://avnadmin:AVNS_ftCWIkMaUvsojeBNmAh@mysql-28ad5375-joshburt.g.aivencloud.com:12667/defaultdb?ssl-mode=REQUIRED"
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[functions]
+
+[functions."*"]
+
+[[headers]]
+for = "/.netlify/functions/*"
+
+[headers.values]
+Access-Control-Allow-Origin = "*"
+Access-Control-Allow-Headers = "Content-Type"
+Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/:splat"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
