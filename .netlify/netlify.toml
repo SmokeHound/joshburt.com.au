@@ -1,8 +1,12 @@
-functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
-functionsDirectoryOrigin = "config-v1"
 headersOrigin = "config"
 redirectsOrigin = "config"
 plugins = []
+functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
+functionsDirectoryOrigin = "config-v1"
+
+[functions]
+
+[functions."*"]
 
 [build]
 publish = "C:\\DEV\\joshburt.com.au\\joshburt.com.au"
@@ -26,10 +30,6 @@ NEON_DATABASE_URL = "mysql://avnadmin:AVNS_ftCWIkMaUvsojeBNmAh@mysql-28ad5375-jo
 [build.processing.js]
 
 [build.services]
-
-[functions]
-
-[functions."*"]
 
 [[headers]]
 for = "/.netlify/functions/*"
