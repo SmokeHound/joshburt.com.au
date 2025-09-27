@@ -20,11 +20,11 @@ Testing the integration between the static website frontend and Neon DB backend 
    - Proper indexes and constraints implemented
 
 2. **Netlify Functions**
-   - **Products Function** (`/netlify/functions/products.mjs`):
+   - **Products Function** (`/.netlify/functions/products.mjs`):
      - GET: Retrieve products (with optional type filtering)
      - POST: Add new products
      - Proper CORS headers and error handling
-   - **Orders Function** (`/netlify/functions/orders.js`):
+   - **Orders Function** (`/.netlify/functions/orders.js`):
      - POST: Submit orders with multiple items
      - GET: Retrieve order history
      - Database transactions for data consistency
