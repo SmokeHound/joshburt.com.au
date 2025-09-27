@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 
 // Database configuration - support PostgreSQL, MySQL, and SQLite fallback
-const DB_TYPE = process.env.DB_TYPE || 'mysql';
+const DB_TYPE = process.env.DB_TYPE || 'postgres';
 
 // PostgreSQL configuration
 const pgConfig = {
@@ -334,7 +334,7 @@ async function createPostgreSQLTables() {
       reset_token_expires BIGINT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
+      )
   `);
 
   // Create refresh tokens table for PostgreSQL
