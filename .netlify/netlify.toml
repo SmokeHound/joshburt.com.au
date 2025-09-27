@@ -7,7 +7,6 @@ functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\funct
 
 [build]
 publish = "C:\\DEV\\joshburt.com.au\\joshburt.com.au"
-publishOrigin = "\"
 commandOrigin = "\"
 command = "npm install"
 functions = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
