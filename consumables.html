@@ -245,6 +245,8 @@
             <span>Total Items:</span>
             <span id="totalOrderItems">0</span>
           </div>
+            <button id="submitOrderBtn" class="mt-4 w-full bg-green-600 text-white px-6 py-2 rounded font-bold">Submit Order</button>
+            <div id="submitOrderStatus" class="mt-2 text-green-700 font-semibold"></div>
         </div>
       </div>
     </div>
@@ -316,6 +318,10 @@
       let products = [];
       let filteredProducts = [];
       let allCategories = [];
+
+        // DOM for submit order
+        const submitOrderBtn = document.getElementById('submitOrderBtn');
+        const submitOrderStatus = document.getElementById('submitOrderStatus');
 
       
       // DOM elements
@@ -714,6 +720,44 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
       searchConsumables.addEventListener('input', filterProducts);
       filterType.addEventListener('change', filterProducts);
       filterCategory.addEventListener('change', filterProducts);
+
+        // Submit order to API
+        if (submitOrderBtn) {
+          submitOrderBtn.addEventListener('click', async function() {
+            if (orderItems.length === 0) {
+              showToast('No items to submit', 'warning');
+              return;
+            }
+            submitOrderBtn.disabled = true;
+            submitOrderStatus.textContent = 'Submitting order...';
+            try {
+              const payload = {
+                created_by: requestedBy.value || 'mechanic',
+                items: orderItems.map(item => ({
+                  name: item.name,
+                  code: item.code,
+                  quantity: item.quantity
+                }))
+              };
+              const res = await fetch('/.netlify/functions/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              if (!res.ok) throw new Error('Failed to submit order');
+              submitOrderStatus.textContent = 'Order submitted!';
+              showToast('Order submitted successfully!', 'success');
+              orderItems.length = 0;
+              updateOrderDisplay();
+            } catch (err) {
+              submitOrderStatus.textContent = 'Error submitting order.';
+              showToast('Error submitting order', 'error');
+            } finally {
+              submitOrderBtn.disabled = false;
+              setTimeout(() => { submitOrderStatus.textContent = ''; }, 3000);
+            }
+          });
+        }
       
       // Load products and any saved draft
       loadProducts();

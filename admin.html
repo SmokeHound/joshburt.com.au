@@ -168,6 +168,14 @@
                     <a href="oil-products-management.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Products</a>
                 </div>
             </div>
+
+                <!-- Order Review Section -->
+                <div class="mt-10">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Workshop Orders Review</h2>
+                    <div id="orders-list" class="bg-white dark:bg-gray-700 rounded-lg shadow p-6">
+                      <div class="text-center text-gray-500 dark:text-gray-400">Loading orders...</div>
+                    </div>
+                </div>
         </section>
     </main>
 
@@ -239,5 +247,40 @@
             });
         }
     </script>
+
+            <!-- Order Review Script -->
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const ordersList = document.getElementById('orders-list');
+                async function loadOrders() {
+                    try {
+                        const res = await fetch('/.netlify/functions/orders');
+                        if (!res.ok) throw new Error('Failed to fetch orders');
+                        const orders = await res.json();
+                        if (!Array.isArray(orders) || orders.length === 0) {
+                            ordersList.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">No orders found.</div>';
+                            return;
+                        }
+                        ordersList.innerHTML = orders.map(order => `
+                            <div class="mb-6 p-4 border-b border-gray-200 dark:border-gray-600">
+                                <div class="flex justify-between items-center mb-2">
+                                    <div>
+                                        <span class="font-semibold text-gray-900 dark:text-white">Order #${order.id}</span>
+                                        <span class="ml-2 text-xs text-gray-500">${new Date(order.created_at).toLocaleString()}</span>
+                                    </div>
+                                    <span class="px-2 py-1 rounded-full text-xs ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}">${order.status}</span>
+                                </div>
+                                <div class="text-sm text-gray-700 dark:text-gray-200 mb-2">Requested by: ${order.created_by || 'mechanic'}</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">Total Items: ${order.total_items || '?'}</div>
+                                <button class="mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary" onclick="alert('Order details and processing coming soon!')">View Details</button>
+                            </div>
+                        `).join('');
+                    } catch (err) {
+                        ordersList.innerHTML = `<div class="text-center text-red-600 dark:text-red-400">Error loading orders: ${err.message}</div>`;
+                    }
+                }
+                loadOrders();
+            });
+            </script>
 </body>
 </html>

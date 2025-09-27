@@ -1,7 +1,4 @@
--- Database Schema for joshburt.com.au Neon DB
--- Run this SQL in your Neon DB console to create the required tables
 
--- Products table for Castrol oil products
 CREATE TABLE IF NOT EXISTS products (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -14,7 +11,18 @@ CREATE TABLE IF NOT EXISTS products (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Orders table to store customer orders
+-- Consumables table for workshop consumables
+CREATE TABLE IF NOT EXISTS consumables (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(100) UNIQUE NOT NULL,
+    type VARCHAR(100) NOT NULL,
+    category VARCHAR(100),
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
     customer_email VARCHAR(255) DEFAULT 'anonymous@example.com',
@@ -24,7 +32,6 @@ CREATE TABLE IF NOT EXISTS orders (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Order items table to store individual products in each order
 CREATE TABLE IF NOT EXISTS order_items (
     id SERIAL PRIMARY KEY,
     order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
@@ -32,6 +39,15 @@ CREATE TABLE IF NOT EXISTS order_items (
     product_code VARCHAR(100),
     quantity INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Inventory table to track stock for products and consumables
+CREATE TABLE IF NOT EXISTS inventory (
+    id SERIAL PRIMARY KEY,
+    item_type VARCHAR(20) NOT NULL CHECK (item_type IN ('product', 'consumable')),
+    item_id INTEGER NOT NULL,
+    stock_count INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(item_type, item_id)
 );
 
 -- Users table for authentication (future enhancement)
