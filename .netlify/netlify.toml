@@ -1,8 +1,5 @@
-headersOrigin = "config"
-redirectsOrigin = "config"
-plugins = []
+
 functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
-functionsDirectoryOrigin = "config-v1"
 
 [functions]
 
@@ -10,8 +7,8 @@ functionsDirectoryOrigin = "config-v1"
 
 [build]
 publish = "C:\\DEV\\joshburt.com.au\\joshburt.com.au"
-publishOrigin = "config"
-commandOrigin = "config"
+publishOrigin = "\"
+commandOrigin = "\"
 command = "npm install"
 functions = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
 
