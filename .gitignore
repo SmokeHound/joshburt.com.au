@@ -395,11 +395,9 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
-# Local Netlify folder
-#.netlify
-
-# Local Netlify folder
-#.netlify
 
 # Local Netlify folder
 .netlify
+
+# Local Tailwind CSS build output
+tailwindcss.exe
