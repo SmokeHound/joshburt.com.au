@@ -14,22 +14,6 @@
     
     <link rel="stylesheet" href="./assets/css/styles.css">
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        secondary: '#10b981',
-                        accent: '#8b5cf6',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                },
-            },
-        };
-    </script>
-    <script>
         // Configuration for dynamic color updates from settings
         function applyDynamicColors() {
             const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
