@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
     <!-- PWA Configuration -->
     <link rel="manifest" href="./manifest.json">
     <!-- Theme color meta removed for Firefox/Opera compatibility -->
@@ -170,12 +168,12 @@
             </div>
 
                 <!-- Order Review Section -->
-                <div class="mt-10">
-                    <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Workshop Orders Review</h2>
-                    <div id="orders-list" class="bg-white dark:bg-gray-700 rounded-lg shadow p-6">
-                      <div class="text-center text-gray-500 dark:text-gray-400">Loading orders...</div>
-                    </div>
-                </div>
+                                <div class="mt-10">
+                                        <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Workshop Orders Review</h2>
+                                        <div id="orders-list" class="bg-white dark:bg-gray-700 rounded-lg shadow p-6">
+                                            <div class="text-center text-gray-500 dark:text-gray-400">Loading orders...</div>
+                                        </div>
+                                </div>
         </section>
     </main>
 
@@ -261,24 +259,78 @@
                             ordersList.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">No orders found.</div>';
                             return;
                         }
-                        ordersList.innerHTML = orders.map(order => `
+                        ordersList.innerHTML = orders.map((order, idx) => `
                             <div class="mb-6 p-4 border-b border-gray-200 dark:border-gray-600">
                                 <div class="flex justify-between items-center mb-2">
                                     <div>
                                         <span class="font-semibold text-gray-900 dark:text-white">Order #${order.id}</span>
                                         <span class="ml-2 text-xs text-gray-500">${new Date(order.created_at).toLocaleString()}</span>
                                     </div>
-                                    <span class="px-2 py-1 rounded-full text-xs ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}">${order.status}</span>
+                                    <span class="px-2 py-1 rounded-full text-xs ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : order.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${order.status}</span>
                                 </div>
-                                <div class="text-sm text-gray-700 dark:text-gray-200 mb-2">Requested by: ${order.created_by || 'mechanic'}</div>
-                                <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">Total Items: ${order.total_items || '?'}</div>
-                                <button class="mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary" onclick="alert('Order details and processing coming soon!')">View Details</button>
+                                <div class="flex flex-wrap gap-4 text-sm mb-2">
+                                    <div class="text-gray-700 dark:text-gray-200">Requested by: <span class="font-medium">${order.created_by || 'mechanic'}</span></div>
+                                    <div class="text-gray-600 dark:text-gray-300">Total Items: <span class="font-medium">${order.total_items || '?'}</span></div>
+                                    <div class="text-gray-600 dark:text-gray-300">Priority: <span class="font-medium">${order.priority || 'normal'}</span></div>
+                                </div>
+                                <div class="text-gray-600 dark:text-gray-300 mb-2">Notes: <span class="font-medium">${order.notes || ''}</span></div>
+                                <button class="mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary" onclick="toggleOrderDetails(${idx})" aria-expanded="false" aria-controls="order-details-${order.id}">
+                                    <span>Show Details</span>
+                                </button>
+                                <div id="order-details-${order.id}" class="hidden mt-4 bg-gray-50 dark:bg-gray-800 rounded p-4">
+                                    <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">Order Items</h4>
+                                    <ul class="mb-2">
+                                        ${(order.items || []).map(item => `
+                                            <li class="mb-1 flex justify-between">
+                                                <span>${item.name} <span class="text-xs text-gray-500">(${item.code})</span></span>
+                                                <span class="font-medium">Qty: ${item.quantity}</span>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                    <div class="flex gap-2 mt-4">
+                                        <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400" onclick="updateOrderStatus(${order.id}, 'approved')">Approve</button>
+                                        <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" onclick="updateOrderStatus(${order.id}, 'rejected')">Reject</button>
+                                    </div>
+                                </div>
                             </div>
                         `).join('');
                     } catch (err) {
                         ordersList.innerHTML = `<div class="text-center text-red-600 dark:text-red-400">Error loading orders: ${err.message}</div>`;
                     }
                 }
+
+                window.toggleOrderDetails = function(idx) {
+                    const orderDivs = ordersList.querySelectorAll('[id^="order-details-"]');
+                    const buttons = ordersList.querySelectorAll('button[aria-controls^="order-details-"]');
+                    orderDivs.forEach((div, i) => {
+                        if (i === idx) {
+                            const isOpen = div.classList.toggle('hidden') === false;
+                            buttons[i].setAttribute('aria-expanded', isOpen);
+                            buttons[i].querySelector('span').textContent = isOpen ? 'Hide Details' : 'Show Details';
+                        } else {
+                            div.classList.add('hidden');
+                            buttons[i].setAttribute('aria-expanded', false);
+                            buttons[i].querySelector('span').textContent = 'Show Details';
+                        }
+                    });
+                };
+
+
+                window.updateOrderStatus = async function(orderId, status) {
+                    try {
+                        const res = await fetch('/.netlify/functions/orders', {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ orderId, status })
+                        });
+                        if (!res.ok) throw new Error('Failed to update order');
+                        showToast('Order #' + orderId + ' ' + (status === 'approved' ? 'approved' : 'rejected'));
+                        await loadOrders();
+                    } catch (err) {
+                        showToast('Error: ' + err.message);
+                    }
+                };
+
                 loadOrders();
             });
             </script>

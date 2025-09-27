@@ -6,7 +6,7 @@ exports.handler = async function(event, context) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
     'Content-Type': 'application/json',
   };
 
@@ -23,7 +23,7 @@ exports.handler = async function(event, context) {
   await client.connect();
 
   try {
-    if (event.httpMethod === 'GET') {
+  if (event.httpMethod === 'GET') {
       // Get orders with basic info (optionally include items)
       const ordersRes = await client.query('SELECT * FROM orders ORDER BY created_at DESC LIMIT 50');
       const orders = ordersRes.rows;
@@ -45,7 +45,36 @@ exports.handler = async function(event, context) {
       };
     }
 
-    if (event.httpMethod === 'POST') {
+  if (event.httpMethod === 'POST') {
+    if (event.httpMethod === 'PATCH') {
+      // Update order status (approve/reject)
+      const { orderId, status } = JSON.parse(event.body || '{}');
+      if (!orderId || !['approved', 'rejected'].includes(status)) {
+        await client.end();
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Missing or invalid orderId/status' }),
+        };
+      }
+      const updateRes = await client.query(
+        'UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+        [status, orderId]
+      );
+      await client.end();
+      if (updateRes.rowCount === 0) {
+        return {
+          statusCode: 404,
+          headers,
+          body: JSON.stringify({ error: 'Order not found' }),
+        };
+      }
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ success: true, order: updateRes.rows[0] }),
+      };
+    }
       const orderData = JSON.parse(event.body);
       if (!orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
         await client.end();
