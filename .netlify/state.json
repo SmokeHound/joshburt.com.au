@@ -1,3 +1,21 @@
 {
-	"siteId": "6390337a-60f4-4d6e-8078-0fdbd19ae28b"
+	"siteId": "6390337a-60f4-4d6e-8078-0fdbd19ae28b",
+	"geolocation": {
+		"data": {
+			"city": "Sydney",
+			"country": {
+				"code": "AU",
+				"name": "Australia"
+			},
+			"subdivision": {
+				"code": "NSW",
+				"name": "New South Wales"
+			},
+			"timezone": "Australia/Sydney",
+			"latitude": -33.8672,
+			"longitude": 151.1997,
+			"postalCode": "2042"
+		},
+		"timestamp": 1758993596643
+	}
 }
