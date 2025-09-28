@@ -38,6 +38,8 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 - **`analytics.html`**: Site metrics and usage statistics
 - **`settings.html`**: Site configuration and customization
 - **`oil.html`**: Castrol product ordering system (API-driven, CSV export)
+- **`consumables.html`**: Consumables order request page (for workshop staff)
+- **`consumables-mgmt.html`**: Consumables product list management (admin/staff CRUD)
 - **`login.html`**: Authentication page
 
 ## 🚀 Quick Start
