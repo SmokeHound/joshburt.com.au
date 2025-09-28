@@ -120,7 +120,7 @@
         switch (widget.type) {
             case 'welcome':
                 content = `
-                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg">
+                    <div class="bg-linear-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg">
                         <h3 class="text-xl font-bold mb-2">${widget.title}</h3>
                         <p>${widget.content}</p>
                         <p class="text-sm mt-2 opacity-90">Logged in as: ${currentUser.name} (${currentUser.email})</p>
@@ -154,7 +154,7 @@
                         <div class="space-y-3">
                             ${widget.items.map(item => `
                                 <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 shrink-0"></div>
                                     <div class="text-sm">${item}</div>
                                 </div>
                             `).join('')}

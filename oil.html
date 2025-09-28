@@ -483,7 +483,7 @@ if ('serviceWorker' in navigator) {
               <span class="text-sm text-gray-600 dark:text-gray-300">Order Quantity:</span>
               <div class="flex items-center space-x-2 no-print">
                 <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" class="w-8 h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500">−</button>
-                <span class="font-medium text-gray-900 dark:text-gray-100 min-w-[3rem] text-center">${item.quantity}</span>
+                <span class="font-medium text-gray-900 dark:text-gray-100 min-w-12 text-center">${item.quantity}</span>
                 <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})" class="w-8 h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500">+</button>
               </div>
               <span class="print-only font-medium text-gray-900 dark:text-gray-100">${item.quantity}</span>
