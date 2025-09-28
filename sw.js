@@ -1,8 +1,8 @@
 // Enhanced Service Worker for PWA offline functionality with performance optimizations
-const CACHE_NAME = 'joshburt-v2';
-const STATIC_CACHE = 'joshburt-static-v2';
-const DYNAMIC_CACHE = 'joshburt-dynamic-v2';
-const API_CACHE = 'joshburt-api-v2';
+const CACHE_NAME = 'joshburt-v3';
+const STATIC_CACHE = 'joshburt-static-v3';
+const DYNAMIC_CACHE = 'joshburt-dynamic-v3';
+const API_CACHE = 'joshburt-api-v3';
 
 const urlsToCache = [
   '/',
@@ -97,23 +97,26 @@ async function cacheFirstStrategy(request, cacheName) {
   try {
     const cache = await caches.open(cacheName);
     const cached = await cache.match(request);
-    
     if (cached) {
       console.log('Service Worker: Serving from cache', request.url);
       return cached;
     }
-    
     // Not in cache, fetch from network
     const response = await fetch(request);
-    
     if (response.status === 200) {
       const responseClone = response.clone();
       cache.put(request, responseClone);
     }
-    
     return response;
   } catch (error) {
     console.error('Service Worker: Cache-first strategy failed', error);
+    // Fallback for CSS/HTML
+    if (request.url.endsWith('.css')) {
+      return new Response('body { font-family: sans-serif; background: #fff; color: #222; }', { headers: { 'Content-Type': 'text/css' } });
+    }
+    if (request.headers.get('accept')?.includes('text/html')) {
+      return new Response('<!DOCTYPE html><html><head><title>Offline</title></head><body><h1>Offline</h1><p>Unable to load page. Please check your connection and refresh.</p></body></html>', { headers: { 'Content-Type': 'text/html' } });
+    }
     return new Response('Offline', { status: 503 });
   }
 }
@@ -166,7 +169,6 @@ async function networkFirstStrategy(request, cacheName) {
 async function staleWhileRevalidateStrategy(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
-  
   // Serve from cache immediately if available
   const response = cached || fetch(request).catch(() => {
     return new Response(`
@@ -181,7 +183,6 @@ async function staleWhileRevalidateStrategy(request, cacheName) {
       </html>
     `, { headers: { 'Content-Type': 'text/html' } });
   });
-  
   // Update cache in background
   fetch(request).then(fetchResponse => {
     if (fetchResponse.status === 200) {
@@ -190,7 +191,6 @@ async function staleWhileRevalidateStrategy(request, cacheName) {
   }).catch(() => {
     // Network failed, cache update skipped
   });
-  
   return response;
 }
 
