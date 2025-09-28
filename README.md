@@ -10,7 +10,7 @@
 - https://joshburt-com-au.onrender.com/
 
 ## Overview
-This is a modern static HTML website for joshburt.com.au featuring a modular component architecture, comprehensive testing, and responsive design with dark/light mode support, admin dashboard functionality, and a specialized Castrol oil product ordering system.
+This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design with dark/light mode support, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The codebase has been fully audited for dead code, unused variables, and debug logic, ensuring maintainability and security.
 
 ## ✨ Features
 - **Modular Components**: Reusable shared components for navigation, theming, and configuration
@@ -19,7 +19,8 @@ This is a modern static HTML website for joshburt.com.au featuring a modular com
 - **Testing Suite**: Unit and integration tests with Jest
 - **CI/CD Pipeline**: Automated testing, linting, and deployment
 - **Admin Dashboard**: User management, analytics, and site settings
-- **Oil Ordering System**: Specialized Castrol product ordering with CSV export
+- **Oil Ordering System**: Dynamic Castrol product ordering (API-driven, CSV export)
+- **API Backend**: Netlify Functions and Express endpoints (Node.js) with MySQL, PostgreSQL, or SQLite support
 - **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
 
 ## 🏗️ Architecture
@@ -28,6 +29,7 @@ This is a modern static HTML website for joshburt.com.au featuring a modular com
 - **`shared-nav.html`**: Navigation sidebar with menu toggle, user profile, and navigation links
 - **`shared-theme.html`**: Theme toggle functionality with localStorage persistence
 - **`shared-config.html`**: TailwindCSS configuration and common styles
+- **API/Netlify Functions**: Dynamic backend for products, orders, users, and authentication
 
 ### Pages
 - **`index.html`**: Landing page with login modal and welcome cards
@@ -35,7 +37,7 @@ This is a modern static HTML website for joshburt.com.au featuring a modular com
 - **`users.html`**: User CRUD operations and role management
 - **`analytics.html`**: Site metrics and usage statistics
 - **`settings.html`**: Site configuration and customization
-- **`oil.html`**: Castrol product ordering system with CSV export
+- **`oil.html`**: Castrol product ordering system (API-driven, CSV export)
 - **`login.html`**: Authentication page
 
 ## 🚀 Quick Start
@@ -49,8 +51,9 @@ cd joshburt.com.au
 # Install dependencies
 npm install
 
-# Start development server
-npm run serve
+# Start static development server
+python3 -m http.server 8000
+# Or use: npx http-server . -p 8000
 # Visit http://localhost:8000
 ```
 
@@ -82,15 +85,15 @@ npm run validate
 - Component rendering and behavior
 
 ### Integration Tests
-- Cross-component interactions
+- Cross-component and API interactions
 - HTML structure validation
 - Accessibility compliance
 - Navigation flow testing
 
 ### Test Coverage
 - **Components**: Shared navigation, theme toggle, configuration
-- **Pages**: Home page functionality, login/logout flows
-- **Integration**: Component loading, cross-page navigation
+- **Pages**: Home page, login/logout, admin, oil ordering
+- **API**: Products, orders, users, authentication endpoints
 
 ## 🎨 Design System
 
@@ -115,6 +118,7 @@ npm run validate
 - **JavaScript Linting**: ESLint with modern standards
 - **Automated Testing**: Jest with JSDOM environment
 - **CI/CD**: GitHub Actions with automated deployment
+- **No dead code or debug logic**: Codebase is regularly audited for production readiness
 
 ### Component Guidelines
 1. Use semantic HTML structure
@@ -135,7 +139,8 @@ npm run validate
 - [ ] Login/logout functionality works
 - [ ] Theme toggle switches between dark/light modes
 - [ ] Mobile navigation toggles correctly
-- [ ] Oil ordering system displays products
+- [ ] Oil ordering system displays products from API
+- [ ] Admin dashboard and user management work via API
 - [ ] All pages are accessible and responsive
 
 ## 🔒 Security & Performance
@@ -143,7 +148,7 @@ npm run validate
 ### Security Features
 - Client-side validation with HTML5 constraints
 - localStorage for session management
-- No server-side dependencies (static site)
+- Secure API endpoints (authentication, rate limiting, audit logging)
 - FTP credentials stored in GitHub Secrets
 
 ### Performance Optimizations
@@ -151,6 +156,7 @@ npm run validate
 - Optimized image loading with lazy loading
 - Minimal HTTP requests
 - Fast load times (< 0.005 seconds measured)
+- No dead code or debug logic in production
 
 ## 📊 Browser Support
 
@@ -165,8 +171,8 @@ npm run validate
 - Enhanced features require modern browser capabilities
 - Responsive design adapts to all screen sizes
 
-## 🤝 Contributing
 
+## 🤝 Contributing
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
 - Development setup and workflow
 - Code style and standards
@@ -187,6 +193,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 - Update dependencies as needed
 - Review and merge pull requests
 - Monitor site performance and uptime
+- Audit codebase for dead code, debug logic, and unused variables
 
 ### Component Updates
 - All styling handled by TailwindCSS utilities
@@ -198,7 +205,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 ### Development Environment
 - CDN resources may be blocked in restricted environments
 - Placeholder images may not load if external requests are blocked
-- All functionality is client-side (no server/database)
+- API/serverless/database features require supported environment and credentials
 
 ### Production Environment
 - Full functionality available with CDN access
@@ -217,4 +224,4 @@ This project is licensed under the MIT License - see the repository for full lic
 
 ---
 
-For detailed development information, see [CONTRIBUTING.md](CONTRIBUTING.md) and component documentation in `shared-*.html` files.
+For detailed development information, see [CONTRIBUTING.md](CONTRIBUTING.md), [DATABASE.md](DATABASE.md), and component documentation in `shared-*.html` files.

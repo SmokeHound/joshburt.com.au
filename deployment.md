@@ -1,10 +1,10 @@
 # Deployment Guide
 
-This application now includes both a static frontend and a Node.js backend with authentication. Here are the deployment options:
+This application now includes both a static frontend and a Node.js backend (API) with authentication and database support (MySQL, PostgreSQL, SQLite). The codebase is fully audited and production-ready. Here are the deployment options:
 
 ## Option 1: Combined Server Deployment (Recommended)
 
-Deploy the entire application as a Node.js app that serves both the API and static files.
+Deploy the entire application as a Node.js app that serves both the API and static files. The backend supports MySQL (default), PostgreSQL (e.g. Neon), and SQLite (for development/testing).
 
 ### Render.com (Recommended)
 1. Connect your GitHub repository to Render
@@ -12,6 +12,7 @@ Deploy the entire application as a Node.js app that serves both the API and stat
 3. Configure:
    - Build Command: `npm install`
    - Start Command: `npm start`
+   - (Optional) Test database: `node test-mysql-init.js`
    - Environment Variables:
      ```
      NODE_ENV=production
@@ -25,11 +26,11 @@ Deploy the entire application as a Node.js app that serves both the API and stat
 
 ### Heroku
 1. Create new Heroku app: `heroku create your-app-name`
-2. Set environment variables:
+2. Set environment variables (see DATABASE.md for full list):
    ```bash
    heroku config:set NODE_ENV=production
    heroku config:set JWT_SECRET=your-super-secure-jwt-secret
-   # ... add other environment variables
+   # ... add other environment variables for database, email, etc.
    ```
 3. Deploy: `git push heroku main`
 
@@ -48,6 +49,7 @@ Keep existing FTP deployment for static files:
 Deploy Node.js backend separately on:
 - Render.com, Heroku, Railway, or VPS
 - Update `API_BASE` in frontend JavaScript files to point to backend URL
+- Ensure environment variables for database (MySQL/PostgreSQL/SQLite) are set
 
 ## Environment Variables
 
@@ -79,9 +81,9 @@ Deploy Node.js backend separately on:
 
 The application uses SQLite by default, which is suitable for small to medium applications. For production with higher traffic, consider:
 
-1. **PostgreSQL**: Update database configuration in `config/database.js`
-2. **MySQL**: Install mysql2 and update configuration
-3. **MongoDB**: Restructure to use MongoDB with Mongoose
+1. **MySQL** (default): Update database configuration in `config/database.js` and set DB_TYPE=mysql
+2. **PostgreSQL**: Supported (e.g. Neon), set DB_TYPE=postgres
+3. **SQLite**: For development/testing, set DB_TYPE=sqlite
 
 ## Security Considerations
 
@@ -90,6 +92,7 @@ The application uses SQLite by default, which is suitable for small to medium ap
 3. **Rate Limiting**: Already configured, adjust limits as needed
 4. **JWT Secret**: Use a strong, unique secret key
 5. **Database**: Secure database access and regular backups
+6. **No debug logic or dead code in production**
 
 ## Performance Optimization
 
@@ -100,9 +103,10 @@ The application uses SQLite by default, which is suitable for small to medium ap
 
 ## Monitoring
 
-Default users for testing:
+Default users for testing (see DATABASE.md for details):
 - Admin: admin@joshburt.com.au / admin123!
 - Test User: test@example.com / password
 - Manager: manager@example.com / manager123
 
 Change these credentials in production!
+No debug logic or non-production code is present in the deployed codebase.

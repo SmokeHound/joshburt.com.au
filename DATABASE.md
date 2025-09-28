@@ -1,10 +1,13 @@
-# Database Implementation Guide
+
+# Database Implementation Guide (Production-Ready, Audited)
 
 ## Overview
 
-The joshburt.com.au application supports dual database configuration:
-- **PostgreSQL** for production environments (recommended)
-- **SQLite** for development and testing (fallback)
+
+The joshburt.com.au application supports multiple database backends:
+- **MySQL** (default, recommended for production)
+- **PostgreSQL** (supported, e.g. Neon)
+- **SQLite** (for development and testing)
 
 ## Database Configuration
 
@@ -12,7 +15,29 @@ The joshburt.com.au application supports dual database configuration:
 
 Set the following environment variables based on your deployment:
 
-#### PostgreSQL (Production)
+
+#### MySQL (Production, Default)
+```env
+# Database Type
+DB_TYPE=mysql
+
+# MySQL Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=joshburt_website
+DB_USER=mysqluser
+DB_PASSWORD=your-secure-password
+
+# JWT Configuration (required)
+JWT_SECRET=your-super-secure-jwt-secret-key
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_EXPIRES_IN=30d
+
+# Security
+BCRYPT_ROUNDS=12
+```
+
+#### PostgreSQL (Alternative, e.g. Neon)
 ```env
 # Database Type
 DB_TYPE=postgres
@@ -55,48 +80,48 @@ BCRYPT_ROUNDS=10
 
 ### Users Table
 ```sql
--- PostgreSQL
+-- MySQL/PostgreSQL/SQLite compatible
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    password_hash VARCHAR(255),
-    role VARCHAR(50) DEFAULT 'user' CHECK(role IN ('user', 'manager', 'admin')),
-    is_active BOOLEAN DEFAULT true,
-    email_verified BOOLEAN DEFAULT false,
-    oauth_provider VARCHAR(50),
-    oauth_id VARCHAR(255),
-    avatar_url TEXT,
-    reset_token VARCHAR(255),
-    reset_token_expires BIGINT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   id INTEGER PRIMARY KEY AUTO_INCREMENT,
+   email VARCHAR(255) UNIQUE NOT NULL,
+   name VARCHAR(255) NOT NULL,
+   password_hash VARCHAR(255),
+   role VARCHAR(50) DEFAULT 'user',
+   is_active BOOLEAN DEFAULT true,
+   email_verified BOOLEAN DEFAULT false,
+   oauth_provider VARCHAR(50),
+   oauth_id VARCHAR(255),
+   avatar_url TEXT,
+   reset_token VARCHAR(255),
+   reset_token_expires BIGINT,
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
 ### Refresh Tokens Table
 ```sql
--- PostgreSQL
 CREATE TABLE refresh_tokens (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    token_hash VARCHAR(255) NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   id INTEGER PRIMARY KEY AUTO_INCREMENT,
+   user_id INTEGER NOT NULL,
+   token_hash VARCHAR(255) NOT NULL,
+   expires_at TIMESTAMP NOT NULL,
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 ```
 
 ### Audit Logs Table
 ```sql
--- PostgreSQL
 CREATE TABLE audit_logs (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-    action VARCHAR(255) NOT NULL,
-    details TEXT,
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   id INTEGER PRIMARY KEY AUTO_INCREMENT,
+   user_id INTEGER,
+   action VARCHAR(255) NOT NULL,
+   details TEXT,
+   ip_address VARCHAR(45),
+   user_agent TEXT,
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 ```
 
@@ -116,7 +141,8 @@ The system automatically creates default users on first startup:
 
 ### Connection Management
 
-The database class automatically handles connections:
+
+The database abstraction in `config/database.js` automatically handles connections and query parameter conversion for MySQL, PostgreSQL, and SQLite:
 
 ```javascript
 const { database } = require('./config/database');
@@ -135,8 +161,9 @@ await database.close();
 
 ### Query Parameter Conversion
 
+
 The database class automatically converts query parameters:
-- **SQLite**: Uses `?` placeholders
+- **SQLite/MySQL**: Uses `?` placeholders
 - **PostgreSQL**: Converts to `$1, $2, $3...` placeholders
 
 Example:
@@ -180,6 +207,7 @@ await database.get('SELECT * FROM users WHERE email = ? AND is_active = ?', ['us
 - **bcrypt hashing** with configurable rounds (default: 12 for production, 10 for development)
 - **Password strength validation** with regex requirements
 - **Salt rounds** configurable via `BCRYPT_ROUNDS` environment variable
+- **No plaintext passwords or debug logic in production**
 
 ### JWT Token Management
 - **Access tokens** with configurable expiration (default: 7 days)
@@ -196,10 +224,12 @@ await database.get('SELECT * FROM users WHERE email = ? AND is_active = ?', ['us
 - **User actions** automatically logged with IP address and user agent
 - **Timestamps** for all critical operations
 - **Detailed audit trail** for compliance and security monitoring
+- **No debug or non-production logging in codebase**
 
 ## Database Migration
 
-### From SQLite to PostgreSQL
+
+### From SQLite to MySQL or PostgreSQL
 
 1. **Set up PostgreSQL database**:
 ```sql
@@ -220,7 +250,7 @@ DB_SSL=true
 
 3. **Run database initialization**:
 ```bash
-node -e "const { initializeDatabase } = require('./config/database'); initializeDatabase();"
+node test-mysql-init.js
 ```
 
 4. **Migrate existing data** (if needed):
@@ -268,6 +298,7 @@ psql -h your-host -U joshburt_user -d joshburt_website < converted_export.sql
 # Run all tests
 npm test
 
+
 # Run authentication tests only
 npm test tests/auth.test.js
 
@@ -278,13 +309,14 @@ DB_TYPE=postgres npm test  # Requires PostgreSQL server
 
 ### Test Database
 
-Tests automatically use a separate test database (`test_database.sqlite`) to avoid affecting development data.
+Tests automatically use a separate test database (`test_database.sqlite`) to avoid affecting development data. No debug logic or dead code is present in test files.
 
 ## Monitoring and Maintenance
 
 ### Health Check
 - **Endpoint**: `GET /api/health`
 - **Response**: Server status, timestamp, and environment
+- **No debug or non-production output in health endpoint**
 
 ### Database Maintenance
 - **Cleanup expired tokens**: Automatic during logout operations

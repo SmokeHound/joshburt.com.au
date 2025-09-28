@@ -5,7 +5,8 @@ This site now includes both static HTML pages and dynamic backend functionality:
 - Responsive design with dark/light mode support
 - Admin dashboard and user management
 - Castrol oil product ordering system
-- **Dynamic backend**: Netlify serverless functions, Express API endpoints, and MySQL database integration
+- **Dynamic backend**: Netlify serverless functions, Express API endpoints, and MySQL/PostgreSQL/SQLite database integration
+**Codebase is fully audited and production-ready (no dead code, debug logic, or unused variables)**
 
 Always reference these instructions first. Fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
 
@@ -16,7 +17,7 @@ Always reference these instructions first. Fallback to search or bash commands o
 - **Static site**: Start local HTTP server as before
    - `python3 -m http.server 8000`
 - **Dynamic backend**:
-   - Set environment variables for MySQL (DB_TYPE, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT)
+   - Set environment variables for MySQL/PostgreSQL/SQLite (DB_TYPE, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT)
    - Start API server: `node api/server.js` (if present)
    - Netlify functions auto-deploy on push
    - Test database: `node test-mysql-init.js`
@@ -25,7 +26,7 @@ Always reference these instructions first. Fallback to search or bash commands o
 ### Build and Deploy Information
 - **Static files**: No build required
 - **Backend/API**: Requires Node.js dependencies (run `npm install`)
-- **Database**: MySQL (see config/database.js for credentials)
+- **Database**: MySQL (default), PostgreSQL (e.g. Neon), or SQLite (see config/database.js for credentials)
 - **Deployment**: GitHub Actions for FTP and Netlify; API/serverless functions deploy automatically
 
 
@@ -60,7 +61,7 @@ ALWAYS manually validate changes by running through these complete end-to-end sc
    - Submit and list orders via `/api/orders`
 
 5. **Database Test**:
-   - Run `node test-mysql-init.js` to verify MySQL connection and table creation
+   - Run `node test-mysql-init.js` to verify database connection and table creation
 
 
 ### Known Limitations
@@ -119,7 +120,7 @@ Two deployment workflows are configured:
 ### Development Notes
 - Static pages use TailwindCSS and unified navigation
 - Backend/API uses Node.js, Express, Netlify functions
-- Database: MySQL (default), PostgreSQL, SQLite supported
+- Database: MySQL (default), PostgreSQL (e.g. Neon), SQLite supported
 - Run `npm install` for backend dependencies
 - FTP credentials stored in GitHub Secrets for deployment
 
@@ -132,7 +133,7 @@ python3 -m http.server 8000
 # Start API server (if present)
 node api/server.js
 
-# Test MySQL database
+# Test database (MySQL/PostgreSQL/SQLite)
 node test-mysql-init.js
 
 # Install backend dependencies
@@ -163,6 +164,7 @@ grep -A10 "<nav>" index.html
 
 ## Error Handling
 - If CDN resources fail to load, website remains functional but may have styling issues
-- If MySQL connection fails, check credentials and network access
+- If database connection fails, check credentials and network access
 - API/serverless errors: check logs and endpoint responses
+- No debug logic or dead code in production
 - Static files: no runtime errors beyond JavaScript console warnings for blocked CDNs

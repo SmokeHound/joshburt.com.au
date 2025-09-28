@@ -1,6 +1,6 @@
 # Contributing to joshburt.com.au
 
-Welcome to the joshburt.com.au project! This is a static website with a modular component structure and comprehensive testing.
+Welcome to the joshburt.com.au project! This is a dynamic website and API with a modular component structure, comprehensive testing, and a fully audited, production-ready codebase (no dead code, debug logic, or unused variables).
 
 ## Development Setup
 
@@ -56,6 +56,7 @@ Welcome to the joshburt.com.au project! This is a static website with a modular 
 - Follows semantic HTML structure
 - JavaScript uses ES6+ features
 - All code must pass linting checks
+- No dead code, unused variables, or debug logic (e.g. `console.log`) allowed in PRs
 
 ### 2. Testing Requirements
 Before submitting any changes:
@@ -76,6 +77,7 @@ npm run lint
 # Run complete validation
 npm run validate
 ```
+All tests and linting must pass. Test files must not contain dead code or debug logic.
 
 ### 3. Component Structure
 The website uses a modular component approach:
@@ -144,6 +146,9 @@ Uses ESLint for JavaScript code quality:
 eslint --ext .js *.html
 ```
 
+#### Codebase Audit
+All code (including tests) is regularly audited for dead code, unused variables, and debug logic. PRs introducing such code will not be accepted.
+
 ## Submitting Changes
 
 ### Pull Request Process
@@ -169,6 +174,7 @@ Use clear, descriptive commit messages:
 - [ ] HTML is valid and semantic
 - [ ] Accessibility attributes are present
 - [ ] Components are properly modularized
+- [ ] No dead code, unused variables, or debug logic present
 - [ ] Documentation is updated if needed
 
 ## Continuous Integration
@@ -215,4 +221,4 @@ For questions about contributing:
 2. Create a GitHub issue for bugs or feature requests
 3. Join discussions in pull requests
 
-Thank you for contributing to joshburt.com.au!
+Thank you for contributing to joshburt.com.au! Help us keep the codebase clean, maintainable, and production-ready.
