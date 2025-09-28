@@ -1,11 +1,22 @@
+headersOrigin = "config"
+redirectsOrigin = "config"
 functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
 
 [functions]
 
 [functions."*"]
 
+[[plugins]]
+origin = "ui"
+package = "netlify-purge-cloudflare-on-deploy"
+pinned_version = "1"
+
+[plugins.inputs]
+
 [build]
 publish = "C:\\DEV\\joshburt.com.au\\joshburt.com.au"
+publishOrigin = "config"
+commandOrigin = "config"
 command = "npm install"
 functions = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
 
