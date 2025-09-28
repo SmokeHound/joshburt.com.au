@@ -9,16 +9,6 @@
   
   
   <script>
-// Listen for service worker update and prompt reload
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', function(event) {
-    if (event.data && event.data.type === 'SW_UPDATED') {
-      if (confirm('A new version is available. Reload now?')) {
-        window.location.reload();
-      }
-    }
-  });
-}
       // Configuration for dynamic color updates from settings
       function applyDynamicColors() {
           const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};

@@ -29,16 +29,6 @@
             });
         }
     </script>
-        // Listen for service worker update and prompt reload
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', function(event) {
-                if (event.data && event.data.type === 'SW_UPDATED') {
-                    if (confirm('A new version is available. Reload now?')) {
-                        window.location.reload();
-                    }
-                }
-            });
-        }
     <style>
         :root {
             --color-primary: #3b82f6;

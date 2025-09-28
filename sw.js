@@ -64,15 +64,9 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    }).then(async () => {
+    }).then(() => {
       console.log('Service Worker: Activation complete');
-      await self.clients.claim();
-      await self.skipWaiting();
-      // Notify all clients to reload
-      const clientsList = await self.clients.matchAll();
-      clientsList.forEach(client => {
-        client.postMessage({ type: 'SW_UPDATED' });
-      });
+      return self.clients.claim();
     })
   );
 });

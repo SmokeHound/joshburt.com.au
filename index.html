@@ -30,16 +30,6 @@
                 }
             });
     </script>
-        // Listen for service worker update and prompt reload
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', function(event) {
-                if (event.data && event.data.type === 'SW_UPDATED') {
-                    if (confirm('A new version is available. Reload now?')) {
-                        window.location.reload();
-                    }
-                }
-            });
-        }
     <style>
         body {
             transition: background-color 0.3s, color 0.3s;
