@@ -1,3 +1,75 @@
+        <!-- Additional Insights Section -->
+        <section class="mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Browser Breakdown Chart -->
+                <div class="widget-secondary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Browser Breakdown</h3>
+                    <div class="w-full h-32 flex items-center justify-center">
+                        <canvas id="browser-chart" height="80"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">% by browser</div>
+                </div>
+                <!-- Multi-Metric Stacked Bar Chart -->
+                <div class="widget-primary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Multi-Metric Comparison</h3>
+                    <div class="w-full h-32 flex items-center justify-center">
+                        <canvas id="multi-metric-chart" height="80"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Visitors, Orders, Sessions</div>
+                </div>
+                <!-- Sparkline Mini-Charts for Quick Stats -->
+                <div class="widget-accent p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Quick Stats</h3>
+                    <div class="flex flex-col gap-2 w-full">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Visitors</span>
+                            <canvas id="sparkline-visitors" width="60" height="20"></canvas>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Orders</span>
+                            <canvas id="sparkline-orders" width="60" height="20"></canvas>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Sessions</span>
+                            <canvas id="sparkline-sessions" width="60" height="20"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Actionable Insights Section -->
+        <section class="mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Conversion Rate Card -->
+                <div class="widget-primary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Conversion Rate</h3>
+                    <div id="conversion-rate" class="text-3xl font-bold text-green-500">-</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">% of visitors who completed a key action</div>
+                </div>
+                <!-- Retention Rate Card -->
+                <div class="widget-secondary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Retention Rate</h3>
+                    <div id="retention-rate" class="text-3xl font-bold text-blue-500">-</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">% of users returning after 7 days</div>
+                </div>
+                <!-- Funnel Analysis Card -->
+                <div class="widget-accent p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Funnel Analysis</h3>
+                    <div class="w-full h-32 flex items-center justify-center">
+                        <canvas id="funnel-chart" height="80"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Steps: Visit → Signup → Order</div>
+                </div>
+                <!-- Device/Browser Breakdown Card -->
+                <div class="widget-primary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Device/Browser Breakdown</h3>
+                    <div class="w-full h-32 flex items-center justify-center">
+                        <canvas id="device-chart" height="80"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">% by device/browser</div>
+                </div>
+            </div>
+        </section>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -135,6 +207,14 @@
                         </button>
                     </div>
                 </div>
+                <!-- Filter Chips for Quick Date Selection -->
+                <div class="mb-4 flex flex-wrap gap-2" role="group" aria-label="Quick date filters">
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="1" aria-label="Today" role="button" tabindex="0">Today</button>
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="7" aria-label="Last 7 days" role="button" tabindex="0">7d</button>
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="30" aria-label="Last 30 days" role="button" tabindex="0">30d</button>
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="90" aria-label="Last 90 days" role="button" tabindex="0">90d</button>
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="365" aria-label="Last year" role="button" tabindex="0">YTD</button>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Date Range Filter -->
                     <div>
@@ -167,7 +247,36 @@
                             <button id="export-pdf" class="flex-1 px-3 py-2 bg-accent text-white rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-colors duration-200">
                                 Export PDF
                             </button>
+                            <button id="export-png" class="flex-1 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-colors duration-200">
+                                Export PNG
+                            </button>
                         </div>
+        // PNG Export functionality for main charts
+        function exportPNG() {
+            // Export visitor, engagement, and sales charts as PNG
+            const charts = [
+                { id: 'visitor-chart', name: 'visitor-trends' },
+                { id: 'engagement-chart', name: 'user-engagement' },
+                { id: 'sales-chart', name: 'product-sales' },
+                { id: 'funnel-chart', name: 'funnel' },
+                { id: 'device-chart', name: 'device-breakdown' },
+                { id: 'browser-chart', name: 'browser-breakdown' },
+                { id: 'multi-metric-chart', name: 'multi-metric' }
+            ];
+            charts.forEach(chart => {
+                const canvas = document.getElementById(chart.id);
+                if (canvas && window.Chart && Chart.getChart(canvas)) {
+                    const url = Chart.getChart(canvas).toBase64Image();
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `analytics-${chart.name}-${new Date().toISOString().split('T')[0]}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            });
+            showToast('Charts exported as PNG images!');
+        }
                     </div>
                 </div>
             </div>
@@ -205,14 +314,17 @@
         <section class="mb-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Visitor Trends Chart -->
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold mb-4">Visitor Trends</h3>
+                <div class="widget-primary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        <span class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span> Visitor Trends
+                    </h3>
                     <div class="chart-container"><canvas id="visitor-chart"></canvas></div>
                 </div>
-                
                 <!-- User Engagement Chart -->
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold mb-4">User Engagement</h3>
+                <div class="widget-secondary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        <span class="inline-block w-2 h-2 bg-green-400 rounded-full"></span> User Engagement
+                    </h3>
                     <div class="chart-container"><canvas id="engagement-chart"></canvas></div>
                 </div>
             </div>
@@ -220,39 +332,36 @@
 
         <!-- Product Sales Chart -->
         <section class="mb-6">
-            <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                <h3 class="font-semibold mb-4">Product Sales Analytics</h3>
+            <div class="widget-accent p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 bg-purple-400 rounded-full"></span> Product Sales Analytics
+                </h3>
                 <div class="sales-chart-container"><canvas id="sales-chart"></canvas></div>
             </div>
         </section>
 
         <!-- Statistics Cards -->
         <section>
-            <p class="mb-4">Real-time statistics and key metrics from your analytics data.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold mb-2">Visitor Statistics</h3>
-                    <ul id="visitor-stats" class="list-disc pl-5 text-gray-300 space-y-1">
+            <p class="mb-4 text-gray-700 dark:text-gray-300">Real-time statistics and key metrics from your analytics data.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="widget-primary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Visitor Statistics</h3>
+                    <ul id="visitor-stats" class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1">
                         <li>Loading...</li>
                     </ul>
                 </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold mb-2">User Engagement</h3>
-                    <ul id="engagement-stats" class="list-disc pl-5 text-gray-300 space-y-1">
+                <div class="widget-secondary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">User Engagement</h3>
+                    <ul id="engagement-stats" class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1">
                         <li>Loading...</li>
                     </ul>
-        @media (min-width: 768px) {
-            .sidebar {
-                width: 16rem;
-            }
-            main {
-                margin-left: 16rem;
-            }
-        }
                 </div>
-                <div class="p-4 bg-gray-700 dark:bg-gray-700 rounded shadow card">
-                    <h3 class="font-semibold mb-2">Top Pages</h3>
-                    <ol id="top-pages" class="list-decimal pl-5 text-gray-300 space-y-1">
+                <div class="widget-accent p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 flex items-center justify-between">
+                        Top Pages
+                        <input id="top-pages-search" type="search" placeholder="Search pages..." class="ml-2 px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary" aria-label="Search top pages">
+                    </h3>
+                    <ol id="top-pages" class="list-decimal pl-5 text-gray-700 dark:text-gray-300 space-y-1">
                         <li>Loading...</li>
                     </ol>
                 </div>
@@ -261,8 +370,8 @@
     </main>
 
     <script>
-        // Global variables for charts
-        let visitorChart, engagementChart, salesChart;
+    // Global variables for charts
+    let visitorChart, engagementChart, salesChart, funnelChart, deviceChart, browserChart, multiMetricChart, sparklineVisitors, sparklineOrders, sparklineSessions;
         let currentFilters = {
             dateRange: 30,
             userType: 'all'
@@ -425,15 +534,163 @@
 
         // Initialize charts
         function initializeCharts() {
-            const data = generateAnalyticsData(currentFilters);
-            
+            const analytics = window.analyticsManager ? window.analyticsManager.getData(currentFilters) : null;
+            const data = analytics ? analytics.data : generateAnalyticsData(currentFilters);
+            const insights = analytics ? analytics.insights : {};
+            // Browser Breakdown Chart (Doughnut)
+            const browserCanvas = document.getElementById('browser-chart');
+            if (browserCanvas && insights.browserBreakdown) {
+                const browserCtx = browserCanvas.getContext('2d');
+                browserChart = new Chart(browserCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: insights.browserBreakdown.browserLabels,
+                        datasets: [{
+                            data: insights.browserBreakdown.browsers,
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(245, 158, 11, 0.8)',
+                                'rgba(139, 92, 246, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#1f2937' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Multi-Metric Stacked Bar Chart
+            const multiMetricCanvas = document.getElementById('multi-metric-chart');
+            if (multiMetricCanvas && insights.multiMetric) {
+                const mmCtx = multiMetricCanvas.getContext('2d');
+                multiMetricChart = new Chart(mmCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: insights.multiMetric.labels,
+                        datasets: [
+                            {
+                                label: 'Visitors',
+                                data: insights.multiMetric.visitors,
+                                backgroundColor: 'rgba(59, 130, 246, 0.7)'
+                            },
+                            {
+                                label: 'Orders',
+                                data: insights.multiMetric.orders,
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)'
+                            },
+                            {
+                                label: 'Sessions',
+                                data: insights.multiMetric.sessions,
+                                backgroundColor: 'rgba(245, 158, 11, 0.7)'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#1f2937' }
+                            }
+                        },
+                        scales: {
+                            x: { stacked: true, ticks: { color: '#1f2937' }, grid: { color: 'rgba(31,41,55,0.1)' } },
+                            y: { stacked: true, ticks: { color: '#1f2937' }, grid: { color: 'rgba(31,41,55,0.1)' } }
+                        }
+                    }
+                });
+            }
+
+            // Sparkline Mini-Charts
+            if (insights.sparklines) {
+                const sparkVisitors = document.getElementById('sparkline-visitors');
+                const sparkOrders = document.getElementById('sparkline-orders');
+                const sparkSessions = document.getElementById('sparkline-sessions');
+                if (sparkVisitors) {
+                    sparklineVisitors = new Chart(sparkVisitors.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: insights.sparklines.visitors.map((_, i) => i + 1),
+                            datasets: [{
+                                data: insights.sparklines.visitors,
+                                borderColor: 'rgb(59, 130, 246)',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 0,
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: { legend: { display: false } },
+                            scales: { x: { display: false }, y: { display: false } }
+                        }
+                    });
+                }
+                if (sparkOrders) {
+                    sparklineOrders = new Chart(sparkOrders.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: insights.sparklines.orders.map((_, i) => i + 1),
+                            datasets: [{
+                                data: insights.sparklines.orders,
+                                borderColor: 'rgb(16, 185, 129)',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 0,
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: { legend: { display: false } },
+                            scales: { x: { display: false }, y: { display: false } }
+                        }
+                    });
+                }
+                if (sparkSessions) {
+                    sparklineSessions = new Chart(sparkSessions.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: insights.sparklines.sessions.map((_, i) => i + 1),
+                            datasets: [{
+                                data: insights.sparklines.sessions,
+                                borderColor: 'rgb(245, 158, 11)',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 0,
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: { legend: { display: false } },
+                            scales: { x: { display: false }, y: { display: false } }
+                        }
+                    });
+                }
+            }
+
             // Check if Chart.js is available
             if (!window.Chart) {
                 // Fallback: Replace canvas elements with text summaries
                 const visitorCanvas = document.getElementById('visitor-chart');
                 const engagementCanvas = document.getElementById('engagement-chart');
                 const salesCanvas = document.getElementById('sales-chart');
-                
+                const funnelCanvas = document.getElementById('funnel-chart');
+                const deviceCanvas = document.getElementById('device-chart');
+
                 if (visitorCanvas) {
                     visitorCanvas.parentElement.innerHTML = `
                         <h3 class="font-semibold mb-4">Visitor Trends</h3>
@@ -445,7 +702,6 @@
                         </div>
                     `;
                 }
-                
                 if (engagementCanvas) {
                     engagementCanvas.parentElement.innerHTML = `
                         <h3 class="font-semibold mb-4">User Engagement</h3>
@@ -457,7 +713,6 @@
                         </div>
                     `;
                 }
-                
                 if (salesCanvas) {
                     salesCanvas.parentElement.innerHTML = `
                         <h3 class="font-semibold mb-4">Product Sales Analytics</h3>
@@ -469,9 +724,15 @@
                         </div>
                     `;
                 }
+                if (funnelCanvas) {
+                    funnelCanvas.parentElement.innerHTML = `<div class='text-gray-300'>Funnel: Visit → Signup → Order<br>Chart unavailable</div>`;
+                }
+                if (deviceCanvas) {
+                    deviceCanvas.parentElement.innerHTML = `<div class='text-gray-300'>Device/Browser breakdown unavailable</div>`;
+                }
                 return;
             }
-            
+
             // Visitor Trends Chart
             const visitorCtx = document.getElementById('visitor-chart').getContext('2d');
             visitorChart = new Chart(visitorCtx, {
@@ -508,7 +769,7 @@
                     }
                 }
             });
-            
+
             // User Engagement Chart (Doughnut)
             const engagementCtx = document.getElementById('engagement-chart').getContext('2d');
             engagementChart = new Chart(engagementCtx, {
@@ -541,7 +802,7 @@
                     }
                 }
             });
-            
+
             // Product Sales Chart (Bar)
             const salesCtx = document.getElementById('sales-chart').getContext('2d');
             salesChart = new Chart(salesCtx, {
@@ -589,6 +850,75 @@
                     }
                 }
             });
+
+            // Funnel Chart (Bar)
+            const funnelCanvas = document.getElementById('funnel-chart');
+            if (funnelCanvas && insights.funnel) {
+                const funnelCtx = funnelCanvas.getContext('2d');
+                funnelChart = new Chart(funnelCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: insights.funnel.steps,
+                        datasets: [{
+                            label: 'Funnel',
+                            data: insights.funnel.values,
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(239, 68, 68, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: { ticks: { color: '#1f2937' }, grid: { color: 'rgba(31,41,55,0.1)' } },
+                            y: { ticks: { color: '#1f2937' }, grid: { color: 'rgba(31,41,55,0.1)' } }
+                        }
+                    }
+                });
+            }
+
+            // Device/Browser Breakdown Chart (Doughnut)
+            const deviceCanvas = document.getElementById('device-chart');
+            if (deviceCanvas && insights.deviceBreakdown) {
+                const deviceCtx = deviceCanvas.getContext('2d');
+                deviceChart = new Chart(deviceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: insights.deviceBreakdown.deviceLabels,
+                        datasets: [{
+                            data: insights.deviceBreakdown.devices,
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(245, 158, 11, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#1f2937' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Set actionable insight values
+            if (insights.conversionRate !== undefined) {
+                document.getElementById('conversion-rate').textContent = insights.conversionRate + '%';
+            }
+            if (insights.retentionRate !== undefined) {
+                document.getElementById('retention-rate').textContent = insights.retentionRate + '%';
+            }
         }
 
         // Update analytics data and charts
@@ -650,42 +980,103 @@
             } else if (cardType === 'top-pages') {
                 listElement = document.getElementById('top-pages');
             }
-            
             if (listElement) {
                 listElement.innerHTML = '';
-                items.forEach(item => {
+                // For top-pages, filter by search input if present
+                if (cardType === 'top-pages') {
+                    const searchInput = document.getElementById('top-pages-search');
+                    let filter = '';
+                    if (searchInput) filter = searchInput.value.trim().toLowerCase();
+                    items = items.filter(item => item.toLowerCase().includes(filter));
+                }
+                if (items.length === 0) {
                     const li = document.createElement('li');
-                    li.textContent = item;
+                    li.textContent = 'No results';
                     listElement.appendChild(li);
-                });
+                } else {
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item;
+                        listElement.appendChild(li);
+                    });
+                }
             }
         }
+        // Top Pages search filter handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('top-pages-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    // Use the same items as in updateAnalytics
+                    updateStatCard('top-pages', [
+                        'Analytics Dashboard',
+                        'Oil Orders System',
+                        'User Management',
+                        'Settings Page',
+                        'Admin Dashboard'
+                    ]);
+                });
+            }
+        });
 
-        // CSV Export functionality
+        // CSV Export functionality (enhanced)
         function exportCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
-            
-            // Use analytics manager if available
-            if (window.analyticsManager) {
-                csvContent += window.analyticsManager.exportData('csv', currentFilters.dateRange);
-            } else {
-                // Fallback to original CSV export
-                const data = generateAnalyticsData(currentFilters);
-                csvContent += "Date,Visitors\n";
-                data.visitors.labels.forEach((label, index) => {
-                    csvContent += `${label},${data.visitors.data[index]}\n`;
-                });
-                
-                // Add summary statistics
-                csvContent += "\nSummary Statistics\n";
-                csvContent += `Total Users,${data.summary.totalUsers}\n`;
-                csvContent += `Total Visitors (${currentFilters.dateRange}d),${data.summary.totalVisitors}\n`;
-                csvContent += `Average Daily Visitors,${data.summary.avgDailyVisitors}\n`;
-                csvContent += `Bounce Rate,${data.engagement.bounceRate.toFixed(1)}%\n`;
-                csvContent += `Average Session Duration,${Math.floor(data.engagement.avgSessionDuration / 60)}m ${Math.floor(data.engagement.avgSessionDuration % 60)}s\n`;
-                csvContent += `Pages per Session,${data.engagement.pagesPerSession.toFixed(1)}\n`;
+            const analytics = window.analyticsManager ? window.analyticsManager.getData(currentFilters) : null;
+            const data = analytics ? analytics.data : generateAnalyticsData(currentFilters);
+            const insights = analytics ? analytics.insights : {};
+
+            // Visitor data
+            csvContent += "Date,Visitors\n";
+            data.visitors.labels.forEach((label, index) => {
+                csvContent += `${label},${data.visitors.data[index]}\n`;
+            });
+
+            // Summary statistics
+            csvContent += "\nSummary Statistics\n";
+            csvContent += `Total Users,${data.summary.totalUsers}\n`;
+            csvContent += `Total Visitors (${currentFilters.dateRange}d),${data.summary.totalVisitors}\n`;
+            csvContent += `Average Daily Visitors,${data.summary.avgDailyVisitors}\n`;
+            csvContent += `Bounce Rate,${data.engagement.bounceRate.toFixed(1)}%\n`;
+            csvContent += `Average Session Duration,${Math.floor(data.engagement.avgSessionDuration / 60)}m ${Math.floor(data.engagement.avgSessionDuration % 60)}s\n`;
+            csvContent += `Pages per Session,${data.engagement.pagesPerSession.toFixed(1)}\n`;
+
+            // Actionable insights
+            if (insights.conversionRate !== undefined) {
+                csvContent += `Conversion Rate,${insights.conversionRate}%\n`;
             }
-            
+            if (insights.retentionRate !== undefined) {
+                csvContent += `Retention Rate,${insights.retentionRate}%\n`;
+            }
+
+            // Funnel
+            if (insights.funnel) {
+                csvContent += "\nFunnel Analysis\n";
+                csvContent += insights.funnel.steps.map((s, i) => `${s},${insights.funnel.values[i]}`).join("\n") + "\n";
+            }
+
+            // Device/Browser breakdown
+            if (insights.deviceBreakdown) {
+                csvContent += "\nDevice Breakdown\n";
+                insights.deviceBreakdown.deviceLabels.forEach((label, i) => {
+                    csvContent += `${label},${insights.deviceBreakdown.devices[i]}%\n`;
+                });
+            }
+            if (insights.browserBreakdown) {
+                csvContent += "\nBrowser Breakdown\n";
+                insights.browserBreakdown.browserLabels.forEach((label, i) => {
+                    csvContent += `${label},${insights.browserBreakdown.browsers[i]}%\n`;
+                });
+            }
+
+            // Multi-metric comparison
+            if (insights.multiMetric) {
+                csvContent += "\nMulti-Metric Comparison\nDate,Visitors,Orders,Sessions\n";
+                insights.multiMetric.labels.forEach((label, i) => {
+                    csvContent += `${label},${insights.multiMetric.visitors[i]},${insights.multiMetric.orders[i]},${insights.multiMetric.sessions[i]}\n`;
+                });
+            }
+
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -693,7 +1084,6 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
             showToast('Enhanced CSV report exported successfully!');
         }
 
@@ -727,7 +1117,7 @@
             }
         }
 
-        // PDF Export functionality
+        // PDF Export functionality (enhanced)
         function exportPDF() {
             // Check if jsPDF is available
             if (!window.jspdf || !window.jspdf.jsPDF) {
@@ -735,27 +1125,24 @@
                 exportCSV();
                 return;
             }
-            
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const data = generateAnalyticsData(currentFilters);
-            
+            const analytics = window.analyticsManager ? window.analyticsManager.getData(currentFilters) : null;
+            const data = analytics ? analytics.data : generateAnalyticsData(currentFilters);
+            const insights = analytics ? analytics.insights : {};
             // Add title
             doc.setFontSize(20);
             doc.text('Analytics Report', 20, 30);
-            
             // Add date range
             doc.setFontSize(12);
             doc.text(`Date Range: Last ${currentFilters.dateRange} days`, 20, 45);
             doc.text(`User Filter: ${currentFilters.userType === 'all' ? 'All Users' : currentFilters.userType + ' Users'}`, 20, 55);
             doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 65);
-            
             // Add summary statistics
             doc.setFontSize(14);
             doc.text('Summary Statistics', 20, 85);
             doc.setFontSize(10);
             let yPos = 95;
-            
             const summaryStats = [
                 `Total Users: ${data.summary.totalUsers}`,
                 `Total Visitors (${currentFilters.dateRange}d): ${data.summary.totalVisitors}`,
@@ -765,62 +1152,145 @@
                 `Pages per Session: ${data.engagement.pagesPerSession.toFixed(1)}`,
                 `Return Visitor Rate: ${data.engagement.returnVisitorRate.toFixed(1)}%`
             ];
-            
             summaryStats.forEach(stat => {
                 doc.text(stat, 25, yPos);
                 yPos += 10;
             });
-            
-            // Add product sales section
+            // Actionable insights
+            if (insights.conversionRate !== undefined) {
+                doc.text(`Conversion Rate: ${insights.conversionRate}%`, 25, yPos);
+                yPos += 10;
+            }
+            if (insights.retentionRate !== undefined) {
+                doc.text(`Retention Rate: ${insights.retentionRate}%`, 25, yPos);
+                yPos += 10;
+            }
+            // Funnel
+            if (insights.funnel) {
+                doc.setFontSize(14);
+                doc.text('Funnel Analysis', 20, yPos + 10);
+                doc.setFontSize(10);
+                yPos += 20;
+                insights.funnel.steps.forEach((step, i) => {
+                    doc.text(`${step}: ${insights.funnel.values[i]}`, 25, yPos);
+                    yPos += 8;
+                });
+            }
+            // Device/Browser breakdown
+            if (insights.deviceBreakdown) {
+                doc.setFontSize(14);
+                doc.text('Device Breakdown', 20, yPos + 10);
+                doc.setFontSize(10);
+                yPos += 20;
+                insights.deviceBreakdown.deviceLabels.forEach((label, i) => {
+                    doc.text(`${label}: ${insights.deviceBreakdown.devices[i]}%`, 25, yPos);
+                    yPos += 8;
+                });
+            }
+            if (insights.browserBreakdown) {
+                doc.setFontSize(14);
+                doc.text('Browser Breakdown', 20, yPos + 10);
+                doc.setFontSize(10);
+                yPos += 20;
+                insights.browserBreakdown.browserLabels.forEach((label, i) => {
+                    doc.text(`${label}: ${insights.browserBreakdown.browsers[i]}%`, 25, yPos);
+                    yPos += 8;
+                });
+            }
+            // Multi-metric comparison
+            if (insights.multiMetric) {
+                doc.setFontSize(14);
+                doc.text('Multi-Metric Comparison', 20, yPos + 10);
+                doc.setFontSize(10);
+                yPos += 20;
+                doc.text('Date   Visitors   Orders   Sessions', 25, yPos);
+                yPos += 8;
+                insights.multiMetric.labels.forEach((label, i) => {
+                    if (yPos > 270) { doc.addPage(); yPos = 30; }
+                    doc.text(`${label}   ${insights.multiMetric.visitors[i]}   ${insights.multiMetric.orders[i]}   ${insights.multiMetric.sessions[i]}`, 25, yPos);
+                    yPos += 8;
+                });
+            }
+            // Product sales section
             doc.setFontSize(14);
             doc.text('Product Sales', 20, yPos + 15);
             doc.setFontSize(10);
             yPos += 25;
-            
             data.sales.labels.forEach((product, index) => {
                 doc.text(`${product}: ${data.sales.data[index]} units`, 25, yPos);
                 yPos += 8;
             });
-            
             // Add visitor trend data (sample)
             doc.setFontSize(14);
             doc.text('Recent Visitor Trends', 20, yPos + 15);
             doc.setFontSize(10);
             yPos += 25;
-            
             const recentDays = data.visitors.labels.slice(-7);
             const recentData = data.visitors.data.slice(-7);
-            
             recentDays.forEach((date, index) => {
-                if (yPos > 250) { // Start new page if needed
-                    doc.addPage();
-                    yPos = 30;
-                }
+                if (yPos > 250) { doc.addPage(); yPos = 30; }
                 doc.text(`${date}: ${recentData[index]} visitors`, 25, yPos);
                 yPos += 8;
             });
-            
             doc.save(`analytics-report-${new Date().toISOString().split('T')[0]}.pdf`);
             showToast('PDF report exported successfully!');
         }
 
         // Filter change handlers
         function setupFilterHandlers() {
+            // Date range select
             document.getElementById('date-range').addEventListener('change', (e) => {
                 currentFilters.dateRange = parseInt(e.target.value);
                 updateAnalytics();
+                updateActiveDateChip(currentFilters.dateRange);
                 showToast(`Updated data for last ${currentFilters.dateRange} days`);
             });
-            
+
+            // Date filter chips
+            document.querySelectorAll('.date-chip').forEach(chip => {
+                chip.addEventListener('click', (e) => {
+                    const range = parseInt(chip.getAttribute('data-range'));
+                    currentFilters.dateRange = range;
+                    document.getElementById('date-range').value = range;
+                    updateAnalytics();
+                    updateActiveDateChip(range);
+                    showToast(`Updated data for last ${range === 1 ? 'today' : range + ' days'}`);
+                });
+                chip.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        chip.click();
+                    }
+                });
+            });
+
+            // Highlight active chip
+            function updateActiveDateChip(activeRange) {
+                document.querySelectorAll('.date-chip').forEach(chip => {
+                    const range = parseInt(chip.getAttribute('data-range'));
+                    if (range === activeRange) {
+                        chip.classList.add('bg-primary', 'text-white');
+                        chip.setAttribute('aria-pressed', 'true');
+                    } else {
+                        chip.classList.remove('bg-primary', 'text-white');
+                        chip.setAttribute('aria-pressed', 'false');
+                    }
+                });
+            }
+            // Set initial chip highlight
+            updateActiveDateChip(currentFilters.dateRange);
+
+            // User type select
             document.getElementById('user-type').addEventListener('change', (e) => {
                 currentFilters.userType = e.target.value;
                 updateAnalytics();
                 showToast(`Filtered by ${currentFilters.userType === 'all' ? 'all users' : currentFilters.userType + ' users'}`);
             });
-            
+
             document.getElementById('export-csv').addEventListener('click', exportCSV);
             document.getElementById('export-pdf').addEventListener('click', exportPDF);
-            
+            document.getElementById('export-png').addEventListener('click', exportPNG);
+
             // Add refresh button handler
             const refreshBtn = document.getElementById('refresh-data');
             if (refreshBtn) {

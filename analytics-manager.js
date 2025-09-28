@@ -209,11 +209,119 @@ class AnalyticsDataManager {
                 }
             });
         }
-        
+        // Generate actionable insights and additional chart data
+        const conversionRate = this.getConversionRate(filteredData);
+        const retentionRate = this.getRetentionRate(filteredData);
+        const funnel = this.getFunnelData(filteredData);
+        const deviceBreakdown = this.getDeviceBreakdown(filteredData);
+        const browserBreakdown = this.getBrowserBreakdown(filteredData);
+        const multiMetric = this.getMultiMetricComparison(filteredData);
+        const sparklines = this.getSparklineData(filteredData);
+
         return {
             data: filteredData,
             settings: settings,
-            lastUpdated: data.lastUpdated
+            lastUpdated: data.lastUpdated,
+            insights: {
+                conversionRate,
+                retentionRate,
+                funnel,
+                deviceBreakdown,
+                browserBreakdown,
+                multiMetric,
+                sparklines
+            }
+        };
+    // Mock: Browser breakdown (randomized for demo)
+    getBrowserBreakdown(data) {
+        // Simulate breakdown for demo
+        const chrome = 60 + Math.floor(Math.random() * 10); // 60-70%
+        const firefox = 20 + Math.floor(Math.random() * 10); // 20-30%
+        const safari = 10;
+        const edge = 10;
+        return {
+            browsers: [chrome, firefox, safari, edge],
+            browserLabels: ['Chrome', 'Firefox', 'Safari', 'Edge']
+        };
+    }
+
+    // Mock: Multi-metric comparison (Visitors, Orders, Sessions per day)
+    getMultiMetricComparison(data) {
+        const days = (data.visitors || []).length;
+        const labels = (data.visitors || []).map(d => d.date);
+        const visitors = (data.visitors || []).map(d => d.totalVisitors);
+        const orders = (data.oilOrders || []).map(d => d.totalOrders);
+        const sessions = (data.userSessions || []).map(d => d.totalSessions);
+        return {
+            labels,
+            visitors,
+            orders,
+            sessions
+        };
+    }
+
+    // Mock: Sparkline data for quick stats (last 14 days)
+    getSparklineData(data) {
+        const last14 = (arr) => arr.slice(-14);
+        return {
+            visitors: last14((data.visitors || []).map(d => d.totalVisitors)),
+            orders: last14((data.oilOrders || []).map(d => d.totalOrders)),
+            sessions: last14((data.userSessions || []).map(d => d.totalSessions))
+        };
+    }
+    }
+
+    // Mock: Conversion rate = orders / unique visitors
+    getConversionRate(data) {
+        const totalOrders = (data.oilOrders || []).reduce((sum, d) => sum + (d.totalOrders || 0), 0);
+        const totalUniqueVisitors = (data.visitors || []).reduce((sum, d) => sum + (d.uniqueVisitors || 0), 0);
+        if (totalUniqueVisitors === 0) return 0;
+        return ((totalOrders / totalUniqueVisitors) * 100).toFixed(1);
+    }
+
+    // Mock: Retention rate = % of users who visited at least twice in period
+    getRetentionRate(data) {
+        const userVisits = {};
+        (data.visitors || []).forEach(day => {
+            // Simulate user IDs by index
+            for (let i = 0; i < (day.uniqueVisitors || 0); i++) {
+                const userId = `user${i}`;
+                userVisits[userId] = (userVisits[userId] || 0) + 1;
+            }
+        });
+        const totalUsers = Object.keys(userVisits).length;
+        const retained = Object.values(userVisits).filter(v => v > 1).length;
+        if (totalUsers === 0) return 0;
+        return ((retained / totalUsers) * 100).toFixed(1);
+    }
+
+    // Mock: Funnel data (Visit → Signup → Order)
+    getFunnelData(data) {
+        // Simulate: 100% visit, 40% signup, 20% order
+        const totalVisitors = (data.visitors || []).reduce((sum, d) => sum + (d.totalVisitors || 0), 0);
+        const signups = Math.floor(totalVisitors * 0.4);
+        const orders = (data.oilOrders || []).reduce((sum, d) => sum + (d.totalOrders || 0), 0);
+        return {
+            steps: ['Visit', 'Signup', 'Order'],
+            values: [totalVisitors, signups, orders]
+        };
+    }
+
+    // Mock: Device/browser breakdown (randomized for demo)
+    getDeviceBreakdown(data) {
+        // Simulate breakdown for demo
+        const total = 100;
+        const desktop = 50 + Math.floor(Math.random() * 20); // 50-70%
+        const mobile = 100 - desktop - 10;
+        const tablet = 10;
+        const chrome = 60 + Math.floor(Math.random() * 10); // 60-70%
+        const firefox = 20 + Math.floor(Math.random() * 10); // 20-30%
+        const safari = 10;
+        return {
+            devices: [desktop, mobile, tablet],
+            deviceLabels: ['Desktop', 'Mobile', 'Tablet'],
+            browsers: [chrome, firefox, safari],
+            browserLabels: ['Chrome', 'Firefox', 'Safari']
         };
     }
 
