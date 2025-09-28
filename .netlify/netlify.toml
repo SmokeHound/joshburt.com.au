@@ -1,4 +1,3 @@
-
 functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
 
 [functions]
@@ -7,7 +6,6 @@ functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\funct
 
 [build]
 publish = "C:\\DEV\\joshburt.com.au\\joshburt.com.au"
-commandOrigin = "\"
 command = "npm install"
 functions = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
 
