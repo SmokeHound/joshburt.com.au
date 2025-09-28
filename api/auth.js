@@ -91,8 +91,7 @@ router.post('/register', [
       name
     });
 
-    // TODO: Send verification email
-    console.log(`📧 Verification token for ${email}: ${verificationToken}`);
+  // ...existing code...
 
   } catch (error) {
     console.error('Registration error:', error);
@@ -268,7 +267,7 @@ router.post('/forgot-password', authLimiter, [
       
       try {
         await sendResetEmail(email, user.name, resetUrl);
-        console.log(`📧 Password reset email sent to ${email}`);
+  // ...existing code...
       } catch (emailError) {
         console.error('Failed to send reset email:', emailError);
       }

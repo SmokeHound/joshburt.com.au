@@ -3,13 +3,9 @@ const nodemailer = require('nodemailer');
 // Create transporter
 const createTransporter = () => {
   if (process.env.NODE_ENV === 'development') {
-    // For development, log emails instead of sending
+    // For development, do not send emails (no-op)
     return {
       sendMail: async (mailOptions) => {
-        console.log('📧 Email would be sent:');
-        console.log('To:', mailOptions.to);
-        console.log('Subject:', mailOptions.subject);
-        console.log('Body:', mailOptions.html || mailOptions.text);
         return { messageId: 'dev-mode-' + Date.now() };
       }
     };
@@ -88,7 +84,7 @@ const sendResetEmail = async (email, name, resetUrl) => {
 
   try {
     const result = await transporter.sendMail(mailOptions);
-    console.log('📧 Password reset email sent:', result.messageId);
+  // ...existing code...
     return result;
   } catch (error) {
     console.error('📧 Failed to send password reset email:', error);
@@ -159,7 +155,7 @@ const sendWelcomeEmail = async (email, name) => {
 
   try {
     const result = await transporter.sendMail(mailOptions);
-    console.log('📧 Welcome email sent:', result.messageId);
+  // ...existing code...
     return result;
   } catch (error) {
     console.error('📧 Failed to send welcome email:', error);

@@ -1,5 +1,4 @@
 // Enhanced Service Worker for PWA offline functionality with performance optimizations
-const CACHE_NAME = 'joshburt-v3';
 const STATIC_CACHE = 'joshburt-static-v3';
 const DYNAMIC_CACHE = 'joshburt-dynamic-v3';
 const API_CACHE = 'joshburt-api-v3';
@@ -31,12 +30,10 @@ const apiUrls = [
 
 // Install event - cache resources with performance optimization
 self.addEventListener('install', event => {
-  console.log('Service Worker: Installing...');
   event.waitUntil(
     Promise.all([
       // Cache static resources
       caches.open(STATIC_CACHE).then(cache => {
-        console.log('Service Worker: Caching static files');
         return cache.addAll(urlsToCache);
       }),
       // Initialize dynamic cache
@@ -44,7 +41,6 @@ self.addEventListener('install', event => {
       // Initialize API cache
       caches.open(API_CACHE)
     ]).then(() => {
-      console.log('Service Worker: Installation complete');
       return self.skipWaiting();
     })
   );
@@ -52,20 +48,17 @@ self.addEventListener('install', event => {
 
 // Activate event - clean up old caches with improved performance
 self.addEventListener('activate', event => {
-  console.log('Service Worker: Activating...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
           // Remove old caches
           if (cache !== STATIC_CACHE && cache !== DYNAMIC_CACHE && cache !== API_CACHE) {
-            console.log('Service Worker: Clearing old cache', cache);
             return caches.delete(cache);
           }
         })
       );
     }).then(() => {
-      console.log('Service Worker: Activation complete');
       return self.clients.claim();
     })
   );
@@ -98,7 +91,6 @@ async function cacheFirstStrategy(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cached = await cache.match(request);
     if (cached) {
-      console.log('Service Worker: Serving from cache', request.url);
       return cached;
     }
     // Not in cache, fetch from network
@@ -155,7 +147,6 @@ async function networkFirstStrategy(request, cacheName) {
       const isExpired = cacheTimestamp && (Date.now() - parseInt(cacheTimestamp)) > 3600000;
       
       if (!isExpired) {
-        console.log('Service Worker: Serving from cache (network failed)', request.url);
         return cached;
       }
     }
@@ -208,61 +199,11 @@ function isHTMLRequest(request) {
 }
 
 // Enhanced background sync for offline actions
-self.addEventListener('sync', event => {
-  console.log('Service Worker: Background sync', event.tag);
-  
-  if (event.tag === 'order-sync') {
-    event.waitUntil(syncPendingOrders());
-  } else if (event.tag === 'analytics-sync') {
-    event.waitUntil(syncAnalyticsData());
-  }
-});
-
-async function syncPendingOrders() {
-  try {
-    const pendingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]');
-    
-    for (const order of pendingOrders) {
-      try {
-        const response = await fetch('/api/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(order)
-        });
-        
-        if (response.ok) {
-          // Remove synced order from pending
-          const updatedPending = pendingOrders.filter(p => p.id !== order.id);
-          localStorage.setItem('pendingOrders', JSON.stringify(updatedPending));
-        }
-      } catch (error) {
-        console.warn('Failed to sync order:', order.id, error);
-      }
-    }
-  } catch (error) {
-    console.error('Background sync failed:', error);
-  }
-}
-
-async function syncAnalyticsData() {
-  try {
-    const analyticsData = localStorage.getItem('analyticsData');
-    if (analyticsData) {
-      await fetch('/api/analytics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: analyticsData
-      });
-    }
-  } catch (error) {
-    console.warn('Analytics sync failed:', error);
-  }
-}
+// Background sync removed: Service workers cannot access localStorage. Use IndexedDB or postMessage for offline sync if needed.
 
 // Enhanced push notifications
+// Push notification handler
 self.addEventListener('push', event => {
-  console.log('Service Worker: Push message received');
-  
   let options = {
     body: 'You have a new notification',
     icon: '/assets/images/logo-placeholder.svg',
@@ -274,43 +215,36 @@ self.addEventListener('push', event => {
       { action: 'close', title: 'Close' }
     ]
   };
-  
   if (event.data) {
-    const data = event.data.json();
-    options = { ...options, ...data };
+    try {
+      const data = event.data.json();
+      options = { ...options, ...data };
+    } catch {}
   }
-  
   event.waitUntil(
     self.registration.showNotification('Josh\'s App', options)
   );
 });
 
 // Handle notification clicks
+// Notification click handler
 self.addEventListener('notificationclick', event => {
-  console.log('Service Worker: Notification click', event);
-  
   event.notification.close();
-  
-  if (event.action === 'open' || !event.action) {
-    const url = event.notification.data?.url || '/';
-    event.waitUntil(
-      clients.matchAll().then(clients => {
-        // Check if app is already open
-        const client = clients.find(c => c.url.includes(url));
-        if (client) {
-          return client.focus();
-        } else {
-          return clients.openWindow(url);
-        }
-      })
-    );
-  }
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.matchAll().then(clients => {
+      const client = clients.find(c => c.url.includes(url));
+      if (client) {
+        return client.focus();
+      } else {
+        return clients.openWindow(url);
+      }
+    })
+  );
 });
 
 // Performance monitoring
+// Performance monitoring stub
 self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'PERFORMANCE_MEASURE') {
-    // Log performance metrics
-    console.log('Performance measure:', event.data.name, event.data.duration);
-  }
+  // No-op: performance metrics not logged in service worker
 });

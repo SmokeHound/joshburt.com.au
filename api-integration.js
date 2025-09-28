@@ -190,7 +190,7 @@ class APIIntegrationService {
   // NOTIFICATION API INTEGRATION
   async sendNotification(type, data) {
     if (!this.config.notifications.enabled) {
-      console.log(`Mock notification sent: ${type}`, data);
+  // ...existing code...
       return { success: true, messageId: 'mock_' + Date.now() };
     }
 
@@ -282,7 +282,7 @@ class APIIntegrationService {
   // CLOUD BACKUP FUNCTIONALITY
   async backupToCloud() {
     if (!this.config.cloudBackup.enabled) {
-      console.log('Cloud backup is disabled');
+  // ...existing code...
       return { success: false, reason: 'disabled' };
     }
 
@@ -373,14 +373,14 @@ class APIIntegrationService {
       });
     }, intervalMinutes * 60 * 1000);
 
-    console.log(`Auto backup started with ${intervalMinutes} minute interval`);
+  // ...existing code...
   }
 
   stopAutoBackup() {
     if (this.backupInterval) {
       clearInterval(this.backupInterval);
       this.backupInterval = null;
-      console.log('Auto backup stopped');
+  // ...existing code...
     }
   }
 
