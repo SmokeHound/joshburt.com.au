@@ -154,15 +154,14 @@
                     <p class="mb-4 text-gray-600 dark:text-gray-300">Manage consumable products, add descriptions and images.</p>
                     <a href="consumables-mgmt.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Products</a>
                 </div>
+                <div class="card widget-warning p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Orders Review</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Review and manage workshop orders.</p>
+                    <a href="orders-review.html" class="w-full block p-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 text-center transition-colors duration-200">Go to Orders Review</a>
+                </div>
             </div>
 
-                <!-- Order Review Section -->
-                                <div class="mt-10">
-                                        <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Workshop Orders Review</h2>
-                                        <div id="orders-list" class="bg-white dark:bg-gray-700 rounded-lg shadow p-6">
-                                            <div class="text-center text-gray-500 dark:text-gray-400">Loading orders...</div>
-                                        </div>
-                                </div>
+                <!-- Order Review Section moved to orders-review.html -->
         </section>
     </main>
 
@@ -170,158 +169,47 @@
         // Load and apply site settings
         function loadAndApplySettings() {
             const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            
             // Apply site title if set
             if (settings['site-title']) {
                 const brandingElements = document.querySelectorAll('h1');
-                brandingElements.forEach(el => {
-                    if (el.textContent.includes('Admin Dashboard') || el.textContent.includes('Josh\'s App')) {
-                        el.textContent = settings['site-title'] + ' - Admin';
-                    }
-                });
+                brandingElements.forEach(el => el.textContent = settings['site-title']);
             }
         }
-
-        // Show toast notification
+        loadAndApplySettings();
+        // Theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            const body = document.body;
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                this.textContent = 'Toggle Dark Mode';
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                this.textContent = 'Toggle Light Mode';
+            }
+        });
+        // Sidebar toggle for mobile
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            sidebarBackdrop.classList.toggle('open');
+            this.setAttribute('aria-expanded', sidebar.classList.contains('open'));
+        });
+        sidebarBackdrop.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            sidebarBackdrop.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+        });
+        // Toast notification helper
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
-
-        // Theme Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-        });
-
-        // Load saved theme from settings or localStorage
-        const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-        const savedTheme = settings['theme'] || localStorage.getItem('theme') || 'dark';
-        body.classList.add(savedTheme);
-        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
-
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            const isOpen = sidebar.classList.contains('open');
-            menuToggle.setAttribute('aria-expanded', isOpen);
-        });
-        
-        // Apply settings on page load
-        document.addEventListener('DOMContentLoaded', loadAndApplySettings);
-        // Service Worker Registration for PWA
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./sw.js")
-                    .then(registration => {
-                        console.log("SW registered: ", registration);
-                    })
-                    .catch(registrationError => {
-                        console.log("SW registration failed: ", registrationError);
-                    });
-            });
+            setTimeout(() => toast.classList.add('hidden'), 3000);
         }
     </script>
-
-            <!-- Order Review Script -->
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const ordersList = document.getElementById('orders-list');
-                async function loadOrders() {
-                    try {
-                        const res = await fetch('/.netlify/functions/orders');
-                        if (!res.ok) throw new Error('Failed to fetch orders');
-                        const orders = await res.json();
-                        if (!Array.isArray(orders) || orders.length === 0) {
-                            ordersList.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">No orders found.</div>';
-                            return;
-                        }
-                        ordersList.innerHTML = orders.map((order, idx) => `
-                            <div class="mb-6 p-4 border-b border-gray-200 dark:border-gray-600">
-                                <div class="flex justify-between items-center mb-2">
-                                    <div>
-                                        <span class="font-semibold text-gray-900 dark:text-white">Order #${order.id}</span>
-                                        <span class="ml-2 text-xs text-gray-500">${new Date(order.created_at).toLocaleString()}</span>
-                                    </div>
-                                    <span class="px-2 py-1 rounded-full text-xs ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : order.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${order.status}</span>
-                                </div>
-                                <div class="flex flex-wrap gap-4 text-sm mb-2">
-                                    <div class="text-gray-700 dark:text-gray-200">Requested by: <span class="font-medium">${order.created_by || 'mechanic'}</span></div>
-                                    <div class="text-gray-600 dark:text-gray-300">Total Items: <span class="font-medium">${order.total_items || '?'}</span></div>
-                                    <div class="text-gray-600 dark:text-gray-300">Priority: <span class="font-medium">${order.priority || 'normal'}</span></div>
-                                </div>
-                                <div class="text-gray-600 dark:text-gray-300 mb-2">Notes: <span class="font-medium">${order.notes || ''}</span></div>
-                                <button class="mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary" onclick="toggleOrderDetails(${idx})" aria-expanded="false" aria-controls="order-details-${order.id}">
-                                    <span>Show Details</span>
-                                </button>
-                                <div id="order-details-${order.id}" class="hidden mt-4 bg-gray-50 dark:bg-gray-800 rounded p-4">
-                                    <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">Order Items</h4>
-                                    <ul class="mb-2">
-                                        ${(order.items || []).map(item => `
-                                            <li class="mb-1 flex justify-between">
-                                                <span>${item.name} <span class="text-xs text-gray-500">(${item.code})</span></span>
-                                                <span class="font-medium">Qty: ${item.quantity}</span>
-                                            </li>
-                                        `).join('')}
-                                    </ul>
-                                    <div class="flex gap-2 mt-4">
-                                        <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400" onclick="updateOrderStatus(${order.id}, 'approved')">Approve</button>
-                                        <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" onclick="updateOrderStatus(${order.id}, 'rejected')">Reject</button>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('');
-                    } catch (err) {
-                        ordersList.innerHTML = `<div class="text-center text-red-600 dark:text-red-400">Error loading orders: ${err.message}</div>`;
-                    }
-                }
-
-                window.toggleOrderDetails = function(idx) {
-                    const orderDivs = ordersList.querySelectorAll('[id^="order-details-"]');
-                    const buttons = ordersList.querySelectorAll('button[aria-controls^="order-details-"]');
-                    orderDivs.forEach((div, i) => {
-                        if (i === idx) {
-                            const isOpen = div.classList.toggle('hidden') === false;
-                            buttons[i].setAttribute('aria-expanded', isOpen);
-                            buttons[i].querySelector('span').textContent = isOpen ? 'Hide Details' : 'Show Details';
-                        } else {
-                            div.classList.add('hidden');
-                            buttons[i].setAttribute('aria-expanded', false);
-                            buttons[i].querySelector('span').textContent = 'Show Details';
-                        }
-                    });
-                };
-
-
-                window.updateOrderStatus = async function(orderId, status) {
-                    try {
-                        const res = await fetch('/.netlify/functions/orders', {
-                            method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ orderId, status })
-                        });
-                        if (!res.ok) throw new Error('Failed to update order');
-                        showToast('Order #' + orderId + ' ' + (status === 'approved' ? 'approved' : 'rejected'));
-                        await loadOrders();
-                    } catch (err) {
-                        showToast('Error: ' + err.message);
-                    }
-                };
-
-                loadOrders();
-            });
-            </script>
 </body>
 </html>
