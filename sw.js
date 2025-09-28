@@ -6,7 +6,7 @@ const API_CACHE = 'joshburt-api-v3';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/admin.html',
+  '/administration.html',
   '/analytics.html',
   '/login.html', 
   '/oil.html',

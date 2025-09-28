@@ -32,7 +32,7 @@ Welcome to the joshburt.com.au project! This is a dynamic website and API with a
 
 ```
 ├── index.html              # Main homepage
-├── admin.html              # Admin dashboard
+├── administration.html     # Administration dashboard
 ├── users.html              # User management
 ├── analytics.html          # Analytics page
 ├── settings.html           # Settings configuration

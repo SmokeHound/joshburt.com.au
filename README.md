@@ -32,11 +32,7 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 - **API/Netlify Functions**: Dynamic backend for products, orders, users, and authentication
 
 ### Pages
-- **`index.html`**: Landing page with login modal and welcome cards
-- **`admin.html`**: Dashboard with management links and user overview
-- **`users.html`**: User CRUD operations and role management
-- **`analytics.html`**: Site metrics and usage statistics
-- **`settings.html`**: Site configuration and customization
+**`administration.html`**: Dashboard with management links and user overview
 - **`oil.html`**: Castrol product ordering system (API-driven, CSV export)
 - **`consumables.html`**: Consumables order request page (for workshop staff)
 - **`consumables-mgmt.html`**: Consumables product list management (admin/staff CRUD)

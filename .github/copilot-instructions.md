@@ -95,7 +95,7 @@ Two deployment workflows are configured:
 │       └── static.yml    # GitHub Pages deployment
 ├── index.html           # Main homepage
 ├── oil.html             # Castrol oil ordering system
-├── admin.html           # Admin dashboard
+├── administration.html  # Administration dashboard
 ├── analytics.html       # Analytics page
 ├── settings.html        # Settings configuration
 ├── users.html           # User management

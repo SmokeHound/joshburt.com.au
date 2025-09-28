@@ -73,7 +73,7 @@ class AnalyticsDataManager {
             { path: '/index.html', name: 'Home', weight: 0.4 },
             { path: '/oil.html', name: 'Oil Orders', weight: 0.25 },
             { path: '/analytics.html', name: 'Analytics', weight: 0.15 },
-            { path: '/admin.html', name: 'Admin', weight: 0.08 },
+            { path: '/administration.html', name: 'Administration', weight: 0.08 },
             { path: '/users.html', name: 'User Management', weight: 0.07 },
             { path: '/settings.html', name: 'Settings', weight: 0.05 }
         ];
@@ -281,7 +281,7 @@ class AnalyticsDataManager {
             '/index.html': 'Home',
             '/oil.html': 'Oil Orders',
             '/analytics.html': 'Analytics',
-            '/admin.html': 'Admin',
+            '/administration.html': 'Administration',
             '/users.html': 'User Management',
             '/settings.html': 'Settings'
         };
