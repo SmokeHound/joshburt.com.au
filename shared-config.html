@@ -112,13 +112,17 @@
         100% { background-position: -200% 0; }
     }
     
+    /* Sidebar styles - Unified for all pages */
+    .sidebar {
+        background-color: #374151; /* Gray-700 equivalent */
+        transition: transform 0.3s ease-in-out;
+    }
+    
     /* Mobile sidebar styles - Unified for all pages */
     @media (max-width: 768px) {
         .sidebar {
             transform: translateX(-100%);
-            transition: transform 0.3s ease-in-out;
             z-index: 40;
-            background-color: #374151;
         }
         .sidebar.open {
             transform: translateX(0);
