@@ -1,205 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="./assets/css/styles.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Settings</title>
-    
-    <script>
-        // Configuration for dynamic color updates from settings
-        function applyDynamicColors() {
-            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            // Apply CSS variables for instant color update
-            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
-        }
-        applyDynamicColors();
-        // Service Worker Registration for PWA
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./sw.js")
-                    .then(registration => {
-                        console.log("SW registered: ", registration);
-                    })
-                    .catch(registrationError => {
-                        console.log("SW registration failed: ", registrationError);
-                    });
-            });
-        }
-    </script>
-    <style>
-        :root {
-            --color-primary: #3b82f6;
-            --color-secondary: #10b981;
-            --color-accent: #8b5cf6;
-        }
-        
-        body {
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .dark {
-            background-color: #1f2937;
-            color: #f9fafb;
-        }
-        .light {
-            background-color: #f9fafb;
-            color: #1f2937;
-        }
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            main {
-                margin-left: 0;
-            }
-        }
-        @media (min-width: 768px) {
-            .sidebar {
-                width: 16rem;
-            }
-            main {
-                margin-left: 16rem;
-            }
-        }
-        .card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Custom color support for elements that use bg-primary, bg-secondary, bg-accent */
-        .bg-primary-custom { background-color: var(--color-primary) !important; }
-        .bg-secondary-custom { background-color: var(--color-secondary) !important; }
-        .bg-accent-custom { background-color: var(--color-accent) !important; }
-        .text-primary-custom { color: var(--color-primary) !important; }
-        .text-secondary-custom { color: var(--color-secondary) !important; }
-        .text-accent-custom { color: var(--color-accent) !important; }
-        .border-primary-custom { border-color: var(--color-primary) !important; }
-        
-        /* Color scheme transition effects */
-        button, .preset-theme {
-            transition: all 0.3s ease;
-        }
-        
-        /* Tab styling */
-        .tab-btn.active {
-            background-color: var(--color-primary);
-            color: white;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        /* Input validation styles */
-        .input-error {
-            border-color: #ef4444 !important;
-            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
-        }
-        
-        .input-success {
-            border-color: #10b981 !important;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-        }
-        
-        .error-message {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        
-        /* Logo preview styles */
-        #logo-preview img {
-            object-fit: contain;
-        }
-    </style>
-</head>
-<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-    <!-- Mobile Menu Toggle -->
-    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
-        ☰
-    </button>
-
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
-
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full bg-gray-700 p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
-        <!-- App Branding -->
-        <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
-
-        <!-- Navigation -->
-        <nav>
-            <ul class="space-y-2">
-
-                <li><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
-                <li><a href="administration.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Administration</a></li>
-                <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-                <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-                <li><a href="settings.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Settings</a></li>
-                <li><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
-                <li><a href="consumables.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Consumables Orders</a></li>
-                <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
-
-            </ul>
-        </nav>
-
-        <!-- Theme Toggle -->
-        <div class="mt-auto">
-            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
-                Toggle Light Mode
-            </button>
-            <div class="bg-gray-800 p-4 rounded shadow">
-                <h2 class="text-lg font-semibold mb-2 text-white">Advanced Color Scheme</h2>
-                <form id="colorSchemeForm" class="space-y-2">
-                    <div>
-                        <label for="primaryColor" class="block text-gray-300 mb-1">Primary Color</label>
-                        <input type="color" id="primaryColor" name="primaryColor" value="#3b82f6" class="w-12 h-8 border-none rounded">
-                    </div>
-                    <div>
-                        <label for="secondaryColor" class="block text-gray-300 mb-1">Secondary Color</label>
-                        <input type="color" id="secondaryColor" name="secondaryColor" value="#10b981" class="w-12 h-8 border-none rounded">
-                    </div>
-                    <div>
-                        <label for="accentColor" class="block text-gray-300 mb-1">Accent Color</label>
-                        <input type="color" id="accentColor" name="accentColor" value="#8b5cf6" class="w-12 h-8 border-none rounded">
-                    </div>
-                    <button type="submit" class="w-full p-2 bg-accent text-white rounded hover:bg-primary focus:outline-none focus:ring-2 focus:ring-accent font-semibold">Apply Colors</button>
-                </form>
-            </div>
-
-            <!-- Theme Schedule Settings -->
-            <div id="theme-schedule-settings" class="bg-gray-800 p-4 rounded shadow">
-                <h2 class="text-lg font-semibold mb-2 text-white">Theme Schedule</h2>
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" id="schedule-enabled" class="mr-2 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
-                            <span class="text-sm font-medium text-gray-300">Auto Dark Mode</span>
-                        </label>
+        <!-- ...existing code... (sidebar ends here, theme controls now only in Theme tab) -->
                         <span id="schedule-status" class="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">Disabled</span>
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-400 mb-1">Dark mode starts at</label>
-                            <input type="time" id="dark-mode-start" value="18:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500" title="Set dark mode start time" placeholder="18:00" aria-label="Dark mode start time">
+                            <!-- Removed duplicate dark-mode-start input from sidebar -->
                         </div>
                         
                         <div>
                             <label class="block text-xs font-medium text-gray-400 mb-1">Light mode starts at</label>
-                            <input type="time" id="light-mode-start" value="06:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500" title="Set light mode start time" placeholder="06:00" aria-label="Light mode start time">
+                            <!-- Removed duplicate light-mode-start input from sidebar -->
                         </div>
                     </div>
 
@@ -338,8 +149,7 @@
 
                 <!-- Theme Customization Tab -->
                 <div id="theme-tab" class="tab-content p-6 hidden">
-                    <h3 class="font-semibold mb-4 text-xl">Theme Customization</h3>
-                    
+                    <h3 class="font-semibold mb-4 text-xl">Theme & Color Customization</h3>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div>
                             <h4 class="font-semibold mb-3">Color Scheme</h4>
@@ -360,65 +170,51 @@
                                     <input type="text" id="accentColorText" value="#8b5cf6" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary" title="Accent color hex code" placeholder="#8b5cf6" aria-label="Accent color hex">
                                 </div>
                             </div>
-                            
                             <div class="mt-6">
-                                <h4 class="font-semibold mb-3">Preset Themes</h4>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="default">
-                                        <div class="flex space-x-2 mb-1">
-                                            <div class="w-4 h-4 rounded bg-primary-custom" title="#3b82f6" aria-label="Primary color"></div>
-                                            <div class="w-4 h-4 rounded bg-secondary-custom" title="#10b981" aria-label="Secondary color"></div>
-                                            <div class="w-4 h-4 rounded bg-accent-custom" title="#8b5cf6" aria-label="Accent color"></div>
+                                <h4 class="font-semibold mb-3">Theme Mode</h4>
+                                <button id="theme-toggle" type="button" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary mb-2" aria-label="Toggle light mode">
+                                    Toggle Light Mode
+                                </button>
+                            </div>
+                            <div class="mt-6">
+                                <h4 class="font-semibold mb-3">Theme Schedule</h4>
+                                <div class="bg-gray-800 p-4 rounded shadow">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="checkbox" id="schedule-enabled" class="mr-2 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                                            <span class="text-sm font-medium text-gray-300">Auto Dark Mode</span>
+                                        </label>
+                                        <span id="schedule-status" class="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">Disabled</span>
+                                    </div>
+                                    <div class="grid grid-cols-1 gap-3">
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-400 mb-1">Dark mode starts at</label>
+                                            <input type="time" id="dark-mode-start" value="18:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500" title="Set dark mode start time" placeholder="18:00" aria-label="Dark mode start time">
                                         </div>
-                                        Default
-                                    </button>
-                                    <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="ocean">
-                                        <div class="flex space-x-2 mb-1">
-                                            <div class="w-4 h-4 rounded bg-ocean-1" title="#0ea5e9" aria-label="Ocean color 1"></div>
-                                            <div class="w-4 h-4 rounded bg-ocean-2" title="#06b6d4" aria-label="Ocean color 2"></div>
-                                            <div class="w-4 h-4 rounded bg-primary-custom" title="#3b82f6" aria-label="Ocean color 3"></div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-400 mb-1">Light mode starts at</label>
+                                            <input type="time" id="light-mode-start" value="06:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500" title="Set light mode start time" placeholder="06:00" aria-label="Light mode start time">
                                         </div>
-                                        Ocean
-                                    </button>
-                                    <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="forest">
-                                        <div class="flex space-x-2 mb-1">
-                                            <div class="w-4 h-4 rounded bg-forest-1" title="#059669" aria-label="Forest color 1"></div>
-                                            <div class="w-4 h-4 rounded bg-forest-2" title="#16a34a" aria-label="Forest color 2"></div>
-                                            <div class="w-4 h-4 rounded bg-forest-3" title="#65a30d" aria-label="Forest color 3"></div>
-                                        </div>
-                                        Forest
-                                    </button>
-                                    <button type="button" class="preset-theme p-3 bg-gray-700 rounded hover:bg-gray-600 text-sm" data-preset="sunset">
-                                        <div class="flex space-x-2 mb-1">
-                                            <div class="w-4 h-4 rounded bg-sunset-1" title="#ea580c" aria-label="Sunset color 1"></div>
-                                            <div class="w-4 h-4 rounded bg-sunset-2" title="#dc2626" aria-label="Sunset color 2"></div>
-                                            <div class="w-4 h-4 rounded bg-sunset-3" title="#c2410c" aria-label="Sunset color 3"></div>
-                                        </div>
-                                        Sunset
-                                    </button>
+                                    </div>
+                                    <div class="text-xs text-gray-500 pt-2 border-t border-gray-600 mt-3">
+                                        Current time: <span id="current-time">--:--</span><br>
+                                        Scheduled mode: <span id="scheduled-mode" class="text-gray-400">Manual</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        
                         <div>
-                            <h4 class="font-semibold mb-3">Logo & Branding</h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <label for="logo-upload" class="block text-gray-300 mb-2">Upload Logo</label>
-                                    <input type="file" id="logo-upload" accept="image/*" class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-primary file:text-white hover:file:bg-secondary">
-                                    <p class="text-xs text-gray-400 mt-1">Recommended: 200x50px, PNG or SVG</p>
+                            <h4 class="font-semibold mb-3">Live Preview</h4>
+                            <div class="flex flex-col items-center justify-center p-6 bg-gray-900 rounded shadow space-y-4">
+                                <div class="flex space-x-4">
+                                    <div class="w-12 h-12 rounded bg-primary-custom border-4 border-primary-custom" title="Primary" aria-label="Primary color preview"></div>
+                                    <div class="w-12 h-12 rounded bg-secondary-custom border-4 border-secondary-custom" title="Secondary" aria-label="Secondary color preview"></div>
+                                    <div class="w-12 h-12 rounded bg-accent-custom border-4 border-accent-custom" title="Accent" aria-label="Accent color preview"></div>
                                 </div>
-                                <div id="logo-preview" class="hidden">
-                                    <label class="block text-gray-300 mb-2">Logo Preview</label>
-                                    <div class="p-4 bg-gray-700 rounded flex items-center justify-center">
-                                        <img id="logo-preview-img" src="" alt="Logo Preview" class="max-h-16 max-w-48">
-                                    </div>
-                                    <button type="button" id="remove-logo" class="mt-2 text-sm text-red-400 hover:text-red-300">Remove Logo</button>
-                                </div>
+                                <span class="text-gray-400 text-sm">Preview of your selected color scheme</span>
                             </div>
                         </div>
                     </div>
-                    
                     <div class="mt-6 pt-4 border-t border-gray-600">
                         <button type="button" id="apply-theme" class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 font-semibold">Apply Theme Changes</button>
                     </div>
@@ -1173,7 +969,7 @@
             
             // Initialize components
             initTabs();
-            initThemeCustomization();
+            // initThemeCustomization(); // Removed: function not defined, logic handled elsewhere
             initSecuritySettings();
             initAuditLog();
             
