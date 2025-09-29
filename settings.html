@@ -28,63 +28,9 @@
             });
         }
     </script>
-    <!-- ...existing styles and head content... -->
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-        <!-- ...existing code... (sidebar ends here, theme controls now only in Theme tab) -->
-                        <span id="schedule-status" class="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">Disabled</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-400 mb-1">Dark mode starts at</label>
-                            <!-- Removed duplicate dark-mode-start input from sidebar -->
-                        </div>
-                        
-                        <div>
-                            <label class="block text-xs font-medium text-gray-400 mb-1">Light mode starts at</label>
-                            <!-- Removed duplicate light-mode-start input from sidebar -->
-                        </div>
-                    </div>
-
-                    <div class="text-xs text-gray-500 pt-2 border-t border-gray-600">
-                        Current time: <span id="current-time">--:--</span><br>
-                        Scheduled mode: <span id="scheduled-mode" class="text-gray-400">Manual</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-        // Advanced Color Scheme Logic
-        document.addEventListener('DOMContentLoaded', function() {
-            const colorForm = document.getElementById('colorSchemeForm');
-            if (colorForm) {
-                // Load saved colors
-                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                colorForm.primaryColor.value = settings.primaryColor || '#3b82f6';
-                colorForm.secondaryColor.value = settings.secondaryColor || '#10b981';
-                colorForm.accentColor.value = settings.accentColor || '#8b5cf6';
-
-                colorForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    // Save colors to localStorage
-                    settings.primaryColor = colorForm.primaryColor.value;
-                    settings.secondaryColor = colorForm.secondaryColor.value;
-                    settings.accentColor = colorForm.accentColor.value;
-                    localStorage.setItem('siteSettings', JSON.stringify(settings));
-                    // Apply colors immediately
-                    applyColors(settings);
-                });
-                // Apply colors on load
-                applyColors(settings);
-            }
-            function applyColors(settings) {
-                document.documentElement.style.setProperty('--tw-color-primary', settings.primaryColor || '#3b82f6');
-                document.documentElement.style.setProperty('--tw-color-secondary', settings.secondaryColor || '#10b981');
-                document.documentElement.style.setProperty('--tw-color-accent', settings.accentColor || '#8b5cf6');
-            }
-        });
-        </script>
+    <!-- Sidebar and main content start here -->
     </aside>
 
     <!-- Main Content -->
