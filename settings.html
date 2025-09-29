@@ -1,524 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <link rel="apple-touch-icon" href="favicon.ico">
     <title>Site Settings</title>
     
     <!-- PWA Configuration -->
     <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
-    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
-    
-    <link rel="stylesheet" href="./assets/css/styles.css">
-    <script>
-        // Configuration for dynamic color updates from settings
-        function applyDynamicColors() {
-            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            // Apply CSS variables for instant color update
-            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Site Settings</title>
+      <link rel="stylesheet" href="./assets/css/styles.css">
+      <script>
+        // Apply theme/colors instantly
+        (function() {
+          try {
+            const s = JSON.parse(localStorage.getItem('siteSettings')||'{}');
+            document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
+            document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
+            document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
+            const theme = s.theme || localStorage.getItem('theme') || 'dark';
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            document.documentElement.classList.toggle('light', theme === 'light');
+          } catch(e) {}
+        })();
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(()=>{});
+          });
         }
-        applyDynamicColors();
-        // Service Worker Registration for PWA
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./sw.js")
-                    .then(registration => {
-                        console.log("SW registered: ", registration);
-                    })
-                    .catch(registrationError => {
-                        console.log("SW registration failed: ", registrationError);
-                    });
-            });
-        }
-    </script>
-    <style>
-        body {
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .dark {
-            background-color: #1f2937;
-            color: #f9fafb;
-        }
-        .light {
-            background-color: #f9fafb;
-            color: #1f2937;
-        }
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
-        }
-        .card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        /* Mobile sidebar styles */
-        @media (max-width: 767px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease-in-out;
-                z-index: 40;
-                background-color: #374151;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-backdrop {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 30;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.3s ease-in-out;
-            }
-            .sidebar-backdrop.open {
-                opacity: 1;
-                pointer-events: auto;
-            }
-        }
-        /* Tab styles */
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .tab-btn.active {
-            background-color: #3b82f6;
-            color: white;
-        }
-        /* Input validation styles */
-        .input-error {
-            border-color: #ef4444;
-            background-color: #fef2f2;
-        }
-        .input-success {
-            border-color: #10b981;
-            background-color: #f0fdf4;
-        }
-        .error-message {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        /* Color preview styles */
-        .color-preview {
-            width: 3rem;
-            height: 3rem;
-            border: 2px solid #6b7280;
-            border-radius: 0.5rem;
-        }
-        /* Schedule status colors */
-        .schedule-enabled { color: #10b981; }
-        .schedule-disabled { color: #6b7280; }
-    </style>
-</head>
-<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-    <!-- Mobile Menu Toggle -->
-    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
-        ☰
-    </button>
+      </script>
+    </head>
+    <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+      <!-- Mobile Menu Toggle -->
+      <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+      <!-- Toast -->
+      <div id="toast" class="hidden fixed bottom-4 right-4 p-3 rounded bg-accent text-white shadow" role="alert" aria-live="polite"></div>
 
-    <!-- Mobile sidebar backdrop -->
-    <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
-
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 md:w-64 lg:w-64 fixed md:static top-0 left-0 h-full bg-gray-800 p-4 flex flex-col shadow-lg" aria-label="Main navigation">
-        <!-- App Branding -->
-        <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
-
-        <!-- Navigation -->
-        <nav>
-            <ul class="space-y-2">
-                <li><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
-                <li><a href="administration.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Administration</a></li>
-                <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-                <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-                <li><a href="settings.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Settings</a></li>
-                <li><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
-                <li><a href="consumables.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Consumables Orders</a></li>
-                <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
-            </ul>
+      <!-- Sidebar -->
+      <aside id="sidebar" class="w-64 fixed top-0 left-0 h-full bg-gray-800 text-white p-4 flex flex-col shadow md:static md:translate-x-0 transform transition-transform duration-300">
+        <h1 class="text-2xl font-bold mb-6">Josh's App</h1>
+        <nav aria-label="Main navigation">
+          <ul class="space-y-2">
+            <li><a class="block p-2 rounded hover:bg-primary" href="index.html">Home</a></li>
+            <li><a class="block p-2 rounded hover:bg-primary" href="administration.html">Administration</a></li>
+            <li><a class="block p-2 rounded hover:bg-primary" href="users.html">User Management</a></li>
+            <li><a class="block p-2 rounded hover:bg-primary" href="analytics.html">Analytics</a></li>
+            <li><a class="block p-2 rounded bg-primary" aria-current="page" href="settings.html">Settings</a></li>
+            <li><a class="block p-2 rounded hover:bg-primary" href="oil.html">Oil Orders</a></li>
+            <li><a class="block p-2 rounded hover:bg-primary" href="consumables.html">Consumables Orders</a></li>
+            <li><a class="block p-2 rounded hover:bg-red-600" href="login.html">Logout</a></li>
+          </ul>
         </nav>
+        <div class="mt-auto pt-4 text-xs text-gray-300">v1 Settings</div>
+      </aside>
 
-        <!-- Theme Toggle -->
-        <div class="mt-auto">
-            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
-                Toggle Light Mode
-            </button>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-6 transition-all duration-300">
-        <!-- Sticky Header -->
-        <header class="sticky top-0 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 z-40 border border-gray-200 dark:border-gray-700">
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white" id="welcome-message">Site Settings</h2>
-            <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">Configure appearance, behavior, and preferences</p>
+      <!-- Main -->
+      <main class="flex-1 p-4 md:p-6">
+        <header class="sticky top-0 z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded p-4 mb-4">
+          <h2 class="text-2xl font-bold">Site Settings</h2>
+          <p class="text-gray-600 dark:text-gray-300">Configure appearance, behavior, and preferences</p>
         </header>
 
-        <!-- Content Section -->
-        <section aria-label="Settings configuration" class="space-y-6">
-            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Configure website settings and preferences. Changes will be saved automatically.</p>
-            
-            <!-- Tab Navigation -->
-            <div class="bg-white dark:bg-gray-800 rounded-t-lg shadow-md border border-gray-200 dark:border-gray-700 border-b-0">
-                <div class="flex border-b border-gray-300 dark:border-gray-600">
-                    <button class="tab-btn px-6 py-3 font-semibold bg-primary text-white rounded-tl-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active" data-tab="general">General</button>
-                    <button class="tab-btn px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="theme">Theme</button>
-                    <button class="tab-btn px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="security">Security</button>
-                    <button class="tab-btn px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="audit">Audit Log</button>
+        <section class="space-y-6">
+          <!-- Tabs -->
+          <div class="rounded-t border border-gray-200 dark:border-gray-700">
+            <div class="flex border-b border-gray-200 dark:border-gray-700">
+              <button class="tab-btn px-4 py-2 bg-primary text-white rounded-tl" data-tab="general">General</button>
+              <button class="tab-btn px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" data-tab="theme">Theme</button>
+              <button class="tab-btn px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" data-tab="security">Security</button>
+              <button class="tab-btn px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" data-tab="audit">Audit</button>
+            </div>
+          </div>
+
+          <!-- Panels -->
+          <div class="rounded-b border border-t-0 border-gray-200 dark:border-gray-700">
+            <!-- General -->
+            <div id="general-tab" class="tab-panel p-4">
+              <form id="settings-form" class="space-y-4">
+                <div>
+                  <label for="site-title" class="block mb-1 font-medium">Site Title</label>
+                  <input id="site-title" class="w-full p-2 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="Josh's App" />
                 </div>
+                <div>
+                  <label for="site-description" class="block mb-1 font-medium">Site Description</label>
+                  <textarea id="site-description" class="w-full p-2 rounded bg-gray-100 dark:bg-gray-700" rows="3" maxlength="500" placeholder="Responsive website template with admin features"></textarea>
+                </div>
+                <div>
+                  <label for="theme-select" class="block mb-1 font-medium">Default Theme</label>
+                  <select id="theme-select" class="w-full p-2 rounded bg-gray-100 dark:bg-gray-700">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="contact-email" class="block mb-1 font-medium">Contact Email</label>
+                  <input id="contact-email" type="email" class="w-full p-2 rounded bg-gray-100 dark:bg-gray-700" placeholder="admin@example.com" />
+                </div>
+                <div class="flex items-center gap-2">
+                  <input id="maintenance-mode" type="checkbox" />
+                  <label for="maintenance-mode">Enable maintenance mode</label>
+                </div>
+                <button class="w-full p-2 rounded bg-primary text-white" type="submit">Save Settings</button>
+              </form>
             </div>
 
-            <!-- Tab Content Container -->
-            <div class="bg-white dark:bg-gray-800 rounded-b-lg shadow-md border border-gray-200 dark:border-gray-700 border-t-0">
-                <!-- General Settings Tab -->
-                <div id="general-tab" class="tab-content p-6 active">
-                    <form id="settings-form" role="form" aria-label="General settings form">
-                        <h3 class="font-semibold mb-6 text-xl text-gray-900 dark:text-gray-100">General Settings</h3>
-                        
-                        <div class="mb-6">
-                            <label for="site-title" class="block mb-2 font-semibold text-gray-900 dark:text-gray-100">Site Title</label>
-                            <input type="text" id="site-title" name="site-title" required maxlength="100" class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter site title">
-                        </div>
-                        
-                        <div class="mb-6">
-                            <label for="site-description" class="block mb-2 font-semibold text-gray-900 dark:text-gray-100">Site Description</label>
-                            <textarea id="site-description" name="site-description" required maxlength="500" class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="3" placeholder="Enter site description"></textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="theme" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Default Theme</label>
-                            <select id="theme" name="theme" required class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="dark">Dark</option>
-                                <option value="light">Light</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="contact-email" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Contact Email</label>
-                            <input type="email" id="contact-email" name="contact-email" required class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="admin@example.com">
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="maintenance-mode" class="flex items-center">
-                                <input type="checkbox" id="maintenance-mode" name="maintenance-mode" class="mr-2 text-primary focus:ring-primary">
-                                <span class="font-medium text-gray-900 dark:text-gray-100">Enable maintenance mode</span>
-                            </label>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="homepage-message" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Homepage Message</label>
-                            <input type="text" id="homepage-message" name="homepage-message" required class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Welcome to our site!">
-                        </div>
-                        
-                        <button type="submit" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">Save Settings</button>
-                    </form>
+            <!-- Theme -->
+            <div id="theme-tab" class="tab-panel p-4 hidden">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                  <div class="flex items-center gap-3">
+                    <label for="primaryColor" class="w-32">Primary</label>
+                    <input id="primaryColor" type="color" class="w-12 h-10" value="#3b82f6" />
+                    <input id="primaryColorText" class="flex-1 p-2 rounded bg-gray-100 dark:bg-gray-700" value="#3b82f6" title="Primary color hex" placeholder="#3b82f6" />
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <label for="secondaryColor" class="w-32">Secondary</label>
+                    <input id="secondaryColor" type="color" class="w-12 h-10" value="#10b981" />
+                    <input id="secondaryColorText" class="flex-1 p-2 rounded bg-gray-100 dark:bg-gray-700" value="#10b981" title="Secondary color hex" placeholder="#10b981" />
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <label for="accentColor" class="w-32">Accent</label>
+                    <input id="accentColor" type="color" class="w-12 h-10" value="#8b5cf6" />
+                    <input id="accentColorText" class="flex-1 p-2 rounded bg-gray-100 dark:bg-gray-700" value="#8b5cf6" title="Accent color hex" placeholder="#8b5cf6" />
+                  </div>
+                  <button id="apply-theme" class="w-full p-2 rounded bg-accent text-white">Apply Theme Changes</button>
                 </div>
-
-                <!-- Theme Customization Tab -->
-                <div id="theme-tab" class="tab-content p-6">
-                    <h3 class="font-semibold mb-4 text-xl text-gray-900 dark:text-gray-100">Theme & Color Customization</h3>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-semibold mb-3 text-gray-900 dark:text-gray-100">Color Scheme</h4>
-                            <div class="space-y-4">
-                                <div class="flex items-center space-x-3">
-                                    <label for="primaryColor" class="block text-gray-900 dark:text-gray-300 w-32">Primary Color</label>
-                                    <input type="color" id="primaryColor" name="primaryColor" value="#3b82f6" class="w-16 h-10 border-none rounded cursor-pointer">
-                                    <input type="text" id="primaryColorText" value="#3b82f6" class="flex-1 p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded text-sm border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary">
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <label for="secondaryColor" class="block text-gray-900 dark:text-gray-300 w-32">Secondary Color</label>
-                                    <input type="color" id="secondaryColor" name="secondaryColor" value="#10b981" class="w-16 h-10 border-none rounded cursor-pointer">
-                                    <input type="text" id="secondaryColorText" value="#10b981" class="flex-1 p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded text-sm border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary">
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <label for="accentColor" class="block text-gray-900 dark:text-gray-300 w-32">Accent Color</label>
-                                    <input type="color" id="accentColor" name="accentColor" value="#8b5cf6" class="w-16 h-10 border-none rounded cursor-pointer">
-                                    <input type="text" id="accentColorText" value="#8b5cf6" class="flex-1 p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded text-sm border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary">
-                                </div>
-                            </div>
-                            
-                            <div class="mt-6">
-                                <h4 class="font-semibold mb-3 text-gray-900 dark:text-gray-100">Theme Schedule</h4>
-                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded shadow">
-                                    <div class="flex items-center justify-between mb-3">
-                                        <label class="flex items-center cursor-pointer">
-                                            <input type="checkbox" id="schedule-enabled" class="mr-2 w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-                                            <span class="text-sm font-medium text-gray-900 dark:text-gray-300">Auto Dark Mode</span>
-                                        </label>
-                                        <span id="schedule-status" class="text-xs px-2 py-1 rounded bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300">Disabled</span>
-                                    </div>
-                                    <div class="grid grid-cols-1 gap-3">
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Dark mode starts at</label>
-                                            <input type="time" id="dark-mode-start" value="18:00" class="w-full px-2 py-1 text-sm bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Light mode starts at</label>
-                                            <input type="time" id="light-mode-start" value="06:00" class="w-full px-2 py-1 text-sm bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        </div>
-                                    </div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-300 dark:border-gray-600 mt-3">
-                                        Current time: <span id="current-time">--:--</span><br>
-                                        Scheduled mode: <span id="scheduled-mode" class="text-gray-600 dark:text-gray-400">Manual</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-semibold mb-3 text-gray-900 dark:text-gray-100">Live Preview</h4>
-                            <div class="flex flex-col items-center justify-center p-6 bg-gray-100 dark:bg-gray-700 rounded shadow space-y-4">
-                                <div class="flex space-x-4">
-                                    <div id="primary-preview" class="color-preview" style="background-color: #3b82f6;" title="Primary"></div>
-                                    <div id="secondary-preview" class="color-preview" style="background-color: #10b981;" title="Secondary"></div>
-                                    <div id="accent-preview" class="color-preview" style="background-color: #8b5cf6;" title="Accent"></div>
-                                </div>
-                                <span class="text-gray-600 dark:text-gray-400 text-sm">Preview of your selected color scheme</span>
-                            </div>
-                        </div>
+                <div>
+                  <h4 class="font-semibold mb-2">Live Preview</h4>
+                  <div class="p-6 bg-gray-900 rounded flex items-center gap-4">
+                    <div class="w-12 h-12 rounded bg-primary border-4 border-primary"></div>
+                    <div class="w-12 h-12 rounded bg-secondary border-4 border-secondary"></div>
+                    <div class="w-12 h-12 rounded bg-accent border-4 border-accent"></div>
+                  </div>
+                  <div class="mt-4">
+                    <h5 class="font-medium mb-2">Theme Mode</h5>
+                    <button id="theme-toggle" class="w-full p-2 rounded bg-primary text-white">Toggle Light/Dark</button>
+                  </div>
+                  <div class="mt-4">
+                    <h5 class="font-medium mb-2">Schedule</h5>
+                    <div class="flex items-center gap-2 mb-2">
+                      <input id="schedule-enabled" type="checkbox" />
+                      <label for="schedule-enabled">Auto dark mode</label>
                     </div>
-                    
-                    <div class="mt-6 pt-4 border-t border-gray-300 dark:border-gray-600">
-                        <button type="button" id="apply-theme" class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 font-semibold">Apply Theme Changes</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-xs mb-1" for="dark-mode-start">Dark start</label>
+                        <input id="dark-mode-start" type="time" class="w-full p-2 rounded bg-gray-100 dark:bg-gray-700" value="18:00" />
+                      </div>
+                      <div>
+                        <label class="block text-xs mb-1" for="light-mode-start">Light start</label>
+                        <input id="light-mode-start" type="time" class="w-full p-2 rounded bg-gray-100 dark:bg-gray-700" value="06:00" />
+                      </div>
                     </div>
+                    <p class="text-xs text-gray-400 mt-2">Scheduled: <span id="scheduled-mode">Manual</span> • Now: <span id="current-time">--:--</span></p>
+                  </div>
                 </div>
-
-                <!-- Security Settings Tab -->
-                <div id="security-tab" class="tab-content p-6">
-                    <h3 class="font-semibold mb-4 text-xl text-gray-900 dark:text-gray-100">Security Settings</h3>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <label for="session-timeout" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Session Timeout (minutes)</label>
-                            <select id="session-timeout" class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="30">30 minutes</option>
-                                <option value="60" selected>1 hour</option>
-                                <option value="120">2 hours</option>
-                                <option value="240">4 hours</option>
-                                <option value="480">8 hours</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label for="max-login-attempts" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Max Login Attempts</label>
-                            <input type="number" id="max-login-attempts" min="3" max="10" value="5" class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary">
-                        </div>
-                        
-                        <div>
-                            <label class="flex items-center">
-                                <input type="checkbox" id="enable-2fa" class="mr-2 text-primary focus:ring-primary">
-                                <span class="font-medium text-gray-900 dark:text-gray-100">Enable Two-Factor Authentication (Future Feature)</span>
-                            </label>
-                        </div>
-                        
-                        <div>
-                            <label class="flex items-center">
-                                <input type="checkbox" id="audit-all-actions" class="mr-2 text-primary focus:ring-primary" checked>
-                                <span class="font-medium text-gray-900 dark:text-gray-100">Log all administrative actions</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6 pt-4 border-t border-gray-300 dark:border-gray-600">
-                        <button type="button" id="save-security" class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 font-semibold">Save Security Settings</button>
-                    </div>
-                </div>
-
-                <!-- Audit Log Tab -->
-                <div id="audit-tab" class="tab-content p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-xl text-gray-900 dark:text-gray-100">Audit Log</h3>
-                        <div class="flex space-x-2">
-                            <button type="button" id="export-audit-log" class="px-4 py-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm">Export Log</button>
-                            <button type="button" id="clear-audit-log" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm">Clear Log</button>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <div class="flex space-x-4">
-                            <select id="audit-filter" class="p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="all">All Actions</option>
-                                <option value="settings">Settings Changes</option>
-                                <option value="users">User Management</option>
-                                <option value="orders">Order Management</option>
-                                <option value="login">Login/Logout</option>
-                            </select>
-                            <input type="date" id="audit-date-filter" class="p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary">
-                        </div>
-                    </div>
-                    
-                    <div id="audit-log-container" class="bg-gray-100 dark:bg-gray-700 rounded max-h-96 overflow-y-auto">
-                        <div id="audit-log-list" class="divide-y divide-gray-300 dark:divide-gray-600">
-                            <!-- Audit log entries will be populated here -->
-                        </div>
-                    </div>
-                </div>
+              </div>
             </div>
 
-            <!-- Settings Preview Panel -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded shadow border border-gray-200 dark:border-gray-700">
-                <h3 class="font-semibold mb-4 text-gray-900 dark:text-gray-100">Current Settings (Preview)</h3>
-                <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300 settings-preview">
-                    <div class="flex justify-between">
-                        <span class="font-medium text-gray-900 dark:text-white">Site Title:</span>
-                        <span data-preview="site-title">Josh's App</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="font-medium text-gray-900 dark:text-white">Site Description:</span>
-                        <span data-preview="site-description">Responsive website template...</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="font-medium text-gray-900 dark:text-white">Theme:</span>
-                        <span data-preview="theme">Dark</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="font-medium text-gray-900 dark:text-white">Contact Email:</span>
-                        <span data-preview="contact-email">admin@example.com</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="font-medium text-gray-900 dark:text-white">Maintenance Mode:</span>
-                        <span class="text-green-400" data-preview="maintenance-mode">Off</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="font-medium text-gray-900 dark:text-white">Homepage Message:</span>
-                        <span data-preview="homepage-message">Welcome to My Website</span>
-                    </div>
+            <!-- Security -->
+            <div id="security-tab" class="tab-panel p-4 hidden">
+              <div class="space-y-4">
+                <div>
+                  <label class="block mb-1" for="session-timeout">Session Timeout (minutes)</label>
+                  <select id="session-timeout" class="w-full p-2 rounded bg-gray-100 dark:bg-gray-700">
+                    <option value="30">30</option>
+                    <option value="60" selected>60</option>
+                    <option value="120">120</option>
+                    <option value="240">240</option>
+                  </select>
                 </div>
-                
-                <div class="mt-6 pt-4 border-t border-gray-300 dark:border-gray-600">
-                    <h4 class="font-semibold mb-2 text-gray-900 dark:text-gray-100">Quick Actions</h4>
-                    <div class="space-y-2">
-                        <button class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" data-action="clear-cache">Clear Cache</button>
-                        <button class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm" data-action="export-settings">Export Settings</button>
-                        <button class="w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm" data-action="reset-defaults">Reset to Defaults</button>
-                    </div>
+                <div>
+                  <label class="block mb-1" for="max-login-attempts">Max Login Attempts</label>
+                  <input id="max-login-attempts" type="number" min="3" max="10" value="5" class="w-full p-2 rounded bg-gray-100 dark:bg-gray-700" />
                 </div>
+                <div class="flex items-center gap-2">
+                  <input id="enable-2fa" type="checkbox" />
+                  <label for="enable-2fa">Enable Two-Factor Authentication (future)</label>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input id="audit-all-actions" type="checkbox" checked />
+                  <label for="audit-all-actions">Log all administrative actions</label>
+                </div>
+                <button id="save-security" class="w-full p-2 rounded bg-secondary text-white">Save Security Settings</button>
+              </div>
             </div>
+
+            <!-- Audit -->
+            <div id="audit-tab" class="tab-panel p-4 hidden">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold text-lg">Audit Log</h3>
+                <div class="flex gap-2">
+                  <button id="export-audit-log" class="px-3 py-2 rounded bg-secondary text-white">Export</button>
+                  <button id="clear-audit-log" class="px-3 py-2 rounded bg-red-600 text-white">Clear</button>
+                </div>
+              </div>
+              <div class="flex gap-3 mb-3">
+                <select id="audit-filter" class="p-2 rounded bg-gray-100 dark:bg-gray-700">
+                  <option value="all">All</option>
+                  <option value="settings">Settings</option>
+                  <option value="users">Users</option>
+                  <option value="orders">Orders</option>
+                  <option value="login">Login/Logout</option>
+                </select>
+                <input id="audit-date-filter" type="date" class="p-2 rounded bg-gray-100 dark:bg-gray-700" title="Filter by date" placeholder="YYYY-MM-DD" />
+              </div>
+              <div id="audit-log-container" class="bg-gray-800 rounded max-h-96 overflow-y-auto">
+                <div id="audit-log-list" class="divide-y divide-gray-700 text-sm"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Preview & Actions -->
+          <div class="rounded border border-gray-200 dark:border-gray-700 p-4">
+            <h3 class="font-semibold mb-3">Current Settings (Preview)</h3>
+            <div class="grid gap-2 text-sm text-gray-300">
+              <div class="flex justify-between"><span class="text-white">Site Title</span><span data-preview="site-title">Josh's App</span></div>
+              <div class="flex justify-between"><span class="text-white">Description</span><span data-preview="site-description">Responsive template...</span></div>
+              <div class="flex justify-between"><span class="text-white">Theme</span><span data-preview="theme">Dark</span></div>
+              <div class="flex justify-between"><span class="text-white">Contact</span><span data-preview="contact-email">admin@example.com</span></div>
+              <div class="flex justify-between"><span class="text-white">Maintenance</span><span data-preview="maintenance-mode" class="text-green-400">Off</span></div>
+            </div>
+            <div class="mt-4 grid sm:grid-cols-3 gap-2">
+              <button class="p-2 rounded bg-accent text-white" data-action="clear-cache">Clear Cache</button>
+              <button class="p-2 rounded bg-secondary text-white" data-action="export-settings">Export Settings</button>
+              <button class="p-2 rounded bg-gray-600 text-white" data-action="reset-defaults">Reset Defaults</button>
+            </div>
+          </div>
         </section>
-    </main>
+      </main>
 
-    <script>
-        // Audit Logging System
-        class AuditLogger {
-            static log(action, details, userId = 'admin') {
-                const auditLogs = JSON.parse(localStorage.getItem('auditLogs') || '[]');
-                const logEntry = {
-                    id: Date.now(),
-                    timestamp: new Date().toISOString(),
-                    userId: userId,
-                    action: action,
-                    details: details,
-                    ip: 'localhost'
-                };
-                
-                auditLogs.unshift(logEntry);
-                
-                // Keep only last 1000 entries
-                if (auditLogs.length > 1000) {
-                    auditLogs.splice(1000);
-                }
-                
-                localStorage.setItem('auditLogs', JSON.stringify(auditLogs));
-                
-                // Trigger custom event for real-time updates
-                window.dispatchEvent(new CustomEvent('auditLogUpdated', { detail: logEntry }));
-            }
-            
-            static getLogs(filter = 'all', dateFilter = null) {
-                const auditLogs = JSON.parse(localStorage.getItem('auditLogs') || '[]');
-                
-                return auditLogs.filter(log => {
-                    // Filter by action type
-                    if (filter !== 'all' && !log.action.toLowerCase().includes(filter)) {
-                        return false;
-                    }
-                    
-                    // Filter by date
-                    if (dateFilter) {
-                        const logDate = new Date(log.timestamp).toDateString();
-                        const filterDate = new Date(dateFilter).toDateString();
-                        if (logDate !== filterDate) {
-                            return false;
-                        }
-                    }
-                    
-                    return true;
-                });
-            }
-            
-            static clearLogs() {
-                localStorage.removeItem('auditLogs');
-                window.dispatchEvent(new CustomEvent('auditLogCleared'));
-            }
-        }
-
-        // Toast notification helper
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
-        }
-
-        // Tab functionality
-        function initTabs() {
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const targetTab = button.getAttribute('data-tab');
-                    
-                    // Update button states
-                    tabButtons.forEach(btn => {
-                        btn.classList.remove('active', 'bg-primary', 'text-white');
-                        btn.classList.add('text-gray-700', 'dark:text-gray-300');
-                    });
-                    button.classList.add('active', 'bg-primary', 'text-white');
-                    button.classList.remove('text-gray-700', 'dark:text-gray-300');
-                    
-                    // Update content visibility
-                    tabContents.forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(targetTab + '-tab').classList.add('active');
-                    
-                    // Log tab change
-                    AuditLogger.log('settings_navigation', `Accessed ${targetTab} settings tab`);
-                });
-            });
-        }
-
-        // Load settings from localStorage
-        function loadSettings() {
-            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {
-                'site-title': 'Josh\'s App',
-                'site-description': 'Responsive website template with admin features',
-                'theme': 'dark',
-                'contact-email': 'admin@example.com',
-                'maintenance-mode': false,
-                'homepage-message': 'Welcome to My Website'
-            };
-
-            // Populate form fields
+      <script>
+    // ...existing code...
+      </script>
+    </body>
+    </html>
             document.getElementById('site-title').value = settings['site-title'];
             document.getElementById('site-description').value = settings['site-description'];
             document.getElementById('theme').value = settings['theme'];
