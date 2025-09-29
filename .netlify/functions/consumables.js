@@ -2,6 +2,7 @@
 const { database } = require('../../config/database');
 
 exports.handler = async function(event, context) {
+  // Always define CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -20,13 +21,13 @@ exports.handler = async function(event, context) {
 
     switch (event.httpMethod) {
       case 'GET':
-        return await handleGet(event);
+        return await handleGet(event, headers);
       case 'POST':
-        return await handlePost(event);
+        return await handlePost(event, headers);
       case 'PUT':
-        return await handlePut(event);
+        return await handlePut(event, headers);
       case 'DELETE':
-        return await handleDelete(event);
+        return await handleDelete(event, headers);
       default:
         return {
           statusCode: 405,
@@ -43,11 +44,10 @@ exports.handler = async function(event, context) {
     };
   }
 
-  async function handleGet(event) {
+  async function handleGet(event, headers) {
     try {
       let query = 'SELECT * FROM consumables ORDER BY name';
       let params = [];
-      
       // Optional filters
       const { type, category } = event.queryStringParameters || {};
       if (type && category) {
@@ -60,7 +60,6 @@ exports.handler = async function(event, context) {
         query = 'SELECT * FROM consumables WHERE category = ? ORDER BY name';
         params = [category];
       }
-      
       const consumables = await database.all(query, params);
       return {
         statusCode: 200,
@@ -77,11 +76,10 @@ exports.handler = async function(event, context) {
     }
   }
 
-  async function handlePost(event) {
+  async function handlePost(event, headers) {
     try {
       const body = JSON.parse(event.body);
       const { name, code, type, category, description } = body;
-      
       if (!name || !type || !category) {
         return {
           statusCode: 400,
@@ -89,15 +87,12 @@ exports.handler = async function(event, context) {
           body: JSON.stringify({ error: 'Missing required fields: name, type, category' }),
         };
       }
-
       const query = `
         INSERT INTO consumables (name, code, type, category, description)
         VALUES (?, ?, ?, ?, ?)
       `;
       const params = [name, code || '', type, category, description || ''];
-      
       const result = await database.run(query, params);
-      
       return {
         statusCode: 201,
         headers,
@@ -124,11 +119,10 @@ exports.handler = async function(event, context) {
     }
   }
 
-  async function handlePut(event) {
+  async function handlePut(event, headers) {
     try {
       const body = JSON.parse(event.body);
       const { id, name, code, type, category, description } = body;
-      
       if (!id || !name || !type || !category) {
         return {
           statusCode: 400,
@@ -136,16 +130,13 @@ exports.handler = async function(event, context) {
           body: JSON.stringify({ error: 'Missing required fields: id, name, type, category' }),
         };
       }
-
       const query = `
         UPDATE consumables 
         SET name = ?, code = ?, type = ?, category = ?, description = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `;
       const params = [name, code || '', type, category, description || '', id];
-      
       const result = await database.run(query, params);
-      
       if (result.changes === 0) {
         return {
           statusCode: 404,
@@ -153,7 +144,6 @@ exports.handler = async function(event, context) {
           body: JSON.stringify({ error: 'Consumable not found' }),
         };
       }
-      
       return {
         statusCode: 200,
         headers,
@@ -179,10 +169,9 @@ exports.handler = async function(event, context) {
     }
   }
 
-  async function handleDelete(event) {
+  async function handleDelete(event, headers) {
     try {
       const { id } = JSON.parse(event.body);
-      
       if (!id) {
         return {
           statusCode: 400,
@@ -190,9 +179,7 @@ exports.handler = async function(event, context) {
           body: JSON.stringify({ error: 'Missing required field: id' }),
         };
       }
-
       const result = await database.run('DELETE FROM consumables WHERE id = ?', [id]);
-      
       if (result.changes === 0) {
         return {
           statusCode: 404,
@@ -200,7 +187,6 @@ exports.handler = async function(event, context) {
           body: JSON.stringify({ error: 'Consumable not found' }),
         };
       }
-      
       return {
         statusCode: 200,
         headers,

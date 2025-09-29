@@ -3,10 +3,14 @@ const { database } = require('../../config/database');
 
 exports.handler = async function(event, context) {
   // Always define CORS headers
+  // For credentialed requests, cannot use '*', must echo the request origin
+  const origin = event.headers && event.headers.origin ? event.headers.origin : '*';
   const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Vary': 'Origin',
     'Content-Type': 'application/json',
   };
 
