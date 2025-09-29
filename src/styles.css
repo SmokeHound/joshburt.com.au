@@ -1,21 +1,26 @@
 @import 'tailwindcss';
 
-/* Custom CSS for enhanced styling */
+/* Custom CSS for enhanced dark theme with neon accents */
 body {
   transition: background-color 0.3s, color 0.3s;
   font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
+  background-color: #0a0a0a;
+  color: #ffffff;
 }
 
+/* Dark theme (default) */
 .dark {
-  background-color: #1f2937;
-  color: #f9fafb;
+  background-color: #0a0a0a;
+  color: #ffffff;
 }
 
+/* Light theme (fallback - keeping for theme toggle functionality) */
 .light {
   background-color: #f9fafb;
   color: #1f2937;
 }
 
+/* Sidebar styling */
 .sidebar {
   width: var(--sidebar-width, 16rem);
   height: 100vh;
@@ -26,6 +31,8 @@ body {
   transition: background-color 0.3s, transform 0.3s;
   z-index: 100;
   transform: translateX(-100%);
+  background-color: #111111;
+  border-right: 1px solid #00d4ff20;
 }
 
 .sidebar.open {
@@ -52,13 +59,132 @@ body {
   }
 }
 
+/* Card styling with neon glow effects */
 .card {
   transition: transform 0.2s, box-shadow 0.2s;
+  background-color: #111111;
+  border: 1px solid #333333;
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+  border-color: #00d4ff;
+}
+
+/* Widget specific colors */
+.widget-primary {
+  border-color: #00d4ff40;
+}
+
+.widget-primary:hover {
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+  border-color: #00d4ff;
+}
+
+.widget-secondary {
+  border-color: #00ff8840;
+}
+
+.widget-secondary:hover {
+  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+  border-color: #00ff88;
+}
+
+.widget-accent {
+  border-color: #8000ff40;
+}
+
+.widget-accent:hover {
+  box-shadow: 0 4px 20px rgba(128, 0, 255, 0.4);
+  border-color: #8000ff;
+}
+
+/* Button styling with neon effects */
+.btn-neon-blue {
+  background: linear-gradient(45deg, #00d4ff, #0099cc);
+  border: 1px solid #00d4ff;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-neon-blue:hover {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+  background: linear-gradient(45deg, #00eeff, #00b8e6);
+}
+
+.btn-neon-green {
+  background: linear-gradient(45deg, #00ff88, #00cc66);
+  border: 1px solid #00ff88;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-neon-green:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+  background: linear-gradient(45deg, #00ff99, #00dd77);
+}
+
+.btn-neon-purple {
+  background: linear-gradient(45deg, #8000ff, #6600cc);
+  border: 1px solid #8000ff;
+  box-shadow: 0 0 10px rgba(128, 0, 255, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-neon-purple:hover {
+  box-shadow: 0 0 20px rgba(128, 0, 255, 0.6);
+  background: linear-gradient(45deg, #9900ff, #7700dd);
+}
+
+.btn-neon-pink {
+  background: linear-gradient(45deg, #ff0080, #cc0066);
+  border: 1px solid #ff0080;
+  box-shadow: 0 0 10px rgba(255, 0, 128, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-neon-pink:hover {
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.6);
+  background: linear-gradient(45deg, #ff0099, #dd0077);
+}
+
+/* Form input styling */
+input, textarea, select {
+  background-color: #181818 !important;
+  border: 1px solid #333333 !important;
+  color: #ffffff !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #00d4ff !important;
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2) !important;
+}
+
+/* Modal styling */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Navigation link styling */
+.nav-link {
+  color: #cccccc;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #00d4ff;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+}
+
+.nav-link.active {
+  color: #00d4ff;
+  background-color: #00d4ff20;
+  border-left: 3px solid #00d4ff;
 }
 
 .fade-out {
@@ -76,4 +202,22 @@ body {
 
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00d4ff;
 }
