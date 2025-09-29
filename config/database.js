@@ -391,6 +391,60 @@ async function createSQLiteTables() {
     )
   `);
 
+  // Create products table for SQLite
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      code TEXT UNIQUE NOT NULL,
+      type TEXT NOT NULL,
+      specs TEXT,
+      description TEXT,
+      image TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Create consumables table for SQLite
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS consumables (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      code TEXT UNIQUE NOT NULL,
+      type TEXT NOT NULL,
+      category TEXT,
+      description TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Create orders table for SQLite
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      customer_email TEXT DEFAULT 'anonymous@example.com',
+      total_items INTEGER NOT NULL DEFAULT 0,
+      status TEXT DEFAULT 'pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Create order_items table for SQLite
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS order_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id INTEGER,
+      product_name TEXT NOT NULL,
+      product_code TEXT,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
+    )
+  `);
+
   // Create refresh tokens table for SQLite
   await database.run(`
     CREATE TABLE IF NOT EXISTS refresh_tokens (

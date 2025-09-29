@@ -1,75 +1,3 @@
-        <!-- Additional Insights Section -->
-        <section class="mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Browser Breakdown Chart -->
-                <div class="widget-secondary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Browser Breakdown</h3>
-                    <div class="w-full h-32 flex items-center justify-center">
-                        <canvas id="browser-chart" height="80"></canvas>
-                    </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">% by browser</div>
-                </div>
-                <!-- Multi-Metric Stacked Bar Chart -->
-                <div class="widget-primary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Multi-Metric Comparison</h3>
-                    <div class="w-full h-32 flex items-center justify-center">
-                        <canvas id="multi-metric-chart" height="80"></canvas>
-                    </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Visitors, Orders, Sessions</div>
-                </div>
-                <!-- Sparkline Mini-Charts for Quick Stats -->
-                <div class="widget-accent p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Quick Stats</h3>
-                    <div class="flex flex-col gap-2 w-full">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Visitors</span>
-                            <canvas id="sparkline-visitors" width="60" height="20"></canvas>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Orders</span>
-                            <canvas id="sparkline-orders" width="60" height="20"></canvas>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Sessions</span>
-                            <canvas id="sparkline-sessions" width="60" height="20"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- Actionable Insights Section -->
-        <section class="mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Conversion Rate Card -->
-                <div class="widget-primary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Conversion Rate</h3>
-                    <div id="conversion-rate" class="text-3xl font-bold text-green-500">-</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">% of visitors who completed a key action</div>
-                </div>
-                <!-- Retention Rate Card -->
-                <div class="widget-secondary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Retention Rate</h3>
-                    <div id="retention-rate" class="text-3xl font-bold text-blue-500">-</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">% of users returning after 7 days</div>
-                </div>
-                <!-- Funnel Analysis Card -->
-                <div class="widget-accent p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Funnel Analysis</h3>
-                    <div class="w-full h-32 flex items-center justify-center">
-                        <canvas id="funnel-chart" height="80"></canvas>
-                    </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Steps: Visit → Signup → Order</div>
-                </div>
-                <!-- Device/Browser Breakdown Card -->
-                <div class="widget-primary p-6 rounded-lg shadow-md card border border-gray-200 dark:border-gray-700 flex flex-col items-center">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Device/Browser Breakdown</h3>
-                    <div class="w-full h-32 flex items-center justify-center">
-                        <canvas id="device-chart" height="80"></canvas>
-                    </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">% by device/browser</div>
-                </div>
-            </div>
-        </section>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
+    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
     
     <!-- Chart.js for analytics charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

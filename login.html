@@ -40,10 +40,12 @@
     <style>
         body {
             transition: background-color 0.3s, color 0.3s;
+            background-color: #0a0a0a;
+            color: #ffffff;
         }
         .dark {
-            background-color: #1f2937;
-            color: #f9fafb;
+            background-color: #0a0a0a;
+            color: #ffffff;
         }
         .light {
             background-color: #f9fafb;
@@ -71,6 +73,19 @@
             clip: auto;
             white-space: normal;
         }
+        
+        /* Neon button styles */
+        .btn-neon-blue {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            border: 1px solid #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+            color: #000000;
+            font-weight: 600;
+        }
+        .btn-neon-blue:hover {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+            background: linear-gradient(45deg, #00eeff, #00b8e6);
+        }
     </style>
 </head>
 <body class="dark min-h-screen flex items-center justify-center font-sans p-4">
@@ -80,24 +95,24 @@
     </div>
 
     <!-- Theme Toggle Button -->
-    <button id="theme-toggle" class="fixed top-4 right-4 p-2 bg-primary text-white rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode" aria-pressed="false">
+    <button id="theme-toggle" class="fixed top-4 right-4 p-2 text-black rounded-md focus:outline-none focus:ring-2 btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
         <span aria-hidden="true">🌓</span>
         <span class="sr-only">Toggle theme</span>
     </button>
 
     <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 bg-red-500 text-white rounded shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300" style="background-color: #00d4ff; color: #000000;" role="alert" aria-live="polite"></div>
 
     <!-- Login Container -->
     <main id="main-content" class="w-full max-w-md" role="main">
         <!-- Header -->
         <header class="text-center mb-8" role="banner">
-            <h1 class="text-4xl font-bold mb-2">Admin Login</h1>
-            <p class="text-gray-400">Please sign in to access the admin dashboard</p>
+            <h1 class="text-4xl font-bold mb-2" style="color: #00d4ff; text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);">Admin Login</h1>
+            <p style="color: #cccccc;">Please sign in to access the admin dashboard</p>
         </header>
 
         <!-- Login Card -->
-        <section class="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-700" role="region" aria-label="Login form">
+        <section class="p-8 rounded-lg shadow-2xl border" style="background-color: #111111; border-color: #333333; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);" role="region" aria-label="Login form">
             <form method="post" action="admin.php" id="login-form" role="form" aria-labelledby="login-heading">
                 <h2 id="login-heading" class="sr-only">Login credentials</h2>
                 
@@ -111,7 +126,8 @@
                         required 
                         aria-required="true"
                         aria-describedby="username-error"
-                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        class="w-full p-3 rounded-lg text-white border focus:outline-none focus:ring-2 focus:border-transparent"
+                        style="background-color: #181818; border-color: #333333; color: #ffffff;"
                         placeholder="Enter your username"
                         autocomplete="username"
                     >
@@ -128,7 +144,8 @@
                         required 
                         aria-required="true"
                         aria-describedby="password-error"
-                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        class="w-full p-3 rounded-lg text-white border focus:outline-none focus:ring-2 focus:border-transparent"
+                        style="background-color: #181818; border-color: #333333; color: #ffffff;"
                         placeholder="Enter your password"
                         autocomplete="current-password"
                     >
@@ -136,13 +153,13 @@
                 </div>
 
                 <!-- Login Error Display -->
-                <div id="login-error" class="hidden text-red-400 text-sm mb-4"></div>
+                <div id="login-error" class="hidden text-sm mb-4" style="color: #ff0080;"></div>
 
                 <!-- Login Button -->
                 <button 
                     type="submit" 
                     id="submit-login"
-                    class="w-full p-3 bg-primary text-white rounded-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-gray-800 font-medium"
+                    class="w-full p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium btn-neon-blue"
                 >
                     Sign In <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
                 </button>
@@ -150,17 +167,17 @@
 
             <!-- Divider -->
             <div class="mt-6 mb-6 flex items-center">
-                <div class="flex-1 border-t border-gray-600"></div>
-                <span class="px-4 text-sm text-gray-400">or</span>
-                <div class="flex-1 border-t border-gray-600"></div>
+                <div class="flex-1 border-t" style="border-color: #333333;"></div>
+                <span class="px-4 text-sm" style="color: #cccccc;">or</span>
+                <div class="flex-1 border-t" style="border-color: #333333;"></div>
             </div>
 
             <!-- OAuth Options -->
             <div class="space-y-3">
-                <button id="google-oauth" class="w-full p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 font-medium">
+                <button id="google-oauth" class="w-full p-3 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium" style="background: linear-gradient(45deg, #ff0080, #cc0066); border: 1px solid #ff0080; box-shadow: 0 0 10px rgba(255, 0, 128, 0.3);">
                     Continue with Google
                 </button>
-                <button id="github-oauth" class="w-full p-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 font-medium">
+                <button id="github-oauth" class="w-full p-3 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium" style="background: linear-gradient(45deg, #333333, #222222); border: 1px solid #555555; box-shadow: 0 0 10px rgba(85, 85, 85, 0.3);">
                     Continue with GitHub
                 </button>
             </div>
@@ -168,18 +185,18 @@
             <!-- Links -->
             <div class="text-center space-y-2 mt-6">
                 <div>
-                    <a href="#" id="forgot-password" class="text-primary hover:text-secondary transition-colors text-sm font-medium">
+                    <a href="#" id="forgot-password" class="transition-colors text-sm font-medium" style="color: #00d4ff;" onmouseover="this.style.color='#00eeff'; this.style.textShadow='0 0 8px rgba(0, 212, 255, 0.6)'" onmouseout="this.style.color='#00d4ff'; this.style.textShadow='none'">
                         Forgot Password?
                     </a>
                 </div>
                 <div>
-                    <span class="text-sm text-gray-400">Don't have an account? </span>
-                    <a href="register.html" class="text-primary hover:text-secondary transition-colors text-sm font-medium">
+                    <span class="text-sm" style="color: #cccccc;">Don't have an account? </span>
+                    <a href="register.html" class="transition-colors text-sm font-medium" style="color: #00d4ff;" onmouseover="this.style.color='#00eeff'; this.style.textShadow='0 0 8px rgba(0, 212, 255, 0.6)'" onmouseout="this.style.color='#00d4ff'; this.style.textShadow='none'">
                         Sign Up
                     </a>
                 </div>
                 <div>
-                    <a href="index.html" class="text-primary hover:text-secondary transition-colors text-sm font-medium">
+                    <a href="index.html" class="transition-colors text-sm font-medium" style="color: #00d4ff;" onmouseover="this.style.color='#00eeff'; this.style.textShadow='0 0 8px rgba(0, 212, 255, 0.6)'" onmouseout="this.style.color='#00d4ff'; this.style.textShadow='none'">
                         ← Back to Home
                     </a>
                 </div>

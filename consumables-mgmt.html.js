@@ -1,7 +1,6 @@
 // Consumables Product Management Page Logic
-// Loads, adds, edits, deletes consumable products from API or local JSON
+// Loads, adds, edits, deletes consumable products from API with fallback to local JSON
 
-// (Identical to previous logic, just filename changed)
 document.addEventListener('DOMContentLoaded', function() {
   const tableContainer = document.getElementById('products-table-container');
   const addBtn = document.getElementById('addProductBtn');
@@ -31,21 +30,77 @@ document.addEventListener('DOMContentLoaded', function() {
     editingId = null;
   }
 
-  // CRUD
+  // API Functions
   async function loadProducts() {
     try {
-      // Try API first
+      showToast('Loading consumables...', 'info');
       const res = await fetch('/.netlify/functions/consumables');
-      if (!res.ok) throw new Error('API unavailable');
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       products = Array.isArray(data) ? data : (data.products || []);
+      renderTable();
+      showToast(`Loaded ${products.length} consumables from database`, 'success');
     } catch (e) {
-      // Fallback to local
-      const res = await fetch('data/consumables.json');
-      const data = await res.json();
-      products = Array.isArray(data) ? data : (data.products || []);
+      console.error('Failed to load from API:', e);
+      showToast('Database unavailable, loading from local files...', 'error');
+      // Fallback to local JSON
+      try {
+        const res = await fetch('data/consumables.json');
+        const data = await res.json();
+        products = Array.isArray(data) ? data : (data.products || []);
+        renderTable();
+        showToast(`Loaded ${products.length} consumables from local files`, 'success');
+      } catch (localError) {
+        console.error('Failed to load from local files:', localError);
+        showToast('Failed to load consumables data', 'error');
+      }
     }
-    renderTable();
+  }
+
+  async function saveProductToAPI(productData, isUpdate = false) {
+    try {
+      const url = '/.netlify/functions/consumables';
+      const method = isUpdate ? 'PUT' : 'POST';
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('API save error:', error);
+      throw error;
+    }
+  }
+
+  async function deleteProductFromAPI(productId) {
+    try {
+      const response = await fetch('/.netlify/functions/consumables', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: productId })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('API delete error:', error);
+      throw error;
+    }
   }
 
   function renderTable() {
@@ -94,39 +149,76 @@ document.addEventListener('DOMContentLoaded', function() {
     const product = products.find(p => String(p.id) === String(id));
     if (product) showModal(true, product);
   }
-  function onDelete(id) {
+  
+  async function onDelete(id) {
     if (!confirm('Delete this product?')) return;
-    products = products.filter(p => String(p.id) !== String(id));
-    renderTable();
-    saveProducts();
+    
+    try {
+      await deleteProductFromAPI(id);
+      showToast('Consumable deleted successfully!', 'success');
+      await loadProducts(); // Reload from API
+    } catch (error) {
+      showToast(`Error deleting consumable: ${error.message}`, 'error');
+      console.error('Delete error:', error);
+    }
   }
+  
   function onAdd() {
     showModal(false);
   }
-  function onSubmit(e) {
+  
+  async function onSubmit(e) {
     e.preventDefault();
-    const id = editingId || Date.now();
     const name = document.getElementById('product-name').value.trim();
     const type = document.getElementById('product-type').value.trim();
     const category = document.getElementById('product-category').value.trim();
     const code = document.getElementById('product-code').value.trim();
-    if (!name || !type || !category) return;
-    if (editingId) {
-      // Edit
-      const idx = products.findIndex(p => String(p.id) === String(editingId));
-      if (idx > -1) products[idx] = { id, name, type, category, code };
-    } else {
-      // Add
-      products.push({ id, name, type, category, code });
+    
+    if (!name || !type || !category) {
+      showToast('Please fill in all required fields', 'error');
+      return;
     }
-    renderTable();
-    saveProducts();
-    hideModal();
+    
+    const productData = { name, type, category, code };
+    
+    try {
+      if (editingId) {
+        // Edit
+        productData.id = editingId;
+        await saveProductToAPI(productData, true);
+        showToast('Consumable updated successfully!', 'success');
+      } else {
+        // Add
+        await saveProductToAPI(productData, false);
+        showToast('Consumable added successfully!', 'success');
+      }
+      
+      hideModal();
+      await loadProducts(); // Reload from API
+    } catch (error) {
+      showToast(`Error: ${error.message}`, 'error');
+      console.error('Save error:', error);
+    }
   }
-  function saveProducts() {
-    // Try to save to API, else localStorage
-    // (API not implemented, so fallback)
-    localStorage.setItem('consumablesProducts', JSON.stringify(products));
+
+  // Toast notification utility
+  function showToast(message, type = 'info') {
+    // Create toast if it doesn't exist
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'toast';
+      toast.className = 'fixed bottom-4 right-4 p-4 text-white rounded shadow-lg transition-opacity duration-300 hidden';
+      document.body.appendChild(toast);
+    }
+    
+    toast.textContent = message;
+    toast.className = `fixed bottom-4 right-4 p-4 text-white rounded shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'}`;
+    toast.classList.remove('hidden');
+    
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 3000);
   }
 
   // Modal events
@@ -142,19 +234,6 @@ document.addEventListener('DOMContentLoaded', function() {
     return text.toString().replace(/[&<>"']/g, m => map[m]);
   }
 
-  // Load from localStorage if present
-  function loadFromLocal() {
-    const local = localStorage.getItem('consumablesProducts');
-    if (local) {
-      try {
-        products = JSON.parse(local);
-        renderTable();
-        return true;
-      } catch {}
-    }
-    return false;
-  }
-
   // Init
-  if (!loadFromLocal()) loadProducts();
+  loadProducts();
 });
