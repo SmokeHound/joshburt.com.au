@@ -33,10 +33,12 @@
     <style>
         body {
             transition: background-color 0.3s, color 0.3s;
+            background-color: #0a0a0a;
+            color: #ffffff;
     /* End of .sr-only and focus:not-sr-only styles */
         .dark {
-            background-color: #1f2937;
-            color: #f9fafb;
+            background-color: #0a0a0a;
+            color: #ffffff;
         }
         .light {
             background-color: #f9fafb;
@@ -44,6 +46,8 @@
         }
         .sidebar {
             transition: transform 0.3s ease-in-out;
+            background-color: #111111;
+            border-right: 1px solid #00d4ff20;
         }
 
         /* Screen reader only class */
@@ -60,18 +64,45 @@
         }
         .card {
             transition: transform 0.2s, box-shadow 0.2s;
+            background-color: #111111;
+            border: 1px solid #333333;
         }
         .card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+            border-color: #00d4ff;
         }
+        
+        /* Widget specific neon colors */
+        .widget-primary {
+            border-color: #00d4ff40;
+        }
+        .widget-primary:hover {
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+            border-color: #00d4ff;
+        }
+        .widget-secondary {
+            border-color: #00ff8840;
+        }
+        .widget-secondary:hover {
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+            border-color: #00ff88;
+        }
+        .widget-accent {
+            border-color: #8000ff40;
+        }
+        .widget-accent:hover {
+            box-shadow: 0 4px 20px rgba(128, 0, 255, 0.4);
+            border-color: #8000ff;
+        }
+        
         /* Mobile sidebar styles */
         @media (max-width: 767px) {
             .sidebar {
                 transform: translateX(-100%);
                 transition: transform 0.3s ease-in-out;
                 z-index: 40;
-                background-color: #374151;
+                background-color: #111111;
             }
             .sidebar.open {
                 transform: translateX(0);
@@ -82,7 +113,7 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background-color: rgba(0, 0, 0, 0.5);
+                background-color: rgba(0, 0, 0, 0.8);
                 z-index: 30;
                 opacity: 0;
                 pointer-events: none;
@@ -132,9 +163,9 @@
     <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full bg-gray-700 p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
+    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" style="background-color: #111111; border-right: 1px solid #00d4ff20;" aria-label="Main navigation" role="navigation">
         <!-- App Branding -->
-        <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
+        <h1 class="text-2xl font-bold mb-6" style="color: #00d4ff; text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);">Josh's App</h1>
 
         <!-- User Profile Section -->
         <div id="user-profile" class="mb-6">
@@ -142,91 +173,107 @@
                 <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
                 <span id="user-name" class="text-white"></span>
             </div>
-            <button id="login-btn" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Open login modal">Login</button>
-            <button id="logout-btn" class="hidden w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" aria-label="Logout">Logout</button>
+            <button id="login-btn" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-blue" aria-label="Open login modal">Login</button>
+            <button id="logout-btn" class="hidden w-full p-2 text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400 btn-neon-pink" aria-label="Logout">Logout</button>
         </div>
 
         <!-- Navigation -->
         <nav role="navigation" aria-label="Main navigation">
             <ul class="space-y-2" role="list">
-                <li role="listitem"><a href="index.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Home</a></li>
-                <li role="listitem"><a href="administration.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Administration</a></li>
-                <li role="listitem"><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
-                <li role="listitem"><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
-                <li role="listitem"><a href="settings.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Settings</a></li>
-                <li role="listitem"><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
-                <li role="listitem"><a href="consumables.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Consumables Orders</a></li>
-                <li role="listitem"><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+                <li role="listitem">
+                    <a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link active" style="color: #00d4ff; background-color: #00d4ff20; border-left: 3px solid #00d4ff;" aria-current="page">Home</a>
+                </li>
+                <li role="listitem">
+                    <a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Administration</a>
+                </li>
+                <li role="listitem">
+                    <a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">User Management</a>
+                </li>
+                <li role="listitem">
+                    <a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Analytics</a>
+                </li>
+                <li role="listitem">
+                    <a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Settings</a>
+                </li>
+                <li role="listitem">
+                    <a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Oil Orders</a>
+                </li>
+                <li role="listitem">
+                    <a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Consumables Orders</a>
+                </li>
+                <li role="listitem">
+                    <a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link" style="color: #ff0080;">Logout</a>
+                </li>
             </ul>
         </nav>
 
         <!-- Theme Toggle -->
         <div class="mt-auto">
-            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode" aria-pressed="false">
+            <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
                 Toggle Light Mode
             </button>
         </div>
     </aside>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md shadow-xl border border-gray-200 dark:border-gray-700">
-            <h2 id="login-modal-title" class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Login</h2>
+    <div id="login-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+        <div class="p-6 rounded-lg w-full max-w-md shadow-xl border" style="background-color: #111111; border-color: #333333;">
+            <h2 id="login-modal-title" class="text-xl font-semibold mb-4 text-white">Login</h2>
             <p id="login-modal-description" class="sr-only">Please enter your email and password to login</p>
             <form id="login-form" role="form" aria-labelledby="login-modal-title">
                 <div class="mb-4">
-                    <label for="email" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                    <input type="email" id="email" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required aria-required="true">
+                    <label for="email" class="block text-sm mb-1" style="color: #cccccc;">Email</label>
+                    <input type="email" id="email" class="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent" style="background-color: #181818; border-color: #333333; color: #ffffff;" required aria-required="true">
                 </div>
                 <div class="mb-4">
-                    <label for="password" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Password</label>
-                    <input type="password" id="password" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required aria-required="true">
+                    <label for="password" class="block text-sm mb-1" style="color: #cccccc;">Password</label>
+                    <input type="password" id="password" class="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent" style="background-color: #181818; border-color: #333333; color: #ffffff;" required aria-required="true">
                 </div>
-                <div id="login-error" class="hidden text-red-600 dark:text-red-400 text-sm mb-4 p-2 bg-red-50 dark:bg-red-900/20 rounded-md"></div>
-                <button type="submit" id="submit-login" class="w-full p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200" aria-label="Submit login">
+                <div id="login-error" class="hidden text-sm mb-4 p-2 rounded-md" style="color: #ff0080; background-color: #ff008020;"></div>
+                <button type="submit" id="submit-login" class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 btn-neon-blue" aria-label="Submit login">
                     Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
                 </button>
             </form>
-            <button id="close-modal" class="mt-4 w-full p-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 text-base transition-colors duration-200" aria-label="Close login modal">Close</button>
+            <button id="close-modal" class="mt-4 w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-base transition-colors duration-200" style="background-color: #333333; color: #ffffff;" aria-label="Close login modal">Close</button>
         </div>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300" style="background-color: #00d4ff; color: #000000;" role="alert" aria-live="polite"></div>
 
     <!-- Main Content -->
-    <main id="main-content" class="flex-1 p-4" role="main">
+    <main id="main-content" class="flex-1 p-4" role="main" style="background-color: #0a0a0a;">
         <!-- Sticky Header -->
-        <header class="sticky top-0 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 z-40 border border-gray-200 dark:border-gray-700">
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white" id="welcome-message">Welcome, Admin!</h2>
-            <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">Administrative Dashboard & Controls</p>
+        <header class="sticky top-0 p-6 rounded-lg shadow-md mb-6 z-40 border" style="background-color: #111111; border-color: #333333;">
+            <h2 class="text-3xl font-bold text-white" id="welcome-message">Welcome, Admin!</h2>
+            <p class="text-lg mt-2" style="color: #cccccc;">Administrative Dashboard & Controls</p>
         </header>
 
         <!-- Content Section -->
         <section aria-label="Administrative functions" class="space-y-6">
-            <p class="mb-6 text-gray-600 dark:text-gray-300 leading-relaxed">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
+            <p class="mb-6 leading-relaxed" style="color: #cccccc;">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
             
             <!-- Admin Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
                 <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">User Management</h3>
-                    <p class="mb-4 text-gray-600 dark:text-gray-300">Manage user accounts and permissions.</p>
-                    <a href="users.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Users</a>
+                    <h3 class="text-xl font-semibold mb-3 text-white">User Management</h3>
+                    <p class="mb-4" style="color: #cccccc;">Manage user accounts and permissions.</p>
+                    <a href="users.html" class="w-full block p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-blue">Manage Users</a>
                 </div>
                 <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Analytics</h3>
-                    <p class="mb-4 text-gray-600 dark:text-gray-300">View site statistics and user engagement.</p>
-                    <a href="analytics.html" class="w-full block p-3 bg-secondary text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 text-center transition-colors duration-200">View Analytics</a>
+                    <h3 class="text-xl font-semibold mb-3 text-white">Analytics</h3>
+                    <p class="mb-4" style="color: #cccccc;">View site statistics and user engagement.</p>
+                    <a href="analytics.html" class="w-full block p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-green">View Analytics</a>
                 </div>
                 <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Site Settings</h3>
-                    <p class="mb-4 text-gray-600 dark:text-gray-300">Configure website settings and preferences.</p>
-                    <a href="settings.html" class="w-full block p-3 bg-accent text-white rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 text-center transition-colors duration-200">Site Settings</a>
+                    <h3 class="text-xl font-semibold mb-3 text-white">Site Settings</h3>
+                    <p class="mb-4" style="color: #cccccc;">Configure website settings and preferences.</p>
+                    <a href="settings.html" class="w-full block p-3 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-purple">Site Settings</a>
                 </div>
                 <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Product Management</h3>
-                    <p class="mb-4 text-gray-600 dark:text-gray-300">Manage oil products, add descriptions and images.</p>
-                    <a href="oil-products-management.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Products</a>
+                    <h3 class="text-xl font-semibold mb-3 text-white">Product Management</h3>
+                    <p class="mb-4" style="color: #cccccc;">Manage oil products, add descriptions and images.</p>
+                    <a href="oil-products-management.html" class="w-full block p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-blue">Manage Products</a>
                 </div>
             </div>
         </section>
