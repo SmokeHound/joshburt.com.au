@@ -128,6 +128,9 @@
         ☰
     </button>
 
+    <!-- Mobile sidebar backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full bg-gray-700 p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
         <!-- App Branding -->
@@ -388,15 +391,58 @@
             loadAndApplySettings();
         }
 
-        // Fallback initialization if navigation doesn't load via fetch
+        // Initialize home page functionality
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                if (!document.getElementById('menu-toggle')) {
-                    // Navigation didn't load, initialize without it
-                    initializeHomePage();
-                }
-            }, 1000);
+            initializeHomePage();
         });
+    </script>
+
+    <!-- Mobile Menu Toggle Functionality -->
+    <script>
+        // Mobile menu toggle functionality
+        (function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+            
+            function toggleSidebar() {
+                const isOpen = sidebar.classList.contains('open');
+                
+                if (isOpen) {
+                    // Close sidebar
+                    sidebar.classList.remove('open');
+                    if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+                    document.body.classList.remove('sidebar-open');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                } else {
+                    // Open sidebar
+                    sidebar.classList.add('open');
+                    if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
+                    document.body.classList.add('sidebar-open');
+                    menuToggle.setAttribute('aria-expanded', 'true');
+                }
+            }
+            
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', toggleSidebar);
+                
+                // Close sidebar when clicking backdrop
+                if (sidebarBackdrop) {
+                    sidebarBackdrop.addEventListener('click', () => {
+                        if (sidebar.classList.contains('open')) {
+                            toggleSidebar();
+                        }
+                    });
+                }
+                
+                // Close sidebar on escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                        toggleSidebar();
+                    }
+                });
+            }
+        })();
     </script>
 
     <!-- Future Features Implementation -->
