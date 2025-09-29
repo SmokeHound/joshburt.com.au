@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site Settings</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
+    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
+    
     <link rel="stylesheet" href="./assets/css/styles.css">
     <script>
         // Configuration for dynamic color updates from settings
@@ -28,13 +36,134 @@
             });
         }
     </script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .light {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Mobile sidebar styles */
+        @media (max-width: 767px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                z-index: 40;
+                background-color: #374151;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 30;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease-in-out;
+            }
+            .sidebar-backdrop.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+        /* Tab styles */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        /* Input validation styles */
+        .input-error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        .input-success {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        /* Color preview styles */
+        .color-preview {
+            width: 3rem;
+            height: 3rem;
+            border: 2px solid #6b7280;
+            border-radius: 0.5rem;
+        }
+        /* Schedule status colors */
+        .schedule-enabled { color: #10b981; }
+        .schedule-disabled { color: #6b7280; }
+    </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-    <!-- Sidebar and main content start here -->
+    <!-- Mobile Menu Toggle -->
+    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
+        ☰
+    </button>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
+
+    <!-- Mobile sidebar backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar w-64 md:w-64 lg:w-64 fixed md:static top-0 left-0 h-full bg-gray-800 p-4 flex flex-col shadow-lg" aria-label="Main navigation">
+        <!-- App Branding -->
+        <h1 class="text-2xl font-bold mb-6 text-white">Josh's App</h1>
+
+        <!-- Navigation -->
+        <nav>
+            <ul class="space-y-2">
+                <li><a href="index.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Home</a></li>
+                <li><a href="administration.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Administration</a></li>
+                <li><a href="users.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">User Management</a></li>
+                <li><a href="analytics.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Analytics</a></li>
+                <li><a href="settings.html" class="block p-2 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary" aria-current="page">Settings</a></li>
+                <li><a href="oil.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Oil Orders</a></li>
+                <li><a href="consumables.html" class="block p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary">Consumables Orders</a></li>
+                <li><a href="login.html" class="block p-2 hover:bg-red-500 hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400">Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Theme Toggle -->
+        <div class="mt-auto">
+            <button id="theme-toggle" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle light mode">
+                Toggle Light Mode
+            </button>
+        </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-6">
+    <main class="flex-1 p-4 md:p-6 transition-all duration-300">
         <!-- Sticky Header -->
         <header class="sticky top-0 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 z-40 border border-gray-200 dark:border-gray-700">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white" id="welcome-message">Site Settings</h2>
@@ -46,80 +175,55 @@
             <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Configure website settings and preferences. Changes will be saved automatically.</p>
             
             <!-- Tab Navigation -->
-            <div class="widget-primary rounded-t-lg shadow-md border border-gray-200 dark:border-gray-700 border-b-0">
+            <div class="bg-white dark:bg-gray-800 rounded-t-lg shadow-md border border-gray-200 dark:border-gray-700 border-b-0">
                 <div class="flex border-b border-gray-300 dark:border-gray-600">
-                    <button class="tab-btn px-6 py-3 font-semibold text-white bg-primary rounded-tl-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="general">General</button>
+                    <button class="tab-btn px-6 py-3 font-semibold bg-primary text-white rounded-tl-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active" data-tab="general">General</button>
                     <button class="tab-btn px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="theme">Theme</button>
                     <button class="tab-btn px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="security">Security</button>
                     <button class="tab-btn px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" data-tab="audit">Audit Log</button>
                 </div>
             </div>
 
-            <!-- Tab Content -->
-            <div class="widget-primary rounded-b-lg shadow-md border border-gray-200 dark:border-gray-700 border-t-0">
+            <!-- Tab Content Container -->
+            <div class="bg-white dark:bg-gray-800 rounded-b-lg shadow-md border border-gray-200 dark:border-gray-700 border-t-0">
                 <!-- General Settings Tab -->
-                <div id="general-tab" class="tab-content p-6">
+                <div id="general-tab" class="tab-content p-6 active">
                     <form id="settings-form" role="form" aria-label="General settings form">
                         <h3 class="font-semibold mb-6 text-xl text-gray-900 dark:text-gray-100">General Settings</h3>
                         
                         <div class="mb-6">
                             <label for="site-title" class="block mb-2 font-semibold text-gray-900 dark:text-gray-100">Site Title</label>
-                            <input type="text" id="site-title" name="site-title" required maxlength="100" class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter site title" value="Josh's App">
+                            <input type="text" id="site-title" name="site-title" required maxlength="100" class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter site title">
                         </div>
                         
                         <div class="mb-6">
                             <label for="site-description" class="block mb-2 font-semibold text-gray-900 dark:text-gray-100">Site Description</label>
-                            <textarea id="site-description" name="site-description" required maxlength="500" class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="3" placeholder="Enter site description">Responsive website template with admin features</textarea>
+                            <textarea id="site-description" name="site-description" required maxlength="500" class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="3" placeholder="Enter site description"></textarea>
                         </div>
                         
                         <div class="mb-4">
-                            <label for="theme" class="block mb-2 font-medium">Default Theme</label>
-                            <select id="theme" name="theme" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="dark" selected>Dark</option>
+                            <label for="theme" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Default Theme</label>
+                            <select id="theme" name="theme" required class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="dark">Dark</option>
                                 <option value="light">Light</option>
                             </select>
                         </div>
                         
                         <div class="mb-4">
-                            <label for="contact-email" class="block mb-2 font-medium">Contact Email</label>
-                            <input type="email" id="contact-email" name="contact-email" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="admin@example.com" value="admin@example.com">
+                            <label for="contact-email" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Contact Email</label>
+                            <input type="email" id="contact-email" name="contact-email" required class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="admin@example.com">
                         </div>
                         
                         <div class="mb-4">
                             <label for="maintenance-mode" class="flex items-center">
                                 <input type="checkbox" id="maintenance-mode" name="maintenance-mode" class="mr-2 text-primary focus:ring-primary">
-                                <span class="font-medium">Enable maintenance mode</span>
+                                <span class="font-medium text-gray-900 dark:text-gray-100">Enable maintenance mode</span>
                             </label>
                         </div>
                         
                         <div class="mb-4">
-                            <label for="homepage-message" class="block mb-2 font-medium">Homepage Message</label>
-                            <input type="text" id="homepage-message" name="homepage-message" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Welcome to our site!" value="Welcome to My Website">
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="homepage-subtitle" class="block mb-2 font-medium">Homepage Subtitle</label>
-                            <input type="text" id="homepage-subtitle" name="homepage-subtitle" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Your subtitle here" value="">
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="homepage-content" class="block mb-2 font-medium">Homepage Content</label>
-                            <textarea id="homepage-content" name="homepage-content" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="4" placeholder="Main content for your homepage...">This is a modern, responsive website template built with the latest web technologies.</textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="site-announcement" class="block mb-2 font-medium">Site Announcement</label>
-                            <textarea id="site-announcement" name="site-announcement" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="2" placeholder="Important announcement for users..."></textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="announcement-type" class="block mb-2 font-medium">Announcement Type</label>
-                            <select id="announcement-type" name="announcement-type" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="info">Info (Blue)</option>
-                                <option value="success">Success (Green)</option>
-                                <option value="warning">Warning (Yellow)</option>
-                                <option value="error">Error (Red)</option>
-                            </select>
+                            <label for="homepage-message" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Homepage Message</label>
+                            <input type="text" id="homepage-message" name="homepage-message" required class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Welcome to our site!">
                         </div>
                         
                         <button type="submit" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">Save Settings</button>
@@ -127,86 +231,84 @@
                 </div>
 
                 <!-- Theme Customization Tab -->
-                <div id="theme-tab" class="tab-content p-6 hidden">
-                    <h3 class="font-semibold mb-4 text-xl">Theme & Color Customization</h3>
+                <div id="theme-tab" class="tab-content p-6">
+                    <h3 class="font-semibold mb-4 text-xl text-gray-900 dark:text-gray-100">Theme & Color Customization</h3>
+                    
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div>
-                            <h4 class="font-semibold mb-3">Color Scheme</h4>
+                            <h4 class="font-semibold mb-3 text-gray-900 dark:text-gray-100">Color Scheme</h4>
                             <div class="space-y-4">
                                 <div class="flex items-center space-x-3">
-                                    <label for="primaryColor" class="block text-gray-300 w-32">Primary Color</label>
+                                    <label for="primaryColor" class="block text-gray-900 dark:text-gray-300 w-32">Primary Color</label>
                                     <input type="color" id="primaryColor" name="primaryColor" value="#3b82f6" class="w-16 h-10 border-none rounded cursor-pointer">
-                                    <input type="text" id="primaryColorText" value="#3b82f6" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary" title="Primary color hex code" placeholder="#3b82f6" aria-label="Primary color hex">
+                                    <input type="text" id="primaryColorText" value="#3b82f6" class="flex-1 p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded text-sm border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary">
                                 </div>
                                 <div class="flex items-center space-x-3">
-                                    <label for="secondaryColor" class="block text-gray-300 w-32">Secondary Color</label>
+                                    <label for="secondaryColor" class="block text-gray-900 dark:text-gray-300 w-32">Secondary Color</label>
                                     <input type="color" id="secondaryColor" name="secondaryColor" value="#10b981" class="w-16 h-10 border-none rounded cursor-pointer">
-                                    <input type="text" id="secondaryColorText" value="#10b981" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary" title="Secondary color hex code" placeholder="#10b981" aria-label="Secondary color hex">
+                                    <input type="text" id="secondaryColorText" value="#10b981" class="flex-1 p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded text-sm border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary">
                                 </div>
                                 <div class="flex items-center space-x-3">
-                                    <label for="accentColor" class="block text-gray-300 w-32">Accent Color</label>
+                                    <label for="accentColor" class="block text-gray-900 dark:text-gray-300 w-32">Accent Color</label>
                                     <input type="color" id="accentColor" name="accentColor" value="#8b5cf6" class="w-16 h-10 border-none rounded cursor-pointer">
-                                    <input type="text" id="accentColorText" value="#8b5cf6" class="flex-1 p-2 bg-gray-700 text-white rounded text-sm focus:ring-2 focus:ring-primary" title="Accent color hex code" placeholder="#8b5cf6" aria-label="Accent color hex">
+                                    <input type="text" id="accentColorText" value="#8b5cf6" class="flex-1 p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded text-sm border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary">
                                 </div>
                             </div>
+                            
                             <div class="mt-6">
-                                <h4 class="font-semibold mb-3">Theme Mode</h4>
-                                <button id="theme-toggle" type="button" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary mb-2" aria-label="Toggle light mode">
-                                    Toggle Light Mode
-                                </button>
-                            </div>
-                            <div class="mt-6">
-                                <h4 class="font-semibold mb-3">Theme Schedule</h4>
-                                <div class="bg-gray-800 p-4 rounded shadow">
+                                <h4 class="font-semibold mb-3 text-gray-900 dark:text-gray-100">Theme Schedule</h4>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded shadow">
                                     <div class="flex items-center justify-between mb-3">
                                         <label class="flex items-center cursor-pointer">
-                                            <input type="checkbox" id="schedule-enabled" class="mr-2 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
-                                            <span class="text-sm font-medium text-gray-300">Auto Dark Mode</span>
+                                            <input type="checkbox" id="schedule-enabled" class="mr-2 w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                                            <span class="text-sm font-medium text-gray-900 dark:text-gray-300">Auto Dark Mode</span>
                                         </label>
-                                        <span id="schedule-status" class="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">Disabled</span>
+                                        <span id="schedule-status" class="text-xs px-2 py-1 rounded bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300">Disabled</span>
                                     </div>
                                     <div class="grid grid-cols-1 gap-3">
                                         <div>
-                                            <label class="block text-xs font-medium text-gray-400 mb-1">Dark mode starts at</label>
-                                            <input type="time" id="dark-mode-start" value="18:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500" title="Set dark mode start time" placeholder="18:00" aria-label="Dark mode start time">
+                                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Dark mode starts at</label>
+                                            <input type="time" id="dark-mode-start" value="18:00" class="w-full px-2 py-1 text-sm bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-medium text-gray-400 mb-1">Light mode starts at</label>
-                                            <input type="time" id="light-mode-start" value="06:00" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500" title="Set light mode start time" placeholder="06:00" aria-label="Light mode start time">
+                                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Light mode starts at</label>
+                                            <input type="time" id="light-mode-start" value="06:00" class="w-full px-2 py-1 text-sm bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         </div>
                                     </div>
-                                    <div class="text-xs text-gray-500 pt-2 border-t border-gray-600 mt-3">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-300 dark:border-gray-600 mt-3">
                                         Current time: <span id="current-time">--:--</span><br>
-                                        Scheduled mode: <span id="scheduled-mode" class="text-gray-400">Manual</span>
+                                        Scheduled mode: <span id="scheduled-mode" class="text-gray-600 dark:text-gray-400">Manual</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        
                         <div>
-                            <h4 class="font-semibold mb-3">Live Preview</h4>
-                            <div class="flex flex-col items-center justify-center p-6 bg-gray-900 rounded shadow space-y-4">
+                            <h4 class="font-semibold mb-3 text-gray-900 dark:text-gray-100">Live Preview</h4>
+                            <div class="flex flex-col items-center justify-center p-6 bg-gray-100 dark:bg-gray-700 rounded shadow space-y-4">
                                 <div class="flex space-x-4">
-                                    <div class="w-12 h-12 rounded bg-primary-custom border-4 border-primary-custom" title="Primary" aria-label="Primary color preview"></div>
-                                    <div class="w-12 h-12 rounded bg-secondary-custom border-4 border-secondary-custom" title="Secondary" aria-label="Secondary color preview"></div>
-                                    <div class="w-12 h-12 rounded bg-accent-custom border-4 border-accent-custom" title="Accent" aria-label="Accent color preview"></div>
+                                    <div id="primary-preview" class="color-preview" style="background-color: #3b82f6;" title="Primary"></div>
+                                    <div id="secondary-preview" class="color-preview" style="background-color: #10b981;" title="Secondary"></div>
+                                    <div id="accent-preview" class="color-preview" style="background-color: #8b5cf6;" title="Accent"></div>
                                 </div>
-                                <span class="text-gray-400 text-sm">Preview of your selected color scheme</span>
+                                <span class="text-gray-600 dark:text-gray-400 text-sm">Preview of your selected color scheme</span>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-6 pt-4 border-t border-gray-600">
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-300 dark:border-gray-600">
                         <button type="button" id="apply-theme" class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 font-semibold">Apply Theme Changes</button>
                     </div>
                 </div>
 
                 <!-- Security Settings Tab -->
-                <div id="security-tab" class="tab-content p-6 hidden">
-                    <h3 class="font-semibold mb-4 text-xl">Security Settings</h3>
+                <div id="security-tab" class="tab-content p-6">
+                    <h3 class="font-semibold mb-4 text-xl text-gray-900 dark:text-gray-100">Security Settings</h3>
                     
                     <div class="space-y-6">
                         <div>
-                            <label for="session-timeout" class="block mb-2 font-medium">Session Timeout (minutes)</label>
-                            <select id="session-timeout" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                            <label for="session-timeout" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Session Timeout (minutes)</label>
+                            <select id="session-timeout" class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary">
                                 <option value="30">30 minutes</option>
                                 <option value="60" selected>1 hour</option>
                                 <option value="120">2 hours</option>
@@ -216,34 +318,34 @@
                         </div>
                         
                         <div>
-                            <label for="max-login-attempts" class="block mb-2 font-medium">Max Login Attempts</label>
-                            <input type="number" id="max-login-attempts" min="3" max="10" value="5" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                            <label for="max-login-attempts" class="block mb-2 font-medium text-gray-900 dark:text-gray-100">Max Login Attempts</label>
+                            <input type="number" id="max-login-attempts" min="3" max="10" value="5" class="w-full p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary">
                         </div>
                         
                         <div>
                             <label class="flex items-center">
                                 <input type="checkbox" id="enable-2fa" class="mr-2 text-primary focus:ring-primary">
-                                <span class="font-medium">Enable Two-Factor Authentication (Future Feature)</span>
+                                <span class="font-medium text-gray-900 dark:text-gray-100">Enable Two-Factor Authentication (Future Feature)</span>
                             </label>
                         </div>
                         
                         <div>
                             <label class="flex items-center">
                                 <input type="checkbox" id="audit-all-actions" class="mr-2 text-primary focus:ring-primary" checked>
-                                <span class="font-medium">Log all administrative actions</span>
+                                <span class="font-medium text-gray-900 dark:text-gray-100">Log all administrative actions</span>
                             </label>
                         </div>
                     </div>
                     
-                    <div class="mt-6 pt-4 border-t border-gray-600">
+                    <div class="mt-6 pt-4 border-t border-gray-300 dark:border-gray-600">
                         <button type="button" id="save-security" class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 font-semibold">Save Security Settings</button>
                     </div>
                 </div>
 
                 <!-- Audit Log Tab -->
-                <div id="audit-tab" class="tab-content p-6 hidden">
+                <div id="audit-tab" class="tab-content p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-xl">Audit Log</h3>
+                        <h3 class="font-semibold text-xl text-gray-900 dark:text-gray-100">Audit Log</h3>
                         <div class="flex space-x-2">
                             <button type="button" id="export-audit-log" class="px-4 py-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm">Export Log</button>
                             <button type="button" id="clear-audit-log" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm">Clear Log</button>
@@ -252,19 +354,19 @@
                     
                     <div class="mb-4">
                         <div class="flex space-x-4">
-                            <select id="audit-filter" class="p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-primary">
+                            <select id="audit-filter" class="p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary">
                                 <option value="all">All Actions</option>
                                 <option value="settings">Settings Changes</option>
                                 <option value="users">User Management</option>
                                 <option value="orders">Order Management</option>
                                 <option value="login">Login/Logout</option>
                             </select>
-                            <input type="date" id="audit-date-filter" class="p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-primary" title="Filter audit log by date" placeholder="Select date" aria-label="Audit log date filter">
+                            <input type="date" id="audit-date-filter" class="p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary">
                         </div>
                     </div>
                     
-                    <div id="audit-log-container" class="bg-gray-700 rounded max-h-96 overflow-y-auto">
-                        <div id="audit-log-list" class="divide-y divide-gray-600">
+                    <div id="audit-log-container" class="bg-gray-100 dark:bg-gray-700 rounded max-h-96 overflow-y-auto">
+                        <div id="audit-log-list" class="divide-y divide-gray-300 dark:divide-gray-600">
                             <!-- Audit log entries will be populated here -->
                         </div>
                     </div>
@@ -272,239 +374,48 @@
             </div>
 
             <!-- Settings Preview Panel -->
-            <div class="bg-gray-800 p-6 rounded shadow">
-                    <h3 class="font-semibold mb-4">Current Settings (Preview)</h3>
-                    <div class="space-y-3 text-sm text-gray-300 settings-preview">
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Site Title:</span>
-                            <span data-preview="site-title">Josh's App</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Site Description:</span>
-                            <span data-preview="site-description">Responsive website template...</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Theme:</span>
-                            <span data-preview="theme">Dark</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Contact Email:</span>
-                            <span data-preview="contact-email">admin@example.com</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Maintenance Mode:</span>
-                            <span class="text-green-400" data-preview="maintenance-mode">Off</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Homepage Message:</span>
-                            <span data-preview="homepage-message">Welcome to My Website</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Homepage Subtitle:</span>
-                            <span data-preview="homepage-subtitle">None</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Homepage Content:</span>
-                            <span data-preview="homepage-content">Modern responsive template...</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Site Announcement:</span>
-                            <span data-preview="site-announcement">None</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-white">Announcement Type:</span>
-                            <span data-preview="announcement-type">Info</span>
-                        </div>
+            <div class="bg-white dark:bg-gray-800 p-6 rounded shadow border border-gray-200 dark:border-gray-700">
+                <h3 class="font-semibold mb-4 text-gray-900 dark:text-gray-100">Current Settings (Preview)</h3>
+                <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300 settings-preview">
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-900 dark:text-white">Site Title:</span>
+                        <span data-preview="site-title">Josh's App</span>
                     </div>
-                    
-                    <div class="mt-6 pt-4 border-t border-gray-600">
-                        <h4 class="font-semibold mb-2">Quick Actions</h4>
-                        <div class="space-y-2">
-                            <button class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" data-action="clear-cache">Clear Cache</button>
-                            <button class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm" data-action="export-settings">Export Settings</button>
-                            <button class="w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm" data-action="reset-defaults">Reset to Defaults</button>
-                        </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-900 dark:text-white">Site Description:</span>
+                        <span data-preview="site-description">Responsive website template...</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-900 dark:text-white">Theme:</span>
+                        <span data-preview="theme">Dark</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-900 dark:text-white">Contact Email:</span>
+                        <span data-preview="contact-email">admin@example.com</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-900 dark:text-white">Maintenance Mode:</span>
+                        <span class="text-green-400" data-preview="maintenance-mode">Off</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-900 dark:text-white">Homepage Message:</span>
+                        <span data-preview="homepage-message">Welcome to My Website</span>
                     </div>
                 </div>
-
-                <!-- API Integration Settings -->
-                <div class="bg-gray-800 p-6 rounded shadow mb-6">
-                    <h3 class="font-semibold mb-4 text-xl">API Integration Settings</h3>
-                    <p class="text-gray-300 text-sm mb-4">Configure external API integrations for inventory, payment, notifications, and cloud backup.</p>
-                    
-                    <form id="api-settings-form">
-                        <!-- Inventory API -->
-                        <div class="mb-6 p-4 bg-gray-700 rounded">
-                            <h4 class="font-medium mb-3 text-lg text-green-400">Inventory API</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="flex items-center mb-2">
-                                        <input type="checkbox" id="inventory-enabled" class="mr-2 text-primary focus:ring-primary">
-                                        <span class="font-medium">Enable Inventory API</span>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label for="inventory-endpoint" class="block mb-1 font-medium">Endpoint URL</label>
-                                    <input type="url" id="inventory-endpoint" placeholder="https://api.example.com/inventory" class="w-full p-2 rounded bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label for="inventory-api-key" class="block mb-1 font-medium">API Key</label>
-                                    <input type="password" id="inventory-api-key" placeholder="Enter API key" class="w-full p-2 rounded bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Notification API -->
-                        <div class="mb-6 p-4 bg-gray-700 rounded">
-                            <h4 class="font-medium mb-3 text-lg text-purple-400">Notification API</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="flex items-center mb-2">
-                                        <input type="checkbox" id="notification-enabled" class="mr-2 text-primary focus:ring-primary">
-                                        <span class="font-medium">Enable Email Notifications</span>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label for="notification-endpoint" class="block mb-1 font-medium">Endpoint URL</label>
-                                    <input type="url" id="notification-endpoint" placeholder="https://api.sendgrid.com/v3" class="w-full p-2 rounded bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label for="notification-api-key" class="block mb-1 font-medium">API Key</label>
-                                    <input type="password" id="notification-api-key" placeholder="Enter API key" class="w-full p-2 rounded bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Cloud Backup -->
-                        <div class="mb-6 p-4 bg-gray-700 rounded">
-                            <h4 class="font-medium mb-3 text-lg text-yellow-400">Cloud Backup</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="flex items-center mb-2">
-                                        <input type="checkbox" id="cloud-backup-enabled" class="mr-2 text-primary focus:ring-primary">
-                                        <span class="font-medium">Enable Cloud Backup</span>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label class="flex items-center mb-2">
-                                        <input type="checkbox" id="auto-backup-enabled" class="mr-2 text-primary focus:ring-primary">
-                                        <span class="font-medium">Auto Backup</span>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label for="cloud-backup-endpoint" class="block mb-1 font-medium">Endpoint URL</label>
-                                    <input type="url" id="cloud-backup-endpoint" placeholder="https://api.jsonbin.io/v3" class="w-full p-2 rounded bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                                <div>
-                                    <label for="auto-backup-interval" class="block mb-1 font-medium">Backup Interval (minutes)</label>
-                                    <input type="number" id="auto-backup-interval" min="15" max="1440" value="60" class="w-full p-2 rounded bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label for="cloud-backup-api-key" class="block mb-1 font-medium">API Key</label>
-                                    <input type="password" id="cloud-backup-api-key" placeholder="Enter API key" class="w-full p-2 rounded bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex space-x-4">
-                            <button type="submit" class="flex-1 p-3 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">
-                                Save API Settings
-                            </button>
-                            <button type="button" id="test-apis" class="flex-1 p-3 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 font-semibold">
-                                Test All APIs
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Webhook Management -->
-                <div class="bg-gray-800 p-6 rounded shadow mb-6">
-                    <h3 class="font-semibold mb-4 text-xl">Webhook Management</h3>
-                    <p class="text-gray-300 text-sm mb-4">Register webhook endpoints to receive order and system events.</p>
-                    
-                    <div class="mb-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label for="webhook-endpoint" class="block mb-1 font-medium">Webhook URL</label>
-                                <input type="url" id="webhook-endpoint" placeholder="https://your-app.com/webhook" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                            </div>
-                            <div>
-                                <label for="webhook-events" class="block mb-1 font-medium">Events (comma separated)</label>
-                                <input type="text" id="webhook-events" placeholder="order.created,order.processed,*" value="*" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                            </div>
-                            <div class="flex items-end">
-                                <button id="add-webhook" class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 font-semibold">
-                                    Add Webhook
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="webhook-list" class="space-y-2">
-                            <!-- Webhooks will be listed here -->
-                        </div>
+                
+                <div class="mt-6 pt-4 border-t border-gray-300 dark:border-gray-600">
+                    <h4 class="font-semibold mb-2 text-gray-900 dark:text-gray-100">Quick Actions</h4>
+                    <div class="space-y-2">
+                        <button class="w-full p-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" data-action="clear-cache">Clear Cache</button>
+                        <button class="w-full p-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm" data-action="export-settings">Export Settings</button>
+                        <button class="w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm" data-action="reset-defaults">Reset to Defaults</button>
                     </div>
                 </div>
-
-                <!-- API Status & Logs -->
-                <div class="bg-gray-800 p-6 rounded shadow mb-6">
-                    <h3 class="font-semibold mb-4 text-xl">API Status & Logs</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- API Status -->
-                        <div>
-                            <h4 class="font-medium mb-3">API Connection Status</h4>
-                            <div class="space-y-2" id="api-status">
-                                <div class="flex justify-between items-center p-2 bg-gray-700 rounded">
-                                    <span>Inventory API</span>
-                                    <span class="px-2 py-1 rounded text-xs bg-gray-600 text-gray-300">Not tested</span>
-                                </div>
-                                <div class="flex justify-between items-center p-2 bg-gray-700 rounded">
-                                    <span>Payment API</span>
-                                    <span class="px-2 py-1 rounded text-xs bg-gray-600 text-gray-300">Not tested</span>
-                                </div>
-                                <div class="flex justify-between items-center p-2 bg-gray-700 rounded">
-                                    <span>Notification API</span>
-                                    <span class="px-2 py-1 rounded text-xs bg-gray-600 text-gray-300">Not tested</span>
-                                </div>
-                                <div class="flex justify-between items-center p-2 bg-gray-700 rounded">
-                                    <span>Cloud Backup</span>
-                                    <span class="px-2 py-1 rounded text-xs bg-gray-600 text-gray-300">Not tested</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Backup History -->
-                        <div>
-                            <div class="flex justify-between items-center mb-3">
-                                <h4 class="font-medium">Backup History</h4>
-                                <button id="manual-backup" class="px-3 py-1 bg-accent text-white rounded text-sm hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                                    Backup Now
-                                </button>
-                            </div>
-                            <div class="space-y-2" id="backup-history">
-                                <p class="text-gray-400 text-sm">No backups yet</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Webhook Log -->
-                    <div class="mt-6">
-                        <div class="flex justify-between items-center mb-3">
-                            <h4 class="font-medium">Recent Webhook Events</h4>
-                            <button id="clear-webhook-log" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400">
-                                Clear Log
-                            </button>
-                        </div>
-                        <div id="webhook-log" class="bg-gray-900 p-3 rounded max-h-64 overflow-y-auto">
-                            <p class="text-gray-400 text-sm">No webhook events yet</p>
-                        </div>
-                    </div>
-                </div>
+            </div>
         </section>
     </main>
 
     <script>
-
         // Audit Logging System
         class AuditLogger {
             static log(action, details, userId = 'admin') {
@@ -515,12 +426,12 @@
                     userId: userId,
                     action: action,
                     details: details,
-                    ip: 'localhost' // In a real app, this would be the actual IP
+                    ip: 'localhost'
                 };
                 
-                auditLogs.unshift(logEntry); // Add to beginning
+                auditLogs.unshift(logEntry);
                 
-                // Keep only last 1000 entries to prevent storage bloat
+                // Keep only last 1000 entries
                 if (auditLogs.length > 1000) {
                     auditLogs.splice(1000);
                 }
@@ -559,63 +470,12 @@
             }
         }
 
-        // Input validation functions
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
-        
-        function validateRequired(value) {
-            return value && value.trim().length > 0;
-        }
-        
-        function validateLength(value, min = 0, max = 255) {
-            return value.length >= min && value.length <= max;
-        }
-        
-        function validateColor(color) {
-            const re = /^#[0-9A-F]{6}$/i;
-            return re.test(color);
-        }
-        
-        function showFieldError(fieldId, message) {
-            const field = document.getElementById(fieldId);
-            const existingError = field.parentNode.querySelector('.error-message');
-            
-            field.classList.add('input-error');
-            field.classList.remove('input-success');
-            
-            if (existingError) {
-                existingError.textContent = message;
-            } else {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                errorDiv.textContent = message;
-                field.parentNode.appendChild(errorDiv);
-            }
-        }
-        
-        function showFieldSuccess(fieldId) {
-            const field = document.getElementById(fieldId);
-            const existingError = field.parentNode.querySelector('.error-message');
-            
-            field.classList.remove('input-error');
-            field.classList.add('input-success');
-            
-            if (existingError) {
-                existingError.remove();
-            }
-        }
-        
-        function clearFieldStatus(fieldId) {
-            const field = document.getElementById(fieldId);
-            const existingError = field.parentNode.querySelector('.error-message');
-            
-            field.classList.remove('input-error', 'input-success');
-            
-            if (existingError) {
-                existingError.remove();
-            }
+        // Toast notification helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
         }
 
         // Tab functionality
@@ -630,78 +490,22 @@
                     // Update button states
                     tabButtons.forEach(btn => {
                         btn.classList.remove('active', 'bg-primary', 'text-white');
-                        btn.classList.add('text-gray-300', 'hover:text-white', 'hover:bg-gray-700');
+                        btn.classList.add('text-gray-700', 'dark:text-gray-300');
                     });
                     button.classList.add('active', 'bg-primary', 'text-white');
-                    button.classList.remove('text-gray-300', 'hover:text-white', 'hover:bg-gray-700');
+                    button.classList.remove('text-gray-700', 'dark:text-gray-300');
                     
                     // Update content visibility
                     tabContents.forEach(content => {
-                        content.classList.add('hidden');
+                        content.classList.remove('active');
                     });
-                    document.getElementById(targetTab + '-tab').classList.remove('hidden');
+                    document.getElementById(targetTab + '-tab').classList.add('active');
                     
                     // Log tab change
                     AuditLogger.log('settings_navigation', `Accessed ${targetTab} settings tab`);
                 });
             });
         }
-
-        // Show toast notification
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
-
-        // Theme Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-            
-            // Update settings form theme selector to match current theme
-            document.getElementById('theme').value = body.classList.contains('dark') ? 'dark' : 'light';
-            updatePreview();
-        });
-
-        // Load saved theme from settings or localStorage
-        const globalSettings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-        const savedTheme = globalSettings['theme'] || localStorage.getItem('theme') || 'dark';
-        body.classList.add(savedTheme);
-        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
-
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            const isOpen = sidebar.classList.contains('open');
-            menuToggle.setAttribute('aria-expanded', isOpen);
-        });
-
-        // Settings form handling
-        const settingsForm = document.getElementById('settings-form');
-        const previewElements = {
-            siteTitle: document.querySelector('.settings-preview [data-preview="site-title"]'),
-            siteDescription: document.querySelector('.settings-preview [data-preview="site-description"]'),
-            theme: document.querySelector('.settings-preview [data-preview="theme"]'),
-            contactEmail: document.querySelector('.settings-preview [data-preview="contact-email"]'),
-            maintenanceMode: document.querySelector('.settings-preview [data-preview="maintenance-mode"]'),
-            homepageMessage: document.querySelector('.settings-preview [data-preview="homepage-message"]'),
-            homepageSubtitle: document.querySelector('.settings-preview [data-preview="homepage-subtitle"]'),
-            homepageContent: document.querySelector('.settings-preview [data-preview="homepage-content"]'),
-            siteAnnouncement: document.querySelector('.settings-preview [data-preview="site-announcement"]'),
-            announcementType: document.querySelector('.settings-preview [data-preview="announcement-type"]')
-        };
 
         // Load settings from localStorage
         function loadSettings() {
@@ -711,11 +515,7 @@
                 'theme': 'dark',
                 'contact-email': 'admin@example.com',
                 'maintenance-mode': false,
-                'homepage-message': 'Welcome to My Website',
-                'homepage-subtitle': '',
-                'homepage-content': 'This is a modern, responsive website template built with the latest web technologies.',
-                'site-announcement': '',
-                'announcement-type': 'info'
+                'homepage-message': 'Welcome to My Website'
             };
 
             // Populate form fields
@@ -725,23 +525,15 @@
             document.getElementById('contact-email').value = settings['contact-email'];
             document.getElementById('maintenance-mode').checked = settings['maintenance-mode'];
             document.getElementById('homepage-message').value = settings['homepage-message'];
-            document.getElementById('homepage-subtitle').value = settings['homepage-subtitle'];
-            document.getElementById('homepage-content').value = settings['homepage-content'];
-            document.getElementById('site-announcement').value = settings['site-announcement'];
-            document.getElementById('announcement-type').value = settings['announcement-type'];
 
             // Update preview panel
             updatePreview();
-            
-            // Apply settings to current page
-            applySettings(settings);
         }
 
         // Update the preview panel in real-time
         function updatePreview() {
             const settings = getFormSettings();
             
-            // Update preview values
             document.querySelector('[data-preview="site-title"]').textContent = settings['site-title'];
             document.querySelector('[data-preview="site-description"]').textContent = settings['site-description'].substring(0, 30) + '...';
             document.querySelector('[data-preview="theme"]').textContent = settings['theme'].charAt(0).toUpperCase() + settings['theme'].slice(1);
@@ -749,10 +541,6 @@
             document.querySelector('[data-preview="maintenance-mode"]').textContent = settings['maintenance-mode'] ? 'On' : 'Off';
             document.querySelector('[data-preview="maintenance-mode"]').className = settings['maintenance-mode'] ? 'text-red-400' : 'text-green-400';
             document.querySelector('[data-preview="homepage-message"]').textContent = settings['homepage-message'];
-            document.querySelector('[data-preview="homepage-subtitle"]').textContent = settings['homepage-subtitle'] || 'None';
-            document.querySelector('[data-preview="homepage-content"]').textContent = settings['homepage-content'].substring(0, 30) + '...';
-            document.querySelector('[data-preview="site-announcement"]').textContent = settings['site-announcement'] || 'None';
-            document.querySelector('[data-preview="announcement-type"]').textContent = settings['announcement-type'].charAt(0).toUpperCase() + settings['announcement-type'].slice(1);
         }
 
         // Get current form settings
@@ -763,85 +551,15 @@
                 'theme': document.getElementById('theme').value,
                 'contact-email': document.getElementById('contact-email').value,
                 'maintenance-mode': document.getElementById('maintenance-mode').checked,
-                'homepage-message': document.getElementById('homepage-message').value,
-                'homepage-subtitle': document.getElementById('homepage-subtitle').value,
-                'homepage-content': document.getElementById('homepage-content').value,
-                'site-announcement': document.getElementById('site-announcement').value,
-                'announcement-type': document.getElementById('announcement-type').value
+                'homepage-message': document.getElementById('homepage-message').value
             };
         }
 
-        // Apply settings to current page
-        function applySettings(settings) {
-            // Update page title if it's the main branding
-            const brandingElements = document.querySelectorAll('h1');
-            brandingElements.forEach(el => {
-                if (el.textContent.includes('Josh\'s App')) {
-                    el.textContent = settings['site-title'];
-                }
-            });
-
-            // Update theme
-            if (settings['theme'] !== (body.classList.contains('dark') ? 'dark' : 'light')) {
-                body.classList.toggle('dark');
-                body.classList.toggle('light');
-                themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-            }
-        }
-
-        // Save settings to localStorage with validation and audit logging
+        // Save settings with audit logging
         function saveSettings() {
             const settings = getFormSettings();
-            
-            // Validate settings
-            let isValid = true;
-            
-            if (!validateRequired(settings['site-title'])) {
-                showFieldError('site-title', 'Site title is required');
-                isValid = false;
-            } else if (!validateLength(settings['site-title'], 1, 100)) {
-                showFieldError('site-title', 'Site title must be 1-100 characters');
-                isValid = false;
-            } else {
-                showFieldSuccess('site-title');
-            }
-            
-            if (!validateRequired(settings['site-description'])) {
-                showFieldError('site-description', 'Site description is required');
-                isValid = false;
-            } else if (!validateLength(settings['site-description'], 1, 500)) {
-                showFieldError('site-description', 'Site description must be 1-500 characters');
-                isValid = false;
-            } else {
-                showFieldSuccess('site-description');
-            }
-            
-            if (!validateEmail(settings['contact-email'])) {
-                showFieldError('contact-email', 'Please enter a valid email address');
-                isValid = false;
-            } else {
-                showFieldSuccess('contact-email');
-            }
-            
-            if (!validateRequired(settings['homepage-message'])) {
-                showFieldError('homepage-message', 'Homepage message is required');
-                isValid = false;
-            } else if (!validateLength(settings['homepage-message'], 1, 200)) {
-                showFieldError('homepage-message', 'Homepage message must be 1-200 characters');
-                isValid = false;
-            } else {
-                showFieldSuccess('homepage-message');
-            }
-            
-            if (!isValid) {
-                showToast('Please fix validation errors before saving');
-                return;
-            }
-            
-            // Get previous settings for comparison
             const previousSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
             
-            // Save settings
             localStorage.setItem('siteSettings', JSON.stringify(settings));
             
             // Log changes
@@ -857,37 +575,211 @@
             }
             
             showToast('Settings saved successfully!');
-            applySettings(settings);
         }
 
-        // Add event listeners for real-time preview updates with validation
-        document.getElementById('site-title').addEventListener('input', (e) => {
-            clearFieldStatus('site-title');
-            updatePreview();
-        });
-        document.getElementById('site-description').addEventListener('input', (e) => {
-            clearFieldStatus('site-description');
-            updatePreview();
-        });
+        // Color theme functionality
+        function initThemeCustomization() {
+            const colorInputs = ['primaryColor', 'secondaryColor', 'accentColor'];
+            const colorTexts = ['primaryColorText', 'secondaryColorText', 'accentColorText'];
+            const previews = ['primary-preview', 'secondary-preview', 'accent-preview'];
+            
+            colorInputs.forEach((inputId, index) => {
+                const colorInput = document.getElementById(inputId);
+                const textInput = document.getElementById(colorTexts[index]);
+                const preview = document.getElementById(previews[index]);
+                
+                colorInput.addEventListener('change', (e) => {
+                    textInput.value = e.target.value;
+                    preview.style.backgroundColor = e.target.value;
+                });
+                
+                textInput.addEventListener('change', (e) => {
+                    if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                        colorInput.value = e.target.value;
+                        preview.style.backgroundColor = e.target.value;
+                    }
+                });
+            });
+            
+            document.getElementById('apply-theme').addEventListener('click', () => {
+                const themeSettings = {
+                    primaryColor: document.getElementById('primaryColor').value,
+                    secondaryColor: document.getElementById('secondaryColor').value,
+                    accentColor: document.getElementById('accentColor').value
+                };
+                
+                localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
+                applyDynamicColors();
+                AuditLogger.log('theme_change', `Applied custom theme: ${JSON.stringify(themeSettings)}`);
+                showToast('Theme applied successfully!');
+            });
+        }
+
+        // Theme schedule functionality
+        function initThemeSchedule() {
+            const defaultSchedule = { enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' };
+            let themeSchedule = JSON.parse(localStorage.getItem('themeSchedule') || JSON.stringify(defaultSchedule));
+            let schedulerInterval = null;
+
+            function updateScheduleUI() {
+                document.getElementById('schedule-enabled').checked = themeSchedule.enabled;
+                document.getElementById('dark-mode-start').value = themeSchedule.darkModeStart;
+                document.getElementById('light-mode-start').value = themeSchedule.lightModeStart;
+                
+                const statusEl = document.getElementById('schedule-status');
+                statusEl.textContent = themeSchedule.enabled ? 'Enabled' : 'Disabled';
+                statusEl.className = `text-xs px-2 py-1 rounded ${themeSchedule.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`;
+            }
+
+            function updateTimeDisplay() {
+                const now = new Date();
+                document.getElementById('current-time').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const scheduledModeEl = document.getElementById('scheduled-mode');
+                if (!themeSchedule.enabled) {
+                    scheduledModeEl.textContent = 'Manual';
+                    scheduledModeEl.className = 'text-gray-600 dark:text-gray-400';
+                } else {
+                    const isDark = isDarkModeTime();
+                    scheduledModeEl.textContent = isDark ? 'Dark' : 'Light';
+                    scheduledModeEl.className = isDark ? 'text-blue-400' : 'text-yellow-400';
+                }
+            }
+
+            function isDarkModeTime() {
+                if (!themeSchedule.enabled) return null;
+                const now = new Date();
+                const currentTime = now.getHours() * 60 + now.getMinutes();
+                const darkStart = parseTimeString(themeSchedule.darkModeStart);
+                const lightStart = parseTimeString(themeSchedule.lightModeStart);
+
+                return darkStart > lightStart ? 
+                    (currentTime >= darkStart || currentTime < lightStart) :
+                    (currentTime >= darkStart && currentTime < lightStart);
+            }
+
+            function parseTimeString(timeStr) {
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                return hours * 60 + minutes;
+            }
+
+            // Event listeners
+            document.getElementById('schedule-enabled').addEventListener('change', (e) => {
+                themeSchedule.enabled = e.target.checked;
+                localStorage.setItem('themeSchedule', JSON.stringify(themeSchedule));
+                updateScheduleUI();
+                AuditLogger.log('theme_schedule', `Theme scheduling ${themeSchedule.enabled ? 'enabled' : 'disabled'}`);
+                showToast(themeSchedule.enabled ? 'Theme scheduling enabled' : 'Theme scheduling disabled');
+            });
+
+            document.getElementById('dark-mode-start').addEventListener('change', (e) => {
+                themeSchedule.darkModeStart = e.target.value;
+                localStorage.setItem('themeSchedule', JSON.stringify(themeSchedule));
+                updateScheduleUI();
+            });
+
+            document.getElementById('light-mode-start').addEventListener('change', (e) => {
+                themeSchedule.lightModeStart = e.target.value;
+                localStorage.setItem('themeSchedule', JSON.stringify(themeSchedule));
+                updateScheduleUI();
+            });
+
+            updateScheduleUI();
+            updateTimeDisplay();
+            setInterval(updateTimeDisplay, 1000);
+        }
+
+        // Security settings functionality
+        function initSecuritySettings() {
+            document.getElementById('save-security').addEventListener('click', () => {
+                const securitySettings = {
+                    sessionTimeout: document.getElementById('session-timeout').value,
+                    maxLoginAttempts: document.getElementById('max-login-attempts').value,
+                    enable2FA: document.getElementById('enable-2fa').checked,
+                    auditAllActions: document.getElementById('audit-all-actions').checked
+                };
+                
+                localStorage.setItem('securitySettings', JSON.stringify(securitySettings));
+                AuditLogger.log('security_change', `Updated security settings: ${JSON.stringify(securitySettings)}`);
+                showToast('Security settings saved successfully!');
+            });
+        }
+
+        // Audit log functionality
+        function initAuditLog() {
+            function renderAuditLog() {
+                const filter = document.getElementById('audit-filter').value;
+                const dateFilter = document.getElementById('audit-date-filter').value;
+                const logs = AuditLogger.getLogs(filter, dateFilter);
+                
+                const container = document.getElementById('audit-log-list');
+                
+                if (logs.length === 0) {
+                    container.innerHTML = '<div class="p-4 text-gray-500 dark:text-gray-400 text-center">No audit log entries found</div>';
+                    return;
+                }
+                
+                container.innerHTML = logs.map(log => `
+                    <div class="p-4 flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">${log.action}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">${log.details}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-500">User: ${log.userId} | IP: ${log.ip}</div>
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-500">${new Date(log.timestamp).toLocaleString()}</div>
+                    </div>
+                `).join('');
+            }
+            
+            // Event listeners
+            document.getElementById('audit-filter').addEventListener('change', renderAuditLog);
+            document.getElementById('audit-date-filter').addEventListener('change', renderAuditLog);
+            
+            document.getElementById('export-audit-log').addEventListener('click', () => {
+                const logs = AuditLogger.getLogs();
+                const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'audit-log.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                AuditLogger.log('audit_export', 'Exported audit log');
+                showToast('Audit log exported successfully!');
+            });
+            
+            document.getElementById('clear-audit-log').addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear the audit log? This cannot be undone.')) {
+                    AuditLogger.clearLogs();
+                    renderAuditLog();
+                    showToast('Audit log cleared successfully!');
+                }
+            });
+            
+            // Listen for real-time updates
+            window.addEventListener('auditLogUpdated', renderAuditLog);
+            window.addEventListener('auditLogCleared', renderAuditLog);
+            
+            renderAuditLog();
+        }
+
+        // Add event listeners for real-time preview updates
+        document.getElementById('site-title').addEventListener('input', updatePreview);
+        document.getElementById('site-description').addEventListener('input', updatePreview);
         document.getElementById('theme').addEventListener('change', updatePreview);
-        document.getElementById('contact-email').addEventListener('input', (e) => {
-            clearFieldStatus('contact-email');
-            updatePreview();
-        });
+        document.getElementById('contact-email').addEventListener('input', updatePreview);
         document.getElementById('maintenance-mode').addEventListener('change', updatePreview);
         document.getElementById('homepage-message').addEventListener('input', updatePreview);
-        document.getElementById('homepage-subtitle').addEventListener('input', updatePreview);
-        document.getElementById('homepage-content').addEventListener('input', updatePreview);
-        document.getElementById('site-announcement').addEventListener('input', updatePreview);
-        document.getElementById('announcement-type').addEventListener('change', updatePreview);
 
         // Settings form submission
-        settingsForm.addEventListener('submit', (e) => {
+        document.getElementById('settings-form').addEventListener('submit', (e) => {
             e.preventDefault();
             saveSettings();
         });
 
-        // Quick action buttons with audit logging
+        // Quick action buttons
         document.querySelector('[data-action="clear-cache"]').addEventListener('click', () => {
             localStorage.removeItem('user');
             localStorage.removeItem('siteUsers');
@@ -920,6 +812,40 @@
             }
         });
 
+        // Theme toggle functionality
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            const body = document.body;
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                this.textContent = 'Toggle Dark Mode';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                this.textContent = 'Toggle Light Mode';
+                localStorage.setItem('theme', 'dark');
+            }
+            // Update settings form theme selector to match current theme
+            document.getElementById('theme').value = body.classList.contains('dark') ? 'dark' : 'light';
+            updatePreview();
+        });
+
+        // Sidebar toggle for mobile
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            sidebarBackdrop.classList.toggle('open');
+            this.setAttribute('aria-expanded', sidebar.classList.contains('open'));
+        });
+        sidebarBackdrop.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            sidebarBackdrop.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+        });
+
         // Initialize all functionality when page loads
         document.addEventListener('DOMContentLoaded', () => {
             // Log page access
@@ -927,168 +853,35 @@
             
             // Initialize components
             initTabs();
-            // initThemeCustomization(); // Removed: function not defined, logic handled elsewhere
+            initThemeCustomization();
+            initThemeSchedule();
             initSecuritySettings();
             initAuditLog();
             
             // Load settings
             loadSettings();
             
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.classList.add(savedTheme);
+            document.getElementById('theme-toggle').textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+            
             // Load and apply saved theme colors
-            const savedTheme = JSON.parse(localStorage.getItem('themeSettings') || '{}');
-            if (savedTheme.primaryColor) {
-                document.getElementById('primaryColor').value = savedTheme.primaryColor;
-                document.getElementById('primaryColorText').value = savedTheme.primaryColor;
-                document.getElementById('secondaryColor').value = savedTheme.secondaryColor;
-                document.getElementById('secondaryColorText').value = savedTheme.secondaryColor;
-                document.getElementById('accentColor').value = savedTheme.accentColor;
-                document.getElementById('accentColorText').value = savedTheme.accentColor;
-                applyColors(savedTheme);
+            const savedThemeColors = JSON.parse(localStorage.getItem('themeSettings') || '{}');
+            if (savedThemeColors.primaryColor) {
+                document.getElementById('primaryColor').value = savedThemeColors.primaryColor;
+                document.getElementById('primaryColorText').value = savedThemeColors.primaryColor;
+                document.getElementById('secondaryColor').value = savedThemeColors.secondaryColor;
+                document.getElementById('secondaryColorText').value = savedThemeColors.secondaryColor;
+                document.getElementById('accentColor').value = savedThemeColors.accentColor;
+                document.getElementById('accentColorText').value = savedThemeColors.accentColor;
+                
+                // Update previews
+                document.getElementById('primary-preview').style.backgroundColor = savedThemeColors.primaryColor;
+                document.getElementById('secondary-preview').style.backgroundColor = savedThemeColors.secondaryColor;
+                document.getElementById('accent-preview').style.backgroundColor = savedThemeColors.accentColor;
             }
         });
-
-        // Load settings when page loads
-        loadSettings();
-
-        // Theme Schedule System
-        const defaultSchedule = { enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' };
-        let themeSchedule = JSON.parse(localStorage.getItem('themeSchedule') || JSON.stringify(defaultSchedule));
-        let schedulerInterval = null;
-
-        function updateThemeSchedule(newSchedule) {
-            themeSchedule = { ...themeSchedule, ...newSchedule };
-            localStorage.setItem('themeSchedule', JSON.stringify(themeSchedule));
-            
-            if (themeSchedule.enabled) {
-                startThemeScheduler();
-            } else {
-                stopThemeScheduler();
-            }
-            
-            updateScheduleUI();
-            showToast(themeSchedule.enabled ? 'Theme scheduling enabled' : 'Theme scheduling disabled');
-        }
-
-        function isDarkModeTime() {
-            if (!themeSchedule.enabled) return null;
-            const now = new Date();
-            const currentTime = now.getHours() * 60 + now.getMinutes();
-            const darkStart = parseTimeString(themeSchedule.darkModeStart);
-            const lightStart = parseTimeString(themeSchedule.lightModeStart);
-
-            return darkStart > lightStart ? 
-                (currentTime >= darkStart || currentTime < lightStart) :
-                (currentTime >= darkStart && currentTime < lightStart);
-        }
-
-        function parseTimeString(timeStr) {
-            const [hours, minutes] = timeStr.split(':').map(Number);
-            return hours * 60 + minutes;
-        }
-
-        function applyScheduledTheme() {
-            if (!themeSchedule.enabled) return;
-            const shouldBeDark = isDarkModeTime();
-            const body = document.body;
-            const currentlyDark = body.classList.contains('dark');
-
-            if (shouldBeDark !== null && shouldBeDark !== currentlyDark) {
-                if (shouldBeDark) {
-                    body.classList.remove('light');
-                    body.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    body.classList.remove('dark');
-                    body.classList.add('light');
-                    localStorage.setItem('theme', 'light');
-                }
-
-                const themeToggle = document.getElementById('theme-toggle');
-                if (themeToggle) {
-                    themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-                }
-
-                showToast(`Automatically switched to ${shouldBeDark ? 'dark' : 'light'} mode`);
-            }
-        }
-
-        function startThemeScheduler() {
-            if (schedulerInterval) clearInterval(schedulerInterval);
-            if (themeSchedule.enabled) {
-                schedulerInterval = setInterval(applyScheduledTheme, 60000);
-                applyScheduledTheme();
-            }
-        }
-
-        function stopThemeScheduler() {
-            if (schedulerInterval) {
-                clearInterval(schedulerInterval);
-                schedulerInterval = null;
-            }
-        }
-
-        function updateScheduleUI() {
-            const enabledCheckbox = document.getElementById('schedule-enabled');
-            const darkStartInput = document.getElementById('dark-mode-start');
-            const lightStartInput = document.getElementById('light-mode-start');
-            const statusSpan = document.getElementById('schedule-status');
-
-            if (enabledCheckbox) enabledCheckbox.checked = themeSchedule.enabled;
-            if (darkStartInput) darkStartInput.value = themeSchedule.darkModeStart;
-            if (lightStartInput) lightStartInput.value = themeSchedule.lightModeStart;
-            
-            if (statusSpan) {
-                statusSpan.textContent = themeSchedule.enabled ? 'Enabled' : 'Disabled';
-                statusSpan.className = `text-xs px-2 py-1 rounded ${
-                    themeSchedule.enabled ? 'bg-green-900 text-green-200' : 'bg-gray-700 text-gray-300'
-                }`;
-            }
-        }
-
-        function updateTimeDisplay() {
-            const currentTimeEl = document.getElementById('current-time');
-            const scheduledModeEl = document.getElementById('scheduled-mode');
-
-            if (currentTimeEl) {
-                const now = new Date();
-                currentTimeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-
-            if (scheduledModeEl) {
-                if (!themeSchedule.enabled) {
-                    scheduledModeEl.textContent = 'Manual';
-                    scheduledModeEl.className = 'text-gray-400';
-                } else {
-                    const isDark = isDarkModeTime();
-                    scheduledModeEl.textContent = isDark ? 'Dark' : 'Light';
-                    scheduledModeEl.className = isDark ? 'text-blue-400' : 'text-yellow-400';
-                }
-            }
-        }
-
-        // Initialize theme scheduler
-        document.getElementById('schedule-enabled').addEventListener('change', (e) => {
-            updateThemeSchedule({ enabled: e.target.checked });
-        });
-
-        document.getElementById('dark-mode-start').addEventListener('change', (e) => {
-            updateThemeSchedule({ darkModeStart: e.target.value });
-        });
-
-        document.getElementById('light-mode-start').addEventListener('change', (e) => {
-            updateThemeSchedule({ lightModeStart: e.target.value });
-        });
-
-        // Initialize scheduler
-        updateScheduleUI();
-        if (themeSchedule.enabled) {
-            startThemeScheduler();
-        }
-        
-        // Update time display every second
-        updateTimeDisplay();
-        setInterval(updateTimeDisplay, 1000);
-
     </script>
 </body>
 </html>
