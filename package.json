@@ -42,7 +42,10 @@
   "author": "Josh Burt",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.36.0",
     "autoprefixer": "^10.4.21",
+    "globals": "^16.4.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.13"
   }

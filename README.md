@@ -14,7 +14,7 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 
 ## ✨ Features
 - **Modular Components**: Reusable shared components for navigation, theming, and configuration
-- **Responsive Design**: Mobile-first approach with TailwindCSS
+- **Responsive Design**: Mobile-first approach with TailwindCSS v4
 - **Dark/Light Mode**: Persistent theme switching with localStorage
 - **Testing Suite**: Unit and integration tests with Jest
 - **CI/CD Pipeline**: Automated testing, linting, and deployment
@@ -29,10 +29,10 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 - **`shared-nav.html`**: Navigation sidebar with menu toggle, user profile, and navigation links
 - **`shared-theme.html`**: Theme toggle functionality with localStorage persistence
 - **`shared-config.html`**: TailwindCSS configuration and common styles
-- **API/Netlify Functions**: Dynamic backend for products, orders, users, and authentication
+- **`API/Netlify Functions`**: Dynamic backend for products, orders, users, and authentication
 
 ### Pages
-**`administration.html`**: Dashboard with management links and user overview
+- **`administration.html`**: Dashboard with management links and user overview
 - **`oil.html`**: Castrol product ordering system (API-driven, CSV export)
 - **`consumables.html`**: Consumables order request page (for workshop staff)
 - **`consumables-mgmt.html`**: Consumables product list management (admin/staff CRUD)
