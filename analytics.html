@@ -1304,6 +1304,9 @@
                 // Set up real-time updates every 30 seconds
                 setInterval(updateRealtimeStats, 30000);
             }, 100);
+            
+            // Also call immediately to ensure real-time stats show up quickly
+            setTimeout(updateRealtimeStats, 50);
         });
     </script>
 </body>
