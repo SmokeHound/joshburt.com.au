@@ -14,6 +14,28 @@
     <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
     
     <link rel="stylesheet" href="./assets/css/styles.css">
+
+        <!-- Load shared config and theme system -->
+        <script>
+            fetch('shared-config.html').then(r => r.text()).then(html => {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                Array.from(temp.children).forEach(child => {
+                    if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
+                        document.head.appendChild(child.cloneNode(true));
+                    }
+                });
+            });
+            fetch('shared-theme.html').then(r => r.text()).then(html => {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                Array.from(temp.children).forEach(child => {
+                    if (child.tagName === 'SCRIPT') {
+                        document.head.appendChild(child.cloneNode(true));
+                    }
+                });
+            });
+        </script>
     <script>
         // Configuration for dynamic color updates from settings
         function applyDynamicColors() {
@@ -82,7 +104,7 @@
         }
     </style>
 </head>
-<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+<body class="dark">
     <!-- Mobile Menu Toggle -->
     <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">
         ☰

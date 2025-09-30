@@ -1,7 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+
+    <!-- Load shared config and theme system -->
+    <script>
+      fetch('shared-config.html').then(r => r.text()).then(html => {
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        Array.from(temp.children).forEach(child => {
+          if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
+            document.head.appendChild(child.cloneNode(true));
+          }
+        });
+      });
+      fetch('shared-theme.html').then(r => r.text()).then(html => {
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        Array.from(temp.children).forEach(child => {
+          if (child.tagName === 'SCRIPT') {
+            document.head.appendChild(child.cloneNode(true));
+          }
+        });
+      });
+    </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Consumables Product Management | joshburt.com.au</title>
   
@@ -37,7 +59,7 @@
     }
   </script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+<body class="dark">
   <!-- Shared Navigation -->
   <div id="shared-navigation"></div>
   <script>

@@ -2,6 +2,27 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="./assets/css/styles.css">
+      <!-- Load shared config and theme system -->
+      <script>
+        fetch('shared-config.html').then(r => r.text()).then(html => {
+          const temp = document.createElement('div');
+          temp.innerHTML = html;
+          Array.from(temp.children).forEach(child => {
+            if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
+              document.head.appendChild(child.cloneNode(true));
+            }
+          });
+        });
+        fetch('shared-theme.html').then(r => r.text()).then(html => {
+          const temp = document.createElement('div');
+          temp.innerHTML = html;
+          Array.from(temp.children).forEach(child => {
+            if (child.tagName === 'SCRIPT') {
+              document.head.appendChild(child.cloneNode(true));
+            }
+          });
+        });
+      </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Oil Stock Order Request</title>
@@ -164,7 +185,7 @@
     }
   </style>
 </head>
-<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+<body class="dark">
   <!-- Skip Links -->
   <div class="sr-only">
     <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>

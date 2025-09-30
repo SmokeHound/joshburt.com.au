@@ -14,6 +14,28 @@
     <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
     
     <link rel="stylesheet" href="./assets/css/styles.css">
+
+        <!-- Load shared config and theme system -->
+        <script>
+            fetch('shared-config.html').then(r => r.text()).then(html => {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                Array.from(temp.children).forEach(child => {
+                    if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
+                        document.head.appendChild(child.cloneNode(true));
+                    }
+                });
+            });
+            fetch('shared-theme.html').then(r => r.text()).then(html => {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                Array.from(temp.children).forEach(child => {
+                    if (child.tagName === 'SCRIPT') {
+                        document.head.appendChild(child.cloneNode(true));
+                    }
+                });
+            });
+        </script>
     <script>
         // Configuration for dynamic color updates from settings
         function applyDynamicColors() {
@@ -26,7 +48,6 @@
         applyDynamicColors();
         // Service Worker Registration for PWA
         if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
                 navigator.serviceWorker.register("./sw.js")
                     .then(registration => {
                         console.log("SW registered: ", registration);
@@ -114,6 +135,7 @@
         <!-- Login Card -->
         <section class="p-8 rounded-lg shadow-2xl border" style="background-color: #111111; border-color: #333333; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);" role="region" aria-label="Login form">
             <form method="post" action="admin.php" id="login-form" role="form" aria-labelledby="login-heading">
+
                 <h2 id="login-heading" class="sr-only">Login credentials</h2>
                 
                 <!-- Username Field -->

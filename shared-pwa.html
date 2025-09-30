@@ -11,8 +11,31 @@
   <meta name="mobile-web-app-status-bar-style" content="default">
   <meta name="mobile-web-app-title" content="JoshBurt.com.au">
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
+  <!-- Load shared configuration (TailwindCSS, color variables, layout styles) -->
+  <script>
+    fetch('shared-config.html')
+      .then(response => response.text())
+      .then(html => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        const styles = tempDiv.getElementsByTagName('style');
+        const scripts = tempDiv.getElementsByTagName('script');
+        const links = tempDiv.getElementsByTagName('link');
+        for (let link of links) {
+          document.head.appendChild(link.cloneNode(true));
+        }
+        for (let style of styles) {
+          document.head.appendChild(style.cloneNode(true));
+        }
+        for (let script of scripts) {
+          const newScript = document.createElement('script');
+          newScript.textContent = script.textContent;
+          document.head.appendChild(newScript);
+        }
+      });
+  </script>
 </head>
-<body>
+<body class="dark min-h-screen font-sans">
   <!-- Service Worker Registration -->
   <script>
   if ('serviceWorker' in navigator) {
@@ -26,6 +49,21 @@
         });
     });
   }
+  </script>
+  <!-- Load shared theme functionality (dark/light mode, theme toggle) -->
+  <script>
+    fetch('shared-theme.html')
+      .then(response => response.text())
+      .then(html => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        const scripts = tempDiv.getElementsByTagName('script');
+        for (let script of scripts) {
+          const newScript = document.createElement('script');
+          newScript.textContent = script.textContent;
+          document.body.appendChild(newScript);
+        }
+      });
   </script>
 </body>
 </html>
