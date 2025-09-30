@@ -232,6 +232,8 @@ class AnalyticsDataManager {
                 sparklines
             }
         };
+    }
+
     // Mock: Browser breakdown (randomized for demo)
     getBrowserBreakdown(data) {
         // Simulate breakdown for demo
@@ -268,7 +270,6 @@ class AnalyticsDataManager {
             orders: last14((data.oilOrders || []).map(d => d.totalOrders)),
             sessions: last14((data.userSessions || []).map(d => d.totalSessions))
         };
-    }
     }
 
     // Mock: Conversion rate = orders / unique visitors
