@@ -186,7 +186,7 @@
         <section>
             <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Manage user accounts and permissions. Add, edit, or remove users from the system.</p>
             <!-- User Table Card -->
-            <div class="widget-primary rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+            <div class="widget-primary rounded-lg shadow-md p-6">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left mb-6" role="table" aria-label="User accounts table">
                         <thead>
@@ -206,9 +206,9 @@
                 <form class="mt-6 pt-6 border-t border-gray-300 dark:border-gray-600" id="user-form" role="form" aria-label="Add new user form">
                     <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Add New User</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <input type="text" placeholder="Name" required class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="User name">
-                        <input type="email" placeholder="Email" required class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="User email">
-                        <select required class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="User role">
+                        <input type="text" placeholder="Name" required class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="User name">
+                        <input type="email" placeholder="Email" required class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="User email">
+                        <select required class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="User role">
                             <option value="">Select Role</option>
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
@@ -223,7 +223,7 @@
         </section>
         <!-- Bulk Operations -->
         <section class="mt-6" aria-label="Bulk operations">
-            <div class="widget-secondary rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+            <div class="widget-secondary rounded-lg shadow-md p-6">
                 <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Bulk Operations</h3>
                 <div class="flex flex-wrap gap-4">
                     <button id="export-users-csv" class="px-4 py-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">Export Users (CSV)</button>
