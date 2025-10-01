@@ -206,7 +206,30 @@
         </style>
         </head>
         <body class="dark">
-        <main>
+        <!-- Mobile Menu Toggle -->
+        <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+        <div class="flex min-h-screen">
+            <!-- Sidebar -->
+            <aside id="sidebar" class="w-64 fixed top-0 left-0 h-full bg-gray-800 text-white p-4 flex flex-col shadow md:static md:translate-x-0 transform transition-transform duration-300">
+                <h1 class="text-2xl font-bold mb-6">Josh's App</h1>
+                <nav aria-label="Main navigation">
+                    <ul class="space-y-2">
+                        <li><a class="block p-2 rounded hover:bg-primary" href="index.html">Home</a></li>
+                        <li><a class="block p-2 rounded hover:bg-primary" href="administration.html">Administration</a></li>
+                        <li><a class="block p-2 rounded hover:bg-primary" href="users.html">User Management</a></li>
+                        <li><a class="block p-2 rounded hover:bg-primary" href="analytics.html">Analytics</a></li>
+                        <li><a class="block p-2 rounded hover:bg-primary" href="settings.html">Settings</a></li>
+                        <li><a class="block p-2 rounded hover:bg-primary" href="oil.html">Oil Orders</a></li>
+                        <li><a class="block p-2 rounded hover:bg-primary" href="consumables.html">Consumables Orders</a></li>
+                        <li><a class="block p-2 rounded hover:bg-red-600" href="login.html">Logout</a></li>
+                    </ul>
+                </nav>
+                <button id="theme-toggle" class="w-full mt-4 p-2 rounded bg-primary text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">Toggle Light/Dark</button>
+                <div class="mt-auto pt-4 text-xs text-gray-300">v1 Settings</div>
+            </aside>
+            <!-- Main Content -->
+            <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
             <section>
                 <div class="widget-primary rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
                     <div class="overflow-x-auto">
