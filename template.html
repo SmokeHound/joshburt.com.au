@@ -85,9 +85,9 @@
         - Use .nav-link and .active for current page
         - Update links as needed for new pages
     -->
-    <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" style="background-color: #111111; border-right: 1px solid #00d4ff20;" aria-label="Main navigation" role="navigation">
+    <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
         <!-- App Branding -->
-        <h1 class="text-2xl font-bold mb-6" style="color: #00d4ff; text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);">Josh's App</h1>
+    <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
         <!-- User Profile Section -->
         <div id="user-profile" class="mb-6">
             <div id="user-info" class="hidden flex items-center space-x-2">
@@ -101,31 +101,31 @@
         <nav role="navigation" aria-label="Main navigation">
             <ul class="space-y-2" role="list">
                 <li role="listitem">
-                    <a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Home</a>
+                    <a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Home</a>
                 </li>
                 <li role="listitem">
-                    <a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Administration</a>
+                    <a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a>
                 </li>
                 <li role="listitem">
-                    <a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">User Management</a>
+                    <a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">User Management</a>
                 </li>
                 <li role="listitem">
-                    <a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Analytics</a>
+                    <a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Analytics</a>
                 </li>
                 <li role="listitem">
-                    <a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Settings</a>
+                    <a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Settings</a>
                 </li>
                 <li role="listitem">
-                    <a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Oil Orders</a>
+                    <a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Oil Orders</a>
                 </li>
                 <li role="listitem">
-                    <a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Consumables Orders</a>
+                    <a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Consumables Orders</a>
                 </li>
                 <li role="listitem">
-                    <a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link" style="color: #ff0080;">Logout</a>
+                    <a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link nav-link-logout">Logout</a>
                 </li>
                 <li role="listitem">
-                    <a href="template.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link active" style="color: #00d4ff; background-color: #00d4ff20; border-left: 3px solid #00d4ff;" aria-current="page">Template Page</a>
+                    <a href="template.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link active nav-link-template" aria-current="page">Template Page</a>
                 </li>
             </ul>
         </nav>
@@ -172,12 +172,13 @@
         </section>
         <!--
             TABLE EXAMPLE
-            - Use .widget-primary for neon border
+            - Always use both .card and a .widget-* class (e.g., .widget-primary) for correct neon card outline
+            - .card provides background and border, .widget-* adds neon border/effects
             - .overflow-x-auto for responsive tables
             - Use semantic <table> markup and ARIA roles
         -->
         <section class="mb-8">
-            <div class="widget-primary rounded-lg shadow-md p-6">
+            <div class="card widget-primary rounded-lg shadow-md p-6">
                 <h3 class="text-xl font-semibold mb-4 text-gray-100">Table Example</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left mb-6" role="table" aria-label="Example table">
@@ -206,12 +207,13 @@
         </section>
         <!--
             FORM EXAMPLE
-            - Use .widget-secondary for neon border
+            - Always use both .card and a .widget-* class (e.g., .widget-secondary) for correct neon card outline
+            - .card provides background and border, .widget-* adds neon border/effects
             - Inputs use dark mode styles and focus rings
             - Use grid for responsive layout
         -->
         <section class="mb-8">
-            <div class="widget-secondary rounded-lg shadow-md p-6">
+            <div class="card widget-secondary rounded-lg shadow-md p-6">
                 <h3 class="text-xl font-semibold mb-4 text-gray-100">Form Example</h3>
                 <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" placeholder="Text Field" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
@@ -255,7 +257,7 @@
         <section class="mb-8">
             <div class="widget-primary rounded-lg shadow-md p-6">
                 <h3 class="text-xl font-semibold mb-4 text-gray-100">Chart Area (Placeholder)</h3>
-                <div class="bg-gray-900 rounded-lg p-8 flex items-center justify-center text-gray-400" style="height:200px;">
+                <div class="bg-gray-900 rounded-lg p-8 flex items-center justify-center text-gray-400 chart-placeholder">
                     Chart.js or other chart library can be embedded here.
                 </div>
             </div>
