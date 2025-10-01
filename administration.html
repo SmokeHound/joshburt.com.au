@@ -237,52 +237,51 @@
                             </div>
                         </section>
                     </main>
+                    <script>
+                        // Load and apply site settings
+                        function loadAndApplySettings() {
+                            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+                            // Apply site title if set
+                            if (settings['site-title']) {
+                                const brandingElements = document.querySelectorAll('h1');
+                                brandingElements.forEach(el => el.textContent = settings['site-title']);
+                            }
+                        }
+                        loadAndApplySettings();
+                        // Theme toggle
+                        document.getElementById('theme-toggle').addEventListener('click', function() {
+                            const body = document.body;
+                            if (body.classList.contains('dark')) {
+                                body.classList.remove('dark');
+                                body.classList.add('light');
+                                this.textContent = 'Toggle Dark Mode';
+                            } else {
+                                body.classList.remove('light');
+                                body.classList.add('dark');
+                                this.textContent = 'Toggle Light Mode';
+                            }
+                        });
+                        // Sidebar toggle for mobile
+                        const menuToggle = document.getElementById('menu-toggle');
+                        const sidebar = document.getElementById('sidebar');
+                        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+                        menuToggle.addEventListener('click', function() {
+                            sidebar.classList.toggle('open');
+                            sidebarBackdrop.classList.toggle('open');
+                            this.setAttribute('aria-expanded', sidebar.classList.contains('open'));
+                        });
+                        sidebarBackdrop.addEventListener('click', function() {
+                            sidebar.classList.remove('open');
+                            sidebarBackdrop.classList.remove('open');
+                            menuToggle.setAttribute('aria-expanded', 'false');
+                        });
+                        // Toast notification helper
+                        function showToast(message) {
+                            const toast = document.getElementById('toast');
+                            toast.textContent = message;
+                            toast.classList.remove('hidden');
+                            setTimeout(() => toast.classList.add('hidden'), 3000);
+                        }
+                    </script>
                     </body>
-                    </html>
-
-    <script>
-        // Load and apply site settings
-        function loadAndApplySettings() {
-            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            // Apply site title if set
-            if (settings['site-title']) {
-                const brandingElements = document.querySelectorAll('h1');
-                brandingElements.forEach(el => el.textContent = settings['site-title']);
-            }
-        }
-        loadAndApplySettings();
-        // Theme toggle
-        document.getElementById('theme-toggle').addEventListener('click', function() {
-            const body = document.body;
-            if (body.classList.contains('dark')) {
-                body.classList.remove('dark');
-                body.classList.add('light');
-                this.textContent = 'Toggle Dark Mode';
-            } else {
-                body.classList.remove('light');
-                body.classList.add('dark');
-                this.textContent = 'Toggle Light Mode';
-            }
-        });
-        // Sidebar toggle for mobile
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        menuToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('open');
-            sidebarBackdrop.classList.toggle('open');
-            this.setAttribute('aria-expanded', sidebar.classList.contains('open'));
-        });
-        sidebarBackdrop.addEventListener('click', function() {
-            sidebar.classList.remove('open');
-            sidebarBackdrop.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-        });
-        // Toast notification helper
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
-        }
-    </script>
+</html>
