@@ -200,43 +200,67 @@
                     </style>
                     </head>
                     <body class="dark">
-                    <main>
-                        <section>
-                            <!-- Admin Cards Grid -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
-                                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">User Management</h3>
-                                    <p class="mb-4 text-gray-600 dark:text-gray-300">Manage user accounts and permissions.</p>
-                                    <a href="users.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Users</a>
-                                </div>
-                                <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Analytics</h3>
-                                    <p class="mb-4 text-gray-600 dark:text-gray-300">View site statistics and user engagement.</p>
-                                    <a href="analytics.html" class="w-full block p-3 bg-secondary text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 text-center transition-colors duration-200">View Analytics</a>
-                                </div>
-                                <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Site Settings</h3>
-                                    <p class="mb-4 text-gray-600 dark:text-gray-300">Configure website settings and preferences.</p>
-                                    <a href="settings.html" class="w-full block p-3 bg-accent text-white rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 text-center transition-colors duration-200">Site Settings</a>
-                                </div>
-                                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Oil Management</h3>
-                                    <p class="mb-4 text-gray-600 dark:text-gray-300">Manage oil products, add descriptions and images.</p>
-                                    <a href="oil-products-management.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Products</a>
-                                </div>
-                                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Consumables Management</h3>
-                                    <p class="mb-4 text-gray-600 dark:text-gray-300">Manage consumable products, add descriptions and images.</p>
-                                    <a href="consumables-mgmt.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Products</a>
-                                </div>
-                                <div class="card widget-warning p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                                    <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Orders Review</h3>
-                                    <p class="mb-4 text-gray-600 dark:text-gray-300">Review and manage workshop orders.</p>
-                                    <a href="orders-review.html" class="w-full block p-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 text-center transition-colors duration-200">Go to Orders Review</a>
-                                </div>
-                            </div>
-                        </section>
-                    </main>
+    <!-- Mobile Menu Toggle -->
+    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 fixed top-0 left-0 h-full bg-gray-800 text-white p-4 flex flex-col shadow md:static md:translate-x-0 transform transition-transform duration-300">
+            <h1 class="text-2xl font-bold mb-6">Josh's App</h1>
+            <nav aria-label="Main navigation">
+                <ul class="space-y-2">
+                    <li><a class="block p-2 rounded hover:bg-primary" href="index.html">Home</a></li>
+                    <li><a class="block p-2 rounded bg-primary" aria-current="page" href="administration.html">Administration</a></li>
+                    <li><a class="block p-2 rounded hover:bg-primary" href="users.html">User Management</a></li>
+                    <li><a class="block p-2 rounded hover:bg-primary" href="analytics.html">Analytics</a></li>
+                    <li><a class="block p-2 rounded hover:bg-primary" href="settings.html">Settings</a></li>
+                    <li><a class="block p-2 rounded hover:bg-primary" href="oil.html">Oil Orders</a></li>
+                    <li><a class="block p-2 rounded hover:bg-primary" href="consumables.html">Consumables Orders</a></li>
+                    <li><a class="block p-2 rounded hover:bg-red-600" href="login.html">Logout</a></li>
+                </ul>
+            </nav>
+            <button id="theme-toggle" class="w-full mt-4 p-2 rounded bg-primary text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">Toggle Light/Dark</button>
+            <div class="mt-auto pt-4 text-xs text-gray-300">v1 Settings</div>
+        </aside>
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
+            <section>
+                <!-- Admin Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
+                    <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">User Management</h3>
+                        <p class="mb-4 text-gray-600 dark:text-gray-300">Manage user accounts and permissions.</p>
+                        <a href="users.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Users</a>
+                    </div>
+                    <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Analytics</h3>
+                        <p class="mb-4 text-gray-600 dark:text-gray-300">View site statistics and user engagement.</p>
+                        <a href="analytics.html" class="w-full block p-3 bg-secondary text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 text-center transition-colors duration-200">View Analytics</a>
+                    </div>
+                    <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Site Settings</h3>
+                        <p class="mb-4 text-gray-600 dark:text-gray-300">Configure website settings and preferences.</p>
+                        <a href="settings.html" class="w-full block p-3 bg-accent text-white rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 text-center transition-colors duration-200">Site Settings</a>
+                    </div>
+                    <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Oil Management</h3>
+                        <p class="mb-4 text-gray-600 dark:text-gray-300">Manage oil products, add descriptions and images.</p>
+                        <a href="oil-products-management.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Products</a>
+                    </div>
+                    <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Consumables Management</h3>
+                        <p class="mb-4 text-gray-600 dark:text-gray-300">Manage consumable products, add descriptions and images.</p>
+                        <a href="consumables-mgmt.html" class="w-full block p-3 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-center transition-colors duration-200">Manage Products</a>
+                    </div>
+                    <div class="card widget-warning p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Orders Review</h3>
+                        <p class="mb-4 text-gray-600 dark:text-gray-300">Review and manage workshop orders.</p>
+                        <a href="orders-review.html" class="w-full block p-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 text-center transition-colors duration-200">Go to Orders Review</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
                     <script>
                         // Load and apply site settings
                         function loadAndApplySettings() {
@@ -283,5 +307,5 @@
                             setTimeout(() => toast.classList.add('hidden'), 3000);
                         }
                     </script>
-                    </body>
+</body>
 </html>
