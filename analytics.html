@@ -218,21 +218,25 @@
                 <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
                 <div class="flex min-h-screen">
                     <!-- Sidebar -->
-                    <aside id="sidebar" class="w-64 fixed top-0 left-0 h-full bg-gray-800 text-white p-4 flex flex-col shadow md:static md:translate-x-0 transform transition-transform duration-300">
-                        <h1 class="text-2xl font-bold mb-6">Josh's App</h1>
-                        <nav aria-label="Main navigation">
-                            <ul class="space-y-2">
-                                <li><a class="block p-2 rounded hover:bg-primary" href="index.html">Home</a></li>
-                                <li><a class="block p-2 rounded hover:bg-primary" href="administration.html">Administration</a></li>
-                                <li><a class="block p-2 rounded hover:bg-primary" href="users.html">User Management</a></li>
-                                <li><a class="block p-2 rounded bg-primary" aria-current="page" href="analytics.html">Analytics</a></li>
-                                <li><a class="block p-2 rounded hover:bg-primary" href="settings.html">Settings</a></li>
-                                <li><a class="block p-2 rounded hover:bg-primary" href="oil.html">Oil Orders</a></li>
-                                <li><a class="block p-2 rounded hover:bg-primary" href="consumables.html">Consumables Orders</a></li>
-                                <li><a class="block p-2 rounded hover:bg-red-600" href="login.html">Logout</a></li>
+                    <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
+                        <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
+                        <nav role="navigation" aria-label="Main navigation">
+                            <ul class="space-y-2" role="list">
+                                <li role="listitem"><a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Home</a></li>
+                                <li role="listitem"><a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a></li>
+                                <li role="listitem"><a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">User Management</a></li>
+                                <li role="listitem"><a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link active" aria-current="page">Analytics</a></li>
+                                <li role="listitem"><a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Settings</a></li>
+                                <li role="listitem"><a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Oil Orders</a></li>
+                                <li role="listitem"><a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Consumables Orders</a></li>
+                                <li role="listitem"><a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link nav-link-logout">Logout</a></li>
                             </ul>
                         </nav>
-                        <button id="theme-toggle" class="w-full mt-4 p-2 rounded bg-primary text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">Toggle Light/Dark</button>
+                        <div class="mt-auto">
+                            <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
+                                Toggle Light Mode
+                            </button>
+                        </div>
                         <div class="mt-auto pt-4 text-xs text-gray-300">v1 Settings</div>
                     </aside>
                     <!-- Main Content -->
