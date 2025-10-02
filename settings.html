@@ -332,14 +332,144 @@
 
             <!-- Audit -->
             <div id="audit-tab" class="tab-panel p-4 hidden">
-
               <div class="flex items-center justify-between mb-3">
                 <h3 class="font-semibold text-lg">Audit Log</h3>
+                <div class="flex gap-2">
+                  <button id="export-audit-log" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">Export</button>
+                  <button id="clear-audit-log" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">Clear</button>
+                </div>
+              </div>
+              <div class="mb-3 flex gap-3">
+                <select id="audit-filter" class="p-2 rounded bg-gray-100 dark:bg-gray-700">
+                  <option value="">All Actions</option>
+                  <option value="page_access">Page Access</option>
+                  <option value="settings_change">Settings Change</option>
+                  <option value="theme_change">Theme Change</option>
+                  <option value="security_change">Security Change</option>
+                </select>
+                <input id="audit-date-filter" type="date" class="p-2 rounded bg-gray-100 dark:bg-gray-700" />
+              </div>
+              <div id="audit-log-list" class="space-y-2 border border-gray-200 dark:border-gray-700 rounded">
+                <div class="p-4 text-gray-500 dark:text-gray-400 text-center">No audit log entries found</div>
               </div>
             </div>
         </section>
     </main>
+    <script src="admin-audit-logger.js"></script>
     <script>
+        // Tab switching functionality
+        function initTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.getAttribute('data-tab');
+                    
+                    // Remove active state from all buttons
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('bg-primary', 'text-white');
+                        btn.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+                    });
+                    
+                    // Add active state to clicked button
+                    button.classList.add('bg-primary', 'text-white');
+                    button.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+                    
+                    // Hide all panels
+                    tabPanels.forEach(panel => {
+                        panel.classList.add('hidden');
+                    });
+                    
+                    // Show target panel
+                    const targetPanel = document.getElementById(`${targetTab}-tab`);
+                    if (targetPanel) {
+                        targetPanel.classList.remove('hidden');
+                    }
+                });
+            });
+        }
+
+        // Toast notification functionality
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            
+            toast.textContent = message;
+            toast.classList.remove('hidden', 'bg-accent', 'bg-red-500', 'bg-green-500', 'bg-blue-500');
+            
+            if (type === 'error') {
+                toast.classList.add('bg-red-500');
+            } else if (type === 'success') {
+                toast.classList.add('bg-green-500');
+            } else if (type === 'info') {
+                toast.classList.add('bg-blue-500');
+            } else {
+                toast.classList.add('bg-accent');
+            }
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Get form settings
+        function getFormSettings() {
+            return {
+                siteTitle: document.getElementById('site-title')?.value || '',
+                siteDescription: document.getElementById('site-description')?.value || '',
+                theme: document.getElementById('theme-select')?.value || 'dark',
+                contactEmail: document.getElementById('contact-email')?.value || '',
+                maintenanceMode: document.getElementById('maintenance-mode')?.checked || false
+            };
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+            
+            if (settings.siteTitle) document.getElementById('site-title').value = settings.siteTitle;
+            if (settings.siteDescription) document.getElementById('site-description').value = settings.siteDescription;
+            if (settings.theme) document.getElementById('theme-select').value = settings.theme;
+            if (settings.contactEmail) document.getElementById('contact-email').value = settings.contactEmail;
+            if (settings.maintenanceMode !== undefined) document.getElementById('maintenance-mode').checked = settings.maintenanceMode;
+        }
+
+        // Update preview (placeholder for now)
+        function updatePreview() {
+            // Preview functionality can be expanded later
+        }
+
+        // Apply dynamic colors from settings
+        function applyDynamicColors() {
+            const themeSettings = JSON.parse(localStorage.getItem('themeSettings') || '{}');
+            
+            if (themeSettings.primaryColor) {
+                document.documentElement.style.setProperty('--tw-color-primary', themeSettings.primaryColor);
+            }
+            if (themeSettings.secondaryColor) {
+                document.documentElement.style.setProperty('--tw-color-secondary', themeSettings.secondaryColor);
+            }
+            if (themeSettings.accentColor) {
+                document.documentElement.style.setProperty('--tw-color-accent', themeSettings.accentColor);
+            }
+        }
+
+        // Mock AuditLogger if not available
+        if (typeof AuditLogger === 'undefined') {
+            window.AuditLogger = {
+                log: function(action, details) {
+                    console.log('[Audit]', action, details);
+                },
+                getLogs: function(filter, dateFilter) {
+                    return [];
+                },
+                clearLogs: function() {
+                    console.log('[Audit] Logs cleared');
+                }
+            };
+        }
+
         // Save settings with audit logging
         function saveSettings() {
             const settings = getFormSettings();
@@ -407,27 +537,39 @@
             let schedulerInterval = null;
 
             function updateScheduleUI() {
-                document.getElementById('schedule-enabled').checked = themeSchedule.enabled;
-                document.getElementById('dark-mode-start').value = themeSchedule.darkModeStart;
-                document.getElementById('light-mode-start').value = themeSchedule.lightModeStart;
-                
+                const scheduleEnabled = document.getElementById('schedule-enabled');
+                const darkModeStart = document.getElementById('dark-mode-start');
+                const lightModeStart = document.getElementById('light-mode-start');
                 const statusEl = document.getElementById('schedule-status');
-                statusEl.textContent = themeSchedule.enabled ? 'Enabled' : 'Disabled';
-                statusEl.className = `text-xs px-2 py-1 rounded ${themeSchedule.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`;
+                
+                if (scheduleEnabled) scheduleEnabled.checked = themeSchedule.enabled;
+                if (darkModeStart) darkModeStart.value = themeSchedule.darkModeStart;
+                if (lightModeStart) lightModeStart.value = themeSchedule.lightModeStart;
+                
+                if (statusEl) {
+                    statusEl.textContent = themeSchedule.enabled ? 'Enabled' : 'Disabled';
+                    statusEl.className = `text-xs px-2 py-1 rounded ${themeSchedule.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`;
+                }
             }
 
             function updateTimeDisplay() {
                 const now = new Date();
-                document.getElementById('current-time').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
+                const currentTimeEl = document.getElementById('current-time');
                 const scheduledModeEl = document.getElementById('scheduled-mode');
-                if (!themeSchedule.enabled) {
-                    scheduledModeEl.textContent = 'Manual';
-                    scheduledModeEl.className = 'text-gray-600 dark:text-gray-400';
-                } else {
-                    const isDark = isDarkModeTime();
-                    scheduledModeEl.textContent = isDark ? 'Dark' : 'Light';
-                    scheduledModeEl.className = isDark ? 'text-blue-400' : 'text-yellow-400';
+                
+                if (currentTimeEl) {
+                    currentTimeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+                
+                if (scheduledModeEl) {
+                    if (!themeSchedule.enabled) {
+                        scheduledModeEl.textContent = 'Manual';
+                        scheduledModeEl.className = 'text-gray-600 dark:text-gray-400';
+                    } else {
+                        const isDark = isDarkModeTime();
+                        scheduledModeEl.textContent = isDark ? 'Dark' : 'Light';
+                        scheduledModeEl.className = isDark ? 'text-blue-400' : 'text-yellow-400';
+                    }
                 }
             }
 
@@ -550,13 +692,20 @@
             renderAuditLog();
         }
 
-        // Add event listeners for real-time preview updates
-        document.getElementById('site-title').addEventListener('input', updatePreview);
-        document.getElementById('site-description').addEventListener('input', updatePreview);
-        document.getElementById('theme').addEventListener('change', updatePreview);
-        document.getElementById('contact-email').addEventListener('input', updatePreview);
-        document.getElementById('maintenance-mode').addEventListener('change', updatePreview);
-        document.getElementById('homepage-message').addEventListener('input', updatePreview);
+        // Add event listeners for real-time preview updates (only if elements exist)
+        const siteTitle = document.getElementById('site-title');
+        const siteDescription = document.getElementById('site-description');
+        const themeSelect = document.getElementById('theme') || document.getElementById('theme-select');
+        const contactEmail = document.getElementById('contact-email');
+        const maintenanceMode = document.getElementById('maintenance-mode');
+        const homepageMessage = document.getElementById('homepage-message');
+        
+        if (siteTitle) siteTitle.addEventListener('input', updatePreview);
+        if (siteDescription) siteDescription.addEventListener('input', updatePreview);
+        if (themeSelect) themeSelect.addEventListener('change', updatePreview);
+        if (contactEmail) contactEmail.addEventListener('input', updatePreview);
+        if (maintenanceMode) maintenanceMode.addEventListener('change', updatePreview);
+        if (homepageMessage) homepageMessage.addEventListener('input', updatePreview);
 
         // Settings form submission
         document.getElementById('settings-form').addEventListener('submit', (e) => {
@@ -564,38 +713,47 @@
             saveSettings();
         });
 
-        // Quick action buttons
-        document.querySelector('[data-action="clear-cache"]').addEventListener('click', () => {
-            localStorage.removeItem('user');
-            localStorage.removeItem('siteUsers');
-            AuditLogger.log('cache_clear', 'Cleared user cache and site users data');
-            showToast('Cache cleared successfully!');
-        });
+        // Quick action buttons (only if they exist)
+        const clearCacheBtn = document.querySelector('[data-action="clear-cache"]');
+        if (clearCacheBtn) {
+            clearCacheBtn.addEventListener('click', () => {
+                localStorage.removeItem('user');
+                localStorage.removeItem('siteUsers');
+                AuditLogger.log('cache_clear', 'Cleared user cache and site users data');
+                showToast('Cache cleared successfully!');
+            });
+        }
 
-        document.querySelector('[data-action="export-settings"]').addEventListener('click', () => {
-            const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'site-settings.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            AuditLogger.log('settings_export', 'Exported site settings configuration');
-            showToast('Settings exported successfully!');
-        });
+        const exportSettingsBtn = document.querySelector('[data-action="export-settings"]');
+        if (exportSettingsBtn) {
+            exportSettingsBtn.addEventListener('click', () => {
+                const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+                const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'site-settings.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                AuditLogger.log('settings_export', 'Exported site settings configuration');
+                showToast('Settings exported successfully!');
+            });
+        }
 
-        document.querySelector('[data-action="reset-defaults"]').addEventListener('click', () => {
-            if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
-                const previousSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-                localStorage.removeItem('siteSettings');
-                loadSettings();
-                AuditLogger.log('settings_reset', `Reset all settings to defaults. Previous settings: ${JSON.stringify(previousSettings)}`);
-                showToast('Settings reset to defaults!');
-            }
-        });
+        const resetDefaultsBtn = document.querySelector('[data-action="reset-defaults"]');
+        if (resetDefaultsBtn) {
+            resetDefaultsBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
+                    const previousSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+                    localStorage.removeItem('siteSettings');
+                    loadSettings();
+                    AuditLogger.log('settings_reset', `Reset all settings to defaults. Previous settings: ${JSON.stringify(previousSettings)}`);
+                    showToast('Settings reset to defaults!');
+                }
+            });
+        }
 
         // Theme toggle functionality
         document.getElementById('theme-toggle').addEventListener('click', function() {
@@ -612,7 +770,10 @@
                 localStorage.setItem('theme', 'dark');
             }
             // Update settings form theme selector to match current theme
-            document.getElementById('theme').value = body.classList.contains('dark') ? 'dark' : 'light';
+            const themeInput = document.getElementById('theme') || document.getElementById('theme-select');
+            if (themeInput) {
+                themeInput.value = body.classList.contains('dark') ? 'dark' : 'light';
+            }
             updatePreview();
         });
 
@@ -620,16 +781,22 @@
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        menuToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('open');
-            sidebarBackdrop.classList.toggle('open');
-            this.setAttribute('aria-expanded', sidebar.classList.contains('open'));
-        });
-        sidebarBackdrop.addEventListener('click', function() {
-            sidebar.classList.remove('open');
-            sidebarBackdrop.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-        });
+        
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                if (sidebarBackdrop) sidebarBackdrop.classList.toggle('open');
+                this.setAttribute('aria-expanded', sidebar.classList.contains('open'));
+            });
+        }
+        
+        if (sidebarBackdrop) {
+            sidebarBackdrop.addEventListener('click', function() {
+                if (sidebar) sidebar.classList.remove('open');
+                sidebarBackdrop.classList.remove('open');
+                if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+            });
+        }
 
         // Initialize all functionality when page loads
         document.addEventListener('DOMContentLoaded', () => {
