@@ -1,3 +1,51 @@
+// --- Category Management Logic ---
+let categories = [];
+const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+const categoryModal = document.getElementById('categoryModal');
+const closeCategoryModal = document.getElementById('closeCategoryModal');
+const categoryForm = document.getElementById('categoryForm');
+const newCategoryInput = document.getElementById('newCategoryInput');
+const categoryList = document.getElementById('categoryList');
+
+function loadCategories() {
+  categories = JSON.parse(localStorage.getItem('consumablesMgmtCategories') || '[]');
+}
+function saveCategories() {
+  localStorage.setItem('consumablesMgmtCategories', JSON.stringify(categories));
+}
+function renderCategories() {
+  categoryList.innerHTML = categories.map((cat, i) => `
+    <li class="flex items-center justify-between bg-gray-800 rounded px-3 py-2">
+      <span>${cat}</span>
+      <button class="btn-neon-pink px-2 py-1 rounded text-xs font-semibold" onclick="deleteCategory(${i})">Delete</button>
+    </li>
+  `).join('');
+}
+window.deleteCategory = function(idx) {
+  const removed = categories.splice(idx, 1);
+  saveCategories();
+  renderCategories();
+  addAuditLog('Delete Category', null, `Deleted category: ${removed[0]}`);
+};
+categoryForm.onsubmit = function(e) {
+  e.preventDefault();
+  const val = newCategoryInput.value.trim();
+  if (val && !categories.includes(val)) {
+    categories.push(val);
+    saveCategories();
+    renderCategories();
+    addAuditLog('Add Category', null, `Added category: ${val}`);
+    newCategoryInput.value = '';
+  }
+};
+manageCategoriesBtn.onclick = function() {
+  loadCategories();
+  renderCategories();
+  categoryModal.classList.remove('hidden');
+};
+closeCategoryModal.onclick = function() {
+  categoryModal.classList.add('hidden');
+};
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,11 +132,125 @@
           Toggle Light Mode
         </button>
       </div>
+      <!-- Audit Log Section -->
+      <div class="bg-gray-900 rounded-lg shadow p-4 mb-8">
+        <h3 class="text-lg font-bold text-accent mb-2">Audit Log</h3>
+        <div class="overflow-x-auto max-h-64">
+          <table class="min-w-full text-xs bg-gray-900 text-white">
+            <thead>
+              <tr class="bg-accent text-left">
+                <th class="p-2">Time</th>
+                <th class="p-2">Action</th>
+                <th class="p-2">Product</th>
+                <th class="p-2">Details</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogBody">
+              <!-- Audit log entries -->
+            </tbody>
+          </table>
+        </div>
+        <button id="clearAuditLogBtn" class="btn-neon-pink px-3 py-1 mt-2 rounded text-xs font-semibold">Clear Log</button>
+      </div>
       <div class="mt-auto pt-4 text-xs text-gray-300">v1 Settings</div>
     </aside>
     <!-- Main Content -->
     <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
-  <style>
+      <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+          <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Consumables Product Management</h2>
+          <div class="flex gap-2">
+            <button id="addProductBtn" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
+            <button id="importBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Import CSV</button>
+            <button id="exportBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Export CSV</button>
+            <button id="syncInventoryBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Sync Inventory</button>
+            <button id="manageCategoriesBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Categories</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto rounded-lg shadow mb-8">
+      <!-- Category Management Modal -->
+      <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+        <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6 relative border-2 border-accent">
+          <button id="closeCategoryModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
+          <h3 class="text-xl font-bold text-accent mb-4">Manage Categories</h3>
+          <form id="categoryForm" class="flex gap-2 mb-4">
+            <input type="text" id="newCategoryInput" class="flex-1 px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" placeholder="New category" required>
+            <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Add</button>
+          </form>
+          <ul id="categoryList" class="space-y-2">
+            <!-- Categories will be rendered here -->
+          </ul>
+        </div>
+      </div>
+          <table class="min-w-full bg-gray-900 text-white">
+            <thead>
+              <tr class="bg-accent text-left">
+                <th class="p-3">Image</th>
+                <th class="p-3">Name</th>
+                <th class="p-3">Type</th>
+                <th class="p-3">Category</th>
+                <th class="p-3">Code</th>
+                <th class="p-3">Stock</th>
+                <th class="p-3">Reorder</th>
+                <th class="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productTableBody">
+              <!-- Products will be rendered here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Product Modal -->
+      <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+        <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6 relative border-2 border-accent">
+          <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
+          <h3 class="text-xl font-bold text-accent mb-4" id="productModalTitle">Add Product</h3>
+          <form id="productForm" class="space-y-4">
+            <input type="hidden" id="productId">
+            <div>
+              <label class="block text-sm font-medium mb-1">Name</label>
+              <input type="text" id="productName" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Type</label>
+              <input type="text" id="productType" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Category</label>
+              <input type="text" id="productCategory" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" list="categoryDatalist">
+              <datalist id="categoryDatalist"></datalist>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Code</label>
+              <input type="text" id="productCode" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white">
+            </div>
+            <div class="flex gap-4">
+              <div class="flex-1">
+                <label class="block text-sm font-medium mb-1">Stock</label>
+                <input type="number" id="productStock" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" min="0" required>
+              </div>
+              <div class="flex-1">
+                <label class="block text-sm font-medium mb-1">Reorder Point</label>
+                <input type="number" id="productReorder" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" min="0" required>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Image</label>
+              <div id="imageDropZone" class="w-full p-2 border-2 border-dashed border-gray-600 rounded bg-gray-800 text-center cursor-pointer hover:border-accent transition">
+                <span id="imageDropText">Click or drag image here</span>
+                <input type="file" id="productImage" accept="image/*" class="w-full text-white hidden">
+                <img id="productImagePreview" src="" alt="Preview" class="mt-2 max-h-24 hidden rounded border border-gray-700 mx-auto">
+                <button type="button" id="removeImageBtn" class="btn-neon-pink px-2 py-1 mt-2 rounded text-xs font-semibold hidden">Remove Image</button>
+              </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-4">
+              <button type="button" id="deleteProductBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold hidden">Delete</button>
+              <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
     body {
       transition: background-color 0.3s, color 0.3s;
       font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
@@ -209,5 +371,357 @@
     }
   </style>
 
+</main>
+<script>
+// --- Product CRUD Logic ---
+let products = [];
+const productTableBody = document.getElementById('productTableBody');
+const productModal = document.getElementById('productModal');
+const productForm = document.getElementById('productForm');
+const addProductBtn = document.getElementById('addProductBtn');
+const closeProductModal = document.getElementById('closeProductModal');
+const productModalTitle = document.getElementById('productModalTitle');
+const deleteProductBtn = document.getElementById('deleteProductBtn');
+const productIdInput = document.getElementById('productId');
+const productNameInput = document.getElementById('productName');
+const productTypeInput = document.getElementById('productType');
+const productCategoryInput = document.getElementById('productCategory');
+const productCodeInput = document.getElementById('productCode');
+const productStockInput = document.getElementById('productStock');
+const productReorderInput = document.getElementById('productReorder');
+const productImageInput = document.getElementById('productImage');
+
+
+const productImagePreview = document.getElementById('productImagePreview');
+const imageDropZone = document.getElementById('imageDropZone');
+const imageDropText = document.getElementById('imageDropText');
+const removeImageBtn = document.getElementById('removeImageBtn');
+
+productImageInput.onchange = function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      productImagePreview.src = evt.target.result;
+      productImagePreview.classList.remove('hidden');
+      removeImageBtn.classList.remove('hidden');
+      imageDropText.classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+// Drag-and-drop support
+imageDropZone.addEventListener('click', () => productImageInput.click());
+imageDropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  imageDropZone.classList.add('border-accent');
+});
+imageDropZone.addEventListener('dragleave', e => {
+  e.preventDefault();
+  imageDropZone.classList.remove('border-accent');
+});
+imageDropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  imageDropZone.classList.remove('border-accent');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    productImageInput.files = e.dataTransfer.files;
+    productImageInput.onchange({ target: productImageInput });
+  }
+});
+
+removeImageBtn.onclick = function() {
+  productImagePreview.src = '';
+  productImagePreview.classList.add('hidden');
+  removeImageBtn.classList.add('hidden');
+  imageDropText.classList.remove('hidden');
+  productImageInput.value = '';
+};
+const importBtn = document.getElementById('importBtn');
+const exportBtn = document.getElementById('exportBtn');
+const auditLogBody = document.getElementById('auditLogBody');
+const clearAuditLogBtn = document.getElementById('clearAuditLogBtn');
+const syncInventoryBtn = document.getElementById('syncInventoryBtn');
+// --- Sync with Inventory API ---
+syncInventoryBtn.onclick = async function() {
+  syncInventoryBtn.disabled = true;
+  syncInventoryBtn.textContent = 'Syncing...';
+  try {
+    const res = await fetch('/api/products');
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('Invalid data');
+    products = data.map(p => ({
+      name: p.name || '',
+      type: p.type || '',
+      category: p.category || '',
+      code: p.code || '',
+      stock: parseInt(p.stock, 10) || 0,
+      reorder: parseInt(p.reorder, 10) || 0,
+      image: p.image || ''
+    }));
+    saveProducts();
+    renderProducts();
+    await addAuditLog('Sync', null, `Synced ${products.length} products from API`);
+    alert('Inventory synced successfully!');
+  } catch (err) {
+    alert('Failed to sync inventory: ' + (err.message || err));
+    await addAuditLog('Sync Failed', null, err.message || String(err));
+  } finally {
+    syncInventoryBtn.disabled = false;
+    syncInventoryBtn.textContent = 'Sync Inventory';
+  }
+};
+
+// --- Audit Log Logic ---
+function getAuditLog() {
+  return JSON.parse(localStorage.getItem('consumablesMgmtAuditLog') || '[]');
+}
+function saveAuditLog(log) {
+  localStorage.setItem('consumablesMgmtAuditLog', JSON.stringify(log));
+}
+async function addAuditLog(action, product, details) {
+  const entry = {
+    time: new Date().toISOString(),
+    action,
+    product: product?.name || '',
+    details: details || ''
+  };
+  // Local log
+  const log = getAuditLog();
+  log.unshift({ ...entry, time: new Date().toLocaleString() });
+  if (log.length > 200) log.length = 200;
+  saveAuditLog(log);
+  renderAuditLog();
+  // Send to backend
+  try {
+    await fetch('/api/audit-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry)
+    });
+  } catch (err) {
+    // Optionally show error or ignore
+    console.warn('Failed to log audit entry to backend:', err);
+  }
+}
+function renderAuditLog() {
+  const log = getAuditLog();
+  auditLogBody.innerHTML = log.map(entry => `
+    <tr>
+      <td class="p-2">${entry.time}</td>
+      <td class="p-2">${entry.action}</td>
+      <td class="p-2">${entry.product}</td>
+      <td class="p-2">${entry.details}</td>
+    </tr>
+  `).join('');
+}
+clearAuditLogBtn.onclick = function() {
+  if (confirm('Clear all audit log entries?')) {
+    saveAuditLog([]);
+    renderAuditLog();
+  }
+};
+
+// --- CSV Export ---
+function exportProductsCSV() {
+  addAuditLog('Export', null, 'Exported products as CSV');
+  const headers = ['Name','Type','Category','Code','Stock','Reorder','Image'];
+  const rows = products.map(p => [
+    p.name,
+    p.type || '',
+    p.category || '',
+    p.code || '',
+    p.stock ?? '',
+    p.reorder ?? '',
+    p.image || ''
+  ]);
+  const csv = [headers, ...rows].map(row => row.map(val => '"'+String(val).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'consumables-products.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+exportBtn.onclick = exportProductsCSV;
+
+// --- CSV Import ---
+function importProductsCSV(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    if (lines.length < 2) return;
+    const [header, ...dataRows] = lines;
+    const cols = header.split(',').map(h => h.replace(/"/g, '').trim());
+    const idx = (name) => cols.indexOf(name);
+    const imported = dataRows.map(row => {
+      const vals = row.split(',').map(v => v.replace(/^"|"$/g, ''));
+      return {
+        name: vals[idx('Name')] || '',
+        type: vals[idx('Type')] || '',
+        category: vals[idx('Category')] || '',
+        code: vals[idx('Code')] || '',
+        stock: parseInt(vals[idx('Stock')], 10) || 0,
+        reorder: parseInt(vals[idx('Reorder')], 10) || 0,
+        image: vals[idx('Image')] || ''
+      };
+    });
+  products = imported;
+  saveProducts();
+  renderProducts();
+  addAuditLog('Import', null, `Imported ${imported.length} products from CSV`);
+  alert('Products imported successfully!');
+  };
+  reader.readAsText(file);
+}
+importBtn.onclick = function() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv,text/csv';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (file) importProductsCSV(file);
+  };
+  input.click();
+};
+
+function loadProducts() {
+  const data = localStorage.getItem('consumablesMgmtProducts');
+  products = data ? JSON.parse(data) : [];
+}
+function saveProducts() {
+  localStorage.setItem('consumablesMgmtProducts', JSON.stringify(products));
+}
+function renderProducts() {
+  productTableBody.innerHTML = products.map((p, i) => `
+    <tr class="border-b border-gray-700">
+      <td class="p-2">${p.image ? `<img src="${p.image}" class="h-10 w-10 object-cover rounded">` : ''}</td>
+      <td class="p-2">${p.name}</td>
+      <td class="p-2">${p.type || ''}</td>
+      <td class="p-2">${p.category || ''}</td>
+      <td class="p-2">${p.code || ''}</td>
+      <td class="p-2 flex items-center gap-2">
+        <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Decrease Stock" onclick="adjustStock(${i},-1)">−</button>
+        <span>${p.stock ?? ''}</span>
+        <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Increase Stock" onclick="adjustStock(${i},1)">+</button>
+      </td>
+      <td class="p-2">${p.reorder ?? ''}</td>
+      <td class="p-2">
+        <button class="btn-neon-blue px-2 py-1 rounded text-xs font-semibold" onclick="editProduct(${i})">Edit</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.adjustStock = function(idx, delta) {
+  if (products[idx]) {
+    let oldStock = parseInt(products[idx].stock, 10) || 0;
+    let newStock = oldStock + delta;
+    if (newStock < 0) newStock = 0;
+    products[idx].stock = newStock;
+    saveProducts();
+    renderProducts();
+    addAuditLog('Stock Adjust', products[idx], `Stock: ${oldStock} → ${newStock}`);
+  }
+};
+function renderCategoryDatalist() {
+  loadCategories();
+  const datalist = document.getElementById('categoryDatalist');
+  datalist.innerHTML = categories.map(cat => `<option value="${cat}"></option>`).join('');
+}
+function openProductModal(editIdx) {
+  productModal.classList.remove('hidden');
+  productForm.reset();
+  productImagePreview.classList.add('hidden');
+  removeImageBtn.classList.add('hidden');
+  imageDropText.classList.remove('hidden');
+  deleteProductBtn.classList.add('hidden');
+  productImageInput.value = '';
+  renderCategoryDatalist();
+  if (typeof editIdx === 'number') {
+    const p = products[editIdx];
+    productModalTitle.textContent = 'Edit Product';
+    productIdInput.value = editIdx;
+    productNameInput.value = p.name;
+    productTypeInput.value = p.type || '';
+    productCategoryInput.value = p.category || '';
+    productCodeInput.value = p.code || '';
+    productStockInput.value = p.stock ?? '';
+    productReorderInput.value = p.reorder ?? '';
+    if (p.image) {
+      productImagePreview.src = p.image;
+      productImagePreview.classList.remove('hidden');
+      removeImageBtn.classList.remove('hidden');
+      imageDropText.classList.add('hidden');
+    }
+    deleteProductBtn.classList.remove('hidden');
+  } else {
+    productModalTitle.textContent = 'Add Product';
+    productIdInput.value = '';
+  }
+}
+function closeModal() {
+  productModal.classList.add('hidden');
+}
+addProductBtn.onclick = () => openProductModal();
+closeProductModal.onclick = closeModal;
+window.editProduct = function(idx) { openProductModal(idx); };
+productImageInput.onchange = function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      productImagePreview.src = evt.target.result;
+      productImagePreview.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+};
+productForm.onsubmit = function(e) {
+  e.preventDefault();
+  const idx = productIdInput.value;
+  const prod = {
+    name: productNameInput.value,
+    type: productTypeInput.value,
+    category: productCategoryInput.value,
+    code: productCodeInput.value,
+    stock: parseInt(productStockInput.value, 10) || 0,
+    reorder: parseInt(productReorderInput.value, 10) || 0,
+    image: productImagePreview.src && !productImagePreview.classList.contains('hidden') ? productImagePreview.src : ''
+  };
+  if (idx !== '') {
+    const old = products[idx];
+    products[idx] = prod;
+    addAuditLog('Edit', prod, `Edited product. Old: ${JSON.stringify(old)}${old.image !== prod.image ? ' (Image changed)' : ''}`);
+  } else {
+    products.push(prod);
+    addAuditLog('Add', prod, 'Added new product' + (prod.image ? ' (Image uploaded)' : ''));
+  }
+  saveProducts();
+  renderProducts();
+  closeModal();
+};
+deleteProductBtn.onclick = function() {
+  const idx = productIdInput.value;
+  if (idx !== '') {
+    const prod = products[idx];
+    products.splice(idx, 1);
+    saveProducts();
+    renderProducts();
+    addAuditLog('Delete', prod, 'Deleted product');
+    closeModal();
+  }
+};
+window.addEventListener('DOMContentLoaded', () => {
+  loadProducts();
+  renderProducts();
+  renderAuditLog();
+});
+</script>
 </body>
 </html>
