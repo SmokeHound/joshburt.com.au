@@ -422,13 +422,14 @@
       
       // Order management functions
       function addToOrder(productId, productName, productType, productCode, productCategory) {
-        const existingItem = orderItems.find(item => item.id === productId);
-        
+        // Always treat IDs as strings to avoid type mismatch bugs
+        const idStr = String(productId);
+        const existingItem = orderItems.find(item => String(item.id) === idStr);
         if (existingItem) {
           existingItem.quantity++;
         } else {
           orderItems.push({
-            id: productId,
+            id: idStr,
             name: productName,
             type: productType || 'Unknown',
             code: productCode || 'N/A',
@@ -444,7 +445,8 @@
       }
       
       function removeFromOrder(productId) {
-        const index = orderItems.findIndex(item => item.id === productId);
+  const idStr = String(productId);
+  const index = orderItems.findIndex(item => String(item.id) === idStr);
         if (index > -1) {
           orderItems.splice(index, 1);
           updateOrderDisplay();
@@ -452,7 +454,8 @@
       }
       
       function updateQuantity(productId, newQuantity) {
-        const item = orderItems.find(item => item.id === productId);
+  const idStr = String(productId);
+  const item = orderItems.find(item => String(item.id) === idStr);
         if (item) {
           if (newQuantity <= 0) {
             removeFromOrder(productId);
