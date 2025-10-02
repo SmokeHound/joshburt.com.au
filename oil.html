@@ -202,7 +202,7 @@
   <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 bg-accent text-white rounded-lg shadow-lg transition-opacity duration-300 no-print" role="alert" aria-live="polite"></div>
 
 
-  <!-- Sidebar -->
+  <!-- Sidebar (copied from template.html for consistency) -->
   <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
     <!-- App Branding -->
     <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
@@ -211,7 +211,7 @@
     <nav role="navigation" aria-label="Main navigation">
       <ul class="space-y-2" role="list">
         <li role="listitem"><a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Home</a></li>
-  <li role="listitem"><a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a></li>
+        <li role="listitem"><a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a></li>
         <li role="listitem"><a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">User Management</a></li>
         <li role="listitem"><a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Analytics</a></li>
         <li role="listitem"><a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Settings</a></li>
@@ -223,14 +223,14 @@
 
     <!-- Theme Toggle -->
     <div class="mt-auto">
-      <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode">
+      <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
         Toggle Light Mode
       </button>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main id="main-content" class="p-6 min-h-screen" style="background-color: #0a0a0a;">
+  <main id="main-content" class="p-6 bg-gray-50 dark:bg-gray-800 min-h-screen">
     <!-- Header -->
     <header class="mb-8">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
@@ -239,24 +239,17 @@
           <p class="text-gray-600 dark:text-gray-300">Prepare oil inventory order list for purchasing department</p>
         </div>
         <div class="flex flex-wrap gap-2 mt-4 md:mt-0 no-print">
-          <button id="clearAllBtn" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
-            Clear All
-          </button>
-          <button id="saveOrderBtn" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">
-            Save Draft
-          </button>
-          <button id="printOrderBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
-            Print Order
-          </button>
-          <button id="emailOrderBtn" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400">
-            Email to Purchasing
-          </button>
+          <button id="clearAllBtn" class="btn-neon-pink px-4 py-2 rounded-lg font-semibold">Clear All</button>
+          <button id="saveOrderBtn" class="btn-neon-green px-4 py-2 rounded-lg font-semibold">Save Draft</button>
+          <button id="printOrderBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Print Order</button>
+          <button id="emailOrderBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Email to Purchasing</button>
         </div>
       </div>
       
       <!-- Order Info Form -->
-      <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Information</h2>
+      <!-- Neon card for order info -->
+      <div class="widget-primary card rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-100 mb-4">Order Information</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label for="requestedBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requested By</label>
@@ -285,10 +278,11 @@
     <!-- Oil Selection and Order List -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Available Oils -->
-      <div class="bg-white dark:bg-gray-700 rounded-lg shadow">
+      <!-- Neon card for available oils -->
+      <div class="widget-secondary card rounded-lg shadow-md p-0 mb-6">
         <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Available Oil Products</h2>
-          <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Click on items to add to order list</p>
+          <h2 class="text-xl font-semibold text-gray-100">Available Oil Products</h2>
+          <p class="text-sm text-gray-400 mt-1">Click on items to add to order list</p>
         </div>
         
         <!-- Data Source Switch -->
@@ -338,13 +332,14 @@
       </div>
       
       <!-- Order List -->
-      <div class="bg-white dark:bg-gray-700 rounded-lg shadow">
+      <!-- Neon card for order list -->
+      <div class="widget-primary card rounded-lg shadow-md p-0 mb-6">
         <div class="p-6 border-b border-gray-200 dark:border-gray-600">
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Order List</h2>
+            <h2 class="text-xl font-semibold text-gray-100">Order List</h2>
             <span id="orderCount" class="bg-primary text-white px-3 py-1 rounded-full text-sm">0 items</span>
           </div>
-          <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Items to be ordered</p>
+          <p class="text-sm text-gray-400 mt-1">Items to be ordered</p>
         </div>
         
         <div id="orderList" class="max-h-96 overflow-y-auto">
@@ -356,10 +351,13 @@
         
         <!-- Order Summary -->
         <div class="p-6 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
-          <div class="flex justify-between items-center text-lg font-semibold text-gray-900 dark:text-white">
+          <div class="flex justify-between items-center text-lg font-semibold text-gray-100">
             <span>Total Items:</span>
             <span id="totalOrderItems">0</span>
           </div>
+          <!-- Add submit order button for consistency with template -->
+          <button id="submitOrderBtn" class="mt-4 w-full btn-neon-green p-3 rounded-lg font-bold">Submit Order</button>
+          <div id="submitOrderStatus" class="mt-2 text-green-400 font-semibold"></div>
         </div>
       </div>
     </div>

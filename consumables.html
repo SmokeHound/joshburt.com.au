@@ -219,18 +219,10 @@
           <p class="text-gray-600 dark:text-gray-300">Prepare workshop consumables order list for purchasing department</p>
         </div>
         <div class="flex flex-wrap gap-2 mt-4 md:mt-0 no-print">
-          <button id="clearAllBtn" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
-            Clear All
-          </button>
-          <button id="saveOrderBtn" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">
-            Save Draft
-          </button>
-          <button id="printOrderBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
-            Print Order
-          </button>
-          <button id="emailOrderBtn" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400">
-            Email to Purchasing
-          </button>
+          <button id="clearAllBtn" class="btn-neon-pink px-4 py-2 rounded-lg font-semibold">Clear All</button>
+          <button id="saveOrderBtn" class="btn-neon-green px-4 py-2 rounded-lg font-semibold">Save Draft</button>
+          <button id="printOrderBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Print Order</button>
+          <button id="emailOrderBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Email to Purchasing</button>
         </div>
       </div>
       
@@ -265,10 +257,11 @@
     <!-- Consumables Selection and Order List -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Available Consumables -->
-        <div class="widget-secondary rounded-lg shadow">
+        <!-- Neon card for available consumables -->
+        <div class="card widget-secondary rounded-lg shadow-md p-0 mb-6">
         <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Available Consumables</h2>
-          <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Click on items to add to order list</p>
+          <h2 class="text-xl font-semibold text-gray-100">Available Consumables</h2>
+          <p class="text-sm text-gray-400 mt-1">Click on items to add to order list</p>
         </div>
         
         <!-- Search and Filter -->
@@ -299,13 +292,14 @@
       </div>
       
       <!-- Order List -->
-        <div class="widget-secondary rounded-lg shadow">
+  <!-- Neon card for order list -->
+  <div class="card widget-primary rounded-lg shadow-md p-0 mb-6">
         <div class="p-6 border-b border-gray-200 dark:border-gray-600">
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Order List</h2>
+            <h2 class="text-xl font-semibold text-gray-100">Order List</h2>
             <span id="orderCount" class="bg-primary text-white px-3 py-1 rounded-full text-sm">0 items</span>
           </div>
-          <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Items to be ordered</p>
+          <p class="text-sm text-gray-400 mt-1">Items to be ordered</p>
         </div>
         
         <div id="orderList" class="max-h-96 overflow-y-auto">
@@ -317,12 +311,12 @@
         
         <!-- Order Summary -->
         <div class="p-6 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
-          <div class="flex justify-between items-center text-lg font-semibold text-gray-900 dark:text-white">
+          <div class="flex justify-between items-center text-lg font-semibold text-gray-100">
             <span>Total Items:</span>
             <span id="totalOrderItems">0</span>
           </div>
-            <button id="submitOrderBtn" class="mt-4 w-full bg-green-600 text-white px-6 py-2 rounded font-bold">Submit Order</button>
-            <div id="submitOrderStatus" class="mt-2 text-green-700 font-semibold"></div>
+            <button id="submitOrderBtn" class="mt-4 w-full btn-neon-green p-3 rounded-lg font-bold">Submit Order</button>
+            <div id="submitOrderStatus" class="mt-2 text-green-400 font-semibold"></div>
         </div>
       </div>
     </div>
@@ -487,11 +481,11 @@
           <div class="p-4 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
             <div class="flex justify-between items-start mb-3">
               <div class="flex-1 min-w-0">
-                <h4 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(item.name)}</h4>
-                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(item.type)} • Code: ${escapeHtml(item.code)}</p>
+                <h4 class="font-medium text-gray-100">${escapeHtml(item.name)}</h4>
+                <p class="text-sm text-gray-400">${escapeHtml(item.type)} • Code: ${escapeHtml(item.code)}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(item.category)}</p>
               </div>
-              <button onclick="removeFromOrder(${item.id})" class="text-red-500 hover:text-red-700 p-1 no-print" title="Remove item">
+              <button onclick="removeFromOrder(${item.id})" class="btn-neon-pink text-white p-1 rounded no-print" title="Remove item">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>

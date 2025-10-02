@@ -48,14 +48,13 @@
         applyDynamicColors();
         // Service Worker Registration for PWA
         if ("serviceWorker" in navigator) {
-                navigator.serviceWorker.register("./sw.js")
-                    .then(registration => {
-                        console.log("SW registered: ", registration);
-                    })
-                    .catch(registrationError => {
-                        console.log("SW registration failed: ", registrationError);
-                    });
-            });
+            navigator.serviceWorker.register("./sw.js")
+                .then(registration => {
+                    console.log("SW registered: ", registration);
+                })
+                .catch(registrationError => {
+                    console.log("SW registration failed: ", registrationError);
+                });
         }
     </script>
     <style>
@@ -175,18 +174,18 @@
     </button>
 
     <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300" style="background-color: #00d4ff; color: #000000;" role="alert" aria-live="polite"></div>
+    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300 btn-neon-blue text-black" role="alert" aria-live="polite"></div>
 
     <!-- Login Container -->
     <main id="main-content" class="w-full max-w-md" role="main">
         <!-- Header -->
         <header class="text-center mb-8" role="banner">
-            <h1 class="text-4xl font-bold mb-2" style="color: #00d4ff; text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);">Admin Login</h1>
-            <p style="color: #cccccc;">Please sign in to access the admin dashboard</p>
+            <h1 class="text-4xl font-bold mb-2 neon-brand">Admin Login</h1>
+            <p class="text-gray-400">Please sign in to access the admin dashboard</p>
         </header>
 
-        <!-- Login Card -->
-        <section class="p-8 rounded-lg shadow-2xl border" style="background-color: #111111; border-color: #333333; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);" role="region" aria-label="Login form">
+        <!-- Login Card: neon/dark theme -->
+        <section class="card widget-primary p-8 rounded-lg shadow-2xl border border-gray-700" role="region" aria-label="Login form">
             <form method="post" action="admin.php" id="login-form" role="form" aria-labelledby="login-heading">
 
                 <h2 id="login-heading" class="sr-only">Login credentials</h2>
@@ -201,8 +200,7 @@
                         required 
                         aria-required="true"
                         aria-describedby="username-error"
-                        class="w-full p-3 rounded-lg text-white border focus:outline-none focus:ring-2 focus:border-transparent"
-                        style="background-color: #181818; border-color: #333333; color: #ffffff;"
+                        class="w-full p-3 rounded-lg text-white border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:border-transparent"
                         placeholder="Enter your username"
                         autocomplete="username"
                     >
@@ -219,8 +217,7 @@
                         required 
                         aria-required="true"
                         aria-describedby="password-error"
-                        class="w-full p-3 rounded-lg text-white border focus:outline-none focus:ring-2 focus:border-transparent"
-                        style="background-color: #181818; border-color: #333333; color: #ffffff;"
+                        class="w-full p-3 rounded-lg text-white border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:border-transparent"
                         placeholder="Enter your password"
                         autocomplete="current-password"
                     >
@@ -228,13 +225,13 @@
                 </div>
 
                 <!-- Login Error Display -->
-                <div id="login-error" class="hidden text-sm mb-4" style="color: #ff0080;"></div>
+                <div id="login-error" class="hidden text-sm mb-4 text-pink-500"></div>
 
                 <!-- Login Button -->
                 <button 
                     type="submit" 
                     id="submit-login"
-                    class="w-full p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium btn-neon-blue"
+                    class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium btn-neon-blue"
                 >
                     Sign In <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
                 </button>
@@ -242,17 +239,17 @@
 
             <!-- Divider -->
             <div class="mt-6 mb-6 flex items-center">
-                <div class="flex-1 border-t" style="border-color: #333333;"></div>
-                <span class="px-4 text-sm" style="color: #cccccc;">or</span>
-                <div class="flex-1 border-t" style="border-color: #333333;"></div>
+                <div class="flex-1 border-t border-gray-700"></div>
+                <span class="px-4 text-sm text-gray-400">or</span>
+                <div class="flex-1 border-t border-gray-700"></div>
             </div>
 
             <!-- OAuth Options -->
             <div class="space-y-3">
-                <button id="google-oauth" class="w-full p-3 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium" style="background: linear-gradient(45deg, #ff0080, #cc0066); border: 1px solid #ff0080; box-shadow: 0 0 10px rgba(255, 0, 128, 0.3);">
+                <button id="google-oauth" class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium btn-neon-pink text-white">
                     Continue with Google
                 </button>
-                <button id="github-oauth" class="w-full p-3 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium" style="background: linear-gradient(45deg, #333333, #222222); border: 1px solid #555555; box-shadow: 0 0 10px rgba(85, 85, 85, 0.3);">
+                <button id="github-oauth" class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium btn-neon-dark text-white">
                     Continue with GitHub
                 </button>
             </div>
@@ -260,20 +257,14 @@
             <!-- Links -->
             <div class="text-center space-y-2 mt-6">
                 <div>
-                    <a href="#" id="forgot-password" class="transition-colors text-sm font-medium" style="color: #00d4ff;" onmouseover="this.style.color='#00eeff'; this.style.textShadow='0 0 8px rgba(0, 212, 255, 0.6)'" onmouseout="this.style.color='#00d4ff'; this.style.textShadow='none'">
-                        Forgot Password?
-                    </a>
+                    <a href="#" id="forgot-password" class="transition-colors text-sm font-medium nav-link-template">Forgot Password?</a>
                 </div>
                 <div>
-                    <span class="text-sm" style="color: #cccccc;">Don't have an account? </span>
-                    <a href="register.html" class="transition-colors text-sm font-medium" style="color: #00d4ff;" onmouseover="this.style.color='#00eeff'; this.style.textShadow='0 0 8px rgba(0, 212, 255, 0.6)'" onmouseout="this.style.color='#00d4ff'; this.style.textShadow='none'">
-                        Sign Up
-                    </a>
+                    <span class="text-sm text-gray-400">Don't have an account? </span>
+                    <a href="register.html" class="transition-colors text-sm font-medium nav-link-template">Sign Up</a>
                 </div>
                 <div>
-                    <a href="index.html" class="transition-colors text-sm font-medium" style="color: #00d4ff;" onmouseover="this.style.color='#00eeff'; this.style.textShadow='0 0 8px rgba(0, 212, 255, 0.6)'" onmouseout="this.style.color='#00d4ff'; this.style.textShadow='none'">
-                        ← Back to Home
-                    </a>
+                    <a href="index.html" class="transition-colors text-sm font-medium nav-link-template">← Back to Home</a>
                 </div>
             </div>
         </section>
