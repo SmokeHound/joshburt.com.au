@@ -203,21 +203,21 @@
 
 
   <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" style="background-color: #111111; border-right: 1px solid #00d4ff20;" aria-label="Main navigation" role="navigation">
+  <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
     <!-- App Branding -->
-    <h1 class="text-2xl font-bold mb-6" style="color: #00d4ff; text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);">Josh's App</h1>
+    <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
 
     <!-- Navigation -->
-    <nav aria-label="Main navigation">
-      <ul class="space-y-2">
-        <li><a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Home</a></li>
-  <li><a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Administration</a></li>
-        <li><a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">User Management</a></li>
-        <li><a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Analytics</a></li>
-        <li><a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Settings</a></li>
-        <li><a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link active" style="color: #00d4ff; background-color: #00d4ff20; border-left: 3px solid #00d4ff;" aria-current="page">Oil Orders</a></li>
-        <li><a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link" style="color: #cccccc;">Consumables Orders</a></li>
-        <li><a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link" style="color: #ff0080;">Logout</a></li>
+    <nav role="navigation" aria-label="Main navigation">
+      <ul class="space-y-2" role="list">
+        <li role="listitem"><a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Home</a></li>
+  <li role="listitem"><a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a></li>
+        <li role="listitem"><a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">User Management</a></li>
+        <li role="listitem"><a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Analytics</a></li>
+        <li role="listitem"><a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Settings</a></li>
+        <li role="listitem"><a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link active" aria-current="page">Oil Orders</a></li>
+        <li role="listitem"><a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Consumables Orders</a></li>
+        <li role="listitem"><a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link nav-link-logout">Logout</a></li>
       </ul>
     </nav>
 
