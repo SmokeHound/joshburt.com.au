@@ -150,7 +150,7 @@ router.put('/:id', authenticateToken, [
     const { name, role, is_active } = req.body;
 
     // Check if user exists
-    const existingUser = await database.get('SELECT id, role FROM users WHERE id = ?', [id]);
+    const existingUser = await database.get('SELECT id, role, is_active FROM users WHERE id = ?', [id]);
     if (!existingUser) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -172,43 +172,56 @@ router.put('/:id', authenticateToken, [
     const updates = [];
     const values = [];
 
+    // Track audit actions
+    const auditActions = [];
     if (name !== undefined) {
       updates.push('name = ?');
       values.push(name);
     }
-
     if (role !== undefined && isAdmin) {
       updates.push('role = ?');
       values.push(role);
+      if (role !== existingUser.role) {
+        auditActions.push({ action: 'user_role_change', details: { from: existingUser.role, to: role } });
+      }
     }
-
     if (is_active !== undefined && isAdmin) {
       updates.push('is_active = ?');
       values.push(is_active ? 1 : 0);
+      if (is_active !== !!existingUser.is_active) {
+        auditActions.push({ action: is_active ? 'user_unlock' : 'user_lock', details: { from: !!existingUser.is_active, to: !!is_active } });
+      }
     }
-
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No valid updates provided' });
     }
-
     updates.push('updated_at = CURRENT_TIMESTAMP');
     values.push(id);
-
     await database.run(
       `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
       values
     );
-
+    // Write extra audit logs for lock/unlock/role change
+    for (const entry of auditActions) {
+      try {
+        await require('../middleware/auth').auditLog(entry.action)({
+          user: req.user,
+          body: entry.details,
+          ip: req.ip,
+          get: (h) => req.get(h)
+        }, { status: () => ({ json: () => {} }) }, () => {});
+      } catch (e) {
+        console.error('Audit log error:', e);
+      }
+    }
     const updatedUser = await database.get(
       'SELECT id, email, name, role, is_active, email_verified, updated_at FROM users WHERE id = ?',
       [id]
     );
-
     res.json({
       message: 'User updated successfully',
       user: updatedUser
     });
-
   } catch (error) {
     console.error('Update user error:', error);
     res.status(500).json({ error: 'Failed to update user' });

@@ -1,3 +1,58 @@
+// Send email verification email
+const sendVerificationEmail = async (email, name, verificationUrl) => {
+  const mailOptions = {
+    from: process.env.FROM_EMAIL || 'noreply@joshburt.com.au',
+    to: email,
+    subject: 'Verify Your Email - Josh Burt Website',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Email Verification</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #3b82f6; color: white; padding: 20px; text-align: center; }
+            .content { padding: 20px; background: #f9f9f9; }
+            .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+            .footer { text-align: center; font-size: 12px; color: #666; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Verify Your Email</h1>
+            </div>
+            <div class="content">
+              <p>Hello ${name},</p>
+              <p>Thank you for registering on the Josh Burt website.</p>
+              <p>Click the button below to verify your email address:</p>
+              <a href="${verificationUrl}" class="button">Verify Email</a>
+              <p>If the button doesn't work, copy and paste this link into your browser:</p>
+              <p><a href="${verificationUrl}">${verificationUrl}</a></p>
+              <p>This link will expire in 24 hours.</p>
+            </div>
+            <div class="footer">
+              <p>&copy; 2025 Josh Burt. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+      Hello ${name},
+      \nThank you for registering on the Josh Burt website.\n\nVerify your email: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\n© 2025 Josh Burt. All rights reserved.
+    `
+  };
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    console.error('📧 Failed to send verification email:', error);
+    throw error;
+  }
+};
 const nodemailer = require('nodemailer');
 
 // Create transporter
@@ -165,5 +220,6 @@ const sendWelcomeEmail = async (email, name) => {
 
 module.exports = {
   sendResetEmail,
-  sendWelcomeEmail
+  sendWelcomeEmail,
+  sendVerificationEmail
 };

@@ -242,6 +242,27 @@
         <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
         <section>
             <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Manage user accounts and permissions. Add, edit, or remove users from the system.</p>
+            <!-- User Filters/Search/Sort -->
+            <div class="flex flex-wrap gap-4 items-center mb-4">
+                <input id="user-search" type="text" placeholder="Search name or email..." class="p-2 rounded border border-gray-400 dark:border-gray-600 bg-gray-900 text-white text-sm" style="min-width:180px;" />
+                <select id="user-role-filter" class="p-2 rounded border border-gray-400 dark:border-gray-600 bg-gray-900 text-white text-sm">
+                    <option value="">All Roles</option>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                </select>
+                <select id="user-status-filter" class="p-2 rounded border border-gray-400 dark:border-gray-600 bg-gray-900 text-white text-sm">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <select id="user-sort" class="p-2 rounded border border-gray-400 dark:border-gray-600 bg-gray-900 text-white text-sm">
+                    <option value="created_at_desc">Newest</option>
+                    <option value="created_at_asc">Oldest</option>
+                    <option value="name_asc">Name A-Z</option>
+                    <option value="name_desc">Name Z-A</option>
+                </select>
+            </div>
             <!-- User Table Card (neon theme, .card + .widget-primary) -->
             <div class="card widget-primary rounded-lg shadow-md p-6">
                 <div class="overflow-x-auto">
@@ -251,6 +272,8 @@
                                 <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Name</th>
                                 <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Email</th>
                                 <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Role</th>
+                                <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Status</th>
+                                <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Last Login</th>
                                 <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Actions</th>
                             </tr>
                         </thead>
@@ -259,6 +282,8 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Pagination Controls -->
+                <div class="flex gap-2 items-center justify-end mt-2" id="user-pagination"></div>
                 <!-- Add User Form (neon theme, .card + .widget-secondary) -->
                 <form class="mt-6 pt-6 border-t border-gray-300 dark:border-gray-600" id="user-form" role="form" aria-label="Add new user form">
                     <h3 class="text-xl font-semibold mb-4 text-gray-100">Add New User</h3>
@@ -354,91 +379,192 @@
             }
         }
 
-        // Load users from localStorage
-        function loadUsers() {
-            const savedUsers = localStorage.getItem('siteUsers');
-            users = savedUsers ? JSON.parse(savedUsers) : [
-                { id: 1, name: 'Josh Burt', email: 'josh@example.com', role: 'admin' },
-                { id: 2, name: 'Jane Doe', email: 'jane@example.com', role: 'user' }
-            ];
-            renderUsers();
+
+        // Load users from backend API with filters, sorting, and pagination
+        let userPagination = { page: 1, limit: 10, total: 0, pages: 1 };
+        let userFilters = { search: '', role: '', status: '', sort: 'created_at_desc' };
+        async function loadUsers(page = 1) {
+            try {
+                const token = localStorage.getItem('authToken');
+                const params = new URLSearchParams({
+                    page,
+                    limit: userPagination.limit,
+                    search: userFilters.search,
+                    role: userFilters.role,
+                    status: userFilters.status,
+                    sort: userFilters.sort
+                });
+                const res = await fetch(`/api/users?${params.toString()}`, {
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                });
+                if (!res.ok) throw new Error('Failed to load users');
+                const data = await res.json();
+                users = data.users || [];
+                userPagination = data.pagination || { page: 1, limit: 10, total: users.length, pages: 1 };
+                renderUsers();
+            } catch (e) {
+                showToast('Error loading users: ' + e.message);
+                users = [];
+                renderUsers();
+            }
         }
 
-        // Save users to localStorage
-        function saveUsers() {
-            localStorage.setItem('siteUsers', JSON.stringify(users));
-        }
 
-        // Render users table
+        // Render users table with avatars, status, last login, and pagination
         function renderUsers() {
             const tbody = document.querySelector('tbody');
             tbody.innerHTML = '';
-            
             users.forEach(user => {
                 const row = document.createElement('tr');
                 row.className = 'border-b border-gray-700';
+                const avatar = user.avatar_url ? `<img src="${user.avatar_url}" class="inline w-8 h-8 rounded-full mr-2"/>` : `<span class="inline-block w-8 h-8 rounded-full bg-gray-600 mr-2"></span>`;
+                const status = user.is_active ? '<span class="text-green-400">Active</span>' : '<span class="text-red-400">Inactive</span>';
+                const lastLogin = user.last_login ? new Date(user.last_login).toLocaleString() : '--';
                 row.innerHTML = `
-                    <td class="py-2 px-3">${user.name}</td>
+                    <td class="py-2 px-3 flex items-center">${avatar}<a href="profile.html?user_id=${user.id}" class="text-blue-400 hover:underline">${user.name}</a></td>
                     <td class="py-2 px-3">${user.email}</td>
                     <td class="py-2 px-3">${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</td>
+                    <td class="py-2 px-3">${status}</td>
+                    <td class="py-2 px-3">${lastLogin}</td>
                     <td class="py-2 px-3">
                         <button class="px-2 py-1 bg-secondary text-white rounded mr-2 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 edit-user" data-id="${user.id}">Edit</button>
                         <button class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 delete-user" data-id="${user.id}">Delete</button>
+                        <button class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 lock-user" data-id="${user.id}">${user.is_active ? 'Lock' : 'Unlock'}</button>
+                        <button class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 reset-password-user" data-id="${user.id}">Reset PW</button>
+                        <button class="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 impersonate-user" data-id="${user.id}">Impersonate</button>
                     </td>
                 `;
+        // Admin action handlers: lock/unlock, reset password, impersonate
+        document.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.querySelector('tbody');
+            tbody.addEventListener('click', async (e) => {
+                const id = e.target.dataset.id;
+                if (e.target.classList.contains('lock-user')) {
+                    // Lock/unlock user
+                    const user = users.find(u => u.id == id);
+                    if (!user) return;
+                    const token = localStorage.getItem('authToken');
+                    try {
+                        const headers = { 'Content-Type': 'application/json' };
+                        if (token) headers['Authorization'] = `Bearer ${token}`;
+                        const res = await fetch(`/api/users/${id}`, {
+                            method: 'PUT',
+                            headers,
+                            body: JSON.stringify({ is_active: !user.is_active })
+                        });
+                        if (!res.ok) throw new Error('Failed to update user status');
+                        showToast(user.is_active ? 'User locked.' : 'User unlocked.');
+                        await loadUsers(userPagination.page);
+                    } catch (err) { showToast('Error: ' + err.message); }
+                } else if (e.target.classList.contains('reset-password-user')) {
+                    // Reset password
+                    if (!confirm('Reset password for this user?')) return;
+                    const token = localStorage.getItem('authToken');
+                    try {
+                        const headers = { 'Content-Type': 'application/json' };
+                        if (token) headers['Authorization'] = `Bearer ${token}`;
+                        const newPassword = Math.random().toString(36).slice(-10) + 'A1!';
+                        const res = await fetch(`/api/users/${id}/password`, {
+                            method: 'PUT',
+                            headers,
+                            body: JSON.stringify({ newPassword })
+                        });
+                        if (!res.ok) throw new Error('Failed to reset password');
+                        showToast('Password reset. New temp password: ' + newPassword);
+                    } catch (err) { showToast('Error: ' + err.message); }
+                } else if (e.target.classList.contains('impersonate-user')) {
+                    // Impersonate user (set authToken to user's token if API supports, else show message)
+                    showToast('Impersonation feature not implemented. (Requires backend support)');
+                }
+            });
+        });
                 tbody.appendChild(row);
             });
+            // Pagination controls
+            const pagDiv = document.getElementById('user-pagination');
+            pagDiv.innerHTML = '';
+            if (userPagination.pages > 1) {
+                for (let i = 1; i <= userPagination.pages; i++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = i;
+                    btn.className = 'px-2 py-1 rounded ' + (i === userPagination.page ? 'bg-primary text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600');
+                    btn.onclick = () => { loadUsers(i); };
+                    pagDiv.appendChild(btn);
+                }
+            }
         }
+        // Filter, sort, and search event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('user-search').addEventListener('input', e => {
+                userFilters.search = e.target.value;
+                loadUsers(1);
+            });
+            document.getElementById('user-role-filter').addEventListener('change', e => {
+                userFilters.role = e.target.value;
+                loadUsers(1);
+            });
+            document.getElementById('user-status-filter').addEventListener('change', e => {
+                userFilters.status = e.target.value;
+                loadUsers(1);
+            });
+            document.getElementById('user-sort').addEventListener('change', e => {
+                userFilters.sort = e.target.value;
+                loadUsers(1);
+            });
+        });
 
-        // Add or update user with audit logging
-        function addOrUpdateUser(event) {
+
+        // Add or update user via backend API
+        async function addOrUpdateUser(event) {
             event.preventDefault();
-            
             const form = event.target;
             const name = form.querySelector('input[type="text"]').value.trim();
             const email = form.querySelector('input[type="email"]').value.trim();
             const role = form.querySelector('select').value;
-            
+            const token = localStorage.getItem('authToken');
             if (!name || !email || !role) {
                 showToast('Please fill in all fields');
                 return;
             }
-
-            if (editingUserId) {
-                // Update existing user
-                const userIndex = users.findIndex(u => u.id === editingUserId);
-                if (userIndex !== -1) {
-                    const oldUser = users[userIndex];
-                    users[userIndex] = { id: editingUserId, name, email, role };
-                    
-                    // Log user update
-                    AuditLogger.log('user_update', `Updated user: ${oldUser.name} (${oldUser.email}) → ${name} (${email}), Role: ${oldUser.role} → ${role}`);
-                    
+            try {
+                if (editingUserId) {
+                    // Update existing user (PUT)
+                    const res = await fetch(`/api/users/${editingUserId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                        },
+                        body: JSON.stringify({ name, role })
+                    });
+                    if (!res.ok) throw new Error('Failed to update user');
                     showToast('User updated successfully!');
                     editingUserId = null;
                     form.querySelector('button[type="submit"]').textContent = 'Add User';
                     form.querySelector('h3').textContent = 'Add New User';
                     document.getElementById('cancel-edit').classList.add('hidden');
+                } else {
+                    // Add new user (POST)
+                    const password = Math.random().toString(36).slice(-10) + 'A1!'; // temp password
+                    const res = await fetch('/api/users', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                        },
+                        body: JSON.stringify({ name, email, role, password })
+                    });
+                    if (!res.ok) {
+                        const err = await res.json();
+                        throw new Error(err.error || 'Failed to add user');
+                    }
+                    showToast('User added successfully!');
                 }
-            } else {
-                // Add new user
-                const newUser = {
-                    id: Date.now(),
-                    name,
-                    email,
-                    role
-                };
-                users.push(newUser);
-                
-                // Log user creation
-                AuditLogger.log('user_create', `Created new user: ${name} (${email}) with role: ${role}`);
-                
-                showToast('User added successfully!');
+                form.reset();
+                await loadUsers();
+            } catch (e) {
+                showToast('Error: ' + e.message);
             }
-            
-            form.reset();
-            saveUsers();
-            renderUsers();
         }
 
         // Edit user
@@ -460,18 +586,21 @@
             form.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Delete user with audit logging
-        function deleteUser(userId) {
-            const user = users.find(u => u.id === userId);
-            if (user && confirm('Are you sure you want to delete this user?')) {
-                users = users.filter(u => u.id !== userId);
-                
-                // Log user deletion
-                AuditLogger.log('user_delete', `Deleted user: ${user.name} (${user.email}) with role: ${user.role}`);
-                
-                saveUsers();
-                renderUsers();
+
+        // Delete user via backend API
+        async function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete this user?')) return;
+            const token = localStorage.getItem('authToken');
+            try {
+                const res = await fetch(`/api/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                });
+                if (!res.ok) throw new Error('Failed to delete user');
                 showToast('User deleted successfully!');
+                await loadUsers();
+            } catch (e) {
+                showToast('Error: ' + e.message);
             }
         }
 
@@ -485,114 +614,114 @@
             document.getElementById('cancel-edit').classList.add('hidden');
         }
 
-        // Export users to CSV
-        function exportUsersCSV() {
-            const headers = ['Name', 'Email', 'Role'];
-            const csvContent = [
-                headers.join(','),
-                ...users.map(user => [
-                    `"${user.name}"`,
-                    `"${user.email}"`,
-                    `"${user.role}"`
-                ].join(','))
-            ].join('\n');
 
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'users.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Users exported to CSV successfully!');
+        // Export users to CSV via backend API
+        async function exportUsersCSV() {
+            const token = localStorage.getItem('authToken');
+            try {
+                const res = await fetch('/api/users?limit=1000', {
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                });
+                if (!res.ok) throw new Error('Failed to fetch users');
+                const data = await res.json();
+                const headers = ['Name', 'Email', 'Role'];
+                const csvContent = [
+                    headers.join(','),
+                    ...data.users.map(user => [
+                        `"${user.name}"`,
+                        `"${user.email}"`,
+                        `"${user.role}"`
+                    ].join(','))
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'users.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Users exported to CSV successfully!');
+            } catch (e) {
+                showToast('Error: ' + e.message);
+            }
         }
 
-        // Export users to Excel format (actually CSV with different extension)
-        function exportUsersExcel() {
-            const headers = ['Name', 'Email', 'Role'];
-            const csvContent = [
-                headers.join('\t'), // Use tabs for better Excel compatibility
-                ...users.map(user => [
-                    user.name,
-                    user.email,
-                    user.role
-                ].join('\t'))
-            ].join('\n');
-
-            const blob = new Blob([csvContent], { type: 'application/vnd.ms-excel' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'users.xls';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Users exported to Excel successfully!');
+        // Export users to Excel (tab-separated) via backend API
+        async function exportUsersExcel() {
+            const token = localStorage.getItem('authToken');
+            try {
+                const res = await fetch('/api/users?limit=1000', {
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                });
+                if (!res.ok) throw new Error('Failed to fetch users');
+                const data = await res.json();
+                const headers = ['Name', 'Email', 'Role'];
+                const csvContent = [
+                    headers.join('\t'),
+                    ...data.users.map(user => [
+                        user.name,
+                        user.email,
+                        user.role
+                    ].join('\t'))
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'application/vnd.ms-excel' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'users.xls';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Users exported to Excel successfully!');
+            } catch (e) {
+                showToast('Error: ' + e.message);
+            }
         }
 
-        // Import users from CSV
-        function importUsersCSV(event) {
+
+        // Import users from CSV via backend API
+        async function importUsersCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
-
+            const token = localStorage.getItem('authToken');
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const csv = e.target.result;
                     const lines = csv.split('\n');
-                    const importedUsers = [];
-
-                    // Skip header row if it exists
                     const startIndex = lines[0].toLowerCase().includes('name') ? 1 : 0;
-                    
+                    let imported = 0;
                     for (let i = startIndex; i < lines.length; i++) {
                         const line = lines[i].trim();
                         if (!line) continue;
-
                         const fields = line.split(',').map(field => field.replace(/^"|"$/g, '').trim());
                         if (fields.length >= 3) {
                             const name = fields[0];
                             const email = fields[1];
                             const role = fields[2].toLowerCase();
-
                             // Validate email format
                             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (!emailRegex.test(email)) {
-                                continue; // Skip invalid emails
-                            }
-
-                            // Validate role
-                            if (!['user', 'admin'].includes(role)) {
-                                continue; // Skip invalid roles
-                            }
-
-                            // Check if user already exists
-                            const existingUser = users.find(u => u.email === email);
-                            if (!existingUser) {
-                                importedUsers.push({
-                                    id: Date.now() + i,
-                                    name,
-                                    email,
-                                    role
-                                });
-                            }
+                            if (!emailRegex.test(email)) continue;
+                            if (!['user', 'admin', 'manager'].includes(role)) continue;
+                            // POST to API (random password)
+                            const password = Math.random().toString(36).slice(-10) + 'A1!';
+                            const res = await fetch('/api/users', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                                },
+                                body: JSON.stringify({ name, email, role, password })
+                            });
+                            if (res.ok) imported++;
                         }
                     }
-
-                    if (importedUsers.length > 0) {
-                        users.push(...importedUsers);
-                        saveUsers();
-                        renderUsers();
-                        showToast(`${importedUsers.length} users imported successfully!`);
-                    } else {
-                        showToast('No valid new users found in CSV file');
-                    }
+                    await loadUsers();
+                    showToast(`${imported} users imported successfully!`);
                 } catch (error) {
                     showToast('Error importing CSV file: ' + error.message);
                 }
             };
             reader.readAsText(file);
-            
-            // Reset input
             event.target.value = '';
         }
 

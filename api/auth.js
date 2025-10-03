@@ -48,8 +48,9 @@ const storeRefreshToken = async (userId, refreshToken) => {
   );
 };
 
+
 // POST /api/auth/register
-router.post('/register', [
+router.post('/register', authLimiter, [
   body('email').isEmail().normalizeEmail(),
   body('password').isLength({ min: 8 }).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/),
   body('name').trim().isLength({ min: 2, max: 50 }),
@@ -75,31 +76,63 @@ router.post('/register', [
     const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Create user
+    // Generate email verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24h
+
+    // Create user (email_verified=0)
     const result = await database.run(
-      'INSERT INTO users (email, name, password_hash, role) VALUES (?, ?, ?, ?)',
-      [email, name, passwordHash, 'user']
+      'INSERT INTO users (email, name, password_hash, role, email_verified, email_verification_token, email_verification_expires) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [email, name, passwordHash, 'user', 0, verificationToken, verificationExpires]
     );
 
-    // Generate email verification token (for future implementation)
-    const verificationToken = crypto.randomBytes(32).toString('hex');
+    // Send verification email
+    const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:8000'}/verify-email.html?token=${verificationToken}`;
+    try {
+      const { sendVerificationEmail } = require('../utils/email');
+      await sendVerificationEmail(email, name, verificationUrl);
+    } catch (emailErr) {
+      console.error('Failed to send verification email:', emailErr);
+    }
 
     res.status(201).json({
-      message: 'User registered successfully',
+      message: 'User registered successfully. Please check your email to verify your account.',
       userId: result.id,
       email,
       name
     });
-
-  // ...existing code...
-
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
 
-// POST /api/auth/login
+// GET /api/auth/verify-email?token=...
+router.get('/verify-email', async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (!token) {
+      return res.status(400).json({ error: 'Missing verification token' });
+    }
+    // Find user by token
+    const user = await database.get('SELECT id, email_verification_expires FROM users WHERE email_verification_token = ?', [token]);
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired verification token' });
+    }
+    if (user.email_verification_expires && user.email_verification_expires < Date.now()) {
+      return res.status(400).json({ error: 'Verification token expired' });
+    }
+    // Mark as verified
+    await database.run('UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?', [user.id]);
+    res.json({ message: 'Email verified successfully' });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(500).json({ error: 'Email verification failed' });
+  }
+});
+
+
+// POST /api/auth/login (with account lockout)
 router.post('/login', authLimiter, [
   body('email').isEmail().normalizeEmail(),
   body('password').notEmpty(),
@@ -113,10 +146,12 @@ router.post('/login', authLimiter, [
     }
 
     const { email, password } = req.body;
+    const MAX_ATTEMPTS = 5;
+    const LOCKOUT_MINUTES = 15;
 
-    // Get user from database
+    // Get user from database (include lockout fields)
     const user = await database.get(
-      'SELECT id, email, name, password_hash, role, is_active, email_verified FROM users WHERE email = ?',
+      'SELECT id, email, name, password_hash, role, is_active, email_verified, failed_login_attempts, lockout_expires FROM users WHERE email = ?',
       [email]
     );
 
@@ -124,10 +159,37 @@ router.post('/login', authLimiter, [
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Check for lockout
+    if (user.lockout_expires && user.lockout_expires > Date.now()) {
+      const minutes = Math.ceil((user.lockout_expires - Date.now()) / 60000);
+      return res.status(403).json({ error: `Account locked. Try again in ${minutes} minute(s).` });
+    }
+
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      // Increment failed attempts
+      const attempts = (user.failed_login_attempts || 0) + 1;
+      let lockout_expires = null;
+      if (attempts >= MAX_ATTEMPTS) {
+        lockout_expires = Date.now() + LOCKOUT_MINUTES * 60 * 1000;
+      }
+      await database.run(
+        'UPDATE users SET failed_login_attempts = ?, lockout_expires = ? WHERE id = ?',
+        [attempts, lockout_expires, user.id]
+      );
+      if (lockout_expires) {
+        return res.status(403).json({ error: `Account locked due to too many failed attempts. Try again in ${LOCKOUT_MINUTES} minutes.` });
+      }
+      return res.status(401).json({ error: `Invalid credentials. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.` });
+    }
+
+    // Reset failed attempts on success
+    if (user.failed_login_attempts > 0 || user.lockout_expires) {
+      await database.run(
+        'UPDATE users SET failed_login_attempts = 0, lockout_expires = NULL WHERE id = ?',
+        [user.id]
+      );
     }
 
     // Generate tokens
@@ -280,7 +342,7 @@ router.post('/forgot-password', authLimiter, [
 });
 
 // POST /api/auth/reset-password
-router.post('/reset-password', [
+router.post('/reset-password', authLimiter, [
   body('token').notEmpty(),
   body('password').isLength({ min: 8 }).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/),
 ], auditLog('password_reset_complete'), async (req, res) => {
