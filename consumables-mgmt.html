@@ -346,39 +346,30 @@ const categoryForm = document.getElementById('categoryForm');
 const newCategoryInput = document.getElementById('newCategoryInput');
 const categoryList = document.getElementById('categoryList');
 
-function loadCategories() {
-  categories = JSON.parse(localStorage.getItem('consumablesMgmtCategories') || '[]');
-}
-function saveCategories() {
-  localStorage.setItem('consumablesMgmtCategories', JSON.stringify(categories));
+async function loadCategories() {
+  try {
+    const res = await fetch('/.netlify/functions/consumable-categories');
+    if (!res.ok) throw new Error('Failed to load categories');
+    categories = await res.json();
+  } catch (err) {
+    categories = [];
+  }
 }
 function renderCategories() {
-  categoryList.innerHTML = categories.map((cat, i) => `
+  categoryList.innerHTML = categories.map((cat) => `
     <li class="flex items-center justify-between bg-gray-800 rounded px-3 py-2">
       <span>${cat}</span>
-      <button class="btn-neon-pink px-2 py-1 rounded text-xs font-semibold" onclick="deleteCategory(${i})">Delete</button>
     </li>
   `).join('');
 }
-window.deleteCategory = function(idx) {
-  const removed = categories.splice(idx, 1);
-  saveCategories();
-  renderCategories();
-  addAuditLog('Delete Category', null, `Deleted category: ${removed[0]}`);
-};
 categoryForm.onsubmit = function(e) {
   e.preventDefault();
-  const val = newCategoryInput.value.trim();
-  if (val && !categories.includes(val)) {
-    categories.push(val);
-    saveCategories();
-    renderCategories();
-    addAuditLog('Add Category', null, `Added category: ${val}`);
-    newCategoryInput.value = '';
-  }
+  // Adding a category is done by creating a product with a new category
+  alert('To add a new category, create a product with the new category name.');
+  newCategoryInput.value = '';
 };
-manageCategoriesBtn.onclick = function() {
-  loadCategories();
+manageCategoriesBtn.onclick = async function() {
+  await loadCategories();
   renderCategories();
   categoryModal.classList.remove('hidden');
 };
@@ -387,7 +378,7 @@ closeCategoryModal.onclick = function() {
 };
 </script>
 <script>
-// --- Product CRUD Logic ---
+// --- Product CRUD Logic (Consumables Only) ---
 let products = [];
 const productTableBody = document.getElementById('productTableBody');
 const productModal = document.getElementById('productModal');
@@ -404,7 +395,6 @@ const productCodeInput = document.getElementById('productCode');
 const productStockInput = document.getElementById('productStock');
 const productReorderInput = document.getElementById('productReorder');
 const productImageInput = document.getElementById('productImage');
-
 
 const productImagePreview = document.getElementById('productImagePreview');
 const imageDropZone = document.getElementById('imageDropZone');
@@ -456,12 +446,12 @@ const exportBtn = document.getElementById('exportBtn');
 const auditLogBody = document.getElementById('auditLogBody');
 const clearAuditLogBtn = document.getElementById('clearAuditLogBtn');
 const syncInventoryBtn = document.getElementById('syncInventoryBtn');
-// --- Sync with Inventory API ---
+// --- Sync with Inventory API (Consumables Only) ---
 syncInventoryBtn.onclick = async function() {
   syncInventoryBtn.disabled = true;
   syncInventoryBtn.textContent = 'Syncing...';
   try {
-    const res = await fetch('/api/products');
+    const res = await fetch('/api/products'); // This endpoint should return consumables only
     if (!res.ok) throw new Error('API error');
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('Invalid data');
@@ -476,10 +466,10 @@ syncInventoryBtn.onclick = async function() {
     }));
     saveProducts();
     renderProducts();
-    await addAuditLog('Sync', null, `Synced ${products.length} products from API`);
-    alert('Inventory synced successfully!');
+    await addAuditLog('Sync', null, `Synced ${products.length} consumables from API`);
+    alert('Consumables inventory synced successfully!');
   } catch (err) {
-    alert('Failed to sync inventory: ' + (err.message || err));
+    alert('Failed to sync consumables: ' + (err.message || err));
     await addAuditLog('Sync Failed', null, err.message || String(err));
   } finally {
     syncInventoryBtn.disabled = false;
@@ -487,59 +477,34 @@ syncInventoryBtn.onclick = async function() {
   }
 };
 
-// --- Audit Log Logic ---
-function getAuditLog() {
-  return JSON.parse(localStorage.getItem('consumablesMgmtAuditLog') || '[]');
-}
-function saveAuditLog(log) {
-  localStorage.setItem('consumablesMgmtAuditLog', JSON.stringify(log));
-}
-async function addAuditLog(action, product, details) {
-  const entry = {
-    time: new Date().toISOString(),
-    action,
-    product: product?.name || '',
-    details: details || ''
-  };
-  // Local log
-  const log = getAuditLog();
-  log.unshift({ ...entry, time: new Date().toLocaleString() });
-  if (log.length > 200) log.length = 200;
-  saveAuditLog(log);
-  renderAuditLog();
-  // Send to backend
+// --- Audit Log Logic (API only) ---
+async function loadAuditLog() {
   try {
-    await fetch('/api/audit-log', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(entry)
-    });
+    const res = await fetch('/.netlify/functions/audit-logs?limit=100');
+    if (!res.ok) throw new Error('Failed to load audit log');
+    const log = await res.json();
+    renderAuditLog(log);
   } catch (err) {
-    // Optionally show error or ignore
-    console.warn('Failed to log audit entry to backend:', err);
+    auditLogBody.innerHTML = '<tr><td colspan="4" class="p-2">Failed to load audit log</td></tr>';
   }
 }
-function renderAuditLog() {
-  const log = getAuditLog();
-  auditLogBody.innerHTML = log.map(entry => `
+function renderAuditLog(log) {
+  auditLogBody.innerHTML = (log || []).map(entry => `
     <tr>
-      <td class="p-2">${entry.time}</td>
+      <td class="p-2">${entry.created_at ? new Date(entry.created_at).toLocaleString() : ''}</td>
       <td class="p-2">${entry.action}</td>
-      <td class="p-2">${entry.product}</td>
-      <td class="p-2">${entry.details}</td>
+      <td class="p-2">${entry.details ? (JSON.parse(entry.details).name || '') : ''}</td>
+      <td class="p-2">${entry.details ? entry.details : ''}</td>
     </tr>
   `).join('');
 }
 clearAuditLogBtn.onclick = function() {
-  if (confirm('Clear all audit log entries?')) {
-    saveAuditLog([]);
-    renderAuditLog();
-  }
+  alert('Audit log clearing is not available via the UI. Please contact an administrator.');
 };
 
 // --- CSV Export ---
 function exportProductsCSV() {
-  addAuditLog('Export', null, 'Exported products as CSV');
+  addAuditLog('Export', null, 'Exported consumables as CSV');
   const headers = ['Name','Type','Category','Code','Stock','Reorder','Image'];
   const rows = products.map(p => [
     p.name,
@@ -585,11 +550,11 @@ function importProductsCSV(file) {
         image: vals[idx('Image')] || ''
       };
     });
-  products = imported;
-  saveProducts();
-  renderProducts();
-  addAuditLog('Import', null, `Imported ${imported.length} products from CSV`);
-  alert('Products imported successfully!');
+    products = imported;
+    saveProducts();
+    renderProducts();
+    addAuditLog('Import', null, `Imported ${imported.length} consumables from CSV`);
+    alert('Consumables imported successfully!');
   };
   reader.readAsText(file);
 }
@@ -643,8 +608,8 @@ window.adjustStock = function(idx, delta) {
     addAuditLog('Stock Adjust', products[idx], `Stock: ${oldStock} → ${newStock}`);
   }
 };
-function renderCategoryDatalist() {
-  loadCategories();
+async function renderCategoryDatalist() {
+  await loadCategories();
   const datalist = document.getElementById('categoryDatalist');
   datalist.innerHTML = categories.map(cat => `<option value="${cat}"></option>`).join('');
 }
@@ -711,10 +676,10 @@ productForm.onsubmit = function(e) {
   if (idx !== '') {
     const old = products[idx];
     products[idx] = prod;
-    addAuditLog('Edit', prod, `Edited product. Old: ${JSON.stringify(old)}${old.image !== prod.image ? ' (Image changed)' : ''}`);
+    addAuditLog('Edit', prod, `Edited consumable. Old: ${JSON.stringify(old)}${old.image !== prod.image ? ' (Image changed)' : ''}`);
   } else {
     products.push(prod);
-    addAuditLog('Add', prod, 'Added new product' + (prod.image ? ' (Image uploaded)' : ''));
+    addAuditLog('Add', prod, 'Added new consumable' + (prod.image ? ' (Image uploaded)' : ''));
   }
   saveProducts();
   renderProducts();
@@ -727,14 +692,14 @@ deleteProductBtn.onclick = function() {
     products.splice(idx, 1);
     saveProducts();
     renderProducts();
-    addAuditLog('Delete', prod, 'Deleted product');
+    addAuditLog('Delete', prod, 'Deleted consumable');
     closeModal();
   }
 };
 window.addEventListener('DOMContentLoaded', () => {
   loadProducts();
   renderProducts();
-  renderAuditLog();
+  loadAuditLog();
 });
 </script>
 </body>

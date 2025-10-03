@@ -312,22 +312,9 @@
         let products = [];
         let editingProductId = null;
 
-        // Initialize default products if none exist
-        function initializeProducts() {
-            const defaultProducts = [
-                { id: 1, code: "3437297", name: "EDGE 0W-20", specs: "API SP, ILSAC GF-6", type: "Engine oil", description: "High-performance synthetic engine oil for modern vehicles", image: "" },
-                { id: 2, code: "3425218", name: "EDGE 0W-20 C5", specs: "ACEA C5/C6, API SP, ILSAC GF-6", type: "Engine oil", description: "Advanced formula for fuel economy and engine protection", image: "" },
-                { id: 3, code: "3433822", name: "EDGE 0W-20 LL IV", specs: "ACEA C5, C6, BMW Longlife-17FE+", type: "Engine oil", description: "Specialized formula for European vehicles", image: "" },
-            ];
-            
-            const savedProducts = localStorage.getItem('oilProducts');
-            if (!savedProducts) {
-                products = defaultProducts;
-                saveProducts();
-            }
-        }
+        // No localStorage fallback or default products: all data is from API
 
-        // Load products from API
+        // Load products from API only
         async function loadProducts() {
             try {
                 showToast('Loading products...', 'info');
@@ -341,18 +328,13 @@
                 showToast(`Loaded ${products.length} products from database`, 'success');
             } catch (error) {
                 console.error('Failed to load products from API:', error);
-                showToast('Failed to load products from database, using local storage', 'error');
-                // Fallback to localStorage
-                const savedProducts = localStorage.getItem('oilProducts');
-                products = savedProducts ? JSON.parse(savedProducts) : [];
-                if (products.length === 0) {
-                    initializeProducts(); // Load default products if nothing else
-                }
+                showToast('Failed to load products from database', 'error');
+                products = [];
                 renderProducts();
             }
         }
 
-        // Save products to API
+        // Save products to API (no localStorage)
         async function saveProductToAPI(product, isUpdate = false) {
             try {
                 const url = '/.netlify/functions/products';
@@ -364,12 +346,10 @@
                     },
                     body: JSON.stringify(product)
                 });
-                
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
-                
                 const result = await response.json();
                 return result;
             } catch (error) {
@@ -378,7 +358,7 @@
             }
         }
 
-        // Delete product from API
+        // Delete product from API (no localStorage)
         async function deleteProductFromAPI(productId) {
             try {
                 const response = await fetch('/.netlify/functions/products', {
@@ -388,12 +368,10 @@
                     },
                     body: JSON.stringify({ id: productId })
                 });
-                
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
-                
                 return await response.json();
             } catch (error) {
                 console.error('API delete error:', error);
@@ -520,83 +498,70 @@
             }
         }
 
-        // Export products to CSV
-        function exportProducts() {
-            const headers = ['Code', 'Name', 'Type', 'Specs', 'Description', 'Image URL'];
-            const csvContent = [
-                headers.join(','),
-                ...products.map(product => [
-                    `"${product.code}"`,
-                    `"${product.name}"`,
-                    `"${product.type}"`,
-                    `"${product.specs}"`,
-                    `"${product.description || ''}"`,
-                    `"${product.image || ''}"`
-                ].join(','))
-            ].join('\n');
-
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'oil_products.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Products exported successfully!', 'success');
+        // Export products to CSV (API only)
+        async function exportProducts() {
+            try {
+                const response = await fetch('/.netlify/functions/products');
+                if (!response.ok) throw new Error('Failed to fetch products for export');
+                const data = await response.json();
+                const headers = ['Code', 'Name', 'Type', 'Specs', 'Description', 'Image URL'];
+                const csvContent = [
+                    headers.join(','),
+                    ...data.map(product => [
+                        `"${product.code}"`,
+                        `"${product.name}"`,
+                        `"${product.type}"`,
+                        `"${product.specs}"`,
+                        `"${product.description || ''}"`,
+                        `"${product.image || ''}"`
+                    ].join(','))
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'oil_products.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Products exported successfully!', 'success');
+            } catch (error) {
+                showToast('Failed to export products: ' + error.message, 'error');
+            }
         }
 
-        // Import products from CSV
-        function importProducts(event) {
+        // Import products from CSV (API only, bulk import)
+        async function importProducts(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const csv = e.target.result;
-                    const lines = csv.split('\n');
-                    const importedProducts = [];
-
-                    // Skip header row
-                    for (let i = 1; i < lines.length; i++) {
-                        const line = lines[i].trim();
-                        if (!line) continue;
-
-                        const fields = line.split(',').map(field => field.replace(/^"|"$/g, ''));
-                        if (fields.length >= 4) {
-                            importedProducts.push({
-                                id: Date.now() + i,
-                                code: fields[0],
-                                name: fields[1],
-                                type: fields[2],
-                                specs: fields[3],
-                                description: fields[4] || '',
-                                image: fields[5] || ''
-                            });
-                        }
-                    }
-
-                    if (importedProducts.length > 0) {
-                        products.push(...importedProducts);
-                        saveProducts();
-                        renderProducts();
-                        showToast(`${importedProducts.length} products imported successfully!`, 'success');
-                    } else {
-                        showToast('No valid products found in CSV file', 'error');
-                    }
+                    // Send CSV to API for bulk import
+                    const response = await fetch('/.netlify/functions/products/import', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/csv' },
+                        body: csv
+                    });
+                    if (!response.ok) throw new Error('Bulk import failed');
+                    showToast('Products imported successfully!', 'success');
+                    await loadProducts();
                 } catch (error) {
-                    showToast('Error importing CSV file', 'error');
+                    showToast('Error importing CSV file: ' + error.message, 'error');
                 }
             };
             reader.readAsText(file);
-            
-            // Reset input
             event.target.value = '';
         }
 
         // Toast notification utility
         function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                document.body.appendChild(toast);
+            }
             toast.textContent = message;
             toast.className = `fixed bottom-4 right-4 p-4 text-white rounded shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-secondary' : type === 'error' ? 'bg-red-500' : 'bg-accent'}`;
             toast.classList.remove('hidden');
@@ -608,14 +573,12 @@
         // Theme toggle functionality
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
-        
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('dark');
             body.classList.toggle('light');
             localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
             themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
         });
-
         // Load saved theme
         const savedTheme = localStorage.getItem('theme') || 'dark';
         body.classList.add(savedTheme);

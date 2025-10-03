@@ -36,13 +36,13 @@
   
   <script>
       // Configuration for dynamic color updates from settings
-      function applyDynamicColors() {
-          const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-          document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-          document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-          document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
-      }
-      applyDynamicColors();
+    function applyDynamicColors() {
+      // TODO: Replace with API call or static config if dynamic settings needed
+      document.documentElement.style.setProperty('--tw-color-primary', '#3b82f6');
+      document.documentElement.style.setProperty('--tw-color-secondary', '#10b981');
+      document.documentElement.style.setProperty('--tw-color-accent', '#8b5cf6');
+    }
+    applyDynamicColors();
   </script>
   <style>
     body {
@@ -527,47 +527,28 @@
       // Product loading and display
       async function loadProducts() {
         try {
-          // Try to load from Netlify function (database)
+          // Load from Netlify function (database) only
           const response = await fetch('/.netlify/functions/consumables');
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const data = await response.json();
           products = Array.isArray(data) ? data : (data.products || []);
-          if (products.length === 0) {
-            throw new Error('No products returned from API');
-          }
           filteredProducts = [...products];
           extractCategories();
           displayProducts();
           console.log('Consumables loaded from API:', products.length);
         } catch (error) {
-          console.warn('API unavailable, loading local backup:', error.message);
-          try {
-            // Fallback to local backup data
-            const backupResponse = await fetch('./data/consumables.json');
-            if (!backupResponse.ok) {
-              throw new Error(`Local backup error! status: ${backupResponse.status}`);
-            }
-            const backupData = await backupResponse.json();
-            products = Array.isArray(backupData) ? backupData : (backupData.products || []);
-            filteredProducts = [...products];
-            extractCategories();
-            displayProducts();
-            console.log('Consumables loaded from local backup:', products.length);
-            showToast('Using local consumables data (offline mode)', 'info');
-          } catch (backupError) {
-            console.error('Error loading backup consumables:', backupError);
-            consumablesList.innerHTML = `
-              <div class="p-6 text-center text-red-600 dark:text-red-400">
-                <p class="mb-2">Unable to load consumables</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Both API and local backup failed</p>
-                <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                  Retry Loading
-                </button>
-              </div>
-            `;
-          }
+          console.error('Failed to load consumables from API:', error);
+          consumablesList.innerHTML = `
+            <div class="p-6 text-center text-red-600 dark:text-red-400">
+              <p class="mb-2">Unable to load consumables</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">API unavailable</p>
+              <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                Retry Loading
+              </button>
+            </div>
+          `;
         }
       }
 
@@ -658,12 +639,11 @@
         }
       }
       
-      function saveOrder() {
+      async function saveOrder() {
         if (orderItems.length === 0) {
           showToast('No items to save', 'warning');
           return;
         }
-        
         const orderData = {
           requestedBy: requestedBy.value,
           orderDate: orderDate.value,
@@ -673,31 +653,36 @@
           totalItems: orderItems.reduce((sum, item) => sum + item.quantity, 0),
           timestamp: new Date().toISOString()
         };
-        
-        localStorage.setItem('consumablesOrderDraft', JSON.stringify(orderData));
-        showToast('Order draft saved successfully!', 'success');
+        try {
+          const response = await fetch('/.netlify/functions/order-drafts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+          });
+          if (!response.ok) throw new Error('Failed to save order draft');
+          showToast('Order draft saved successfully!', 'success');
+        } catch (error) {
+          showToast('Failed to save order draft: ' + error.message, 'error');
+        }
       }
       
-      function loadSavedOrder() {
-        const saved = localStorage.getItem('consumablesOrderDraft');
-        if (saved) {
-          try {
-            const orderData = JSON.parse(saved);
-            requestedBy.value = orderData.requestedBy || '';
-            orderDate.value = orderData.orderDate || '';
-            priority.value = orderData.priority || 'normal';
-            notes.value = orderData.notes || '';
-            
-            orderItems.length = 0;
-            orderItems.push(...(orderData.items || []));
-            updateOrderDisplay();
-            
-            if (orderItems.length > 0) {
-              showToast('Previous order draft loaded', 'info');
-            }
-          } catch (error) {
-            console.error('Error loading saved order:', error);
+      async function loadSavedOrder() {
+        try {
+          const response = await fetch('/.netlify/functions/order-drafts');
+          if (!response.ok) throw new Error('No saved draft found');
+          const orderData = await response.json();
+          requestedBy.value = orderData.requestedBy || '';
+          orderDate.value = orderData.orderDate || '';
+          priority.value = orderData.priority || 'normal';
+          notes.value = orderData.notes || '';
+          orderItems.length = 0;
+          orderItems.push(...(orderData.items || []));
+          updateOrderDisplay();
+          if (orderItems.length > 0) {
+            showToast('Previous order draft loaded', 'info');
           }
+        } catch (error) {
+          // No saved draft or error
         }
       }
       
