@@ -40,6 +40,35 @@
         });
     </script>
 <body>
+        <!-- Enhanced User Analytics Section -->
+        <div class="max-w-4xl mx-auto bg-gray-800 text-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex flex-wrap gap-6 items-center justify-between mb-4">
+                <div>
+                    <div class="text-lg font-semibold mb-1">User Breakdown</div>
+                    <ul id="user-breakdown-list" class="space-y-1 text-base"></ul>
+                </div>
+                <div>
+                    <div class="text-lg font-semibold mb-1">User Growth (30d)</div>
+                    <canvas id="user-growth-sparkline" width="120" height="40"></canvas>
+                </div>
+                <div>
+                    <div class="text-lg font-semibold mb-1">Top Users</div>
+                    <ul id="top-users-list" class="flex flex-col gap-1"></ul>
+                </div>
+            </div>
+            <div class="flex gap-4 items-center">
+                <label for="user-role-filter" class="text-xs">Role:</label>
+                <select id="user-role-filter" class="bg-gray-700 text-white rounded px-2 py-1 text-xs">
+                    <option value="all">All</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                    <option value="locked">Locked</option>
+                </select>
+                <label for="user-date-filter" class="text-xs ml-4">Signup Since:</label>
+                <input type="date" id="user-date-filter" class="bg-gray-700 text-white rounded px-2 py-1 text-xs" />
+                <button id="export-user-analytics" class="ml-4 px-2 py-1 rounded bg-gray-700 text-white text-xs hover:bg-gray-600 focus:outline-none">Export Users CSV</button>
+            </div>
+        </div>
     <!-- Last Updated Timestamp -->
     <div class="w-full text-center text-xs text-gray-400 mb-2 flex items-center justify-center gap-2" id="analytics-last-updated">
         <span id="analytics-last-updated-text">Last updated: --</span>
@@ -1004,7 +1033,7 @@
         }
 
         // Update analytics data and charts (async, uses live API data)
-        async function updateAnalytics() {
+    async function updateAnalytics() {
             const data = await generateAnalyticsData(currentFilters);
             // Update last updated timestamp
             const lastUpdatedText = document.getElementById('analytics-last-updated-text');
@@ -1049,9 +1078,112 @@
                 salesChart.data.datasets[0].data = data.sales.data;
                 salesChart.update();
             }
+            // Enhanced User Analytics
+            // Fetch users from API
+            let users = [];
+            try {
+                const usersRes = await fetch('/api/users');
+                users = (await usersRes.json()).users || [];
+            } catch (e) {}
+            // Apply filters
+            const roleFilter = document.getElementById('user-role-filter')?.value || 'all';
+            const dateFilter = document.getElementById('user-date-filter')?.value;
+            let filteredUsers = users;
+            if (roleFilter === 'admin') filteredUsers = users.filter(u => u.role === 'admin');
+            else if (roleFilter === 'user') filteredUsers = users.filter(u => u.role === 'user');
+            else if (roleFilter === 'locked') filteredUsers = users.filter(u => u.locked);
+            if (dateFilter) filteredUsers = filteredUsers.filter(u => u.created_at && u.created_at >= dateFilter);
+            // Breakdown
+            const total = users.length;
+            const admins = users.filter(u => u.role === 'admin').length;
+            const regular = users.filter(u => u.role === 'user').length;
+            const locked = users.filter(u => u.locked).length;
+            const now = new Date();
+            const newUsers = users.filter(u => u.created_at && (now - new Date(u.created_at)) < 7*24*60*60*1000).length;
+            // Returning users: crude proxy, users with >1 order
+            let orders = [];
+            try {
+                const ordersRes = await fetch('/api/orders');
+                orders = await ordersRes.json();
+            } catch (e) {}
+            const returning = users.filter(u => orders.filter(o => o.created_by === u.username).length > 1).length;
+            // Render breakdown
+            const userBreakdownList = document.getElementById('user-breakdown-list');
+            userBreakdownList.innerHTML = `
+              <li>Total: <span class='font-bold'>${total}</span></li>
+              <li>Admins: <span class='font-bold'>${admins}</span></li>
+              <li>Regular: <span class='font-bold'>${regular}</span></li>
+              <li>Locked: <span class='font-bold'>${locked}</span></li>
+              <li>New (7d): <span class='font-bold'>${newUsers}</span></li>
+              <li>Returning: <span class='font-bold'>${returning}</span></li>
+            `;
+            // User growth sparkline (30d)
+            const userGrowth = Array(30).fill(0);
+            users.forEach(u => {
+                if (u.created_at) {
+                    const daysAgo = Math.floor((now - new Date(u.created_at)) / (24*60*60*1000));
+                    if (daysAgo >= 0 && daysAgo < 30) userGrowth[29-daysAgo]++;
+                }
+            });
+            if (window.Chart) {
+                const ctx = document.getElementById('user-growth-sparkline').getContext('2d');
+                if (window.userGrowthSparkline) window.userGrowthSparkline.destroy();
+                window.userGrowthSparkline = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 30}, (_, i) => i+1),
+                        datasets: [{
+                            data: userGrowth,
+                            borderColor: 'rgb(59,130,246)',
+                            backgroundColor: 'rgba(59,130,246,0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 0,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { display: false }, y: { display: false } }
+                    }
+                });
+            }
+            // Top users by order count
+            const userOrderCounts = {};
+            orders.forEach(order => {
+                if (order.created_by) userOrderCounts[order.created_by] = (userOrderCounts[order.created_by] || 0) + 1;
+            });
+            const topUsers = Object.entries(userOrderCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
+            const topUsersList = document.getElementById('top-users-list');
+            topUsersList.innerHTML = topUsers.length ? topUsers.map(([username, count]) => {
+                const user = users.find(u => u.username === username);
+                const avatar = user && user.avatar_url ? `<img src='${user.avatar_url}' class='inline w-6 h-6 rounded-full mr-2'/>` : `<span class='inline-block w-6 h-6 rounded-full bg-gray-600 mr-2'></span>`;
+                return `<li class='flex items-center'>${avatar}<span class='font-bold'>${username}</span> <span class='ml-2 text-xs text-gray-400'>${count} orders</span></li>`;
+            }).join('') : '<li>N/A</li>';
+            // Export users CSV
+            document.getElementById('export-user-analytics').onclick = () => {
+                let csv = 'Username,Role,Locked,Created At,Orders\n';
+                filteredUsers.forEach(u => {
+                    const orderCount = orders.filter(o => o.created_by === u.username).length;
+                    csv += `${u.username},${u.role},${u.locked ? 'Yes' : 'No'},${u.created_at || ''},${orderCount}\n`;
+                });
+                const blob = new Blob([csv], {type: 'text/csv'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `user-analytics-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast('User analytics CSV exported!');
+            };
+            // User filter change handlers
+            document.getElementById('user-role-filter').onchange = updateAnalytics;
+            document.getElementById('user-date-filter').onchange = updateAnalytics;
             // Update statistics cards
             updateStatCard('visitor-stats', [
-                `Total Users: ${data.summary.totalUsers}`,
+                `Total Users: ${filteredUsers.length}`,
                 `Total Visitors (${currentFilters.dateRange}d): ${data.summary.totalVisitors}`,
                 `Avg Daily Visitors: ${data.summary.avgDailyVisitors}`,
                 `Active Session: ${data.summary.activeSession > 0 ? 'Yes' : 'No'}`
