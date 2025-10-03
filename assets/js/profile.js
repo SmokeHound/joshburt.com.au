@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 // profile.js: User profile view/edit and activity log
 
 document.addEventListener('DOMContentLoaded', async () => {
