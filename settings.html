@@ -231,6 +231,26 @@
                   <label for="site-description" class="block mb-1 font-semibold">Site Description</label>
                   <textarea id="site-description" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" rows="3" maxlength="500" placeholder="Responsive website template with admin features"></textarea>
                 </div>
+                <!-- Logo URL -->
+                <div>
+                  <label for="logo-url" class="block mb-1 font-semibold">Logo URL</label>
+                  <input id="logo-url" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="300" placeholder="https://example.com/logo.png" />
+                </div>
+                <!-- Favicon URL -->
+                <div>
+                  <label for="favicon-url" class="block mb-1 font-semibold">Favicon URL</label>
+                  <input id="favicon-url" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="300" placeholder="https://example.com/favicon.ico" />
+                </div>
+                <!-- Support Phone -->
+                <div>
+                  <label for="support-phone" class="block mb-1 font-semibold">Support Phone</label>
+                  <input id="support-phone" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="30" placeholder="+1 555-555-5555" />
+                </div>
+                <!-- Support Address -->
+                <div>
+                  <label for="support-address" class="block mb-1 font-semibold">Support Address</label>
+                  <input id="support-address" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="200" placeholder="123 Main St, City, Country" />
+                </div>
                 <!-- Default Theme -->
                 <div>
                   <label for="theme-select" class="block mb-1 font-semibold">Default Theme</label>
@@ -248,6 +268,53 @@
                 <div class="flex items-center gap-2">
                   <input id="maintenance-mode" type="checkbox" />
                   <label for="maintenance-mode">Enable maintenance mode</label>
+                </div>
+                <!-- Feature Toggles -->
+                <div class="flex flex-wrap gap-4 mt-2">
+                  <label><input id="enable-registration" type="checkbox" class="mr-1">Enable Registration</label>
+                  <label><input id="enable-guest-checkout" type="checkbox" class="mr-1">Enable Guest Checkout</label>
+                  <label><input id="enable-newsletter" type="checkbox" class="mr-1">Enable Newsletter</label>
+                </div>
+                <!-- Integrations -->
+                <div>
+                  <label for="google-analytics-id" class="block mb-1 font-semibold">Google Analytics ID</label>
+                  <input id="google-analytics-id" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="32" placeholder="UA-XXXXXX" />
+                </div>
+                <div>
+                  <label for="facebook-pixel-id" class="block mb-1 font-semibold">Facebook Pixel ID</label>
+                  <input id="facebook-pixel-id" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="32" placeholder="FB-XXXXXX" />
+                </div>
+                <!-- SMTP -->
+                <div>
+                  <label for="smtp-host" class="block mb-1 font-semibold">SMTP Host</label>
+                  <input id="smtp-host" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="smtp.example.com" />
+                </div>
+                <div>
+                  <label for="smtp-port" class="block mb-1 font-semibold">SMTP Port</label>
+                  <input id="smtp-port" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="10" placeholder="587" />
+                </div>
+                <div>
+                  <label for="smtp-user" class="block mb-1 font-semibold">SMTP User</label>
+                  <input id="smtp-user" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="user@example.com" />
+                </div>
+                <div>
+                  <label for="smtp-password" class="block mb-1 font-semibold">SMTP Password</label>
+                  <input id="smtp-password" type="password" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="Password" />
+                </div>
+                <!-- Custom CSS/JS -->
+                <div>
+                  <label for="custom-css" class="block mb-1 font-semibold">Custom CSS</label>
+                  <textarea id="custom-css" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" rows="2" maxlength="2000" placeholder="/* Custom CSS */"></textarea>
+                </div>
+                <div>
+                  <label for="custom-js" class="block mb-1 font-semibold">Custom JS</label>
+                  <textarea id="custom-js" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" rows="2" maxlength="2000" placeholder="// Custom JS"></textarea>
+                </div>
+                <!-- Feature Flags -->
+                <div class="flex flex-wrap gap-4 mt-2">
+                  <label><input id="feature-beta-features" type="checkbox" class="mr-1">Beta Features</label>
+                  <label><input id="feature-new-dashboard" type="checkbox" class="mr-1">New Dashboard</label>
+                  <label><input id="feature-advanced-reports" type="checkbox" class="mr-1">Advanced Reports</label>
                 </div>
                 <!-- Actions: Save, Reset, Export -->
                 <div class="flex flex-col md:flex-row gap-2 mt-4">
@@ -433,6 +500,29 @@
         theme: document.getElementById('theme-select')?.value || 'dark',
         contactEmail: document.getElementById('contact-email')?.value || '',
         maintenanceMode: document.getElementById('maintenance-mode')?.checked || false,
+        // Branding & contact
+        logoUrl: document.getElementById('logo-url')?.value || '',
+        faviconUrl: document.getElementById('favicon-url')?.value || '',
+        supportPhone: document.getElementById('support-phone')?.value || '',
+        supportAddress: document.getElementById('support-address')?.value || '',
+        // Feature toggles
+        enableRegistration: document.getElementById('enable-registration')?.checked || false,
+        enableGuestCheckout: document.getElementById('enable-guest-checkout')?.checked || false,
+        enableNewsletter: document.getElementById('enable-newsletter')?.checked || false,
+        // Integrations
+        googleAnalyticsId: document.getElementById('google-analytics-id')?.value || '',
+        facebookPixelId: document.getElementById('facebook-pixel-id')?.value || '',
+        smtpHost: document.getElementById('smtp-host')?.value || '',
+        smtpPort: document.getElementById('smtp-port')?.value || '',
+        smtpUser: document.getElementById('smtp-user')?.value || '',
+        smtpPassword: document.getElementById('smtp-password')?.value || '',
+        customCss: document.getElementById('custom-css')?.value || '',
+        customJs: document.getElementById('custom-js')?.value || '',
+        featureFlags: {
+          betaFeatures: document.getElementById('feature-beta-features')?.checked || false,
+          newDashboard: document.getElementById('feature-new-dashboard')?.checked || false,
+          advancedReports: document.getElementById('feature-advanced-reports')?.checked || false
+        },
         // Theme customization
         primaryColor: document.getElementById('primaryColor')?.value || '#3b82f6',
         secondaryColor: document.getElementById('secondaryColor')?.value || '#10b981',
@@ -457,29 +547,52 @@
         const res = await fetch('/.netlify/functions/settings');
         if (!res.ok) throw new Error('Failed to load settings');
         const settings = await res.json();
-        if (settings.siteTitle) document.getElementById('site-title').value = settings.siteTitle;
-        if (settings.siteDescription) document.getElementById('site-description').value = settings.siteDescription;
-        if (settings.theme) document.getElementById('theme-select').value = settings.theme;
-        if (settings.contactEmail) document.getElementById('contact-email').value = settings.contactEmail;
-        if (settings.maintenanceMode !== undefined) document.getElementById('maintenance-mode').checked = settings.maintenanceMode;
-        // Theme customization
-        if (settings.primaryColor) document.getElementById('primaryColor').value = settings.primaryColor;
-        if (settings.secondaryColor) document.getElementById('secondaryColor').value = settings.secondaryColor;
-        if (settings.accentColor) document.getElementById('accentColor').value = settings.accentColor;
-        if (settings.primaryColor) document.getElementById('primaryColorText').value = settings.primaryColor;
-        if (settings.secondaryColor) document.getElementById('secondaryColorText').value = settings.secondaryColor;
-        if (settings.accentColor) document.getElementById('accentColorText').value = settings.accentColor;
-        // Theme schedule
-        if (settings.themeSchedule) {
-          document.getElementById('schedule-enabled').checked = settings.themeSchedule.enabled;
-          document.getElementById('dark-mode-start').value = settings.themeSchedule.darkModeStart;
-          document.getElementById('light-mode-start').value = settings.themeSchedule.lightModeStart;
-        }
-        // Security
-        if (settings.sessionTimeout) document.getElementById('session-timeout').value = settings.sessionTimeout;
-        if (settings.maxLoginAttempts) document.getElementById('max-login-attempts').value = settings.maxLoginAttempts;
-        if (settings.enable2FA !== undefined) document.getElementById('enable-2fa').checked = settings.enable2FA;
-        if (settings.auditAllActions !== undefined) document.getElementById('audit-all-actions').checked = settings.auditAllActions;
+                if (settings.siteTitle) document.getElementById('site-title').value = settings.siteTitle;
+                if (settings.siteDescription) document.getElementById('site-description').value = settings.siteDescription;
+                if (settings.theme) document.getElementById('theme-select').value = settings.theme;
+                if (settings.contactEmail) document.getElementById('contact-email').value = settings.contactEmail;
+                if (settings.maintenanceMode !== undefined) document.getElementById('maintenance-mode').checked = settings.maintenanceMode;
+                // Branding & contact
+                if (settings.logoUrl) document.getElementById('logo-url').value = settings.logoUrl;
+                if (settings.faviconUrl) document.getElementById('favicon-url').value = settings.faviconUrl;
+                if (settings.supportPhone) document.getElementById('support-phone').value = settings.supportPhone;
+                if (settings.supportAddress) document.getElementById('support-address').value = settings.supportAddress;
+                // Feature toggles
+                if (settings.enableRegistration !== undefined) document.getElementById('enable-registration').checked = settings.enableRegistration;
+                if (settings.enableGuestCheckout !== undefined) document.getElementById('enable-guest-checkout').checked = settings.enableGuestCheckout;
+                if (settings.enableNewsletter !== undefined) document.getElementById('enable-newsletter').checked = settings.enableNewsletter;
+                // Integrations
+                if (settings.googleAnalyticsId) document.getElementById('google-analytics-id').value = settings.googleAnalyticsId;
+                if (settings.facebookPixelId) document.getElementById('facebook-pixel-id').value = settings.facebookPixelId;
+                if (settings.smtpHost) document.getElementById('smtp-host').value = settings.smtpHost;
+                if (settings.smtpPort) document.getElementById('smtp-port').value = settings.smtpPort;
+                if (settings.smtpUser) document.getElementById('smtp-user').value = settings.smtpUser;
+                if (settings.smtpPassword) document.getElementById('smtp-password').value = settings.smtpPassword;
+                if (settings.customCss) document.getElementById('custom-css').value = settings.customCss;
+                if (settings.customJs) document.getElementById('custom-js').value = settings.customJs;
+                if (settings.featureFlags) {
+                  document.getElementById('feature-beta-features').checked = settings.featureFlags.betaFeatures;
+                  document.getElementById('feature-new-dashboard').checked = settings.featureFlags.newDashboard;
+                  document.getElementById('feature-advanced-reports').checked = settings.featureFlags.advancedReports;
+                }
+                // Theme customization
+                if (settings.primaryColor) document.getElementById('primaryColor').value = settings.primaryColor;
+                if (settings.secondaryColor) document.getElementById('secondaryColor').value = settings.secondaryColor;
+                if (settings.accentColor) document.getElementById('accentColor').value = settings.accentColor;
+                if (settings.primaryColor) document.getElementById('primaryColorText').value = settings.primaryColor;
+                if (settings.secondaryColor) document.getElementById('secondaryColorText').value = settings.secondaryColor;
+                if (settings.accentColor) document.getElementById('accentColorText').value = settings.accentColor;
+                // Theme schedule
+                if (settings.themeSchedule) {
+                    document.getElementById('schedule-enabled').checked = settings.themeSchedule.enabled;
+                    document.getElementById('dark-mode-start').value = settings.themeSchedule.darkModeStart;
+                    document.getElementById('light-mode-start').value = settings.themeSchedule.lightModeStart;
+                }
+                // Security
+                if (settings.sessionTimeout) document.getElementById('session-timeout').value = settings.sessionTimeout;
+                if (settings.maxLoginAttempts) document.getElementById('max-login-attempts').value = settings.maxLoginAttempts;
+                if (settings.enable2FA !== undefined) document.getElementById('enable-2fa').checked = settings.enable2FA;
+                if (settings.auditAllActions !== undefined) document.getElementById('audit-all-actions').checked = settings.auditAllActions;
       } catch (e) {
         showToast('Failed to load settings from server', 'error');
       }
@@ -522,19 +635,42 @@
 
     // Save settings with audit logging (to API)
     async function saveSettings() {
-      const settings = getFormSettings();
-      try {
-        const res = await fetch('/.netlify/functions/settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(settings)
-        });
-        if (!res.ok) throw new Error('Failed to save settings');
-        AuditLogger.log('settings_change', 'Settings updated via API');
-        showToast('Settings saved successfully!');
-      } catch (e) {
-        showToast('Failed to save settings', 'error');
-      }
+            const settings = getFormSettings();
+            try {
+                // Fetch previous settings for audit diff
+                const prevRes = await fetch('/.netlify/functions/settings');
+                const previousSettings = prevRes.ok ? await prevRes.json() : {};
+                const res = await fetch('/.netlify/functions/settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+                if (!res.ok) throw new Error('Failed to save settings');
+                // Compute changed fields (shallow diff)
+                const changes = [];
+                for (const key in settings) {
+                  if (typeof settings[key] === 'object' && settings[key] !== null) {
+                    // Compare nested objects (e.g., featureFlags, themeSchedule)
+                    for (const subKey in settings[key]) {
+                      if (!previousSettings[key] || previousSettings[key][subKey] !== settings[key][subKey]) {
+                        changes.push(`${key}.${subKey}: "${previousSettings[key]?.[subKey] ?? ''}" → "${settings[key][subKey]}"`);
+                      }
+                    }
+                  } else {
+                    if (previousSettings[key] !== settings[key]) {
+                      changes.push(`${key}: "${previousSettings[key] ?? ''}" → "${settings[key]}"`);
+                    }
+                  }
+                }
+                if (changes.length > 0) {
+                  AuditLogger.log('settings_change', `Modified settings: ${changes.join(', ')}`);
+                } else {
+                  AuditLogger.log('settings_change', 'Settings updated via API (no changes detected)');
+                }
+                showToast('Settings saved successfully!');
+            } catch (e) {
+                showToast('Failed to save settings', 'error');
+            }
     }
 
     // Color theme functionality (update preview only)
