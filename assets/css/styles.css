@@ -8,7 +8,7 @@
     background-color: #111111 !important;
     border-right: 1px solid #0050b320 !important;
 }
-
+.btn-neon-green{color:#000;background:#00ff88;border:1px solid #0f8;font-weight:600;box-shadow:0 0 10px #00ff884d}.btn-neon-green:hover{background:#00ff99;box-shadow:0 0 20px #0f89}.btn-neon-purple{color:#fff;background:#8000ff;border:1px solid #8000ff;font-weight:600;box-shadow:0 0 10px #8000ff4d}.btn-neon-purple:hover{background:#900fff;box-shadow:0 0 20px #8000ff99}.btn-neon-pink{color:#fff;background:#ff0080;border:1px solid #ff0080;font-weight:600;box-shadow:0 0 10px #ff00804d}.btn-neon-pink:hover{background:#ff3399;box-shadow:0 0 20px #ff008099}
 /* Neon brand heading */
 .neon-brand {
     color: #0050b3 !important;
@@ -49,12 +49,12 @@
 /* Neon blue button */
 .btn-neon-blue {
     color: #fff !important;
-    background: linear-gradient(45deg, #0050b3, #003366) !important;
+    background: #0050b3 !important;
     border: 1px solid #0050b3 !important;
     font-weight: 600 !important;
     box-shadow: 0 0 10px #0050b34d !important;
 }
 .btn-neon-blue:hover {
-    background: linear-gradient(45deg, #0066cc, #002244) !important;
+    background: #0066cc !important;
     box-shadow: 0 0 20px #0050b399 !important;
 }
