@@ -405,10 +405,14 @@
         function renderProducts() {
             const tbody = document.getElementById('products-table');
             tbody.innerHTML = '';
-            
             products.forEach(product => {
                 const row = document.createElement('tr');
-                row.className = 'border-b border-gray-700';
+                // Highlight row if editing
+                if (editingProductId === product.id) {
+                    row.className = 'border-b border-gray-700 bg-accent/10';
+                } else {
+                    row.className = 'border-b border-gray-700';
+                }
                 row.innerHTML = `
                     <td class="py-2 px-3 font-mono text-sm">${product.code}</td>
                     <td class="py-2 px-3">${product.name}</td>
@@ -471,7 +475,6 @@
         function editProduct(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) return;
-            
             const form = document.getElementById('product-form');
             document.getElementById('product-code').value = product.code;
             document.getElementById('product-name').value = product.name;
@@ -479,11 +482,15 @@
             document.getElementById('product-specs').value = product.specs;
             document.getElementById('product-description').value = product.description || '';
             document.getElementById('product-image').value = product.image || '';
-            
             editingProductId = productId;
             form.querySelector('button[type="submit"]').textContent = 'Update Product';
             document.getElementById('form-title').textContent = 'Edit Product';
             document.getElementById('cancel-edit').classList.remove('hidden');
+            renderProducts(); // Highlight the row being edited
+            // Auto-scroll to form
+            setTimeout(() => {
+                form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
         }
 
         // Cancel edit
@@ -494,6 +501,7 @@
             form.querySelector('button[type="submit"]').textContent = 'Add Product';
             document.getElementById('form-title').textContent = 'Add New Product';
             document.getElementById('cancel-edit').classList.add('hidden');
+            renderProducts(); // Remove highlight
         }
 
         // Delete product
