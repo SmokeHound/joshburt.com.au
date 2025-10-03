@@ -17,32 +17,32 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Analytics Data Manager -->
     <script src="analytics-manager.js"></script>
-
-    <!-- Load shared config and theme system -->
-    <script>
-        fetch('shared-config.html').then(r => r.text()).then(html => {
-            const temp = document.createElement('div');
-            temp.innerHTML = html;
-            Array.from(temp.children).forEach(child => {
-                if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
-                    document.head.appendChild(child.cloneNode(true));
-                }
-            });
-        });
-        fetch('shared-theme.html').then(r => r.text()).then(html => {
-            const temp = document.createElement('div');
-            temp.innerHTML = html;
-            Array.from(temp.children).forEach(child => {
-                if (child.tagName === 'SCRIPT') {
-                    document.head.appendChild(child.cloneNode(true));
-                }
-            });
-        });
-    </script>
-<body>
-        <!-- Enhanced User Analytics Section -->
-        <div class="max-w-4xl mx-auto bg-gray-800 text-white rounded-lg shadow-md p-4 mb-6">
-            <div class="flex flex-wrap gap-6 items-center justify-between mb-4">
+                </style>
+            </head>
+            <body class="dark">
+                <!-- MOBILE MENU TOGGLE (copied from template.html) -->
+                <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+                <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+                <div class="flex flex-col md:flex-row min-h-screen">
+                    <!-- SIDEBAR NAVIGATION (copied from template.html) -->
+                    <aside id="sidebar" class="sidebar sidebar-neon w-full md:w-64 fixed md:static top-0 left-0 h-full md:h-auto p-4 flex flex-col shadow-lg z-50 md:z-auto bg-gray-900 md:bg-inherit border-b md:border-b-0 border-r md:border-r-0 border-gray-800" aria-label="Main navigation" role="navigation">
+                        <!-- App Branding -->
+                        <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
+                        <!-- User Profile Section -->
+                        <div id="user-profile" class="mb-6">
+                            <!-- ...existing code... -->
+                        </div>
+                        <!-- Navigation -->
+                        <nav role="navigation" aria-label="Main navigation">
+                            <!-- ...existing code... -->
+                        </nav>
+                        <!-- Theme Toggle -->
+                        <div class="mt-auto">
+                            <!-- ...existing code... -->
+                        </div>
+                    </aside>
+                    <!-- Main Content -->
+                    <main class="flex-1 p-4 md:p-6 md:ml-64 ml-0 transition-all duration-300">
                 <div>
                     <div class="text-lg font-semibold mb-1">User Breakdown</div>
                     <ul id="user-breakdown-list" class="space-y-1 text-base"></ul>
@@ -473,7 +473,9 @@
                 </div>
             </div>
         </section>
-    </main>
+
+                    </main>
+                </div>
 
     <script>
     // Global variables for charts
@@ -1725,5 +1727,5 @@
             setTimeout(updateRealtimeStats, 50);
         });
     </script>
-</body>
+        </body>
 </html>
