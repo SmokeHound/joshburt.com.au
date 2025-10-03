@@ -457,7 +457,10 @@
       // Order management functions
       function addToOrder(productId, productName, productType, productCode) {
         const existingItem = orderItems.find(item => item.id === productId);
-        
+        // Find the product in the products array to get model_qty
+        const product = products.find(p => p.id === productId);
+        const modelQty = product && typeof product.model_qty !== 'undefined' ? product.model_qty : '';
+        const currentStock = typeof product !== 'undefined' && typeof product.currentStock !== 'undefined' ? product.currentStock : Math.floor(Math.random() * 50);
         if (existingItem) {
           existingItem.quantity++;
         } else {
@@ -467,8 +470,8 @@
             type: productType || 'Unknown',
             code: productCode || 'N/A',
             quantity: 1,
-            currentStock: Math.floor(Math.random() * 50), // Mock current stock
-            reorderPoint: Math.floor(Math.random() * 10) + 5 // Mock reorder point
+            currentStock: currentStock,
+            reorderPoint: modelQty // Use model_qty from DB as reorder point
           });
         }
         
