@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS products (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -7,6 +6,7 @@ CREATE TABLE IF NOT EXISTS products (
     specs TEXT,
     description TEXT,
     image TEXT,
+    model_qty INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS consumables (
     type VARCHAR(100) NOT NULL,
     category VARCHAR(100),
     description TEXT,
+    model_qty INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -61,8 +62,9 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Insert sample Castrol products
-INSERT INTO products (name, code, type, specs, description, image) VALUES
 
+-- Insert sample Castrol products (with ON CONFLICT inside INSERT for PostgreSQL)
+INSERT INTO products (name, code, type, specs, description, image) VALUES
 -- Engine Oil products
 ('EDGE 0W-20', '3437297', 'Engine Oil', 'API SP, ILSAC GF-6', 'Fully synthetic engine oil meeting API SP and ILSAC GF-6 standards.', ''),
 ('EDGE 0W-20 C5', '3425218', 'Engine Oil', 'ACEA C5, ACEA C6, API SQ, ILSAC GF-7, STJLR.03.5006, Chrysler MS 6395, GM dexos1™ Gen 3, MB-Approval 229.71, Fiat 9.55535-CR1, Fiat 9.55535-GSX, Ford WSS-M2C947-A, Ford WSS-M2C947-B1, Ford WSS-M2C962-A1', 'Advanced synthetic oil compatible with ACEA C5/C6 and multiple OEM approvals including Ford, GM, MB, Fiat, and Jaguar Land Rover.', ''),
@@ -93,20 +95,17 @@ INSERT INTO products (name, code, type, specs, description, image) VALUES
 ('MAGNATEC 0W-20 E', '3440475', 'Engine Oil', 'Ford WSS-M2C954-A1', 'Ford-approved oil for engines requiring WSS-M2C954-A1.', ''),
 ('MAGNATEC 0W-30 D', '3434547', 'Engine Oil', 'ACEA C2, API SN, Ford WSS-M2C950-A', 'Synthetic oil for Ford engines requiring ACEA C2 and WSS-M2C950-A.', ''),
 ('MAGNATEC 5W-20', '3429066', 'Engine Oil', 'API SP, ILSAC GF-6, Ford WSS-M2C960-A1', 'Fuel-efficient oil for Ford engines requiring WSS-M2C960-A', ''),
-
 -- Coolant products  
 ('Radicool SF', '3424712', 'Coolant', 'ASTM D3306, BS 6580:2010', 'Long-life OAT coolant suitable for modern engines including those requiring G12+ specification.', ''),
 ('Radicool P-OAT', '3429903', 'Coolant', 'ASTM D3306', 'Phosphated OAT coolant designed for Japanese and Korean vehicles requiring enhanced aluminium protection.', ''),
 ('Radicool Si-OAT', '3437791', 'Coolant', 'VW TL-774G (G12++), MAN 324 Si-OAT, ASTM D3306', 'Silicated OAT coolant approved for VW G12++ and MAN Si-OAT systems; ideal for high-performance aluminium engines.', ''),
 ('Radicool NF', '3376394', 'Coolant', 'ASTM D3306, BS 6580:2010', 'Hybrid OAT coolant suitable for European vehicles; phosphate-free and compatible with mixed-metal systems.', ''),
 ('Radicool Concentrate', '3424670', 'Coolant', 'ASTM D3306, BS 6580:2010', 'General-purpose ethylene glycol-based coolant for older petrol and diesel engines.', ''),
-
 -- Brake Fluid products
 ('React Performance DOT 4', '3430314', 'Brake Fluid', 'FMVSS 116 DOT 4, SAE J1704, ISO 4925 Class 4', 'High-performance glycol-based brake fluid for ABS, ESP, and disc/drum systems requiring DOT 4.', ''),
 ('React DOT 4 Low Temp', '3430315', 'Brake Fluid', 'FMVSS 116 DOT 4, SAE J1704, ISO 4925 Class 6', 'Low viscosity DOT 4 brake fluid for modern vehicles with advanced braking systems including ABS and ESP.', ''),
 ('React DOT 4', '3430316', 'Brake Fluid', 'FMVSS 116 DOT 4, SAE J1704, ISO 4925 Class 4', 'Standard DOT 4 brake fluid suitable for most passenger vehicles and light commercial applications.', ''),
-('React DOT 3', '3430317', 'Brake Fluid', 'FMVSS 116 DOT 3, SAE J1703, ISO 4925 Class 3', 'DOT 3 brake fluid for older vehicles and systems not requiring low viscosity performance.', '');
-
+('React DOT 3', '3430317', 'Brake Fluid', 'FMVSS 116 DOT 3, SAE J1703, ISO 4925 Class 3', 'DOT 3 brake fluid for older vehicles and systems not requiring low viscosity performance.', ''),
 -- Gear Oil products
 ('Transmax ATF Dex/Merc Multivehicle', '3429062', 'Gear Oil', 'Dexron III, Mercon, JASO 1A, Allison C4', 'Multi-vehicle ATF for older GM and Ford models; compatible with Dexron III and Mercon specs.', ''),
 ('Transmax CVT', '3425325', 'Gear Oil', 'CVT fluids for Japanese, Hyundai, Kia, Chrysler, Ford', 'Continuously Variable Transmission fluid designed for a wide range of Asian and domestic CVTs.', ''),
@@ -116,8 +115,7 @@ INSERT INTO products (name, code, type, specs, description, image) VALUES
 ('Transmax Limited Slip 75W-85', '3430676', 'Gear Oil', 'API GL-5, Limited Slip', 'Low-viscosity limited slip oil for modern differentials requiring GL-5.', ''),
 ('Transmax Manual VMX 80W', '3429677', 'Gear Oil', 'API GL-4', 'Smooth-shifting manual transmission oil for passenger vehicles.', ''),
 ('Transmax Manual Long Life 75W-85', '3432318', 'Gear Oil', 'API GL-4, MB 235.4, Volvo, Eaton', 'Extended drain manual transmission oil for European and heavy-duty gearboxes.', ''),
-('Transmax Universal 80W-90', '3430310', 'Gear Oil', 'API GL-4 / GL-5', 'Universal gear oil for manual transmissions and axles requiring GL-4 or GL-5.', ''),
-
+('Transmax Universal 80W-90', '3430310', 'Gear Oil', 'API GL-4 / GL-5', 'Universal gear oil for manual transmissions and axles requiring GL-4 or GL-5.', '')
 ON CONFLICT (code) DO NOTHING;
 
 -- Create indexes for better performance
