@@ -61,8 +61,6 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert sample Castrol products
-
 -- Insert sample Castrol products (with ON CONFLICT inside INSERT for PostgreSQL)
 INSERT INTO products (name, code, type, specs, description, image) VALUES
 -- Engine Oil products

@@ -419,6 +419,10 @@
         // Always treat IDs as strings to avoid type mismatch bugs
         const idStr = String(productId);
         const existingItem = orderItems.find(item => String(item.id) === idStr);
+        // Find the product in the products array to get model_qty
+        const product = products.find(p => String(p.id) === idStr);
+        const modelQty = product && typeof product.model_qty !== 'undefined' ? product.model_qty : '';
+        const currentStock = typeof product !== 'undefined' && typeof product.currentStock !== 'undefined' ? product.currentStock : Math.floor(Math.random() * 50);
         if (existingItem) {
           existingItem.quantity++;
         } else {
@@ -429,8 +433,8 @@
             code: productCode || 'N/A',
             category: productCategory || 'General',
             quantity: 1,
-            currentStock: Math.floor(Math.random() * 50), // Mock current stock
-            reorderPoint: Math.floor(Math.random() * 10) + 5 // Mock reorder point
+            currentStock: currentStock,
+            reorderPoint: modelQty // Use model_qty from DB as reorder point
           });
         }
         
