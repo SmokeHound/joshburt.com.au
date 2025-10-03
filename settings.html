@@ -424,27 +424,66 @@
             }, 3000);
         }
 
-        // Get form settings
-        function getFormSettings() {
-            return {
-                siteTitle: document.getElementById('site-title')?.value || '',
-                siteDescription: document.getElementById('site-description')?.value || '',
-                theme: document.getElementById('theme-select')?.value || 'dark',
-                contactEmail: document.getElementById('contact-email')?.value || '',
-                maintenanceMode: document.getElementById('maintenance-mode')?.checked || false
-            };
-        }
 
-        // Load settings from localStorage
-        function loadSettings() {
-            const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-            
-            if (settings.siteTitle) document.getElementById('site-title').value = settings.siteTitle;
-            if (settings.siteDescription) document.getElementById('site-description').value = settings.siteDescription;
-            if (settings.theme) document.getElementById('theme-select').value = settings.theme;
-            if (settings.contactEmail) document.getElementById('contact-email').value = settings.contactEmail;
-            if (settings.maintenanceMode !== undefined) document.getElementById('maintenance-mode').checked = settings.maintenanceMode;
+    // Get form settings (all panels)
+    function getFormSettings() {
+      return {
+        siteTitle: document.getElementById('site-title')?.value || '',
+        siteDescription: document.getElementById('site-description')?.value || '',
+        theme: document.getElementById('theme-select')?.value || 'dark',
+        contactEmail: document.getElementById('contact-email')?.value || '',
+        maintenanceMode: document.getElementById('maintenance-mode')?.checked || false,
+        // Theme customization
+        primaryColor: document.getElementById('primaryColor')?.value || '#3b82f6',
+        secondaryColor: document.getElementById('secondaryColor')?.value || '#10b981',
+        accentColor: document.getElementById('accentColor')?.value || '#8b5cf6',
+        // Theme schedule
+        themeSchedule: {
+          enabled: document.getElementById('schedule-enabled')?.checked || false,
+          darkModeStart: document.getElementById('dark-mode-start')?.value || '18:00',
+          lightModeStart: document.getElementById('light-mode-start')?.value || '06:00'
+        },
+        // Security
+        sessionTimeout: document.getElementById('session-timeout')?.value || '60',
+        maxLoginAttempts: document.getElementById('max-login-attempts')?.value || '5',
+        enable2FA: document.getElementById('enable-2fa')?.checked || false,
+        auditAllActions: document.getElementById('audit-all-actions')?.checked || false
+      };
+    }
+
+    // Load settings from API
+    async function loadSettings() {
+      try {
+        const res = await fetch('/.netlify/functions/settings');
+        if (!res.ok) throw new Error('Failed to load settings');
+        const settings = await res.json();
+        if (settings.siteTitle) document.getElementById('site-title').value = settings.siteTitle;
+        if (settings.siteDescription) document.getElementById('site-description').value = settings.siteDescription;
+        if (settings.theme) document.getElementById('theme-select').value = settings.theme;
+        if (settings.contactEmail) document.getElementById('contact-email').value = settings.contactEmail;
+        if (settings.maintenanceMode !== undefined) document.getElementById('maintenance-mode').checked = settings.maintenanceMode;
+        // Theme customization
+        if (settings.primaryColor) document.getElementById('primaryColor').value = settings.primaryColor;
+        if (settings.secondaryColor) document.getElementById('secondaryColor').value = settings.secondaryColor;
+        if (settings.accentColor) document.getElementById('accentColor').value = settings.accentColor;
+        if (settings.primaryColor) document.getElementById('primaryColorText').value = settings.primaryColor;
+        if (settings.secondaryColor) document.getElementById('secondaryColorText').value = settings.secondaryColor;
+        if (settings.accentColor) document.getElementById('accentColorText').value = settings.accentColor;
+        // Theme schedule
+        if (settings.themeSchedule) {
+          document.getElementById('schedule-enabled').checked = settings.themeSchedule.enabled;
+          document.getElementById('dark-mode-start').value = settings.themeSchedule.darkModeStart;
+          document.getElementById('light-mode-start').value = settings.themeSchedule.lightModeStart;
         }
+        // Security
+        if (settings.sessionTimeout) document.getElementById('session-timeout').value = settings.sessionTimeout;
+        if (settings.maxLoginAttempts) document.getElementById('max-login-attempts').value = settings.maxLoginAttempts;
+        if (settings.enable2FA !== undefined) document.getElementById('enable-2fa').checked = settings.enable2FA;
+        if (settings.auditAllActions !== undefined) document.getElementById('audit-all-actions').checked = settings.auditAllActions;
+      } catch (e) {
+        showToast('Failed to load settings from server', 'error');
+      }
+    }
 
         // Update preview (placeholder for now)
         function updatePreview() {
@@ -481,167 +520,104 @@
             };
         }
 
-        // Save settings with audit logging
-        function saveSettings() {
-            const settings = getFormSettings();
-            const previousSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-            
-            localStorage.setItem('siteSettings', JSON.stringify(settings));
-            
-            // Log changes
-            const changes = [];
-            Object.keys(settings).forEach(key => {
-                if (previousSettings[key] !== settings[key]) {
-                    changes.push(`${key}: "${previousSettings[key] || 'none'}" → "${settings[key]}"`);
-                }
-            });
-            
-            if (changes.length > 0) {
-                AuditLogger.log('settings_change', `Modified settings: ${changes.join(', ')}`);
-            }
-            
-            showToast('Settings saved successfully!');
+    // Save settings with audit logging (to API)
+    async function saveSettings() {
+      const settings = getFormSettings();
+      try {
+        const res = await fetch('/.netlify/functions/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings)
+        });
+        if (!res.ok) throw new Error('Failed to save settings');
+        AuditLogger.log('settings_change', 'Settings updated via API');
+        showToast('Settings saved successfully!');
+      } catch (e) {
+        showToast('Failed to save settings', 'error');
+      }
+    }
+
+    // Color theme functionality (update preview only)
+    function initThemeCustomization() {
+      const colorInputs = ['primaryColor', 'secondaryColor', 'accentColor'];
+      const colorTexts = ['primaryColorText', 'secondaryColorText', 'accentColorText'];
+      const previews = ['primary-preview', 'secondary-preview', 'accent-preview'];
+      colorInputs.forEach((inputId, index) => {
+        const colorInput = document.getElementById(inputId);
+        const textInput = document.getElementById(colorTexts[index]);
+        const preview = document.getElementById(previews[index]);
+        colorInput.addEventListener('change', (e) => {
+          textInput.value = e.target.value;
+          preview.style.backgroundColor = e.target.value;
+        });
+        textInput.addEventListener('change', (e) => {
+          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            colorInput.value = e.target.value;
+            preview.style.backgroundColor = e.target.value;
+          }
+        });
+      });
+      document.getElementById('apply-theme').addEventListener('click', async () => {
+        await saveSettings();
+        applyDynamicColors();
+        AuditLogger.log('theme_change', 'Applied custom theme via API');
+        showToast('Theme applied successfully!');
+      });
+    }
+
+    // Theme schedule functionality (save to API)
+    function initThemeSchedule() {
+      function updateTimeDisplay() {
+        const now = new Date();
+        const currentTimeEl = document.getElementById('current-time');
+        const scheduledModeEl = document.getElementById('scheduled-mode');
+        const enabled = document.getElementById('schedule-enabled').checked;
+        if (currentTimeEl) {
+          currentTimeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
-
-        // Color theme functionality
-        function initThemeCustomization() {
-            const colorInputs = ['primaryColor', 'secondaryColor', 'accentColor'];
-            const colorTexts = ['primaryColorText', 'secondaryColorText', 'accentColorText'];
-            const previews = ['primary-preview', 'secondary-preview', 'accent-preview'];
-            
-            colorInputs.forEach((inputId, index) => {
-                const colorInput = document.getElementById(inputId);
-                const textInput = document.getElementById(colorTexts[index]);
-                const preview = document.getElementById(previews[index]);
-                
-                colorInput.addEventListener('change', (e) => {
-                    textInput.value = e.target.value;
-                    preview.style.backgroundColor = e.target.value;
-                });
-                
-                textInput.addEventListener('change', (e) => {
-                    if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-                        colorInput.value = e.target.value;
-                        preview.style.backgroundColor = e.target.value;
-                    }
-                });
-            });
-            
-            document.getElementById('apply-theme').addEventListener('click', () => {
-                const themeSettings = {
-                    primaryColor: document.getElementById('primaryColor').value,
-                    secondaryColor: document.getElementById('secondaryColor').value,
-                    accentColor: document.getElementById('accentColor').value
-                };
-                
-                localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
-                applyDynamicColors();
-                AuditLogger.log('theme_change', `Applied custom theme: ${JSON.stringify(themeSettings)}`);
-                showToast('Theme applied successfully!');
-            });
+        if (scheduledModeEl) {
+          if (!enabled) {
+            scheduledModeEl.textContent = 'Manual';
+            scheduledModeEl.className = 'text-gray-600 dark:text-gray-400';
+          } else {
+            // Just show which mode would be active
+            const nowMins = now.getHours() * 60 + now.getMinutes();
+            const darkStart = parseInt(document.getElementById('dark-mode-start').value.split(':')[0]) * 60 + parseInt(document.getElementById('dark-mode-start').value.split(':')[1]);
+            const lightStart = parseInt(document.getElementById('light-mode-start').value.split(':')[0]) * 60 + parseInt(document.getElementById('light-mode-start').value.split(':')[1]);
+            let isDark = false;
+            if (darkStart > lightStart) {
+              isDark = (nowMins >= darkStart || nowMins < lightStart);
+            } else {
+              isDark = (nowMins >= darkStart && nowMins < lightStart);
+            }
+            scheduledModeEl.textContent = isDark ? 'Dark' : 'Light';
+            scheduledModeEl.className = isDark ? 'text-blue-400' : 'text-yellow-400';
+          }
         }
+      }
+      document.getElementById('schedule-enabled').addEventListener('change', async (e) => {
+        await saveSettings();
+        AuditLogger.log('theme_schedule', `Theme scheduling ${e.target.checked ? 'enabled' : 'disabled'} via API`);
+        showToast(e.target.checked ? 'Theme scheduling enabled' : 'Theme scheduling disabled');
+      });
+      document.getElementById('dark-mode-start').addEventListener('change', async (e) => {
+        await saveSettings();
+      });
+      document.getElementById('light-mode-start').addEventListener('change', async (e) => {
+        await saveSettings();
+      });
+      updateTimeDisplay();
+      setInterval(updateTimeDisplay, 1000);
+    }
 
-        // Theme schedule functionality
-        function initThemeSchedule() {
-            const defaultSchedule = { enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' };
-            let themeSchedule = JSON.parse(localStorage.getItem('themeSchedule') || JSON.stringify(defaultSchedule));
-            let schedulerInterval = null;
-
-            function updateScheduleUI() {
-                const scheduleEnabled = document.getElementById('schedule-enabled');
-                const darkModeStart = document.getElementById('dark-mode-start');
-                const lightModeStart = document.getElementById('light-mode-start');
-                const statusEl = document.getElementById('schedule-status');
-                
-                if (scheduleEnabled) scheduleEnabled.checked = themeSchedule.enabled;
-                if (darkModeStart) darkModeStart.value = themeSchedule.darkModeStart;
-                if (lightModeStart) lightModeStart.value = themeSchedule.lightModeStart;
-                
-                if (statusEl) {
-                    statusEl.textContent = themeSchedule.enabled ? 'Enabled' : 'Disabled';
-                    statusEl.className = `text-xs px-2 py-1 rounded ${themeSchedule.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`;
-                }
-            }
-
-            function updateTimeDisplay() {
-                const now = new Date();
-                const currentTimeEl = document.getElementById('current-time');
-                const scheduledModeEl = document.getElementById('scheduled-mode');
-                
-                if (currentTimeEl) {
-                    currentTimeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
-                
-                if (scheduledModeEl) {
-                    if (!themeSchedule.enabled) {
-                        scheduledModeEl.textContent = 'Manual';
-                        scheduledModeEl.className = 'text-gray-600 dark:text-gray-400';
-                    } else {
-                        const isDark = isDarkModeTime();
-                        scheduledModeEl.textContent = isDark ? 'Dark' : 'Light';
-                        scheduledModeEl.className = isDark ? 'text-blue-400' : 'text-yellow-400';
-                    }
-                }
-            }
-
-            function isDarkModeTime() {
-                if (!themeSchedule.enabled) return null;
-                const now = new Date();
-                const currentTime = now.getHours() * 60 + now.getMinutes();
-                const darkStart = parseTimeString(themeSchedule.darkModeStart);
-                const lightStart = parseTimeString(themeSchedule.lightModeStart);
-
-                return darkStart > lightStart ? 
-                    (currentTime >= darkStart || currentTime < lightStart) :
-                    (currentTime >= darkStart && currentTime < lightStart);
-            }
-
-            function parseTimeString(timeStr) {
-                const [hours, minutes] = timeStr.split(':').map(Number);
-                return hours * 60 + minutes;
-            }
-
-            // Event listeners
-            document.getElementById('schedule-enabled').addEventListener('change', (e) => {
-                themeSchedule.enabled = e.target.checked;
-                localStorage.setItem('themeSchedule', JSON.stringify(themeSchedule));
-                updateScheduleUI();
-                AuditLogger.log('theme_schedule', `Theme scheduling ${themeSchedule.enabled ? 'enabled' : 'disabled'}`);
-                showToast(themeSchedule.enabled ? 'Theme scheduling enabled' : 'Theme scheduling disabled');
-            });
-
-            document.getElementById('dark-mode-start').addEventListener('change', (e) => {
-                themeSchedule.darkModeStart = e.target.value;
-                localStorage.setItem('themeSchedule', JSON.stringify(themeSchedule));
-                updateScheduleUI();
-            });
-
-            document.getElementById('light-mode-start').addEventListener('change', (e) => {
-                themeSchedule.lightModeStart = e.target.value;
-                localStorage.setItem('themeSchedule', JSON.stringify(themeSchedule));
-                updateScheduleUI();
-            });
-
-            updateScheduleUI();
-            updateTimeDisplay();
-            setInterval(updateTimeDisplay, 1000);
-        }
-
-        // Security settings functionality
-        function initSecuritySettings() {
-            document.getElementById('save-security').addEventListener('click', () => {
-                const securitySettings = {
-                    sessionTimeout: document.getElementById('session-timeout').value,
-                    maxLoginAttempts: document.getElementById('max-login-attempts').value,
-                    enable2FA: document.getElementById('enable-2fa').checked,
-                    auditAllActions: document.getElementById('audit-all-actions').checked
-                };
-                
-                localStorage.setItem('securitySettings', JSON.stringify(securitySettings));
-                AuditLogger.log('security_change', `Updated security settings: ${JSON.stringify(securitySettings)}`);
-                showToast('Security settings saved successfully!');
-            });
-        }
+    // Security settings functionality (save to API)
+    function initSecuritySettings() {
+      document.getElementById('save-security').addEventListener('click', async () => {
+        await saveSettings();
+        AuditLogger.log('security_change', 'Updated security settings via API');
+        showToast('Security settings saved successfully!');
+      });
+    }
 
         // Audit log functionality
         function initAuditLog() {
@@ -726,66 +702,111 @@
 
         // Quick action buttons (only if they exist)
         const clearCacheBtn = document.querySelector('[data-action="clear-cache"]');
-        if (clearCacheBtn) {
-            clearCacheBtn.addEventListener('click', () => {
-                localStorage.removeItem('user');
-                localStorage.removeItem('siteUsers');
-                AuditLogger.log('cache_clear', 'Cleared user cache and site users data');
-                showToast('Cache cleared successfully!');
-            });
-        }
+    if (clearCacheBtn) {
+      clearCacheBtn.addEventListener('click', () => {
+        // Only clear user cache, not settings
+        localStorage.removeItem('user');
+        localStorage.removeItem('siteUsers');
+        AuditLogger.log('cache_clear', 'Cleared user cache and site users data');
+        showToast('Cache cleared successfully!');
+      });
+    }
 
         const exportSettingsBtn = document.querySelector('[data-action="export-settings"]');
-        if (exportSettingsBtn) {
-            exportSettingsBtn.addEventListener('click', () => {
-                const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-                const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'site-settings.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                AuditLogger.log('settings_export', 'Exported site settings configuration');
-                showToast('Settings exported successfully!');
-            });
+    if (exportSettingsBtn) {
+      exportSettingsBtn.addEventListener('click', async () => {
+        try {
+          const res = await fetch('/.netlify/functions/settings');
+          if (!res.ok) throw new Error('Failed to export settings');
+          const settings = await res.json();
+          const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'site-settings.json';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          AuditLogger.log('settings_export', 'Exported site settings configuration');
+          showToast('Settings exported successfully!');
+        } catch (e) {
+          showToast('Failed to export settings', 'error');
         }
+      });
+    }
 
         const resetDefaultsBtn = document.querySelector('[data-action="reset-defaults"]');
-        if (resetDefaultsBtn) {
-            resetDefaultsBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
-                    const previousSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-                    localStorage.removeItem('siteSettings');
-                    loadSettings();
-                    AuditLogger.log('settings_reset', `Reset all settings to defaults. Previous settings: ${JSON.stringify(previousSettings)}`);
-                    showToast('Settings reset to defaults!');
-                }
+    if (resetDefaultsBtn) {
+      resetDefaultsBtn.addEventListener('click', async () => {
+        if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
+          try {
+            // Fetch previous settings for audit
+            const prevRes = await fetch('/.netlify/functions/settings');
+            const previousSettings = prevRes.ok ? await prevRes.json() : {};
+            // Reset to hardcoded defaults (update as needed)
+            const defaultSettings = {
+              siteTitle: '',
+              siteDescription: '',
+              theme: 'dark',
+              contactEmail: '',
+              maintenanceMode: false,
+              primaryColor: '#3b82f6',
+              secondaryColor: '#10b981',
+              accentColor: '#8b5cf6',
+              themeSchedule: { enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' },
+              sessionTimeout: '60',
+              maxLoginAttempts: '5',
+              enable2FA: false,
+              auditAllActions: false
+            };
+            await fetch('/.netlify/functions/settings', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(defaultSettings)
             });
+            loadSettings();
+            AuditLogger.log('settings_reset', `Reset all settings to defaults. Previous settings: ${JSON.stringify(previousSettings)}`);
+            showToast('Settings reset to defaults!');
+          } catch (e) {
+            showToast('Failed to reset settings', 'error');
+          }
         }
+      });
+    }
 
         // Theme toggle functionality
         document.getElementById('theme-toggle').addEventListener('click', function() {
-            const body = document.body;
-            if (body.classList.contains('dark')) {
-                body.classList.remove('dark');
-                body.classList.add('light');
-                this.textContent = 'Toggle Dark Mode';
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.classList.remove('light');
-                body.classList.add('dark');
-                this.textContent = 'Toggle Light Mode';
-                localStorage.setItem('theme', 'dark');
-            }
-            // Update settings form theme selector to match current theme
-            const themeInput = document.getElementById('theme') || document.getElementById('theme-select');
-            if (themeInput) {
-                themeInput.value = body.classList.contains('dark') ? 'dark' : 'light';
-            }
-            updatePreview();
+      const body = document.body;
+      let newTheme;
+      if (body.classList.contains('dark')) {
+        body.classList.remove('dark');
+        body.classList.add('light');
+        this.textContent = 'Toggle Dark Mode';
+        newTheme = 'light';
+      } else {
+        body.classList.remove('light');
+        body.classList.add('dark');
+        this.textContent = 'Toggle Light Mode';
+        newTheme = 'dark';
+      }
+      // Update settings form theme selector to match current theme
+      const themeInput = document.getElementById('theme') || document.getElementById('theme-select');
+      if (themeInput) {
+        themeInput.value = newTheme;
+      }
+      // Save theme to backend settings
+      (async () => {
+        const settings = getFormSettings();
+        settings.theme = newTheme;
+        await fetch('/.netlify/functions/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings)
+        });
+        AuditLogger.log('theme_change', `Theme toggled to ${newTheme} via API`);
+      })();
+      updatePreview();
         });
 
         // Sidebar toggle for mobile
@@ -809,42 +830,35 @@
             });
         }
 
-        // Initialize all functionality when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            // Log page access
-            AuditLogger.log('page_access', 'Accessed Settings page');
-            
-            // Initialize components
-            initTabs();
-            initThemeCustomization();
-            initThemeSchedule();
-            initSecuritySettings();
-            initAuditLog();
-            
-            // Load settings
-            loadSettings();
-            
-            // Load saved theme
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.body.classList.add(savedTheme);
-            document.getElementById('theme-toggle').textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-            
-            // Load and apply saved theme colors
-            const savedThemeColors = JSON.parse(localStorage.getItem('themeSettings') || '{}');
-            if (savedThemeColors.primaryColor) {
-                document.getElementById('primaryColor').value = savedThemeColors.primaryColor;
-                document.getElementById('primaryColorText').value = savedThemeColors.primaryColor;
-                document.getElementById('secondaryColor').value = savedThemeColors.secondaryColor;
-                document.getElementById('secondaryColorText').value = savedThemeColors.secondaryColor;
-                document.getElementById('accentColor').value = savedThemeColors.accentColor;
-                document.getElementById('accentColorText').value = savedThemeColors.accentColor;
-                
-                // Update previews
-                document.getElementById('primary-preview').style.backgroundColor = savedThemeColors.primaryColor;
-                document.getElementById('secondary-preview').style.backgroundColor = savedThemeColors.secondaryColor;
-                document.getElementById('accent-preview').style.backgroundColor = savedThemeColors.accentColor;
-            }
-        });
+    // Initialize all functionality when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      AuditLogger.log('page_access', 'Accessed Settings page');
+      initTabs();
+      initThemeCustomization();
+      initThemeSchedule();
+      initSecuritySettings();
+      initAuditLog();
+      loadSettings();
+    });
   </script>
-</body>
-</html>
+    <script>
+        // Apply theme/colors instantly from backend settings
+        (async function() {
+          try {
+            const res = await fetch('/.netlify/functions/settings');
+            const s = res.ok ? await res.json() : {};
+            document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
+            document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
+            document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
+            const theme = s.theme || 'dark';
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            document.documentElement.classList.toggle('light', theme === 'light');
+          } catch(e) {}
+        })();
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(()=>{});
+          });
+        }
+      </script>
