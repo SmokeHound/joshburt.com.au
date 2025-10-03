@@ -214,28 +214,10 @@
         <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
           Toggle Light Mode
         </button>
-      </div>
-      <!-- Audit Log Section -->
-      <div class="bg-gray-900 rounded-lg shadow p-4 mb-8">
-        <h3 class="text-lg font-bold text-accent mb-2">Audit Log</h3>
-        <div class="overflow-x-auto max-h-64">
-          <table class="min-w-full text-xs bg-gray-900 text-white">
-            <thead>
-              <tr class="bg-accent text-left">
-                <th class="p-2">Time</th>
-                <th class="p-2">Action</th>
-                <th class="p-2">Product</th>
-                <th class="p-2">Details</th>
-              </tr>
-            </thead>
-            <tbody id="auditLogBody">
-              <!-- Audit log entries -->
-            </tbody>
-          </table>
-        </div>
-        <button id="clearAuditLogBtn" class="btn-neon-pink px-3 py-1 mt-2 rounded text-xs font-semibold">Clear Log</button>
-      </div>
-      <div class="mt-auto pt-4 text-xs text-gray-300">v1 Settings</div>
+  </div>
+  <!-- Version Info (moved from sidebar) -->
+  <div class="pt-4 text-xs text-gray-300 text-right">v1 Settings</div>
+
     </aside>
     <!-- Main Content -->
     <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
@@ -250,6 +232,26 @@
             <button id="manageCategoriesBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Categories</button>
           </div>
         </div>
+        <!-- Audit Log Section (moved from sidebar) -->
+        <section class="bg-gray-900 rounded-lg shadow p-4 mb-8 mt-8">
+          <h3 class="text-lg font-bold text-accent mb-2">Audit Log</h3>
+          <div class="overflow-x-auto max-h-64">
+            <table class="min-w-full text-xs bg-gray-900 text-white">
+              <thead>
+                <tr class="bg-accent text-left">
+                  <th class="p-2">Time</th>
+                  <th class="p-2">Action</th>
+                  <th class="p-2">Product</th>
+                  <th class="p-2">Details</th>
+                </tr>
+              </thead>
+              <tbody id="auditLogBody">
+                <!-- Audit log entries -->
+              </tbody>
+            </table>
+          </div>
+          <button id="clearAuditLogBtn" class="btn-neon-pink px-3 py-1 mt-2 rounded text-xs font-semibold">Clear Log</button>
+        </section>
         <div class="overflow-x-auto rounded-lg shadow mb-8">
       <!-- Category Management Modal -->
       <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
