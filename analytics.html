@@ -2,45 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="./assets/css/styles.css">
-
-        <!-- Load shared config and theme system -->
-        <script>
-            fetch('shared-config.html').then(r => r.text()).then(html => {
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                Array.from(temp.children).forEach(child => {
-                    if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
-                        document.head.appendChild(child.cloneNode(true));
-                    }
-                });
-            });
-            fetch('shared-theme.html').then(r => r.text()).then(html => {
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                Array.from(temp.children).forEach(child => {
-                    if (child.tagName === 'SCRIPT') {
-                        document.head.appendChild(child.cloneNode(true));
-                    }
-                });
-            });
-        </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics</title>
-    
+    <link rel="stylesheet" href="./assets/css/styles.css">
     <!-- PWA Configuration -->
     <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
     <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
-    
     <!-- Chart.js for analytics charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- jsPDF for PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Analytics Data Manager -->
     <script src="analytics-manager.js"></script>
+
+    <!-- Load shared config and theme system -->
+    <script>
+        fetch('shared-config.html').then(r => r.text()).then(html => {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            Array.from(temp.children).forEach(child => {
+                if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
+                    document.head.appendChild(child.cloneNode(true));
+                }
+            });
+        });
+        fetch('shared-theme.html').then(r => r.text()).then(html => {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            Array.from(temp.children).forEach(child => {
+                if (child.tagName === 'SCRIPT') {
+                    document.head.appendChild(child.cloneNode(true));
+                }
+            });
+        });
+    </script>
+<body>
+    <!-- Last Updated Timestamp -->
+    <div class="w-full text-center text-xs text-gray-400 mb-2 flex items-center justify-center gap-2" id="analytics-last-updated">
+        <span id="analytics-last-updated-text">Last updated: --</span>
+        <button id="analytics-refresh-btn" class="ml-2 px-2 py-1 rounded bg-gray-700 text-white text-xs hover:bg-gray-600 focus:outline-none" title="Refresh analytics now">⟳ Refresh</button>
+        <span id="analytics-auto-refresh" class="text-gray-500 text-xs ml-2">(auto-refresh every 45s)</span>
+    </div>
+    <!-- Device/Browser/Location Breakdown Cards -->
+    <div class="max-w-4xl mx-auto flex flex-wrap gap-6 mb-6">
+        <div class="flex-1 min-w-[200px] bg-gray-800 text-white rounded-lg shadow-md p-4">
+            <div class="text-lg font-semibold mb-2">Device Breakdown</div>
+            <ul id="device-breakdown-list" class="space-y-1 text-base"></ul>
+        </div>
+        <div class="flex-1 min-w-[200px] bg-gray-800 text-white rounded-lg shadow-md p-4">
+            <div class="text-lg font-semibold mb-2">Browser Breakdown</div>
+            <ul id="browser-breakdown-list" class="space-y-1 text-base"></ul>
+        </div>
+        <div class="flex-1 min-w-[200px] bg-gray-800 text-white rounded-lg shadow-md p-4">
+            <div class="text-lg font-semibold mb-2">Location Breakdown</div>
+            <ul id="location-breakdown-list" class="space-y-1 text-base"></ul>
+        </div>
+    </div>
+    <!-- Actionable Insights Card -->
+    <div id="insights-card" class="max-w-4xl mx-auto bg-gray-800 text-white rounded-lg shadow-md p-4 mb-6 flex flex-wrap gap-6 justify-between">
+        <div>
+            <div class="text-lg font-semibold mb-1">Conversion Rate</div>
+            <div id="insight-conversion" class="text-2xl font-bold flex items-center">--%</div>
+        </div>
+        <div>
+            <div class="text-lg font-semibold mb-1">Retention Rate</div>
+            <div id="insight-retention" class="text-2xl font-bold flex items-center">--%</div>
+        </div>
+        <div>
+            <div class="text-lg font-semibold mb-1">Top Product</div>
+            <div id="insight-top-product" class="text-2xl font-bold flex items-center">--</div>
+        </div>
+        <div>
+            <div class="text-lg font-semibold mb-1">Top User</div>
+            <div id="insight-top-user" class="text-2xl font-bold flex items-center">--</div>
+        </div>
+    </div>
+    <!-- Status Bar for API/DB/Server Health -->
+    <div id="status-bar" class="w-full flex flex-wrap items-center justify-center gap-4 py-2 px-4 bg-gray-900 text-white text-sm mb-4">
+        <span id="status-api" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-400"></span>API: <span class="ml-1">Checking...</span></span>
+        <span id="status-db" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-400"></span>Database: <span class="ml-1">Checking...</span></span>
+        <span id="status-server" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-400"></span>Server: <span class="ml-1">Checking...</span></span>
+    </div>
     <script>
         // Configuration for dynamic color updates from settings
         function applyDynamicColors() {
@@ -434,77 +479,82 @@
             }
         }
 
-        // Generate mock analytics data based on filters
-        function generateAnalyticsData(filters) {
-            // Use the new analytics manager
+        // Generate analytics data from live backend APIs
+        async function generateAnalyticsData(filters) {
+            // Use analyticsManager if available
             if (window.analyticsManager) {
                 const analyticsData = window.analyticsManager.getData(filters);
                 if (analyticsData) {
                     return processAnalyticsData(analyticsData.data, filters);
                 }
             }
-            
-            // Fallback to original mock data generation
-            const days = filters.dateRange;
-            const userType = filters.userType;
-            const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
-            
+
+            // Fetch users, orders, and products from backend APIs
+            const [usersRes, ordersRes, productsRes] = await Promise.all([
+                fetch('/api/users'),
+                fetch('/api/orders'),
+                fetch('/api/products')
+            ]);
+            const usersData = await usersRes.json();
+            const ordersData = await ordersRes.json();
+            const productsData = await productsRes.json();
+
             // Filter users by type
+            let users = usersData.users || usersData;
+            const userType = filters.userType;
             let filteredUsers = users;
             if (userType === 'admin') {
                 filteredUsers = users.filter(u => u.role === 'admin');
             } else if (userType === 'user') {
                 filteredUsers = users.filter(u => u.role === 'user');
             }
-            
-            // Generate visitor trend data
+
+            // Generate visitor trend data (use order timestamps as proxy for visits)
+            const days = filters.dateRange;
             const visitorData = [];
             const labels = [];
-            const baseVisitors = Math.max(filteredUsers.length * 10, 50);
-            
+            const now = new Date();
             for (let i = days - 1; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
+                const date = new Date(now);
+                date.setDate(now.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
                 labels.push(date.toLocaleDateString());
-                
-                // Simulate visitor patterns (weekends lower, recent days higher)
-                const dayOfWeek = date.getDay();
-                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-                const trendMultiplier = 1 + (days - i) / days * 0.3; // Recent growth
-                const weekendMultiplier = isWeekend ? 0.7 : 1;
-                const randomVariation = 0.8 + Math.random() * 0.4;
-                
-                const visitors = Math.floor(baseVisitors * trendMultiplier * weekendMultiplier * randomVariation);
-                visitorData.push(visitors);
+                // Count orders (visits) for this day
+                const count = ordersData.filter(order => (order.created_at || order.createdAt || '').startsWith(dateStr)).length;
+                visitorData.push(count);
             }
-            
-            // Generate engagement data
-            const engagementData = {
-                bounceRate: 30 + Math.random() * 40, // 30-70%
-                avgSessionDuration: 180 + Math.random() * 300, // 3-8 minutes
-                pagesPerSession: 2 + Math.random() * 3, // 2-5 pages
-                returnVisitorRate: 20 + Math.random() * 30 // 20-50%
-            };
-            
-            // Generate product sales data (from oil orders)
-            const salesData = {
-                labels: ['Castrol GTX', 'Castrol Magnatec', 'Castrol EDGE', 'Castrol GTX Diesel', 'Castrol Actevo'],
-                data: [
-                    Math.floor(Math.random() * 50 + 10),
-                    Math.floor(Math.random() * 40 + 15),
-                    Math.floor(Math.random() * 60 + 20),
-                    Math.floor(Math.random() * 30 + 5),
-                    Math.floor(Math.random() * 25 + 8)
-                ]
-            };
-            
+
+            // Engagement data (basic, from orders/users)
+            const totalOrders = ordersData.length;
+            const bounceRate = Math.max(0, 100 - (totalOrders / (filteredUsers.length * days)) * 100); // crude estimate
+            const avgSessionDuration = 300; // Placeholder, needs real session data
+            const pagesPerSession = 3; // Placeholder
+            const returnVisitorRate = 30; // Placeholder
+
+            // Product sales data
+            const productNames = productsData.map(p => p.name);
+            const salesCounts = productNames.map(name =>
+                ordersData.reduce((sum, order) => {
+                    if (!order.items) return sum;
+                    return sum + order.items.filter(item => item.name === name).reduce((s, i) => s + (i.quantity || 1), 0);
+                }, 0)
+            );
+
             return {
                 visitors: { labels, data: visitorData },
-                engagement: engagementData,
-                sales: salesData,
+                engagement: {
+                    bounceRate,
+                    avgSessionDuration,
+                    pagesPerSession,
+                    returnVisitorRate
+                },
+                sales: {
+                    labels: productNames,
+                    data: salesCounts
+                },
                 summary: {
                     totalUsers: filteredUsers.length,
-                    activeSession: JSON.parse(localStorage.getItem('user') || 'null') ? 1 : 0,
+                    activeSession: 0, // Not tracked here
                     adminUsers: users.filter(u => u.role === 'admin').length,
                     regularUsers: users.filter(u => u.role === 'user').length,
                     totalVisitors: visitorData.reduce((a, b) => a + b, 0),
@@ -953,17 +1003,39 @@
             }
         }
 
-        // Update analytics data and charts
-        function updateAnalytics() {
-            const data = generateAnalyticsData(currentFilters);
-            
+        // Update analytics data and charts (async, uses live API data)
+        async function updateAnalytics() {
+            const data = await generateAnalyticsData(currentFilters);
+            // Update last updated timestamp
+            const lastUpdatedText = document.getElementById('analytics-last-updated-text');
+            if (lastUpdatedText) {
+                lastUpdatedText.textContent = 'Last updated: ' + new Date().toLocaleString();
+            }
+        // Auto-refresh logic
+        let analyticsAutoRefreshInterval = null;
+        function startAnalyticsAutoRefresh() {
+            if (analyticsAutoRefreshInterval) clearInterval(analyticsAutoRefreshInterval);
+            analyticsAutoRefreshInterval = setInterval(() => {
+                updateAnalytics();
+            }, 45000); // 45 seconds
+        }
+
+        // Manual refresh button
+        document.addEventListener('DOMContentLoaded', () => {
+            const refreshBtn = document.getElementById('analytics-refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    updateAnalytics();
+                });
+            }
+            startAnalyticsAutoRefresh();
+        });
             // Update charts
             if (visitorChart) {
                 visitorChart.data.labels = data.visitors.labels;
                 visitorChart.data.datasets[0].data = data.visitors.data;
                 visitorChart.update();
             }
-            
             if (engagementChart) {
                 engagementChart.data.datasets[0].data = [
                     data.engagement.returnVisitorRate,
@@ -973,12 +1045,10 @@
                 ];
                 engagementChart.update();
             }
-            
             if (salesChart) {
                 salesChart.data.datasets[0].data = data.sales.data;
                 salesChart.update();
             }
-            
             // Update statistics cards
             updateStatCard('visitor-stats', [
                 `Total Users: ${data.summary.totalUsers}`,
@@ -986,14 +1056,12 @@
                 `Avg Daily Visitors: ${data.summary.avgDailyVisitors}`,
                 `Active Session: ${data.summary.activeSession > 0 ? 'Yes' : 'No'}`
             ]);
-            
             updateStatCard('engagement-stats', [
                 `Bounce Rate: ${data.engagement.bounceRate.toFixed(1)}%`,
                 `Avg Session: ${Math.floor(data.engagement.avgSessionDuration / 60)}m ${Math.floor(data.engagement.avgSessionDuration % 60)}s`,
                 `Pages/Session: ${data.engagement.pagesPerSession.toFixed(1)}`,
                 `Return Rate: ${data.engagement.returnVisitorRate.toFixed(1)}%`
             ]);
-            
             updateStatCard('top-pages', [
                 'Analytics Dashboard',
                 'Oil Orders System', 
@@ -1001,6 +1069,75 @@
                 'Settings Page',
                 'Admin Dashboard'
             ]);
+
+            // Actionable Insights
+            // Conversion Rate: orders/users
+            const conversion = data.summary.totalUsers > 0 ? (data.sales.data.reduce((a,b)=>a+b,0) / data.summary.totalUsers) * 100 : 0;
+            document.getElementById('insight-conversion').innerHTML = `${conversion.toFixed(1)}% ${trendArrow(conversion)}`;
+            // Retention Rate: use returnVisitorRate
+            document.getElementById('insight-retention').innerHTML = `${data.engagement.returnVisitorRate.toFixed(1)}% ${trendArrow(data.engagement.returnVisitorRate)}`;
+            // Top Product
+            let topIdx = 0;
+            if (data.sales.data.length > 0) {
+                topIdx = data.sales.data.indexOf(Math.max(...data.sales.data));
+            }
+            document.getElementById('insight-top-product').textContent = data.sales.labels[topIdx] || '--';
+            // Top User (by order count)
+            try {
+                const usersRes = await fetch('/api/users');
+                const ordersRes = await fetch('/api/orders');
+                const users = (await usersRes.json()).users || [];
+                const orders = await ordersRes.json();
+                const userOrderCounts = {};
+                orders.forEach(order => {
+                    if (order.created_by) {
+                        userOrderCounts[order.created_by] = (userOrderCounts[order.created_by] || 0) + 1;
+                    }
+                });
+                let topUser = '--', maxOrders = 0;
+                Object.entries(userOrderCounts).forEach(([user, count]) => {
+                    if (count > maxOrders) { topUser = user; maxOrders = count; }
+                });
+                document.getElementById('insight-top-user').textContent = topUser;
+            } catch (e) {
+                document.getElementById('insight-top-user').textContent = '--';
+            }
+
+            // Device/Browser/Location breakdowns
+            let deviceLabels = [], deviceData = [], browserLabels = [], browserData = [], locationLabels = [], locationData = [];
+            if (window.analyticsManager && window.analyticsManager.getData) {
+                const analytics = window.analyticsManager.getData(currentFilters);
+                if (analytics && analytics.insights) {
+                    if (analytics.insights.deviceBreakdown) {
+                        deviceLabels = analytics.insights.deviceBreakdown.deviceLabels;
+                        deviceData = analytics.insights.deviceBreakdown.devices;
+                    }
+                    if (analytics.insights.browserBreakdown) {
+                        browserLabels = analytics.insights.browserBreakdown.browserLabels;
+                        browserData = analytics.insights.browserBreakdown.browsers;
+                    }
+                    if (analytics.insights.locationBreakdown) {
+                        locationLabels = analytics.insights.locationBreakdown.locationLabels;
+                        locationData = analytics.insights.locationBreakdown.locations;
+                    }
+                }
+            }
+            // Render device breakdown
+            const deviceList = document.getElementById('device-breakdown-list');
+            deviceList.innerHTML = deviceLabels.length > 0 ? deviceLabels.map((label, i) => `<li>${label}: <span class='font-bold'>${deviceData[i]}%</span></li>`).join('') : '<li>N/A</li>';
+            // Render browser breakdown
+            const browserList = document.getElementById('browser-breakdown-list');
+            browserList.innerHTML = browserLabels.length > 0 ? browserLabels.map((label, i) => `<li>${label}: <span class='font-bold'>${browserData[i]}%</span></li>`).join('') : '<li>N/A</li>';
+            // Render location breakdown
+            const locationList = document.getElementById('location-breakdown-list');
+            locationList.innerHTML = locationLabels.length > 0 ? locationLabels.map((label, i) => `<li>${label}: <span class='font-bold'>${locationData[i]}%</span></li>`).join('') : '<li>N/A</li>';
+        }
+
+        // Helper: Trend arrow (up/down/flat)
+        function trendArrow(value) {
+            if (value > 50) return '<span class="ml-2 text-green-400">&#8593;</span>';
+            if (value < 20) return '<span class="ml-2 text-red-400">&#8595;</span>';
+            return '<span class="ml-2 text-yellow-400">&#8596;</span>';
         }
         
         function updateStatCard(cardType, items) {
@@ -1119,31 +1256,57 @@
             showToast('Enhanced CSV report exported successfully!');
         }
 
-        // Update real-time statistics
-        function updateRealtimeStats() {
+        // Update real-time statistics and health status
+        async function updateRealtimeStats() {
+            // API Health
+            let apiHealthy = false, dbHealthy = false, serverHealthy = true;
+            try {
+                const apiRes = await fetch('/api/users');
+                apiHealthy = apiRes.ok;
+            } catch (e) { apiHealthy = false; }
+            try {
+                const dbRes = await fetch('/api/orders');
+                dbHealthy = dbRes.ok;
+            } catch (e) { dbHealthy = false; }
+            // Server health: if page loads, assume server is up
+            serverHealthy = true;
+            // Update status bar
+            function setStatus(id, healthy, label) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const dot = el.querySelector('span');
+                const text = el.querySelector('span.ml-1');
+                if (healthy) {
+                    dot.classList.remove('bg-gray-400', 'bg-red-500');
+                    dot.classList.add('bg-green-500');
+                    text.textContent = 'Online';
+                } else {
+                    dot.classList.remove('bg-gray-400', 'bg-green-500');
+                    dot.classList.add('bg-red-500');
+                    text.textContent = 'Offline';
+                }
+            }
+            setStatus('status-api', apiHealthy, 'API');
+            setStatus('status-db', dbHealthy, 'Database');
+            setStatus('status-server', serverHealthy, 'Server');
+            // Update other real-time stats as before (if analyticsManager exists)
             if (window.analyticsManager) {
                 const realtimeStats = window.analyticsManager.getRealtimeStats();
-                
                 document.getElementById('active-users').textContent = realtimeStats.activeUsers;
                 document.getElementById('current-page-views').textContent = realtimeStats.currentPageViews;
                 document.getElementById('server-status').textContent = realtimeStats.serverStatus;
                 document.getElementById('total-users').textContent = realtimeStats.totalUsers;
-                
-                // Update last updated timestamp
                 const lastUpdatedElement = document.getElementById('last-updated');
                 if (lastUpdatedElement) {
                     const date = new Date(realtimeStats.lastUpdate);
                     lastUpdatedElement.textContent = date.toLocaleTimeString();
                 }
             } else {
-                // Fallback when analytics manager is not available
-                const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
+                // Fallback: show basic stats
                 document.getElementById('active-users').textContent = '1';
                 document.getElementById('current-page-views').textContent = Math.floor(Math.random() * 15 + 5);
-                document.getElementById('server-status').textContent = 'Online';
-                document.getElementById('total-users').textContent = users.length;
-                
-                // Update last updated timestamp
+                document.getElementById('server-status').textContent = serverHealthy ? 'Online' : 'Offline';
+                document.getElementById('total-users').textContent = '...';
                 const lastUpdatedElement = document.getElementById('last-updated');
                 if (lastUpdatedElement) {
                     lastUpdatedElement.textContent = new Date().toLocaleTimeString();
@@ -1417,17 +1580,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadAndApplySettings();
             setupFilterHandlers();
-            
             // Initialize charts after a short delay to ensure DOM is ready
             setTimeout(() => {
                 initializeCharts();
                 updateAnalytics();
                 updateRealtimeStats();
-                
                 // Set up real-time updates every 30 seconds
+                setInterval(updateAnalytics, 60000); // Auto-refresh analytics every 60s
                 setInterval(updateRealtimeStats, 30000);
             }, 100);
-            
             // Also call immediately to ensure real-time stats show up quickly
             setTimeout(updateRealtimeStats, 50);
         });
