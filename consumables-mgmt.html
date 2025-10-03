@@ -1,51 +1,3 @@
-// --- Category Management Logic ---
-let categories = [];
-const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
-const categoryModal = document.getElementById('categoryModal');
-const closeCategoryModal = document.getElementById('closeCategoryModal');
-const categoryForm = document.getElementById('categoryForm');
-const newCategoryInput = document.getElementById('newCategoryInput');
-const categoryList = document.getElementById('categoryList');
-
-function loadCategories() {
-  categories = JSON.parse(localStorage.getItem('consumablesMgmtCategories') || '[]');
-}
-function saveCategories() {
-  localStorage.setItem('consumablesMgmtCategories', JSON.stringify(categories));
-}
-function renderCategories() {
-  categoryList.innerHTML = categories.map((cat, i) => `
-    <li class="flex items-center justify-between bg-gray-800 rounded px-3 py-2">
-      <span>${cat}</span>
-      <button class="btn-neon-pink px-2 py-1 rounded text-xs font-semibold" onclick="deleteCategory(${i})">Delete</button>
-    </li>
-  `).join('');
-}
-window.deleteCategory = function(idx) {
-  const removed = categories.splice(idx, 1);
-  saveCategories();
-  renderCategories();
-  addAuditLog('Delete Category', null, `Deleted category: ${removed[0]}`);
-};
-categoryForm.onsubmit = function(e) {
-  e.preventDefault();
-  const val = newCategoryInput.value.trim();
-  if (val && !categories.includes(val)) {
-    categories.push(val);
-    saveCategories();
-    renderCategories();
-    addAuditLog('Add Category', null, `Added category: ${val}`);
-    newCategoryInput.value = '';
-  }
-};
-manageCategoriesBtn.onclick = function() {
-  loadCategories();
-  renderCategories();
-  categoryModal.classList.remove('hidden');
-};
-closeCategoryModal.onclick = function() {
-  categoryModal.classList.add('hidden');
-};
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -106,6 +58,137 @@ closeCategoryModal.onclick = function() {
       });
     }
   </script>
+  <style>
+    body {
+      transition: background-color 0.3s, color 0.3s;
+      font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
+      background-color: #0a0a0a;
+      color: #ffffff;
+    }
+    .dark {
+      background-color: #0a0a0a;
+      color: #ffffff;
+    }
+    .light {
+      background-color: #f9fafb;
+      color: #1f2937;
+    }
+    .sidebar {
+      width: 16rem;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
+      transition: background-color 0.3s;
+      z-index: 100;
+      background-color: #111111;
+      border-right: 1px solid #00d4ff20;
+    }
+    main {
+      margin-left: 16rem;
+      min-height: 100vh;
+      background-color: #0a0a0a;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      main {
+        margin-left: 0;
+      }
+    }
+    .consumable-item {
+      transition: all 0.2s ease;
+      background-color: #111111;
+      border: 1px solid #333333;
+    }
+    .consumable-item:hover {
+      background-color: #181818;
+      border-color: #00d4ff;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .focus\:not-sr-only:focus {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 0.5rem;
+      margin: 0;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+    }
+    @media print {
+      .sidebar, .no-print { display: none !important; }
+      main { margin-left: 0 !important; }
+      body { background: white !important; color: black !important; }
+    }
+
+    /* Neon button styles */
+    .btn-neon-blue {
+      background: linear-gradient(45deg, #00d4ff, #0099cc);
+      border: 1px solid #00d4ff;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+      color: #000000;
+      font-weight: 600;
+    }
+    .btn-neon-blue:hover {
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+      background: linear-gradient(45deg, #00eeff, #00b8e6);
+    }
+    .btn-neon-green {
+      background: linear-gradient(45deg, #00ff88, #00cc66);
+      border: 1px solid #00ff88;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+      color: #000000;
+      font-weight: 600;
+    }
+    .btn-neon-green:hover {
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+      background: linear-gradient(45deg, #00ff99, #00dd77);
+    }
+    .btn-neon-pink {
+      background: linear-gradient(45deg, #ff1493, #c71585);
+      border: 1px solid #ff1493;
+      box-shadow: 0 0 10px rgba(255, 20, 147, 0.3);
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .btn-neon-pink:hover {
+      box-shadow: 0 0 20px rgba(255, 20, 147, 0.6);
+      background: linear-gradient(45deg, #ff69b4, #db7093);
+    }
+
+    /* Navigation link styling */
+    .nav-link {
+      color: #cccccc;
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover {
+      color: #00d4ff;
+      text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+    }
+    .nav-link.active {
+      color: #00d4ff;
+      background-color: #00d4ff20;
+      border-left: 3px solid #00d4ff;
+    }
+  </style>
 </head>
 <body class="dark">
   <!-- Mobile Menu Toggle -->
@@ -251,127 +334,58 @@ closeCategoryModal.onclick = function() {
           </form>
         </div>
       </div>
-    body {
-      transition: background-color 0.3s, color 0.3s;
-      font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
-      background-color: #0a0a0a;
-      color: #ffffff;
-    }
-    .dark {
-      background-color: #0a0a0a;
-      color: #ffffff;
-    }
-    .light {
-      background-color: #f9fafb;
-      color: #1f2937;
-    }
-    .sidebar {
-      width: 16rem;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      overflow-y: auto;
-      transition: background-color 0.3s;
-      z-index: 100;
-      background-color: #111111;
-      border-right: 1px solid #00d4ff20;
-    }
-    main {
-      margin-left: 16rem;
-      min-height: 100vh;
-      background-color: #0a0a0a;
-    }
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
-      }
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      main {
-        margin-left: 0;
-      }
-    }
-    .consumable-item {
-      transition: all 0.2s ease;
-      background-color: #111111;
-      border: 1px solid #333333;
-    }
-    .consumable-item:hover {
-      background-color: #181818;
-      border-color: #00d4ff;
-      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
-    }
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-    .focus\:not-sr-only:focus {
-      position: static;
-      width: auto;
-      height: auto;
-      padding: 0.5rem;
-      margin: 0;
-      overflow: visible;
-      clip: auto;
-      white-space: normal;
-    }
-    @media print {
-      .sidebar, .no-print { display: none !important; }
-      main { margin-left: 0 !important; }
-      body { background: white !important; color: black !important; }
-    }
+    </main>
+  </div>
+<script>
+// --- Category Management Logic ---
+let categories = [];
+const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+const categoryModal = document.getElementById('categoryModal');
+const closeCategoryModal = document.getElementById('closeCategoryModal');
+const categoryForm = document.getElementById('categoryForm');
+const newCategoryInput = document.getElementById('newCategoryInput');
+const categoryList = document.getElementById('categoryList');
 
-    /* Neon button styles */
-    .btn-neon-blue {
-      background: linear-gradient(45deg, #00d4ff, #0099cc);
-      border: 1px solid #00d4ff;
-      box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-      color: #000000;
-      font-weight: 600;
-    }
-    .btn-neon-blue:hover {
-      box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
-      background: linear-gradient(45deg, #00eeff, #00b8e6);
-    }
-    .btn-neon-green {
-      background: linear-gradient(45deg, #00ff88, #00cc66);
-      border: 1px solid #00ff88;
-      box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-      color: #000000;
-      font-weight: 600;
-    }
-    .btn-neon-green:hover {
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
-      background: linear-gradient(45deg, #00ff99, #00dd77);
-    }
-
-    /* Navigation link styling */
-    .nav-link {
-      color: #cccccc;
-      transition: all 0.3s ease;
-    }
-    .nav-link:hover {
-      color: #00d4ff;
-      text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
-    }
-    .nav-link.active {
-      color: #00d4ff;
-      background-color: #00d4ff20;
-      border-left: 3px solid #00d4ff;
-    }
-  </style>
-
-</main>
+function loadCategories() {
+  categories = JSON.parse(localStorage.getItem('consumablesMgmtCategories') || '[]');
+}
+function saveCategories() {
+  localStorage.setItem('consumablesMgmtCategories', JSON.stringify(categories));
+}
+function renderCategories() {
+  categoryList.innerHTML = categories.map((cat, i) => `
+    <li class="flex items-center justify-between bg-gray-800 rounded px-3 py-2">
+      <span>${cat}</span>
+      <button class="btn-neon-pink px-2 py-1 rounded text-xs font-semibold" onclick="deleteCategory(${i})">Delete</button>
+    </li>
+  `).join('');
+}
+window.deleteCategory = function(idx) {
+  const removed = categories.splice(idx, 1);
+  saveCategories();
+  renderCategories();
+  addAuditLog('Delete Category', null, `Deleted category: ${removed[0]}`);
+};
+categoryForm.onsubmit = function(e) {
+  e.preventDefault();
+  const val = newCategoryInput.value.trim();
+  if (val && !categories.includes(val)) {
+    categories.push(val);
+    saveCategories();
+    renderCategories();
+    addAuditLog('Add Category', null, `Added category: ${val}`);
+    newCategoryInput.value = '';
+  }
+};
+manageCategoriesBtn.onclick = function() {
+  loadCategories();
+  renderCategories();
+  categoryModal.classList.remove('hidden');
+};
+closeCategoryModal.onclick = function() {
+  categoryModal.classList.add('hidden');
+};
+</script>
 <script>
 // --- Product CRUD Logic ---
 let products = [];
