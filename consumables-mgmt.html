@@ -703,6 +703,27 @@ window.addEventListener('DOMContentLoaded', () => {
   renderProducts();
   loadAuditLog();
 });
+
+// --- Audit Log Helper ---
+async function addAuditLog(action, product, details) {
+  try {
+    // Send audit log to backend API (Netlify function or Express endpoint)
+    await fetch('/.netlify/functions/audit-logs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action,
+        details: product ? JSON.stringify(product) : details,
+        extra: product ? details : undefined
+      })
+    });
+    // Optionally reload audit log after adding
+    loadAuditLog();
+  } catch (err) {
+    // Fallback: log to console if API fails
+    console.error('Failed to add audit log:', err);
+  }
+}
 </script>
 </body>
 </html>
