@@ -2,6 +2,8 @@
 const { database } = require('../../config/database');
 
 exports.handler = async function(event, context) {
+  console.log('Settings function called', event.httpMethod);
+
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -24,6 +26,7 @@ exports.handler = async function(event, context) {
       return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
     }
   } catch (error) {
+    console.error('Settings API error:', error);
     return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
   }
 
