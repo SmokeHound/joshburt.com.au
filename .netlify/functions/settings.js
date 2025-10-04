@@ -42,7 +42,7 @@ exports.handler = async function(event, context) {
 
   async function handlePut(event, headers) {
     const data = event.body;
-    await database.run('INSERT OR REPLACE INTO settings (id, data) VALUES (1, ?)', [data]);
+    await database.run('INSERT INTO settings (id, data) VALUES (1, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data;', [data]);
     return {
       statusCode: 200,
       headers,
