@@ -15,14 +15,36 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 ## ✨ Features
 - **Modular Components**: Reusable shared components for navigation, theming, and configuration
 - **Responsive Design**: Mobile-first approach with TailwindCSS v4
-- **Dark/Light Mode**: Persistent theme switching with localStorage
+- **Dark/Light Mode**: Persistent theme switching (settings stored in database, not localStorage)
 - **Testing Suite**: Unit and integration tests with Jest
 - **CI/CD Pipeline**: Automated testing, linting, and deployment
-- **Admin Dashboard**: User management, analytics, and site settings
+- **Admin Dashboard**: User management, analytics, and site settings (fully database-driven)
 - **Oil Ordering System**: Dynamic Castrol product ordering (API-driven, CSV export)
 - **API Backend**: Netlify Functions and Express endpoints (Node.js) with MySQL, PostgreSQL, or SQLite support
 - **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
 
+## ⚙️ Site Settings (Database-Backed)
+
+All site settings are now stored in the database and managed via the admin dashboard. Settings are loaded and saved via the `/settings` API endpoint and changes are fully audit-logged.
+
+### Settings Fields
+
+- **Branding & Contact**
+	- `siteTitle`, `siteDescription`, `logoUrl`, `faviconUrl`, `contactEmail`, `supportPhone`, `supportAddress`
+- **Theme**
+	- `theme`, `primaryColor`, `secondaryColor`, `accentColor`, `themeSchedule`
+- **Feature Toggles**
+	- `maintenanceMode`, `enableRegistration`, `enableGuestCheckout`, `enableNewsletter`
+- **Integrations**
+	- `googleAnalyticsId`, `facebookPixelId`, `smtpHost`, `smtpPort`, `smtpUser`, `smtpPassword`
+- **Custom Code**
+	- `customCss`, `customJs`
+- **Feature Flags**
+	- `featureFlags.betaFeatures`, `featureFlags.newDashboard`, `featureFlags.advancedReports`
+- **Security**
+	- `sessionTimeout`, `maxLoginAttempts`, `enable2FA`, `auditAllActions`
+
+All settings are editable in the admin dashboard and changes are persisted instantly. See `settings.html` for the full UI and field list.
 ## 🏗️ Architecture
 
 ### Component Structure
@@ -135,7 +157,7 @@ npm run validate
 ### Manual Testing Checklist
 - [ ] Homepage loads with navigation and cards
 - [ ] Login/logout functionality works
-- [ ] Theme toggle switches between dark/light modes
+- [ ] Theme toggle and all settings fields persist via database
 - [ ] Mobile navigation toggles correctly
 - [ ] Oil ordering system displays products from API
 - [ ] Admin dashboard and user management work via API
@@ -145,7 +167,7 @@ npm run validate
 
 ### Security Features
 - Client-side validation with HTML5 constraints
-- localStorage for session management
+- Database-backed settings and session management
 - Secure API endpoints (authentication, rate limiting, audit logging)
 - FTP credentials stored in GitHub Secrets
 

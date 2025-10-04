@@ -78,6 +78,32 @@ BCRYPT_ROUNDS=10
 
 ## Database Schema
 
+### Settings Table
+
+All site settings are stored as a single JSON blob in the `settings` table. This enables flexible, versioned, and auditable configuration management.
+
+```sql
+CREATE TABLE IF NOT EXISTS settings (
+   id INTEGER PRIMARY KEY,
+   data TEXT NOT NULL
+);
+INSERT OR IGNORE INTO settings (id, data) VALUES (1, '{}');
+```
+
+#### Settings JSON Fields
+
+The following fields are supported (see `settings.html` for UI):
+
+- siteTitle, siteDescription, logoUrl, faviconUrl, contactEmail, supportPhone, supportAddress
+- theme, primaryColor, secondaryColor, accentColor, themeSchedule
+- maintenanceMode, enableRegistration, enableGuestCheckout, enableNewsletter
+- googleAnalyticsId, facebookPixelId, smtpHost, smtpPort, smtpUser, smtpPassword
+- customCss, customJs
+- featureFlags (betaFeatures, newDashboard, advancedReports)
+- sessionTimeout, maxLoginAttempts, enable2FA, auditAllActions
+
+All changes to settings are audit-logged for compliance and traceability.
+
 ### Users Table
 ```sql
 -- MySQL/PostgreSQL/SQLite compatible

@@ -53,6 +53,17 @@ Welcome to the joshburt.com.au project! This is a dynamic website and API with a
 
 ## Development Workflow
 
+## Settings System
+
+- All site settings are now stored in the database (see `DATABASE.md` for schema).
+- The settings UI (`settings.html`) must be updated for any new or changed settings fields.
+- All changes to settings are audit-logged automatically via the frontend.
+- When adding new settings fields:
+   1. Update the settings form in `settings.html`.
+   2. Update the JS logic to load/save the new field.
+   3. Document the new field in `README.md` and `DATABASE.md`.
+   4. Ensure audit logging covers the new field.
+
 ### 1. Code Style and Standards
 - Uses TailwindCSS for styling
 - Follows semantic HTML structure

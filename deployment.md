@@ -77,11 +77,16 @@ Deploy Node.js backend separately on:
 
 ## Database
 
-The application uses SQLite by default, which is suitable for small to medium applications. For production with higher traffic, consider:
+### Settings Persistence
 
-1. **PostgreSQL**: Update database configuration in `config/database.js`
-2. **MySQL**: Install mysql2 and update configuration
-3. **MongoDB**: Restructure to use MongoDB with Mongoose
+All site settings are now stored in the database in a single-row `settings` table as a JSON blob. The admin dashboard UI (`settings.html`) loads and saves settings via the `/settings` API endpoint. All changes are audit-logged.
+
+#### Migration Notes
+- If upgrading from a version using localStorage for settings, run the SQL in `DATABASE.md` to create the `settings` table and insert the default row.
+- No manual migration of settings data is required; the UI will initialize defaults if the table is empty.
+
+#### Environment Variables
+- No additional environment variables are required for settings persistence. Ensure your DB credentials are set as described above.
 
 ## Security Considerations
 

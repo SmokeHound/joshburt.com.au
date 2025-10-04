@@ -1,7 +1,7 @@
 # API Integration Test Results
 
 ## Test Overview
-Testing the integration between the static website frontend and Neon DB backend via Netlify Functions.
+Testing the integration between the static website frontend and the backend database via Netlify Functions, including the expanded settings system.
 
 ## Test Environment
 - **Local Development Server**: Python HTTP server on port 8000
@@ -20,15 +20,20 @@ Testing the integration between the static website frontend and Neon DB backend 
    - Proper indexes and constraints implemented
 
 2. **Netlify Functions**
-   - **Products Function** (`/.netlify/functions/products.js`):
-     - GET: Retrieve products (with optional type filtering)
-     - POST: Add new products
-     - Proper CORS headers and error handling
-   - **Orders Function** (`/.netlify/functions/orders.js`):
-     - POST: Submit orders with multiple items
-     - GET: Retrieve order history
-     - Database transactions for data consistency
-     - Environment variable support for connection string
+    - **Settings Function** (`/.netlify/functions/settings.js`):
+       - GET: Retrieve all site settings as a JSON object
+       - PUT: Update all site settings (JSON object)
+       - All changes are audit-logged
+       - Proper CORS headers and error handling
+    - **Products Function** (`/.netlify/functions/products.js`):
+       - GET: Retrieve products (with optional type filtering)
+       - POST: Add new products
+       - Proper CORS headers and error handling
+    - **Orders Function** (`/.netlify/functions/orders.js`):
+       - POST: Submit orders with multiple items
+       - GET: Retrieve order history
+       - Database transactions for data consistency
+       - Environment variable support for connection string
 
 3. **Frontend Integration**
    - Replaced hardcoded product array with API calls
@@ -122,6 +127,19 @@ productsContainer.innerHTML = `
 - Enhanced analytics and reporting
 
 ## Conclusion
+
+## Settings API Test Cases
+
+### 1. GET /settings
+**Should return all site settings as a JSON object.**
+
+### 2. PUT /settings
+**Should update all site settings.**
+- Send a JSON object with all fields (see README.md for schema)
+- Verify changes persist and are audit-logged
+
+### 3. Audit Logging
+**All changes to settings should be recorded in the audit log.
 
 The Neon DB integration has been successfully implemented and is ready for production deployment. The frontend now properly interfaces with the backend API, and all components are configured correctly for a Netlify + Neon DB deployment.
 
