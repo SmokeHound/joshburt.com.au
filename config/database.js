@@ -288,12 +288,12 @@ async function createMySQLTables() {
   `);
 
   // Create indexes for better performance
-  await database.run(`CREATE INDEX idx_users_email ON users(email)`);
-  await database.run(`CREATE INDEX idx_users_oauth ON users(oauth_provider, oauth_id)`);
-  await database.run(`CREATE INDEX idx_refresh_tokens_user ON refresh_tokens(user_id)`);
-  await database.run(`CREATE INDEX idx_refresh_tokens_expires ON refresh_tokens(expires_at)`);
-  await database.run(`CREATE INDEX idx_audit_logs_user ON audit_logs(user_id)`);
-  await database.run(`CREATE INDEX idx_audit_logs_created ON audit_logs(created_at)`);
+  await database.run('CREATE INDEX idx_users_email ON users(email)');
+  await database.run('CREATE INDEX idx_users_oauth ON users(oauth_provider, oauth_id)');
+  await database.run('CREATE INDEX idx_refresh_tokens_user ON refresh_tokens(user_id)');
+  await database.run('CREATE INDEX idx_refresh_tokens_expires ON refresh_tokens(expires_at)');
+  await database.run('CREATE INDEX idx_audit_logs_user ON audit_logs(user_id)');
+  await database.run('CREATE INDEX idx_audit_logs_created ON audit_logs(created_at)');
 }
 
 const database = new Database();
@@ -362,12 +362,12 @@ async function createPostgreSQLTables() {
   `);
 
   // Create indexes for better performance
-  await database.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
-  await database.run(`CREATE INDEX IF NOT EXISTS idx_users_oauth ON users(oauth_provider, oauth_id)`);
-  await database.run(`CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)`);
-  await database.run(`CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at)`);
-  await database.run(`CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id)`);
-  await database.run(`CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at)`);
+  await database.run('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_users_oauth ON users(oauth_provider, oauth_id)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at)');
 }
 
 async function createSQLiteTables() {

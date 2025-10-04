@@ -24,20 +24,20 @@ exports.handler = async function(event, context) {
     await database.connect();
 
     switch (event.httpMethod) {
-      case 'GET':
-        return await handleGet(event, headers);
-      case 'POST':
-        return await handlePost(event, headers);
-      case 'PUT':
-        return await handlePut(event, headers);
-      case 'DELETE':
-        return await handleDelete(event, headers);
-      default:
-        return {
-          statusCode: 405,
-          headers,
-          body: JSON.stringify({ error: 'Method Not Allowed' }),
-        };
+    case 'GET':
+      return await handleGet(event, headers);
+    case 'POST':
+      return await handlePost(event, headers);
+    case 'PUT':
+      return await handlePut(event, headers);
+    case 'DELETE':
+      return await handleDelete(event, headers);
+    default:
+      return {
+        statusCode: 405,
+        headers,
+        body: JSON.stringify({ error: 'Method Not Allowed' }),
+      };
     }
   } catch (error) {
     console.error('Database error:', error);

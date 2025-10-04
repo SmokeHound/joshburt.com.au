@@ -219,7 +219,10 @@ self.addEventListener('push', event => {
     try {
       const data = event.data.json();
       options = { ...options, ...data };
-    } catch {}
+    } catch (err) {
+      // Log error for debugging; can be removed in production
+      console.error('Failed to parse notification data:', err);
+    }
   }
   event.waitUntil(
     self.registration.showNotification('Josh\'s App', options)
@@ -232,12 +235,12 @@ self.addEventListener('notificationclick', event => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
   event.waitUntil(
-    clients.matchAll().then(clients => {
-      const client = clients.find(c => c.url.includes(url));
+    self.clients.matchAll().then(windowClients => {
+      const client = windowClients.find(c => c.url.includes(url));
       if (client) {
         return client.focus();
       } else {
-        return clients.openWindow(url);
+        return self.clients.openWindow(url);
       }
     })
   );

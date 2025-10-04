@@ -20,12 +20,12 @@ initializeDatabase();
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"],
-      imgSrc: ["'self'", "data:", "https://via.placeholder.com"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      defaultSrc: ['\'self\''],
+      styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://cdn.tailwindcss.com'],
+      scriptSrc: ['\'self\'', '\'unsafe-inline\'', 'https://cdn.tailwindcss.com'],
+      imgSrc: ['\'self\'', 'data:', 'https://via.placeholder.com'],
+      connectSrc: ['\'self\''],
+      fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
     },
   },
 }));

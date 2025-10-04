@@ -16,12 +16,12 @@ exports.handler = async function(event, context) {
   try {
     await database.connect();
     switch (event.httpMethod) {
-      case 'GET':
-        return await handleGet(event, headers);
-      case 'PUT':
-        return await handlePut(event, headers);
-      default:
-        return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+    case 'GET':
+      return await handleGet(event, headers);
+    case 'PUT':
+      return await handlePut(event, headers);
+    default:
+      return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
     }
   } catch (error) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };

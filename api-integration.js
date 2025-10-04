@@ -190,7 +190,7 @@ class APIIntegrationService {
   // NOTIFICATION API INTEGRATION
   async sendNotification(type, data) {
     if (!this.config.notifications.enabled) {
-  // ...existing code...
+      // ...existing code...
       return { success: true, messageId: 'mock_' + Date.now() };
     }
 
@@ -282,7 +282,7 @@ class APIIntegrationService {
   // CLOUD BACKUP FUNCTIONALITY
   async backupToCloud() {
     if (!this.config.cloudBackup.enabled) {
-  // ...existing code...
+      // ...existing code...
       return { success: false, reason: 'disabled' };
     }
 
@@ -380,7 +380,7 @@ class APIIntegrationService {
     if (this.backupInterval) {
       clearInterval(this.backupInterval);
       this.backupInterval = null;
-  // ...existing code...
+      // ...existing code...
     }
   }
 

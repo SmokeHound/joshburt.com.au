@@ -82,8 +82,8 @@ describe('Home Page', () => {
         'user',
         JSON.stringify({
           name: 'test',
-            email: 'test@example.com',
-            avatar: 'https://via.placeholder.com/40'
+          email: 'test@example.com',
+          avatar: 'https://via.placeholder.com/40'
         })
       );
     }

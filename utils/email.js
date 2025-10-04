@@ -139,7 +139,7 @@ const sendResetEmail = async (email, name, resetUrl) => {
 
   try {
     const result = await transporter.sendMail(mailOptions);
-  // ...existing code...
+    // ...existing code...
     return result;
   } catch (error) {
     console.error('📧 Failed to send password reset email:', error);
@@ -210,7 +210,7 @@ const sendWelcomeEmail = async (email, name) => {
 
   try {
     const result = await transporter.sendMail(mailOptions);
-  // ...existing code...
+    // ...existing code...
     return result;
   } catch (error) {
     console.error('📧 Failed to send welcome email:', error);

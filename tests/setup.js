@@ -1,10 +1,5 @@
 // Test setup file
 
-// Add Node.js polyfills for browser APIs
-const { TextEncoder, TextDecoder } = require('util');
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
-
 // Mock localStorage
 const localStorageMock = {
   getItem: jest.fn(),

@@ -41,7 +41,7 @@ describe('Shared Navigation Component', () => {
   });
 
   test('should highlight current page link', () => {
-  const currentPage = 'administration.html';
+    const currentPage = 'administration.html';
     const navLinks = document.querySelectorAll('.nav-link');
 
     navLinks.forEach(link => {
@@ -52,9 +52,9 @@ describe('Shared Navigation Component', () => {
       }
     });
 
-  const adminLink = document.querySelector('a[href="administration.html"]');
-  expect(adminLink.classList.contains('bg-primary')).toBe(true);
-  expect(adminLink.getAttribute('aria-current')).toBe('page');
+    const adminLink = document.querySelector('a[href="administration.html"]');
+    expect(adminLink.classList.contains('bg-primary')).toBe(true);
+    expect(adminLink.getAttribute('aria-current')).toBe('page');
   });
 
   test('should have proper accessibility attributes', () => {

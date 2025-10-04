@@ -8,8 +8,8 @@ const path = require('path');
  * @returns {string} File content
  */
 function loadHTMLFile(filename) {
-    const filePath = path.join(__dirname, '../../', filename);
-    return fs.readFileSync(filePath, 'utf8');
+  const filePath = path.join(__dirname, '../../', filename);
+  return fs.readFileSync(filePath, 'utf8');
 }
 
 /**
@@ -18,8 +18,8 @@ function loadHTMLFile(filename) {
  * @returns {Document} Mock document
  */
 function createMockDOM(html) {
-    document.body.innerHTML = html;
-    return document;
+  document.body.innerHTML = html;
+  return document;
 }
 
 /**
@@ -27,8 +27,8 @@ function createMockDOM(html) {
  * @param {Element} element - DOM element
  */
 function simulateClick(element) {
-    const event = new Event('click', { bubbles: true });
-    element.dispatchEvent(event);
+  const event = new Event('click', { bubbles: true });
+  element.dispatchEvent(event);
 }
 
 /**
@@ -36,9 +36,9 @@ function simulateClick(element) {
  * @param {Element} form - Form element
  */
 function simulateSubmit(form) {
-    const event = new Event('submit', { bubbles: true });
-    event.preventDefault = jest.fn();
-    form.dispatchEvent(event);
+  const event = new Event('submit', { bubbles: true });
+  event.preventDefault = jest.fn();
+  form.dispatchEvent(event);
 }
 
 /**
@@ -46,7 +46,7 @@ function simulateSubmit(form) {
  * @param {number} ms - Milliseconds to wait
  */
 function waitFor(ms = 100) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -56,14 +56,14 @@ function waitFor(ms = 100) {
  * @returns {boolean}
  */
 function hasClass(element, className) {
-    return element && element.classList && element.classList.contains(className);
+  return element && element.classList && element.classList.contains(className);
 }
 
 module.exports = {
-    loadHTMLFile,
-    createMockDOM,
-    simulateClick,
-    simulateSubmit,
-    waitFor,
-    hasClass
+  loadHTMLFile,
+  createMockDOM,
+  simulateClick,
+  simulateSubmit,
+  waitFor,
+  hasClass
 };

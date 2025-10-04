@@ -1,7 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 
@@ -329,7 +328,7 @@ router.post('/forgot-password', authLimiter, [
       
       try {
         await sendResetEmail(email, user.name, resetUrl);
-  // ...existing code...
+        // ...existing code...
       } catch (emailError) {
         console.error('Failed to send reset email:', emailError);
       }
