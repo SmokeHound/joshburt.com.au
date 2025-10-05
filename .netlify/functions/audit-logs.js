@@ -14,12 +14,30 @@ exports.handler = async function(event, context) {
     return { statusCode: 200, headers, body: '' };
   }
 
-  if (event.httpMethod !== 'GET') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
-    };
+
+  if (event.httpMethod === 'POST') {
+    try {
+      await database.connect();
+      const body = JSON.parse(event.body || '{}');
+      // Accept: action, details, userId, ip_address, user_agent
+      const action = body.action || '';
+      const details = body.details || '';
+      const user_id = body.userId || null;
+      // Try to get IP and UA from event/context if not provided
+      const ip_address = body.ip_address || (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'] || ''));
+      const user_agent = body.user_agent || (event.headers && (event.headers['user-agent'] || ''));
+      if (!action) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing action' }) };
+      }
+      // Insert into audit_logs table
+      const query = `INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)`;
+      const params = [user_id, action, typeof details === 'string' ? details : JSON.stringify(details), ip_address, user_agent];
+      await database.run(query, params);
+      return { statusCode: 201, headers, body: JSON.stringify({ message: 'Audit log entry created' }) };
+    } catch (error) {
+      console.error('Audit log POST error:', error);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Failed to create audit log', message: error.message }) };
+    }
   }
 
   try {
