@@ -471,14 +471,12 @@ syncInventoryBtn.onclick = async function() {
   syncInventoryBtn.disabled = true;
   syncInventoryBtn.textContent = 'Syncing...';
   try {
-    const res = await fetch('/api/products'); // This endpoint should return consumables only
+    const res = await fetch('/.netlify/functions/consumables');
     if (!res.ok) throw new Error('API error');
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('Invalid data');
-    // Only include products where type contains 'consumable' (case-insensitive)
-    products = data.filter(p =>
-      typeof p.type === 'string' && p.type.toLowerCase().includes('consumable')
-    ).map(p => ({
+    // Map backend fields to frontend model
+    products = data.map(p => ({
       name: p.name || '',
       type: p.type || '',
       category: p.category || '',
@@ -489,7 +487,7 @@ syncInventoryBtn.onclick = async function() {
     }));
     saveProducts();
     renderProducts();
-    await addAuditLog('Sync', null, `Synced ${products.length} consumables from API`);
+    await addAuditLog('Sync', null, `Synced ${products.length} consumables from database`);
     alert('Consumables inventory synced successfully!');
   } catch (err) {
     alert('Failed to sync consumables: ' + (err.message || err));
@@ -719,8 +717,32 @@ deleteProductBtn.onclick = function() {
     closeModal();
   }
 };
-window.addEventListener('DOMContentLoaded', () => {
-  loadProducts();
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    // Try to load from backend first
+    const res = await fetch('/.netlify/functions/consumables');
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        products = data.map(p => ({
+          name: p.name || '',
+          type: p.type || '',
+          category: p.category || '',
+          code: p.code || '',
+          stock: parseInt(p.stock, 10) || 0,
+          reorder: parseInt(p.reorder, 10) || 0,
+          image: p.image || ''
+        }));
+        saveProducts();
+      } else {
+        loadProducts();
+      }
+    } else {
+      loadProducts();
+    }
+  } catch (err) {
+    loadProducts();
+  }
   renderProducts();
   loadAuditLog();
 });
