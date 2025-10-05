@@ -269,71 +269,71 @@
         </div>
       </div>
     </main>
+  </div>
 
-    <!-- Category Management Modal (moved to body root) -->
-    <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-      <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6 relative border-2 border-accent">
-        <button id="closeCategoryModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
-        <h3 class="text-xl font-bold text-accent mb-4">Manage Categories</h3>
-        <form id="categoryForm" class="flex gap-2 mb-4">
-          <input type="text" id="newCategoryInput" class="flex-1 px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" placeholder="New category" required>
-          <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Add</button>
-        </form>
-        <ul id="categoryList" class="space-y-2">
-          <!-- Categories will be rendered here -->
-        </ul>
-      </div>
+  <!-- Category Management Modal (now direct child of body) -->
+  <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6 relative border-2 border-accent">
+      <button id="closeCategoryModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
+      <h3 class="text-xl font-bold text-accent mb-4">Manage Categories</h3>
+      <form id="categoryForm" class="flex gap-2 mb-4">
+        <input type="text" id="newCategoryInput" class="flex-1 px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" placeholder="New category" required>
+        <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Add</button>
+      </form>
+      <ul id="categoryList" class="space-y-2">
+        <!-- Categories will be rendered here -->
+      </ul>
     </div>
+  </div>
 
-    <!-- Product Modal (moved to body root) -->
-    <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-      <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6 relative border-2 border-accent">
-        <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
-        <h3 class="text-xl font-bold text-accent mb-4" id="productModalTitle">Add Product</h3>
-        <form id="productForm" class="space-y-4">
-          <input type="hidden" id="productId">
-          <div>
-            <label class="block text-sm font-medium mb-1">Name</label>
-            <input type="text" id="productName" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" required>
+  <!-- Product Modal (now direct child of body) -->
+  <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6 relative border-2 border-accent">
+      <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
+      <h3 class="text-xl font-bold text-accent mb-4" id="productModalTitle">Add Product</h3>
+      <form id="productForm" class="space-y-4">
+        <input type="hidden" id="productId">
+        <div>
+          <label class="block text-sm font-medium mb-1">Name</label>
+          <input type="text" id="productName" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Type</label>
+          <input type="text" id="productType" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Category</label>
+          <input type="text" id="productCategory" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" list="categoryDatalist">
+          <datalist id="categoryDatalist"></datalist>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Code</label>
+          <input type="text" id="productCode" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white">
+        </div>
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <label class="block text-sm font-medium mb-1">Stock</label>
+            <input type="number" id="productStock" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" min="0" required>
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Type</label>
-            <input type="text" id="productType" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white">
+          <div class="flex-1">
+            <label class="block text-sm font-medium mb-1">Reorder Point</label>
+            <input type="number" id="productReorder" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" min="0" required>
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Category</label>
-            <input type="text" id="productCategory" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" list="categoryDatalist">
-            <datalist id="categoryDatalist"></datalist>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Image</label>
+          <div id="imageDropZone" class="w-full p-2 border-2 border-dashed border-gray-600 rounded bg-gray-800 text-center cursor-pointer hover:border-accent transition">
+            <span id="imageDropText">Click or drag image here</span>
+            <input type="file" id="productImage" accept="image/*" class="w-full text-white hidden">
+            <img id="productImagePreview" src="" alt="Preview" class="mt-2 max-h-24 hidden rounded border border-gray-700 mx-auto">
+            <button type="button" id="removeImageBtn" class="btn-neon-pink px-2 py-1 mt-2 rounded text-xs font-semibold hidden">Remove Image</button>
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Code</label>
-            <input type="text" id="productCode" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white">
-          </div>
-          <div class="flex gap-4">
-            <div class="flex-1">
-              <label class="block text-sm font-medium mb-1">Stock</label>
-              <input type="number" id="productStock" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" min="0" required>
-            </div>
-            <div class="flex-1">
-              <label class="block text-sm font-medium mb-1">Reorder Point</label>
-              <input type="number" id="productReorder" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" min="0" required>
-            </div>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Image</label>
-            <div id="imageDropZone" class="w-full p-2 border-2 border-dashed border-gray-600 rounded bg-gray-800 text-center cursor-pointer hover:border-accent transition">
-              <span id="imageDropText">Click or drag image here</span>
-              <input type="file" id="productImage" accept="image/*" class="w-full text-white hidden">
-              <img id="productImagePreview" src="" alt="Preview" class="mt-2 max-h-24 hidden rounded border border-gray-700 mx-auto">
-              <button type="button" id="removeImageBtn" class="btn-neon-pink px-2 py-1 mt-2 rounded text-xs font-semibold hidden">Remove Image</button>
-            </div>
-          </div>
-          <div class="flex justify-end gap-2 mt-4">
-            <button type="button" id="deleteProductBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold hidden">Delete</button>
-            <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Save</button>
-          </div>
-        </form>
-      </div>
+        </div>
+        <div class="flex justify-end gap-2 mt-4">
+          <button type="button" id="deleteProductBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold hidden">Delete</button>
+          <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 <script>
@@ -475,7 +475,10 @@ syncInventoryBtn.onclick = async function() {
     if (!res.ok) throw new Error('API error');
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('Invalid data');
-    products = data.map(p => ({
+    // Only include products where type contains 'consumable' (case-insensitive)
+    products = data.filter(p =>
+      typeof p.type === 'string' && p.type.toLowerCase().includes('consumable')
+    ).map(p => ({
       name: p.name || '',
       type: p.type || '',
       category: p.category || '',
