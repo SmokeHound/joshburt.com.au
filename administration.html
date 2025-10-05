@@ -99,14 +99,59 @@
             <div class="mt-auto pt-4 text-xs text-gray-300">v1 Settings</div>
         </aside>
         <!-- Main Content -->
-        <main class="flex-1 p-4 md:p-6 md:ml-64 ml-0 transition-all duration-300">
-            <section>
-                <!-- Admin Cards Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
-                    <!-- ...existing code... -->
+    <!-- Main Content -->
+    <main id="main-content" class="flex-1 p-4" role="main">
+        <!-- Sticky Header -->
+    <header class="sticky top-0 p-6 rounded-lg shadow-md mb-6 z-40 border card">
+            <h2 class="text-3xl font-bold text-white" id="welcome-message">Welcome, Admin!</h2>
+            <p class="text-lg mt-2 nav-link-muted">Administrative Dashboard & Controls</p>
+        </header>
+
+        <!-- Content Section -->
+        <section aria-label="Administrative functions" class="space-y-6">
+            <p class="mb-6 leading-relaxed nav-link-muted">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
+            
+            <!-- Admin Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
+                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white">User Management</h3>
+                    <p class="mb-4 nav-link-muted">Manage user accounts and permissions.</p>
+                    <a href="users.html" class="w-full block p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-blue">Manage Users</a>
                 </div>
-            </section>
-        </main>
+                <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white">Analytics</h3>
+                    <p class="mb-4 nav-link-muted">View site statistics and user engagement.</p>
+                    <a href="analytics.html" class="w-full block p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-green">View Analytics</a>
+                </div>
+                <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white">Site Settings</h3>
+                    <p class="mb-4 nav-link-muted">Configure website settings and preferences.</p>
+                    <a href="settings.html" class="w-full block p-3 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-purple">Site Settings</a>
+                </div>
+                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white">Product Management</h3>
+                    <p class="mb-4 nav-link-muted">Manage oil products, add descriptions and images.</p>
+                    <a href="oil-products-management.html" class="w-full block p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-blue">Manage Products</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Load shared theme functionality -->
+    <script>
+        fetch('shared-theme.html')
+            .then(response => response.text())
+            .then(html => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const scripts = tempDiv.getElementsByTagName('script');
+                for (let script of scripts) {
+                    const newScript = document.createElement('script');
+                    newScript.textContent = script.textContent;
+                    document.body.appendChild(newScript);
+                }
+            });
+    </script>
     </div>
                     <script>
                         // Load and apply site settings
