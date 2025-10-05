@@ -129,12 +129,7 @@
                 </li>
             </ul>
         </nav>
-        <!-- Theme Toggle -->
-        <div class="mt-auto">
-            <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
-                Toggle Light Mode
-            </button>
-        </div>
+
     </aside>
     <!--
         MAIN CONTENT AREA
@@ -271,21 +266,7 @@
     - Update as needed for new features
 -->
 <script>
-// Theme Toggle
-const themeToggle = document.getElementById('theme-toggle');
-const body = document.body;
-themeToggle.addEventListener('click', () => {
-    body.classList.toggle('dark');
-    body.classList.toggle('light');
-    localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-    themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-    themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-});
-// Load saved theme
-const savedTheme = localStorage.getItem('theme') || 'dark';
-body.classList.add(savedTheme);
-themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
+
 // Mobile Menu Toggle
 const menuToggle = document.getElementById('menu-toggle');
 const sidebar = document.getElementById('sidebar');

@@ -244,11 +244,7 @@
                     <li role="listitem"><a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link nav-link-logout">Logout</a></li>
                 </ul>
             </nav>
-            <div class="mt-auto">
-                <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
-                    Toggle Light Mode
-                </button>
-            </div>
+
             <div class="mt-auto pt-4 text-xs text-gray-300">v1 Settings</div>
         </aside>
         <!-- Main Content -->
@@ -272,19 +268,7 @@
                             }
                         }
                         loadAndApplySettings();
-                        // Theme toggle
-                        document.getElementById('theme-toggle').addEventListener('click', function() {
-                            const body = document.body;
-                            if (body.classList.contains('dark')) {
-                                body.classList.remove('dark');
-                                body.classList.add('light');
-                                this.textContent = 'Toggle Dark Mode';
-                            } else {
-                                body.classList.remove('light');
-                                body.classList.add('dark');
-                                this.textContent = 'Toggle Light Mode';
-                            }
-                        });
+
                         // Sidebar toggle for mobile
                         const menuToggle = document.getElementById('menu-toggle');
                         const sidebar = document.getElementById('sidebar');

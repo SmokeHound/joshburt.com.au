@@ -231,12 +231,7 @@
                     </li>
                 </ul>
             </nav>
-            <!-- Theme Toggle -->
-            <div class="mt-auto">
-                <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
-                    Toggle Light Mode
-                </button>
-            </div>
+
         </aside>
         <!-- Main Content -->
         <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
@@ -725,23 +720,7 @@
             event.target.value = '';
         }
 
-        // Theme Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-        });
 
-        // Load saved theme from settings or localStorage
-        const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-        const savedTheme = settings['theme'] || localStorage.getItem('theme') || 'dark';
-        body.classList.add(savedTheme);
-        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
 
         // Mobile Menu Toggle
         const menuToggle = document.getElementById('menu-toggle');

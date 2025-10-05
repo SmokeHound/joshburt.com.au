@@ -167,11 +167,7 @@
         <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
     </div>
 
-    <!-- Theme Toggle Button -->
-    <button id="theme-toggle" class="fixed top-4 right-4 p-2 text-black rounded-md focus:outline-none focus:ring-2 btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
-        <span aria-hidden="true">🌓</span>
-        <span class="sr-only">Toggle theme</span>
-    </button>
+
 
     <!-- Toast Notification -->
     <div id="toast" class="hidden fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300 btn-neon-blue text-black" role="alert" aria-live="polite"></div>
@@ -318,20 +314,7 @@
             showToast('Password reset successful! Please log in with your new password.', 'success');
         }
 
-        // Theme Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-            themeToggle.setAttribute('aria-label', body.classList.contains('dark') ? 'Toggle light mode' : 'Toggle dark mode');
-        });
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        body.classList.add(savedTheme);
-        themeToggle.setAttribute('aria-label', savedTheme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode');
 
         // Form handling
         const loginForm = document.getElementById('login-form');
