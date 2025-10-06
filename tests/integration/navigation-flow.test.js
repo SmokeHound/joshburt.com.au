@@ -24,10 +24,11 @@ describe('Navigation & Shared Components Integration', () => {
     });
   });
 
-  test('should have consistent theme structure', () => {
+  test('should load shared theme resources without legacy toggle', () => {
     const themeHTML = loadHTMLFile('shared-theme.html');
     document.body.innerHTML = themeHTML;
-    expect(document.getElementById('theme-toggle')).toBeTruthy();
+    // Legacy #theme-toggle removed; ensure no element exists
+    expect(document.getElementById('theme-toggle')).toBeFalsy();
   });
 
   test('should have consistent configuration tokens', () => {
@@ -44,7 +45,8 @@ describe('Navigation & Shared Components Integration', () => {
 
     expect(document.getElementById('menu-toggle')).toBeTruthy();
     expect(document.getElementById('sidebar')).toBeTruthy();
-    expect(document.getElementById('theme-toggle')).toBeTruthy();
+    // Theme toggle intentionally removed
+    expect(document.getElementById('theme-toggle')).toBeFalsy();
   });
 
   test('should have proper accessibility attributes', () => {

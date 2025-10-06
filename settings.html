@@ -358,10 +358,7 @@
                   <div class="w-12 h-12 rounded bg-secondary border-4 border-secondary"></div>
                   <div class="w-12 h-12 rounded bg-accent border-4 border-accent"></div>
                 </div>
-                <div class="mt-4">
-                  <h5 class="font-medium mb-2">Theme Mode</h5>
-                  <button id="theme-toggle" class="w-full btn-neon-blue px-6 py-2 rounded-lg font-bold">Toggle Light/Dark</button>
-                </div>
+                <!-- Theme toggle removed: mode managed via settings and presets -->
                 <div class="mt-4">
                   <h5 class="font-medium mb-2">Schedule</h5>
                   <div class="flex items-center gap-2 mb-2">
@@ -917,39 +914,7 @@
       });
     }
 
-        // Theme toggle functionality
-        document.getElementById('theme-toggle').addEventListener('click', function() {
-      const body = document.body;
-      let newTheme;
-      if (body.classList.contains('dark')) {
-        body.classList.remove('dark');
-        body.classList.add('light');
-        this.textContent = 'Toggle Dark Mode';
-        newTheme = 'light';
-      } else {
-        body.classList.remove('light');
-        body.classList.add('dark');
-        this.textContent = 'Toggle Light Mode';
-        newTheme = 'dark';
-      }
-      // Update settings form theme selector to match current theme
-      const themeInput = document.getElementById('theme') || document.getElementById('theme-select');
-      if (themeInput) {
-        themeInput.value = newTheme;
-      }
-      // Save theme to backend settings
-      (async () => {
-        const settings = getFormSettings();
-        settings.theme = newTheme;
-        await fetch('/.netlify/functions/settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(settings)
-        });
-        AuditLogger.log('theme_change', `Theme toggled to ${newTheme} via API`);
-      })();
-      updatePreview();
-        });
+        // Legacy manual theme toggle removed
 
         // Sidebar toggle for mobile
         const menuToggle = document.getElementById('menu-toggle');

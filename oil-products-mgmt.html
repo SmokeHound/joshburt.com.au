@@ -555,19 +555,7 @@
             }, 3000);
         }
 
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-            themeToggle.textContent = body.classList.contains('dark') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-        });
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        body.classList.add(savedTheme);
-        themeToggle.textContent = savedTheme === 'dark' ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        // Legacy theme toggle removed; theme managed via siteSettings presets.
 
         // Mobile menu toggle
         const menuToggle = document.getElementById('menu-toggle');
