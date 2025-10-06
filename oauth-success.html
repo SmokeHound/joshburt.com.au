@@ -87,7 +87,7 @@
             localStorage.setItem('refreshToken', refreshToken);
             
             // Fetch user info
-            fetch('/api/auth/me', {
+            fetch('/.netlify/functions/auth?action=me', {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }

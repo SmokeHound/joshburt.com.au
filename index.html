@@ -312,17 +312,18 @@
         let users = [], orders = [], products = [], auditLogs = [];
         let apiHealthy = false, dbHealthy = false, serverHealthy = true;
         try {
-            const res = await fetch('/api/users');
+            const FN_BASE='/.netlify/functions';
+            const res = await fetch(`${FN_BASE}/users`);
             apiHealthy = res.ok;
             users = (await res.json()).users || [];
         } catch (e) { apiHealthy = false; }
         try {
-            const res = await fetch('/api/orders');
+            const res = await fetch(`${FN_BASE}/orders`);
             dbHealthy = res.ok;
             orders = await res.json();
         } catch (e) { dbHealthy = false; }
         try {
-            const res = await fetch('/api/products');
+            const res = await fetch(`${FN_BASE}/products`);
             products = await res.json();
         } catch (e) {}
         try {
