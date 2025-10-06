@@ -162,6 +162,13 @@
     </style>
 </head>
 <body class="dark min-h-screen flex items-center justify-center font-sans p-4">
+        <!-- Shared Navigation Loader -->
+        <div id="main-nav"></div>
+        <script>
+            fetch('shared-nav.html').then(r => r.text()).then(html => {
+                document.getElementById('main-nav').innerHTML = html;
+            });
+        </script>
     <!-- Skip Links -->
     <div class="sr-only">
         <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>

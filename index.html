@@ -192,53 +192,16 @@
     <!-- Mobile sidebar backdrop -->
     <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
-        <!-- App Branding -->
-    <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
-
-        <!-- User Profile Section -->
-        <div id="user-profile" class="mb-6">
-            <div id="user-info" class="hidden flex items-center space-x-2">
-                <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
-                <span id="user-name" class="text-white"></span>
-            </div>
-            <button id="login-btn" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-blue" aria-label="Open login modal">Login</button>
-            <button id="logout-btn" class="hidden w-full p-2 text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400 btn-neon-pink" aria-label="Logout">Logout</button>
-        </div>
-
-        <!-- Navigation -->
-        <nav role="navigation" aria-label="Main navigation">
-            <ul class="space-y-2" role="list">
-                <li role="listitem">
-                    <a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-template active" aria-current="page">Home</a>
-                </li>
-                <li role="listitem">
-                    <a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a>
-                </li>
-                <li role="listitem">
-                    <a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">User Management</a>
-                </li>
-                <li role="listitem">
-                    <a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Analytics</a>
-                </li>
-                <li role="listitem">
-                    <a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Settings</a>
-                </li>
-                <li role="listitem">
-                    <a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Oil Orders</a>
-                </li>
-                <li role="listitem">
-                    <a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Consumables Orders</a>
-                </li>
-                <li role="listitem">
-                    <a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link nav-link-logout">Logout</a>
-                </li>
-            </ul>
-        </nav>
-
-
-    </aside>
+    <!-- Shared Navigation Loader -->
+    <div id="main-nav"></div>
+    <script>
+      // Dynamically load shared navigation
+      fetch('shared-nav.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('main-nav').innerHTML = html;
+        });
+    </script>
 
     <!-- Login Modal -->
     <div id="login-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">

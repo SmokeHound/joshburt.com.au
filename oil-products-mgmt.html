@@ -210,28 +210,13 @@
         <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
         <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
         <div class="flex min-h-screen">
-            <!-- Sidebar -->
-            <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
-                <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
-                <nav role="navigation" aria-label="Main navigation">
-                    <ul class="space-y-2" role="list">
-                        <li role="listitem"><a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Home</a></li>
-                        <li role="listitem"><a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a></li>
-                        <li role="listitem"><a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">User Management</a></li>
-                        <li role="listitem"><a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Analytics</a></li>
-                        <li role="listitem"><a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Settings</a></li>
-                        <li role="listitem"><a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Oil Orders</a></li>
-                        <li role="listitem"><a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Consumables Orders</a></li>
-                        <li role="listitem"><a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link nav-link-logout">Logout</a></li>
-                    </ul>
-                </nav>
-                <div class="mt-auto">
-                    <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
-                        Toggle Light Mode
-                    </button>
-                </div>
-                <div class="mt-auto pt-4 text-xs text-gray-300">v1 Settings</div>
-            </aside>
+            <!-- Shared Navigation Loader -->
+            <div id="main-nav"></div>
+            <script>
+              fetch('shared-nav.html').then(r => r.text()).then(html => {
+                document.getElementById('main-nav').innerHTML = html;
+              });
+            </script>
             <!-- Main Content -->
             <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
             <section>
