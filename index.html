@@ -241,29 +241,97 @@
         <section aria-label="Administrative functions" class="space-y-6">
             <p class="mb-6 leading-relaxed nav-link-muted">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
             
-            <!-- Admin Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
-                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-white">User Management</h3>
-                    <p class="mb-4 nav-link-muted">Manage user accounts and permissions.</p>
-                    <a href="users.html" class="w-full block p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-blue">Manage Users</a>
+            <!-- Website Stats and Status Widgets -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Website stats and status">
+                <div class="card widget-primary p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="text-2xl font-bold text-blue-400" id="stat-total-users">--</div>
+                    <div class="text-sm text-gray-400 mt-2">Total Users</div>
                 </div>
-                <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-white">Analytics</h3>
-                    <p class="mb-4 nav-link-muted">View site statistics and user engagement.</p>
-                    <a href="analytics.html" class="w-full block p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-green">View Analytics</a>
+                <div class="card widget-secondary p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="text-2xl font-bold text-green-400" id="stat-total-orders">--</div>
+                    <div class="text-sm text-gray-400 mt-2">Total Orders</div>
                 </div>
-                <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-white">Site Settings</h3>
-                    <p class="mb-4 nav-link-muted">Configure website settings and preferences.</p>
-                    <a href="settings.html" class="w-full block p-3 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-purple">Site Settings</a>
+                <div class="card widget-accent p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="text-2xl font-bold text-purple-400" id="stat-total-products">--</div>
+                    <div class="text-sm text-gray-400 mt-2">Total Products</div>
                 </div>
-                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" tabindex="0" role="article">
-                    <h3 class="text-xl font-semibold mb-3 text-white">Product Management</h3>
-                    <p class="mb-4 nav-link-muted">Manage oil products, add descriptions and images.</p>
-                    <a href="oil-products-management.html" class="w-full block p-3 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-blue">Manage Products</a>
+                <div class="card widget-primary p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="flex flex-col gap-2 w-full">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-400">API</span>
+                            <span id="status-api" class="w-3 h-3 rounded-full bg-gray-400 inline-block"></span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-400">Database</span>
+                            <span id="status-db" class="w-3 h-3 rounded-full bg-gray-400 inline-block"></span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-400">Server</span>
+                            <span id="status-server" class="w-3 h-3 rounded-full bg-gray-400 inline-block"></span>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-400 mt-2">System Status</div>
                 </div>
             </div>
+            <!-- Recent Audit Log (optional) -->
+            <div class="mt-8">
+                <div class="card widget-secondary p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-3 text-white">Recent Activity</h3>
+                    <ul id="recent-audit-log" class="space-y-2 text-sm text-gray-300">
+                        <li>Loading...</li>
+                    </ul>
+                </div>
+            </div>
+    <!-- Dashboard Stats Script -->
+    <script>
+    async function updateDashboardStats() {
+        // Fetch stats from backend APIs
+        let users = [], orders = [], products = [], auditLogs = [];
+        let apiHealthy = false, dbHealthy = false, serverHealthy = true;
+        try {
+            const res = await fetch('/api/users');
+            apiHealthy = res.ok;
+            users = (await res.json()).users || [];
+        } catch (e) { apiHealthy = false; }
+        try {
+            const res = await fetch('/api/orders');
+            dbHealthy = res.ok;
+            orders = await res.json();
+        } catch (e) { dbHealthy = false; }
+        try {
+            const res = await fetch('/api/products');
+            products = await res.json();
+        } catch (e) {}
+        try {
+            const res = await fetch('/.netlify/functions/audit-logs');
+            auditLogs = Array.isArray(await res.json()) ? await res.json() : ((await res.json()).logs || []);
+        } catch (e) {}
+        // Update stats
+        document.getElementById('stat-total-users').textContent = users.length;
+        document.getElementById('stat-total-orders').textContent = Array.isArray(orders) ? orders.length : (orders.orders ? orders.orders.length : '--');
+        document.getElementById('stat-total-products').textContent = Array.isArray(products) ? products.length : (products.products ? products.products.length : '--');
+        // Update status
+        function setStatus(id, healthy) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.remove('bg-gray-400', 'bg-green-500', 'bg-red-500');
+            el.classList.add(healthy ? 'bg-green-500' : 'bg-red-500');
+        }
+        setStatus('status-api', apiHealthy);
+        setStatus('status-db', dbHealthy);
+        setStatus('status-server', serverHealthy);
+        // Recent audit log
+        const auditList = document.getElementById('recent-audit-log');
+        if (auditLogs && auditLogs.length > 0) {
+            auditList.innerHTML = auditLogs.slice(0, 5).map(log =>
+                `<li><span class="font-semibold">${log.action}</span> <span class="text-xs text-gray-500">${log.timestamp ? new Date(log.timestamp).toLocaleString() : ''}</span><br><span class="text-gray-400">${log.details ? (typeof log.details === 'string' ? log.details : JSON.stringify(log.details)) : ''}</span></li>`
+            ).join('');
+        } else {
+            auditList.innerHTML = '<li>No recent activity</li>';
+        }
+    }
+    document.addEventListener('DOMContentLoaded', updateDashboardStats);
+    </script>
         </section>
     </main>
 
