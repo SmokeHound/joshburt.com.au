@@ -17,37 +17,91 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Analytics Data Manager -->
     <script src="analytics-manager.js"></script>
-                </style>
-            </head>
-            <body class="dark">
-                <!-- MOBILE MENU TOGGLE (copied from template.html) -->
-                <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
-                <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
-                <div class="flex flex-col md:flex-row min-h-screen">
-                    <!-- Shared Navigation Loader -->
-                    <div id="main-nav"></div>
-                    <script>
-                      // Dynamically load shared navigation
-                      fetch('shared-nav.html')
-                        .then(response => response.text())
-                        .then(html => {
-                          document.getElementById('main-nav').innerHTML = html;
-                        });
-                    </script>
-                    <!-- Main Content -->
-                    <main class="flex-1 p-4 md:p-6 md:ml-64 ml-0 transition-all duration-300">
-                <div>
-                    <div class="text-lg font-semibold mb-1">User Breakdown</div>
-                    <ul id="user-breakdown-list" class="space-y-1 text-base"></ul>
+    </style>
+</head>
+<body class="dark">
+    <!-- MOBILE MENU TOGGLE (copied from template.html) -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+    <div class="flex min-h-screen">
+        <!-- SIDEBAR NAVIGATION (copied from template.html) -->
+        <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
+            <!-- App Branding -->
+            <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
+            <!-- User Profile Section -->
+            <div id="user-profile" class="mb-6">
+                <div id="user-info" class="hidden flex items-center space-x-2">
+                    <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
+                    <span id="user-name" class="text-white"></span>
                 </div>
-                <div>
-                    <div class="text-lg font-semibold mb-1">User Growth (30d)</div>
-                    <canvas id="user-growth-sparkline" width="120" height="40"></canvas>
-                </div>
-                <div>
-                    <div class="text-lg font-semibold mb-1">Top Users</div>
-                    <ul id="top-users-list" class="flex flex-col gap-1"></ul>
-                </div>
+                <!-- Only one login/logout button set should exist per page -->
+                <button id="login-btn" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-blue" aria-label="Open login modal">Login</button>
+                <button id="logout-btn" class="hidden w-full p-2 text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400 btn-neon-pink" aria-label="Logout">Logout</button>
+            </div>
+            <!-- Navigation -->
+            <nav role="navigation" aria-label="Main navigation">
+                <ul class="space-y-2" role="list">
+                    <li role="listitem">
+                        <a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Home</a>
+                    </li>
+                    <li role="listitem">
+                        <a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a>
+                    </li>
+                    <li role="listitem">
+                        <a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">User Management</a>
+                    </li>
+                    <li role="listitem">
+                        <a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link active" aria-current="page">Analytics</a>
+                    </li>
+                    <li role="listitem">
+                        <a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Settings</a>
+                    </li>
+                    <li role="listitem">
+                        <a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Oil Orders</a>
+                    </li>
+                    <li role="listitem">
+                        <a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Consumables Orders</a>
+                    </li>
+                    <li role="listitem">
+                        <a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link nav-link-logout">Logout</a>
+                    </li>
+                    <li role="listitem">
+                        <a href="template.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-template">Template Page</a>
+            <!-- Theme Toggle -->
+                </ul>
+        <!-- Shared Navigation Loader -->
+        <div id="main-nav"></div>
+        <script>
+            // Dynamically load shared navigation
+            fetch('shared-nav.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('main-nav').innerHTML = html;
+                });
+        </script>
+            </nav>
+            <!-- Theme Toggle -->
+            <div class="mt-auto">
+                <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
+                    Toggle Light Mode
+                </button>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
+            <!-- Shared Navigation Loader -->
+            <div id="main-nav"></div>
+            <!-- User Analytics Section -->
+            <div>
+                <div class="text-lg font-semibold mb-1">User Breakdown</div>
+                <ul id="user-breakdown-list" class="space-y-1 text-base"></ul>
+            </div>
+            <div>
+                <div class="text-lg font-semibold mb-1">User Growth (30d)</div>
+                <canvas id="user-growth-sparkline" width="120" height="40"></canvas>
+            </div>
+            <div>
+                <div class="text-lg font-semibold mb-1">Top Users</div>
+                <ul id="top-users-list" class="flex flex-col gap-1"></ul>
             </div>
             <div class="flex gap-4 items-center">
                 <label for="user-role-filter" class="text-xs">Role:</label>
@@ -61,7 +115,6 @@
                 <input type="date" id="user-date-filter" class="bg-gray-700 text-white rounded px-2 py-1 text-xs" />
                 <button id="export-user-analytics" class="ml-4 px-2 py-1 rounded bg-gray-700 text-white text-xs hover:bg-gray-600 focus:outline-none">Export Users CSV</button>
             </div>
-        </div>
     <!-- Last Updated Timestamp -->
     <div class="w-full text-center text-xs text-gray-400 mb-2 flex items-center justify-center gap-2" id="analytics-last-updated">
         <span id="analytics-last-updated-text">Last updated: --</span>
@@ -329,12 +382,7 @@
                                 </li>
                             </ul>
                         </nav>
-                        <!-- Theme Toggle -->
-                        <div class="mt-auto">
-                            <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
-                                Toggle Light Mode
-                            </button>
-                        </div>
+                        <!-- Theme Toggle (only in sidebar, not duplicated) -->
                     </aside>
                     <!-- Main Content -->
                     <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">

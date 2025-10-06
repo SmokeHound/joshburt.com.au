@@ -92,12 +92,29 @@
   <script>
     // Audit log functionality (copied from settings.html)
     function initAuditLog() {
-      function renderAuditLog() {
+      async function fetchAuditLogs() {
         const filter = document.getElementById('audit-filter').value;
         const dateFilter = document.getElementById('audit-date-filter').value;
-        const logs = AuditLogger.getLogs(filter, dateFilter);
+        let url = '/.netlify/functions/audit-logs';
+        const params = [];
+        if (filter) params.push(`action=${encodeURIComponent(filter)}`);
+        if (dateFilter) params.push(`date=${encodeURIComponent(dateFilter)}`);
+        if (params.length > 0) url += '?' + params.join('&');
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('Failed to fetch logs');
+          const logs = await res.json();
+          return Array.isArray(logs) ? logs : (logs.logs || []);
+        } catch (e) {
+          return [];
+        }
+      }
+
+      async function renderAuditLog() {
         const container = document.getElementById('audit-log-list');
-        if (logs.length === 0) {
+        container.innerHTML = '<div class="p-4 text-gray-500 dark:text-gray-400 text-center">Loading...</div>';
+        const logs = await fetchAuditLogs();
+        if (!logs || logs.length === 0) {
           container.innerHTML = '<div class="p-4 text-gray-500 dark:text-gray-400 text-center">No audit log entries found</div>';
           return;
         }
@@ -106,15 +123,16 @@
             <div>
               <div class="font-semibold">${log.action}</div>
               <div class="text-xs text-gray-400">${log.timestamp || ''}</div>
-              <div class="text-sm mt-1">${log.details || ''}</div>
+              <div class="text-sm mt-1">${log.details ? (typeof log.details === 'string' ? log.details : JSON.stringify(log.details)) : ''}</div>
             </div>
           </div>
         `).join('');
       }
+
       document.getElementById('audit-filter').addEventListener('change', renderAuditLog);
       document.getElementById('audit-date-filter').addEventListener('change', renderAuditLog);
-      document.getElementById('export-audit-log').addEventListener('click', () => {
-        const logs = AuditLogger.getLogs();
+      document.getElementById('export-audit-log').addEventListener('click', async () => {
+        const logs = await fetchAuditLogs();
         const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -124,26 +142,16 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        AuditLogger.log('audit_export', 'Exported audit log');
       });
-      document.getElementById('clear-audit-log').addEventListener('click', () => {
+      document.getElementById('clear-audit-log').addEventListener('click', async () => {
         if (confirm('Are you sure you want to clear the audit log? This cannot be undone.')) {
-          AuditLogger.clearLogs();
+          await fetch('/.netlify/functions/audit-logs', { method: 'DELETE' });
           renderAuditLog();
         }
       });
-      window.addEventListener('auditLogUpdated', renderAuditLog);
-      window.addEventListener('auditLogCleared', renderAuditLog);
       renderAuditLog();
     }
     document.addEventListener('DOMContentLoaded', () => {
-      if (typeof AuditLogger === 'undefined') {
-        window.AuditLogger = {
-          log: function(action, details) { console.log('[Audit]', action, details); },
-          getLogs: function() { return []; },
-          clearLogs: function() { console.log('[Audit] Logs cleared'); }
-        };
-      }
       initAuditLog();
     });
   </script>
