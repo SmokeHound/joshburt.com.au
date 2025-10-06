@@ -322,6 +322,18 @@
           <div id="theme-tab" class="tab-panel widget-primary rounded-lg border border-gray-200 dark:border-gray-700 p-6 hidden">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div class="space-y-4">
+                <!-- Preset Theme Selector -->
+                <div class="flex items-center gap-3 mb-2">
+                  <label for="theme-preset" class="w-32 font-semibold">Preset Theme</label>
+                  <select id="theme-preset" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700">
+                    <option value="">Custom</option>
+                    <option value="default">Default (Blue/Green/Purple)</option>
+                    <option value="ocean">Ocean</option>
+                    <option value="forest">Forest</option>
+                    <option value="sunset">Sunset</option>
+                    <option value="mono">Monochrome</option>
+                  </select>
+                </div>
                 <div class="flex items-center gap-3">
                   <label for="primaryColor" class="w-32">Primary</label>
                   <input id="primaryColor" type="color" class="w-12 h-10" value="#3b82f6" />
@@ -472,8 +484,6 @@
         // Branding & contact
         logoUrl: document.getElementById('logo-url')?.value || '',
         faviconUrl: document.getElementById('favicon-url')?.value || '',
-        supportPhone: document.getElementById('support-phone')?.value || '',
-        supportAddress: document.getElementById('support-address')?.value || '',
         // Feature toggles
         enableRegistration: document.getElementById('enable-registration')?.checked || false,
         enableGuestCheckout: document.getElementById('enable-guest-checkout')?.checked || false,
@@ -524,8 +534,6 @@
                 // Branding & contact
                 if (settings.logoUrl) document.getElementById('logo-url').value = settings.logoUrl;
                 if (settings.faviconUrl) document.getElementById('favicon-url').value = settings.faviconUrl;
-                if (settings.supportPhone) document.getElementById('support-phone').value = settings.supportPhone;
-                if (settings.supportAddress) document.getElementById('support-address').value = settings.supportAddress;
                 // Feature toggles
                 if (settings.enableRegistration !== undefined) document.getElementById('enable-registration').checked = settings.enableRegistration;
                 if (settings.enableGuestCheckout !== undefined) document.getElementById('enable-guest-checkout').checked = settings.enableGuestCheckout;
@@ -647,18 +655,47 @@
       const colorInputs = ['primaryColor', 'secondaryColor', 'accentColor'];
       const colorTexts = ['primaryColorText', 'secondaryColorText', 'accentColorText'];
       const previews = ['primary-preview', 'secondary-preview', 'accent-preview'];
+      // Preset themes
+      const themePresets = {
+        default: { primary: '#3b82f6', secondary: '#10b981', accent: '#8b5cf6' },
+        ocean:   { primary: '#0284c7', secondary: '#06b6d4', accent: '#0ea5e9' },
+        forest:  { primary: '#166534', secondary: '#22c55e', accent: '#84cc16' },
+        sunset:  { primary: '#f59e42', secondary: '#ef4444', accent: '#f472b6' },
+        mono:    { primary: '#22223b', secondary: '#4a4e69', accent: '#9a8c98' }
+      };
+      // Handle preset selection
+      const presetSelect = document.getElementById('theme-preset');
+      presetSelect.addEventListener('change', () => {
+        const preset = presetSelect.value;
+        if (themePresets[preset]) {
+          document.getElementById('primaryColor').value = themePresets[preset].primary;
+          document.getElementById('secondaryColor').value = themePresets[preset].secondary;
+          document.getElementById('accentColor').value = themePresets[preset].accent;
+          document.getElementById('primaryColorText').value = themePresets[preset].primary;
+          document.getElementById('secondaryColorText').value = themePresets[preset].secondary;
+          document.getElementById('accentColorText').value = themePresets[preset].accent;
+          // Optionally update preview swatches if present
+          colorInputs.forEach((inputId, idx) => {
+            const preview = document.getElementById(previews[idx]);
+            if (preview) preview.style.backgroundColor = document.getElementById(inputId).value;
+          });
+        }
+      });
+      // Color pickers and text inputs sync
       colorInputs.forEach((inputId, index) => {
         const colorInput = document.getElementById(inputId);
         const textInput = document.getElementById(colorTexts[index]);
         const preview = document.getElementById(previews[index]);
         colorInput.addEventListener('change', (e) => {
           textInput.value = e.target.value;
-          preview.style.backgroundColor = e.target.value;
+          if (preview) preview.style.backgroundColor = e.target.value;
+          presetSelect.value = '';
         });
         textInput.addEventListener('change', (e) => {
           if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
             colorInput.value = e.target.value;
-            preview.style.backgroundColor = e.target.value;
+            if (preview) preview.style.backgroundColor = e.target.value;
+            presetSelect.value = '';
           }
         });
       });
