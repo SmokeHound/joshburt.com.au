@@ -71,695 +71,258 @@
         <!-- Shared Navigation Loader -->
         <div id="main-nav"></div>
         <script>
-            // Dynamically load shared navigation
-            fetch('shared-nav.html')
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('main-nav').innerHTML = html;
-                });
-        </script>
-            </nav>
-            <!-- Theme Toggle -->
-            <div class="mt-auto">
-                <button id="theme-toggle" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-green" aria-label="Toggle light mode" aria-pressed="false">
-                    Toggle Light Mode
-                </button>
-            </div>
-        </aside>
-        <!-- Main Content -->
-        <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
-            <!-- Shared Navigation Loader -->
-            <div id="main-nav"></div>
-            <!-- User Analytics Section -->
-            <div>
-                <div class="text-lg font-semibold mb-1">User Breakdown</div>
-                <ul id="user-breakdown-list" class="space-y-1 text-base"></ul>
-            </div>
-            <div>
-                <div class="text-lg font-semibold mb-1">User Growth (30d)</div>
-                <canvas id="user-growth-sparkline" width="120" height="40"></canvas>
-            </div>
-            <div>
-                <div class="text-lg font-semibold mb-1">Top Users</div>
-                <ul id="top-users-list" class="flex flex-col gap-1"></ul>
-            </div>
-            <div class="flex gap-4 items-center">
-                <label for="user-role-filter" class="text-xs">Role:</label>
-                <select id="user-role-filter" class="bg-gray-700 text-white rounded px-2 py-1 text-xs">
-                    <option value="all">All</option>
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                    <option value="locked">Locked</option>
-                </select>
-                <label for="user-date-filter" class="text-xs ml-4">Signup Since:</label>
-                <input type="date" id="user-date-filter" class="bg-gray-700 text-white rounded px-2 py-1 text-xs" />
-                <button id="export-user-analytics" class="ml-4 px-2 py-1 rounded bg-gray-700 text-white text-xs hover:bg-gray-600 focus:outline-none">Export Users CSV</button>
-            </div>
-    <!-- Last Updated Timestamp -->
-    <div class="w-full text-center text-xs text-gray-400 mb-2 flex items-center justify-center gap-2" id="analytics-last-updated">
-        <span id="analytics-last-updated-text">Last updated: --</span>
-        <button id="analytics-refresh-btn" class="ml-2 px-2 py-1 rounded bg-gray-700 text-white text-xs hover:bg-gray-600 focus:outline-none" title="Refresh analytics now">⟳ Refresh</button>
-        <span id="analytics-auto-refresh" class="text-gray-500 text-xs ml-2">(auto-refresh every 45s)</span>
-    </div>
-    <!-- Device/Browser/Location Breakdown Cards -->
-    <div class="max-w-4xl mx-auto flex flex-wrap gap-6 mb-6">
-        <div class="flex-1 min-w-[200px] bg-gray-800 text-white rounded-lg shadow-md p-4">
-            <div class="text-lg font-semibold mb-2">Device Breakdown</div>
-            <ul id="device-breakdown-list" class="space-y-1 text-base"></ul>
-        </div>
-        <div class="flex-1 min-w-[200px] bg-gray-800 text-white rounded-lg shadow-md p-4">
-            <div class="text-lg font-semibold mb-2">Browser Breakdown</div>
-            <ul id="browser-breakdown-list" class="space-y-1 text-base"></ul>
-        </div>
-        <div class="flex-1 min-w-[200px] bg-gray-800 text-white rounded-lg shadow-md p-4">
-            <div class="text-lg font-semibold mb-2">Location Breakdown</div>
-            <ul id="location-breakdown-list" class="space-y-1 text-base"></ul>
-        </div>
-    </div>
-    <!-- Actionable Insights Card -->
-    <div id="insights-card" class="max-w-4xl mx-auto bg-gray-800 text-white rounded-lg shadow-md p-4 mb-6 flex flex-wrap gap-6 justify-between">
-        <div>
-            <div class="text-lg font-semibold mb-1">Conversion Rate</div>
-            <div id="insight-conversion" class="text-2xl font-bold flex items-center">--%</div>
-        </div>
-        <div>
-            <div class="text-lg font-semibold mb-1">Retention Rate</div>
-            <div id="insight-retention" class="text-2xl font-bold flex items-center">--%</div>
-        </div>
-        <div>
-            <div class="text-lg font-semibold mb-1">Top Product</div>
-            <div id="insight-top-product" class="text-2xl font-bold flex items-center">--</div>
-        </div>
-        <div>
-            <div class="text-lg font-semibold mb-1">Top User</div>
-            <div id="insight-top-user" class="text-2xl font-bold flex items-center">--</div>
-        </div>
-    </div>
-    <!-- Status Bar for API/DB/Server Health -->
-    <div id="status-bar" class="w-full flex flex-wrap items-center justify-center gap-4 py-2 px-4 bg-gray-900 text-white text-sm mb-4">
-        <span id="status-api" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-400"></span>API: <span class="ml-1">Checking...</span></span>
-        <span id="status-db" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-400"></span>Database: <span class="ml-1">Checking...</span></span>
-        <span id="status-server" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-400"></span>Server: <span class="ml-1">Checking...</span></span>
-    </div>
-    <script>
-        // Configuration for dynamic color updates from settings
-        function applyDynamicColors() {
-            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            // Apply CSS variables for instant color update
-            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
-        }
-        applyDynamicColors();
-        // Service Worker Registration for PWA
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./sw.js")
-                    .then(registration => {
-                        console.log("SW registered: ", registration);
-                    })
-                    .catch(registrationError => {
-                        console.log("SW registration failed: ", registrationError);
-                    });
-            });
-        }
-    </script>
-    <style>
-        body {
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .chart-container {
-            height: 300px;
-            width: 100%;
-        }
-        .sales-chart-container {
-            height: 350px;
-            width: 100%;
-        }
-        .dark {
-            background-color: #1f2937;
-            color: #f9fafb;
-        }
-        .light {
-            background-color: #f9fafb;
-            color: #1f2937;
-        }
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                    body {
-                        transition: background-color 0.3s, color 0.3s;
-                        font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
-                        background-color: #0a0a0a;
-                        color: #ffffff;
-                    }
-                    .dark {
-                        background-color: #0a0a0a;
-                        color: #ffffff;
-                    }
-                    .light {
-                        background-color: #f9fafb;
-                        color: #1f2937;
-                    }
-                    .sidebar {
-                        width: 16rem;
-                        height: 100vh;
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        overflow-y: auto;
-                        transition: background-color 0.3s;
-                        z-index: 100;
-                        background-color: #111111;
-                        border-right: 1px solid #00d4ff20;
-                    }
-                    main {
-                        margin-left: 16rem;
-                        min-height: 100vh;
-                        background-color: #0a0a0a;
-                    }
-                    @media (max-width: 768px) {
-                        .sidebar {
-                            transform: translateX(-100%);
-                            transition: transform 0.3s ease-in-out;
-                        }
-                        .sidebar.open {
-                            transform: translateX(0);
-                        }
-                        main {
-                            margin-left: 0;
-                        }
-                    }
-                    .analytics-item {
-                        transition: all 0.2s ease;
-                        background-color: #111111;
-                        border: 1px solid #333333;
-                    }
-                    .analytics-item:hover {
-                        background-color: #181818;
-                        border-color: #00d4ff;
-                        box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
-                    }
-                    .sr-only {
-                        position: absolute;
-                        width: 1px;
-                        height: 1px;
-                        padding: 0;
-                        margin: -1px;
-                        overflow: hidden;
-                        clip: rect(0, 0, 0, 0);
-                        white-space: nowrap;
-                        border: 0;
-                    }
-                    .focus\:not-sr-only:focus {
-                        position: static;
-                        width: auto;
-                        height: auto;
-                        padding: 0.5rem;
-                        margin: 0;
-                        overflow: visible;
-                        clip: auto;
-                        white-space: normal;
-                    }
-                    @media print {
-                        .sidebar, .no-print { display: none !important; }
-                        main { margin-left: 0 !important; }
-                        body { background: white !important; color: black !important; }
-                    }
-
-                    /* Neon button styles */
-                    .btn-neon-blue {
-                        background: linear-gradient(45deg, #00d4ff, #0099cc);
-                        border: 1px solid #00d4ff;
-                        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-                        color: #000000;
-                        font-weight: 600;
-                    }
-                    .btn-neon-blue:hover {
-                        box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
-                        background: linear-gradient(45deg, #00eeff, #00b8e6);
-                    }
-                    .btn-neon-green {
-                        background: linear-gradient(45deg, #00ff88, #00cc66);
-                        border: 1px solid #00ff88;
-                        box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-                        color: #000000;
-                        font-weight: 600;
-                    }
-                    .btn-neon-green:hover {
-                        box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
-                        background: linear-gradient(45deg, #00ff99, #00dd77);
-                    }
-
-                    /* Navigation link styling */
-                    .nav-link {
-                        color: #cccccc;
-                        transition: all 0.3s ease;
-                    }
-                    .nav-link:hover {
-                        color: #00d4ff;
-                        text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
-                    }
-                    .nav-link.active {
-                        color: #00d4ff;
-                        background-color: #00d4ff20;
-                        border-left: 3px solid #00d4ff;
-                    }
-                </style>
-                </head>
-                <body class="dark">
-                <!-- MOBILE MENU TOGGLE (copied from template.html) -->
-                <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
-                <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
-                <div class="flex min-h-screen">
-                    <!-- SIDEBAR NAVIGATION (copied from template.html) -->
-                    <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
-                        <!-- App Branding -->
-                        <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
-                        <!-- User Profile Section -->
-                        <div id="user-profile" class="mb-6">
-                            <div id="user-info" class="hidden flex items-center space-x-2">
-                                <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
-                                <span id="user-name" class="text-white"></span>
-                            </div>
-                            <button id="login-btn" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-blue" aria-label="Open login modal">Login</button>
-                            <button id="logout-btn" class="hidden w-full p-2 text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400 btn-neon-pink" aria-label="Logout">Logout</button>
-                        </div>
-                        <!-- Navigation -->
-                        <nav role="navigation" aria-label="Main navigation">
-                            <ul class="space-y-2" role="list">
-                                <li role="listitem">
-                                    <a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Home</a>
-                                </li>
-                                <li role="listitem">
-                                    <a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a>
-                                </li>
-                                <li role="listitem">
-                                    <a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">User Management</a>
-                                </li>
-                                <li role="listitem">
-                                    <a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link active" aria-current="page">Analytics</a>
-                                </li>
-                                <li role="listitem">
-                                    <a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Settings</a>
-                                </li>
-                                <li role="listitem">
-                                    <a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Oil Orders</a>
-                                </li>
-                                <li role="listitem">
-                                    <a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Consumables Orders</a>
-                                </li>
-                                <li role="listitem">
-                                    <a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link nav-link-logout">Logout</a>
-                                </li>
-                                <li role="listitem">
-                                    <a href="template.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-template">Template Page</a>
-                                </li>
-                            </ul>
-                        </nav>
-                        <!-- Theme Toggle (only in sidebar, not duplicated) -->
-                    </aside>
-                    <!-- Main Content -->
-                    <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
-    <!-- Removed extra closing divs that were not opened -->
-                <!-- Filter Chips for Quick Date Selection -->
-                <div class="mb-4 flex flex-wrap gap-2" role="group" aria-label="Quick date filters">
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="1" aria-label="Today" role="button" tabindex="0">Today</button>
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="7" aria-label="Last 7 days" role="button" tabindex="0">7d</button>
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="30" aria-label="Last 30 days" role="button" tabindex="0">30d</button>
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="90" aria-label="Last 90 days" role="button" tabindex="0">90d</button>
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" data-range="365" aria-label="Last year" role="button" tabindex="0">YTD</button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Date Range Filter -->
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width,initial-scale=1" />
+              <title>Analytics</title>
+              <link rel="stylesheet" href="./assets/css/styles.css" />
+              <link rel="manifest" href="./manifest.json" />
+              <meta name="apple-mobile-web-app-capable" content="yes" />
+              <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+              <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au" />
+              <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+              <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+              <script src="analytics-manager.js"></script>
+              <script>
+                function applyDynamicColors() {
+                  const s = JSON.parse(localStorage.getItem('siteSettings')) || {};
+                  document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
+                  document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
+                  document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
+                }
+                applyDynamicColors();
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+                  });
+                }
+              </script>
+              <style>
+                body { background:#0a0a0a; color:#ffffff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif; }
+                .chart-container { height:300px; width:100%; }
+                .sales-chart-container { height:350px; width:100%; }
+                .card { background:#111111; border:1px solid #333; transition:.2s box-shadow,.2s transform; }
+                .card:hover { box-shadow:0 4px 16px rgba(0,212,255,.25); transform:translateY(-3px); border-color:#00d4ff; }
+                .widget-primary { border-color:#00d4ff40; }
+                .widget-secondary { border-color:#00ff8840; }
+                .widget-accent { border-color:#8000ff40; }
+                .widget-yellow { border-color:#fbbf2440; }
+                .date-chip { cursor:pointer; }
+                .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+                @media (max-width:767px){ body.sidebar-open { overflow:hidden; } }
+                #toast { background:#111111; border:1px solid #00d4ff40; box-shadow:0 4px 18px rgba(0,212,255,.3); }
+              </style>
+            </head>
+            <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+              <!-- Skip Links -->
+              <div class="sr-only">
+                <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
+                <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
+              </div>
+              <!-- Mobile Menu Toggle -->
+              <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+              <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
+              <!-- Shared Navigation Loader -->
+              <div id="main-nav"></div>
+              <script>
+                fetch('shared-nav.html').then(r=>r.text()).then(html=>{ document.getElementById('main-nav').innerHTML = html; });
+              </script>
+              <!-- Toast -->
+              <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300 text-sm" role="alert" aria-live="polite"></div>
+              <!-- Main Content -->
+              <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
+                <header class="p-4 md:p-6 card rounded-lg shadow-md sticky top-0 z-30">
+                  <h1 class="text-2xl font-bold">Analytics Dashboard</h1>
+                  <p class="text-sm text-gray-400 mt-1">Traffic, engagement & product performance overview</p>
+                </header>
+                <!-- Filters & Exports -->
+                <section aria-label="Filters" class="space-y-4">
+                  <div class="flex flex-wrap gap-2" role="group" aria-label="Quick date filters">
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="1">Today</button>
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="7">7d</button>
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="30">30d</button>
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="90">90d</button>
+                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="365">YTD</button>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <label class="block text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">Date Range</label>
-                        <select id="date-range" class="w-full p-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            <option value="7">Last 7 days</option>
-                            <option value="30" selected>Last 30 days</option>
-                            <option value="90">Last 90 days</option>
-                            <option value="365">Last year</option>
-                        </select>
+                      <label class="block text-sm font-semibold mb-2">Date Range</label>
+                      <select id="date-range" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="365">Last year</option>
+                      </select>
                     </div>
-                    
-                    <!-- User Type Filter -->
                     <div>
-                        <label class="block text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">User Type</label>
-                        <select id="user-type" class="w-full p-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            <option value="all" selected>All Users</option>
-                            <option value="admin">Admin Users</option>
-                            <option value="user">Regular Users</option>
-                        </select>
+                      <label class="block text-sm font-semibold mb-2">User Type</label>
+                      <select id="user-type" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="all" selected>All Users</option>
+                        <option value="admin">Admin Users</option>
+                        <option value="user">Regular Users</option>
+                      </select>
                     </div>
-                
-                    <!-- Export Options -->
-
                     <div class="flex flex-col gap-2">
-                        <label class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Export Options</label>
-                        <div class="flex gap-2">
-                            <button id="export-csv" class="btn-neon-green flex-1 px-3 py-2 rounded-lg">Export CSV</button>
-                            <button id="export-pdf" class="btn-neon-blue flex-1 px-3 py-2 rounded-lg">Export PDF</button>
-                            <button id="export-png" class="btn-neon-blue flex-1 px-3 py-2 rounded-lg">Export PNG</button>
-                        </div>
+                      <label class="block text-sm font-semibold">Export</label>
+                      <div class="flex gap-2">
+                        <button id="export-csv" class="btn-neon-green flex-1 px-3 py-2 rounded-lg">CSV</button>
+                        <button id="export-pdf" class="btn-neon-blue flex-1 px-3 py-2 rounded-lg">PDF</button>
+                        <button id="export-png" class="btn-neon-blue flex-1 px-3 py-2 rounded-lg">PNG</button>
+                      </div>
                     </div>
-                </div>
-
-        <!-- Real-time Statistics -->
-        <section class="mb-6" aria-label="Real-time statistics">
-            <div class="card widget-secondary rounded-lg shadow-md p-6">
-                <h3 class="text-xl font-semibold mb-4 flex items-center text-gray-900 dark:text-gray-100">
-                    <span class="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></span>
-                    Real-time Statistics
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-green-400" id="active-users">-</div>
-                        <div class="text-sm text-gray-400">Active Users</div>
+                  </div>
+                  <div class="w-full text-center text-xs text-gray-400 flex items-center justify-center gap-2" id="analytics-last-updated">
+                    <span id="analytics-last-updated-text">Last updated: --</span>
+                    <button id="analytics-refresh-btn" class="ml-2 px-2 py-1 rounded bg-gray-800 text-white text-xs hover:bg-gray-700 focus:outline-none">⟳ Refresh</button>
+                    <span id="analytics-auto-refresh" class="text-gray-500 text-xs ml-2">(auto every 60s)</span>
+                  </div>
+                </section>
+                <!-- Real-time Stats -->
+                <section aria-label="Real-time statistics" class="mb-2">
+                  <div class="card widget-secondary rounded-lg shadow-md p-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center"><span class="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></span>Real-time Statistics</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div class="text-center"><div class="text-2xl font-bold text-green-400" id="active-users">-</div><div class="text-xs text-gray-400">Active Users</div></div>
+                      <div class="text-center"><div class="text-2xl font-bold text-blue-400" id="current-page-views">-</div><div class="text-xs text-gray-400">Page Views (Hr)</div></div>
+                      <div class="text-center"><div class="text-2xl font-bold text-yellow-400" id="server-status">-</div><div class="text-xs text-gray-400">Server Status</div></div>
+                      <div class="text-center"><div class="text-2xl font-bold text-purple-400" id="total-users">-</div><div class="text-xs text-gray-400">Total Users</div></div>
                     </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-blue-400" id="current-page-views">-</div>
-                        <div class="text-sm text-gray-400">Page Views (Hour)</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-yellow-400" id="server-status">-</div>
-                        <div class="text-sm text-gray-400">Server Status</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-purple-400" id="total-users">-</div>
-                        <div class="text-sm text-gray-400">Total Users</div>
-                    </div>
+                  </div>
+                </section>
+                <!-- Insights -->
+                <section class="grid grid-cols-2 md:grid-cols-4 gap-4" aria-label="Key insights">
+                  <div class="card p-4 widget-primary rounded-lg" aria-live="polite"><h3 class="text-sm font-semibold mb-1">Conversion Rate</h3><div id="insight-conversion" class="text-xl font-bold">--%</div></div>
+                  <div class="card p-4 widget-secondary rounded-lg" aria-live="polite"><h3 class="text-sm font-semibold mb-1">Retention Rate</h3><div id="insight-retention" class="text-xl font-bold">--%</div></div>
+                  <div class="card p-4 widget-accent rounded-lg" aria-live="polite"><h3 class="text-sm font-semibold mb-1">Top Product</h3><div id="insight-top-product" class="text-xl font-bold">--</div></div>
+                  <div class="card p-4 widget-yellow rounded-lg" aria-live="polite"><h3 class="text-sm font-semibold mb-1">Top User</h3><div id="insight-top-user" class="text-xl font-bold">--</div></div>
+                </section>
+                <!-- Health Bar -->
+                <div id="status-bar" class="w-full flex flex-wrap items-center justify-center gap-4 py-2 px-4 card text-sm">
+                  <span id="status-api" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>API: <span class="ml-1">Checking...</span></span>
+                  <span id="status-db" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>Database: <span class="ml-1">Checking...</span></span>
+                  <span id="status-server" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>Server: <span class="ml-1">Checking...</span></span>
                 </div>
-            </div>
-        </section>
+                <!-- Charts -->
+                <section class="grid grid-cols-1 lg:grid-cols-2 gap-6" aria-label="Charts">
+                  <div class="card widget-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>Visitor Trends</h3><div class="chart-container"><canvas id="visitor-chart"></canvas></div></div>
+                  <div class="card widget-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-green-400 rounded-full"></span>User Engagement</h3><div class="chart-container"><canvas id="engagement-chart"></canvas></div></div>
+                  <div class="card widget-accent p-6 rounded-lg shadow-md lg:col-span-2"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>Product Sales Analytics</h3><div class="sales-chart-container"><canvas id="sales-chart"></canvas></div></div>
+                </section>
+                <!-- Lists & Breakdown -->
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6" aria-label="Stat cards">
+                  <div class="card widget-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">Visitor Statistics</h3><ul id="visitor-stats" class="list-disc pl-5 space-y-1 text-gray-300"><li>Loading...</li></ul></div>
+                  <div class="card widget-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">User Engagement</h3><ul id="engagement-stats" class="list-disc pl-5 space-y-1 text-gray-300"><li>Loading...</li></ul></div>
+                  <div class="card widget-accent p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2 flex items-center justify-between">Top Pages <input id="top-pages-search" type="search" placeholder="Search pages..." class="ml-2 px-2 py-1 rounded bg-gray-800 border border-gray-600 text-sm focus:outline-none" aria-label="Search top pages"></h3><ol id="top-pages" class="list-decimal pl-5 space-y-1 text-gray-300"><li>Loading...</li></ol></div>
+                </section>
+                <!-- User Analytics Mini Section -->
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6" aria-label="User analytics breakdown">
+                  <div class="card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">User Breakdown</h3><ul id="user-breakdown-list" class="space-y-1 text-sm"></ul></div>
+                  <div class="card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">User Growth (30d)</h3><canvas id="user-growth-sparkline" width="180" height="60"></canvas></div>
+                  <div class="card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">Top Users</h3><ul id="top-users-list" class="flex flex-col gap-1 text-sm"></ul><div class="mt-3 flex gap-2 items-center text-xs"><label for="user-role-filter">Role:</label><select id="user-role-filter" class="bg-gray-800 text-white rounded px-2 py-1 text-xs"><option value="all">All</option><option value="admin">Admin</option><option value="user">User</option><option value="locked">Locked</option></select></div><div class="mt-2 flex gap-2 items-center text-xs"><label for="user-date-filter">Since:</label><input type="date" id="user-date-filter" class="bg-gray-800 text-white rounded px-2 py-1 text-xs" /></div><button id="export-user-analytics" class="mt-3 w-full px-2 py-1 rounded bg-gray-800 text-white text-xs hover:bg-gray-700 focus:outline-none">Export Users CSV</button></div>
+                </section>
+              </main>
+              <script>
+                // Global state
+                let visitorChart, engagementChart, salesChart; let userGrowthSparkline; let autoRefreshTimer=null; const REFRESH_INTERVAL=60000; // 60s
+                const currentFilters = { dateRange:30, userType:'all' };
 
-        <!-- Charts Section -->
-        <section class="mb-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Visitor Trends Chart -->
-                <div class="card widget-primary p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                        <span class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span> Visitor Trends
-                    </h3>
-                    <div class="chart-container"><canvas id="visitor-chart"></canvas></div>
-                </div>
-                <!-- User Engagement Chart -->
-                <div class="card widget-secondary p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                        <span class="inline-block w-2 h-2 bg-green-400 rounded-full"></span> User Engagement
-                    </h3>
-                    <div class="chart-container"><canvas id="engagement-chart"></canvas></div>
-                </div>
-            </div>
-        </section>
+                function showToast(message){ const t=document.getElementById('toast'); if(!t) return; t.textContent=message; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3000);} 
 
-        <!-- Product Sales Chart -->
-        <section class="mb-6">
-            <div class="card widget-accent p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                    <span class="inline-block w-2 h-2 bg-purple-400 rounded-full"></span> Product Sales Analytics
-                </h3>
-                <div class="sales-chart-container"><canvas id="sales-chart"></canvas></div>
-            </div>
-        </section>
+                function loadAndApplySettings(){ const settings=JSON.parse(localStorage.getItem('siteSettings')||'{}'); if(settings['site-title']) { document.title = settings['site-title']+ ' | Analytics'; }}
 
-        <!-- Statistics Cards -->
-        <section>
-            <p class="mb-4 text-gray-700 dark:text-gray-300">Real-time statistics and key metrics from your analytics data.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="card widget-primary p-6 rounded-lg shadow-md">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Visitor Statistics</h3>
-                    <ul id="visitor-stats" class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1">
-                        <li>Loading...</li>
-                    </ul>
-                </div>
-                <div class="card widget-secondary p-6 rounded-lg shadow-md">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">User Engagement</h3>
-                    <ul id="engagement-stats" class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1">
-                        <li>Loading...</li>
-                    </ul>
-                </div>
-                <div class="card widget-accent p-6 rounded-lg shadow-md">
-                    <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 flex items-center justify-between">
-                        Top Pages
-                        <input id="top-pages-search" type="search" placeholder="Search pages..." class="ml-2 px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary" aria-label="Search top pages">
-                    </h3>
-                    <ol id="top-pages" class="list-decimal pl-5 text-gray-700 dark:text-gray-300 space-y-1">
-                        <li>Loading...</li>
-                    </ol>
-                </div>
-            </div>
-        </section>
-
-                    </main>
-                </div>
-
-    <script>
-    // Global variables for charts
-    let visitorChart, engagementChart, salesChart, funnelChart, deviceChart, browserChart, multiMetricChart, sparklineVisitors, sparklineOrders, sparklineSessions;
-        let currentFilters = {
-            dateRange: 30,
-            userType: 'all'
-        };
-
-        // Show toast notification
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
-
-        // Load and apply site settings
-        function loadAndApplySettings() {
-            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            
-            // Apply site title if set
-            if (settings['site-title']) {
-                const brandingElements = document.querySelectorAll('h1');
-                brandingElements.forEach(el => {
-                    if (el.textContent.includes('Josh\'s App')) {
-                        el.textContent = settings['site-title'];
-                    }
-                });
-            }
-        }
-
-        // Generate analytics data from live backend APIs
-        async function generateAnalyticsData(filters) {
-            // Use analyticsManager if available
-            if (window.analyticsManager) {
-                const analyticsData = window.analyticsManager.getData(filters);
-                if (analyticsData) {
-                    return processAnalyticsData(analyticsData.data, filters);
+                // Data generation / processing (kept similar to previous for continuity)
+                async function generateAnalyticsData(filters){ try {
+                    if(window.analyticsManager){ const analytics=window.analyticsManager.getData(filters); if(analytics){ return processAnalyticsData(analytics.data, filters); } }
+                  } catch(e) {}
+                  const [usersRes, ordersRes, productsRes] = await Promise.allSettled([
+                    fetch('/api/users'), fetch('/api/orders'), fetch('/api/products')
+                  ]);
+                  const usersData = usersRes.status==='fulfilled' ? await usersRes.value.json() : [];
+                  const ordersData = ordersRes.status==='fulfilled' ? await ordersRes.value.json() : [];
+                  const productsData = productsRes.status==='fulfilled' ? await productsRes.value.json() : [];
+                  let users = usersData.users || usersData || [];
+                  if(!Array.isArray(users)) users=[];
+                  if(filters.userType==='admin') users = users.filter(u=>u.role==='admin');
+                  else if(filters.userType==='user') users = users.filter(u=>u.role==='user');
+                  const days = filters.dateRange; const visitorData=[]; const labels=[]; const now=new Date();
+                  for(let i=days-1;i>=0;i--){ const d=new Date(now); d.setDate(now.getDate()-i); labels.push(d.toLocaleDateString()); const dateStr=d.toISOString().split('T')[0]; const count = (Array.isArray(ordersData)?ordersData:[]).filter(o=> (o.created_at||o.createdAt||'').startsWith(dateStr)).length; visitorData.push(count);} 
+                  const totalOrders = Array.isArray(ordersData)?ordersData.length:0; const bounceRate=Math.max(0,100-(totalOrders/(users.length*days))*100); const avgSessionDuration=300; const pagesPerSession=3; const returnVisitorRate=30; 
+                  const productNames = (Array.isArray(productsData)?productsData:[]).map(p=>p.name); const salesCounts = productNames.map(name => (Array.isArray(ordersData)?ordersData:[]).reduce((sum,o)=> sum + ((o.items||[]).filter(i=>i.name===name).reduce((s,i)=>s+(i.quantity||1),0)),0));
+                  return { visitors:{labels,data:visitorData}, engagement:{ bounceRate, avgSessionDuration, pagesPerSession, returnVisitorRate }, sales:{ labels:productNames, data:salesCounts }, summary:{ totalUsers:users.length, activeSession:0, totalVisitors:visitorData.reduce((a,b)=>a+b,0), avgDailyVisitors: Math.floor(visitorData.reduce((a,b)=>a+b,0)/(visitorData.length||1)) } };
                 }
-            }
 
-            // Fetch users, orders, and products from backend APIs
-            const [usersRes, ordersRes, productsRes] = await Promise.all([
-                fetch('/api/users'),
-                fetch('/api/orders'),
-                fetch('/api/products')
-            ]);
-            const usersData = await usersRes.json();
-            const ordersData = await ordersRes.json();
-            const productsData = await productsRes.json();
+                function processAnalyticsData(data){ const visitorData=data.visitors||[]; const labels=visitorData.map(v=> new Date(v.date).toLocaleDateString()); const visitors=visitorData.map(v=>v.totalVisitors); const sessions=data.userSessions||[]; const avgBounceRate = sessions.reduce((s,x)=>s+x.bounceRate,0)/(sessions.length||1); const avgSessionDuration = sessions.reduce((s,x)=>s+x.avgSessionDuration,0)/(sessions.length||1); const avgPagesPerSession = sessions.reduce((s,x)=>s+x.pagesPerSession,0)/(sessions.length||1); const totalVisitors=visitorData.reduce((s,v)=>s+v.totalVisitors,0); const totalReturning=visitorData.reduce((s,v)=>s+v.returningVisitors,0); const returnVisitorRate = totalVisitors? (totalReturning/totalVisitors)*100:0; const productNames=['Castrol GTX','Castrol Magnatec','Castrol EDGE','Castrol GTX Diesel','Castrol Actevo']; const orderData=data.oilOrders||[]; const productSales={}; productNames.forEach(p=>{productSales[p]=orderData.reduce((sum,day)=> sum + (day.products[p]?.orders||0),0);}); return { visitors:{labels,data:visitors}, engagement:{ bounceRate:avgBounceRate*100, avgSessionDuration, pagesPerSession:avgPagesPerSession, returnVisitorRate }, sales:{ labels:productNames, data:productNames.map(n=>productSales[n]) }, summary:{ totalUsers:(JSON.parse(localStorage.getItem('siteUsers')||'[]')).length, activeSession: JSON.parse(localStorage.getItem('user')||'null')?1:0, totalVisitors, avgDailyVisitors: visitorData.length? Math.floor(totalVisitors/visitorData.length):0 } }; }
 
-            // Filter users by type
-            let users = usersData.users || usersData;
-            const userType = filters.userType;
-            let filteredUsers = users;
-            if (userType === 'admin') {
-                filteredUsers = users.filter(u => u.role === 'admin');
-            } else if (userType === 'user') {
-                filteredUsers = users.filter(u => u.role === 'user');
-            }
+                function trendArrow(v){ if(v>50) return '↗'; if(v<20) return '↘'; return '→'; }
 
-            // Generate visitor trend data (use order timestamps as proxy for visits)
-            const days = filters.dateRange;
-            const visitorData = [];
-            const labels = [];
-            const now = new Date();
-            for (let i = days - 1; i >= 0; i--) {
-                const date = new Date(now);
-                date.setDate(now.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                labels.push(date.toLocaleDateString());
-                // Count orders (visits) for this day
-                const count = ordersData.filter(order => (order.created_at || order.createdAt || '').startsWith(dateStr)).length;
-                visitorData.push(count);
-            }
+                function updateStatCard(id, items){ const el=document.getElementById(id); if(!el) return; el.innerHTML=''; if(!items.length){ el.innerHTML='<li>No results</li>'; return;} items.forEach(i=>{ const li=document.createElement('li'); li.textContent=i; el.appendChild(li); }); }
 
-            // Engagement data (basic, from orders/users)
-            const totalOrders = ordersData.length;
-            const bounceRate = Math.max(0, 100 - (totalOrders / (filteredUsers.length * days)) * 100); // crude estimate
-            const avgSessionDuration = 300; // Placeholder, needs real session data
-            const pagesPerSession = 3; // Placeholder
-            const returnVisitorRate = 30; // Placeholder
-
-            // Product sales data
-            const productNames = productsData.map(p => p.name);
-            const salesCounts = productNames.map(name =>
-                ordersData.reduce((sum, order) => {
-                    if (!order.items) return sum;
-                    return sum + order.items.filter(item => item.name === name).reduce((s, i) => s + (i.quantity || 1), 0);
-                }, 0)
-            );
-
-            return {
-                visitors: { labels, data: visitorData },
-                engagement: {
-                    bounceRate,
-                    avgSessionDuration,
-                    pagesPerSession,
-                    returnVisitorRate
-                },
-                sales: {
-                    labels: productNames,
-                    data: salesCounts
-                },
-                summary: {
-                    totalUsers: filteredUsers.length,
-                    activeSession: 0, // Not tracked here
-                    adminUsers: users.filter(u => u.role === 'admin').length,
-                    regularUsers: users.filter(u => u.role === 'user').length,
-                    totalVisitors: visitorData.reduce((a, b) => a + b, 0),
-                    avgDailyVisitors: Math.floor(visitorData.reduce((a, b) => a + b, 0) / visitorData.length)
+                function ensureCharts(data){ if(!window.Chart) return; // create or update
+                  // Visitor chart
+                  const visitorCanvas=document.getElementById('visitor-chart'); if(visitorCanvas){ if(!visitorChart){ visitorChart=new Chart(visitorCanvas.getContext('2d'), { type:'line', data:{ labels:data.visitors.labels, datasets:[{ label:'Daily Visitors', data:data.visitors.data, borderColor:'rgb(59,130,246)', backgroundColor:'rgba(59,130,246,0.1)', tension:.4, fill:true }]}, options:{ responsive:true, maintainAspectRatio:true, aspectRatio:2, plugins:{legend:{labels:{color:'#f9fafb'}}}, scales:{ x:{ticks:{color:'#f9fafb'},grid:{color:'rgba(249,250,251,0.1)'}}, y:{ticks:{color:'#f9fafb'},grid:{color:'rgba(249,250,251,0.1)'}} } } }); } else { visitorChart.data.labels=data.visitors.labels; visitorChart.data.datasets[0].data=data.visitors.data; visitorChart.update(); } }
+                  const engagementCanvas=document.getElementById('engagement-chart'); if(engagementCanvas){ const ds=[ data.engagement.returnVisitorRate, 100-data.engagement.returnVisitorRate, data.engagement.bounceRate, 100-data.engagement.bounceRate]; if(!engagementChart){ engagementChart=new Chart(engagementCanvas.getContext('2d'), { type:'doughnut', data:{ labels:['Return','New','Bounced','Engaged'], datasets:[{ data:ds, backgroundColor:['rgb(16,185,129)','rgb(59,130,246)','rgb(239,68,68)','rgb(139,92,246)'] }]}, options:{ plugins:{legend:{labels:{color:'#f9fafb'}}} } }); } else { engagementChart.data.datasets[0].data=ds; engagementChart.update(); } }
+                  const salesCanvas=document.getElementById('sales-chart'); if(salesCanvas){ if(!salesChart){ salesChart=new Chart(salesCanvas.getContext('2d'), { type:'bar', data:{ labels:data.sales.labels, datasets:[{ label:'Units Sold', data:data.sales.data, backgroundColor:['rgba(239,68,68,0.8)','rgba(16,185,129,0.8)','rgba(59,130,246,0.8)','rgba(139,92,246,0.8)','rgba(245,158,11,0.8)'], borderColor:['rgb(239,68,68)','rgb(16,185,129)','rgb(59,130,246)','rgb(139,92,246)','rgb(245,158,11)'], borderWidth:1 }]}, options:{ responsive:true, plugins:{legend:{labels:{color:'#f9fafb'}}}, scales:{ x:{ticks:{color:'#f9fafb'}}, y:{ticks:{color:'#f9fafb'}} } }); } else { salesChart.data.labels=data.sales.labels; salesChart.data.datasets[0].data=data.sales.data; salesChart.update(); } }
                 }
-            };
-        }
 
-        // Process analytics data from the manager
-        function processAnalyticsData(data, filters) {
-            const visitorData = data.visitors || [];
-            const labels = visitorData.map(v => new Date(v.date).toLocaleDateString());
-            const visitors = visitorData.map(v => v.totalVisitors);
-            
-            // Calculate engagement metrics from session data
-            const sessions = data.userSessions || [];
-            const avgBounceRate = sessions.reduce((sum, s) => sum + s.bounceRate, 0) / sessions.length || 0;
-            const avgSessionDuration = sessions.reduce((sum, s) => sum + s.avgSessionDuration, 0) / sessions.length || 0;
-            const avgPagesPerSession = sessions.reduce((sum, s) => sum + s.pagesPerSession, 0) / sessions.length || 0;
-            
-            // Calculate return visitor rate
-            const totalVisitors = visitorData.reduce((sum, v) => sum + v.totalVisitors, 0);
-            const totalReturning = visitorData.reduce((sum, v) => sum + v.returningVisitors, 0);
-            const returnVisitorRate = totalVisitors > 0 ? (totalReturning / totalVisitors) * 100 : 0;
-            
-            // Process oil orders data
-            const orderData = data.oilOrders || [];
-            const productSales = {};
-            const productNames = ['Castrol GTX', 'Castrol Magnatec', 'Castrol EDGE', 'Castrol GTX Diesel', 'Castrol Actevo'];
-            
-            productNames.forEach(product => {
-                productSales[product] = orderData.reduce((sum, day) => {
-                    return sum + (day.products[product]?.orders || 0);
-                }, 0);
-            });
-            
-            return {
-                visitors: { labels, data: visitors },
-                engagement: {
-                    bounceRate: avgBounceRate * 100,
-                    avgSessionDuration: avgSessionDuration,
-                    pagesPerSession: avgPagesPerSession,
-                    returnVisitorRate: returnVisitorRate
-                },
-                sales: {
-                    labels: productNames,
-                    data: productNames.map(name => productSales[name])
-                },
-                summary: {
-                    totalUsers: JSON.parse(localStorage.getItem('siteUsers') || '[]').length,
-                    activeSession: JSON.parse(localStorage.getItem('user') || 'null') ? 1 : 0,
-                    adminUsers: JSON.parse(localStorage.getItem('siteUsers') || '[]').filter(u => u.role === 'admin').length,
-                    regularUsers: JSON.parse(localStorage.getItem('siteUsers') || '[]').filter(u => u.role === 'user').length,
-                    totalVisitors: totalVisitors,
-                    avgDailyVisitors: Math.floor(totalVisitors / visitorData.length)
+                async function updateAnalytics(){ const lastText=document.getElementById('analytics-last-updated-text'); try { const data = await generateAnalyticsData(currentFilters); if(lastText) lastText.textContent='Last updated: '+ new Date().toLocaleTimeString(); ensureCharts(data); // stats
+                    updateStatCard('visitor-stats', [ `Total Visitors (${currentFilters.dateRange}d): ${data.summary.totalVisitors}`, `Avg Daily: ${data.summary.avgDailyVisitors}`, `Active Session: ${data.summary.activeSession>0?'Yes':'No'}` ]);
+                    updateStatCard('engagement-stats', [ `Bounce Rate: ${data.engagement.bounceRate.toFixed(1)}%`, `Avg Session: ${Math.floor(data.engagement.avgSessionDuration/60)}m ${Math.floor(data.engagement.avgSessionDuration%60)}s`, `Pages/Session: ${data.engagement.pagesPerSession.toFixed(1)}`, `Return Rate: ${data.engagement.returnVisitorRate.toFixed(1)}%` ]);
+                    updateStatCard('top-pages', [ 'Analytics Dashboard','Oil Orders System','User Management','Settings Page','Admin Dashboard' ]);
+                    // insights
+                    const totalSalesUnits = data.sales.data.reduce((a,b)=>a+b,0);
+                    const conversion = data.summary.totalUsers ? (totalSalesUnits / data.summary.totalUsers)*100 : 0;
+                    document.getElementById('insight-conversion').textContent = conversion.toFixed(1)+'% '+trendArrow(conversion);
+                    document.getElementById('insight-retention').textContent = data.engagement.returnVisitorRate.toFixed(1)+'% '+trendArrow(data.engagement.returnVisitorRate);
+                    if(data.sales.data.length){ const idx=data.sales.data.indexOf(Math.max(...data.sales.data)); document.getElementById('insight-top-product').textContent=data.sales.labels[idx]||'--'; }
+                    // top user by orders
+                    try { const orders = await (await fetch('/api/orders')).json(); const usersRes = await (await fetch('/api/users')).json(); const usersArr = usersRes.users||[]; const userOrderCounts={}; (orders||[]).forEach(o=>{ if(o.created_by) userOrderCounts[o.created_by]=(userOrderCounts[o.created_by]||0)+1; }); let topUser='--', max=0; Object.entries(userOrderCounts).forEach(([u,c])=>{ if(c>max){ max=c; topUser=u; } }); document.getElementById('insight-top-user').textContent=topUser; } catch(e){ document.getElementById('insight-top-user').textContent='--'; }
+                    // user breakdown & growth
+                    buildUserBreakdown();
+                  } catch(e){ if(lastText) lastText.textContent='Last updated: error'; }
                 }
-            };
-        }
 
-        // Initialize charts
-        function initializeCharts() {
-            const analytics = window.analyticsManager ? window.analyticsManager.getData(currentFilters) : null;
-            const data = analytics ? analytics.data : generateAnalyticsData(currentFilters);
-            const insights = analytics ? analytics.insights : {};
-            // Browser Breakdown Chart (Doughnut)
-            const browserCanvas = document.getElementById('browser-chart');
-            if (browserCanvas && insights.browserBreakdown) {
-                const browserCtx = browserCanvas.getContext('2d');
-                browserChart = new Chart(browserCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: insights.browserBreakdown.browserLabels,
-                        datasets: [{
-                            data: insights.browserBreakdown.browsers,
-                            backgroundColor: [
-                                'rgba(59, 130, 246, 0.8)',
-                                'rgba(16, 185, 129, 0.8)',
-                                'rgba(245, 158, 11, 0.8)',
-                                'rgba(139, 92, 246, 0.8)'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#1f2937' }
-                            }
-                        }
-                    }
-                });
-            }
+                async function buildUserBreakdown(){ let users=[]; let orders=[]; try{ const u=await fetch('/api/users'); users=(await u.json()).users||[]; }catch(e){} try{ const o=await fetch('/api/orders'); orders=await o.json(); }catch(e){} const list=document.getElementById('user-breakdown-list'); if(list){ const total=users.length; const admins=users.filter(u=>u.role==='admin').length; const regular=users.filter(u=>u.role==='user').length; const locked=users.filter(u=>u.locked).length; const now=new Date(); const newUsers=users.filter(u=>u.created_at && (now-new Date(u.created_at))<7*24*60*60*1000).length; const returning=users.filter(u=> orders.filter(o=>o.created_by===u.username).length>1).length; list.innerHTML = `<li>Total: <strong>${total}</strong></li><li>Admins: <strong>${admins}</strong></li><li>Regular: <strong>${regular}</strong></li><li>Locked: <strong>${locked}</strong></li><li>New (7d): <strong>${newUsers}</strong></li><li>Returning: <strong>${returning}</strong></li>`; }
+                  // growth sparkline
+                  const growthCanvas=document.getElementById('user-growth-sparkline'); if(growthCanvas && window.Chart){ const arr=Array(30).fill(0); const now=new Date(); users.forEach(u=>{ if(u.created_at){ const daysAgo=Math.floor((now-new Date(u.created_at))/(24*60*60*1000)); if(daysAgo>=0 && daysAgo<30) arr[29-daysAgo]++; }}); if(userGrowthSparkline) userGrowthSparkline.destroy(); userGrowthSparkline=new Chart(growthCanvas.getContext('2d'), { type:'line', data:{ labels:Array.from({length:30},(_,i)=>i+1), datasets:[{ data:arr, borderColor:'rgb(59,130,246)', backgroundColor:'rgba(59,130,246,0.1)', tension:.4, fill:true, pointRadius:0, borderWidth:2 }]}, options:{ responsive:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} } }); }
+                  // top users
+                  const topList=document.getElementById('top-users-list'); if(topList){ const userOrderCounts={}; orders.forEach(o=>{ if(o.created_by) userOrderCounts[o.created_by]=(userOrderCounts[o.created_by]||0)+1; }); const top=Object.entries(userOrderCounts).sort((a,b)=>b[1]-a[1]).slice(0,5); topList.innerHTML = top.length? top.map(([u,c])=> `<li class='flex items-center'><span class='inline-block w-2 h-2 rounded-full bg-blue-400 mr-2'></span><strong>${u}</strong><span class='ml-2 text-xs text-gray-400'>${c} orders</span></li>`).join('') : '<li>N/A</li>'; }
+                }
 
-            // Multi-Metric Stacked Bar Chart
-            const multiMetricCanvas = document.getElementById('multi-metric-chart');
-            if (multiMetricCanvas && insights.multiMetric) {
-                const mmCtx = multiMetricCanvas.getContext('2d');
-                multiMetricChart = new Chart(mmCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: insights.multiMetric.labels,
-                        datasets: [
-                            {
-                                label: 'Visitors',
-                                data: insights.multiMetric.visitors,
-                                backgroundColor: 'rgba(59, 130, 246, 0.7)'
-                            },
-                            {
-                                label: 'Orders',
-                                data: insights.multiMetric.orders,
-                                backgroundColor: 'rgba(16, 185, 129, 0.7)'
-                            },
-                            {
-                                label: 'Sessions',
-                                data: insights.multiMetric.sessions,
-                                backgroundColor: 'rgba(245, 158, 11, 0.7)'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#1f2937' }
-                            }
-                        },
-                        scales: {
-                            x: { stacked: true, ticks: { color: '#1f2937' }, grid: { color: 'rgba(31,41,55,0.1)' } },
-                            y: { stacked: true, ticks: { color: '#1f2937' }, grid: { color: 'rgba(31,41,55,0.1)' } }
-                        }
-                    }
+                async function updateRealtimeStats(){ let apiHealthy=false, dbHealthy=false, serverHealthy=true; try{ apiHealthy=(await fetch('/api/users')).ok; }catch(e){} try{ dbHealthy=(await fetch('/api/orders')).ok; }catch(e){} // serverHealthy assumed true
+                  function setStatus(id, healthy){ const el=document.getElementById(id); if(!el) return; const dot=el.querySelector('span'); const text=el.querySelector('span.ml-1'); if(dot){ dot.classList.remove('bg-gray-500','bg-green-500','bg-red-500'); dot.classList.add(healthy?'bg-green-500':'bg-red-500'); } if(text) text.textContent = healthy?'Online':'Offline'; }
+                  setStatus('status-api', apiHealthy); setStatus('status-db', dbHealthy); setStatus('status-server', serverHealthy);
+                  // realtime placeholders
+                  document.getElementById('active-users').textContent = Math.floor(Math.random()*5)+1;
+                  document.getElementById('current-page-views').textContent = Math.floor(Math.random()*50)+10;
+                  document.getElementById('server-status').textContent = serverHealthy? 'Online':'Offline';
+                  try { const usersRes=await fetch('/api/users'); const users=(await usersRes.json()).users||[]; document.getElementById('total-users').textContent=users.length; } catch(e){ document.getElementById('total-users').textContent='--'; }
+                }
+
+                function exportCSV(){ (async()=>{ const data=await generateAnalyticsData(currentFilters); let csv='Date,Visitors\n'; data.visitors.labels.forEach((l,i)=> csv+=`${l},${data.visitors.data[i]}\n`); csv+='\nSummary\n'; csv+=`Total Visitors (${currentFilters.dateRange}d),${data.summary.totalVisitors}\nAverage Daily Visitors,${data.summary.avgDailyVisitors}\nBounce Rate,${data.engagement.bounceRate.toFixed(1)}%\nReturn Rate,${data.engagement.returnVisitorRate.toFixed(1)}%\n`; csv+='\nProduct Sales\n'; data.sales.labels.forEach((p,i)=> csv+=`${p},${data.sales.data[i]}\n`); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`analytics-report-${new Date().toISOString().split('T')[0]}.csv`; document.body.appendChild(a); a.click(); a.remove(); showToast('CSV exported'); })(); }
+                function exportPDF(){ if(!window.jspdf||!window.jspdf.jsPDF){ showToast('PDF unavailable; exporting CSV'); return exportCSV(); } (async()=>{ const { jsPDF }=window.jspdf; const doc=new jsPDF(); const data=await generateAnalyticsData(currentFilters); doc.setFontSize(18); doc.text('Analytics Report',20,20); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`,20,28); let y=40; const lines=[`Range: ${currentFilters.dateRange}d`,`Total Visitors: ${data.summary.totalVisitors}`,`Avg Daily: ${data.summary.avgDailyVisitors}`,`Bounce: ${data.engagement.bounceRate.toFixed(1)}%`,`Return: ${data.engagement.returnVisitorRate.toFixed(1)}%`]; lines.forEach(l=>{ doc.text(l,20,y); y+=6; }); y+=4; doc.text('Product Sales:',20,y); y+=6; data.sales.labels.forEach((p,i)=>{ if(y>270){ doc.addPage(); y=20;} doc.text(`${p}: ${data.sales.data[i]}`,26,y); y+=6; }); doc.save(`analytics-report-${new Date().toISOString().split('T')[0]}.pdf`); showToast('PDF exported'); })(); }
+                function exportPNG(){ if(!window.Chart){ showToast('Charts not loaded; CSV fallback'); return exportCSV(); } const charts=[['visitor-chart','visitor-trends'],['engagement-chart','engagement'],['sales-chart','sales']]; let count=0; charts.forEach(([id,name])=>{ const canvas=document.getElementById(id); if(canvas){ const chart=Chart.getChart(canvas); if(chart){ const url=chart.toBase64Image(); const a=document.createElement('a'); a.href=url; a.download=`analytics-${name}-${new Date().toISOString().split('T')[0]}.png`; document.body.appendChild(a); a.click(); a.remove(); count++; } } }); showToast(count? `${count} PNG exported`:'No charts to export'); }
+
+                function startAutoRefresh(){ if(autoRefreshTimer) clearInterval(autoRefreshTimer); autoRefreshTimer=setInterval(()=>{ updateAnalytics(); updateRealtimeStats(); }, REFRESH_INTERVAL); }
+
+                function setupFilters(){ const dateRange=document.getElementById('date-range'); if(dateRange){ dateRange.addEventListener('change',e=>{ currentFilters.dateRange=parseInt(e.target.value); highlightDateChip(); updateAnalytics(); }); } document.querySelectorAll('.date-chip').forEach(chip=>{ chip.addEventListener('click',()=>{ currentFilters.dateRange=parseInt(chip.dataset.range); if(dateRange) dateRange.value=currentFilters.dateRange; highlightDateChip(); updateAnalytics(); }); }); function highlightDateChip(){ document.querySelectorAll('.date-chip').forEach(chip=>{ const r=parseInt(chip.dataset.range); chip.classList.toggle('bg-primary', r===currentFilters.dateRange); chip.classList.toggle('text-white', r===currentFilters.dateRange); }); } highlightDateChip(); const userType=document.getElementById('user-type'); if(userType){ userType.addEventListener('change',e=>{ currentFilters.userType=e.target.value; updateAnalytics(); }); } const topPagesSearch=document.getElementById('top-pages-search'); if(topPagesSearch){ topPagesSearch.addEventListener('input',()=>{ updateStatCard('top-pages',[ 'Analytics Dashboard','Oil Orders System','User Management','Settings Page','Admin Dashboard' ].filter(i=> i.toLowerCase().includes(topPagesSearch.value.toLowerCase()))); }); }
+                  document.getElementById('export-csv')?.addEventListener('click', exportCSV);
+                  document.getElementById('export-pdf')?.addEventListener('click', exportPDF);
+                  document.getElementById('export-png')?.addEventListener('click', exportPNG);
+                  document.getElementById('analytics-refresh-btn')?.addEventListener('click', ()=>{ updateAnalytics(); updateRealtimeStats(); showToast('Analytics refreshed'); });
+                  document.getElementById('export-user-analytics')?.addEventListener('click', exportUserAnalyticsCSV);
+                  document.getElementById('user-role-filter')?.addEventListener('change', buildUserBreakdown);
+                  document.getElementById('user-date-filter')?.addEventListener('change', buildUserBreakdown);
+                }
+
+                function exportUserAnalyticsCSV(){ (async()=>{ let users=[]; let orders=[]; try{ users=(await (await fetch('/api/users')).json()).users||[]; }catch(e){} try{ orders=await (await fetch('/api/orders')).json(); }catch(e){} const role=document.getElementById('user-role-filter')?.value||'all'; const since=document.getElementById('user-date-filter')?.value; let filtered=[...users]; if(role==='admin') filtered=filtered.filter(u=>u.role==='admin'); else if(role==='user') filtered=filtered.filter(u=>u.role==='user'); else if(role==='locked') filtered=filtered.filter(u=>u.locked); if(since) filtered=filtered.filter(u=>u.created_at && u.created_at>=since); let csv='Username,Role,Locked,Created At,Orders\n'; filtered.forEach(u=>{ const count=orders.filter(o=>o.created_by===u.username).length; csv+=`${u.username},${u.role},${u.locked?'Yes':'No'},${u.created_at||''},${count}\n`; }); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`user-analytics-${new Date().toISOString().split('T')[0]}.csv`; document.body.appendChild(a); a.click(); a.remove(); showToast('User analytics CSV exported'); })(); }
+
+                document.addEventListener('DOMContentLoaded', ()=>{ loadAndApplySettings(); setupFilters(); updateAnalytics(); updateRealtimeStats(); startAutoRefresh(); setInterval(updateRealtimeStats, 30000); });
+              </script>
+            </body>
+            </html>
                 });
             }
 
@@ -785,173 +348,6 @@
                         },
                         options: {
                             responsive: false,
-                            plugins: { legend: { display: false } },
-                            scales: { x: { display: false }, y: { display: false } }
-                        }
-                    });
-                }
-                if (sparkOrders) {
-                    sparklineOrders = new Chart(sparkOrders.getContext('2d'), {
-                        type: 'line',
-                        data: {
-                            labels: insights.sparklines.orders.map((_, i) => i + 1),
-                            datasets: [{
-                                data: insights.sparklines.orders,
-                                borderColor: 'rgb(16, 185, 129)',
-                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                tension: 0.4,
-                                fill: true,
-                                pointRadius: 0,
-                                borderWidth: 2
-                            }]
-                        },
-                        options: {
-                            responsive: false,
-                            plugins: { legend: { display: false } },
-                            scales: { x: { display: false }, y: { display: false } }
-                        }
-                    });
-                }
-                if (sparkSessions) {
-                    sparklineSessions = new Chart(sparkSessions.getContext('2d'), {
-                        type: 'line',
-                        data: {
-                            labels: insights.sparklines.sessions.map((_, i) => i + 1),
-                            datasets: [{
-                                data: insights.sparklines.sessions,
-                                borderColor: 'rgb(245, 158, 11)',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                tension: 0.4,
-                                fill: true,
-                                pointRadius: 0,
-                                borderWidth: 2
-                            }]
-                        },
-                        options: {
-                            responsive: false,
-                            plugins: { legend: { display: false } },
-                            scales: { x: { display: false }, y: { display: false } }
-                        }
-                    });
-                }
-            }
-
-            // Check if Chart.js is available
-            if (!window.Chart) {
-                // Fallback: Replace canvas elements with text summaries
-                const visitorCanvas = document.getElementById('visitor-chart');
-                const engagementCanvas = document.getElementById('engagement-chart');
-                const salesCanvas = document.getElementById('sales-chart');
-                const funnelCanvas = document.getElementById('funnel-chart');
-                const deviceCanvas = document.getElementById('device-chart');
-
-                if (visitorCanvas) {
-                    visitorCanvas.parentElement.innerHTML = `
-                        <h3 class="font-semibold mb-4">Visitor Trends</h3>
-                        <div class="text-gray-300 space-y-2">
-                            <p><strong>Chart unavailable (CDN blocked)</strong></p>
-                            <p>Total Visitors: ${data.summary.totalVisitors}</p>
-                            <p>Average Daily: ${data.summary.avgDailyVisitors}</p>
-                            <p>Peak Day: ${Math.max(...data.visitors.data)} visitors</p>
-                        </div>
-                    `;
-                }
-                if (engagementCanvas) {
-                    engagementCanvas.parentElement.innerHTML = `
-                        <h3 class="font-semibold mb-4">User Engagement</h3>
-                        <div class="text-gray-300 space-y-2">
-                            <p><strong>Chart unavailable (CDN blocked)</strong></p>
-                            <p>Bounce Rate: ${data.engagement.bounceRate.toFixed(1)}%</p>
-                            <p>Return Rate: ${data.engagement.returnVisitorRate.toFixed(1)}%</p>
-                            <p>Avg Session: ${Math.floor(data.engagement.avgSessionDuration / 60)}m</p>
-                        </div>
-                    `;
-                }
-                if (salesCanvas) {
-                    salesCanvas.parentElement.innerHTML = `
-                        <h3 class="font-semibold mb-4">Product Sales Analytics</h3>
-                        <div class="text-gray-300 space-y-2">
-                            <p><strong>Chart unavailable (CDN blocked)</strong></p>
-                            ${data.sales.labels.map((product, i) => 
-                                `<p>${product}: ${data.sales.data[i]} units</p>`
-                            ).join('')}
-                        </div>
-                    `;
-                }
-                if (funnelCanvas) {
-                    funnelCanvas.parentElement.innerHTML = `<div class='text-gray-300'>Funnel: Visit → Signup → Order<br>Chart unavailable</div>`;
-                }
-                if (deviceCanvas) {
-                    deviceCanvas.parentElement.innerHTML = `<div class='text-gray-300'>Device/Browser breakdown unavailable</div>`;
-                }
-                return;
-            }
-
-            // Visitor Trends Chart
-            const visitorCtx = document.getElementById('visitor-chart').getContext('2d');
-            visitorChart = new Chart(visitorCtx, {
-                type: 'line',
-                data: {
-                    labels: data.visitors.labels,
-                    datasets: [{
-                        label: 'Daily Visitors',
-                        data: data.visitors.data,
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 2,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#f9fafb' }
-                        }
-                    },
-                    scales: {
-                        x: { 
-                            ticks: { color: '#f9fafb' },
-                            grid: { color: 'rgba(249, 250, 251, 0.1)' }
-                        },
-                        y: { 
-                            ticks: { color: '#f9fafb' },
-                            grid: { color: 'rgba(249, 250, 251, 0.1)' }
-                        }
-                    }
-                }
-            });
-
-            // User Engagement Chart (Doughnut)
-            const engagementCtx = document.getElementById('engagement-chart').getContext('2d');
-            engagementChart = new Chart(engagementCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Return Visitors', 'New Visitors', 'Bounced Sessions', 'Engaged Sessions'],
-                    datasets: [{
-                        data: [
-                            data.engagement.returnVisitorRate,
-                            100 - data.engagement.returnVisitorRate,
-                            data.engagement.bounceRate,
-                            100 - data.engagement.bounceRate
-                        ],
-                        backgroundColor: [
-                            'rgb(16, 185, 129)',
-                            'rgb(59, 130, 246)', 
-                            'rgb(239, 68, 68)',
-                            'rgb(139, 92, 246)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 2,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#f9fafb' }
                         }
                     }
                 }
