@@ -205,7 +205,6 @@
               <button class="tab-btn px-4 py-2 bg-primary text-white rounded-tl" data-tab="general" aria-controls="general-tab">General</button>
               <button class="tab-btn px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" data-tab="theme" aria-controls="theme-tab">Theme</button>
                 <button class="tab-btn px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" data-tab="security" aria-controls="security-tab">Security</button>
-                <button class="tab-btn px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" data-tab="audit" aria-controls="audit-tab">Audit</button>
             </div>
           </nav>
 
@@ -401,29 +400,6 @@
             </div>
           </div>
 
-          <!-- Audit Log Panel -->
-          <div id="audit-tab" class="tab-panel widget-primary rounded-lg border border-gray-200 dark:border-gray-700 p-6 hidden">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="font-semibold text-lg">Audit Log</h3>
-              <div class="flex gap-2">
-                <button id="export-audit-log" class="btn-neon-blue px-3 py-1 rounded text-sm font-semibold">Export</button>
-                <button id="clear-audit-log" class="btn-neon-pink px-3 py-1 rounded text-sm font-semibold">Clear</button>
-              </div>
-            </div>
-            <div class="mb-3 flex gap-3">
-              <select id="audit-filter" class="p-3 rounded bg-gray-100 dark:bg-gray-700">
-                <option value="">All Actions</option>
-                <option value="page_access">Page Access</option>
-                <option value="settings_change">Settings Change</option>
-                <option value="theme_change">Theme Change</option>
-                <option value="security_change">Security Change</option>
-              </select>
-              <input id="audit-date-filter" type="date" class="p-3 rounded bg-gray-100 dark:bg-gray-700" title="Filter by date" aria-label="Filter by date" />
-            </div>
-            <div id="audit-log-list" class="space-y-2 border border-gray-200 dark:border-gray-700 rounded">
-              <div class="p-4 text-gray-500 dark:text-gray-400 text-center">No audit log entries found</div>
-            </div>
-          </div>
         </section>
     </main>
     <script src="admin-audit-logger.js"></script>

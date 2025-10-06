@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Audit Logs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <!-- Load shared config and theme system -->
+  <script>
+    fetch('shared-config.html').then(r => r.text()).then(html => {
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      Array.from(temp.children).forEach(child => {
+        if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
+          document.head.appendChild(child.cloneNode(true));
+        }
+      });
+    });
+    fetch('shared-theme.html').then(r => r.text()).then(html => {
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      Array.from(temp.children).forEach(child => {
+        if (child.tagName === 'SCRIPT') {
+          document.head.appendChild(child.cloneNode(true));
+        }
+      });
+    });
+  </script>
+  <script>
+    // Apply theme/colors instantly
+    (function() {
+      try {
+        const s = JSON.parse(localStorage.getItem('siteSettings')||'{}');
+        document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
+        document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
+        document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
+        const theme = s.theme || localStorage.getItem('theme') || 'dark';
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.classList.toggle('light', theme === 'light');
+      } catch(e) {}
+    })();
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      });
+    }
+  </script>
+</head>
+<body class="dark">
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+  <!-- Shared Navigation Loader -->
+  <div id="main-nav"></div>
+  <script>
+    fetch('shared-nav.html').then(r => r.text()).then(html => {
+      document.getElementById('main-nav').innerHTML = html;
+    });
+  </script>
+  <main class="flex-1 p-4 md:p-6">
+    <header class="sticky top-0 z-10 widget-primary border border-gray-200 dark:border-gray-700 rounded p-4 mb-4">
+      <h2 class="text-2xl font-bold">Audit Log</h2>
+      <p class="text-gray-600 dark:text-gray-300">Review all administrative actions and changes</p>
+    </header>
+    <section class="space-y-8">
+      <div class="widget-primary rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-semibold text-lg">Audit Log</h3>
+          <div class="flex gap-2">
+            <button id="export-audit-log" class="btn-neon-blue px-3 py-1 rounded text-sm font-semibold">Export</button>
+            <button id="clear-audit-log" class="btn-neon-pink px-3 py-1 rounded text-sm font-semibold">Clear</button>
+          </div>
+        </div>
+        <div class="mb-3 flex gap-3">
+          <select id="audit-filter" class="p-3 rounded bg-gray-100 dark:bg-gray-700">
+            <option value="">All Actions</option>
+            <option value="page_access">Page Access</option>
+            <option value="settings_change">Settings Change</option>
+            <option value="theme_change">Theme Change</option>
+            <option value="security_change">Security Change</option>
+          </select>
+          <input id="audit-date-filter" type="date" class="p-3 rounded bg-gray-100 dark:bg-gray-700" title="Filter by date" aria-label="Filter by date" />
+        </div>
+        <div id="audit-log-list" class="space-y-2 border border-gray-200 dark:border-gray-700 rounded">
+          <div class="p-4 text-gray-500 dark:text-gray-400 text-center">No audit log entries found</div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="admin-audit-logger.js"></script>
+  <script>
+    // Audit log functionality (copied from settings.html)
+    function initAuditLog() {
+      function renderAuditLog() {
+        const filter = document.getElementById('audit-filter').value;
+        const dateFilter = document.getElementById('audit-date-filter').value;
+        const logs = AuditLogger.getLogs(filter, dateFilter);
+        const container = document.getElementById('audit-log-list');
+        if (logs.length === 0) {
+          container.innerHTML = '<div class="p-4 text-gray-500 dark:text-gray-400 text-center">No audit log entries found</div>';
+          return;
+        }
+        container.innerHTML = logs.map(log => `
+          <div class="p-4 flex justify-between items-start">
+            <div>
+              <div class="font-semibold">${log.action}</div>
+              <div class="text-xs text-gray-400">${log.timestamp || ''}</div>
+              <div class="text-sm mt-1">${log.details || ''}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+      document.getElementById('audit-filter').addEventListener('change', renderAuditLog);
+      document.getElementById('audit-date-filter').addEventListener('change', renderAuditLog);
+      document.getElementById('export-audit-log').addEventListener('click', () => {
+        const logs = AuditLogger.getLogs();
+        const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'audit-log.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        AuditLogger.log('audit_export', 'Exported audit log');
+      });
+      document.getElementById('clear-audit-log').addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear the audit log? This cannot be undone.')) {
+          AuditLogger.clearLogs();
+          renderAuditLog();
+        }
+      });
+      window.addEventListener('auditLogUpdated', renderAuditLog);
+      window.addEventListener('auditLogCleared', renderAuditLog);
+      renderAuditLog();
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof AuditLogger === 'undefined') {
+        window.AuditLogger = {
+          log: function(action, details) { console.log('[Audit]', action, details); },
+          getLogs: function() { return []; },
+          clearLogs: function() { console.log('[Audit] Logs cleared'); }
+        };
+      }
+      initAuditLog();
+    });
+  </script>
+</body>
+</html>
