@@ -1,53 +1,117 @@
-# Deployment Guide
+# Deployment Guide (Serverless Architecture)
 
-This application now includes both a static frontend and a Node.js backend with authentication. Here are the deployment options:
+The application now runs entirely as a static frontend plus Netlify Functions (no standalone Node/Express server). All dynamic features (auth, users, orders, products, audit logs, inventory, consumables) are provided by serverless endpoints.
 
-## Option 1: Combined Server Deployment (Recommended)
+## Primary Deployment: Netlify
 
-Deploy the entire application as a Node.js app that serves both the API and static files.
+Netlify builds & serves:
+- Static assets (HTML/CSS/JS)
+- Functions (in `netlify/functions/*`)
 
-### Render.com (Recommended)
-1. Connect your GitHub repository to Render
-2. Create a new Web Service
-3. Configure:
-   - Build Command: `npm install`
-   - Start Command: `npm start`
-   - Environment Variables:
-     ```
-     NODE_ENV=production
-     JWT_SECRET=your-super-secure-jwt-secret-change-this
-     JWT_EXPIRES_IN=7d
-     JWT_REFRESH_EXPIRES_IN=30d
-     FRONTEND_URL=https://joshburt-com-au.onrender.com
-     PRODUCTION_URL=https://joshburt.com.au
-     BCRYPT_ROUNDS=12
-     ```
+### Steps
+1. Connect repository to Netlify
+2. Build command: (none required unless you want to run Tailwind build) `npm run build`
+3. Publish directory: root (`/`)
+4. Add environment variables (see below)
+5. (Optional) Enable automatic deploy previews
 
-### Heroku
-1. Create new Heroku app: `heroku create your-app-name`
-2. Set environment variables:
-   ```bash
-   heroku config:set NODE_ENV=production
-   heroku config:set JWT_SECRET=your-super-secure-jwt-secret
-   # ... add other environment variables
-   ```
-3. Deploy: `git push heroku main`
+### Local Development (Optional)
+```bash
+netlify dev
+```
+Serves static site and functions at http://localhost:8888
 
-### Railway
-1. Connect GitHub repository
-2. Deploy automatically with environment variables set
+## Secondary Deployment (Static Mirrors)
+- FTP deployment (GitHub Action) maintains a static mirror at production host
+- GitHub Pages provides a static fallback (dynamic API calls will fail there)
 
-## Option 2: Separate Frontend/Backend Deployment
+## Serverless Endpoints
+```
+/.netlify/functions/auth?action=register|login|refresh|logout|forgot-password|reset-password|me
+/.netlify/functions/users
+/.netlify/functions/users/{id}
+/.netlify/functions/users/stats/overview
+/.netlify/functions/orders
+/.netlify/functions/products
+/.netlify/functions/audit-logs
+/.netlify/functions/inventory
+/.netlify/functions/consumables
+/.netlify/functions/consumable-categories
+```
 
-### Frontend (Static Files)
-Keep existing FTP deployment for static files:
-- GitHub Actions already configured in `.github/workflows/main.yml`
-- Deploys to joshburt.com.au via FTP
+## Environment Variables (Netlify)
+Required:
+```
+JWT_SECRET=your-super-secure-jwt-secret
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_EXPIRES_IN=30d
+BCRYPT_ROUNDS=12
+DB_TYPE=sqlite   # or mysql | postgres
+DB_PATH=./database.sqlite  # if sqlite
+# If MySQL / Postgres set: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+```
+Optional:
+```
+SMTP_HOST=...
+SMTP_PORT=...
+SMTP_USER=...
+SMTP_PASS=...
+FROM_EMAIL=...
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
+```
 
-### Backend (API Server)
-Deploy Node.js backend separately on:
-- Render.com, Heroku, Railway, or VPS
-- Update `API_BASE` in frontend JavaScript files to point to backend URL
+## Database
+SQLite default (bundled `database.sqlite`). For remote DB (MySQL/PostgreSQL) supply credentials via env vars. The unified `config/database.js` selects driver based on `DB_TYPE`.
+
+### Migrations / Schema
+Check `DATABASE.md` / `database-schema.sql`. On first run, functions lazily initialize tables if missing (ensure proper permissions).
+
+## Security
+1. Strong `JWT_SECRET`
+2. Rotate tokens by pruning `refresh_tokens` table periodically
+3. Enforce HTTPS (Netlify auto) & set HSTS via Netlify headers if desired
+4. Limit origin access with Netlify site domain (optional future enhancement)
+5. Audit logs available via `/.netlify/functions/audit-logs`
+
+## Performance
+Caching handled mostly client-side + service worker.
+Tips:
+- Pre-build Tailwind: `npm run build:css`
+- Keep functions lean (shared DB module is reused)
+
+## Monitoring & Logs
+Use Netlify function logs for runtime errors. Add external monitoring (StatusCake, UptimeRobot) to root + critical endpoints.
+
+## Default Test Credentials (Change in Production)
+```
+admin@joshburt.com.au / admin123!
+test@example.com / password
+manager@example.com / manager123
+```
+
+## Migration From Legacy Express
+1. Remove `server.js`, `api/`, `middleware/` (already done)
+2. Replace any `/api/...` calls with `/.netlify/functions/...`
+3. Update docs (completed in this file & README)
+4. Validate auth flows via `auth?action=login` etc.
+
+## Manual Verification Checklist
+- [ ] Static pages load (index, analytics, users, oil, settings)
+- [ ] Auth register/login/me flows succeed against serverless function
+- [ ] Users list fetches from `/.netlify/functions/users`
+- [ ] Orders & products endpoints respond
+- [ ] Analytics dashboard renders charts (Chart.js loaded)
+- [ ] Service worker installs & caches static assets
+- [ ] No console errors referencing removed `/api/` paths
+
+## Rollback Strategy
+If needed, reintroduce Express by restoring removed files from git history and pointing fetch calls back to `/api/`. Not recommended unless adding WebSockets or long-lived streaming features.
+
+---
+All dynamic capability now relies on Netlify Functions; ensure environment variables are configured before first deploy.
 
 ## Environment Variables
 

@@ -2,6 +2,7 @@
 // profile.js: User profile view/edit and activity log
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const FN_BASE = '/.netlify/functions';
   const token = localStorage.getItem('authToken');
   if (!token) {
     window.location.href = 'login.html';
@@ -18,7 +19,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Fetch current user info (to check admin)
   let currentUser = null;
   try {
-    const res = await fetch('/api/users/me', {
+    // Serverless auth "me" action
+    const res = await fetch(`${FN_BASE}/auth?action=me`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Failed to load current user');
@@ -34,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (profileUserId && currentUser.role === 'admin') {
     // Admin viewing another user
     try {
-      const res = await fetch(`/api/users/${profileUserId}`, {
+      const res = await fetch(`${FN_BASE}/users/${profileUserId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to load user profile');
@@ -76,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const body = { name };
       if (password) body.password = password;
-      const res = await fetch(`/api/users/${user.id}`, {
+      const res = await fetch(`${FN_BASE}/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Fetch activity log (admin or self)
   try {
-    const res = await fetch(`/api/audit-logs?userId=${user.id}`, {
+    const res = await fetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (res.ok) {

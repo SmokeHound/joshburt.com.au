@@ -20,7 +20,7 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 - **CI/CD Pipeline**: Automated testing, linting, and deployment
 - **Admin Dashboard**: User management, analytics, and site settings (fully database-driven)
 - **Oil Ordering System**: Dynamic Castrol product ordering (API-driven, CSV export)
-- **API Backend**: Netlify Functions and Express endpoints (Node.js) with MySQL, PostgreSQL, or SQLite support
+- **API Backend**: Serverless-only (Netlify Functions) with MySQL / PostgreSQL / SQLite abstraction
 - **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
 
 ## ⚙️ Site Settings (Database-Backed)
@@ -32,36 +32,69 @@ All site settings are now stored in the database and managed via the admin dashb
 - **Branding & Contact**
 	- `siteTitle`, `siteDescription`, `logoUrl`, `faviconUrl`, `contactEmail`, `supportPhone`, `supportAddress`
 - **Theme**
-	- `theme`, `primaryColor`, `secondaryColor`, `accentColor`, `themeSchedule`
+This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The backend has been fully migrated to Netlify Functions (serverless) – legacy Express server code has been removed.
 - **Feature Toggles**
 	- `maintenanceMode`, `enableRegistration`, `enableGuestCheckout`, `enableNewsletter`
-- **Integrations**
+- **API Backend**: Netlify Functions (serverless) with MySQL / PostgreSQL / SQLite abstraction
 	- `googleAnalyticsId`, `facebookPixelId`, `smtpHost`, `smtpPort`, `smtpUser`, `smtpPassword`
 - **Custom Code**
-	- `customCss`, `customJs`
-- **Feature Flags**
-	- `featureFlags.betaFeatures`, `featureFlags.newDashboard`, `featureFlags.advancedReports`
-- **Security**
+### Component / Serverless Structure
+- **`shared-nav.html`**: Navigation sidebar with menu toggle, user profile, and navigation links
+- **`shared-theme.html`**: Theme handling (user settings + CSS variables)
+- **`shared-config.html`**: TailwindCSS configuration and common styles
+- **`netlify/functions/*`**: Serverless backend for products, orders, users, authentication, audit logs, inventory, consumables
 	- `sessionTimeout`, `maxLoginAttempts`, `enable2FA`, `auditAllActions`
 
+**Theming**: Centralized theme & color settings stored in database (no per-page toggles)
 All settings are editable in the admin dashboard and changes are persisted instantly. See `settings.html` for the full UI and field list.
 ## 🏗️ Architecture
 
-### Component Structure
-- **`shared-nav.html`**: Navigation sidebar with menu toggle, user profile, and navigation links
-- **`shared-theme.html`**: Theme toggle functionality with localStorage persistence
+# Start static development server (serves HTML/CSS/JS only)
+python3 -m http.server 8000
+
+# Netlify Functions local dev (optional, if using Netlify CLI)
+# npm install -g netlify-cli
+# netlify dev
+
+# Visit http://localhost:8888 (Netlify Dev) OR http://localhost:8000 (static only)
 - **`shared-config.html`**: TailwindCSS configuration and common styles
 - **`API/Netlify Functions`**: Dynamic backend for products, orders, users, and authentication
+### Automated Deployment
+- **Netlify**: Deploys static assets + functions (primary runtime)
+- **FTP Deployment**: Still available for static mirror (optional)
+- **GitHub Pages**: Secondary static mirror (no dynamic features)
 
-### Pages
-- **`administration.html`**: Dashboard with management links and user overview
-- **`oil.html`**: Castrol product ordering system (API-driven, CSV export)
+Serverless endpoints are accessible at:
+
+```
+/.netlify/functions/auth
+/.netlify/functions/users
+/.netlify/functions/orders
+/.netlify/functions/products
+/.netlify/functions/audit-logs
+/.netlify/functions/inventory
+/.netlify/functions/consumables
+/.netlify/functions/consumable-categories
+```
+
+Auth actions use a query/body `action` parameter, e.g. `/.netlify/functions/auth?action=login`.
 - **`consumables.html`**: Consumables order request page (for workshop staff)
 - **`consumables-mgmt.html`**: Consumables product list management (admin/staff CRUD)
-- **`login.html`**: Authentication page
+- Secure serverless endpoints (JWT auth, audit logging)
 
 ## 🚀 Quick Start
+- Dynamic features require serverless environment (Netlify Functions). Static mirrors (GitHub Pages) will show UI but API calls fail.
 
+## 🧭 Migration Notes
+
+The project previously supported a dual backend (Express + Netlify Functions). All Express code (`server.js`, `api/`, `middleware/`) has been removed in favor of a pure serverless model. If you have an older fork:
+
+1. Remove legacy Express files
+2. Update any remaining `/api/...` fetch calls to `/.netlify/functions/...`
+3. Ensure `JWT_SECRET` is set in Netlify env vars
+4. Re-run Tailwind build if customizing styles: `npm run build:css`
+
+If you need a traditional server again, reintroduce an Express layer only as a thin proxy or for WebSocket needs.
 ### Development Setup
 ```bash
 # Clone the repository
@@ -219,6 +252,63 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 - All styling handled by TailwindCSS utilities
 - Shared components require updates across all pages
 - Test coverage ensures stability during changes
+
+### Token & Session Hygiene
+Refresh (persistent) authentication tokens are stored (hashed) in the database and expire automatically. A maintenance script is included to proactively prune any already-expired refresh tokens so the table remains small and efficient:
+
+Run manually:
+```
+node scripts/prune-refresh-tokens.js
+```
+
+What it does:
+- Scans the `refresh_tokens` (or equivalent) table for expired entries
+- Removes them in batches (works across MySQL, PostgreSQL, SQLite)
+- Outputs a summary count of deleted rows
+
+Recommended cadence:
+- Ad-hoc (local dev) after heavy auth testing
+- Nightly via a scheduled GitHub Actions workflow (add a `schedule:` cron trigger to `.github/workflows/ci.yml` if desired)
+
+### Serverless Function Tests
+Lightweight smoke & error tests (plain Node scripts) live under `tests/functions/` and are executed in CI:
+- `auth_me_smoke.test.js` – login + /me + users listing
+- `orders_products_smoke.test.js` – products list, create order, list orders
+- `auth_errors.test.js` – invalid password, missing token, forged token cases
+- `handlers.test.js` – direct in-process invocation of function handlers (no HTTP layer) for fast feedback
+
+Run locally (ensure dependencies installed first):
+```
+node tests/functions/auth_me_smoke.test.js
+node tests/functions/orders_products_smoke.test.js
+node tests/functions/auth_errors.test.js
+node tests/functions/handlers.test.js
+```
+
+### CI Workflow
+`/.github/workflows/ci.yml` performs:
+1. Dependency install & CSS build
+2. Direct handler tests (fast feedback without Netlify dev)
+3. Starts Netlify dev (serverless runtime)
+4. Executes smoke & error HTTP tests
+5. Runs the refresh token prune script
+
+Extending CI:
+- Add coverage (nyc) by wrapping the handler test step
+- Add a `schedule:` block for nightly hygiene (token prune, dependency audit)
+- Include `npm audit --production` or `npx depcheck` for additional safety
+
+### Environment Variables Checklist
+Ensure the following are defined in Netlify (or locally in `.env`) for full functionality:
+- `DB_TYPE` (mysql | pg | sqlite)
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (if not sqlite)
+- `JWT_SECRET` (required for auth)
+- Optional: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` (email flows)
+
+### Operational Tips
+- If switching database engines, clear or migrate the existing schema before first request so automatic table creation runs cleanly.
+- Use SQLite locally for quickest iteration, then confirm against MySQL/PostgreSQL in CI or a staging branch.
+- Re-run the prune script after bulk auth / load testing to keep token tables lean.
 
 ## 🐛 Known Limitations
 

@@ -7,7 +7,8 @@
     "dev": "python3 -m http.server 8000",
     "build:css": "npx tailwindcss -c tailwind.config.js -i ./src/styles.css -o ./assets/css/styles.css --minify",
     "build": "npm run build:css",
-    "test": "echo 'No tests configured'",
+  "test:smoke:functions": "node tests/functions/auth_me_smoke.test.js",
+  "test": "npm run test:smoke:functions",
     "lint:js": "eslint . --ext .js",
     "lint:html": "htmlhint '**/*.html'",
     "lint": "npm run lint:js && npm run lint:html"

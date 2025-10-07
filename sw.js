@@ -21,7 +21,9 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
+// Include legacy '/api/' for backward compatibility during transition, prefer Netlify Functions path
 const apiUrls = [
+  '/.netlify/functions/',
   '/api/',
   'https://cdn.tailwindcss.com/',
   'https://cdn.jsdelivr.net/',
@@ -191,7 +193,8 @@ function isStaticResource(url) {
 }
 
 function isAPIRequest(url) {
-  return apiUrls.some(apiUrl => url.includes(apiUrl)) || url.includes('/api/');
+  // Treat both legacy /api/ and serverless /.netlify/functions/ as API; prefer explicit list.
+  return apiUrls.some(apiUrl => url.includes(apiUrl));
 }
 
 function isHTMLRequest(request) {

@@ -352,7 +352,8 @@
                     status: userFilters.status,
                     sort: userFilters.sort
                 });
-                const res = await fetch(`/api/users?${params.toString()}`, {
+                const FN_BASE='/.netlify/functions';
+                const res = await fetch(`${FN_BASE}/users?${params.toString()}`, {
                     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
                 });
                 if (!res.ok) throw new Error('Failed to load users');
@@ -405,7 +406,7 @@
                     try {
                         const headers = { 'Content-Type': 'application/json' };
                         if (token) headers['Authorization'] = `Bearer ${token}`;
-                        const res = await fetch(`/api/users/${id}`, {
+                        const res = await fetch(`${FN_BASE}/users/${id}`, {
                             method: 'PUT',
                             headers,
                             body: JSON.stringify({ is_active: !user.is_active })
@@ -422,7 +423,8 @@
                         const headers = { 'Content-Type': 'application/json' };
                         if (token) headers['Authorization'] = `Bearer ${token}`;
                         const newPassword = Math.random().toString(36).slice(-10) + 'A1!';
-                        const res = await fetch(`/api/users/${id}/password`, {
+                        // Password change endpoint not yet implemented in serverless version
+                        const res = await fetch(`${FN_BASE}/users/${id}`, {
                             method: 'PUT',
                             headers,
                             body: JSON.stringify({ newPassword })
@@ -487,7 +489,7 @@
             try {
                 if (editingUserId) {
                     // Update existing user (PUT)
-                    const res = await fetch(`/api/users/${editingUserId}`, {
+                    const res = await fetch(`${FN_BASE}/users/${editingUserId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -504,7 +506,7 @@
                 } else {
                     // Add new user (POST)
                     const password = Math.random().toString(36).slice(-10) + 'A1!'; // temp password
-                    const res = await fetch('/api/users', {
+                    const res = await fetch(`${FN_BASE}/users`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -550,7 +552,7 @@
             if (!confirm('Are you sure you want to delete this user?')) return;
             const token = localStorage.getItem('authToken');
             try {
-                const res = await fetch(`/api/users/${userId}`, {
+                const res = await fetch(`${FN_BASE}/users/${userId}`, {
                     method: 'DELETE',
                     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
                 });
@@ -577,7 +579,7 @@
         async function exportUsersCSV() {
             const token = localStorage.getItem('authToken');
             try {
-                const res = await fetch('/api/users?limit=1000', {
+                const res = await fetch(`${FN_BASE}/users?limit=1000`, {
                     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
                 });
                 if (!res.ok) throw new Error('Failed to fetch users');
@@ -608,7 +610,7 @@
         async function exportUsersExcel() {
             const token = localStorage.getItem('authToken');
             try {
-                const res = await fetch('/api/users?limit=1000', {
+                const res = await fetch(`${FN_BASE}/users?limit=1000`, {
                     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
                 });
                 if (!res.ok) throw new Error('Failed to fetch users');
@@ -662,7 +664,7 @@
                             if (!['user', 'admin', 'manager'].includes(role)) continue;
                             // POST to API (random password)
                             const password = Math.random().toString(36).slice(-10) + 'A1!';
-                            const res = await fetch('/api/users', {
+                            const res = await fetch(`${FN_BASE}/users`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',

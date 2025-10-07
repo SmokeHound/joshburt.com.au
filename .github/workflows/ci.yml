@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build CSS
+        run: npm run build:css || echo "Skipping Tailwind build"
+
+      - name: Function handler tests
+        env:
+          DB_TYPE: sqlite
+          JWT_SECRET: test-secret
+          BCRYPT_ROUNDS: 6
+        run: node tests/functions/handlers.test.js
+
+      - name: Smoke auth/users
+        env:
+          BASE_URL: http://localhost:8888
+          DB_TYPE: sqlite
+          JWT_SECRET: test-secret
+          BCRYPT_ROUNDS: 6
+        run: |
+          npx netlify-cli@17.33.3 dev &
+          sleep 8
+          node tests/functions/auth_me_smoke.test.js
+
+      - name: Smoke products/orders
+        env:
+          BASE_URL: http://localhost:8888
+          DB_TYPE: sqlite
+          JWT_SECRET: test-secret
+          BCRYPT_ROUNDS: 6
+        run: node tests/functions/orders_products_smoke.test.js
+
+      - name: Auth error tests
+        env:
+          BASE_URL: http://localhost:8888
+          DB_TYPE: sqlite
+          JWT_SECRET: test-secret
+          BCRYPT_ROUNDS: 6
+        run: node tests/functions/auth_errors.test.js
+
+      - name: Prune refresh tokens script
+        env:
+          DB_TYPE: sqlite
+          JWT_SECRET: test-secret
+          BCRYPT_ROUNDS: 6
+        run: node scripts/prune-refresh-tokens.js

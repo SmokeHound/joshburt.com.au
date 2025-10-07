@@ -1,1153 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics</title>
-    <link rel="stylesheet" href="./assets/css/styles.css">
-    <!-- PWA Configuration -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
-    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
-    <!-- Chart.js for analytics charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- jsPDF for PDF export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Analytics Data Manager -->
-    <script src="analytics-manager.js"></script>
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Analytics</title>
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="analytics-manager.js"></script>
+  <style>
+    body{background:#0a0a0a;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;}
+    .card{background:#111;border:1px solid #333;transition:.2s box-shadow,.2s transform;}
+    .card:hover{box-shadow:0 4px 16px rgba(0,212,255,.25);transform:translateY(-3px);border-color:#00d4ff;}
+    .widget-primary{border-color:#00d4ff40}.widget-secondary{border-color:#00ff8840}.widget-accent{border-color:#8000ff40}.widget-yellow{border-color:#fbbf2440}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
 </head>
-<body class="dark">
-    <!-- MOBILE MENU TOGGLE (copied from template.html) -->
-    <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
-    <div class="flex min-h-screen">
-        <!-- SIDEBAR NAVIGATION (copied from template.html) -->
-        <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
-            <!-- App Branding -->
-            <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
-            <!-- User Profile Section -->
-            <div id="user-profile" class="mb-6">
-                <div id="user-info" class="hidden flex items-center space-x-2">
-                    <img id="user-avatar" src="https://via.placeholder.com/40" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
-                    <span id="user-name" class="text-white"></span>
-                </div>
-                <!-- Only one login/logout button set should exist per page -->
-                <button id="login-btn" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-blue" aria-label="Open login modal">Login</button>
-                <button id="logout-btn" class="hidden w-full p-2 text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400 btn-neon-pink" aria-label="Logout">Logout</button>
-            </div>
-            <!-- Navigation -->
-            <nav role="navigation" aria-label="Main navigation">
-                <ul class="space-y-2" role="list">
-                    <li role="listitem">
-                        <a href="index.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Home</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="administration.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Administration</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="users.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">User Management</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="analytics.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link active" aria-current="page">Analytics</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="settings.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Settings</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="oil.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Oil Orders</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="consumables.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-muted">Consumables Orders</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="login.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 nav-link nav-link-logout">Logout</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="template.html" class="block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary nav-link nav-link-template">Template Page</a>
-            <!-- Theme Toggle -->
-                </ul>
-        <!-- Shared Navigation Loader -->
-        <div id="main-nav"></div>
-        <script>
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width,initial-scale=1" />
-              <title>Analytics</title>
-              <link rel="stylesheet" href="./assets/css/styles.css" />
-              <link rel="manifest" href="./manifest.json" />
-              <meta name="apple-mobile-web-app-capable" content="yes" />
-              <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-              <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au" />
-              <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
-              <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-              <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-              <script src="analytics-manager.js"></script>
-              <script>
-                function applyDynamicColors() {
-                  const s = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                  document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
-                  document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
-                  document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
-                }
-                applyDynamicColors();
-                if ('serviceWorker' in navigator) {
-                  window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-                  });
-                }
-              </script>
-              <style>
-                body { background:#0a0a0a; color:#ffffff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif; }
-                .chart-container { height:300px; width:100%; }
-                .sales-chart-container { height:350px; width:100%; }
-                .card { background:#111111; border:1px solid #333; transition:.2s box-shadow,.2s transform; }
-                .card:hover { box-shadow:0 4px 16px rgba(0,212,255,.25); transform:translateY(-3px); border-color:#00d4ff; }
-                .widget-primary { border-color:#00d4ff40; }
-                .widget-secondary { border-color:#00ff8840; }
-                .widget-accent { border-color:#8000ff40; }
-                .widget-yellow { border-color:#fbbf2440; }
-                .date-chip { cursor:pointer; }
-                .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
-                @media (max-width:767px){ body.sidebar-open { overflow:hidden; } }
-                #toast { background:#111111; border:1px solid #00d4ff40; box-shadow:0 4px 18px rgba(0,212,255,.3); }
-              </style>
-            </head>
-            <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-              <!-- Skip Links -->
-              <div class="sr-only">
-                <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
-                <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
-              </div>
-              <!-- Mobile Menu Toggle -->
-              <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
-              <div id="sidebar-backdrop" class="sidebar-backdrop md:hidden"></div>
-              <!-- Shared Navigation Loader -->
-              <div id="main-nav"></div>
-              <script>
-                fetch('shared-nav.html').then(r=>r.text()).then(html=>{ document.getElementById('main-nav').innerHTML = html; });
-              </script>
-              <!-- Toast -->
-              <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300 text-sm" role="alert" aria-live="polite"></div>
-              <!-- Main Content -->
-              <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
-                <header class="p-4 md:p-6 card rounded-lg shadow-md sticky top-0 z-30">
-                  <h1 class="text-2xl font-bold">Analytics Dashboard</h1>
-                  <p class="text-sm text-gray-400 mt-1">Traffic, engagement & product performance overview</p>
-                </header>
-                <!-- Filters & Exports -->
-                <section aria-label="Filters" class="space-y-4">
-                  <div class="flex flex-wrap gap-2" role="group" aria-label="Quick date filters">
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="1">Today</button>
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="7">7d</button>
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="30">30d</button>
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="90">90d</button>
-                    <button class="date-chip px-3 py-1 rounded-full bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary" data-range="365">YTD</button>
-                  </div>
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label class="block text-sm font-semibold mb-2">Date Range</label>
-                      <select id="date-range" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
-                        <option value="7">Last 7 days</option>
-                        <option value="30" selected>Last 30 days</option>
-                        <option value="90">Last 90 days</option>
-                        <option value="365">Last year</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-semibold mb-2">User Type</label>
-                      <select id="user-type" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
-                        <option value="all" selected>All Users</option>
-                        <option value="admin">Admin Users</option>
-                        <option value="user">Regular Users</option>
-                      </select>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                      <label class="block text-sm font-semibold">Export</label>
-                      <div class="flex gap-2">
-                        <button id="export-csv" class="btn-neon-green flex-1 px-3 py-2 rounded-lg">CSV</button>
-                        <button id="export-pdf" class="btn-neon-blue flex-1 px-3 py-2 rounded-lg">PDF</button>
-                        <button id="export-png" class="btn-neon-blue flex-1 px-3 py-2 rounded-lg">PNG</button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="w-full text-center text-xs text-gray-400 flex items-center justify-center gap-2" id="analytics-last-updated">
-                    <span id="analytics-last-updated-text">Last updated: --</span>
-                    <button id="analytics-refresh-btn" class="ml-2 px-2 py-1 rounded bg-gray-800 text-white text-xs hover:bg-gray-700 focus:outline-none">⟳ Refresh</button>
-                    <span id="analytics-auto-refresh" class="text-gray-500 text-xs ml-2">(auto every 60s)</span>
-                  </div>
-                </section>
-                <!-- Real-time Stats -->
-                <section aria-label="Real-time statistics" class="mb-2">
-                  <div class="card widget-secondary rounded-lg shadow-md p-6">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center"><span class="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></span>Real-time Statistics</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div class="text-center"><div class="text-2xl font-bold text-green-400" id="active-users">-</div><div class="text-xs text-gray-400">Active Users</div></div>
-                      <div class="text-center"><div class="text-2xl font-bold text-blue-400" id="current-page-views">-</div><div class="text-xs text-gray-400">Page Views (Hr)</div></div>
-                      <div class="text-center"><div class="text-2xl font-bold text-yellow-400" id="server-status">-</div><div class="text-xs text-gray-400">Server Status</div></div>
-                      <div class="text-center"><div class="text-2xl font-bold text-purple-400" id="total-users">-</div><div class="text-xs text-gray-400">Total Users</div></div>
-                    </div>
-                  </div>
-                </section>
-                <!-- Insights -->
-                <section class="grid grid-cols-2 md:grid-cols-4 gap-4" aria-label="Key insights">
-                  <div class="card p-4 widget-primary rounded-lg" aria-live="polite"><h3 class="text-sm font-semibold mb-1">Conversion Rate</h3><div id="insight-conversion" class="text-xl font-bold">--%</div></div>
-                  <div class="card p-4 widget-secondary rounded-lg" aria-live="polite"><h3 class="text-sm font-semibold mb-1">Retention Rate</h3><div id="insight-retention" class="text-xl font-bold">--%</div></div>
-                  <div class="card p-4 widget-accent rounded-lg" aria-live="polite"><h3 class="text-sm font-semibold mb-1">Top Product</h3><div id="insight-top-product" class="text-xl font-bold">--</div></div>
-                  <div class="card p-4 widget-yellow rounded-lg" aria-live="polite"><h3 class="text-sm font-semibold mb-1">Top User</h3><div id="insight-top-user" class="text-xl font-bold">--</div></div>
-                </section>
-                <!-- Health Bar -->
-                <div id="status-bar" class="w-full flex flex-wrap items-center justify-center gap-4 py-2 px-4 card text-sm">
-                  <span id="status-api" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>API: <span class="ml-1">Checking...</span></span>
-                  <span id="status-db" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>Database: <span class="ml-1">Checking...</span></span>
-                  <span id="status-server" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>Server: <span class="ml-1">Checking...</span></span>
-                </div>
-                <!-- Charts -->
-                <section class="grid grid-cols-1 lg:grid-cols-2 gap-6" aria-label="Charts">
-                  <div class="card widget-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>Visitor Trends</h3><div class="chart-container"><canvas id="visitor-chart"></canvas></div></div>
-                  <div class="card widget-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-green-400 rounded-full"></span>User Engagement</h3><div class="chart-container"><canvas id="engagement-chart"></canvas></div></div>
-                  <div class="card widget-accent p-6 rounded-lg shadow-md lg:col-span-2"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>Product Sales Analytics</h3><div class="sales-chart-container"><canvas id="sales-chart"></canvas></div></div>
-                </section>
-                <!-- Lists & Breakdown -->
-                <section class="grid grid-cols-1 md:grid-cols-3 gap-6" aria-label="Stat cards">
-                  <div class="card widget-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">Visitor Statistics</h3><ul id="visitor-stats" class="list-disc pl-5 space-y-1 text-gray-300"><li>Loading...</li></ul></div>
-                  <div class="card widget-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">User Engagement</h3><ul id="engagement-stats" class="list-disc pl-5 space-y-1 text-gray-300"><li>Loading...</li></ul></div>
-                  <div class="card widget-accent p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2 flex items-center justify-between">Top Pages <input id="top-pages-search" type="search" placeholder="Search pages..." class="ml-2 px-2 py-1 rounded bg-gray-800 border border-gray-600 text-sm focus:outline-none" aria-label="Search top pages"></h3><ol id="top-pages" class="list-decimal pl-5 space-y-1 text-gray-300"><li>Loading...</li></ol></div>
-                </section>
-                <!-- User Analytics Mini Section -->
-                <section class="grid grid-cols-1 md:grid-cols-3 gap-6" aria-label="User analytics breakdown">
-                  <div class="card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">User Breakdown</h3><ul id="user-breakdown-list" class="space-y-1 text-sm"></ul></div>
-                  <div class="card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">User Growth (30d)</h3><canvas id="user-growth-sparkline" width="180" height="60"></canvas></div>
-                  <div class="card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">Top Users</h3><ul id="top-users-list" class="flex flex-col gap-1 text-sm"></ul><div class="mt-3 flex gap-2 items-center text-xs"><label for="user-role-filter">Role:</label><select id="user-role-filter" class="bg-gray-800 text-white rounded px-2 py-1 text-xs"><option value="all">All</option><option value="admin">Admin</option><option value="user">User</option><option value="locked">Locked</option></select></div><div class="mt-2 flex gap-2 items-center text-xs"><label for="user-date-filter">Since:</label><input type="date" id="user-date-filter" class="bg-gray-800 text-white rounded px-2 py-1 text-xs" /></div><button id="export-user-analytics" class="mt-3 w-full px-2 py-1 rounded bg-gray-800 text-white text-xs hover:bg-gray-700 focus:outline-none">Export Users CSV</button></div>
-                </section>
-              </main>
-              <script>
-                // Global state
-                let visitorChart, engagementChart, salesChart; let userGrowthSparkline; let autoRefreshTimer=null; const REFRESH_INTERVAL=60000; // 60s
-                const currentFilters = { dateRange:30, userType:'all' };
-
-                function showToast(message){ const t=document.getElementById('toast'); if(!t) return; t.textContent=message; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3000);} 
-
-                function loadAndApplySettings(){ const settings=JSON.parse(localStorage.getItem('siteSettings')||'{}'); if(settings['site-title']) { document.title = settings['site-title']+ ' | Analytics'; }}
-
-                // Data generation / processing (kept similar to previous for continuity)
-                async function generateAnalyticsData(filters){ try {
-                    if(window.analyticsManager){ const analytics=window.analyticsManager.getData(filters); if(analytics){ return processAnalyticsData(analytics.data, filters); } }
-                  } catch(e) {}
-                                    const FN_BASE='/.netlify/functions';
-                                    const [usersRes, ordersRes, productsRes] = await Promise.allSettled([
-                                        fetch(`${FN_BASE}/users`), fetch(`${FN_BASE}/orders`), fetch(`${FN_BASE}/products`)
-                  ]);
-                  const usersData = usersRes.status==='fulfilled' ? await usersRes.value.json() : [];
-                  const ordersData = ordersRes.status==='fulfilled' ? await ordersRes.value.json() : [];
-                  const productsData = productsRes.status==='fulfilled' ? await productsRes.value.json() : [];
-                  let users = usersData.users || usersData || [];
-                  if(!Array.isArray(users)) users=[];
-                  if(filters.userType==='admin') users = users.filter(u=>u.role==='admin');
-                  else if(filters.userType==='user') users = users.filter(u=>u.role==='user');
-                  const days = filters.dateRange; const visitorData=[]; const labels=[]; const now=new Date();
-                  for(let i=days-1;i>=0;i--){ const d=new Date(now); d.setDate(now.getDate()-i); labels.push(d.toLocaleDateString()); const dateStr=d.toISOString().split('T')[0]; const count = (Array.isArray(ordersData)?ordersData:[]).filter(o=> (o.created_at||o.createdAt||'').startsWith(dateStr)).length; visitorData.push(count);} 
-                  const totalOrders = Array.isArray(ordersData)?ordersData.length:0; const bounceRate=Math.max(0,100-(totalOrders/(users.length*days))*100); const avgSessionDuration=300; const pagesPerSession=3; const returnVisitorRate=30; 
-                  const productNames = (Array.isArray(productsData)?productsData:[]).map(p=>p.name); const salesCounts = productNames.map(name => (Array.isArray(ordersData)?ordersData:[]).reduce((sum,o)=> sum + ((o.items||[]).filter(i=>i.name===name).reduce((s,i)=>s+(i.quantity||1),0)),0));
-                  return { visitors:{labels,data:visitorData}, engagement:{ bounceRate, avgSessionDuration, pagesPerSession, returnVisitorRate }, sales:{ labels:productNames, data:salesCounts }, summary:{ totalUsers:users.length, activeSession:0, totalVisitors:visitorData.reduce((a,b)=>a+b,0), avgDailyVisitors: Math.floor(visitorData.reduce((a,b)=>a+b,0)/(visitorData.length||1)) } };
-                }
-
-                function processAnalyticsData(data){ const visitorData=data.visitors||[]; const labels=visitorData.map(v=> new Date(v.date).toLocaleDateString()); const visitors=visitorData.map(v=>v.totalVisitors); const sessions=data.userSessions||[]; const avgBounceRate = sessions.reduce((s,x)=>s+x.bounceRate,0)/(sessions.length||1); const avgSessionDuration = sessions.reduce((s,x)=>s+x.avgSessionDuration,0)/(sessions.length||1); const avgPagesPerSession = sessions.reduce((s,x)=>s+x.pagesPerSession,0)/(sessions.length||1); const totalVisitors=visitorData.reduce((s,v)=>s+v.totalVisitors,0); const totalReturning=visitorData.reduce((s,v)=>s+v.returningVisitors,0); const returnVisitorRate = totalVisitors? (totalReturning/totalVisitors)*100:0; const productNames=['Castrol GTX','Castrol Magnatec','Castrol EDGE','Castrol GTX Diesel','Castrol Actevo']; const orderData=data.oilOrders||[]; const productSales={}; productNames.forEach(p=>{productSales[p]=orderData.reduce((sum,day)=> sum + (day.products[p]?.orders||0),0);}); return { visitors:{labels,data:visitors}, engagement:{ bounceRate:avgBounceRate*100, avgSessionDuration, pagesPerSession:avgPagesPerSession, returnVisitorRate }, sales:{ labels:productNames, data:productNames.map(n=>productSales[n]) }, summary:{ totalUsers:(JSON.parse(localStorage.getItem('siteUsers')||'[]')).length, activeSession: JSON.parse(localStorage.getItem('user')||'null')?1:0, totalVisitors, avgDailyVisitors: visitorData.length? Math.floor(totalVisitors/visitorData.length):0 } }; }
-
-                function trendArrow(v){ if(v>50) return '↗'; if(v<20) return '↘'; return '→'; }
-
-                function updateStatCard(id, items){ const el=document.getElementById(id); if(!el) return; el.innerHTML=''; if(!items.length){ el.innerHTML='<li>No results</li>'; return;} items.forEach(i=>{ const li=document.createElement('li'); li.textContent=i; el.appendChild(li); }); }
-
-                function ensureCharts(data){ if(!window.Chart) return; // create or update
-                  // Visitor chart
-                  const visitorCanvas=document.getElementById('visitor-chart'); if(visitorCanvas){ if(!visitorChart){ visitorChart=new Chart(visitorCanvas.getContext('2d'), { type:'line', data:{ labels:data.visitors.labels, datasets:[{ label:'Daily Visitors', data:data.visitors.data, borderColor:'rgb(59,130,246)', backgroundColor:'rgba(59,130,246,0.1)', tension:.4, fill:true }]}, options:{ responsive:true, maintainAspectRatio:true, aspectRatio:2, plugins:{legend:{labels:{color:'#f9fafb'}}}, scales:{ x:{ticks:{color:'#f9fafb'},grid:{color:'rgba(249,250,251,0.1)'}}, y:{ticks:{color:'#f9fafb'},grid:{color:'rgba(249,250,251,0.1)'}} } } }); } else { visitorChart.data.labels=data.visitors.labels; visitorChart.data.datasets[0].data=data.visitors.data; visitorChart.update(); } }
-                  const engagementCanvas=document.getElementById('engagement-chart'); if(engagementCanvas){ const ds=[ data.engagement.returnVisitorRate, 100-data.engagement.returnVisitorRate, data.engagement.bounceRate, 100-data.engagement.bounceRate]; if(!engagementChart){ engagementChart=new Chart(engagementCanvas.getContext('2d'), { type:'doughnut', data:{ labels:['Return','New','Bounced','Engaged'], datasets:[{ data:ds, backgroundColor:['rgb(16,185,129)','rgb(59,130,246)','rgb(239,68,68)','rgb(139,92,246)'] }]}, options:{ plugins:{legend:{labels:{color:'#f9fafb'}}} } }); } else { engagementChart.data.datasets[0].data=ds; engagementChart.update(); } }
-                  const salesCanvas=document.getElementById('sales-chart'); if(salesCanvas){ if(!salesChart){ salesChart=new Chart(salesCanvas.getContext('2d'), { type:'bar', data:{ labels:data.sales.labels, datasets:[{ label:'Units Sold', data:data.sales.data, backgroundColor:['rgba(239,68,68,0.8)','rgba(16,185,129,0.8)','rgba(59,130,246,0.8)','rgba(139,92,246,0.8)','rgba(245,158,11,0.8)'], borderColor:['rgb(239,68,68)','rgb(16,185,129)','rgb(59,130,246)','rgb(139,92,246)','rgb(245,158,11)'], borderWidth:1 }]}, options:{ responsive:true, plugins:{legend:{labels:{color:'#f9fafb'}}}, scales:{ x:{ticks:{color:'#f9fafb'}}, y:{ticks:{color:'#f9fafb'}} } }); } else { salesChart.data.labels=data.sales.labels; salesChart.data.datasets[0].data=data.sales.data; salesChart.update(); } }
-                }
-
-                async function updateAnalytics(){ const lastText=document.getElementById('analytics-last-updated-text'); try { const data = await generateAnalyticsData(currentFilters); if(lastText) lastText.textContent='Last updated: '+ new Date().toLocaleTimeString(); ensureCharts(data); // stats
-                    updateStatCard('visitor-stats', [ `Total Visitors (${currentFilters.dateRange}d): ${data.summary.totalVisitors}`, `Avg Daily: ${data.summary.avgDailyVisitors}`, `Active Session: ${data.summary.activeSession>0?'Yes':'No'}` ]);
-                    updateStatCard('engagement-stats', [ `Bounce Rate: ${data.engagement.bounceRate.toFixed(1)}%`, `Avg Session: ${Math.floor(data.engagement.avgSessionDuration/60)}m ${Math.floor(data.engagement.avgSessionDuration%60)}s`, `Pages/Session: ${data.engagement.pagesPerSession.toFixed(1)}`, `Return Rate: ${data.engagement.returnVisitorRate.toFixed(1)}%` ]);
-                    updateStatCard('top-pages', [ 'Analytics Dashboard','Oil Orders System','User Management','Settings Page','Admin Dashboard' ]);
-                    // insights
-                    const totalSalesUnits = data.sales.data.reduce((a,b)=>a+b,0);
-                    const conversion = data.summary.totalUsers ? (totalSalesUnits / data.summary.totalUsers)*100 : 0;
-                    document.getElementById('insight-conversion').textContent = conversion.toFixed(1)+'% '+trendArrow(conversion);
-                    document.getElementById('insight-retention').textContent = data.engagement.returnVisitorRate.toFixed(1)+'% '+trendArrow(data.engagement.returnVisitorRate);
-                    if(data.sales.data.length){ const idx=data.sales.data.indexOf(Math.max(...data.sales.data)); document.getElementById('insight-top-product').textContent=data.sales.labels[idx]||'--'; }
-                    // top user by orders
-                    try { const orders = await (await fetch(`${FN_BASE}/orders`)).json(); const usersRes = await (await fetch(`${FN_BASE}/users`)).json(); const usersArr = usersRes.users||[]; const userOrderCounts={}; (orders||[]).forEach(o=>{ if(o.created_by) userOrderCounts[o.created_by]=(userOrderCounts[o.created_by]||0)+1; }); let topUser='--', max=0; Object.entries(userOrderCounts).forEach(([u,c])=>{ if(c>max){ max=c; topUser=u; } }); document.getElementById('insight-top-user').textContent=topUser; } catch(e){ document.getElementById('insight-top-user').textContent='--'; }
-                    // user breakdown & growth
-                    buildUserBreakdown();
-                  } catch(e){ if(lastText) lastText.textContent='Last updated: error'; }
-                }
-
-                async function buildUserBreakdown(){ let users=[]; let orders=[]; try{ const u=await fetch(`${FN_BASE}/users`); users=(await u.json()).users||[]; }catch(e){} try{ const o=await fetch(`${FN_BASE}/orders`); orders=await o.json(); }catch(e){} const list=document.getElementById('user-breakdown-list'); if(list){ const total=users.length; const admins=users.filter(u=>u.role==='admin').length; const regular=users.filter(u=>u.role==='user').length; const locked=users.filter(u=>u.locked).length; const now=new Date(); const newUsers=users.filter(u=>u.created_at && (now-new Date(u.created_at))<7*24*60*60*1000).length; const returning=users.filter(u=> orders.filter(o=>o.created_by===u.username).length>1).length; list.innerHTML = `<li>Total: <strong>${total}</strong></li><li>Admins: <strong>${admins}</strong></li><li>Regular: <strong>${regular}</strong></li><li>Locked: <strong>${locked}</strong></li><li>New (7d): <strong>${newUsers}</strong></li><li>Returning: <strong>${returning}</strong></li>`; }
-                  // growth sparkline
-                  const growthCanvas=document.getElementById('user-growth-sparkline'); if(growthCanvas && window.Chart){ const arr=Array(30).fill(0); const now=new Date(); users.forEach(u=>{ if(u.created_at){ const daysAgo=Math.floor((now-new Date(u.created_at))/(24*60*60*1000)); if(daysAgo>=0 && daysAgo<30) arr[29-daysAgo]++; }}); if(userGrowthSparkline) userGrowthSparkline.destroy(); userGrowthSparkline=new Chart(growthCanvas.getContext('2d'), { type:'line', data:{ labels:Array.from({length:30},(_,i)=>i+1), datasets:[{ data:arr, borderColor:'rgb(59,130,246)', backgroundColor:'rgba(59,130,246,0.1)', tension:.4, fill:true, pointRadius:0, borderWidth:2 }]}, options:{ responsive:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} } }); }
-                  // top users
-                  const topList=document.getElementById('top-users-list'); if(topList){ const userOrderCounts={}; orders.forEach(o=>{ if(o.created_by) userOrderCounts[o.created_by]=(userOrderCounts[o.created_by]||0)+1; }); const top=Object.entries(userOrderCounts).sort((a,b)=>b[1]-a[1]).slice(0,5); topList.innerHTML = top.length? top.map(([u,c])=> `<li class='flex items-center'><span class='inline-block w-2 h-2 rounded-full bg-blue-400 mr-2'></span><strong>${u}</strong><span class='ml-2 text-xs text-gray-400'>${c} orders</span></li>`).join('') : '<li>N/A</li>'; }
-                }
-
-                async function updateRealtimeStats(){ let apiHealthy=false, dbHealthy=false, serverHealthy=true; try{ apiHealthy=(await fetch(`${FN_BASE}/users`)).ok; }catch(e){} try{ dbHealthy=(await fetch(`${FN_BASE}/orders`)).ok; }catch(e){} // serverHealthy assumed true
-                  function setStatus(id, healthy){ const el=document.getElementById(id); if(!el) return; const dot=el.querySelector('span'); const text=el.querySelector('span.ml-1'); if(dot){ dot.classList.remove('bg-gray-500','bg-green-500','bg-red-500'); dot.classList.add(healthy?'bg-green-500':'bg-red-500'); } if(text) text.textContent = healthy?'Online':'Offline'; }
-                  setStatus('status-api', apiHealthy); setStatus('status-db', dbHealthy); setStatus('status-server', serverHealthy);
-                  // realtime placeholders
-                  document.getElementById('active-users').textContent = Math.floor(Math.random()*5)+1;
-                  document.getElementById('current-page-views').textContent = Math.floor(Math.random()*50)+10;
-                  document.getElementById('server-status').textContent = serverHealthy? 'Online':'Offline';
-                  try { const usersRes=await fetch(`${FN_BASE}/users`); const users=(await usersRes.json()).users||[]; document.getElementById('total-users').textContent=users.length; } catch(e){ document.getElementById('total-users').textContent='--'; }
-                }
-
-                function exportCSV(){ (async()=>{ const data=await generateAnalyticsData(currentFilters); let csv='Date,Visitors\n'; data.visitors.labels.forEach((l,i)=> csv+=`${l},${data.visitors.data[i]}\n`); csv+='\nSummary\n'; csv+=`Total Visitors (${currentFilters.dateRange}d),${data.summary.totalVisitors}\nAverage Daily Visitors,${data.summary.avgDailyVisitors}\nBounce Rate,${data.engagement.bounceRate.toFixed(1)}%\nReturn Rate,${data.engagement.returnVisitorRate.toFixed(1)}%\n`; csv+='\nProduct Sales\n'; data.sales.labels.forEach((p,i)=> csv+=`${p},${data.sales.data[i]}\n`); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`analytics-report-${new Date().toISOString().split('T')[0]}.csv`; document.body.appendChild(a); a.click(); a.remove(); showToast('CSV exported'); })(); }
-                function exportPDF(){ if(!window.jspdf||!window.jspdf.jsPDF){ showToast('PDF unavailable; exporting CSV'); return exportCSV(); } (async()=>{ const { jsPDF }=window.jspdf; const doc=new jsPDF(); const data=await generateAnalyticsData(currentFilters); doc.setFontSize(18); doc.text('Analytics Report',20,20); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`,20,28); let y=40; const lines=[`Range: ${currentFilters.dateRange}d`,`Total Visitors: ${data.summary.totalVisitors}`,`Avg Daily: ${data.summary.avgDailyVisitors}`,`Bounce: ${data.engagement.bounceRate.toFixed(1)}%`,`Return: ${data.engagement.returnVisitorRate.toFixed(1)}%`]; lines.forEach(l=>{ doc.text(l,20,y); y+=6; }); y+=4; doc.text('Product Sales:',20,y); y+=6; data.sales.labels.forEach((p,i)=>{ if(y>270){ doc.addPage(); y=20;} doc.text(`${p}: ${data.sales.data[i]}`,26,y); y+=6; }); doc.save(`analytics-report-${new Date().toISOString().split('T')[0]}.pdf`); showToast('PDF exported'); })(); }
-                function exportPNG(){ if(!window.Chart){ showToast('Charts not loaded; CSV fallback'); return exportCSV(); } const charts=[['visitor-chart','visitor-trends'],['engagement-chart','engagement'],['sales-chart','sales']]; let count=0; charts.forEach(([id,name])=>{ const canvas=document.getElementById(id); if(canvas){ const chart=Chart.getChart(canvas); if(chart){ const url=chart.toBase64Image(); const a=document.createElement('a'); a.href=url; a.download=`analytics-${name}-${new Date().toISOString().split('T')[0]}.png`; document.body.appendChild(a); a.click(); a.remove(); count++; } } }); showToast(count? `${count} PNG exported`:'No charts to export'); }
-
-                function startAutoRefresh(){ if(autoRefreshTimer) clearInterval(autoRefreshTimer); autoRefreshTimer=setInterval(()=>{ updateAnalytics(); updateRealtimeStats(); }, REFRESH_INTERVAL); }
-
-                function setupFilters(){ const dateRange=document.getElementById('date-range'); if(dateRange){ dateRange.addEventListener('change',e=>{ currentFilters.dateRange=parseInt(e.target.value); highlightDateChip(); updateAnalytics(); }); } document.querySelectorAll('.date-chip').forEach(chip=>{ chip.addEventListener('click',()=>{ currentFilters.dateRange=parseInt(chip.dataset.range); if(dateRange) dateRange.value=currentFilters.dateRange; highlightDateChip(); updateAnalytics(); }); }); function highlightDateChip(){ document.querySelectorAll('.date-chip').forEach(chip=>{ const r=parseInt(chip.dataset.range); chip.classList.toggle('bg-primary', r===currentFilters.dateRange); chip.classList.toggle('text-white', r===currentFilters.dateRange); }); } highlightDateChip(); const userType=document.getElementById('user-type'); if(userType){ userType.addEventListener('change',e=>{ currentFilters.userType=e.target.value; updateAnalytics(); }); } const topPagesSearch=document.getElementById('top-pages-search'); if(topPagesSearch){ topPagesSearch.addEventListener('input',()=>{ updateStatCard('top-pages',[ 'Analytics Dashboard','Oil Orders System','User Management','Settings Page','Admin Dashboard' ].filter(i=> i.toLowerCase().includes(topPagesSearch.value.toLowerCase()))); }); }
-                  document.getElementById('export-csv')?.addEventListener('click', exportCSV);
-                  document.getElementById('export-pdf')?.addEventListener('click', exportPDF);
-                  document.getElementById('export-png')?.addEventListener('click', exportPNG);
-                  document.getElementById('analytics-refresh-btn')?.addEventListener('click', ()=>{ updateAnalytics(); updateRealtimeStats(); showToast('Analytics refreshed'); });
-                  document.getElementById('export-user-analytics')?.addEventListener('click', exportUserAnalyticsCSV);
-                  document.getElementById('user-role-filter')?.addEventListener('change', buildUserBreakdown);
-                  document.getElementById('user-date-filter')?.addEventListener('change', buildUserBreakdown);
-                }
-
-                function exportUserAnalyticsCSV(){ (async()=>{ let users=[]; let orders=[]; try{ users=(await (await fetch(`${FN_BASE}/users`)).json()).users||[]; }catch(e){} try{ orders=await (await fetch(`${FN_BASE}/orders`)).json(); }catch(e){} const role=document.getElementById('user-role-filter')?.value||'all'; const since=document.getElementById('user-date-filter')?.value; let filtered=[...users]; if(role==='admin') filtered=filtered.filter(u=>u.role==='admin'); else if(role==='user') filtered=filtered.filter(u=>u.role==='user'); else if(role==='locked') filtered=filtered.filter(u=>u.locked); if(since) filtered=filtered.filter(u=>u.created_at && u.created_at>=since); let csv='Username,Role,Locked,Created At,Orders\n'; filtered.forEach(u=>{ const count=orders.filter(o=>o.created_by===u.username).length; csv+=`${u.username},${u.role},${u.locked?'Yes':'No'},${u.created_at||''},${count}\n`; }); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`user-analytics-${new Date().toISOString().split('T')[0]}.csv`; document.body.appendChild(a); a.click(); a.remove(); showToast('User analytics CSV exported'); })(); }
-
-                document.addEventListener('DOMContentLoaded', ()=>{ loadAndApplySettings(); setupFilters(); updateAnalytics(); updateRealtimeStats(); startAutoRefresh(); setInterval(updateRealtimeStats, 30000); });
-              </script>
-            </body>
-            </html>
-                });
-            }
-
-            // Sparkline Mini-Charts
-            if (insights.sparklines) {
-                const sparkVisitors = document.getElementById('sparkline-visitors');
-                const sparkOrders = document.getElementById('sparkline-orders');
-                const sparkSessions = document.getElementById('sparkline-sessions');
-                if (sparkVisitors) {
-                    sparklineVisitors = new Chart(sparkVisitors.getContext('2d'), {
-                        type: 'line',
-                        data: {
-                            labels: insights.sparklines.visitors.map((_, i) => i + 1),
-                            datasets: [{
-                                data: insights.sparklines.visitors,
-                                borderColor: 'rgb(59, 130, 246)',
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                tension: 0.4,
-                                fill: true,
-                                pointRadius: 0,
-                                borderWidth: 2
-                            }]
-                        },
-                        options: {
-                            responsive: false,
-                        }
-                    }
-                }
-            });
-
-            // Product Sales Chart (Bar)
-            const salesCtx = document.getElementById('sales-chart').getContext('2d');
-            salesChart = new Chart(salesCtx, {
-                type: 'bar',
-                data: {
-                    labels: data.sales.labels,
-                    datasets: [{
-                        label: 'Units Sold',
-                        data: data.sales.data,
-                        backgroundColor: [
-                            'rgba(239, 68, 68, 0.8)',
-                            'rgba(16, 185, 129, 0.8)',
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(139, 92, 246, 0.8)',
-                            'rgba(245, 158, 11, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgb(239, 68, 68)',
-                            'rgb(16, 185, 129)',
-                            'rgb(59, 130, 246)',
-                            'rgb(139, 92, 246)',
-                            'rgb(245, 158, 11)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 2,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#f9fafb' }
-                        }
-                    },
-                    scales: {
-                        x: { 
-                            ticks: { color: '#f9fafb' },
-                            grid: { color: 'rgba(249, 250, 251, 0.1)' }
-                        },
-                        y: { 
-                            ticks: { color: '#f9fafb' },
-                            grid: { color: 'rgba(249, 250, 251, 0.1)' }
-                        }
-                    }
-                }
-            });
-
-            // Funnel Chart (Bar)
-            const funnelCanvas = document.getElementById('funnel-chart');
-            if (funnelCanvas && insights.funnel) {
-                const funnelCtx = funnelCanvas.getContext('2d');
-                funnelChart = new Chart(funnelCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: insights.funnel.steps,
-                        datasets: [{
-                            label: 'Funnel',
-                            data: insights.funnel.values,
-                            backgroundColor: [
-                                'rgba(59, 130, 246, 0.8)',
-                                'rgba(16, 185, 129, 0.8)',
-                                'rgba(239, 68, 68, 0.8)'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#1f2937' }, grid: { color: 'rgba(31,41,55,0.1)' } },
-                            y: { ticks: { color: '#1f2937' }, grid: { color: 'rgba(31,41,55,0.1)' } }
-                        }
-                    }
-                });
-            }
-
-            // Device/Browser Breakdown Chart (Doughnut)
-            const deviceCanvas = document.getElementById('device-chart');
-            if (deviceCanvas && insights.deviceBreakdown) {
-                const deviceCtx = deviceCanvas.getContext('2d');
-                deviceChart = new Chart(deviceCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: insights.deviceBreakdown.deviceLabels,
-                        datasets: [{
-                            data: insights.deviceBreakdown.devices,
-                            backgroundColor: [
-                                'rgba(59, 130, 246, 0.8)',
-                                'rgba(16, 185, 129, 0.8)',
-                                'rgba(245, 158, 11, 0.8)'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#1f2937' }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Set actionable insight values
-            if (insights.conversionRate !== undefined) {
-                document.getElementById('conversion-rate').textContent = insights.conversionRate + '%';
-            }
-            if (insights.retentionRate !== undefined) {
-                document.getElementById('retention-rate').textContent = insights.retentionRate + '%';
-            }
-        }
-
-        // Update analytics data and charts (async, uses live API data)
-    async function updateAnalytics() {
-            const data = await generateAnalyticsData(currentFilters);
-            // Update last updated timestamp
-            const lastUpdatedText = document.getElementById('analytics-last-updated-text');
-            if (lastUpdatedText) {
-                lastUpdatedText.textContent = 'Last updated: ' + new Date().toLocaleString();
-            }
-        // Auto-refresh logic
-        let analyticsAutoRefreshInterval = null;
-        function startAnalyticsAutoRefresh() {
-            if (analyticsAutoRefreshInterval) clearInterval(analyticsAutoRefreshInterval);
-            analyticsAutoRefreshInterval = setInterval(() => {
-                updateAnalytics();
-            }, 45000); // 45 seconds
-        }
-
-        // Manual refresh button
-        document.addEventListener('DOMContentLoaded', () => {
-            const refreshBtn = document.getElementById('analytics-refresh-btn');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', () => {
-                    updateAnalytics();
-                });
-            }
-            startAnalyticsAutoRefresh();
-        });
-            // Update charts
-            if (visitorChart) {
-                visitorChart.data.labels = data.visitors.labels;
-                visitorChart.data.datasets[0].data = data.visitors.data;
-                visitorChart.update();
-            }
-            if (engagementChart) {
-                engagementChart.data.datasets[0].data = [
-                    data.engagement.returnVisitorRate,
-                    100 - data.engagement.returnVisitorRate,
-                    data.engagement.bounceRate,
-                    100 - data.engagement.bounceRate
-                ];
-                engagementChart.update();
-            }
-            if (salesChart) {
-                salesChart.data.datasets[0].data = data.sales.data;
-                salesChart.update();
-            }
-            // Enhanced User Analytics
-            // Fetch users from API
-            let users = [];
-            try {
-                const usersRes = await fetch('/api/users');
-                users = (await usersRes.json()).users || [];
-            } catch (e) {}
-            // Apply filters
-            const roleFilter = document.getElementById('user-role-filter')?.value || 'all';
-            const dateFilter = document.getElementById('user-date-filter')?.value;
-            let filteredUsers = users;
-            if (roleFilter === 'admin') filteredUsers = users.filter(u => u.role === 'admin');
-            else if (roleFilter === 'user') filteredUsers = users.filter(u => u.role === 'user');
-            else if (roleFilter === 'locked') filteredUsers = users.filter(u => u.locked);
-            if (dateFilter) filteredUsers = filteredUsers.filter(u => u.created_at && u.created_at >= dateFilter);
-            // Breakdown
-            const total = users.length;
-            const admins = users.filter(u => u.role === 'admin').length;
-            const regular = users.filter(u => u.role === 'user').length;
-            const locked = users.filter(u => u.locked).length;
-            const now = new Date();
-            const newUsers = users.filter(u => u.created_at && (now - new Date(u.created_at)) < 7*24*60*60*1000).length;
-            // Returning users: crude proxy, users with >1 order
-            let orders = [];
-            try {
-                const ordersRes = await fetch('/api/orders');
-                orders = await ordersRes.json();
-            } catch (e) {}
-            const returning = users.filter(u => orders.filter(o => o.created_by === u.username).length > 1).length;
-            // Render breakdown
-            const userBreakdownList = document.getElementById('user-breakdown-list');
-            userBreakdownList.innerHTML = `
-              <li>Total: <span class='font-bold'>${total}</span></li>
-              <li>Admins: <span class='font-bold'>${admins}</span></li>
-              <li>Regular: <span class='font-bold'>${regular}</span></li>
-              <li>Locked: <span class='font-bold'>${locked}</span></li>
-              <li>New (7d): <span class='font-bold'>${newUsers}</span></li>
-              <li>Returning: <span class='font-bold'>${returning}</span></li>
-            `;
-            // User growth sparkline (30d)
-            const userGrowth = Array(30).fill(0);
-            users.forEach(u => {
-                if (u.created_at) {
-                    const daysAgo = Math.floor((now - new Date(u.created_at)) / (24*60*60*1000));
-                    if (daysAgo >= 0 && daysAgo < 30) userGrowth[29-daysAgo]++;
-                }
-            });
-            if (window.Chart) {
-                const ctx = document.getElementById('user-growth-sparkline').getContext('2d');
-                if (window.userGrowthSparkline) window.userGrowthSparkline.destroy();
-                window.userGrowthSparkline = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: Array.from({length: 30}, (_, i) => i+1),
-                        datasets: [{
-                            data: userGrowth,
-                            borderColor: 'rgb(59,130,246)',
-                            backgroundColor: 'rgba(59,130,246,0.1)',
-                            tension: 0.4,
-                            fill: true,
-                            pointRadius: 0,
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: false,
-                        plugins: { legend: { display: false } },
-                        scales: { x: { display: false }, y: { display: false } }
-                    }
-                });
-            }
-            // Top users by order count
-            const userOrderCounts = {};
-            orders.forEach(order => {
-                if (order.created_by) userOrderCounts[order.created_by] = (userOrderCounts[order.created_by] || 0) + 1;
-            });
-            const topUsers = Object.entries(userOrderCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
-            const topUsersList = document.getElementById('top-users-list');
-            topUsersList.innerHTML = topUsers.length ? topUsers.map(([username, count]) => {
-                const user = users.find(u => u.username === username);
-                const avatar = user && user.avatar_url ? `<img src='${user.avatar_url}' class='inline w-6 h-6 rounded-full mr-2'/>` : `<span class='inline-block w-6 h-6 rounded-full bg-gray-600 mr-2'></span>`;
-                return `<li class='flex items-center'>${avatar}<span class='font-bold'>${username}</span> <span class='ml-2 text-xs text-gray-400'>${count} orders</span></li>`;
-            }).join('') : '<li>N/A</li>';
-            // Export users CSV
-            document.getElementById('export-user-analytics').onclick = () => {
-                let csv = 'Username,Role,Locked,Created At,Orders\n';
-                filteredUsers.forEach(u => {
-                    const orderCount = orders.filter(o => o.created_by === u.username).length;
-                    csv += `${u.username},${u.role},${u.locked ? 'Yes' : 'No'},${u.created_at || ''},${orderCount}\n`;
-                });
-                const blob = new Blob([csv], {type: 'text/csv'});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `user-analytics-${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                showToast('User analytics CSV exported!');
-            };
-            // User filter change handlers
-            document.getElementById('user-role-filter').onchange = updateAnalytics;
-            document.getElementById('user-date-filter').onchange = updateAnalytics;
-            // Update statistics cards
-            updateStatCard('visitor-stats', [
-                `Total Users: ${filteredUsers.length}`,
-                `Total Visitors (${currentFilters.dateRange}d): ${data.summary.totalVisitors}`,
-                `Avg Daily Visitors: ${data.summary.avgDailyVisitors}`,
-                `Active Session: ${data.summary.activeSession > 0 ? 'Yes' : 'No'}`
-            ]);
-            updateStatCard('engagement-stats', [
-                `Bounce Rate: ${data.engagement.bounceRate.toFixed(1)}%`,
-                `Avg Session: ${Math.floor(data.engagement.avgSessionDuration / 60)}m ${Math.floor(data.engagement.avgSessionDuration % 60)}s`,
-                `Pages/Session: ${data.engagement.pagesPerSession.toFixed(1)}`,
-                `Return Rate: ${data.engagement.returnVisitorRate.toFixed(1)}%`
-            ]);
-            updateStatCard('top-pages', [
-                'Analytics Dashboard',
-                'Oil Orders System', 
-                'User Management',
-                'Settings Page',
-                'Admin Dashboard'
-            ]);
-
-            // Actionable Insights
-            // Conversion Rate: orders/users
-            const conversion = data.summary.totalUsers > 0 ? (data.sales.data.reduce((a,b)=>a+b,0) / data.summary.totalUsers) * 100 : 0;
-            document.getElementById('insight-conversion').innerHTML = `${conversion.toFixed(1)}% ${trendArrow(conversion)}`;
-            // Retention Rate: use returnVisitorRate
-            document.getElementById('insight-retention').innerHTML = `${data.engagement.returnVisitorRate.toFixed(1)}% ${trendArrow(data.engagement.returnVisitorRate)}`;
-            // Top Product
-            let topIdx = 0;
-            if (data.sales.data.length > 0) {
-                topIdx = data.sales.data.indexOf(Math.max(...data.sales.data));
-            }
-            document.getElementById('insight-top-product').textContent = data.sales.labels[topIdx] || '--';
-            // Top User (by order count)
-            try {
-                const usersRes = await fetch('/api/users');
-                const ordersRes = await fetch('/api/orders');
-                const users = (await usersRes.json()).users || [];
-                const orders = await ordersRes.json();
-                const userOrderCounts = {};
-                orders.forEach(order => {
-                    if (order.created_by) {
-                        userOrderCounts[order.created_by] = (userOrderCounts[order.created_by] || 0) + 1;
-                    }
-                });
-                let topUser = '--', maxOrders = 0;
-                Object.entries(userOrderCounts).forEach(([user, count]) => {
-                    if (count > maxOrders) { topUser = user; maxOrders = count; }
-                });
-                document.getElementById('insight-top-user').textContent = topUser;
-            } catch (e) {
-                document.getElementById('insight-top-user').textContent = '--';
-            }
-
-            // Device/Browser/Location breakdowns
-            let deviceLabels = [], deviceData = [], browserLabels = [], browserData = [], locationLabels = [], locationData = [];
-            if (window.analyticsManager && window.analyticsManager.getData) {
-                const analytics = window.analyticsManager.getData(currentFilters);
-                if (analytics && analytics.insights) {
-                    if (analytics.insights.deviceBreakdown) {
-                        deviceLabels = analytics.insights.deviceBreakdown.deviceLabels;
-                        deviceData = analytics.insights.deviceBreakdown.devices;
-                    }
-                    if (analytics.insights.browserBreakdown) {
-                        browserLabels = analytics.insights.browserBreakdown.browserLabels;
-                        browserData = analytics.insights.browserBreakdown.browsers;
-                    }
-                    if (analytics.insights.locationBreakdown) {
-                        locationLabels = analytics.insights.locationBreakdown.locationLabels;
-                        locationData = analytics.insights.locationBreakdown.locations;
-                    }
-                }
-            }
-            // Render device breakdown
-            const deviceList = document.getElementById('device-breakdown-list');
-            deviceList.innerHTML = deviceLabels.length > 0 ? deviceLabels.map((label, i) => `<li>${label}: <span class='font-bold'>${deviceData[i]}%</span></li>`).join('') : '<li>N/A</li>';
-            // Render browser breakdown
-            const browserList = document.getElementById('browser-breakdown-list');
-            browserList.innerHTML = browserLabels.length > 0 ? browserLabels.map((label, i) => `<li>${label}: <span class='font-bold'>${browserData[i]}%</span></li>`).join('') : '<li>N/A</li>';
-            // Render location breakdown
-            const locationList = document.getElementById('location-breakdown-list');
-            locationList.innerHTML = locationLabels.length > 0 ? locationLabels.map((label, i) => `<li>${label}: <span class='font-bold'>${locationData[i]}%</span></li>`).join('') : '<li>N/A</li>';
-        }
-
-        // Helper: Trend arrow (up/down/flat)
-        function trendArrow(value) {
-            if (value > 50) return '<span class="ml-2 text-green-400">&#8593;</span>';
-            if (value < 20) return '<span class="ml-2 text-red-400">&#8595;</span>';
-            return '<span class="ml-2 text-yellow-400">&#8596;</span>';
-        }
-        
-        function updateStatCard(cardType, items) {
-            let listElement;
-            if (cardType === 'visitor-stats') {
-                listElement = document.getElementById('visitor-stats');
-            } else if (cardType === 'engagement-stats') {
-                listElement = document.getElementById('engagement-stats');
-            } else if (cardType === 'top-pages') {
-                listElement = document.getElementById('top-pages');
-            }
-            if (listElement) {
-                listElement.innerHTML = '';
-                // For top-pages, filter by search input if present
-                if (cardType === 'top-pages') {
-                    const searchInput = document.getElementById('top-pages-search');
-                    let filter = '';
-                    if (searchInput) filter = searchInput.value.trim().toLowerCase();
-                    items = items.filter(item => item.toLowerCase().includes(filter));
-                }
-                if (items.length === 0) {
-                    const li = document.createElement('li');
-                    li.textContent = 'No results';
-                    listElement.appendChild(li);
-                } else {
-                    items.forEach(item => {
-                        const li = document.createElement('li');
-                        li.textContent = item;
-                        listElement.appendChild(li);
-                    });
-                }
-            }
-        }
-        // Top Pages search filter handler
-        document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.getElementById('top-pages-search');
-            if (searchInput) {
-                searchInput.addEventListener('input', () => {
-                    // Use the same items as in updateAnalytics
-                    updateStatCard('top-pages', [
-                        'Analytics Dashboard',
-                        'Oil Orders System',
-                        'User Management',
-                        'Settings Page',
-                        'Admin Dashboard'
-                    ]);
-                });
-            }
-        });
-
-        // CSV Export functionality (enhanced)
-        function exportCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,";
-            const analytics = window.analyticsManager ? window.analyticsManager.getData(currentFilters) : null;
-            const data = analytics ? analytics.data : generateAnalyticsData(currentFilters);
-            const insights = analytics ? analytics.insights : {};
-
-            // Visitor data
-            csvContent += "Date,Visitors\n";
-            data.visitors.labels.forEach((label, index) => {
-                csvContent += `${label},${data.visitors.data[index]}\n`;
-            });
-
-            // Summary statistics
-            csvContent += "\nSummary Statistics\n";
-            csvContent += `Total Users,${data.summary.totalUsers}\n`;
-            csvContent += `Total Visitors (${currentFilters.dateRange}d),${data.summary.totalVisitors}\n`;
-            csvContent += `Average Daily Visitors,${data.summary.avgDailyVisitors}\n`;
-            csvContent += `Bounce Rate,${data.engagement.bounceRate.toFixed(1)}%\n`;
-            csvContent += `Average Session Duration,${Math.floor(data.engagement.avgSessionDuration / 60)}m ${Math.floor(data.engagement.avgSessionDuration % 60)}s\n`;
-            csvContent += `Pages per Session,${data.engagement.pagesPerSession.toFixed(1)}\n`;
-
-            // Actionable insights
-            if (insights.conversionRate !== undefined) {
-                csvContent += `Conversion Rate,${insights.conversionRate}%\n`;
-            }
-            if (insights.retentionRate !== undefined) {
-                csvContent += `Retention Rate,${insights.retentionRate}%\n`;
-            }
-
-            // Funnel
-            if (insights.funnel) {
-                csvContent += "\nFunnel Analysis\n";
-                csvContent += insights.funnel.steps.map((s, i) => `${s},${insights.funnel.values[i]}`).join("\n") + "\n";
-            }
-
-            // Device/Browser breakdown
-            if (insights.deviceBreakdown) {
-                csvContent += "\nDevice Breakdown\n";
-                insights.deviceBreakdown.deviceLabels.forEach((label, i) => {
-                    csvContent += `${label},${insights.deviceBreakdown.devices[i]}%\n`;
-                });
-            }
-            if (insights.browserBreakdown) {
-                csvContent += "\nBrowser Breakdown\n";
-                insights.browserBreakdown.browserLabels.forEach((label, i) => {
-                    csvContent += `${label},${insights.browserBreakdown.browsers[i]}%\n`;
-                });
-            }
-
-            // Multi-metric comparison
-            if (insights.multiMetric) {
-                csvContent += "\nMulti-Metric Comparison\nDate,Visitors,Orders,Sessions\n";
-                insights.multiMetric.labels.forEach((label, i) => {
-                    csvContent += `${label},${insights.multiMetric.visitors[i]},${insights.multiMetric.orders[i]},${insights.multiMetric.sessions[i]}\n`;
-                });
-            }
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `analytics-report-${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast('Enhanced CSV report exported successfully!');
-        }
-
-        // Update real-time statistics and health status
-        async function updateRealtimeStats() {
-            // API Health
-            let apiHealthy = false, dbHealthy = false, serverHealthy = true;
-            try {
-                const apiRes = await fetch('/api/users');
-                apiHealthy = apiRes.ok;
-            } catch (e) { apiHealthy = false; }
-            try {
-                const dbRes = await fetch('/api/orders');
-                dbHealthy = dbRes.ok;
-            } catch (e) { dbHealthy = false; }
-            // Server health: if page loads, assume server is up
-            serverHealthy = true;
-            // Update status bar
-            function setStatus(id, healthy, label) {
-                const el = document.getElementById(id);
-                if (!el) return;
-                const dot = el.querySelector('span');
-                const text = el.querySelector('span.ml-1');
-                if (healthy) {
-                    dot.classList.remove('bg-gray-400', 'bg-red-500');
-                    dot.classList.add('bg-green-500');
-                    text.textContent = 'Online';
-                } else {
-                    dot.classList.remove('bg-gray-400', 'bg-green-500');
-                    dot.classList.add('bg-red-500');
-                    text.textContent = 'Offline';
-                }
-            }
-            setStatus('status-api', apiHealthy, 'API');
-            setStatus('status-db', dbHealthy, 'Database');
-            setStatus('status-server', serverHealthy, 'Server');
-            // Update other real-time stats as before (if analyticsManager exists)
-            if (window.analyticsManager) {
-                const realtimeStats = window.analyticsManager.getRealtimeStats();
-                document.getElementById('active-users').textContent = realtimeStats.activeUsers;
-                document.getElementById('current-page-views').textContent = realtimeStats.currentPageViews;
-                document.getElementById('server-status').textContent = realtimeStats.serverStatus;
-                document.getElementById('total-users').textContent = realtimeStats.totalUsers;
-                const lastUpdatedElement = document.getElementById('last-updated');
-                if (lastUpdatedElement) {
-                    const date = new Date(realtimeStats.lastUpdate);
-                    lastUpdatedElement.textContent = date.toLocaleTimeString();
-                }
-            } else {
-                // Fallback: show basic stats
-                document.getElementById('active-users').textContent = '1';
-                document.getElementById('current-page-views').textContent = Math.floor(Math.random() * 15 + 5);
-                document.getElementById('server-status').textContent = serverHealthy ? 'Online' : 'Offline';
-                document.getElementById('total-users').textContent = '...';
-                const lastUpdatedElement = document.getElementById('last-updated');
-                if (lastUpdatedElement) {
-                    lastUpdatedElement.textContent = new Date().toLocaleTimeString();
-                }
-            }
-        }
-
-        // Refresh analytics data
-        function refreshAnalyticsData() {
-            if (window.analyticsManager) {
-                // Force refresh of analytics data
-                window.analyticsManager.createInitialData();
-                updateAnalytics();
-                updateRealtimeStats();
-                showToast('Analytics data refreshed successfully!');
-            }
-        }
-
-        // PDF Export functionality (enhanced)
-        function exportPDF() {
-            // Check if jsPDF is available
-            if (!window.jspdf || !window.jspdf.jsPDF) {
-                showToast('PDF export not available - CDN blocked. Using CSV fallback.');
-                exportCSV();
-                return;
-            }
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const analytics = window.analyticsManager ? window.analyticsManager.getData(currentFilters) : null;
-            const data = analytics ? analytics.data : generateAnalyticsData(currentFilters);
-            const insights = analytics ? analytics.insights : {};
-            // Add title
-            doc.setFontSize(20);
-            doc.text('Analytics Report', 20, 30);
-            // Add date range
-            doc.setFontSize(12);
-            doc.text(`Date Range: Last ${currentFilters.dateRange} days`, 20, 45);
-            doc.text(`User Filter: ${currentFilters.userType === 'all' ? 'All Users' : currentFilters.userType + ' Users'}`, 20, 55);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 65);
-            // Add summary statistics
-            doc.setFontSize(14);
-            doc.text('Summary Statistics', 20, 85);
-            doc.setFontSize(10);
-            let yPos = 95;
-            const summaryStats = [
-                `Total Users: ${data.summary.totalUsers}`,
-                `Total Visitors (${currentFilters.dateRange}d): ${data.summary.totalVisitors}`,
-                `Average Daily Visitors: ${data.summary.avgDailyVisitors}`,
-                `Bounce Rate: ${data.engagement.bounceRate.toFixed(1)}%`,
-                `Average Session Duration: ${Math.floor(data.engagement.avgSessionDuration / 60)}m ${Math.floor(data.engagement.avgSessionDuration % 60)}s`,
-                `Pages per Session: ${data.engagement.pagesPerSession.toFixed(1)}`,
-                `Return Visitor Rate: ${data.engagement.returnVisitorRate.toFixed(1)}%`
-            ];
-            summaryStats.forEach(stat => {
-                doc.text(stat, 25, yPos);
-                yPos += 10;
-            });
-            // Actionable insights
-            if (insights.conversionRate !== undefined) {
-                doc.text(`Conversion Rate: ${insights.conversionRate}%`, 25, yPos);
-                yPos += 10;
-            }
-            if (insights.retentionRate !== undefined) {
-                doc.text(`Retention Rate: ${insights.retentionRate}%`, 25, yPos);
-                yPos += 10;
-            }
-            // Funnel
-            if (insights.funnel) {
-                doc.setFontSize(14);
-                doc.text('Funnel Analysis', 20, yPos + 10);
-                doc.setFontSize(10);
-                yPos += 20;
-                insights.funnel.steps.forEach((step, i) => {
-                    doc.text(`${step}: ${insights.funnel.values[i]}`, 25, yPos);
-                    yPos += 8;
-                });
-            }
-            // Device/Browser breakdown
-            if (insights.deviceBreakdown) {
-                doc.setFontSize(14);
-                doc.text('Device Breakdown', 20, yPos + 10);
-                doc.setFontSize(10);
-                yPos += 20;
-                insights.deviceBreakdown.deviceLabels.forEach((label, i) => {
-                    doc.text(`${label}: ${insights.deviceBreakdown.devices[i]}%`, 25, yPos);
-                    yPos += 8;
-                });
-            }
-            if (insights.browserBreakdown) {
-                doc.setFontSize(14);
-                doc.text('Browser Breakdown', 20, yPos + 10);
-                doc.setFontSize(10);
-                yPos += 20;
-                insights.browserBreakdown.browserLabels.forEach((label, i) => {
-                    doc.text(`${label}: ${insights.browserBreakdown.browsers[i]}%`, 25, yPos);
-                    yPos += 8;
-                });
-            }
-            // Multi-metric comparison
-            if (insights.multiMetric) {
-                doc.setFontSize(14);
-                doc.text('Multi-Metric Comparison', 20, yPos + 10);
-                doc.setFontSize(10);
-                yPos += 20;
-                doc.text('Date   Visitors   Orders   Sessions', 25, yPos);
-                yPos += 8;
-                insights.multiMetric.labels.forEach((label, i) => {
-                    if (yPos > 270) { doc.addPage(); yPos = 30; }
-                    doc.text(`${label}   ${insights.multiMetric.visitors[i]}   ${insights.multiMetric.orders[i]}   ${insights.multiMetric.sessions[i]}`, 25, yPos);
-                    yPos += 8;
-                });
-            }
-            // Product sales section
-            doc.setFontSize(14);
-            doc.text('Product Sales', 20, yPos + 15);
-            doc.setFontSize(10);
-            yPos += 25;
-            data.sales.labels.forEach((product, index) => {
-                doc.text(`${product}: ${data.sales.data[index]} units`, 25, yPos);
-                yPos += 8;
-            });
-            // Add visitor trend data (sample)
-            doc.setFontSize(14);
-            doc.text('Recent Visitor Trends', 20, yPos + 15);
-            doc.setFontSize(10);
-            yPos += 25;
-            const recentDays = data.visitors.labels.slice(-7);
-            const recentData = data.visitors.data.slice(-7);
-            recentDays.forEach((date, index) => {
-                if (yPos > 250) { doc.addPage(); yPos = 30; }
-                doc.text(`${date}: ${recentData[index]} visitors`, 25, yPos);
-                yPos += 8;
-            });
-            doc.save(`analytics-report-${new Date().toISOString().split('T')[0]}.pdf`);
-            showToast('PDF report exported successfully!');
-        }
-
-        // PNG Export functionality for main charts
-        function exportPNG() {
-            // Check if Chart.js is available
-            if (!window.Chart) {
-                showToast('PNG export not available - Charts not loaded. Using CSV fallback.');
-                exportCSV();
-                return;
-            }
-            
-            // Export visitor, engagement, and sales charts as PNG
-            const charts = [
-                { id: 'visitor-chart', name: 'visitor-trends' },
-                { id: 'engagement-chart', name: 'user-engagement' },
-                { id: 'sales-chart', name: 'product-sales' },
-                { id: 'funnel-chart', name: 'funnel' },
-                { id: 'device-chart', name: 'device-breakdown' },
-                { id: 'browser-chart', name: 'browser-breakdown' },
-                { id: 'multi-metric-chart', name: 'multi-metric' }
-            ];
-            
-            let exportedCount = 0;
-            charts.forEach(chart => {
-                const canvas = document.getElementById(chart.id);
-                if (canvas && Chart.getChart(canvas)) {
-                    const url = Chart.getChart(canvas).toBase64Image();
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `analytics-${chart.name}-${new Date().toISOString().split('T')[0]}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    exportedCount++;
-                }
-            });
-            
-            if (exportedCount > 0) {
-                showToast(`${exportedCount} charts exported as PNG images!`);
-            } else {
-                showToast('No charts available for PNG export. Using CSV fallback.');
-                exportCSV();
-            }
-        }
-
-        // Filter change handlers
-        function setupFilterHandlers() {
-            // Date range select
-            document.getElementById('date-range').addEventListener('change', (e) => {
-                currentFilters.dateRange = parseInt(e.target.value);
-                updateAnalytics();
-                updateActiveDateChip(currentFilters.dateRange);
-                showToast(`Updated data for last ${currentFilters.dateRange} days`);
-            });
-
-            // Date filter chips
-            document.querySelectorAll('.date-chip').forEach(chip => {
-                chip.addEventListener('click', (e) => {
-                    const range = parseInt(chip.getAttribute('data-range'));
-                    currentFilters.dateRange = range;
-                    document.getElementById('date-range').value = range;
-                    updateAnalytics();
-                    updateActiveDateChip(range);
-                    showToast(`Updated data for last ${range === 1 ? 'today' : range + ' days'}`);
-                });
-                chip.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        chip.click();
-                    }
-                });
-            });
-
-            // Highlight active chip
-            function updateActiveDateChip(activeRange) {
-                document.querySelectorAll('.date-chip').forEach(chip => {
-                    const range = parseInt(chip.getAttribute('data-range'));
-                    if (range === activeRange) {
-                        chip.classList.add('bg-primary', 'text-white');
-                        chip.setAttribute('aria-pressed', 'true');
-                    } else {
-                        chip.classList.remove('bg-primary', 'text-white');
-                        chip.setAttribute('aria-pressed', 'false');
-                    }
-                });
-            }
-            // Set initial chip highlight
-            updateActiveDateChip(currentFilters.dateRange);
-
-            // User type select
-            document.getElementById('user-type').addEventListener('change', (e) => {
-                currentFilters.userType = e.target.value;
-                updateAnalytics();
-                showToast(`Filtered by ${currentFilters.userType === 'all' ? 'all users' : currentFilters.userType + ' users'}`);
-            });
-
-            document.getElementById('export-csv').addEventListener('click', exportCSV);
-            document.getElementById('export-pdf').addEventListener('click', exportPDF);
-            document.getElementById('export-png').addEventListener('click', exportPNG);
-
-            // Add refresh button handler
-            const refreshBtn = document.getElementById('refresh-data');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', refreshAnalyticsData);
-            }
-        }
-
-        // Legacy theme toggle removed. Theme handled via stored settings and CSS variables.
-
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            const isOpen = sidebar.classList.contains('open');
-            menuToggle.setAttribute('aria-expanded', isOpen);
-        });
-        
-        // Initialize everything when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAndApplySettings();
-            setupFilterHandlers();
-            // Initialize charts after a short delay to ensure DOM is ready
-            setTimeout(() => {
-                initializeCharts();
-                updateAnalytics();
-                updateRealtimeStats();
-                // Set up real-time updates every 30 seconds
-                setInterval(updateAnalytics, 60000); // Auto-refresh analytics every 60s
-                setInterval(updateRealtimeStats, 30000);
-            }, 100);
-            // Also call immediately to ensure real-time stats show up quickly
-            setTimeout(updateRealtimeStats, 50);
-        });
-    </script>
-        </body>
+<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+  <aside id="sidebar" class="sidebar sidebar-neon w-64 fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation">
+    <h1 class="text-2xl font-bold mb-6 neon-brand">Josh's App</h1>
+    <nav aria-label="Main navigation">
+      <ul class="space-y-2">
+        <li><a href="index.html" class="block p-2 rounded nav-link nav-link-muted">Home</a></li>
+        <li><a href="administration.html" class="block p-2 rounded nav-link nav-link-muted">Administration</a></li>
+        <li><a href="users.html" class="block p-2 rounded nav-link nav-link-muted">User Management</a></li>
+        <li><a href="analytics.html" class="block p-2 rounded nav-link active" aria-current="page">Analytics</a></li>
+        <li><a href="settings.html" class="block p-2 rounded nav-link nav-link-muted">Settings</a></li>
+        <li><a href="oil.html" class="block p-2 rounded nav-link nav-link-muted">Oil Orders</a></li>
+        <li><a href="consumables.html" class="block p-2 rounded nav-link nav-link-muted">Consumables Orders</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
+    <header class="p-4 md:p-6 card rounded-lg shadow-md sticky top-0 z-30">
+      <h1 class="text-2xl font-bold">Analytics Dashboard</h1>
+      <p class="text-sm text-gray-400 mt-1">Traffic, engagement & product performance overview</p>
+    </header>
+    <section class="space-y-4">
+      <div class="flex flex-wrap gap-2" id="quick-date-chips"></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label class="block text-sm font-semibold mb-2">Date Range</label>
+          <select id="date-range" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="365">Last year</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">User Type</label>
+          <select id="user-type" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+            <option value="all" selected>All Users</option>
+            <option value="admin">Admin Users</option>
+            <option value="user">Regular Users</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="block text-sm font-semibold">Export</label>
+          <div class="flex gap-2">
+            <button id="export-csv" class="btn-neon-green flex-1 px-3 py-2 rounded-lg">CSV</button>
+            <button id="export-pdf" class="btn-neon-blue flex-1 px-3 py-2 rounded-lg">PDF</button>
+            <button id="export-png" class="btn-neon-blue flex-1 px-3 py-2 rounded-lg">PNG</button>
+          </div>
+        </div>
+      </div>
+      <div class="w-full text-center text-xs text-gray-400 flex items-center justify-center gap-2">
+        <span id="last-updated">Last updated: --</span>
+        <button id="refresh-btn" class="ml-2 px-2 py-1 rounded bg-gray-800 text-white text-xs hover:bg-gray-700">⟳ Refresh</button>
+        <span class="text-gray-500 text-xs ml-2" id="auto-refresh-label">(auto every 60s)</span>
+      </div>
+    </section>
+    <section class="mb-2">
+      <div class="card widget-secondary rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center"><span class="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></span>Real-time Statistics</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="text-center"><div class="text-2xl font-bold text-green-400" id="active-users">-</div><div class="text-xs text-gray-400">Active Users</div></div>
+          <div class="text-center"><div class="text-2xl font-bold text-blue-400" id="current-page-views">-</div><div class="text-xs text-gray-400">Page Views (Hr)</div></div>
+          <div class="text-center"><div class="text-2xl font-bold text-yellow-400" id="server-status">-</div><div class="text-xs text-gray-400">Server Status</div></div>
+          <div class="text-center"><div class="text-2xl font-bold text-purple-400" id="total-users">-</div><div class="text-xs text-gray-400">Total Users</div></div>
+        </div>
+      </div>
+    </section>
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="card p-4 widget-primary rounded-lg"><h3 class="text-sm font-semibold mb-1">Conversion Rate</h3><div id="insight-conversion" class="text-xl font-bold">--%</div></div>
+      <div class="card p-4 widget-secondary rounded-lg"><h3 class="text-sm font-semibold mb-1">Retention Rate</h3><div id="insight-retention" class="text-xl font-bold">--%</div></div>
+      <div class="card p-4 widget-accent rounded-lg"><h3 class="text-sm font-semibold mb-1">Top Product</h3><div id="insight-top-product" class="text-xl font-bold">--</div></div>
+      <div class="card p-4 widget-yellow rounded-lg"><h3 class="text-sm font-semibold mb-1">Top User</h3><div id="insight-top-user" class="text-xl font-bold">--</div></div>
+    </section>
+    <div id="status-bar" class="w-full flex flex-wrap items-center justify-center gap-4 py-2 px-4 card text-sm">
+      <span id="status-api" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>API: <span class="ml-1">Checking...</span></span>
+      <span id="status-db" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>Database: <span class="ml-1">Checking...</span></span>
+      <span id="status-server" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>Server: <span class="ml-1">Checking...</span></span>
+    </div>
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="card widget-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>Visitor Trends</h3><div class="h-72"><canvas id="visitor-chart"></canvas></div></div>
+      <div class="card widget-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-green-400 rounded-full"></span>User Engagement</h3><div class="h-72"><canvas id="engagement-chart"></canvas></div></div>
+      <div class="card widget-accent p-6 rounded-lg shadow-md lg:col-span-2"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>Product Sales Analytics</h3><div class="h-80"><canvas id="sales-chart"></canvas></div></div>
+    </section>
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card widget-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">Visitor Statistics</h3><ul id="visitor-stats" class="list-disc pl-5 space-y-1 text-gray-300"><li>Loading...</li></ul></div>
+      <div class="card widget-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">User Engagement</h3><ul id="engagement-stats" class="list-disc pl-5 space-y-1 text-gray-300"><li>Loading...</li></ul></div>
+      <div class="card widget-accent p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2 flex items-center justify-between">Top Pages <input id="top-pages-search" type="search" placeholder="Search pages..." class="ml-2 px-2 py-1 rounded bg-gray-800 border border-gray-600 text-sm" aria-label="Search top pages"></h3><ol id="top-pages" class="list-decimal pl-5 space-y-1 text-gray-300"><li>Loading...</li></ol></div>
+    </section>
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">User Breakdown</h3><ul id="user-breakdown-list" class="space-y-1 text-sm"></ul></div>
+      <div class="card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">User Growth (30d)</h3><canvas id="user-growth-sparkline" width="180" height="60"></canvas></div>
+      <div class="card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">Top Users</h3><ul id="top-users-list" class="flex flex-col gap-1 text-sm"></ul><div class="mt-3 flex gap-2 items-center text-xs"><label for="user-role-filter">Role:</label><select id="user-role-filter" class="bg-gray-800 text-white rounded px-2 py-1 text-xs"><option value="all">All</option><option value="admin">Admin</option><option value="user">User</option><option value="locked">Locked</option></select></div><div class="mt-2 flex gap-2 items-center text-xs"><label for="user-date-filter">Since:</label><input type="date" id="user-date-filter" class="bg-gray-800 text-white rounded px-2 py-1 text-xs" /></div><button id="export-user-analytics" class="mt-3 w-full px-2 py-1 rounded bg-gray-800 text-white text-xs hover:bg-gray-700">Export Users CSV</button></div>
+    </section>
+  </main>
+  <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300 text-sm" role="alert" aria-live="polite"></div>
+  <script>
+    const FN_BASE='/.netlify/functions';
+    const REFRESH_INTERVAL=60000; let autoTimer=null; const filters={dateRange:30,userType:'all'};
+    let visitorChart, engagementChart, salesChart, userGrowthSparkline;
+    function showToast(msg){const t=document.getElementById('toast'); if(!t)return; t.textContent=msg; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3000);}
+    function setupQuickChips(){const ranges=[1,7,30,90,365]; const wrap=document.getElementById('quick-date-chips'); ranges.forEach(r=>{ const btn=document.createElement('button'); btn.className='px-3 py-1 rounded-full bg-gray-800 text-gray-200 text-xs'; btn.textContent=r===1?'Today': (r===365?'YTD': r+'d'); btn.dataset.range=r; btn.addEventListener('click',()=>{ filters.dateRange=r; document.getElementById('date-range').value=r; highlight(); updateAll();}); wrap.appendChild(btn);}); function highlight(){wrap.querySelectorAll('button').forEach(b=>{const active=parseInt(b.dataset.range)===filters.dateRange; b.classList.toggle('bg-primary',active); b.classList.toggle('text-white',active);});} highlight(); }
+    async function fetchJSON(url){ try{ const r=await fetch(url); if(!r.ok) throw new Error(r.status); return await r.json(); }catch(e){ return null; } }
+    async function generateData(){ const usersData=await fetchJSON(`${FN_BASE}/users`); const ordersData=await fetchJSON(`${FN_BASE}/orders`); const productsData=await fetchJSON(`${FN_BASE}/products`); const users=(usersData && usersData.users)||[]; let filteredUsers=users; if(filters.userType==='admin') filteredUsers=users.filter(u=>u.role==='admin'); else if(filters.userType==='user') filteredUsers=users.filter(u=>u.role==='user'); const orders=Array.isArray(ordersData)?ordersData:[]; const products=Array.isArray(productsData)?productsData:[]; const days=filters.dateRange; const labels=[]; const visitorCounts=[]; const now=new Date(); for(let i=days-1;i>=0;i--){ const d=new Date(now); d.setDate(now.getDate()-i); labels.push(d.toLocaleDateString()); const ds=d.toISOString().split('T')[0]; const count=orders.filter(o=> (o.created_at||'').startsWith(ds)).length; visitorCounts.push(count);} const productNames=products.map(p=>p.name); const salesCounts=productNames.map(n=> orders.reduce((s,o)=> s + ((o.items||[]).filter(i=>i.name===n).reduce((a,i)=>a+(i.quantity||1),0)),0)); const totalVisitors=visitorCounts.reduce((a,b)=>a+b,0); return { users:filteredUsers, orders, products, visitors:{labels,data:visitorCounts}, sales:{labels:productNames,data:salesCounts}, engagement:{ bounceRate: Math.max(0,100-(orders.length/(filteredUsers.length*days||1))*100), avgSessionDuration:300, pagesPerSession:3, returnVisitorRate:30 }, summary:{ totalUsers:filteredUsers.length, totalVisitors, avgDaily: days? Math.round(totalVisitors/days):0 }}; }
+    function ensureCharts(data){ if(!window.Chart) return; if(!visitorChart){ visitorChart=new Chart(document.getElementById('visitor-chart'), { type:'line', data:{labels:data.visitors.labels,datasets:[{label:'Daily Visitors',data:data.visitors.data,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',tension:.4,fill:true}]}, options:{plugins:{legend:{labels:{color:'#f9fafb'}}},scales:{x:{ticks:{color:'#f9fafb'}},y:{ticks:{color:'#f9fafb'}}}}}); } else { visitorChart.data.labels=data.visitors.labels; visitorChart.data.datasets[0].data=data.visitors.data; visitorChart.update(); }
+      if(!engagementChart){ engagementChart=new Chart(document.getElementById('engagement-chart'), { type:'doughnut', data:{ labels:['Return','New','Bounced','Engaged'], datasets:[{ data:[data.engagement.returnVisitorRate,100-data.engagement.returnVisitorRate,data.engagement.bounceRate,100-data.engagement.bounceRate], backgroundColor:['rgb(16,185,129)','rgb(59,130,246)','rgb(239,68,68)','rgb(139,92,246)'] }]}, options:{plugins:{legend:{labels:{color:'#f9fafb'}}}}}); } else { engagementChart.data.datasets[0].data=[data.engagement.returnVisitorRate,100-data.engagement.returnVisitorRate,data.engagement.bounceRate,100-data.engagement.bounceRate]; engagementChart.update(); }
+      if(!salesChart){ salesChart=new Chart(document.getElementById('sales-chart'), { type:'bar', data:{ labels:data.sales.labels, datasets:[{ label:'Units Sold', data:data.sales.data, backgroundColor:['rgba(239,68,68,0.8)','rgba(16,185,129,0.8)','rgba(59,130,246,0.8)','rgba(139,92,246,0.8)','rgba(245,158,11,0.8)']}]}, options:{plugins:{legend:{labels:{color:'#f9fafb'}}},scales:{x:{ticks:{color:'#f9fafb'}},y:{ticks:{color:'#f9fafb'}}}}}); } else { salesChart.data.labels=data.sales.labels; salesChart.data.datasets[0].data=data.sales.data; salesChart.update(); } }
+    function updateStatCard(id, items){ const el=document.getElementById(id); if(!el) return; el.innerHTML=''; if(!items.length){ el.innerHTML='<li>No results</li>'; return;} items.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; el.appendChild(li); }); }
+    function trendArrow(v){ if(v>50) return '↗'; if(v<20) return '↘'; return '→'; }
+    async function updateAll(){ const last=document.getElementById('last-updated'); try{ const data=await generateData(); if(last) last.textContent='Last updated: '+ new Date().toLocaleTimeString(); ensureCharts(data); updateStatCard('visitor-stats',[`Total Visitors (${filters.dateRange}d): ${data.summary.totalVisitors}`,`Avg Daily: ${data.summary.avgDaily}`,`Active Session: ${data.summary.totalUsers>0?'Yes':'No'}`]); updateStatCard('engagement-stats',[`Bounce Rate: ${data.engagement.bounceRate.toFixed(1)}%`,`Avg Session: 5m 0s`,`Pages/Session: ${data.engagement.pagesPerSession.toFixed(1)}`,`Return Rate: ${data.engagement.returnVisitorRate.toFixed(1)}%`]); updateStatCard('top-pages',['Analytics Dashboard','Oil Orders System','User Management','Settings Page','Admin Dashboard']); const totalSalesUnits=data.sales.data.reduce((a,b)=>a+b,0); const conversion = data.summary.totalUsers ? (totalSalesUnits / data.summary.totalUsers)*100 : 0; document.getElementById('insight-conversion').textContent=conversion.toFixed(1)+'% '+trendArrow(conversion); document.getElementById('insight-retention').textContent=data.engagement.returnVisitorRate.toFixed(1)+'% '+trendArrow(data.engagement.returnVisitorRate); if(data.sales.data.length){ const idx=data.sales.data.indexOf(Math.max(...data.sales.data)); document.getElementById('insight-top-product').textContent=data.sales.labels[idx]||'--'; } await updateTopUser(); await buildUserBreakdown(); }catch(e){ if(last) last.textContent='Last updated: error'; } }
+    async function updateTopUser(){ try{ const orders=await fetchJSON(`${FN_BASE}/orders`); const usersData=await fetchJSON(`${FN_BASE}/users`); const users=(usersData && usersData.users)||[]; const counts={}; (orders||[]).forEach(o=>{ if(o.created_by) counts[o.created_by]=(counts[o.created_by]||0)+1; }); let top='--', max=0; Object.entries(counts).forEach(([u,c])=>{ if(c>max){ max=c; top=u; }}); document.getElementById('insight-top-user').textContent=top; }catch(e){ document.getElementById('insight-top-user').textContent='--'; } }
+    async function buildUserBreakdown(){ let users=[]; let orders=[]; try{ const u=await fetchJSON(`${FN_BASE}/users`); users=(u&&u.users)||[]; }catch(_){} try{ const o=await fetchJSON(`${FN_BASE}/orders`); orders=o||[]; }catch(_){} const list=document.getElementById('user-breakdown-list'); if(list){ const total=users.length; const admins=users.filter(u=>u.role==='admin').length; const regular=users.filter(u=>u.role==='user').length; const locked=users.filter(u=>u.locked).length; const now=new Date(); const newUsers=users.filter(u=>u.created_at && (now-new Date(u.created_at))<7*24*60*60*1000).length; const returning=users.filter(u=> orders.filter(o=>o.created_by===u.username).length>1).length; list.innerHTML=`<li>Total: <strong>${total}</strong></li><li>Admins: <strong>${admins}</strong></li><li>Regular: <strong>${regular}</strong></li><li>Locked: <strong>${locked}</strong></li><li>New (7d): <strong>${newUsers}</strong></li><li>Returning: <strong>${returning}</strong></li>`; } const growthCanvas=document.getElementById('user-growth-sparkline'); if(growthCanvas && window.Chart){ const arr=Array(30).fill(0); const now=new Date(); users.forEach(u=>{ if(u.created_at){ const daysAgo=Math.floor((now-new Date(u.created_at))/(24*60*60*1000)); if(daysAgo>=0 && daysAgo<30) arr[29-daysAgo]++; }}); if(userGrowthSparkline) userGrowthSparkline.destroy(); userGrowthSparkline=new Chart(growthCanvas.getContext('2d'),{ type:'line', data:{ labels:Array.from({length:30},(_,i)=>i+1), datasets:[{ data:arr,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',tension:.4,fill:true,pointRadius:0,borderWidth:2 }]}, options:{responsive:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}}); } const topList=document.getElementById('top-users-list'); if(topList){ const counts={}; orders.forEach(o=>{ if(o.created_by) counts[o.created_by]=(counts[o.created_by]||0)+1; }); const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5); topList.innerHTML= top.length? top.map(([u,c])=>`<li class='flex items-center'><span class='inline-block w-2 h-2 rounded-full bg-blue-400 mr-2'></span><strong>${u}</strong><span class='ml-2 text-xs text-gray-400'>${c} orders</span></li>`).join(''):'<li>N/A</li>'; } }
+    async function updateRealtime(){ let apiHealthy=false, dbHealthy=false, serverHealthy=true; try{ apiHealthy=(await fetch(`${FN_BASE}/users`)).ok; }catch(_){} try{ dbHealthy=(await fetch(`${FN_BASE}/orders`)).ok; }catch(_){} function setStatus(id, healthy){ const el=document.getElementById(id); if(!el) return; const dot=el.querySelector('span'); const text=el.querySelector('span.ml-1'); if(dot){ dot.classList.remove('bg-gray-500','bg-green-500','bg-red-500'); dot.classList.add(healthy?'bg-green-500':'bg-red-500'); } if(text) text.textContent=healthy?'Online':'Offline'; } setStatus('status-api', apiHealthy); setStatus('status-db', dbHealthy); setStatus('status-server', serverHealthy); document.getElementById('active-users').textContent=Math.floor(Math.random()*5)+1; document.getElementById('current-page-views').textContent=Math.floor(Math.random()*50)+10; document.getElementById('server-status').textContent=serverHealthy?'Online':'Offline'; try{ const u=await fetchJSON(`${FN_BASE}/users`); document.getElementById('total-users').textContent=(u&&u.users?u.users.length:'--'); }catch(_){ document.getElementById('total-users').textContent='--'; } }
+    function exportCSV(){ (async()=>{ const data=await generateData(); let csv='Date,Visitors\n'; data.visitors.labels.forEach((l,i)=> csv+=`${l},${data.visitors.data[i]}\n`); csv+='\nSummary\n'; csv+=`Total Visitors (${filters.dateRange}d),${data.summary.totalVisitors}\nAverage Daily Visitors,${data.summary.avgDaily}\nBounce Rate,${data.engagement.bounceRate.toFixed(1)}%\nReturn Rate,${data.engagement.returnVisitorRate.toFixed(1)}%\n`; csv+='\nProduct Sales\n'; data.sales.labels.forEach((p,i)=> csv+=`${p},${data.sales.data[i]}\n`); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`analytics-report-${new Date().toISOString().split('T')[0]}.csv`; a.click(); showToast('CSV exported'); })(); }
+    function exportUserCSV(){ (async()=>{ const u=await fetchJSON(`${FN_BASE}/users`); const o=await fetchJSON(`${FN_BASE}/orders`); const users=(u&&u.users)||[]; const orders=o||[]; let csv='Username,Role,Locked,Created At,Orders\n'; users.forEach(user=>{ const count=orders.filter(or=>or.created_by===user.username).length; csv+=`${user.username},${user.role},${user.locked?'Yes':'No'},${user.created_at||''},${count}\n`; }); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`user-analytics-${new Date().toISOString().split('T')[0]}.csv`; a.click(); showToast('User analytics CSV exported'); })(); }
+    function exportPDF(){ if(!window.jspdf||!window.jspdf.jsPDF){ showToast('PDF unavailable; CSV fallback'); return exportCSV(); } const { jsPDF }=window.jspdf; (async()=>{ const data=await generateData(); const doc=new jsPDF(); doc.setFontSize(18); doc.text('Analytics Report',20,20); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`,20,28); let y=40; const lines=[`Range: ${filters.dateRange}d`,`Total Visitors: ${data.summary.totalVisitors}`,`Avg Daily: ${data.summary.avgDaily}`,`Bounce: ${data.engagement.bounceRate.toFixed(1)}%`,`Return: ${data.engagement.returnVisitorRate.toFixed(1)}%`]; lines.forEach(l=>{ doc.text(l,20,y); y+=6; }); y+=4; doc.text('Product Sales:',20,y); y+=6; data.sales.labels.forEach((p,i)=>{ if(y>270){ doc.addPage(); y=20;} doc.text(`${p}: ${data.sales.data[i]}`,26,y); y+=6; }); doc.save(`analytics-report-${new Date().toISOString().split('T')[0]}.pdf`); showToast('PDF exported'); })(); }
+    function exportPNG(){ if(!window.Chart){ showToast('Charts not loaded'); return; } const charts=[['visitor-chart','visitor'],['engagement-chart','engagement'],['sales-chart','sales']]; charts.forEach(([id,name])=>{ const c=document.getElementById(id); if(c){ const ch=Chart.getChart(c); if(ch){ const url=ch.toBase64Image(); const a=document.createElement('a'); a.href=url; a.download=`analytics-${name}-${new Date().toISOString().split('T')[0]}.png`; a.click(); } } }); showToast('PNG export complete'); }
+    function bindUI(){ document.getElementById('date-range').addEventListener('change',e=>{ filters.dateRange=parseInt(e.target.value); updateAll(); }); document.getElementById('user-type').addEventListener('change',e=>{ filters.userType=e.target.value; updateAll();}); document.getElementById('export-csv').addEventListener('click',exportCSV); document.getElementById('export-pdf').addEventListener('click',exportPDF); document.getElementById('export-png').addEventListener('click',exportPNG); document.getElementById('export-user-analytics').addEventListener('click',exportUserCSV); document.getElementById('refresh-btn').addEventListener('click',()=>{ updateAll(); updateRealtime(); showToast('Refreshed');}); }
+    function startAuto(){ if(autoTimer) clearInterval(autoTimer); autoTimer=setInterval(()=>{ updateAll(); updateRealtime(); }, REFRESH_INTERVAL); }
+    document.addEventListener('DOMContentLoaded',()=>{ setupQuickChips(); bindUI(); updateAll(); updateRealtime(); startAuto(); });
+  </script>
+</body>
 </html>
