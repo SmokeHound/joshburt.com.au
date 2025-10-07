@@ -17,7 +17,7 @@ command = "npm install"
 functions = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
 
 [build.environment]
-NODE_VERSION = "24"
+NODE_VERSION = "22"
 
 [build.processing]
 
