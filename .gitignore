@@ -396,9 +396,6 @@ temp/
 ehthumbs.db
 Thumbs.db
 
-# Local Netlify folder
-
-
 # Local Tailwind CSS build output
 tailwindcss.exe
 DEPLOYMENT.md
