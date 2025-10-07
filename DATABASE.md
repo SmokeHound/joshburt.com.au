@@ -5,8 +5,8 @@
 
 
 The joshburt.com.au application supports multiple database backends:
-- **MySQL** (default, recommended for production)
-- **PostgreSQL** (supported, e.g. Neon)
+- **PostgreSQL** (default, supported, e.g. Neon)
+- **MySQL**
 - **SQLite** (for development and testing)
 
 ## Database Configuration
@@ -15,18 +15,21 @@ The joshburt.com.au application supports multiple database backends:
 
 Set the following environment variables based on your deployment:
 
+ LEGACY NOTE: Historical documentation elsewhere may reference REST paths like `/api/users`. The live system now serves all dynamic operations via Netlify Functions at `/.netlify/functions/users`.
 
-#### MySQL (Production, Default)
+#### PostgreSQL (default, e.g. Neon)
 ```env
 # Database Type
-DB_TYPE=mysql
+DB_TYPE=postgres
 
-# MySQL Configuration
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=joshburt_website
-DB_USER=mysqluser
-DB_PASSWORD=your-secure-password
+# PostgreSQL Configuration
+
+DB_HOST='ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech'
+DB_DATABASE='neondb'
+DB_USER='neondb_owner'
+DB_PASSWORD='*************'
+DB_SSLMODE='require'
+DB_CHANNELBINDING='require'
 
 # JWT Configuration (required)
 JWT_SECRET=your-super-secure-jwt-secret-key
@@ -35,20 +38,6 @@ JWT_REFRESH_EXPIRES_IN=30d
 
 # Security
 BCRYPT_ROUNDS=12
-```
-> LEGACY NOTE: Historical documentation elsewhere may reference REST paths like `/api/users`. The live system now serves all dynamic operations via Netlify Functions at `/.netlify/functions/users`.
-
-#### PostgreSQL (Alternative, e.g. Neon)
-```env
-# Database Type
-DB_TYPE=postgres
-
-# PostgreSQL Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=joshburt_website
-DB_USER=postgres
-> LEGACY NOTE: Any prior endpoint references such as `/api/auth/refresh` are replaced by the unified function `/.netlify/functions/auth?action=refresh`.
 DB_PASSWORD=your-secure-password
 DB_SSL=true
 

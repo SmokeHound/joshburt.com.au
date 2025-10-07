@@ -38,5 +38,3 @@ for = "/.netlify/functions/*"
 Access-Control-Allow-Origin = "*"
 Access-Control-Allow-Headers = "Content-Type"
 Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
-
-## Removed legacy /api/* redirect (Express fully deprecated)
