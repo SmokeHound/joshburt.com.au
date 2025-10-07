@@ -1,7 +1,4 @@
-headersOrigin = "config"
-redirectsOrigin = "config"
 functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
-functionsDirectoryOrigin = "config-v1"
 
 [functions]
 
@@ -16,14 +13,11 @@ pinned_version = "1"
 
 [build]
 publish = "C:\\DEV\\joshburt.com.au\\joshburt.com.au"
-publishOrigin = "config"
-commandOrigin = "config"
 command = "npm install"
 functions = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
 
 [build.environment]
-NODE_VERSION = "22"
-NEON_DATABASE_URL = "mysql://avnadmin:AVNS_ftCWIkMaUvsojeBNmAh@mysql-28ad5375-joshburt.g.aivencloud.com:12667/defaultdb?ssl-mode=REQUIRED"
+NODE_VERSION = "24"
 
 [build.processing]
 
