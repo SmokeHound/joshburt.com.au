@@ -1,4 +1,4 @@
-// Netlify Function: Full CRUD for products
+// Netlify Function: Full CRUD /.netlify/functions/products (legacy /api/products deprecated)
 const { database } = require('../../config/database');
 
 exports.handler = async function(event, context) {

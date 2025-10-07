@@ -1,4 +1,4 @@
-// Netlify Function: Full CRUD for consumables
+// Netlify Function: Full CRUD /.netlify/functions/consumables (legacy /api/consumables deprecated)
 const { database } = require('../../config/database');
 
 exports.handler = async function(event, context) {

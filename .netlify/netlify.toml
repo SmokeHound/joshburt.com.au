@@ -39,14 +39,4 @@ Access-Control-Allow-Origin = "*"
 Access-Control-Allow-Headers = "Content-Type"
 Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
 
-[[redirects]]
-from = "/api/*"
-to = "/.netlify/functions/:splat"
-status = 200.0
-force = false
-
-[redirects.query]
-
-[redirects.conditions]
-
-[redirects.headers]
+## Removed legacy /api/* redirect (Express fully deprecated)

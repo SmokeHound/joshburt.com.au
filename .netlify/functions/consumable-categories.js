@@ -1,4 +1,4 @@
-// Netlify Function: GET /api/consumable-categories
+// Netlify Function: GET /.netlify/functions/consumable-categories (legacy /api/consumable-categories deprecated)
 const { database } = require('../../config/database');
 
 exports.handler = async function(event, context) {

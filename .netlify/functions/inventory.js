@@ -1,4 +1,4 @@
-// Netlify Function: GET /api/inventory
+// Netlify Function: GET /.netlify/functions/inventory (legacy /api/inventory deprecated)
 const { Client } = require('pg');
 
 exports.handler = async function(event, context) {

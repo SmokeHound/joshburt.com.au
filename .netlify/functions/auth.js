@@ -1,22 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-// Use Node built-in crypto (eslint environment may mark crypto as global in some configs)
-// eslint-disable-next-line no-redeclare
 const crypto = require('crypto');
 const { database } = require('../../config/database');
-
-// CORS helper
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS'
-};
-
-const jsonResponse = (statusCode, body) => ({
-  statusCode,
-  headers: { 'Content-Type': 'application/json', ...corsHeaders },
-  body: JSON.stringify(body)
-});
+const { corsHeaders, json: jsonResponse, error: errorResponse, parseBody, authenticate } = require('../../utils/http');
 
 const generateTokens = (userId) => {
   const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
@@ -30,19 +16,19 @@ const storeRefreshToken = async (userId, refreshToken) => {
   await database.run('INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)', [userId, tokenHash, expiresAt.toISOString()]);
 };
 
-async function authenticate(event) {
-  try {
-    const auth = event.headers.authorization || event.headers.Authorization;
-    if (!auth) return null;
-    const token = auth.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await database.get('SELECT id, email, name, role, is_active, email_verified FROM users WHERE id = ?', [decoded.userId]);
-    if (!user || !user.is_active) return null;
-    return user;
-  } catch (e) {
-    return null;
-  }
+// In-memory rate limiter (per cold start container). Basic protection for login brute force.
+const rateBuckets = {};
+function rateLimit(key, limit = 5, windowMs = 5 * 60 * 1000) {
+  const now = Date.now();
+  if (!rateBuckets[key]) rateBuckets[key] = [];
+  // purge old
+  rateBuckets[key] = rateBuckets[key].filter(ts => now - ts < windowMs);
+  if (rateBuckets[key].length >= limit) return false;
+  rateBuckets[key].push(now);
+  return true;
 }
+
+// authenticate now provided by shared helper
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -51,24 +37,17 @@ exports.handler = async (event) => {
 
   // Expect an action param via path or query (?action=login) or JSON body { action }
   let action = (event.queryStringParameters && event.queryStringParameters.action) || '';
-  let payload = {};
-  if (event.body) {
-    try {
-      payload = JSON.parse(event.body);
-      if (!action && payload.action) action = payload.action;
-    } catch (e) {
-      // ignore body parse errors
-    }
-  }
+  const payload = parseBody(event);
+  if (!action && payload.action) action = payload.action;
   const method = event.httpMethod;
 
   try {
     // REGISTER
     if ((action === 'register' || (method === 'POST' && event.path.endsWith('/auth/register')))) {
       const { email, password, name } = payload;
-      if (!email || !password || !name) return jsonResponse(400, { error: 'Missing email, password or name' });
+      if (!email || !password || !name) return errorResponse(400, 'Missing email, password or name');
       const existing = await database.get('SELECT id FROM users WHERE email = ?', [email]);
-      if (existing) return jsonResponse(409, { error: 'User already exists with this email' });
+      if (existing) return errorResponse(409, 'User already exists with this email');
       const rounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
       const passwordHash = await bcrypt.hash(password, rounds);
       const verificationToken = crypto.randomBytes(32).toString('hex');
@@ -80,10 +59,10 @@ exports.handler = async (event) => {
     // VERIFY EMAIL
     if (action === 'verify-email') {
       const { token } = event.queryStringParameters || {};
-      if (!token) return jsonResponse(400, { error: 'Missing verification token' });
+      if (!token) return errorResponse(400, 'Missing verification token');
       const user = await database.get('SELECT id, email_verification_expires FROM users WHERE email_verification_token = ?', [token]);
-      if (!user) return jsonResponse(400, { error: 'Invalid or expired verification token' });
-      if (user.email_verification_expires && user.email_verification_expires < Date.now()) return jsonResponse(400, { error: 'Verification token expired' });
+      if (!user) return errorResponse(400, 'Invalid or expired verification token');
+      if (user.email_verification_expires && user.email_verification_expires < Date.now()) return errorResponse(400, 'Verification token expired');
       await database.run('UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?', [user.id]);
       return jsonResponse(200, { message: 'Email verified' });
     }
@@ -91,12 +70,18 @@ exports.handler = async (event) => {
     // LOGIN
     if ((action === 'login' || (method === 'POST' && event.path.endsWith('/auth/login')))) {
       const { email, password } = payload;
-      if (!email || !password) return jsonResponse(400, { error: 'Invalid email or password format' });
+      if (!email || !password) return errorResponse(400, 'Invalid email or password format');
+      // Basic rate limiting by IP + action
+      const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || 'unknown';
+      const rlKey = `login:${ip}`;
+      if (!rateLimit(rlKey, 5, 5 * 60 * 1000)) {
+        return errorResponse(429, 'Too many login attempts. Please wait a few minutes and try again.');
+      }
       const user = await database.get('SELECT id, email, name, password_hash, role, is_active, email_verified, failed_login_attempts, lockout_expires FROM users WHERE email = ?', [email]);
-      if (!user || !user.is_active) return jsonResponse(401, { error: 'Invalid credentials' });
+      if (!user || !user.is_active) return errorResponse(401, 'Invalid credentials');
       if (user.lockout_expires && user.lockout_expires > Date.now()) {
         const minutes = Math.ceil((user.lockout_expires - Date.now())/60000);
-        return jsonResponse(403, { error: `Account locked. Try again in ${minutes} minute(s).` });
+        return errorResponse(403, `Account locked. Try again in ${minutes} minute(s).`);
       }
       const valid = await bcrypt.compare(password, user.password_hash);
       const MAX_ATTEMPTS = 5; const LOCKOUT_MINUTES = 15;
@@ -104,8 +89,8 @@ exports.handler = async (event) => {
         const attempts = (user.failed_login_attempts || 0) + 1;
         let lockout = null; if (attempts >= MAX_ATTEMPTS) lockout = Date.now() + LOCKOUT_MINUTES*60000;
         await database.run('UPDATE users SET failed_login_attempts = ?, lockout_expires = ? WHERE id = ?', [attempts, lockout, user.id]);
-        if (lockout) return jsonResponse(403, { error: `Account locked due to too many failed attempts. Try again in ${LOCKOUT_MINUTES} minutes.` });
-        return jsonResponse(401, { error: `Invalid credentials. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.` });
+        if (lockout) return errorResponse(403, `Account locked due to too many failed attempts. Try again in ${LOCKOUT_MINUTES} minutes.`);
+        return errorResponse(401, `Invalid credentials. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.`);
       }
       if (user.failed_login_attempts > 0 || user.lockout_expires) {
         await database.run('UPDATE users SET failed_login_attempts = 0, lockout_expires = NULL WHERE id = ?', [user.id]);
@@ -118,21 +103,21 @@ exports.handler = async (event) => {
     // REFRESH
     if (action === 'refresh') {
       const { refreshToken } = payload;
-      if (!refreshToken) return jsonResponse(401, { error: 'Refresh token required' });
+      if (!refreshToken) return errorResponse(401, 'Refresh token required');
       try {
         const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
-        if (decoded.type !== 'refresh') return jsonResponse(401, { error: 'Invalid token type' });
+        if (decoded.type !== 'refresh') return errorResponse(401, 'Invalid token type');
         const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
         const tokenRecord = await database.get('SELECT user_id FROM refresh_tokens WHERE token_hash = ? AND expires_at > datetime("now")', [tokenHash]);
-        if (!tokenRecord) return jsonResponse(401, { error: 'Invalid or expired refresh token' });
+        if (!tokenRecord) return errorResponse(401, 'Invalid or expired refresh token');
         const user = await database.get('SELECT id, is_active FROM users WHERE id = ?', [tokenRecord.user_id]);
-        if (!user || !user.is_active) return jsonResponse(401, { error: 'User not found or inactive' });
+        if (!user || !user.is_active) return errorResponse(401, 'User not found or inactive');
         const tokens = generateTokens(user.id);
         await storeRefreshToken(user.id, tokens.refreshToken);
         await database.run('DELETE FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
         return jsonResponse(200, { message: 'Tokens refreshed', accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
       } catch (e) {
-        return jsonResponse(401, { error: 'Token refresh failed' });
+        return errorResponse(401, 'Token refresh failed');
       }
     }
 
@@ -165,9 +150,9 @@ exports.handler = async (event) => {
     // RESET PASSWORD
     if (action === 'reset-password') {
       const { token, password } = payload;
-      if (!token || !password) return jsonResponse(400, { error: 'Invalid token or password format' });
+      if (!token || !password) return errorResponse(400, 'Invalid token or password format');
       const user = await database.get('SELECT id FROM users WHERE reset_token = ? AND reset_token_expires > ?', [token, Date.now()]);
-      if (!user) return jsonResponse(400, { error: 'Invalid or expired reset token' });
+      if (!user) return errorResponse(400, 'Invalid or expired reset token');
       const rounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
       const hash = await bcrypt.hash(password, rounds);
       await database.run('UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?', [hash, user.id]);
@@ -178,13 +163,13 @@ exports.handler = async (event) => {
     // ME
     if (action === 'me') {
       const user = await authenticate(event);
-      if (!user) return jsonResponse(401, { error: 'User not found' });
+      if (!user) return errorResponse(401, 'User not found');
       return jsonResponse(200, { user: { id: user.id, email: user.email, name: user.name, role: user.role, emailVerified: user.email_verified } });
     }
 
-    return jsonResponse(400, { error: 'Unknown auth action' });
+    return errorResponse(400, 'Unknown auth action');
   } catch (error) {
     console.error('Auth function error', error);
-    return jsonResponse(500, { error: 'Internal server error' });
+    return errorResponse(500, 'Internal server error');
   }
 };

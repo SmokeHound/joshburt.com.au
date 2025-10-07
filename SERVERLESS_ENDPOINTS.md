@@ -11,16 +11,16 @@ This document tracks the migration from legacy Express `/api/*` endpoints to Net
 | /api/consumables | /.netlify/functions/consumables | Active | Consumables CRUD |
 | /api/consumable-categories | /.netlify/functions/consumable-categories | Active | Category CRUD |
 | /api/inventory  | /.netlify/functions/inventory | Active | Inventory adjustments |
-| /api/users      | /.netlify/functions/users | Pending | To be implemented (list, get, create, update, delete, stats) |
-| /api/auth/register | /.netlify/functions/auth (method=register) | Pending | Combine auth flows into single function switch |
-| /api/auth/login | /.netlify/functions/auth (method=login) | Pending | JWT issuance |
-| /api/auth/logout | /.netlify/functions/auth (method=logout) | Pending | Refresh token revocation |
-| /api/auth/me    | /.netlify/functions/auth (method=me) | Pending | Return current user (requires Bearer token) |
-| /api/auth/refresh | /.netlify/functions/auth (method=refresh) | Pending | Token refresh (validate stored refresh) |
-| /api/auth/forgot-password | /.netlify/functions/auth (method=forgot-password) | Pending | Always 200; send email if user exists |
-| /api/auth/reset-password | /.netlify/functions/auth (method=reset-password) | Pending | Validate token; update password |
-| /api/auth/verify-email | /.netlify/functions/auth (method=verify-email) | Pending | Verify email token |
-| /api/health     | /.netlify/functions/health | Optional | Can implement lightweight function for uptime checks |
+| /api/users      | /.netlify/functions/users | Active | Implemented (list, get, create, update, delete, stats) |
+| /api/auth/register | /.netlify/functions/auth (action=register) | Active | Unified auth function (query/body action param) |
+| /api/auth/login | /.netlify/functions/auth (action=login) | Active | Issues JWT + refresh token |
+| /api/auth/logout | /.netlify/functions/auth (action=logout) | Active | Revokes refresh token |
+| /api/auth/me    | /.netlify/functions/auth (action=me) | Active | Returns current user (Bearer token) |
+| /api/auth/refresh | /.netlify/functions/auth (action=refresh) | Active | Refreshes tokens (stored hashed) |
+| /api/auth/forgot-password | /.netlify/functions/auth (action=forgot-password) | Active | Always 200; email send if exists |
+| /api/auth/reset-password | /.netlify/functions/auth (action=reset-password) | Active | Validates token; updates password |
+| /api/auth/verify-email | /.netlify/functions/auth (action=verify-email) | Active | Email verification placeholder |
+| /api/health     | /.netlify/functions/health | Active | Lightweight uptime + DB probe |
 
 ## Design Notes
 
@@ -42,18 +42,24 @@ This document tracks the migration from legacy Express `/api/*` endpoints to Net
 
 - [x] Inventory existing functions
 - [x] Map legacy endpoints
-- [ ] Implement `users` function
-- [ ] Implement `auth` function
-- [ ] (Optional) Implement `health` function
-- [ ] Update all frontend references
-- [ ] Remove legacy Express files
-- [ ] Final grep verification
+- [x] Implement `users` function
+- [x] Implement `auth` function
+- [x] Implement `health` function
+- [x] Update all frontend references (frontend now uses FN_BASE constant)
+- [x] Remove legacy Express files (server.js, api/ directory, oauth middleware) — removed
+- [x] Final grep verification (only intentional references in service worker comments / docs)
 
-## Deferred / Nice-to-Have
+## Deferred / Nice-to-Have (Updated)
 
-* Central CORS helper module
-* Shared response utility (success/error wrappers)
-* Function-level rate limiting (KV or Deno Edge adapter)
+Completed enhancements:
+* Central CORS helper module (implemented in `utils/http.js`)
+* Shared response utility & auth helpers (`utils/http.js` json/error/requireAuth)
+* Basic in-memory login rate limiting (added to `auth` function; per-container, 5 attempts / 5 min)
+
+Still deferred for future hardening:
+* Durable / global rate limiting (KV/Redis style) beyond single container memory
+* Structured audit for auth failures (currently only success + generic error logging)
+* Move refresh token pruning to scheduled/background function (currently script + CI)
 
 ---
 Document maintained during migration; remove once fully stabilized and docs updated.

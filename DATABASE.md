@@ -36,6 +36,7 @@ JWT_REFRESH_EXPIRES_IN=30d
 # Security
 BCRYPT_ROUNDS=12
 ```
+> LEGACY NOTE: Historical documentation elsewhere may reference REST paths like `/api/users`. The live system now serves all dynamic operations via Netlify Functions at `/.netlify/functions/users`.
 
 #### PostgreSQL (Alternative, e.g. Neon)
 ```env
@@ -47,6 +48,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=joshburt_website
 DB_USER=postgres
+> LEGACY NOTE: Any prior endpoint references such as `/api/auth/refresh` are replaced by the unified function `/.netlify/functions/auth?action=refresh`.
 DB_PASSWORD=your-secure-password
 DB_SSL=true
 
@@ -60,6 +62,7 @@ BCRYPT_ROUNDS=12
 ```
 
 #### SQLite (Development)
+> LEGACY NOTE: Access audit logs via `/.netlify/functions/audit-logs` (legacy `/api/audit-logs` path removed).
 ```env
 # Database Type (default)
 DB_TYPE=sqlite

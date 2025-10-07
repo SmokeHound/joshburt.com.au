@@ -92,11 +92,8 @@ test@example.com / password
 manager@example.com / manager123
 ```
 
-## Migration From Legacy Express
-1. Remove `server.js`, `api/`, `middleware/` (already done)
-2. Replace any `/api/...` calls with `/.netlify/functions/...`
-3. Update docs (completed in this file & README)
-4. Validate auth flows via `auth?action=login` etc.
+## Migration From Legacy Express (Completed)
+Legacy Express artifacts have been fully removed. If checking out an older tag, follow upgrade guidance in `README.md` to transition fetch calls to serverless paths.
 
 ## Manual Verification Checklist
 - [ ] Static pages load (index, analytics, users, oil, settings)
@@ -107,8 +104,8 @@ manager@example.com / manager123
 - [ ] Service worker installs & caches static assets
 - [ ] No console errors referencing removed `/api/` paths
 
-## Rollback Strategy
-If needed, reintroduce Express by restoring removed files from git history and pointing fetch calls back to `/api/`. Not recommended unless adding WebSockets or long-lived streaming features.
+## Rollback Strategy (Discouraged)
+Reintroducing Express is not recommended. For WebSockets or streaming, add a minimal edge or proxy layer while keeping business logic inside functions.
 
 ---
 All dynamic capability now relies on Netlify Functions; ensure environment variables are configured before first deploy.

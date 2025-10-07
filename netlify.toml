@@ -1,6 +1,6 @@
 [build]
   command = "npm install"
-  functions = ".netlify/functions"
+  functions = "/.netlify/functions"
   publish = "."
 
 [build.environment]
@@ -13,8 +13,4 @@
     Access-Control-Allow-Headers = "Content-Type"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
 
-# Redirect API calls to functions (optional, for cleaner URLs)
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+## Removed legacy Express redirect (/api/* -> functions) after full migration.

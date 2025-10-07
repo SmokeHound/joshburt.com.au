@@ -1,4 +1,4 @@
-// Netlify Function: GET /api/audit-logs
+// Netlify Function: GET /.netlify/functions/audit-logs (legacy /api/audit-logs removed)
 const { database } = require('../../config/database');
 
 exports.handler = async function(event, context) {
@@ -30,7 +30,7 @@ exports.handler = async function(event, context) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing action' }) };
       }
       // Insert into audit_logs table
-      const query = `INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)`;
+      const query = 'INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)';
       const params = [user_id, action, typeof details === 'string' ? details : JSON.stringify(details), ip_address, user_agent];
       await database.run(query, params);
       return { statusCode: 201, headers, body: JSON.stringify({ message: 'Audit log entry created' }) };

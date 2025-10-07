@@ -1,11 +1,11 @@
 
 # joshburt.com.au - Dynamic Website & API
 
-This site now includes both static HTML pages and dynamic backend functionality:
+This site includes static HTML pages plus a serverless backend (Netlify Functions) only:
 - Responsive design with dark/light mode support
 - Admin dashboard and user management
 - Castrol oil product ordering system
-- **Dynamic backend**: Netlify serverless functions, Express API endpoints, and MySQL/PostgreSQL/SQLite database integration
+- **Dynamic backend**: Netlify serverless functions with MySQL/PostgreSQL/SQLite database integration (legacy Express removed)
 **Codebase is fully audited and production-ready (no dead code, debug logic, or unused variables)**
 
 Always reference these instructions first. Fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
@@ -14,13 +14,11 @@ Always reference these instructions first. Fallback to search or bash commands o
 ## Working Effectively
 
 ### Bootstrap and Run the Website
-- **Static site**: Start local HTTP server as before
-   - `python3 -m http.server 8000`
-- **Dynamic backend**:
-   - Set environment variables for MySQL/PostgreSQL/SQLite (DB_TYPE, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT)
-   - Start API server: `node api/server.js` (if present)
-   - Netlify functions auto-deploy on push
-   - Test database: `node test-mysql-init.js`
+- **Static site**: `python3 -m http.server 8000` (HTML/CSS/JS only)
+- **Serverless backend**:
+  - Set DB env vars (DB_TYPE, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT as needed)
+  - Use `netlify dev` (optional) to run functions locally (`/.netlify/functions/*`)
+  - Test database connectivity: `node test-mysql-init.js`
 
 
 ### Build and Deploy Information
@@ -31,14 +29,18 @@ Always reference these instructions first. Fallback to search or bash commands o
 
 
 ### Test Website & API Functionality
-- **Static pages**: As before
-- **API endpoints**:
-   - Products: `/api/products` (GET, POST)
-   - Orders: `/api/orders` (GET, POST)
-   - Users: `/api/users` (GET, POST, PUT, DELETE)
-   - Auth: `/api/auth` (register, login, OAuth)
-- **Database**: Test with `node test-mysql-init.js`
-- **Netlify functions**: Test via deployed endpoints or local Netlify dev
+- **Static pages**: Load via local server
+- **Serverless endpoints (replace legacy /api)**:
+   - Products: `/.netlify/functions/products`
+   - Orders: `/.netlify/functions/orders`
+   - Users: `/.netlify/functions/users`
+   - Auth (multi-action): `/.netlify/functions/auth?action=login|register|refresh|logout|me|forgot-password|reset-password|verify-email`
+   - Audit Logs: `/.netlify/functions/audit-logs`
+   - Inventory: `/.netlify/functions/inventory`
+   - Consumables: `/.netlify/functions/consumables`
+   - Categories: `/.netlify/functions/consumable-categories`
+- **Database**: `node test-mysql-init.js`
+- **Local Functions**: `netlify dev` (optional)
 
 
 ## Validation
@@ -50,15 +52,15 @@ ALWAYS manually validate changes by running through these complete end-to-end sc
    - As before
 
 2. **Oil Ordering System Test** (dynamic):
-   - Navigate to oil.html and test product API (`/api/products`)
-   - Add product, view, and order via API
+   - Navigate to oil.html and test product API (`/.netlify/functions/products`)
+   - Add product, view, and order via serverless endpoints
 
 3. **Admin Dashboard & User Management**:
-   - Test user CRUD via `/api/users`
-   - Test login, registration, and OAuth via `/api/auth`
+   - Test user CRUD via `/.netlify/functions/users`
+   - Test auth actions via `/.netlify/functions/auth?action=...`
 
 4. **Orders API Test**:
-   - Submit and list orders via `/api/orders`
+   - Submit and list orders via `/.netlify/functions/orders`
 
 5. **Database Test**:
    - Run `node test-mysql-init.js` to verify database connection and table creation
@@ -100,8 +102,7 @@ Two deployment workflows are configured:
 ├── settings.html        # Settings configuration
 ├── users.html           # User management
 ├── login.html           # Login page
-├── netlify/functions/   # Serverless API endpoints (products.js, orders.js, etc.)
-├── api/                 # Express API endpoints (users.js, auth.js, oauth.js)
+├── netlify/functions/   # Serverless API endpoints (products.js, orders.js, users.js, auth.js, etc.)
 ├── config/database.js   # Database abstraction (MySQL, PostgreSQL, SQLite)
 ├── test-mysql-init.js   # MySQL test script
 └── README.md            # Basic project info
@@ -111,15 +112,14 @@ Two deployment workflows are configured:
 ### Key Files Reference
 - **index.html**: Main website template
 - **oil.html**: Castrol product ordering (uses API)
-- **netlify/functions/**: Serverless API endpoints (products.js, orders.js)
-- **api/**: Express API endpoints (users.js, auth.js, oauth.js)
+- **netlify/functions/**: Serverless API endpoints (products, orders, users, auth, consumables, categories, audit logs, inventory, settings, health)
 - **config/database.js**: Database abstraction
 - **test-mysql-init.js**: MySQL test script
 
 
 ### Development Notes
 - Static pages use TailwindCSS and unified navigation
-- Backend/API uses Node.js, Express, Netlify functions
+- Backend/API uses Netlify Functions only (Node.js runtime)
 - Database: MySQL (default), PostgreSQL (e.g. Neon), SQLite supported
 - Run `npm install` for backend dependencies
 - FTP credentials stored in GitHub Secrets for deployment
@@ -130,8 +130,7 @@ Two deployment workflows are configured:
 # Start static development server
 python3 -m http.server 8000
 
-# Start API server (if present)
-node api/server.js
+# (Legacy Express removed – no standalone API server to start)
 
 # Test database (MySQL/PostgreSQL/SQLite)
 node test-mysql-init.js

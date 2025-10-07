@@ -10,7 +10,7 @@
 - https://joshburt-com-au.onrender.com/
 
 ## Overview
-This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design with dark/light mode support, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The codebase has been fully audited for dead code, unused variables, and debug logic, ensuring maintainability and security.
+This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design with dark/light mode support, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The codebase is now 100% serverless (Netlify Functions) and has been fully audited for dead code, unused variables, and debug logic.
 
 ## ✨ Features
 - **Modular Components**: Reusable shared components for navigation, theming, and configuration
@@ -20,7 +20,7 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 - **CI/CD Pipeline**: Automated testing, linting, and deployment
 - **Admin Dashboard**: User management, analytics, and site settings (fully database-driven)
 - **Oil Ordering System**: Dynamic Castrol product ordering (API-driven, CSV export)
-- **API Backend**: Serverless-only (Netlify Functions) with MySQL / PostgreSQL / SQLite abstraction
+- **API Backend**: Serverless-only (Netlify Functions) with MySQL / PostgreSQL / SQLite abstraction (legacy Express layer removed)
 - **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
 
 ## ⚙️ Site Settings (Database-Backed)
@@ -87,14 +87,14 @@ Auth actions use a query/body `action` parameter, e.g. `/.netlify/functions/auth
 
 ## 🧭 Migration Notes
 
-The project previously supported a dual backend (Express + Netlify Functions). All Express code (`server.js`, `api/`, `middleware/`) has been removed in favor of a pure serverless model. If you have an older fork:
+The project previously supported a dual backend (Express + Netlify Functions). All Express code (`server.js`, `api/`, `middleware/`) has now been removed. If working from an older fork, upgrade by:
 
-1. Remove legacy Express files
-2. Update any remaining `/api/...` fetch calls to `/.netlify/functions/...`
-3. Ensure `JWT_SECRET` is set in Netlify env vars
-4. Re-run Tailwind build if customizing styles: `npm run build:css`
+1. Deleting any `server.js`, `api/`, and `middleware/` directories/files.
+2. Replacing legacy `/api/...` fetch calls with `/.netlify/functions/...` equivalents.
+3. Verifying required secrets (e.g. `JWT_SECRET`) exist in Netlify environment settings.
+4. Re-running Tailwind build if you customize styles: `npm run build:css`.
 
-If you need a traditional server again, reintroduce an Express layer only as a thin proxy or for WebSocket needs.
+Need a traditional server again? Add a minimal proxy or edge layer only if required for websockets or streaming; keep business logic in functions.
 ### Development Setup
 ```bash
 # Clone the repository

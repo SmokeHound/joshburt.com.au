@@ -1,5 +1,5 @@
 
-// Netlify Function: GET and POST /api/orders
+// Netlify Function: GET and POST /.netlify/functions/orders (legacy /api/orders path removed)
 const { Client } = require('pg');
 
 exports.handler = async function(event, context) {

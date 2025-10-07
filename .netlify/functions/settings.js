@@ -1,4 +1,4 @@
-// Netlify Function: Site Settings CRUD
+// Netlify Function: Site Settings CRUD /.netlify/functions/settings (legacy /api/settings deprecated)
 const { database } = require('../../config/database');
 
 exports.handler = async function(event, context) {
