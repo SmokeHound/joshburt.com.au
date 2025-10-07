@@ -4,9 +4,8 @@
   publish = "."
 
 [build.environment]
-  NODE_VERSION = "22"
-  NEON_DATABASE_URL = "mysql://avnadmin:AVNS_ftCWIkMaUvsojeBNmAh@mysql-28ad5375-joshburt.g.aivencloud.com:12667/defaultdb?ssl-mode=REQUIRED"
-
+  NODE_VERSION = "24"
+  
 [[headers]]
   for = "/.netlify/functions/*"
   [headers.values]
