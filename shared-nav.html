@@ -86,11 +86,17 @@
     }
     
     if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            const isOpen = sidebar.classList.contains('open');
-            menuToggle.setAttribute('aria-expanded', isOpen);
-        });
+        menuToggle.addEventListener('click', toggleSidebar);
+        
+        // Close sidebar when clicking backdrop
+        if (sidebarBackdrop) {
+            sidebarBackdrop.addEventListener('click', () => {
+                if (sidebar.classList.contains('open')) {
+                    toggleSidebar();
+                }
+            });
+        }
+        
         menuToggle.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
