@@ -24,7 +24,7 @@ Always reference these instructions first. Fallback to search or bash commands o
 ### Build and Deploy Information
 - **Static files**: No build required
 - **Backend/API**: Requires Node.js dependencies (run `npm install`)
-- **Database**: MySQL (default), PostgreSQL (e.g. Neon), or SQLite (see config/database.js for credentials)
+- **Database**: PostgreSQL (e.g. Neon), or SQLite (see config/database.js for credentials)
 - **Deployment**: GitHub Actions for FTP and Netlify; API/serverless functions deploy automatically
 
 
@@ -102,7 +102,7 @@ Two deployment workflows are configured:
 ├── settings.html        # Settings configuration
 ├── users.html           # User management
 ├── login.html           # Login page
-├── netlify/functions/   # Serverless API endpoints (products.js, orders.js, users.js, auth.js, etc.)
+├── .netlify/functions/  # Serverless API endpoints (products.js, orders.js, users.js, auth.js, etc.)
 ├── config/database.js   # Database abstraction (MySQL, PostgreSQL, SQLite)
 ├── test-mysql-init.js   # MySQL test script
 └── README.md            # Basic project info
@@ -112,15 +112,15 @@ Two deployment workflows are configured:
 ### Key Files Reference
 - **index.html**: Main website template
 - **oil.html**: Castrol product ordering (uses API)
-- **netlify/functions/**: Serverless API endpoints (products, orders, users, auth, consumables, categories, audit logs, inventory, settings, health)
+- **.netlify/functions/**: Serverless API endpoints (products, orders, users, auth, consumables, categories, audit logs, inventory, settings, health)
 - **config/database.js**: Database abstraction
 - **test-mysql-init.js**: MySQL test script
 
 
 ### Development Notes
-- Static pages use TailwindCSS and unified navigation
+- Static pages use TailwindCSS v4.1 and unified navigation
 - Backend/API uses Netlify Functions only (Node.js runtime)
-- Database: MySQL (default), PostgreSQL (e.g. Neon), SQLite supported
+- Database: PostgreSQL (e.g. Neon), SQLite supported
 - Run `npm install` for backend dependencies
 - FTP credentials stored in GitHub Secrets for deployment
 

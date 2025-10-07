@@ -6,7 +6,7 @@ The application now runs entirely as a static frontend plus Netlify Functions (n
 
 Netlify builds & serves:
 - Static assets (HTML/CSS/JS)
-- Functions (in `netlify/functions/*`)
+- Functions (in `.netlify/functions/*`)
 
 ### Steps
 1. Connect repository to Netlify
