@@ -1,856 +1,146 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    
-    <!-- PWA Configuration -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="JoshBurt.com.au">
-    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
-    
-    <!-- Include shared configuration -->
-    <script>
-        fetch('shared-config.html')
-            .then(response => response.text())
-            .then(html => {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                // Inject styles and scripts into head
-                const styles = tempDiv.getElementsByTagName('style');
-                const scripts = tempDiv.getElementsByTagName('script');
-                const links = tempDiv.getElementsByTagName('link');
-                
-                for (let link of links) {
-                    document.head.appendChild(link.cloneNode(true));
-                }
-                for (let style of styles) {
-                    document.head.appendChild(style.cloneNode(true));
-                }
-                for (let script of scripts) {
-                    const newScript = document.createElement('script');
-                    newScript.textContent = script.textContent;
-                    document.head.appendChild(newScript);
-                }
-            });
-    </script>
-    <script>
-        // Configuration for dynamic color updates from settings
-        function applyDynamicColors() {
-            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            // Apply CSS variables for instant color update
-            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
-        }
-        applyDynamicColors();
-        // Service Worker Registration for PWA
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./sw.js")
-                    .then(registration => {
-                        console.log("SW registered: ", registration);
-                    })
-                    .catch(registrationError => {
-                        console.log("SW registration failed: ", registrationError);
-                    });
-            });
-        }
-    </script>
     <style>
-        body {
-            transition: background-color 0.3s, color 0.3s;
-            background-color: #0a0a0a;
-            color: #ffffff;
-    /* End of .sr-only and focus:not-sr-only styles */
-        .dark {
-            background-color: #0a0a0a;
-            color: #ffffff;
-        }
-        .light {
-            background-color: #f9fafb;
-            color: #1f2937;
-        }
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
-            background-color: #111111;
-            border-right: 1px solid #00d4ff20;
-        }
-
-        /* Screen reader only class */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-        .card {
-            transition: transform 0.2s, box-shadow 0.2s;
-            background-color: #111111;
-            border: 1px solid #333333;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
-            border-color: #00d4ff;
-        }
-        
-        /* Widget specific neon colors */
-        .widget-primary {
-            border-color: #00d4ff40;
-        }
-        .widget-primary:hover {
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
-            border-color: #00d4ff;
-        }
-        .widget-secondary {
-            border-color: #00ff8840;
-        }
-        .widget-secondary:hover {
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
-            border-color: #00ff88;
-        }
-        .widget-accent {
-            border-color: #8000ff40;
-        }
-        .widget-accent:hover {
-            box-shadow: 0 4px 20px rgba(128, 0, 255, 0.4);
-            border-color: #8000ff;
-        }
-        .widget-cyan {
-            border-color: #22d3ee80;
-        }
-        .widget-cyan:hover {
-            box-shadow: 0 4px 20px rgba(34, 211, 238, 0.4);
-            border-color: #22d3ee;
-        }
-        
-        /* Mobile sidebar styles */
-        @media (max-width: 767px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease-in-out;
-                z-index: 40;
-                background-color: #111111;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-backdrop {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.8);
-                z-index: 30;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.3s ease-in-out;
-            }
-            .sidebar-backdrop.show {
-                opacity: 1;
-                pointer-events: auto;
-            }
-            body.sidebar-open {
-                overflow: hidden;
-            }
-        }
-        @media (min-width: 768px) and (max-width: 1023px) {
-            .sidebar {
-                width: 200px;
-            }
-            main {
-                margin-left: 200px;
-            }
-        }
-        }
-        /* Tablet and desktop optimizations */
-        @media (min-width: 768px) {
-            .sidebar {
-                width: 16rem;
-            }
-            main {
-                margin-left: 16rem;
-            }
-        }
+        body { transition: background-color 0.3s, color 0.3s; background-color: #0a0a0a; color: #ffffff; }
+        .dark { background-color: #0a0a0a; color: #ffffff; }
+        .light { background-color: #f9fafb; color: #1f2937; }
+        .sidebar { transition: transform 0.3s ease-in-out; background-color: #111111; border-right: 1px solid #00d4ff20; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+        .card { transition: transform 0.2s, box-shadow 0.2s; background-color: #111111; border: 1px solid #333333; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3); border-color: #00d4ff; }
+        .widget-primary { border-color: #00d4ff40; }
+        .widget-primary:hover { box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4); border-color: #00d4ff; }
+        .widget-secondary { border-color: #00ff8840; }
+        .widget-secondary:hover { box-shadow: 0 4px 20px rgba(0,255,136,0.4); border-color:#00ff88; }
+        .widget-accent { border-color:#8000ff40; }
+        .widget-accent:hover { box-shadow:0 4px 20px rgba(128,0,255,0.4); border-color:#8000ff; }
+        .widget-cyan { border-color:#22d3ee80; }
+        .widget-cyan:hover { box-shadow:0 4px 20px rgba(34,211,238,0.4); border-color:#22d3ee; }
+        @media (max-width: 767px) { .sidebar { transform: translateX(-100%); z-index:40; background-color:#111111; } .sidebar.open { transform: translateX(0);} .sidebar-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:30; opacity:0; pointer-events:none; transition:opacity .3s; } .sidebar-backdrop.show { opacity:1; pointer-events:auto;} body.sidebar-open { overflow:hidden; }}
+        @media (min-width: 768px) and (max-width:1023px) { .sidebar { width:200px; } main { margin-left:200px; } }
+        @media (min-width: 768px) { .sidebar { width:16rem; } main { margin-left:16rem; } }
     </style>
-</head>
-<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
-    <!-- Skip Links for Accessibility -->
-    <div class="sr-only">
-        <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
-        <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
-    </div>
-
-    <!-- Shared Navigation Loader -->
-    <div id="main-nav"></div>
-    <script>
-      // Dynamically load shared navigation
-      fetch('shared-nav.html')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('main-nav').innerHTML = html;
-          
-          // Initialize mobile menu toggle after shared-nav is loaded
-          function toggleSidebar() {
-            const menuToggle = document.getElementById('menu-toggle');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-            
-            if (!sidebar || !menuToggle) return;
-            
-            const isOpen = sidebar.classList.contains('open');
-            
-            if (isOpen) {
-              // Close sidebar
-              sidebar.classList.remove('open');
-              if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
-              document.body.classList.remove('sidebar-open');
-              menuToggle.setAttribute('aria-expanded', 'false');
-            } else {
-              // Open sidebar
-              sidebar.classList.add('open');
-              if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
-              document.body.classList.add('sidebar-open');
-              menuToggle.setAttribute('aria-expanded', 'true');
-            }
-          }
-          
-          const menuToggle = document.getElementById('menu-toggle');
-          const sidebar = document.getElementById('sidebar');
-          const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-          
-          if (menuToggle && sidebar) {
-            menuToggle.addEventListener('click', toggleSidebar);
-            
-            // Close sidebar when clicking backdrop
-            if (sidebarBackdrop) {
-              sidebarBackdrop.addEventListener('click', () => {
-                if (sidebar.classList.contains('open')) {
-                  toggleSidebar();
-                }
-              });
-            }
-            
-            // Close sidebar on escape key
-            document.addEventListener('keydown', function(e) {
-              if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-                toggleSidebar();
-              }
-            });
-          }
-        });
-    </script>
-
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
-    <div class="p-6 rounded-lg w-full max-w-md shadow-xl border card" >
-            <h2 id="login-modal-title" class="text-xl font-semibold mb-4 text-white">Login</h2>
-            <p id="login-modal-description" class="sr-only">Please enter your email and password to login</p>
-            <form id="login-form" role="form" aria-labelledby="login-modal-title">
-                <div class="mb-4">
-                    <label for="email" class="block text-sm mb-1 nav-link-muted">Email</label>
-                    <input type="email" id="email" class="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent" required aria-required="true">
-                </div>
-                <div class="mb-4">
-                    <label for="password" class="block text-sm mb-1 nav-link-muted">Password</label>
-                    <input type="password" id="password" class="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent" required aria-required="true">
-                </div>
-                <div id="login-error" class="hidden text-sm mb-4 p-2 rounded-md nav-link-logout bg-neon-pink"></div>
-                <button type="submit" id="submit-login" class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 btn-neon-blue" aria-label="Submit login">
-                    Login <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
-                </button>
-            </form>
-            <button id="close-modal" class="mt-4 w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-base transition-colors duration-200" aria-label="Close login modal">Close</button>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300" role="alert" aria-live="polite"></div>
-
-    <!-- Main Content -->
-    <main id="main-content" class="flex-1 p-4" role="main">
-        <!-- Sticky Header -->
-        <header class="sticky top-0 p-6 rounded-lg shadow-md mb-6 z-40 border card flex flex-col md:flex-row md:items-start md:justify-between relative">
-                <div>
-                    <h2 class="text-3xl font-bold text-white" id="welcome-message">Welcome, {userName}!</h2>
-                    <p class="text-lg mt-2 nav-link-muted">Web App Dashboard & Status Homepage.</p>
-                </div>
-                <!-- Notification Bell Wrapper (relocated from sidebar) -->
-            <div id="notification-bell-wrapper" class="mt-4 md:mt-0 md:self-start relative"></div>
-            </header>
-
-        <!-- Content Section -->
-        <section aria-label="Administrative functions" class="space-y-6">
-            <p class="mb-6 leading-relaxed nav-link-muted">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
-            
-            <!-- Website Stats and Status Widgets -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Website stats and status">
-                <div class="card widget-primary p-6 rounded-lg shadow-md flex flex-col items-center">
-                    <span class="mb-2">
-                      <!-- Users Icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0zm6 8v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a6 6 0 0112 0z" /></svg>
-                    </span>
-                    <div class="text-2xl font-bold text-blue-400" id="stat-total-users">--</div>
-                    <div class="text-sm text-gray-400 mt-2">Total Users</div>
-                </div>
-                <div class="card widget-secondary p-6 rounded-lg shadow-md flex flex-col items-center">
-                    <span class="mb-2">
-                      <!-- Orders Icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" /></svg>
-                    </span>
-                    <div class="text-2xl font-bold text-green-400" id="stat-total-orders">--</div>
-                    <div class="text-sm text-gray-400 mt-2">Total Orders</div>
-                </div>
-                <div class="card widget-accent p-6 rounded-lg shadow-md flex flex-col items-center">
-                    <span class="mb-2">
-                      <!-- Products Icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2H6a2 2 0 00-2 2v6m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6" /></svg>
-                    </span>
-                    <div class="text-2xl font-bold text-purple-400" id="stat-total-products">--</div>
-                    <div class="text-sm text-gray-400 mt-2">Total Products</div>
-                </div>
-                <div class="card widget-yellow p-6 rounded-lg shadow-md flex flex-col items-center">
-                    <span class="mb-2">
-                      <!-- System Status Icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 21m6-4l.75 4M4.21 10.29a1 1 0 01.13-1.32l7.07-7.07a1 1 0 011.32 0l7.07 7.07a1 1 0 01.13 1.32l-7.07 7.07a1 1 0 01-1.32 0l-7.07-7.07z" /></svg>
-                    </span>
-                    <div class="flex flex-col gap-2 w-full">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-400">API</span>
-                            <span id="status-api" class="w-3 h-3 rounded-full bg-gray-400 inline-block"></span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-400">Database</span>
-                            <span id="status-db" class="w-3 h-3 rounded-full bg-gray-400 inline-block"></span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-400">Server</span>
-                            <span id="status-server" class="w-3 h-3 rounded-full bg-gray-400 inline-block"></span>
-                        </div>
-                    </div>
-                    <div class="text-sm text-gray-400 mt-2">System Status</div>
-                </div>
-            </div>
-            <!-- Recent Audit Log (optional) -->
-            <div class="mt-8">
-                <div class="card widget-secondary p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold mb-3 text-white">Recent Activity</h3>
-                    <ul id="recent-audit-log" class="space-y-2 text-sm text-gray-300">
-                        <li>Loading...</li>
-                    </ul>
-                </div>
-            </div>
-    <!-- Dashboard Stats Script -->
-    <script>
-    async function updateDashboardStats() {
-        // Fetch stats from backend APIs
-        let users = [], orders = [], products = [], auditLogs = [];
-        let apiHealthy = false, dbHealthy = false, serverHealthy = true;
-        try {
-            const FN_BASE='/.netlify/functions';
-            const res = await fetch(`${FN_BASE}/users`);
-            apiHealthy = res.ok;
-            users = (await res.json()).users || [];
-        } catch (e) { apiHealthy = false; }
-        try {
-            const res = await fetch(`${FN_BASE}/orders`);
-            dbHealthy = res.ok;
-            orders = await res.json();
-        } catch (e) { dbHealthy = false; }
-        try {
-            const res = await fetch(`${FN_BASE}/products`);
-            products = await res.json();
-        } catch (e) {}
-        try {
-            const res = await fetch('/.netlify/functions/audit-logs');
-            auditLogs = Array.isArray(await res.json()) ? await res.json() : ((await res.json()).logs || []);
-        } catch (e) {}
-        // Update stats
-        document.getElementById('stat-total-users').textContent = users.length;
-        document.getElementById('stat-total-orders').textContent = Array.isArray(orders) ? orders.length : (orders.orders ? orders.orders.length : '--');
-        document.getElementById('stat-total-products').textContent = Array.isArray(products) ? products.length : (products.products ? products.products.length : '--');
-        // Update status
-        function setStatus(id, healthy) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.classList.remove('bg-gray-400', 'bg-green-500', 'bg-red-500');
-            el.classList.add(healthy ? 'bg-green-500' : 'bg-red-500');
-        }
-        setStatus('status-api', apiHealthy);
-        setStatus('status-db', dbHealthy);
-        setStatus('status-server', serverHealthy);
-        // Recent audit log
-        const auditList = document.getElementById('recent-audit-log');
-        if (auditLogs && auditLogs.length > 0) {
-            auditList.innerHTML = auditLogs.slice(0, 5).map(log =>
-                `<li><span class="font-semibold">${log.action}</span> <span class="text-xs text-gray-500">${log.timestamp ? new Date(log.timestamp).toLocaleString() : ''}</span><br><span class="text-gray-400">${log.details ? (typeof log.details === 'string' ? log.details : JSON.stringify(log.details)) : ''}</span></li>`
-            ).join('');
-        } else {
-            auditList.innerHTML = '<li>No recent activity</li>';
-        }
-    }
-    document.addEventListener('DOMContentLoaded', updateDashboardStats);
-    </script>
-        </section>
-    </main>
-
-    <!-- Load shared theme functionality -->
-    <script>
-        fetch('shared-theme.html')
-            .then(response => response.text())
-            .then(html => {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                const scripts = tempDiv.getElementsByTagName('script');
-                for (let script of scripts) {
-                    const newScript = document.createElement('script');
-                    newScript.textContent = script.textContent;
-                    document.body.appendChild(newScript);
-                }
-            });
-    </script>
 
     <!-- Home-specific functionality -->
     <script>
-        function initializeHomePage() {
-            // Load and apply site settings
-            function loadAndApplySettings() {
-                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                
-                // Apply site title if set
-                if (settings['site-title']) {
-                    const brandingElements = document.querySelectorAll('h1');
-                    brandingElements.forEach(el => {
-                        if (el.textContent.includes('Josh\'s App')) {
-                            el.textContent = settings['site-title'];
-                        }
-                    });
-                }
-                
-                // Apply homepage message if set
-                if (settings['homepage-message']) {
-                    const welcomeMessage = document.getElementById('welcome-message');
-                    const currentUser = JSON.parse(localStorage.getItem('user'));
-                    if (welcomeMessage && !currentUser) {
-                        welcomeMessage.textContent = settings['homepage-message'];
-                    }
-                }
-            }
-
-            // User Management
-            const loginBtn = document.getElementById('login-btn');
-            const logoutBtn = document.getElementById('logout-btn');
-            const userInfo = document.getElementById('user-info');
-            const userName = document.getElementById('user-name');
-            const userAvatar = document.getElementById('user-avatar');
-            const loginModal = document.getElementById('login-modal');
-            const loginForm = document.getElementById('login-form');
-            const closeModal = document.getElementById('close-modal');
-            const loginSpinner = document.getElementById('login-spinner');
-            const loginError = document.getElementById('login-error');
-            const toast = document.getElementById('toast');
-            const welcomeMessage = document.getElementById('welcome-message');
-
-            // Show toast notification
-            function showToast(message) {
-                if (toast) {
-                    toast.textContent = message;
-                    toast.classList.remove('hidden');
-                    setTimeout(() => {
-                        toast.classList.add('hidden');
-                    }, 3000);
-                }
-            }
-
-            // Check if user is logged in
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user) {
-                userInfo?.classList.remove('hidden');
-                loginBtn?.classList.add('hidden');
-                logoutBtn?.classList.remove('hidden');
-                if (userName) userName.textContent = user.name;
-                if (userAvatar) userAvatar.src = user.avatar || 'https://via.placeholder.com/40';
-                if (welcomeMessage) welcomeMessage.textContent = `Welcome, Admin!`;
-            } else {
-                loadAndApplySettings();
-            }
-
-            // Open login modal
-            loginBtn?.addEventListener('click', () => {
-                loginModal?.classList.remove('hidden');
-            });
-
-            // Close login modal
-            closeModal?.addEventListener('click', () => {
-                loginModal?.classList.add('hidden');
-                loginForm?.reset();
-                loginError?.classList.add('hidden');
-            });
-
-            // Handle login
-            loginForm?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                loginSpinner?.classList.remove('hidden');
-                loginError?.classList.add('hidden');
-
-                const email = document.getElementById('email')?.value;
-                const password = document.getElementById('password')?.value;
-
-                try {
-                    const users = JSON.parse(localStorage.getItem('siteUsers') || '[]');
-                    const registeredUser = users.find(u => u.email === email);
-                    
-                    let authenticatedUser = null;
-                    
-                    if (registeredUser && password === 'password') {
-                        authenticatedUser = { 
-                            name: registeredUser.name, 
-                            email: registeredUser.email,
-                            avatar: 'https://via.placeholder.com/40' 
-                        };
-                    } else if (email === 'test@example.com' && password === 'password') {
-                        authenticatedUser = { 
-                            name: email.split('@')[0], 
-                            email: email,
-                            avatar: 'https://via.placeholder.com/40' 
-                        };
-                    } else {
-                        throw new Error('Invalid credentials');
-                    }
-
-                    localStorage.setItem('user', JSON.stringify(authenticatedUser));
-                    userInfo?.classList.remove('hidden');
-                    loginBtn?.classList.add('hidden');
-                    logoutBtn?.classList.remove('hidden');
-                    if (userName) userName.textContent = authenticatedUser.name;
-                    if (userAvatar) userAvatar.src = authenticatedUser.avatar;
-                    if (welcomeMessage) welcomeMessage.textContent = `Welcome, Admin!`;
-                    loginModal?.classList.add('hidden');
-                    loginForm?.reset();
-                    showToast('Login successful!');
-                } catch (error) {
-                    if (loginError) {
-                        loginError.textContent = error.message;
-                        loginError.classList.remove('hidden');
-                    }
-                } finally {
-                    loginSpinner?.classList.add('hidden');
-                }
-            });
-
-            // Handle logout
-            logoutBtn?.addEventListener('click', async () => {
-                localStorage.removeItem('user');
-                userInfo?.classList.add('hidden');
-                loginBtn?.classList.remove('hidden');
-                logoutBtn?.classList.add('hidden');
-                
-                const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
-                if (welcomeMessage) welcomeMessage.textContent = settings['homepage-message'] || 'Welcome, Admin!';
-                showToast('Logged out successfully!');
-            });
-
-            loadAndApplySettings();
-        }
-
-        // Initialize home page functionality
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeHomePage();
-        });
-    </script>
-
-    <!-- Future Features Implementation -->
-    <script>
-        // Multi-language Support System
-        (function() {
-            const languages = {
-                en: { name: 'English', flag: '🇺🇸', translations: {
-                    'nav.home': 'Home', 'nav.admin': 'Admin', 'nav.users': 'User Management',
-                    'nav.analytics': 'Analytics', 'nav.settings': 'Settings', 'nav.oil': 'Oil Orders',
-                    'nav.consumables': 'Consumables Orders', 'nav.logout': 'Logout', 'app.title': "Josh's App", 'language.label': 'Language',
-                    'dashboard.welcome': 'Welcome to My Website', 'notifications.title': 'Notifications',
-                    'notifications.empty': 'No new notifications'
-                }},
-                es: { name: 'Español', flag: '🇪🇸', translations: {
-                    'nav.home': 'Inicio', 'nav.admin': 'Administración', 'nav.users': 'Gestión de Usuarios',
-                    'nav.analytics': 'Analíticas', 'nav.settings': 'Configuración', 'nav.oil': 'Pedidos de Aceite',
-                    'nav.consumables': 'Pedidos de Consumibles', 'nav.logout': 'Cerrar Sesión', 'app.title': 'Aplicación de Josh', 'language.label': 'Idioma',
-                    'dashboard.welcome': 'Bienvenido a Mi Sitio Web', 'notifications.title': 'Notificaciones',
-                    'notifications.empty': 'No hay notificaciones nuevas'
-                }}
-            };
-
-            let currentLanguage = localStorage.getItem('siteLanguage') || 'en';
-            
-            window.t = function(key, fallback = key) {
-                return languages[currentLanguage]?.translations[key] || fallback;
-            };
-
-            function updateTranslations() {
-                document.querySelectorAll('[data-i18n]').forEach(element => {
-                    const key = element.getAttribute('data-i18n');
-                    element.textContent = window.t(key);
-                });
-            }
-
-            // Language selector handler
-            document.addEventListener('DOMContentLoaded', function() {
-                const selector = document.getElementById('language-selector');
-                if (selector) {
-                    selector.value = currentLanguage;
-                    selector.addEventListener('change', function(e) {
-                        currentLanguage = e.target.value;
-                        localStorage.setItem('siteLanguage', currentLanguage);
-                        updateTranslations();
-                        if (window.showNotification) {
-                            window.showNotification(`Language changed to ${languages[currentLanguage].name}`, 'success');
-                        }
-                    });
-                }
-                updateTranslations();
-            });
-        })();
-
-        // Notifications System
-        (function() {
             let notifications = JSON.parse(localStorage.getItem('siteNotifications') || '[]');
             let notificationId = parseInt(localStorage.getItem('notificationId') || '1');
             let unread = new Set(JSON.parse(localStorage.getItem('notificationUnread') || '[]'));
+            let settings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+            if (!settings || typeof settings !== 'object') settings = {};
+            if (!Array.isArray(settings.mutedTypes)) settings.mutedTypes = [];
+            if (typeof settings.retentionDays !== 'number' || settings.retentionDays <= 0) settings.retentionDays = 7;
 
-            const TYPE_META = {
-                info: { color: 'text-blue-400', icon: 'ℹ️' },
-                success: { color: 'text-green-400', icon: '✅' },
-                warning: { color: 'text-yellow-400', icon: '⚠️' },
-                error: { color: 'text-red-400', icon: '⛔' }
-            };
-
-<<<<<<< HEAD
-            function persist() {
-                localStorage.setItem('siteNotifications', JSON.stringify(notifications.slice(0, 100)));
-                localStorage.setItem('notificationId', notificationId.toString());
-                localStorage.setItem('notificationUnread', JSON.stringify(Array.from(unread)));
-            }
-=======
-            function updateNotificationBell() {
-                let bell = document.getElementById('notification-bell');
-                const wrapper = document.getElementById('notification-bell-wrapper');
-                if (!bell && wrapper) {
-                    wrapper.innerHTML = `
-                      <button id="notification-bell" aria-haspopup="true" aria-expanded="false" class="flex items-center gap-2 px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-secondary text-sm">
-                        <span class="hidden sm:inline" data-i18n="notifications.title">Notifications</span>
-                        <span class="relative inline-flex items-center">
-                          🔔
-                          <span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span>
-                        </span>
-                      </button>
-                      <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
-                        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-                          <h3 class="font-semibold" data-i18n="notifications.title">Notifications</h3>
-                        </div>
-                        <div id="notification-list" class="max-h-64 overflow-y-auto p-2">
-                          <div class="text-center text-gray-500 p-4" data-i18n="notifications.empty">No new notifications</div>
-                        </div>
-                      </div>`;
-                    bell = document.getElementById('notification-bell');
-                    const dropdown = document.getElementById('notification-dropdown');
-                    bell.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const expanded = bell.getAttribute('aria-expanded') === 'true';
-                        bell.setAttribute('aria-expanded', String(!expanded));
-                        dropdown.classList.toggle('hidden');
-                    });
-                    document.addEventListener('click', () => {
-                        dropdown.classList.add('hidden');
-                        bell.setAttribute('aria-expanded', 'false');
-                    });
-                } else if (!bell) {
-                    // Fallback to sidebar if wrapper missing
-                    const nav = document.querySelector('#sidebar nav ul');
-                    if (nav) {
-                        const li = document.createElement('li');
-                        li.className = 'relative';
-                        li.innerHTML = `<button id=\"notification-bell\" class=\"w-full flex items-center justify-between p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary\">\n  <span data-i18n=\"notifications.title\">Notifications</span>\n  <span class=\"flex items-center gap-1\">🔔<span id=\"notification-badge\" class=\"bg-red-500 text-white text-xs rounded-full px-1 hidden\">0</span></span>\n</button>\n<div id=\"notification-dropdown\" class=\"hidden absolute left-full top-0 ml-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50\">\n  <div class=\"p-4 border-b border-gray-200 dark:border-gray-700\">\n    <h3 class=\"font-semibold\" data-i18n=\"notifications.title\">Notifications</h3>\n  </div>\n  <div id=\"notification-list\" class=\"max-h-64 overflow-y-auto p-2\">\n    <div class=\"text-center text-gray-500 p-4\" data-i18n=\"notifications.empty\">No new notifications</div>\n  </div>\n</div>`;
-                        nav.appendChild(li);
-                        bell = document.getElementById('notification-bell');
-                        const dropdown = document.getElementById('notification-dropdown');
-                        bell.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('hidden'); });
-                        document.addEventListener('click', () => dropdown.classList.add('hidden'));
-                    }
-                }
->>>>>>> 3861d1cd594e01abbd0d4f3b97a8da8d3515cb68
-
-            function relativeTime(ts) {
-                const diff = Date.now() - ts;
-                const sec = Math.floor(diff/1000);
-                if (sec < 60) return sec + 's ago';
-                const min = Math.floor(sec/60); if (min < 60) return min + 'm ago';
-                const hr = Math.floor(min/60); if (hr < 24) return hr + 'h ago';
-                const day = Math.floor(hr/24); return day + 'd ago';
-            }
-
-            window.showNotification = function(message, type = 'info', duration = 5000) {
-                const id = notificationId++;
-                const notification = { id, message, type, timestamp: Date.now() };
-                notifications.unshift(notification);
-                unread.add(id);
-                notifications = notifications.slice(0, 100);
-                persist();
-                spawnToast(notification);
-                renderNotifications();
-                return id;
-            };
-
-            function spawnToast(n) {
-                const toast = document.createElement('div');
-                const palette = { info:'bg-blue-600', success:'bg-green-600', warning:'bg-yellow-600 text-black', error:'bg-red-600' };
-                const meta = TYPE_META[n.type] || TYPE_META.info;
-                toast.className = `fixed bottom-4 right-4 p-4 ${palette[n.type]||palette.info} text-white rounded-lg shadow-lg flex items-start gap-3 transform translate-x-full transition-transform duration-300 z-50 w-72`;
-                toast.innerHTML = `
-                  <div class="text-lg leading-none">${meta.icon}</div>
-                  <div class="flex-1">
-                    <div class="font-medium">${escapeHtml(n.message)}</div>
-                    <div class="text-xs opacity-75">Just now</div>
-                  </div>
-                  <button aria-label="Dismiss" class="font-bold ml-2" style="line-height:1;">&times;</button>`;
-                toast.querySelector('button').onclick = () => toast.remove();
-                document.body.appendChild(toast);
-                setTimeout(()=>toast.classList.remove('translate-x-full'), 30);
-                setTimeout(()=>{ toast.classList.add('translate-x-full'); setTimeout(()=>toast.remove(), 250); }, duration);
-            }
-
-            function escapeHtml(str){ return str.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
-
-            function updateBadge() {
-                const badge = document.getElementById('notification-badge');
-                if (!badge) return;
-                const count = unread.size;
-                if (count > 0) {
-                    badge.textContent = count > 99 ? '99+' : String(count);
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            }
-
-            function markAllRead() {
-                notifications.forEach(n=>unread.delete(n.id));
-                persist();
-                renderNotifications();
-            }
-
-            function toggleRead(id) {
-                if (unread.has(id)) unread.delete(id); else unread.add(id);
-                persist();
-                renderNotifications();
-            }
-
-            function renderNotifications() {
+            const TYPE_META = { info:{color:'text-blue-400',icon:'ℹ️'}, success:{color:'text-green-400',icon:'✅'}, warning:{color:'text-yellow-400',icon:'⚠️'}, error:{color:'text-red-400',icon:'⛔'} };
+            function escapeHtml(str){return str.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+            function relativeTime(ts){const diff=Date.now()-ts;const s=Math.floor(diff/1000);if(s<60)return s+'s ago';const m=Math.floor(s/60);if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';const d=Math.floor(h/24);return d+'d ago';}
+            function prune(){const cutoff=Date.now()-settings.retentionDays*86400000;const before=notifications.length;notifications=notifications.filter(n=>n.timestamp>=cutoff);if(before!==notifications.length){unread.forEach(id=>{if(!notifications.find(n=>n.id===id)) unread.delete(id);});}}
+            function persist(){prune();localStorage.setItem('siteNotifications',JSON.stringify(notifications.slice(0,300)));localStorage.setItem('notificationId',String(notificationId));localStorage.setItem('notificationUnread',JSON.stringify([...unread]));localStorage.setItem('notificationSettings',JSON.stringify(settings));}
+            function updateBadge(){const badge=document.getElementById('notification-badge');if(!badge)return;const count=unread.size;if(count){badge.textContent=count>99?'99+':String(count);badge.classList.remove('hidden');}else badge.classList.add('hidden');}
+            function markAllRead(){notifications.forEach(n=>unread.delete(n.id));persist();render();}
+            function toggleRead(id){if(unread.has(id)) unread.delete(id); else unread.add(id);persist();render();}
+            function spawnToast(n){const toast=document.createElement('div');const palette={info:'bg-blue-600',success:'bg-green-600',warning:'bg-yellow-600 text-black',error:'bg-red-600'};const meta=TYPE_META[n.type]||TYPE_META.info;toast.className=`fixed bottom-4 right-4 p-4 ${palette[n.type]||palette.info} text-white rounded-lg shadow-lg flex items-start gap-3 transform translate-x-full transition-transform duration-300 z-50 w-72`;toast.innerHTML=`<div class="text-lg leading-none">${meta.icon}</div><div class="flex-1"><div class="font-medium">${escapeHtml(n.message)}</div><div class="text-xs opacity-75">Just now</div></div><button aria-label="Dismiss" class="font-bold ml-2" style="line-height:1;">&times;</button>`;toast.querySelector('button').onclick=()=>toast.remove();document.body.appendChild(toast);setTimeout(()=>toast.classList.remove('translate-x-full'),30);setTimeout(()=>{toast.classList.add('translate-x-full');setTimeout(()=>toast.remove(),250);},5000);}            
+            window.showNotification=function(message,type='info',duration=5000){if(type!=='error'&&settings.mutedTypes.includes(type)) return null;const id=notificationId++;const n={id,message,type,timestamp:Date.now()};notifications.unshift(n);unread.add(id);persist();spawnToast(n);render();return id;};
+            function group(list){const g={today:[],yesterday:[],older:[]};const now=new Date();const startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();const startYesterday=startToday-86400000;list.forEach(n=>{if(n.timestamp>=startToday) g.today.push(n); else if(n.timestamp>=startYesterday) g.yesterday.push(n); else g.older.push(n);});return g;}
+            function closeDropdown(){const dd=document.getElementById('notification-dropdown');const bell=document.getElementById('notification-bell');if(dd && !dd.classList.contains('hidden')){dd.classList.add('hidden');bell?.setAttribute('aria-expanded','false');bell?.focus();}}
+            function render(){
                 updateBadge();
-                const list = document.getElementById('notification-list');
-                if (!list) return;
-                if (!notifications.length) {
-                    list.innerHTML = `<div class='text-center text-gray-500 p-4' data-i18n='notifications.empty'>No new notifications</div>`;
+                const listEl=document.getElementById('notification-list');
+                if(!listEl) return;
+                if(!notifications.length){
+                    listEl.innerHTML=`<div class='text-center text-gray-500 p-4' data-i18n='notifications.empty'>No new notifications</div>`;
                     return;
                 }
-                list.innerHTML = notifications.slice(0,50).map(n => {
-                    const meta = TYPE_META[n.type] || TYPE_META.info;
-                    const isUnread = unread.has(n.id);
-                    return `<div class="flex gap-3 p-3 rounded hover:bg-gray-100 dark:hover:bg-gray-700 group ${isUnread ? 'bg-gray-50 dark:bg-gray-900/40' : ''}" data-id="${n.id}">
-                      <div class="text-lg leading-none ${meta.color}">${meta.icon}</div>
-                      <div class="flex-1 min-w-0">
-                        <div class="text-sm ${isUnread ? 'font-semibold' : 'font-medium'}">${escapeHtml(n.message)}</div>
-                        <div class="text-[10px] uppercase tracking-wide opacity-60 mt-1">${relativeTime(n.timestamp)}</div>
-                      </div>
-                      <button class="text-[10px] text-blue-400 hover:underline toggle-read" aria-label="Toggle read state">${isUnread ? 'Mark read' : 'Unread'}</button>
-                    </div>`;
-                }).join('') + `<div class='flex justify-between items-center p-2 border-t border-gray-200 dark:border-gray-700'>
-                  <button id='mark-all-read' class='text-xs text-blue-500 hover:underline'>Mark all read</button>
-                  <button id='clear-notifications' class='text-xs text-red-500 hover:underline'>Clear</button>
-                </div>`;
-
-                // Wire item events
-                list.querySelectorAll('.toggle-read').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const parent = btn.closest('[data-id]');
-                        if (!parent) return;
-                        const id = parseInt(parent.getAttribute('data-id'));
-                        toggleRead(id);
-                    });
-                });
-                const markBtn = document.getElementById('mark-all-read');
-                if (markBtn) markBtn.onclick = (e)=>{ e.stopPropagation(); markAllRead(); };
-                const clearBtn = document.getElementById('clear-notifications');
-                if (clearBtn) clearBtn.onclick = (e)=>{ e.stopPropagation(); notifications=[]; unread.clear(); persist(); renderNotifications(); };
-            }
-
-            function ensureBell() {
-                let bell = document.getElementById('notification-bell');
-                const wrapper = document.getElementById('notification-bell-wrapper');
-                if (!bell && wrapper) {
-                    wrapper.innerHTML = `
-                    <button id="notification-bell" aria-haspopup="true" aria-expanded="false" aria-controls="notification-dropdown" class="flex items-center gap-2 px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-secondary text-sm" title="Notifications">
-                      <span class="hidden sm:inline" data-i18n="notifications.title">Notifications</span>
-                      <span class="relative inline-flex items-center">
-                        🔔
-                        <span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span>
-                      </span>
-                    </button>
-                    <div id="notification-dropdown" role="menu" aria-label="Notifications" class="hidden absolute right-0 mt-2 w-96 max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50">
-                      <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                        <h3 class="font-semibold" data-i18n="notifications.title">Notifications</h3>
-                        <button id="close-notifications" class="text-xs text-gray-400 hover:text-gray-200" aria-label="Close">✕</button>
-                      </div>
-                      <div id="notification-list" class="max-h-80 overflow-y-auto p-2" aria-live="polite"></div>
-                    </div>`;
-                    bell = document.getElementById('notification-bell');
-                    const dropdown = document.getElementById('notification-dropdown');
-                    const closeBtn = document.getElementById('close-notifications');
-                    bell.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const expanded = bell.getAttribute('aria-expanded') === 'true';
-                        bell.setAttribute('aria-expanded', String(!expanded));
-                        dropdown.classList.toggle('hidden');
-                        if (!dropdown.classList.contains('hidden')) renderNotifications();
-                    });
-                    closeBtn.addEventListener('click', (e)=>{ e.stopPropagation(); dropdown.classList.add('hidden'); bell.setAttribute('aria-expanded','false'); });
-                    document.addEventListener('click', ()=>{ dropdown.classList.add('hidden'); bell.setAttribute('aria-expanded','false'); });
+                const groups=group(notifications.slice(0,250));
+                function renderGroup(label,arr){
+                    if(!arr.length)return'';
+                    return `<div class='px-3 pt-3 text-[10px] uppercase tracking-wide opacity-60'>${label}</div>`+arr.map(n=>{
+                        const meta=TYPE_META[n.type]||TYPE_META.info;
+                        const isUnread=unread.has(n.id);
+                        return `<div tabindex='0' class="notification-item flex gap-3 p-3 rounded outline-none focus:ring-2 focus:ring-secondary hover:bg-gray-100 dark:hover:bg-gray-700 group ${isUnread?'bg-gray-50 dark:bg-gray-900/40':''}" data-id='${n.id}'>
+    <div class='text-lg leading-none ${meta.color}'>${meta.icon}</div>
+    <div class='flex-1 min-w-0'><div class='text-sm ${isUnread?'font-semibold':'font-medium'}'>${escapeHtml(n.message)}</div><div class='text-[10px] uppercase tracking-wide opacity-60 mt-1'>${relativeTime(n.timestamp)}</div></div>
+    <button class='text-[10px] text-blue-400 hover:underline toggle-read' aria-label='Toggle read state'>${isUnread?'Mark read':'Unread'}</button>
+    </div>`;}).join('');
                 }
-                updateBadge();
-            }
-
-            document.addEventListener('DOMContentLoaded', () => {
-                ensureBell();
-                renderNotifications();
-                // Demo initial notification (if none yet)
-                if (!notifications.length) {
-                    showNotification('Welcome! Future features are now active.', 'success');
-                }
-                // Periodic simulated notifications
-                setInterval(()=>{
-                    if (Math.random() < 0.25) {
-                        const msgs = ['New system update available','User login detected','Backup completed successfully','New order received'];
-                        const types = ['info','success','warning'];
-                        const msg = msgs[Math.floor(Math.random()*msgs.length)];
-                        const type = types[Math.floor(Math.random()*types.length)];
-                        showNotification(msg, type, 4500);
+                listEl.innerHTML=[
+                    renderGroup('Today',groups.today),
+                    renderGroup('Yesterday',groups.yesterday),
+                    renderGroup('Older',groups.older),
+                    `<div class='flex justify-between items-center gap-2 p-2 border-t border-gray-200 dark:border-gray-700 mt-2 flex-wrap'>
+                        <div class='flex gap-2'>
+                            <button id='mark-all-read' class='text-xs text-blue-500 hover:underline'>Mark all read</button>
+                            <button id='clear-notifications' class='text-xs text-red-500 hover:underline'>Clear</button>
+                        </div>
+                        <button id='open-notification-settings' class='text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1' aria-haspopup='true' aria-expanded='false'>⚙️ Settings</button>
+                    </div>`,
+                    `<div id='notification-settings-panel' class='hidden border-t border-gray-200 dark:border-gray-700 p-3 text-sm space-y-3' aria-label='Notification settings'>
+                        <div class='flex items-center justify-between'>
+                            <label class='font-medium'>Retention (days)</label>
+                            <input id='notif-retention-days' type='number' min='1' class='w-20 px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-secondary' value='${settings.retentionDays}'>
+                        </div>
+                        <fieldset class='space-y-2'>
+                            <legend class='font-medium'>Mute Types</legend>
+                            ${['info','success','warning','error'].map(t=>{const disabled=t==='error'?'disabled':'';const checked=settings.mutedTypes.includes(t)?'checked':'';return `<label class='flex items-center gap-2'><input type='checkbox' class='notif-mute-type' data-type='${t}' ${checked} ${disabled}> <span class='capitalize'>${t}</span> ${t==='error'?'<span class="text-[10px] opacity-60">(cannot mute)</span>':''}</label>`;}).join('')}
+                        </fieldset>
+                        <div class='flex justify-end gap-2'>
+                            <button id='notif-settings-cancel' class='text-xs px-2 py-1 rounded bg-gray-600 hover:bg-gray-500'>Close</button>
+                            <button id='notif-settings-save' class='text-xs px-2 py-1 rounded bg-primary hover:brightness-110'>Save</button>
+                        </div>
+                    </div>`
+                ].join('');
+                listEl.querySelectorAll('.toggle-read').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const id=parseInt(btn.closest('[data-id]')?.getAttribute('data-id'));if(!isNaN(id)) toggleRead(id);}));
+                listEl.querySelectorAll('.notification-item').forEach(item=>item.addEventListener('keydown',e=>{
+                    if(e.key==='Enter'||e.key===' '){
+                        e.preventDefault();
+                        const id=parseInt(item.getAttribute('data-id'));
+                        if(!isNaN(id)) toggleRead(id);
+                    }else if(e.key==='Delete'){
+                        const id=parseInt(item.getAttribute('data-id'));
+                        notifications=notifications.filter(n=>n.id!==id);
+                        unread.delete(id);persist();render();
+                    }else if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+                        e.preventDefault();
+                        const items=[...listEl.querySelectorAll('.notification-item')];
+                        const idx=items.indexOf(item);
+                        const next=e.key==='ArrowDown'?items[idx+1]||items[0]:items[idx-1]||items[items.length-1];
+                        next?.focus();
+                    }else if(e.key==='Escape'){
+                        closeDropdown();
                     }
-                }, 60000);
-            });
-        })();
+                }));
+                const markBtn=document.getElementById('mark-all-read');
+                markBtn && (markBtn.onclick=e=>{e.stopPropagation();markAllRead();});
+                const clearBtn=document.getElementById('clear-notifications');
+                clearBtn && (clearBtn.onclick=e=>{e.stopPropagation();notifications=[];unread.clear();persist();render();});
+                const openSettings=document.getElementById('open-notification-settings');
+                const panel=document.getElementById('notification-settings-panel');
+                if(openSettings && panel){
+                    openSettings.addEventListener('click',e=>{
+                        e.stopPropagation();
+                        const exp=openSettings.getAttribute('aria-expanded')==='true';
+                        openSettings.setAttribute('aria-expanded',String(!exp));
+                        panel.classList.toggle('hidden');
+                        if(!panel.classList.contains('hidden')) panel.querySelector('input,button,select,textarea')?.focus();
+                    });
+                }
+                const save=document.getElementById('notif-settings-save');
+                const cancel=document.getElementById('notif-settings-cancel');
+                save && save.addEventListener('click',e=>{
+                    e.stopPropagation();
+                    const days=parseInt(document.getElementById('notif-retention-days').value)||7;
+                    settings.retentionDays=Math.max(1,days);
+                    settings.mutedTypes=[...listEl.querySelectorAll('.notif-mute-type:checked')].map(cb=>cb.getAttribute('data-type')).filter(t=>t!=='error');
+                    persist();
+                    render();
+                });
+                cancel && cancel.addEventListener('click',e=>{
+                    e.stopPropagation();
+                    panel?.classList.add('hidden');
+                    openSettings?.setAttribute('aria-expanded','false');
+                });
+            }
 
-        // Role-based Dashboard System
-        (function() {
+    // Role-based Dashboard System
+    (function() {
             const userRoles = {
                 admin: { name: 'Administrator', dashboards: ['admin', 'analytics'] },
                 manager: { name: 'Manager', dashboards: ['manager'] },
@@ -902,5 +192,6 @@
             });
         })();
     </script>
+    <script src="assets/js/notifications.js"></script>
 </body>
 </html>
