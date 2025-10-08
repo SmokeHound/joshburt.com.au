@@ -634,11 +634,60 @@
                 error: { color: 'text-red-400', icon: '⛔' }
             };
 
+<<<<<<< HEAD
             function persist() {
                 localStorage.setItem('siteNotifications', JSON.stringify(notifications.slice(0, 100)));
                 localStorage.setItem('notificationId', notificationId.toString());
                 localStorage.setItem('notificationUnread', JSON.stringify(Array.from(unread)));
             }
+=======
+            function updateNotificationBell() {
+                let bell = document.getElementById('notification-bell');
+                const wrapper = document.getElementById('notification-bell-wrapper');
+                if (!bell && wrapper) {
+                    wrapper.innerHTML = `
+                      <button id="notification-bell" aria-haspopup="true" aria-expanded="false" class="flex items-center gap-2 px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-secondary text-sm">
+                        <span class="hidden sm:inline" data-i18n="notifications.title">Notifications</span>
+                        <span class="relative inline-flex items-center">
+                          🔔
+                          <span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span>
+                        </span>
+                      </button>
+                      <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                          <h3 class="font-semibold" data-i18n="notifications.title">Notifications</h3>
+                        </div>
+                        <div id="notification-list" class="max-h-64 overflow-y-auto p-2">
+                          <div class="text-center text-gray-500 p-4" data-i18n="notifications.empty">No new notifications</div>
+                        </div>
+                      </div>`;
+                    bell = document.getElementById('notification-bell');
+                    const dropdown = document.getElementById('notification-dropdown');
+                    bell.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const expanded = bell.getAttribute('aria-expanded') === 'true';
+                        bell.setAttribute('aria-expanded', String(!expanded));
+                        dropdown.classList.toggle('hidden');
+                    });
+                    document.addEventListener('click', () => {
+                        dropdown.classList.add('hidden');
+                        bell.setAttribute('aria-expanded', 'false');
+                    });
+                } else if (!bell) {
+                    // Fallback to sidebar if wrapper missing
+                    const nav = document.querySelector('#sidebar nav ul');
+                    if (nav) {
+                        const li = document.createElement('li');
+                        li.className = 'relative';
+                        li.innerHTML = `<button id=\"notification-bell\" class=\"w-full flex items-center justify-between p-2 hover:bg-primary hover:text-white rounded focus:outline-none focus:ring-2 focus:ring-secondary\">\n  <span data-i18n=\"notifications.title\">Notifications</span>\n  <span class=\"flex items-center gap-1\">🔔<span id=\"notification-badge\" class=\"bg-red-500 text-white text-xs rounded-full px-1 hidden\">0</span></span>\n</button>\n<div id=\"notification-dropdown\" class=\"hidden absolute left-full top-0 ml-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50\">\n  <div class=\"p-4 border-b border-gray-200 dark:border-gray-700\">\n    <h3 class=\"font-semibold\" data-i18n=\"notifications.title\">Notifications</h3>\n  </div>\n  <div id=\"notification-list\" class=\"max-h-64 overflow-y-auto p-2\">\n    <div class=\"text-center text-gray-500 p-4\" data-i18n=\"notifications.empty\">No new notifications</div>\n  </div>\n</div>`;
+                        nav.appendChild(li);
+                        bell = document.getElementById('notification-bell');
+                        const dropdown = document.getElementById('notification-dropdown');
+                        bell.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('hidden'); });
+                        document.addEventListener('click', () => dropdown.classList.add('hidden'));
+                    }
+                }
+>>>>>>> 3861d1cd594e01abbd0d4f3b97a8da8d3515cb68
 
             function relativeTime(ts) {
                 const diff = Date.now() - ts;
