@@ -193,31 +193,38 @@ await database.get('SELECT * FROM users WHERE email = ? AND is_active = ?', ['us
 // PostgreSQL: SELECT * FROM users WHERE email = $1 AND is_active = $2
 ```
 
-## API Endpoints
+## Serverless API Endpoints (Current)
 
-### Authentication Endpoints
+All dynamic operations are served via Netlify Functions under `/.netlify/functions/*`. Legacy `/api/*` paths have been fully removed (see SERVERLESS_ENDPOINTS.md for historical mapping).
 
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| POST | `/api/auth/register` | Register new user | None |
-| POST | `/api/auth/login` | User login | None |
-| POST | `/api/auth/logout` | User logout | Required |
-| POST | `/api/auth/refresh` | Refresh tokens | None |
-| GET | `/api/auth/me` | Get user profile | Required |
-| POST | `/api/auth/forgot-password` | Request password reset | None |
-| POST | `/api/auth/reset-password` | Reset password with token | None |
+### Authentication (Unified Function)
 
-### User Management Endpoints
+Single function `/.netlify/functions/auth` handles multiple actions via the `action` query parameter (or request body fallback for POST). Each action shares the same base path and differs only by `action` value.
+
+| Action | Method | Endpoint Example | Description | Auth Required |
+|--------|--------|------------------|-------------|---------------|
+| register | POST | `/.netlify/functions/auth?action=register` | Register new user | No |
+| login | POST | `/.netlify/functions/auth?action=login` | User login (issues access + refresh) | No |
+| logout | POST | `/.netlify/functions/auth?action=logout` | Invalidate refresh token | Yes |
+| refresh | POST | `/.netlify/functions/auth?action=refresh` | Exchange refresh for new tokens | No |
+| me | GET | `/.netlify/functions/auth?action=me` | Get current user profile | Yes |
+| forgot-password | POST | `/.netlify/functions/auth?action=forgot-password` | Initiate password reset (always 200) | No |
+| reset-password | POST | `/.netlify/functions/auth?action=reset-password` | Reset password with valid token | No |
+| verify-email | POST | `/.netlify/functions/auth?action=verify-email` | Email verification placeholder | Yes (token) |
+
+### Users
+
+User management is performed through the `users` function. ID-specific operations use a path suffix (e.g. `/.netlify/functions/users/123`) or query parameter fallback depending on implementation.
 
 | Method | Endpoint | Description | Role Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/users` | List all users | Manager/Admin |
-| GET | `/api/users/:id` | Get user by ID | Manager/Admin |
-| POST | `/api/users` | Create new user | Admin |
-| PUT | `/api/users/:id` | Update user | Admin (or own profile) |
-| DELETE | `/api/users/:id` | Delete user | Admin |
-| PUT | `/api/users/:id/password` | Change password | Admin (or own profile) |
-| GET | `/api/users/stats/overview` | User statistics | Manager/Admin |
+| GET | `/.netlify/functions/users` | List all users | Manager/Admin |
+| GET | `/.netlify/functions/users/:id` | Get user by ID | Manager/Admin |
+| POST | `/.netlify/functions/users` | Create new user | Admin |
+| PUT | `/.netlify/functions/users/:id` | Update user | Admin (or own profile) |
+| DELETE | `/.netlify/functions/users/:id` | Delete user | Admin |
+| PUT | `/.netlify/functions/users/:id/password` | Change password | Admin (or own profile) |
+| GET | `/.netlify/functions/users?stats=overview` | User statistics overview | Manager/Admin |
 
 ## Security Features
 
@@ -332,7 +339,7 @@ Tests automatically use a separate test database (`test_database.sqlite`) to avo
 ## Monitoring and Maintenance
 
 ### Health Check
-- **Endpoint**: `GET /api/health`
+- **Endpoint**: `GET /.netlify/functions/health`
 - **Response**: Server status, timestamp, and environment
 - **No debug or non-production output in health endpoint**
 
