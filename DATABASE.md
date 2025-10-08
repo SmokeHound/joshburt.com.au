@@ -131,27 +131,12 @@ CREATE TABLE refresh_tokens (
 
 ### Audit Logs Table
 ```sql
-CREATE TABLE audit_logs (
-   id INTEGER PRIMARY KEY AUTO_INCREMENT,
-   user_id INTEGER,
-   action VARCHAR(255) NOT NULL,
    details TEXT,
    ip_address VARCHAR(45),
-   user_agent TEXT,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-);
 ```
 
-## Default Users
-
-The system automatically creates default users on first startup:
 
 | Role | Email | Password | Purpose |
-|------|-------|----------|---------|
-| Admin | admin@joshburt.com.au | admin123! | System administrator |
-| Manager | manager@example.com | manager123 | Content manager |
-| User | test@example.com | password | Test user |
 
 > **Security Note**: Change default passwords immediately in production!
 
@@ -186,9 +171,6 @@ The database class automatically converts query parameters:
 
 Example:
 ```javascript
-// Write once, works with both databases
-await database.get('SELECT * FROM users WHERE email = ? AND is_active = ?', ['user@example.com', true]);
-
 // SQLite: SELECT * FROM users WHERE email = ? AND is_active = ?
 // PostgreSQL: SELECT * FROM users WHERE email = $1 AND is_active = $2
 ```
@@ -225,6 +207,76 @@ User management is performed through the `users` function. ID-specific operation
 | DELETE | `/.netlify/functions/users/:id` | Delete user | Admin |
 | PUT | `/.netlify/functions/users/:id/password` | Change password | Admin (or own profile) |
 | GET | `/.netlify/functions/users?stats=overview` | User statistics overview | Manager/Admin |
+
+### Products
+
+Product catalog management via `products` function. Supports filtering by query parameters (e.g. `type`, `category`).
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/.netlify/functions/products` | List products (optional filters) | No |
+| GET | `/.netlify/functions/products/:id` | Get product by ID | No |
+| POST | `/.netlify/functions/products` | Create new product | Admin |
+| PUT | `/.netlify/functions/products/:id` | Update product | Admin |
+| DELETE | `/.netlify/functions/products/:id` | Delete product | Admin |
+
+### Inventory
+
+Inventory adjustments and stock queries.
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/.netlify/functions/inventory` | List inventory records / summary | Manager/Admin |
+| POST | `/.netlify/functions/inventory` | Adjust inventory (delta, reason) | Manager/Admin |
+
+### Consumables
+
+Consumable items tracked separately from products (e.g., shop supplies).
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/.netlify/functions/consumables` | List consumables | Manager/Admin |
+| GET | `/.netlify/functions/consumables/:id` | Get consumable by ID | Manager/Admin |
+| POST | `/.netlify/functions/consumables` | Create consumable | Manager/Admin |
+| PUT | `/.netlify/functions/consumables/:id` | Update consumable | Manager/Admin |
+| DELETE | `/.netlify/functions/consumables/:id` | Delete consumable | Admin |
+
+### Consumable Categories
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/.netlify/functions/consumable-categories` | List categories | Manager/Admin |
+| POST | `/.netlify/functions/consumable-categories` | Create category | Manager/Admin |
+| PUT | `/.netlify/functions/consumable-categories/:id` | Update category | Manager/Admin |
+| DELETE | `/.netlify/functions/consumable-categories/:id` | Delete category | Admin |
+
+### Audit Logs
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/.netlify/functions/audit-logs` | List audit events (paginated) | Admin |
+| POST | `/.netlify/functions/audit-logs` | Create custom audit entry | Admin |
+
+### Settings
+
+Settings are a single JSON document in the database; function exposes retrieval and update.
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/.netlify/functions/settings` | Retrieve current settings JSON | Admin |
+| PUT | `/.netlify/functions/settings` | Replace/merge settings JSON | Admin |
+
+### Orders
+
+Customer order creation and administrative management.
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/.netlify/functions/orders` | List orders (may support filters) | Manager/Admin |
+| GET | `/.netlify/functions/orders/:id` | Get order by ID | Manager/Admin (or owner if exposed) |
+| POST | `/.netlify/functions/orders` | Create new order | User |
+| PUT | `/.netlify/functions/orders/:id` | Update order (status, details) | Manager/Admin |
+| DELETE | `/.netlify/functions/orders/:id` | Delete/cancel order | Admin |
 
 ## Security Features
 
