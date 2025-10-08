@@ -212,107 +212,119 @@
           <div class="widget-primary rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700">
             <!-- General Settings Panel -->
             <div id="general-tab" class="tab-panel p-6">
-              <form id="settings-form" class="space-y-6" autocomplete="off">
-                <!-- Site Title -->
-                <div>
-                  <label for="site-title" class="block mb-1 font-semibold">Site Title</label>
-                  <input id="site-title" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="Josh's App" />
-                </div>
-                <!-- Site Description -->
-                <div>
-                  <label for="site-description" class="block mb-1 font-semibold">Site Description</label>
-                  <textarea id="site-description" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" rows="3" maxlength="500" placeholder="Responsive website template with admin features"></textarea>
-                </div>
-                <!-- Logo URL -->
-                <div>
-                  <label for="logo-url" class="block mb-1 font-semibold">Logo URL</label>
-                  <input id="logo-url" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="300" placeholder="https://example.com/logo.png" />
-                </div>
-                <!-- Favicon URL -->
-                <div>
-                  <label for="favicon-url" class="block mb-1 font-semibold">Favicon URL</label>
-                  <input id="favicon-url" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="300" placeholder="https://example.com/favicon.ico" />
-                </div>
-                <!-- Support Phone -->
-                <div>
-                  <label for="support-phone" class="block mb-1 font-semibold">Support Phone</label>
-                  <input id="support-phone" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="30" placeholder="+1 555-555-5555" />
-                </div>
-                <!-- Support Address -->
-                <div>
-                  <label for="support-address" class="block mb-1 font-semibold">Support Address</label>
-                  <input id="support-address" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="200" placeholder="123 Main St, City, Country" />
-                </div>
-                <!-- Default Theme -->
-                <div>
-                  <label for="theme-select" class="block mb-1 font-semibold">Default Theme</label>
-                  <select id="theme-select" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700">
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                  </select>
-                </div>
-                <!-- Contact Email -->
-                <div>
-                  <label for="contact-email" class="block mb-1 font-semibold">Contact Email</label>
-                  <input id="contact-email" type="email" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" placeholder="admin@example.com" />
-                </div>
-                <!-- Maintenance Mode -->
-                <div class="flex items-center gap-2">
-                  <input id="maintenance-mode" type="checkbox" />
-                  <label for="maintenance-mode">Enable maintenance mode</label>
-                </div>
-                <!-- Feature Toggles -->
-                <div class="flex flex-wrap gap-4 mt-2">
-                  <label><input id="enable-registration" type="checkbox" class="mr-1">Enable Registration</label>
-                  <label><input id="enable-guest-checkout" type="checkbox" class="mr-1">Enable Guest Checkout</label>
-                  <label><input id="enable-newsletter" type="checkbox" class="mr-1">Enable Newsletter</label>
-                </div>
-                <!-- Integrations -->
-                <div>
-                  <label for="google-analytics-id" class="block mb-1 font-semibold">Google Analytics ID</label>
-                  <input id="google-analytics-id" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="32" placeholder="UA-XXXXXX" />
-                </div>
-                <div>
-                  <label for="facebook-pixel-id" class="block mb-1 font-semibold">Facebook Pixel ID</label>
-                  <input id="facebook-pixel-id" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="32" placeholder="FB-XXXXXX" />
-                </div>
-                <!-- SMTP -->
-                <div>
-                  <label for="smtp-host" class="block mb-1 font-semibold">SMTP Host</label>
-                  <input id="smtp-host" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="smtp.example.com" />
-                </div>
-                <div>
-                  <label for="smtp-port" class="block mb-1 font-semibold">SMTP Port</label>
-                  <input id="smtp-port" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="10" placeholder="587" />
-                </div>
-                <div>
-                  <label for="smtp-user" class="block mb-1 font-semibold">SMTP User</label>
-                  <input id="smtp-user" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="user@example.com" />
-                </div>
-                <div>
-                  <label for="smtp-password" class="block mb-1 font-semibold">SMTP Password</label>
-                  <input id="smtp-password" type="password" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="Password" />
-                </div>
-                <!-- Custom CSS/JS -->
-                <div>
-                  <label for="custom-css" class="block mb-1 font-semibold">Custom CSS</label>
-                  <textarea id="custom-css" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" rows="2" maxlength="2000" placeholder="/* Custom CSS */"></textarea>
-                </div>
-                <div>
-                  <label for="custom-js" class="block mb-1 font-semibold">Custom JS</label>
-                  <textarea id="custom-js" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" rows="2" maxlength="2000" placeholder="// Custom JS"></textarea>
-                </div>
-                <!-- Feature Flags -->
-                <div class="flex flex-wrap gap-4 mt-2">
-                  <label><input id="feature-beta-features" type="checkbox" class="mr-1">Beta Features</label>
-                  <label><input id="feature-new-dashboard" type="checkbox" class="mr-1">New Dashboard</label>
-                  <label><input id="feature-advanced-reports" type="checkbox" class="mr-1">Advanced Reports</label>
-                </div>
-                <!-- Actions: Save, Reset, Export -->
-                <div class="flex flex-col md:flex-row gap-2 mt-4">
-                  <button class="w-full md:w-auto btn-neon-green px-6 py-2 rounded-lg font-bold" type="submit">Save Settings</button>
-                  <button type="button" data-action="reset-defaults" class="w-full md:w-auto btn-neon-blue px-6 py-2 rounded-lg font-bold">Reset to Defaults</button>
-                  <button type="button" data-action="export-settings" class="w-full md:w-auto btn-neon-blue px-6 py-2 rounded-lg font-bold">Export Settings</button>
+              <form id="settings-form" class="space-y-10" autocomplete="off">
+                <fieldset class="space-y-6">
+                  <legend class="text-lg font-semibold mb-2">Core Identity</legend>
+                  <div class="grid gap-6 md:grid-cols-2">
+                    <div class="col-span-2 md:col-span-1">
+                      <label for="site-title" class="block mb-1 font-semibold">Site Title <span class="text-xs text-gray-500" id="site-title-count"></span></label>
+                      <input id="site-title" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="Josh's App" />
+                    </div>
+                    <div class="col-span-2 md:col-span-1">
+                      <label for="contact-email" class="block mb-1 font-semibold">Contact Email</label>
+                      <input id="contact-email" type="email" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" placeholder="admin@example.com" />
+                    </div>
+                    <div class="col-span-2">
+                      <label for="site-description" class="block mb-1 font-semibold">Site Description <span class="text-xs text-gray-500" id="site-description-count"></span></label>
+                      <textarea id="site-description" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" rows="3" maxlength="500" placeholder="Responsive website template with admin features"></textarea>
+                    </div>
+                    <div>
+                      <label for="logo-url" class="block mb-1 font-semibold">Logo URL</label>
+                      <input id="logo-url" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="300" placeholder="https://example.com/logo.png" />
+                      <div class="mt-2 h-12 flex items-center gap-4" id="logo-preview-wrapper">
+                        <img id="logo-preview" alt="Logo preview" class="h-12 w-auto hidden border border-gray-700 rounded p-1 bg-gray-900" />
+                        <button type="button" id="logo-test" class="text-xs px-3 py-1 rounded bg-gray-800 hover:bg-gray-700 border border-gray-600">Preview</button>
+                      </div>
+                    </div>
+                    <div>
+                      <label for="favicon-url" class="block mb-1 font-semibold">Favicon URL</label>
+                      <input id="favicon-url" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="300" placeholder="https://example.com/favicon.ico" />
+                      <div class="mt-2 flex items-center gap-4" id="favicon-preview-wrapper">
+                        <img id="favicon-preview" alt="Favicon preview" class="h-10 w-10 hidden border border-gray-700 rounded p-1 bg-gray-900" />
+                        <button type="button" id="favicon-test" class="text-xs px-3 py-1 rounded bg-gray-800 hover:bg-gray-700 border border-gray-600">Preview</button>
+                      </div>
+                    </div>
+                    <div>
+                      <label for="theme-select" class="block mb-1 font-semibold">Default Theme</label>
+                      <select id="theme-select" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                      </select>
+                    </div>
+                    <div class="flex items-center gap-2 mt-6">
+                      <input id="maintenance-mode" type="checkbox" />
+                      <label for="maintenance-mode">Enable maintenance mode</label>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="space-y-4">
+                  <legend class="text-lg font-semibold mb-2">Feature Toggles</legend>
+                  <div class="flex flex-wrap gap-6">
+                    <label class="flex items-center gap-2"><input id="enable-registration" type="checkbox"> <span>Enable Registration</span></label>
+                    <label class="flex items-center gap-2"><input id="enable-guest-checkout" type="checkbox"> <span>Enable Guest Checkout</span></label>
+                    <label class="flex items-center gap-2"><input id="enable-newsletter" type="checkbox"> <span>Enable Newsletter</span></label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="space-y-6">
+                  <legend class="text-lg font-semibold mb-2">SMTP Configuration</legend>
+                  <div class="grid gap-6 md:grid-cols-2">
+                    <div>
+                      <label for="smtp-host" class="block mb-1 font-semibold">SMTP Host</label>
+                      <input id="smtp-host" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="smtp.example.com" />
+                    </div>
+                    <div>
+                      <label for="smtp-port" class="block mb-1 font-semibold">SMTP Port</label>
+                      <input id="smtp-port" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="10" placeholder="587" />
+                    </div>
+                    <div>
+                      <label for="smtp-user" class="block mb-1 font-semibold">SMTP User</label>
+                      <input id="smtp-user" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="user@example.com" />
+                    </div>
+                    <div>
+                      <label for="smtp-password" class="block mb-1 font-semibold">SMTP Password</label>
+                      <input id="smtp-password" type="password" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="Password" />
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="space-y-6">
+                  <legend class="text-lg font-semibold mb-2">Customization</legend>
+                  <div class="grid gap-6 md:grid-cols-2">
+                    <div class="md:col-span-1">
+                      <label for="custom-css" class="block mb-1 font-semibold">Custom CSS <span class="text-xs text-gray-500" id="custom-css-count"></span></label>
+                      <textarea id="custom-css" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" rows="4" maxlength="2000" placeholder="/* Custom CSS */"></textarea>
+                    </div>
+                    <div class="md:col-span-1">
+                      <label for="custom-js" class="block mb-1 font-semibold">Custom JS <span class="text-xs text-gray-500" id="custom-js-count"></span></label>
+                      <textarea id="custom-js" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" rows="4" maxlength="2000" placeholder="// Custom JS"></textarea>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="space-y-4">
+                  <legend class="text-lg font-semibold mb-2">Feature Flags</legend>
+                  <div class="flex flex-wrap gap-6">
+                    <label class="flex items-center gap-2"><input id="feature-beta-features" type="checkbox"> <span>Beta Features</span></label>
+                    <label class="flex items-center gap-2"><input id="feature-new-dashboard" type="checkbox"> <span>New Dashboard</span></label>
+                    <label class="flex items-center gap-2"><input id="feature-advanced-reports" type="checkbox"> <span>Advanced Reports</span></label>
+                  </div>
+                </fieldset>
+
+                <details class="group border border-gray-700 rounded-lg p-4 bg-gray-900/40">
+                  <summary class="cursor-pointer font-semibold flex items-center justify-between">Advanced <span class="text-xs text-gray-500 group-open:hidden">(optional)</span><span class="text-xs text-gray-500 hidden group-open:inline">(open)</span></summary>
+                  <div class="mt-4 space-y-4 text-sm text-gray-300">
+                    <p>No advanced options currently. Reserved for future expansion (API keys, webhooks, etc.).</p>
+                  </div>
+                </details>
+
+                <div class="flex flex-col md:flex-row gap-3 md:items-center pt-2 border-t border-gray-800">
+                  <div class="flex gap-2 order-2 md:order-1">
+                    <button type="button" data-action="reset-defaults" class="btn-neon-blue px-6 py-2 rounded-lg font-bold">Reset</button>
+                    <button type="button" data-action="export-settings" class="btn-neon-blue px-6 py-2 rounded-lg font-bold">Export</button>
+                  </div>
+                  <button class="w-full md:w-auto btn-neon-green px-8 py-3 rounded-lg font-bold order-1 md:order-2" type="submit">Save Settings</button>
                 </div>
               </form>
             </div>
@@ -486,8 +498,6 @@
         enableGuestCheckout: document.getElementById('enable-guest-checkout')?.checked || false,
         enableNewsletter: document.getElementById('enable-newsletter')?.checked || false,
         // Integrations
-        googleAnalyticsId: document.getElementById('google-analytics-id')?.value || '',
-        facebookPixelId: document.getElementById('facebook-pixel-id')?.value || '',
         smtpHost: document.getElementById('smtp-host')?.value || '',
         smtpPort: document.getElementById('smtp-port')?.value || '',
         smtpUser: document.getElementById('smtp-user')?.value || '',
@@ -536,8 +546,6 @@
                 if (settings.enableGuestCheckout !== undefined) document.getElementById('enable-guest-checkout').checked = settings.enableGuestCheckout;
                 if (settings.enableNewsletter !== undefined) document.getElementById('enable-newsletter').checked = settings.enableNewsletter;
                 // Integrations
-                if (settings.googleAnalyticsId) document.getElementById('google-analytics-id').value = settings.googleAnalyticsId;
-                if (settings.facebookPixelId) document.getElementById('facebook-pixel-id').value = settings.facebookPixelId;
                 if (settings.smtpHost) document.getElementById('smtp-host').value = settings.smtpHost;
                 if (settings.smtpPort) document.getElementById('smtp-port').value = settings.smtpPort;
                 if (settings.smtpUser) document.getElementById('smtp-user').value = settings.smtpUser;
@@ -946,6 +954,27 @@
       initSecuritySettings();
       initAuditLog();
       loadSettings();
+      // Character counters
+      const titleEl = document.getElementById('site-title');
+      const descEl = document.getElementById('site-description');
+      const cssEl = document.getElementById('custom-css');
+      const jsEl = document.getElementById('custom-js');
+      const counters = [
+        { el: titleEl, max: 100, label: 'site-title-count' },
+        { el: descEl, max: 500, label: 'site-description-count' },
+        { el: cssEl, max: 2000, label: 'custom-css-count' },
+        { el: jsEl, max: 2000, label: 'custom-js-count' }
+      ];
+      function updateCount(c){
+        if(!c.el) return; const lbl=document.getElementById(c.label); if(!lbl) return; const len=c.el.value.length; lbl.textContent=`${len}/${c.max}`; lbl.className = 'text-xs ' + (len>c.max*0.9 ? 'text-red-500' : 'text-gray-500'); }
+      counters.forEach(c=>{ if(c.el){ c.el.addEventListener('input', ()=>updateCount(c)); updateCount(c); }});
+      // Logo & favicon preview
+      function attachPreview(inputId, btnId, imgId){
+        const input=document.getElementById(inputId); const btn=document.getElementById(btnId); const img=document.getElementById(imgId);
+        if(btn && input && img){ btn.addEventListener('click', ()=>{ const url=input.value.trim(); if(!url){ showToast('Enter a URL first','info'); return; } img.src=url; img.classList.remove('hidden'); img.onerror=()=>{img.classList.add('hidden'); showToast('Image failed to load','error');}; img.onload=()=>{showToast('Preview loaded');}; }); }
+      }
+      attachPreview('logo-url','logo-test','logo-preview');
+      attachPreview('favicon-url','favicon-test','favicon-preview');
     });
   </script>
     <script>
