@@ -2,7 +2,7 @@ const request = require('supertest');
 
 // Use server.js and make sure it doesn't start a real server in test mode
 process.env.NODE_ENV = 'test';
-const app = require('../server');
+const app = require('../server.js.delete');
 
 /**
  * Authentication & User Management API Tests

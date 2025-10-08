@@ -757,7 +757,6 @@
       setInterval(updateTimeDisplay, 1000);
     }
 
-    // Security settings functionality (save to API)
     function initSecuritySettings() {
       document.getElementById('save-security').addEventListener('click', async () => {
         await saveSettings();
@@ -765,66 +764,6 @@
         showToast('Security settings saved successfully!');
       });
     }
-
-        // Audit log functionality
-        function initAuditLog() {
-            function renderAuditLog() {
-                const filter = document.getElementById('audit-filter').value;
-                const dateFilter = document.getElementById('audit-date-filter').value;
-                const logs = AuditLogger.getLogs(filter, dateFilter);
-                
-                const container = document.getElementById('audit-log-list');
-                
-                if (logs.length === 0) {
-                    container.innerHTML = '<div class="p-4 text-gray-500 dark:text-gray-400 text-center">No audit log entries found</div>';
-                    return;
-                }
-                
-                container.innerHTML = logs.map(log => `
-                    <div class="p-4 flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">${log.action}</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400">${log.details}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-500">User: ${log.userId} | IP: ${log.ip}</div>
-                        </div>
-                        <div class="text-xs text-gray-500 dark:text-gray-500">${new Date(log.timestamp).toLocaleString()}</div>
-                    </div>
-                `).join('');
-            }
-            
-            // Event listeners
-            document.getElementById('audit-filter').addEventListener('change', renderAuditLog);
-            document.getElementById('audit-date-filter').addEventListener('change', renderAuditLog);
-            
-            document.getElementById('export-audit-log').addEventListener('click', () => {
-                const logs = AuditLogger.getLogs();
-                const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'audit-log.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                AuditLogger.log('audit_export', 'Exported audit log');
-                showToast('Audit log exported successfully!');
-            });
-            
-            document.getElementById('clear-audit-log').addEventListener('click', () => {
-                if (confirm('Are you sure you want to clear the audit log? This cannot be undone.')) {
-                    AuditLogger.clearLogs();
-                    renderAuditLog();
-                    showToast('Audit log cleared successfully!');
-                }
-            });
-            
-            // Listen for real-time updates
-            window.addEventListener('auditLogUpdated', renderAuditLog);
-            window.addEventListener('auditLogCleared', renderAuditLog);
-            
-            renderAuditLog();
-        }
 
         // Add event listeners for real-time preview updates (only if elements exist)
         const siteTitle = document.getElementById('site-title');
@@ -952,7 +891,6 @@
       initThemeCustomization();
       initThemeSchedule();
       initSecuritySettings();
-      initAuditLog();
       loadSettings();
       // Character counters
       const titleEl = document.getElementById('site-title');

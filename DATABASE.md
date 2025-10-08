@@ -254,8 +254,61 @@ Consumable items tracked separately from products (e.g., shop supplies).
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/audit-logs` | List audit events (paginated) | Admin |
+| GET | `/.netlify/functions/audit-logs` | List audit events (supports pagination & search) | Admin |
 | POST | `/.netlify/functions/audit-logs` | Create custom audit entry | Admin |
+| DELETE | `/.netlify/functions/audit-logs` | Clear all logs or logs older than N days | Admin |
+
+#### Query Parameters (GET)
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `page` | number | 1 | Page number (enables paginated response structure) |
+| `pageSize` | number | 25 | Page size (1–200) |
+| `limit` | number | 100 | Backward-compatible single array limit (used only if `page`/`pageSize` omitted) |
+| `q` | string | — | Free-text search across `action`, `details`, `user_id` (SQL LIKE) |
+| `action` | string | — | Filter by exact action value |
+| `userId` | string | — | Filter by exact user ID/email stored with entry |
+| `startDate` | ISO date/time | — | Only include events with `created_at >= startDate` |
+| `endDate` | ISO date/time | — | Only include events with `created_at <= endDate` |
+| `format` | `csv` | — | If `csv`, returns CSV export instead of JSON |
+
+When `page` or `pageSize` is provided the JSON response is:
+```json
+{
+   "data": [ { /* log */ }, ... ],
+   "pagination": { "page": 1, "pageSize": 25, "total": 1234, "totalPages": 50 }
+}
+```
+If neither is supplied the response is the legacy simple JSON array of logs (respecting `limit`).
+
+#### DELETE Semantics
+
+| Query | Behavior |
+|-------|----------|
+| (none) | Deletes ALL audit log rows |
+| `olderThanDays=30` | Deletes only rows with `created_at` earlier than now minus N days |
+
+Response example:
+```json
+{ "message": "Old audit logs cleared", "olderThanDays": 30 }
+```
+
+#### Example Requests
+
+```bash
+# First page, 50 per page, search for "settings"
+curl \
+   '/.netlify/functions/audit-logs?page=1&pageSize=50&q=settings'
+
+# Export filtered login events to CSV
+curl '/.netlify/functions/audit-logs?action=user_login&format=csv' -o login-events.csv
+
+# Delete logs older than 90 days
+curl -X DELETE '/.netlify/functions/audit-logs?olderThanDays=90'
+
+# Legacy style (array) limited to 25 entries
+curl '/.netlify/functions/audit-logs?limit=25'
+```
 
 ### Settings
 

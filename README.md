@@ -29,14 +29,14 @@ All site settings are now stored in the database and managed via the admin dashb
 
 ### Settings Fields
 
-- **Branding & Contact**
-	- `siteTitle`, `siteDescription`, `logoUrl`, `faviconUrl`, `contactEmail`, `supportPhone`, `supportAddress`
+-- **Branding & Contact**
+	- `siteTitle`, `siteDescription`, `logoUrl`, `faviconUrl`, `contactEmail`
 - **Theme**
 This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The backend has been fully migrated to Netlify Functions (serverless) – legacy Express server code has been removed.
 - **Feature Toggles**
 	- `maintenanceMode`, `enableRegistration`, `enableGuestCheckout`, `enableNewsletter`
 - **API Backend**: Netlify Functions (serverless) with MySQL / PostgreSQL / SQLite abstraction
-	- `googleAnalyticsId`, `facebookPixelId`, `smtpHost`, `smtpPort`, `smtpUser`, `smtpPassword`
+	- `smtpHost`, `smtpPort`, `smtpUser`, `smtpPassword`
 - **Custom Code**
 ### Component / Serverless Structure
 - **`shared-nav.html`**: Navigation sidebar with menu toggle, user profile, and navigation links
@@ -47,6 +47,31 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 
 **Theming**: Centralized theme & color settings stored in database (no per-page toggles)
 All settings are editable in the admin dashboard and changes are persisted instantly. See `settings.html` for the full UI and field list.
+### Audit Logging (Enhanced)
+
+The audit log system now supports:
+
+- Server-side pagination (`page`, `pageSize`) with legacy `limit` fallback
+- Free-text search (`q`) across `action`, `details`, and `user_id`
+- Filtering by `action`, `userId`, `startDate`, `endDate`
+- CSV export (`format=csv`) and JSON export (default)
+- Bulk deletion via `DELETE /.netlify/functions/audit-logs` with optional `olderThanDays=N`
+- Lazy-loaded modular UI (`assets/js/audit-ui.js`) mounted only when `#audit-log-root` exists
+
+Example:
+```bash
+curl '/.netlify/functions/audit-logs?page=1&pageSize=50&q=settings'
+curl '/.netlify/functions/audit-logs?action=user_login&format=csv' -o login-events.csv
+curl -X DELETE '/.netlify/functions/audit-logs?olderThanDays=90'
+```
+
+UI Features:
+- Debounced search input
+- Adjustable page size (10/25/50/100)
+- Export buttons (JSON / CSV)
+- Clear button (with confirmation)
+
+See `DATABASE.md` for full parameter reference.
 ## 🏗️ Architecture
 
 # Start static development server (serves HTML/CSS/JS only)

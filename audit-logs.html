@@ -64,96 +64,11 @@
       <p class="text-gray-600 dark:text-gray-300">Review all administrative actions and changes</p>
     </header>
     <section class="space-y-8">
-      <div class="widget-primary rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-semibold text-lg">Audit Log</h3>
-          <div class="flex gap-2">
-            <button id="export-audit-log" class="btn-neon-blue px-3 py-1 rounded text-sm font-semibold">Export</button>
-            <button id="clear-audit-log" class="btn-neon-pink px-3 py-1 rounded text-sm font-semibold">Clear</button>
-          </div>
-        </div>
-        <div class="mb-3 flex gap-3">
-          <select id="audit-filter" class="p-3 rounded bg-gray-100 dark:bg-gray-700">
-            <option value="">All Actions</option>
-            <option value="page_access">Page Access</option>
-            <option value="settings_change">Settings Change</option>
-            <option value="theme_change">Theme Change</option>
-            <option value="security_change">Security Change</option>
-          </select>
-          <input id="audit-date-filter" type="date" class="p-3 rounded bg-gray-100 dark:bg-gray-700" title="Filter by date" aria-label="Filter by date" />
-        </div>
-        <div id="audit-log-list" class="space-y-2 border border-gray-200 dark:border-gray-700 rounded">
-          <div class="p-4 text-gray-500 dark:text-gray-400 text-center">No audit log entries found</div>
-        </div>
-      </div>
+      <!-- Modular Audit Log Root (auto-initialized by assets/js/audit-ui.js) -->
+      <div id="audit-log-root" class="min-h-[200px]"></div>
     </section>
   </main>
   <script src="admin-audit-logger.js"></script>
-  <script>
-    // Audit log functionality (copied from settings.html)
-    function initAuditLog() {
-      async function fetchAuditLogs() {
-        const filter = document.getElementById('audit-filter').value;
-        const dateFilter = document.getElementById('audit-date-filter').value;
-        let url = '/.netlify/functions/audit-logs';
-        const params = [];
-        if (filter) params.push(`action=${encodeURIComponent(filter)}`);
-        if (dateFilter) params.push(`date=${encodeURIComponent(dateFilter)}`);
-        if (params.length > 0) url += '?' + params.join('&');
-        try {
-          const res = await fetch(url);
-          if (!res.ok) throw new Error('Failed to fetch logs');
-          const logs = await res.json();
-          return Array.isArray(logs) ? logs : (logs.logs || []);
-        } catch (e) {
-          return [];
-        }
-      }
-
-      async function renderAuditLog() {
-        const container = document.getElementById('audit-log-list');
-        container.innerHTML = '<div class="p-4 text-gray-500 dark:text-gray-400 text-center">Loading...</div>';
-        const logs = await fetchAuditLogs();
-        if (!logs || logs.length === 0) {
-          container.innerHTML = '<div class="p-4 text-gray-500 dark:text-gray-400 text-center">No audit log entries found</div>';
-          return;
-        }
-        container.innerHTML = logs.map(log => `
-          <div class="p-4 flex justify-between items-start">
-            <div>
-              <div class="font-semibold">${log.action}</div>
-              <div class="text-xs text-gray-400">${log.timestamp || ''}</div>
-              <div class="text-sm mt-1">${log.details ? (typeof log.details === 'string' ? log.details : JSON.stringify(log.details)) : ''}</div>
-            </div>
-          </div>
-        `).join('');
-      }
-
-      document.getElementById('audit-filter').addEventListener('change', renderAuditLog);
-      document.getElementById('audit-date-filter').addEventListener('change', renderAuditLog);
-      document.getElementById('export-audit-log').addEventListener('click', async () => {
-        const logs = await fetchAuditLogs();
-        const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'audit-log.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      });
-      document.getElementById('clear-audit-log').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to clear the audit log? This cannot be undone.')) {
-          await fetch('/.netlify/functions/audit-logs', { method: 'DELETE' });
-          renderAuditLog();
-        }
-      });
-      renderAuditLog();
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-      initAuditLog();
-    });
-  </script>
+  <script src="assets/js/audit-ui.js" defer></script>
 </body>
 </html>
