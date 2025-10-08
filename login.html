@@ -1,165 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    
-    <!-- PWA Configuration -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-status-bar-style" content="default">
-    <meta name="mobile-web-app-title" content="JoshBurt.com.au">
-    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
-    
-    <link rel="stylesheet" href="./assets/css/styles.css">
-
-        <!-- Load shared config and theme system -->
-        <script>
-            fetch('shared-config.html').then(r => r.text()).then(html => {
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                Array.from(temp.children).forEach(child => {
-                    if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
-                        document.head.appendChild(child.cloneNode(true));
-                    }
-                });
-            });
-            fetch('shared-theme.html').then(r => r.text()).then(html => {
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                Array.from(temp.children).forEach(child => {
-                    if (child.tagName === 'SCRIPT') {
-                        document.head.appendChild(child.cloneNode(true));
-                    }
-                });
-            });
-        </script>
-    <script>
-        // Configuration for dynamic color updates from settings
-        function applyDynamicColors() {
-            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            // Apply CSS variables for instant color update
-            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
-        }
-        applyDynamicColors();
-        // Service Worker Registration for PWA
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./sw.js")
-                .then(registration => {
-                    console.log("SW registered: ", registration);
-                })
-                .catch(registrationError => {
-                    console.log("SW registration failed: ", registrationError);
-                });
-        }
-    </script>
-    <style>
-        body {
-            transition: background-color 0.3s, color 0.3s;
-            font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
-            background-color: #0a0a0a;
-            color: #ffffff;
-        }
-        .dark {
-            background-color: #0a0a0a;
-            color: #ffffff;
-        }
-        .light {
-            background-color: #f9fafb;
-            color: #1f2937;
-        }
-        .sidebar {
-            width: 16rem;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            overflow-y: auto;
-            transition: background-color 0.3s;
-            z-index: 100;
-            background-color: #111111;
-            border-right: 1px solid #00d4ff20;
-        }
-        main {
-            margin-left: 16rem;
-            min-height: 100vh;
-            background-color: #0a0a0a;
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease-in-out;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            main {
-                margin-left: 0;
-            }
-        }
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-        .focus\:not-sr-only:focus {
-            position: static;
-            width: auto;
-            height: auto;
-            padding: 0.5rem;
-            margin: 0;
-            overflow: visible;
-            clip: auto;
-            white-space: normal;
-        }
-        /* Neon button styles */
-        .btn-neon-blue {
-            background: linear-gradient(45deg, #00d4ff, #0099cc);
-            border: 1px solid #00d4ff;
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-            color: #000000;
-            font-weight: 600;
-        }
-        .btn-neon-blue:hover {
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
-            background: linear-gradient(45deg, #00eeff, #00b8e6);
-        }
-        .btn-neon-green {
-            background: linear-gradient(45deg, #00ff88, #00cc66);
-            border: 1px solid #00ff88;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-            color: #000000;
-            font-weight: 600;
-        }
-        .btn-neon-green:hover {
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
-            background: linear-gradient(45deg, #00ff99, #00dd77);
-        }
-        /* Navigation link styling */
-        .nav-link {
-            color: #cccccc;
-            transition: all 0.3s ease;
-        }
-        .nav-link:hover {
-            color: #00d4ff;
-            text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
-        }
-        .nav-link.active {
-            color: #00d4ff;
-            background-color: #00d4ff20;
-            border-left: 3px solid #00d4ff;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Admin Login</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script>
+    fetch('shared-config.html').then(r=>r.text()).then(h=>{const d=document.createElement('div');d.innerHTML=h;Array.from(d.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName))document.head.appendChild(c.cloneNode(true));});});
+    fetch('shared-theme.html').then(r=>r.text()).then(h=>{const d=document.createElement('div');d.innerHTML=h;Array.from(d.children).forEach(c=>{if(c.tagName==='SCRIPT')document.head.appendChild(c.cloneNode(true));});});
+  </script>
+  <script>(function(){const s=JSON.parse(localStorage.getItem('siteSettings')||'{}');document.documentElement.style.setProperty('--tw-color-primary',s.primaryColor||'#3b82f6');document.documentElement.style.setProperty('--tw-color-secondary',s.secondaryColor||'#10b981');document.documentElement.style.setProperty('--tw-color-accent',s.accentColor||'#8b5cf6');})();</script>
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
 </head>
 <body class="dark min-h-screen flex items-center justify-center font-sans p-4">
         <!-- Shared Navigation Loader -->
