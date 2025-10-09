@@ -1,197 +1,129 @@
-    <style>
-        body { transition: background-color 0.3s, color 0.3s; background-color: #0a0a0a; color: #ffffff; }
-        .dark { background-color: #0a0a0a; color: #ffffff; }
-        .light { background-color: #f9fafb; color: #1f2937; }
-        .sidebar { transition: transform 0.3s ease-in-out; background-color: #111111; border-right: 1px solid #00d4ff20; }
-        .sr-only { position: absolute; width: 1px; height: 1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-        .card { transition: transform 0.2s, box-shadow 0.2s; background-color: #111111; border: 1px solid #333333; }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3); border-color: #00d4ff; }
-        .widget-primary { border-color: #00d4ff40; }
-        .widget-primary:hover { box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4); border-color: #00d4ff; }
-        .widget-secondary { border-color: #00ff8840; }
-        .widget-secondary:hover { box-shadow: 0 4px 20px rgba(0,255,136,0.4); border-color:#00ff88; }
-        .widget-accent { border-color:#8000ff40; }
-        .widget-accent:hover { box-shadow:0 4px 20px rgba(128,0,255,0.4); border-color:#8000ff; }
-        .widget-cyan { border-color:#22d3ee80; }
-        .widget-cyan:hover { box-shadow:0 4px 20px rgba(34,211,238,0.4); border-color:#22d3ee; }
-        @media (max-width: 767px) { .sidebar { transform: translateX(-100%); z-index:40; background-color:#111111; } .sidebar.open { transform: translateX(0);} .sidebar-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:30; opacity:0; pointer-events:none; transition:opacity .3s; } .sidebar-backdrop.show { opacity:1; pointer-events:auto;} body.sidebar-open { overflow:hidden; }}
-        @media (min-width: 768px) and (max-width:1023px) { .sidebar { width:200px; } main { margin-left:200px; } }
-        @media (min-width: 768px) { .sidebar { width:16rem; } main { margin-left:16rem; } }
-    </style>
-
-    <!-- Home-specific functionality -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Home</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
+  <script src="./assets/js/notifications.js" defer></script>
+</head>
+<body class="dark">
+  <!-- MOBILE MENU TOGGLE -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+  <div class="flex min-h-screen">
+    <!-- Shared Navigation Loader -->
+    <div id="main-nav"></div>
     <script>
-            let notifications = JSON.parse(localStorage.getItem('siteNotifications') || '[]');
-            let notificationId = parseInt(localStorage.getItem('notificationId') || '1');
-            let unread = new Set(JSON.parse(localStorage.getItem('notificationUnread') || '[]'));
-            let settings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
-            if (!settings || typeof settings !== 'object') settings = {};
-            if (!Array.isArray(settings.mutedTypes)) settings.mutedTypes = [];
-            if (typeof settings.retentionDays !== 'number' || settings.retentionDays <= 0) settings.retentionDays = 7;
-
-            const TYPE_META = { info:{color:'text-blue-400',icon:'ℹ️'}, success:{color:'text-green-400',icon:'✅'}, warning:{color:'text-yellow-400',icon:'⚠️'}, error:{color:'text-red-400',icon:'⛔'} };
-            function escapeHtml(str){return str.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
-            function relativeTime(ts){const diff=Date.now()-ts;const s=Math.floor(diff/1000);if(s<60)return s+'s ago';const m=Math.floor(s/60);if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';const d=Math.floor(h/24);return d+'d ago';}
-            function prune(){const cutoff=Date.now()-settings.retentionDays*86400000;const before=notifications.length;notifications=notifications.filter(n=>n.timestamp>=cutoff);if(before!==notifications.length){unread.forEach(id=>{if(!notifications.find(n=>n.id===id)) unread.delete(id);});}}
-            function persist(){prune();localStorage.setItem('siteNotifications',JSON.stringify(notifications.slice(0,300)));localStorage.setItem('notificationId',String(notificationId));localStorage.setItem('notificationUnread',JSON.stringify([...unread]));localStorage.setItem('notificationSettings',JSON.stringify(settings));}
-            function updateBadge(){const badge=document.getElementById('notification-badge');if(!badge)return;const count=unread.size;if(count){badge.textContent=count>99?'99+':String(count);badge.classList.remove('hidden');}else badge.classList.add('hidden');}
-            function markAllRead(){notifications.forEach(n=>unread.delete(n.id));persist();render();}
-            function toggleRead(id){if(unread.has(id)) unread.delete(id); else unread.add(id);persist();render();}
-            function spawnToast(n){const toast=document.createElement('div');const palette={info:'bg-blue-600',success:'bg-green-600',warning:'bg-yellow-600 text-black',error:'bg-red-600'};const meta=TYPE_META[n.type]||TYPE_META.info;toast.className=`fixed bottom-4 right-4 p-4 ${palette[n.type]||palette.info} text-white rounded-lg shadow-lg flex items-start gap-3 transform translate-x-full transition-transform duration-300 z-50 w-72`;toast.innerHTML=`<div class="text-lg leading-none">${meta.icon}</div><div class="flex-1"><div class="font-medium">${escapeHtml(n.message)}</div><div class="text-xs opacity-75">Just now</div></div><button aria-label="Dismiss" class="font-bold ml-2" style="line-height:1;">&times;</button>`;toast.querySelector('button').onclick=()=>toast.remove();document.body.appendChild(toast);setTimeout(()=>toast.classList.remove('translate-x-full'),30);setTimeout(()=>{toast.classList.add('translate-x-full');setTimeout(()=>toast.remove(),250);},5000);}            
-            window.showNotification=function(message,type='info',duration=5000){if(type!=='error'&&settings.mutedTypes.includes(type)) return null;const id=notificationId++;const n={id,message,type,timestamp:Date.now()};notifications.unshift(n);unread.add(id);persist();spawnToast(n);render();return id;};
-            function group(list){const g={today:[],yesterday:[],older:[]};const now=new Date();const startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();const startYesterday=startToday-86400000;list.forEach(n=>{if(n.timestamp>=startToday) g.today.push(n); else if(n.timestamp>=startYesterday) g.yesterday.push(n); else g.older.push(n);});return g;}
-            function closeDropdown(){const dd=document.getElementById('notification-dropdown');const bell=document.getElementById('notification-bell');if(dd && !dd.classList.contains('hidden')){dd.classList.add('hidden');bell?.setAttribute('aria-expanded','false');bell?.focus();}}
-            function render(){
-                updateBadge();
-                const listEl=document.getElementById('notification-list');
-                if(!listEl) return;
-                if(!notifications.length){
-                    listEl.innerHTML=`<div class='text-center text-gray-500 p-4' data-i18n='notifications.empty'>No new notifications</div>`;
-                    return;
-                }
-                const groups=group(notifications.slice(0,250));
-                function renderGroup(label,arr){
-                    if(!arr.length)return'';
-                    return `<div class='px-3 pt-3 text-[10px] uppercase tracking-wide opacity-60'>${label}</div>`+arr.map(n=>{
-                        const meta=TYPE_META[n.type]||TYPE_META.info;
-                        const isUnread=unread.has(n.id);
-                        return `<div tabindex='0' class="notification-item flex gap-3 p-3 rounded outline-none focus:ring-2 focus:ring-secondary hover:bg-gray-100 dark:hover:bg-gray-700 group ${isUnread?'bg-gray-50 dark:bg-gray-900/40':''}" data-id='${n.id}'>
-    <div class='text-lg leading-none ${meta.color}'>${meta.icon}</div>
-    <div class='flex-1 min-w-0'><div class='text-sm ${isUnread?'font-semibold':'font-medium'}'>${escapeHtml(n.message)}</div><div class='text-[10px] uppercase tracking-wide opacity-60 mt-1'>${relativeTime(n.timestamp)}</div></div>
-    <button class='text-[10px] text-blue-400 hover:underline toggle-read' aria-label='Toggle read state'>${isUnread?'Mark read':'Unread'}</button>
-    </div>`;}).join('');
-                }
-                listEl.innerHTML=[
-                    renderGroup('Today',groups.today),
-                    renderGroup('Yesterday',groups.yesterday),
-                    renderGroup('Older',groups.older),
-                    `<div class='flex justify-between items-center gap-2 p-2 border-t border-gray-200 dark:border-gray-700 mt-2 flex-wrap'>
-                        <div class='flex gap-2'>
-                            <button id='mark-all-read' class='text-xs text-blue-500 hover:underline'>Mark all read</button>
-                            <button id='clear-notifications' class='text-xs text-red-500 hover:underline'>Clear</button>
-                        </div>
-                        <button id='open-notification-settings' class='text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1' aria-haspopup='true' aria-expanded='false'>⚙️ Settings</button>
-                    </div>`,
-                    `<div id='notification-settings-panel' class='hidden border-t border-gray-200 dark:border-gray-700 p-3 text-sm space-y-3' aria-label='Notification settings'>
-                        <div class='flex items-center justify-between'>
-                            <label class='font-medium'>Retention (days)</label>
-                            <input id='notif-retention-days' type='number' min='1' class='w-20 px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-secondary' value='${settings.retentionDays}'>
-                        </div>
-                        <fieldset class='space-y-2'>
-                            <legend class='font-medium'>Mute Types</legend>
-                            ${['info','success','warning','error'].map(t=>{const disabled=t==='error'?'disabled':'';const checked=settings.mutedTypes.includes(t)?'checked':'';return `<label class='flex items-center gap-2'><input type='checkbox' class='notif-mute-type' data-type='${t}' ${checked} ${disabled}> <span class='capitalize'>${t}</span> ${t==='error'?'<span class="text-[10px] opacity-60">(cannot mute)</span>':''}</label>`;}).join('')}
-                        </fieldset>
-                        <div class='flex justify-end gap-2'>
-                            <button id='notif-settings-cancel' class='text-xs px-2 py-1 rounded bg-gray-600 hover:bg-gray-500'>Close</button>
-                            <button id='notif-settings-save' class='text-xs px-2 py-1 rounded bg-primary hover:brightness-110'>Save</button>
-                        </div>
-                    </div>`
-                ].join('');
-                listEl.querySelectorAll('.toggle-read').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const id=parseInt(btn.closest('[data-id]')?.getAttribute('data-id'));if(!isNaN(id)) toggleRead(id);}));
-                listEl.querySelectorAll('.notification-item').forEach(item=>item.addEventListener('keydown',e=>{
-                    if(e.key==='Enter'||e.key===' '){
-                        e.preventDefault();
-                        const id=parseInt(item.getAttribute('data-id'));
-                        if(!isNaN(id)) toggleRead(id);
-                    }else if(e.key==='Delete'){
-                        const id=parseInt(item.getAttribute('data-id'));
-                        notifications=notifications.filter(n=>n.id!==id);
-                        unread.delete(id);persist();render();
-                    }else if(e.key==='ArrowDown'||e.key==='ArrowUp'){
-                        e.preventDefault();
-                        const items=[...listEl.querySelectorAll('.notification-item')];
-                        const idx=items.indexOf(item);
-                        const next=e.key==='ArrowDown'?items[idx+1]||items[0]:items[idx-1]||items[items.length-1];
-                        next?.focus();
-                    }else if(e.key==='Escape'){
-                        closeDropdown();
-                    }
-                }));
-                const markBtn=document.getElementById('mark-all-read');
-                markBtn && (markBtn.onclick=e=>{e.stopPropagation();markAllRead();});
-                const clearBtn=document.getElementById('clear-notifications');
-                clearBtn && (clearBtn.onclick=e=>{e.stopPropagation();notifications=[];unread.clear();persist();render();});
-                const openSettings=document.getElementById('open-notification-settings');
-                const panel=document.getElementById('notification-settings-panel');
-                if(openSettings && panel){
-                    openSettings.addEventListener('click',e=>{
-                        e.stopPropagation();
-                        const exp=openSettings.getAttribute('aria-expanded')==='true';
-                        openSettings.setAttribute('aria-expanded',String(!exp));
-                        panel.classList.toggle('hidden');
-                        if(!panel.classList.contains('hidden')) panel.querySelector('input,button,select,textarea')?.focus();
-                    });
-                }
-                const save=document.getElementById('notif-settings-save');
-                const cancel=document.getElementById('notif-settings-cancel');
-                save && save.addEventListener('click',e=>{
-                    e.stopPropagation();
-                    const days=parseInt(document.getElementById('notif-retention-days').value)||7;
-                    settings.retentionDays=Math.max(1,days);
-                    settings.mutedTypes=[...listEl.querySelectorAll('.notif-mute-type:checked')].map(cb=>cb.getAttribute('data-type')).filter(t=>t!=='error');
-                    persist();
-                    render();
-                });
-                cancel && cancel.addEventListener('click',e=>{
-                    e.stopPropagation();
-                    panel?.classList.add('hidden');
-                    openSettings?.setAttribute('aria-expanded','false');
-                });
-            }
-
-    // Role-based Dashboard System
-    (function() {
-            const userRoles = {
-                admin: { name: 'Administrator', dashboards: ['admin', 'analytics'] },
-                manager: { name: 'Manager', dashboards: ['manager'] },
-                user: { name: 'User', dashboards: ['user'] }
-            };
-
-            let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"role": "admin", "name": "Josh"}');
-
-            window.setUserRole = function(role) {
-                if (userRoles[role]) {
-                    currentUser.role = role;
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    updateDashboard();
-                    if (window.showNotification) {
-                        window.showNotification(`Switched to ${userRoles[role].name} role`, 'success');
-                    }
-                }
-            };
-
-            function updateDashboard() {
-                const welcomeMessage = document.getElementById('welcome-message');
-                if (welcomeMessage) {
-                    const roleName = userRoles[currentUser.role]?.name || 'User';
-                    welcomeMessage.textContent = `Welcome, Admin!`;
-                }
-            }
-
-            // Create role switcher
-            document.addEventListener('DOMContentLoaded', function() {
-                const roleSwitcher = document.getElementById('role-switcher');
-                if (roleSwitcher) {
-                    roleSwitcher.classList.remove('hidden');
-                    roleSwitcher.innerHTML = `
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">Role (Demo)</label>
-                            <select id="role-selector" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-secondary">
-                                ${Object.entries(userRoles).map(([key, role]) => 
-                                    `<option value="${key}" ${key === currentUser.role ? 'selected' : ''}>${role.name}</option>`
-                                ).join('')}
-                            </select>
-                        </div>
-                    `;
-
-                    document.getElementById('role-selector').addEventListener('change', function(e) {
-                        window.setUserRole(e.target.value);
-                    });
-                }
-                updateDashboard();
-            });
-        })();
+      // Dynamically load shared navigation
+      fetch('shared-nav.html')
+        .then(response => response.text())
+        .then(html => { document.getElementById('main-nav').innerHTML = html; });
     </script>
-    <script src="assets/js/notifications.js"></script>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
+      <!-- Header with Welcome + Actions -->
+      <header class="sticky top-0 p-6 rounded-lg shadow-md mb-6 z-40 border card">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <h2 id="welcome-message" class="text-3xl font-bold text-white">Welcome!</h2>
+            <p class="text-lg mt-2 nav-link-muted">Your dashboard overview</p>
+          </div>
+          <div class="flex items-start gap-4">
+            <div id="role-switcher" class="hidden"></div>
+            <div id="notification-bell-wrapper" class="relative"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Quick Links -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Quick links">
+        <a href="administration.html" class="card widget-primary p-6 rounded-lg shadow-md block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+          <h3 class="text-xl font-semibold mb-2 text-white">Administration</h3>
+          <p class="nav-link-muted">Manage users, settings, and more.</p>
+        </a>
+        <a href="analytics.html" class="card widget-secondary p-6 rounded-lg shadow-md block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+          <h3 class="text-xl font-semibold mb-2 text-white">Analytics</h3>
+          <p class="nav-link-muted">View traffic and usage charts.</p>
+        </a>
+        <a href="oil.html" class="card widget-accent p-6 rounded-lg shadow-md block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+          <h3 class="text-xl font-semibold mb-2 text-white">Oil Orders</h3>
+          <p class="nav-link-muted">Place or review oil product orders.</p>
+        </a>
+      </section>
+    </main>
+  </div>
+
+  <!-- Role-based Dashboard System (kept minimal and safe) -->
+  <script>
+    (function(){
+      var userRoles = {
+        admin: { name: 'Administrator', dashboards: ['admin','analytics'] },
+        manager: { name: 'Manager', dashboards: ['manager'] },
+        user: { name: 'User', dashboards: ['user'] }
+      };
+      var currentUser;
+      try { currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"role":"admin","name":"Josh"}'); } catch(e){ currentUser = { role:'admin', name:'Josh' }; }
+      function updateDashboard(){
+        var welcomeMessage = document.getElementById('welcome-message');
+        if (welcomeMessage){
+          var roleObj = userRoles[currentUser.role];
+          var roleName = roleObj ? roleObj.name : 'User';
+          welcomeMessage.textContent = 'Welcome, ' + roleName + '!';
+        }
+      }
+      window.setUserRole = function(role){
+        if (userRoles[role]){
+          currentUser.role = role;
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          updateDashboard();
+          if (window.showNotification){ window.showNotification('Switched to ' + userRoles[role].name + ' role','success'); }
+        }
+      };
+      document.addEventListener('DOMContentLoaded', function(){
+        var roleSwitcher = document.getElementById('role-switcher');
+        if (roleSwitcher){
+          roleSwitcher.classList.remove('hidden');
+          var options = Object.keys(userRoles).map(function(key){
+            var selected = key === currentUser.role ? 'selected' : '';
+            return '<option value="'+key+'" '+selected+'>'+userRoles[key].name+'</option>';
+          }).join('');
+          roleSwitcher.innerHTML = '<div><label class="block text-sm font-medium text-gray-300 mb-1">Role (Demo)</label><select id="role-selector" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-secondary">'+options+'</select></div>';
+          var sel = document.getElementById('role-selector');
+          if (sel){ sel.addEventListener('change', function(e){ window.setUserRole(e.target.value); }); }
+        }
+        updateDashboard();
+      });
+    })();
+  </script>
+
+  <!-- Minimal mobile menu wiring after nav injection -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      function wireMenu(){
+        var menuToggle=document.getElementById('menu-toggle');
+        var sidebar=document.getElementById('sidebar');
+        var sidebarBackdrop=document.getElementById('sidebar-backdrop');
+        if(!(menuToggle && sidebar)) return;
+        function toggle(){
+          var isOpen = sidebar.classList.toggle('open');
+          menuToggle.setAttribute('aria-expanded', String(isOpen));
+          if(sidebarBackdrop){
+            if(isOpen){ sidebarBackdrop.classList.remove('hidden'); }
+            else { sidebarBackdrop.classList.add('hidden'); }
+          }
+          document.body.classList.toggle('sidebar-open', isOpen);
+        }
+        menuToggle.addEventListener('click', toggle);
+        if(sidebarBackdrop){ sidebarBackdrop.addEventListener('click', function(){ if(sidebar.classList.contains('open')) toggle(); }); }
+      }
+      wireMenu();
+      setTimeout(wireMenu, 250);
+    });
+  </script>
 </body>
 </html>

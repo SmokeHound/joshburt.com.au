@@ -7,12 +7,8 @@
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
-  <script>
-    fetch('shared-config.html').then(r=>r.text()).then(h=>{const d=document.createElement('div');d.innerHTML=h;Array.from(d.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName))document.head.appendChild(c.cloneNode(true));});});
-    fetch('shared-theme.html').then(r=>r.text()).then(h=>{const d=document.createElement('div');d.innerHTML=h;Array.from(d.children).forEach(c=>{if(c.tagName==='SCRIPT')document.head.appendChild(c.cloneNode(true));});});
-  </script>
-  <script>(function(){const s=JSON.parse(localStorage.getItem('siteSettings')||'{}');document.documentElement.style.setProperty('--tw-color-primary',s.primaryColor||'#3b82f6');document.documentElement.style.setProperty('--tw-color-secondary',s.secondaryColor||'#10b981');document.documentElement.style.setProperty('--tw-color-accent',s.accentColor||'#8b5cf6');})();</script>
-  <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
+    <script src="./assets/js/init-shared.js" defer></script>
+    <script src="./assets/js/audit.js" defer></script>
   <style>
     .sidebar{transition:transform .3s ease-in-out}
   </style>

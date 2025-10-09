@@ -7,12 +7,7 @@
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
-  <script>
-    fetch('shared-config.html').then(r=>r.text()).then(h=>{const d=document.createElement('div');d.innerHTML=h;Array.from(d.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName))document.head.appendChild(c.cloneNode(true));});});
-    fetch('shared-theme.html').then(r=>r.text()).then(h=>{const d=document.createElement('div');d.innerHTML=h;Array.from(d.children).forEach(c=>{if(c.tagName==='SCRIPT')document.head.appendChild(c.cloneNode(true));});});
-  </script>
-  <script>(function(){try{const s=JSON.parse(localStorage.getItem('siteSettings')||'{}');['primary','secondary','accent'].forEach(()=>{});document.documentElement.style.setProperty('--tw-color-primary',s.primaryColor||'#3b82f6');document.documentElement.style.setProperty('--tw-color-secondary',s.secondaryColor||'#10b981');document.documentElement.style.setProperty('--tw-color-accent',s.accentColor||'#8b5cf6');const theme=s.theme||localStorage.getItem('theme')||'dark';document.documentElement.classList.toggle('dark',theme==='dark');document.documentElement.classList.toggle('light',theme==='light');}catch(e){}})();</script>
-  <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
+  <script src="./assets/js/init-shared.js" defer></script>
   <style>
     .settings-item{transition:.2s all;background:#111;border:1px solid #333}
     .settings-item:hover{background:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
