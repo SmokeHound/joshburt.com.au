@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
     <script src="./assets/js/init-shared.js" defer></script>
+        <script src="./assets/js/auth0.js" defer></script>
 </head>
 <body class="dark min-h-screen flex items-center justify-center font-sans p-4">
     <!-- Theme toggle removed (legacy manual dark/light mode replaced by presets) -->
@@ -144,8 +145,8 @@
     </div>
 
     <script>
-        // API Configuration
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        // Serverless auth function base
+        const FN_AUTH = '/.netlify/functions/auth';
 
         // Show toast notification
         function showToast(message, type = 'error') {
@@ -224,7 +225,7 @@
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch(`${API_BASE}/auth/register`, {
+                const response = await fetch(`${FN_AUTH}?action=register`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -239,13 +240,37 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    registerSuccess.textContent = 'Account created successfully! Redirecting to login...';
+                    registerSuccess.textContent = 'Account created! Signing you in...';
                     registerSuccess.classList.remove('hidden');
-                    
-                    // Redirect to login after delay
-                    setTimeout(() => {
+
+                    // Auto-login with provided credentials
+                    try {
+                        const loginRes = await fetch(`${FN_AUTH}?action=login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, password })
+                        });
+                        const loginData = await loginRes.json();
+                        if (!loginRes.ok) throw new Error(loginData.error || 'Auto-login failed');
+                        // Store tokens and user
+                        localStorage.setItem('accessToken', loginData.accessToken);
+                        localStorage.setItem('refreshToken', loginData.refreshToken);
+                        localStorage.setItem('user', JSON.stringify(loginData.user));
+                        try {
+                            const currentUser = {
+                                name: loginData.user?.name || loginData.user?.email || 'User',
+                                role: loginData.user?.role || 'user',
+                                email: loginData.user?.email
+                            };
+                            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        } catch {}
+                        // Redirect home
+                        window.location.href = 'index.html';
+                    } catch (autoErr) {
+                        // Fallback to login page with success message
+                        console.warn('Auto-login failed, redirecting to login', autoErr);
                         window.location.href = 'login.html?message=registration-success';
-                    }, 2000);
+                    }
                 } else {
                     throw new Error(data.error || 'Registration failed');
                 }
@@ -260,13 +285,15 @@
             }
         });
 
-        // OAuth handlers
-        document.getElementById('google-oauth').addEventListener('click', () => {
-            window.location.href = `${API_BASE}/auth/google`;
+        // OAuth handlers via Auth0 (if available)
+        document.getElementById('google-oauth').addEventListener('click', async () => {
+            try { await (window.Auth && Auth.login('google-oauth2')); }
+            catch(e){ console.error(e); showToast('Google sign-in failed'); }
         });
 
-        document.getElementById('github-oauth').addEventListener('click', () => {
-            window.location.href = `${API_BASE}/auth/github`;
+        document.getElementById('github-oauth').addEventListener('click', async () => {
+            try { await (window.Auth && Auth.login('github')); }
+            catch(e){ console.error(e); showToast('GitHub sign-in failed'); }
         });
     </script>
 </body>

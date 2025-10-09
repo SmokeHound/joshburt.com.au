@@ -142,8 +142,8 @@
     </div>
 
     <script>
-    // API Configuration (legacy fallback if needed)
-    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+    // Serverless auth function base
+    const FN_AUTH = '/.netlify/functions/auth';
 
         // Show toast notification
         function showToast(message, type = 'error') {
@@ -195,13 +195,13 @@
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch(`${API_BASE}/auth/login`, {
+                const response = await fetch(`${FN_AUTH}?action=login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        email: username, // API expects email field
+                        email: username, // function expects email field
                         password: password
                     })
                 });
@@ -213,6 +213,15 @@
                     localStorage.setItem('accessToken', data.accessToken);
                     localStorage.setItem('refreshToken', data.refreshToken);
                     localStorage.setItem('user', JSON.stringify(data.user));
+                    // Also set currentUser for UI compatibility
+                    try {
+                        const currentUser = {
+                            name: data.user?.name || data.user?.email || 'User',
+                            role: data.user?.role || 'user',
+                            email: data.user?.email
+                        };
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    } catch {}
                     
                     showToast('Login successful! Redirecting...', 'success');
                     
@@ -242,6 +251,61 @@
             try { await (window.Auth && Auth.login('github')); }
             catch(e){ console.error(e); showToast('GitHub sign-in failed'); }
         });
+
+        // Forgot password modal wiring
+        const forgotLink = document.getElementById('forgot-password');
+        const forgotModal = document.getElementById('forgot-modal');
+        const closeForgot = document.getElementById('close-forgot-modal');
+        const forgotForm = document.getElementById('forgot-form');
+        const forgotEmail = document.getElementById('forgot-email');
+        const forgotError = document.getElementById('forgot-error');
+        const forgotSuccess = document.getElementById('forgot-success');
+        const forgotSpinner = document.getElementById('forgot-spinner');
+
+        function openForgot() {
+            forgotError.classList.add('hidden');
+            forgotSuccess.classList.add('hidden');
+            forgotModal.classList.remove('hidden');
+        }
+        function closeForgotModal() {
+            forgotModal.classList.add('hidden');
+        }
+        if (forgotLink) {
+            forgotLink.addEventListener('click', (e) => { e.preventDefault(); openForgot(); });
+        }
+        if (closeForgot) {
+            closeForgot.addEventListener('click', () => closeForgotModal());
+        }
+        if (forgotForm) {
+            forgotForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                forgotError.classList.add('hidden');
+                forgotSuccess.classList.add('hidden');
+                const email = (forgotEmail.value || '').trim();
+                if (!email) {
+                    forgotError.textContent = 'Please enter your email address';
+                    forgotError.classList.remove('hidden');
+                    return;
+                }
+                forgotSpinner.classList.remove('hidden');
+                try {
+                    const res = await fetch(`${FN_AUTH}?action=forgot-password`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.error || 'Failed to send reset link');
+                    forgotSuccess.textContent = 'If that email exists, a reset link has been sent.';
+                    forgotSuccess.classList.remove('hidden');
+                } catch (err) {
+                    forgotError.textContent = err.message || 'Something went wrong';
+                    forgotError.classList.remove('hidden');
+                } finally {
+                    forgotSpinner.classList.add('hidden');
+                }
+            });
+        }
     </script>
 </body>
 </html>
