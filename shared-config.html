@@ -22,6 +22,15 @@
     }
     applyDynamicColors();
 </script>
+<!-- Auth0 config placeholders: override these in a secure way (env-injected script or Netlify config inject) -->
+<script>
+    // You can override these at deploy-time using an injected <script> or Netlify environment replacement
+    window.AUTH0_DOMAIN = window.AUTH0_DOMAIN || '';
+    window.AUTH0_CLIENT_ID = window.AUTH0_CLIENT_ID || '';
+    window.AUTH0_AUDIENCE = window.AUTH0_AUDIENCE || '';
+    window.AUTH0_REDIRECT_URI = window.AUTH0_REDIRECT_URI || (window.location.origin + '/oauth-success.html');
+    window.AUTH0_SCOPE = window.AUTH0_SCOPE || 'openid profile email';
+</script>
 <style>
     body {
         transition: background-color 0.3s, color 0.3s;

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const nodeCrypto = require('crypto');
 const { database } = require('../../config/database');
 const { corsHeaders, json: jsonResponse, error: errorResponse, parseBody, authenticate } = require('../../utils/http');
 
@@ -11,7 +11,7 @@ const generateTokens = (userId) => {
 };
 
 const storeRefreshToken = async (userId, refreshToken) => {
-  const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+  const tokenHash = nodeCrypto.createHash('sha256').update(refreshToken).digest('hex');
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
   await database.run('INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)', [userId, tokenHash, expiresAt.toISOString()]);
 };
@@ -50,7 +50,7 @@ exports.handler = async (event) => {
       if (existing) return errorResponse(409, 'User already exists with this email');
       const rounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
       const passwordHash = await bcrypt.hash(password, rounds);
-      const verificationToken = crypto.randomBytes(32).toString('hex');
+      const verificationToken = nodeCrypto.randomBytes(32).toString('hex');
       const verificationExpires = Date.now() + 24*60*60*1000;
       const result = await database.run('INSERT INTO users (email, name, password_hash, role, email_verified, email_verification_token, email_verification_expires) VALUES (?, ?, ?, ?, ?, ?, ?)', [email, name, passwordHash, 'user', 0, verificationToken, verificationExpires]);
       return jsonResponse(201, { message: 'Registered. Verify email.', userId: result.id });
@@ -107,7 +107,7 @@ exports.handler = async (event) => {
       try {
         const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
         if (decoded.type !== 'refresh') return errorResponse(401, 'Invalid token type');
-        const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+        const tokenHash = nodeCrypto.createHash('sha256').update(refreshToken).digest('hex');
         const tokenRecord = await database.get('SELECT user_id FROM refresh_tokens WHERE token_hash = ? AND expires_at > datetime("now")', [tokenHash]);
         if (!tokenRecord) return errorResponse(401, 'Invalid or expired refresh token');
         const user = await database.get('SELECT id, is_active FROM users WHERE id = ?', [tokenRecord.user_id]);
@@ -125,7 +125,7 @@ exports.handler = async (event) => {
     if (action === 'logout') {
       const { refreshToken } = payload || {};
       if (refreshToken) {
-        const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+        const tokenHash = nodeCrypto.createHash('sha256').update(refreshToken).digest('hex');
         await database.run('DELETE FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
       }
       await database.run('DELETE FROM refresh_tokens WHERE expires_at <= datetime("now")');
@@ -138,7 +138,7 @@ exports.handler = async (event) => {
       if (email) {
         const user = await database.get('SELECT id, name FROM users WHERE email = ?', [email]);
         if (user) {
-          const resetToken = crypto.randomBytes(32).toString('hex');
+          const resetToken = nodeCrypto.randomBytes(32).toString('hex');
           const resetTokenExpires = Date.now() + 3600000; // 1h
           await database.run('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?', [resetToken, resetTokenExpires, user.id]);
           // Email sending is omitted here (previously via nodemailer) – can integrate later.

@@ -13,6 +13,7 @@
     <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
     
     <link rel="stylesheet" href="./assets/css/styles.css">
+    <script src="./assets/js/auth0.js" defer></script>
     <script>
         // Configuration for dynamic color updates from settings
         function applyDynamicColors() {
@@ -76,42 +77,25 @@
     </div>
 
     <script>
-        // Extract tokens from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const accessToken = urlParams.get('token');
-        const refreshToken = urlParams.get('refresh');
-        
-        if (accessToken && refreshToken) {
-            // Store tokens
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', refreshToken);
-            
-            // Fetch user info
-            fetch('/.netlify/functions/auth?action=me', {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.user) {
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    // Redirect to home page
-                    window.location.href = 'index.html';
-                } else {
-                    throw new Error('Failed to get user info');
-                }
-            })
-            .catch(error => {
-                console.error('OAuth completion error:', error);
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('error').classList.remove('hidden');
-            });
-        } else {
-            // No tokens, show error
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('error').classList.remove('hidden');
+      (async function(){
+        try {
+          // Use Auth0 helper to finish the code exchange
+          await (window.Auth && Auth.init());
+          const res = await (window.Auth && Auth.handleRedirectCallback());
+          // If handled, fetch tokens and user
+          const token = await (window.Auth && Auth.getToken());
+          const user = await (window.Auth && Auth.getUser());
+          if (token) localStorage.setItem('accessToken', token);
+          if (user) localStorage.setItem('user', JSON.stringify(user));
+          // If your backend expects a token for sessions, optionally call /.netlify/functions/auth?action=login
+          // Redirect home
+          window.location.href = 'index.html';
+        } catch (e){
+          console.error('Auth0 redirect handling failed', e);
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('error').classList.remove('hidden');
         }
+      })();
     </script>
 </body>
 </html>

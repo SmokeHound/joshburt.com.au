@@ -8,15 +8,11 @@
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
     <script src="./assets/js/init-shared.js" defer></script>
+    <script src="./assets/js/auth0.js" defer></script>
 </head>
 <body class="dark min-h-screen flex items-center justify-center font-sans p-4">
-        <!-- Shared Navigation Loader -->
-        <div id="main-nav"></div>
-        <script>
-            fetch('shared-nav.html').then(r => r.text()).then(html => {
-                document.getElementById('main-nav').innerHTML = html;
-            });
-        </script>
+        <!-- Shared Navigation Loader (hidden on auth page for focus) -->
+        <div id="main-nav" class="hidden"></div>
     <!-- Skip Links -->
     <div class="sr-only">
         <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
@@ -146,8 +142,8 @@
     </div>
 
     <script>
-        // API Configuration
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+    // API Configuration (legacy fallback if needed)
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 
         // Show toast notification
         function showToast(message, type = 'error') {
@@ -171,7 +167,7 @@
 
 
 
-        // Form handling
+    // Form handling (email/password fallback through legacy API)
         const loginForm = document.getElementById('login-form');
         const loginSpinner = document.getElementById('login-spinner');
         const loginError = document.getElementById('login-error');
@@ -235,6 +231,16 @@
                 loginSpinner.classList.add('hidden');
                 submitBtn.disabled = false;
             }
+        });
+
+        // Auth0 OIDC login buttons
+        document.getElementById('google-oauth').addEventListener('click', async function(){
+            try { await (window.Auth && Auth.login('google-oauth2')); }
+            catch(e){ console.error(e); showToast('Google sign-in failed'); }
+        });
+        document.getElementById('github-oauth').addEventListener('click', async function(){
+            try { await (window.Auth && Auth.login('github')); }
+            catch(e){ console.error(e); showToast('GitHub sign-in failed'); }
         });
     </script>
 </body>
