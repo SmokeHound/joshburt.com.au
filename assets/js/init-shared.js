@@ -48,7 +48,7 @@
       var loginBtn = document.getElementById('login-btn');
       var logoutBtn = document.getElementById('logout-btn');
       var storedUser = null;
-  try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch (e) { /* noop */ }
+      try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch (e) { /* noop */ }
       if (userProfile) userProfile.classList.remove('hidden');
       var isLoggedIn = !!(localStorage.getItem('accessToken') || (storedUser && storedUser.email));
       if (isLoggedIn) {
@@ -98,4 +98,48 @@
       }
     } catch(e){ /* non-fatal nav wiring */ }
   });
+
+  // Session bootstrap: verify current user and refresh if possible
+  (async function(){
+    try {
+      var token = localStorage.getItem('accessToken');
+      if (!token) return;
+      // Ask backend who we are
+      var meRes = await fetch('/.netlify/functions/auth?action=me', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (meRes.ok) {
+        var me = await meRes.json();
+        if (me && me.user) {
+          localStorage.setItem('user', JSON.stringify(me.user));
+          var cu = { name: me.user.name || me.user.email || 'User', role: me.user.role || 'user', email: me.user.email };
+          localStorage.setItem('currentUser', JSON.stringify(cu));
+        }
+        return;
+      }
+      // Try refresh flow if 401
+      if (meRes.status === 401) {
+        var refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) return;
+        var refRes = await fetch('/.netlify/functions/auth?action=refresh', {
+          method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
+        });
+        if (refRes.ok) {
+          var refData = await refRes.json();
+          if (refData.accessToken) localStorage.setItem('accessToken', refData.accessToken);
+          if (refData.refreshToken) localStorage.setItem('refreshToken', refData.refreshToken);
+          // Recurse once to update user
+          var meRes2 = await fetch('/.netlify/functions/auth?action=me', { headers: { 'Authorization': 'Bearer ' + (refData.accessToken || token) }});
+          if (meRes2.ok) {
+            var me2 = await meRes2.json();
+            if (me2 && me2.user) {
+              localStorage.setItem('user', JSON.stringify(me2.user));
+              var cu2 = { name: me2.user.name || me2.user.email || 'User', role: me2.user.role || 'user', email: me2.user.email };
+              localStorage.setItem('currentUser', JSON.stringify(cu2));
+            }
+          }
+        }
+      }
+    } catch (e) { /* silent session bootstrap */ }
+  })();
 })();
