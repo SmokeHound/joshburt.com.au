@@ -283,6 +283,8 @@
       const useLocalData = document.getElementById('useLocalData');
       const switchLabel = document.querySelector('.switch-label');
       const reloadDataBtn = document.getElementById('reloadDataBtn');
+      const submitOrderBtn = document.getElementById('submitOrderBtn');
+      const submitOrderStatus = document.getElementById('submitOrderStatus');
       
       // Set default date to today
       orderDate.value = new Date().toISOString().split('T')[0];
@@ -710,6 +712,42 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
       document.getElementById('saveOrderBtn').addEventListener('click', saveOrder);
       document.getElementById('printOrderBtn').addEventListener('click', printOrder);
       document.getElementById('emailOrderBtn').addEventListener('click', emailOrder);
+      
+      // Submit order to API
+      submitOrderBtn.addEventListener('click', async function() {
+        if (orderItems.length === 0) {
+          showToast('No items to submit', 'warning');
+          return;
+        }
+        submitOrderBtn.disabled = true;
+        submitOrderStatus.textContent = 'Submitting order...';
+        try {
+          const payload = {
+            requestedBy: requestedBy.value || 'mechanic',
+            items: orderItems.map(item => ({
+              name: item.name,
+              code: item.code,
+              quantity: item.quantity
+            }))
+          };
+          const res = await fetch('/.netlify/functions/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('Failed to submit order');
+          submitOrderStatus.textContent = 'Order submitted!';
+          showToast('Order submitted successfully!', 'success');
+          orderItems.length = 0;
+          updateOrderDisplay();
+        } catch (err) {
+          submitOrderStatus.textContent = 'Error submitting order.';
+          showToast('Error submitting order', 'error');
+        } finally {
+          submitOrderBtn.disabled = false;
+          setTimeout(() => { submitOrderStatus.textContent = ''; }, 3000);
+        }
+      });
       
       searchOils.addEventListener('input', filterProducts);
       filterType.addEventListener('change', filterProducts);
