@@ -48,7 +48,7 @@
       var loginBtn = document.getElementById('login-btn');
       var logoutBtn = document.getElementById('logout-btn');
       var storedUser = null;
-      try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch {}
+  try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch (e) { /* noop */ }
       if (userProfile) userProfile.classList.remove('hidden');
       var isLoggedIn = !!(localStorage.getItem('accessToken') || (storedUser && storedUser.email));
       if (isLoggedIn) {
@@ -76,19 +76,25 @@
                 method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
               }).catch(()=>{});
             }
-          } catch {}
+          } catch (e) { /* noop */ }
           // Clear local session
           try {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('user');
             localStorage.removeItem('currentUser');
-          } catch {}
+          } catch (e) { /* noop */ }
           // Auth0 global logout if available
-          try { if (window.Auth && Auth.logout) { return Auth.logout(); } } catch {}
+          try { if (window.Auth && typeof window.Auth.logout === 'function') { window.Auth.logout(); return; } } catch (e) { /* noop */ }
           // Fallback: navigate to login
           window.location.href = 'login.html';
         });
+      }
+
+      // Also wire sidebar nav logout link if present
+      var navLogout = document.getElementById('nav-logout');
+      if (navLogout) {
+        navLogout.addEventListener('click', function(ev){ ev.preventDefault(); if (logoutBtn) { logoutBtn.click(); } else { window.location.href='login.html'; } });
       }
     } catch(e){ /* non-fatal nav wiring */ }
   });
