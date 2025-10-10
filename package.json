@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "python3 -m http.server 8000",
-    "build:css": "npx tailwindcss -c tailwind.config.js -i ./src/styles.css -o ./assets/css/styles.css --minify",
+    "build:css": "npx @tailwindcss/cli -i ./src/styles.css -o ./assets/css/styles.css -m",
     "build": "npm run build:css",
     "test:smoke:functions": "node tests/functions/auth_me_smoke.test.js",
     "test": "npm run test:smoke:functions",
