@@ -37,4 +37,59 @@
   injectFragment('shared-theme.html', ['SCRIPT']);
   applyColors();
   registerSW();
+
+  // Auth-aware nav wiring (profile, login/logout)
+  document.addEventListener('DOMContentLoaded', function(){
+    try {
+      var userProfile = document.getElementById('user-profile');
+      var userInfo = document.getElementById('user-info');
+      var userName = document.getElementById('user-name');
+      var userAvatar = document.getElementById('user-avatar');
+      var loginBtn = document.getElementById('login-btn');
+      var logoutBtn = document.getElementById('logout-btn');
+      var storedUser = null;
+      try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch {}
+      if (userProfile) userProfile.classList.remove('hidden');
+      var isLoggedIn = !!(localStorage.getItem('accessToken') || (storedUser && storedUser.email));
+      if (isLoggedIn) {
+        if (userInfo) userInfo.classList.remove('hidden');
+        if (loginBtn) loginBtn.classList.add('hidden');
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+        if (userName) userName.textContent = (storedUser && (storedUser.name || storedUser.email)) || 'User';
+        if (userAvatar && storedUser && storedUser.picture) userAvatar.src = storedUser.picture;
+      } else {
+        if (userInfo) userInfo.classList.add('hidden');
+        if (loginBtn) loginBtn.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+      }
+
+      if (loginBtn) {
+        loginBtn.addEventListener('click', function(){ window.location.href = 'login.html'; });
+      }
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async function(){
+          try {
+            // Best-effort serverless logout (invalidate refresh token)
+            var refreshToken = localStorage.getItem('refreshToken');
+            if (refreshToken) {
+              fetch('/.netlify/functions/auth?action=logout', {
+                method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
+              }).catch(()=>{});
+            }
+          } catch {}
+          // Clear local session
+          try {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            localStorage.removeItem('currentUser');
+          } catch {}
+          // Auth0 global logout if available
+          try { if (window.Auth && Auth.logout) { return Auth.logout(); } } catch {}
+          // Fallback: navigate to login
+          window.location.href = 'login.html';
+        });
+      }
+    } catch(e){ /* non-fatal nav wiring */ }
+  });
 })();
