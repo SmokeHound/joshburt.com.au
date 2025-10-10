@@ -35,6 +35,9 @@ exports.handler = async (event) => {
     return { statusCode: 204, headers: corsHeaders };
   }
 
+  // Connect to database
+  await database.connect();
+
   // Expect an action param via path or query (?action=login) or JSON body { action }
   let action = (event.queryStringParameters && event.queryStringParameters.action) || '';
   const payload = parseBody(event);

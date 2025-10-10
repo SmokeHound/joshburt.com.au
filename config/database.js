@@ -251,11 +251,15 @@ async function createMySQLTables() {
       role VARCHAR(50) DEFAULT 'user',
       is_active BOOLEAN DEFAULT true,
       email_verified BOOLEAN DEFAULT false,
+      email_verification_token VARCHAR(255),
+      email_verification_expires BIGINT,
       oauth_provider VARCHAR(50),
       oauth_id VARCHAR(255),
       avatar_url TEXT,
       reset_token VARCHAR(255),
       reset_token_expires BIGINT,
+      failed_login_attempts INT DEFAULT 0,
+      lockout_expires BIGINT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
@@ -327,11 +331,15 @@ async function createPostgreSQLTables() {
       role VARCHAR(50) DEFAULT 'user' CHECK(role IN ('user', 'manager', 'admin')),
       is_active BOOLEAN DEFAULT true,
       email_verified BOOLEAN DEFAULT false,
+      email_verification_token VARCHAR(255),
+      email_verification_expires BIGINT,
       oauth_provider VARCHAR(50),
       oauth_id VARCHAR(255),
       avatar_url TEXT,
       reset_token VARCHAR(255),
       reset_token_expires BIGINT,
+      failed_login_attempts INTEGER DEFAULT 0,
+      lockout_expires BIGINT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -381,11 +389,15 @@ async function createSQLiteTables() {
       role TEXT DEFAULT 'user' CHECK(role IN ('user', 'manager', 'admin')),
       is_active BOOLEAN DEFAULT 1,
       email_verified BOOLEAN DEFAULT 0,
+      email_verification_token TEXT,
+      email_verification_expires INTEGER,
       oauth_provider TEXT,
       oauth_id TEXT,
       avatar_url TEXT,
       reset_token TEXT,
       reset_token_expires INTEGER,
+      failed_login_attempts INTEGER DEFAULT 0,
+      lockout_expires INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
