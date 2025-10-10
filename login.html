@@ -242,15 +242,23 @@
             }
         });
 
-        // Auth0 OIDC login buttons
-        document.getElementById('google-oauth').addEventListener('click', async function(){
-            try { await (window.Auth && Auth.login('google-oauth2')); }
-            catch(e){ console.error(e); showToast('Google sign-in failed'); }
-        });
-        document.getElementById('github-oauth').addEventListener('click', async function(){
-            try { await (window.Auth && Auth.login('github')); }
-            catch(e){ console.error(e); showToast('GitHub sign-in failed'); }
-        });
+        // Auth0 OIDC login buttons (guard if not configured)
+        const AUTH0_READY = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
+        const googleBtn = document.getElementById('google-oauth');
+        const githubBtn = document.getElementById('github-oauth');
+        if (!AUTH0_READY) {
+            if (googleBtn) { googleBtn.disabled = true; googleBtn.classList.add('opacity-60','cursor-not-allowed'); }
+            if (githubBtn) { githubBtn.disabled = true; githubBtn.classList.add('opacity-60','cursor-not-allowed'); }
+        } else {
+            googleBtn.addEventListener('click', async function(){
+                try { await (window.Auth && window.Auth.login('google-oauth2')); }
+                catch(e){ console.error(e); showToast('Google sign-in failed'); }
+            });
+            githubBtn.addEventListener('click', async function(){
+                try { await (window.Auth && window.Auth.login('github')); }
+                catch(e){ console.error(e); showToast('GitHub sign-in failed'); }
+            });
+        }
 
         // Forgot password modal wiring
         const forgotLink = document.getElementById('forgot-password');

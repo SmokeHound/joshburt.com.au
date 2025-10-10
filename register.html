@@ -147,6 +147,8 @@
     <script>
         // Serverless auth function base
         const FN_AUTH = '/.netlify/functions/auth';
+        // Check Auth0 configuration presence
+        const AUTH0_READY = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
 
         // Show toast notification
         function showToast(message, type = 'error') {
@@ -286,15 +288,26 @@
         });
 
         // OAuth handlers via Auth0 (if available)
-        document.getElementById('google-oauth').addEventListener('click', async () => {
-            try { await (window.Auth && Auth.login('google-oauth2')); }
-            catch(e){ console.error(e); showToast('Google sign-in failed'); }
-        });
-
-        document.getElementById('github-oauth').addEventListener('click', async () => {
-            try { await (window.Auth && Auth.login('github')); }
-            catch(e){ console.error(e); showToast('GitHub sign-in failed'); }
-        });
+        const googleBtn = document.getElementById('google-oauth');
+        const githubBtn = document.getElementById('github-oauth');
+        if (!AUTH0_READY) {
+            if (googleBtn) { googleBtn.disabled = true; googleBtn.classList.add('opacity-60','cursor-not-allowed'); }
+            if (githubBtn) { githubBtn.disabled = true; githubBtn.classList.add('opacity-60','cursor-not-allowed'); }
+            // Insert a small helper text if not already present
+            const helper = document.createElement('p');
+            helper.className = 'text-xs text-gray-400 mt-2';
+            helper.textContent = 'Social sign-in is not configured. Please use email/password.';
+            if (githubBtn && githubBtn.parentElement) githubBtn.parentElement.appendChild(helper);
+        } else {
+            googleBtn.addEventListener('click', async () => {
+                try { await (window.Auth && window.Auth.login('google-oauth2')); }
+                catch(e){ console.error(e); showToast('Google sign-in failed'); }
+            });
+            githubBtn.addEventListener('click', async () => {
+                try { await (window.Auth && window.Auth.login('github')); }
+                catch(e){ console.error(e); showToast('GitHub sign-in failed'); }
+            });
+        }
     </script>
 </body>
 </html>
