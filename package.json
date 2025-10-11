@@ -18,6 +18,7 @@
     "url": "https://github.com/SmokeHound/joshburt.com.au"
   },
   "dependencies": {
+    "@auth0/auth0-spa-js": "^2.5.0",
     "@neondatabase/serverless": "^1.0.1",
     "@netlify/functions": "^4.2.5",
     "@netlify/zip-it-and-ship-it": "^14.1.8",
