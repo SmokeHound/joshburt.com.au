@@ -1,42 +1,16 @@
 // Netlify Function: GET /.netlify/functions/consumable-categories (legacy /api/consumable-categories deprecated)
 const { database } = require('../../config/database');
+const { withHandler, ok, error } = require('../../utils/fn');
 
-exports.handler = async function(event, context) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Content-Type': 'application/json',
-  };
-
-  // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
-  if (event.httpMethod !== 'GET') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
-    };
-  }
-
+exports.handler = withHandler(async function(event){
+  if (event.httpMethod !== 'GET') return error(405, 'Method Not Allowed');
   try {
     await database.connect();
     const rows = await database.all('SELECT DISTINCT category FROM consumables WHERE category IS NOT NULL AND category != "" ORDER BY category');
     const categories = rows.map(r => r.category);
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(categories),
-    };
-  } catch (error) {
-    console.error('Consumable categories API error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Failed to fetch categories', message: error.message }),
-    };
+    return ok(categories);
+  } catch (e) {
+    console.error('Consumable categories API error:', e);
+    return error(500, 'Failed to fetch categories', { message: e.message });
   }
-};
+});

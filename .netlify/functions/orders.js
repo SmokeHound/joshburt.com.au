@@ -1,34 +1,16 @@
 
-// Netlify Function: GET and POST /.netlify/functions/orders (legacy /api/orders path removed)
+// Netlify Function: GET/POST/PATCH /.netlify/functions/orders (legacy /api/orders removed)
 const { Client } = require('pg');
+const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 
-exports.handler = async function(event, context) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
-    'Content-Type': 'application/json',
-  };
-
-  // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: '',
-    };
-  }
-
+exports.handler = withHandler(async function(event){
   const client = new Client({ connectionString: process.env.NEON_DATABASE_URL });
   await client.connect();
-
+  const method = event.httpMethod;
   try {
-    if (event.httpMethod === 'GET') {
-      // Get orders with basic info (optionally include items)
+    if (method === 'GET') {
       const ordersRes = await client.query('SELECT * FROM orders ORDER BY created_at DESC LIMIT 50');
       const orders = ordersRes.rows;
-
-      // For each order, get its items
       for (const order of orders) {
         const itemsRes = await client.query(
           'SELECT product_name AS name, product_code AS code, quantity FROM order_items WHERE order_id = $1',
@@ -36,91 +18,48 @@ exports.handler = async function(event, context) {
         );
         order.items = itemsRes.rows;
       }
-
       await client.end();
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(orders),
-      };
+      return ok(orders);
     }
-
-    if (event.httpMethod === 'POST') {
-      if (event.httpMethod === 'PATCH') {
-      // Update order status (approve/reject)
-        const { orderId, status } = JSON.parse(event.body || '{}');
-        if (!orderId || !['approved', 'rejected'].includes(status)) {
-          await client.end();
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({ error: 'Missing or invalid orderId/status' }),
-          };
-        }
-        const updateRes = await client.query(
-          'UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
-          [status, orderId]
-        );
+    if (method === 'PATCH') {
+      const { orderId, status } = parseBody(event);
+      if (!orderId || !['approved', 'rejected'].includes(status)) {
         await client.end();
-        if (updateRes.rowCount === 0) {
-          return {
-            statusCode: 404,
-            headers,
-            body: JSON.stringify({ error: 'Order not found' }),
-          };
-        }
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({ success: true, order: updateRes.rows[0] }),
-        };
+        return error(400, 'Missing or invalid orderId/status');
       }
-      const orderData = JSON.parse(event.body);
+      const updateRes = await client.query(
+        'UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+        [status, orderId]
+      );
+      await client.end();
+      if (updateRes.rowCount === 0) return error(404, 'Order not found');
+      return ok({ success: true, order: updateRes.rows[0] });
+    }
+    if (method === 'POST') {
+      const orderData = parseBody(event);
       if (!orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
         await client.end();
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Order must contain at least one item' }),
-        };
+        return error(400, 'Order must contain at least one item');
       }
-
-      // Insert order
       const orderRes = await client.query(
         'INSERT INTO orders (created_by, total_items, status) VALUES ($1, $2, $3) RETURNING id',
         [orderData.requestedBy || 'mechanic', orderData.items.length, 'pending']
       );
       const orderId = orderRes.rows[0].id;
-
-      // Insert order items
       for (const item of orderData.items) {
         await client.query(
           'INSERT INTO order_items (order_id, product_name, product_code, quantity) VALUES ($1, $2, $3, $4)',
           [orderId, item.name, item.code, item.quantity]
         );
       }
-
       await client.end();
-      return {
-        statusCode: 201,
-        headers,
-        body: JSON.stringify({ orderId }),
-      };
+      return ok({ orderId }, 201);
     }
-
     await client.end();
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
-    };
-  } catch (error) {
+    return error(405, 'Method Not Allowed');
+  } catch (e) {
     await client.end();
-    console.error('Database error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Failed to process order', message: error.message }),
-    };
+    console.error('Orders function error:', e);
+    return error(500, 'Failed to process order', { message: e.message });
   }
-};
+});

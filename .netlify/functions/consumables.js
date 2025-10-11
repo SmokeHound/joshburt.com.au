@@ -1,50 +1,17 @@
 // Netlify Function: Full CRUD /.netlify/functions/consumables (legacy /api/consumables deprecated)
 const { database } = require('../../config/database');
+const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 
-exports.handler = async function(event, context) {
-  // Always define CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Content-Type': 'application/json',
-  };
+exports.handler = withHandler(async function(event){
+  await database.connect();
+  const method = event.httpMethod;
+  if (method === 'GET') return handleGet(event);
+  if (method === 'POST') return handlePost(event);
+  if (method === 'PUT') return handlePut(event);
+  if (method === 'DELETE') return handleDelete(event);
+  return error(405, 'Method Not Allowed');
 
-  // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
-  try {
-    // Initialize database connection
-    await database.connect();
-
-    switch (event.httpMethod) {
-    case 'GET':
-      return await handleGet(event, headers);
-    case 'POST':
-      return await handlePost(event, headers);
-    case 'PUT':
-      return await handlePut(event, headers);
-    case 'DELETE':
-      return await handleDelete(event, headers);
-    default:
-      return {
-        statusCode: 405,
-        headers,
-        body: JSON.stringify({ error: 'Method Not Allowed' }),
-      };
-    }
-  } catch (error) {
-    console.error('Database error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Database operation failed', message: error.message }),
-    };
-  }
-
-  async function handleGet(event, headers) {
+  async function handleGet(event) {
     try {
       let query = 'SELECT * FROM consumables ORDER BY name';
       let params = [];
@@ -61,31 +28,19 @@ exports.handler = async function(event, context) {
         params = [category];
       }
       const consumables = await database.all(query, params);
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(consumables),
-      };
-    } catch (error) {
-      console.error('GET error:', error);
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Failed to fetch consumables' }),
-      };
+      return ok(consumables);
+    } catch (e) {
+      console.error('GET /consumables error:', e);
+      return error(500, 'Failed to fetch consumables');
     }
   }
 
-  async function handlePost(event, headers) {
+  async function handlePost(event) {
     try {
-      const body = JSON.parse(event.body);
+      const body = parseBody(event);
       const { name, code, type, category, description } = body;
       if (!name || !type || !category) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Missing required fields: name, type, category' }),
-        };
+        return error(400, 'Missing required fields: name, type, category');
       }
       const query = `
         INSERT INTO consumables (name, code, type, category, description)
@@ -93,42 +48,26 @@ exports.handler = async function(event, context) {
       `;
       const params = [name, code || '', type, category, description || ''];
       const result = await database.run(query, params);
-      return {
-        statusCode: 201,
-        headers,
-        body: JSON.stringify({ 
-          id: result.id, 
-          message: 'Consumable created successfully',
-          consumable: { id: result.id, name, code, type, category, description }
-        }),
-      };
-    } catch (error) {
-      console.error('POST error:', error);
-      if (error.message.includes('UNIQUE constraint')) {
-        return {
-          statusCode: 409,
-          headers,
-          body: JSON.stringify({ error: 'Consumable code already exists' }),
-        };
+      return ok({
+        id: result.id,
+        message: 'Consumable created successfully',
+        consumable: { id: result.id, name, code, type, category, description }
+      }, 201);
+    } catch (e) {
+      console.error('POST /consumables error:', e);
+      if (e.message && e.message.includes('UNIQUE constraint')) {
+        return error(409, 'Consumable code already exists');
       }
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Failed to create consumable' }),
-      };
+      return error(500, 'Failed to create consumable');
     }
   }
 
-  async function handlePut(event, headers) {
+  async function handlePut(event) {
     try {
-      const body = JSON.parse(event.body);
+      const body = parseBody(event);
       const { id, name, code, type, category, description } = body;
       if (!id || !name || !type || !category) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Missing required fields: id, name, type, category' }),
-        };
+        return error(400, 'Missing required fields: id, name, type, category');
       }
       const query = `
         UPDATE consumables 
@@ -137,68 +76,30 @@ exports.handler = async function(event, context) {
       `;
       const params = [name, code || '', type, category, description || '', id];
       const result = await database.run(query, params);
-      if (result.changes === 0) {
-        return {
-          statusCode: 404,
-          headers,
-          body: JSON.stringify({ error: 'Consumable not found' }),
-        };
+      if (result.changes === 0) return error(404, 'Consumable not found');
+      return ok({
+        message: 'Consumable updated successfully',
+        consumable: { id, name, code, type, category, description }
+      });
+    } catch (e) {
+      console.error('PUT /consumables error:', e);
+      if (e.message && e.message.includes('UNIQUE constraint')) {
+        return error(409, 'Consumable code already exists');
       }
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ 
-          message: 'Consumable updated successfully',
-          consumable: { id, name, code, type, category, description }
-        }),
-      };
-    } catch (error) {
-      console.error('PUT error:', error);
-      if (error.message.includes('UNIQUE constraint')) {
-        return {
-          statusCode: 409,
-          headers,
-          body: JSON.stringify({ error: 'Consumable code already exists' }),
-        };
-      }
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Failed to update consumable' }),
-      };
+      return error(500, 'Failed to update consumable');
     }
   }
 
-  async function handleDelete(event, headers) {
+  async function handleDelete(event) {
     try {
-      const { id } = JSON.parse(event.body);
-      if (!id) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Missing required field: id' }),
-        };
-      }
+      const { id } = parseBody(event);
+      if (!id) return error(400, 'Missing required field: id');
       const result = await database.run('DELETE FROM consumables WHERE id = ?', [id]);
-      if (result.changes === 0) {
-        return {
-          statusCode: 404,
-          headers,
-          body: JSON.stringify({ error: 'Consumable not found' }),
-        };
-      }
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ message: 'Consumable deleted successfully' }),
-      };
-    } catch (error) {
-      console.error('DELETE error:', error);
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Failed to delete consumable' }),
-      };
+      if (result.changes === 0) return error(404, 'Consumable not found');
+      return ok({ message: 'Consumable deleted successfully' });
+    } catch (e) {
+      console.error('DELETE /consumables error:', e);
+      return error(500, 'Failed to delete consumable');
     }
   }
-};
+});

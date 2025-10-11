@@ -1,13 +1,12 @@
 // Netlify Function: CRUD & management /.netlify/functions/users (legacy /api/users removed)
 const bcrypt = require('bcryptjs');
 const { database } = require('../../config/database');
-const { corsHeaders, json: respond, error: errorResponse, parseBody, requireAuth } = require('../../utils/http');
-const { getPagination } = require('../../utils/fn');
+const { corsHeaders, parseBody, requireAuth } = require('../../utils/http');
+const { getPagination, withHandler, ok, error } = require('../../utils/fn');
 
 function requireRole(user, roles) { return !!user && roles.includes(user.role); }
 
-exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: corsHeaders };
+exports.handler = withHandler(async (event) => {
   const method = event.httpMethod;
   const pathParts = event.path.split('/').filter(Boolean);
   const maybeId = pathParts[pathParts.length - 1];
@@ -19,7 +18,7 @@ exports.handler = async (event) => {
   try {
     // Stats endpoint: /users/stats/overview
     if (isStats) {
-      if (!requireRole(user, ['admin','manager'])) return errorResponse(403, 'Insufficient permissions');
+      if (!requireRole(user, ['admin','manager'])) return error(403, 'Insufficient permissions');
       const stats = await database.all(`SELECT 
         COUNT(*) as total_users,
         SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_users,
@@ -29,16 +28,16 @@ exports.handler = async (event) => {
         SUM(CASE WHEN email_verified = 1 THEN 1 ELSE 0 END) as verified_users,
         SUM(CASE WHEN created_at >= datetime('now', '-30 days') THEN 1 ELSE 0 END) as new_users_30d
       FROM users`);
-      return respond(200, { stats: stats[0] });
+      return ok({ stats: stats[0] });
     }
 
     // Collection endpoints (no id)
     if (!/^[0-9]+$/.test(maybeId)) {
       if (method === 'GET') {
-        if (!requireRole(user, ['admin','manager'])) return errorResponse(403, 'Insufficient permissions');
-  const { page, limit, offset } = getPagination(event.queryStringParameters || {}, { page: 1, limit: 10 });
-  const search = (event.queryStringParameters && event.queryStringParameters.search) || '';
-  const role = (event.queryStringParameters && event.queryStringParameters.role) || '';
+        if (!requireRole(user, ['admin','manager'])) return error(403, 'Insufficient permissions');
+        const { page, limit, offset } = getPagination(event.queryStringParameters || {}, { page: 1, limit: 10 });
+        const search = (event.queryStringParameters && event.queryStringParameters.search) || '';
+        const role = (event.queryStringParameters && event.queryStringParameters.role) || '';
         let query = 'SELECT id, email, name, role, is_active, email_verified, created_at FROM users';
         let countQuery = 'SELECT COUNT(*) as total FROM users';
         const params = []; const countParams = [];
@@ -58,63 +57,63 @@ exports.handler = async (event) => {
           database.all(query, params),
           database.get(countQuery, countParams)
         ]);
-        return respond(200, { users: usersList, pagination: { page: parseInt(page), limit: parseInt(limit), total: countResult.total, pages: Math.ceil(countResult.total / limit) } });
+        return ok({ users: usersList, pagination: { page: parseInt(page), limit: parseInt(limit), total: countResult.total, pages: Math.ceil(countResult.total / limit) } });
       }
       if (method === 'POST') {
-        if (!requireRole(user, ['admin'])) return errorResponse(403, 'Insufficient permissions');
+        if (!requireRole(user, ['admin'])) return error(403, 'Insufficient permissions');
         const { email, password, name, role = 'user' } = body;
-        if (!email || !password || !name) return errorResponse(400, 'Validation failed');
-        if (!['user','manager','admin'].includes(role)) return errorResponse(400, 'Invalid role');
+        if (!email || !password || !name) return error(400, 'Validation failed');
+        if (!['user','manager','admin'].includes(role)) return error(400, 'Invalid role');
         const existing = await database.get('SELECT id FROM users WHERE email = ?', [email]);
-        if (existing) return errorResponse(409, 'User already exists with this email');
+        if (existing) return error(409, 'User already exists with this email');
         const rounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
         const hash = await bcrypt.hash(password, rounds);
         const result = await database.run('INSERT INTO users (email, name, password_hash, role, email_verified) VALUES (?, ?, ?, ?, ?)', [email, name, hash, role, 1]);
         const newUser = await database.get('SELECT id, email, name, role, is_active, email_verified, created_at FROM users WHERE id = ?', [result.id]);
-        return respond(201, { message: 'User created successfully', user: newUser });
+        return ok({ message: 'User created successfully', user: newUser }, 201);
       }
-      return errorResponse(405, 'Method not allowed');
+      return error(405, 'Method not allowed');
     }
 
     // Individual resource by numeric id
     const id = parseInt(maybeId, 10);
-    if (Number.isNaN(id)) return errorResponse(400, 'Invalid user id');
+    if (Number.isNaN(id)) return error(400, 'Invalid user id');
 
     if (method === 'GET') {
-      if (!requireRole(user, ['admin','manager'])) return errorResponse(403, 'Insufficient permissions');
+      if (!requireRole(user, ['admin','manager'])) return error(403, 'Insufficient permissions');
       const u = await database.get('SELECT id, email, name, role, is_active, email_verified, avatar_url, created_at, updated_at FROM users WHERE id = ?', [id]);
-      if (!u) return errorResponse(404, 'User not found');
-      return respond(200, { user: u });
+      if (!u) return error(404, 'User not found');
+      return ok({ user: u });
     }
     if (method === 'PUT') {
-      if (!user) return errorResponse(401, 'Authentication required');
+      if (!user) return error(401, 'Authentication required');
       const isOwn = user.id === id; const isAdmin = user.role === 'admin';
-      if (!isOwn && !isAdmin) return errorResponse(403, 'Insufficient permissions');
+      if (!isOwn && !isAdmin) return error(403, 'Insufficient permissions');
       const { name, role, is_active } = body;
-      if (!isAdmin && (role !== undefined || is_active !== undefined)) return errorResponse(403, 'Cannot modify role or status');
+      if (!isAdmin && (role !== undefined || is_active !== undefined)) return error(403, 'Cannot modify role or status');
       const updates = []; const values = [];
       if (name !== undefined) { updates.push('name = ?'); values.push(name); }
-      if (role !== undefined && isAdmin) { if (!['user','manager','admin'].includes(role)) return errorResponse(400, 'Invalid role'); updates.push('role = ?'); values.push(role); }
+      if (role !== undefined && isAdmin) { if (!['user','manager','admin'].includes(role)) return error(400, 'Invalid role'); updates.push('role = ?'); values.push(role); }
       if (is_active !== undefined && isAdmin) { updates.push('is_active = ?'); values.push(is_active ? 1 : 0); }
-      if (!updates.length) return errorResponse(400, 'No valid updates provided');
+      if (!updates.length) return error(400, 'No valid updates provided');
       updates.push('updated_at = CURRENT_TIMESTAMP'); values.push(id);
       await database.run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, values);
       const updated = await database.get('SELECT id, email, name, role, is_active, email_verified, updated_at FROM users WHERE id = ?', [id]);
-      return respond(200, { message: 'User updated successfully', user: updated });
+      return ok({ message: 'User updated successfully', user: updated });
     }
     if (method === 'DELETE') {
-      if (!user || user.role !== 'admin') return errorResponse(403, 'Insufficient permissions');
-      if (user.id === id) return errorResponse(400, 'Cannot delete your own account');
+      if (!user || user.role !== 'admin') return error(403, 'Insufficient permissions');
+      if (user.id === id) return error(400, 'Cannot delete your own account');
       const exists = await database.get('SELECT id FROM users WHERE id = ?', [id]);
-      if (!exists) return errorResponse(404, 'User not found');
+      if (!exists) return error(404, 'User not found');
       await database.run('DELETE FROM refresh_tokens WHERE user_id = ?', [id]);
       await database.run('DELETE FROM users WHERE id = ?', [id]);
-      return respond(200, { message: 'User deleted successfully' });
+      return ok({ message: 'User deleted successfully' });
     }
-    // Password change: treat query param action=password or /users/{id}/password not implemented for brevity
-    return errorResponse(405, 'Method not allowed');
+    // Password change: not implemented
+    return error(405, 'Method not allowed');
   } catch (error) {
     console.error('Users function error', error);
-    return errorResponse(500, 'Internal server error');
+    return error(500, 'Internal server error');
   }
-};
+});

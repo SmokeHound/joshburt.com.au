@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const nodeCrypto = require('crypto');
 const { database, initializeDatabase } = require('../../config/database');
 const { corsHeaders, json: jsonResponse, error: errorResponse, parseBody, authenticate } = require('../../utils/http');
+const { withHandler } = require('../../utils/fn');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 const generateTokens = (userId) => {
@@ -32,10 +33,7 @@ function rateLimit(key, limit = 5, windowMs = 5 * 60 * 1000) {
 // authenticate now provided by shared helper
 
 let dbInitialized = false;
-exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers: corsHeaders };
-  }
+exports.handler = withHandler(async (event) => {
 
   // Connect and initialize database (once per cold start)
   if (!dbInitialized) {
@@ -183,4 +181,4 @@ exports.handler = async (event) => {
     console.error('Auth function error', error);
     return errorResponse(500, 'Internal server error');
   }
-};
+});
