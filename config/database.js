@@ -87,6 +87,22 @@ class Database {
       }
     } catch (error) {
       console.error('Database connection failed:', error);
+      // Attempt graceful fallback to SQLite if available and not already using it
+      if (this.type !== 'sqlite' && sqlite3) {
+        console.warn('Falling back to SQLite database...');
+        this.type = 'sqlite';
+        return new Promise((resolve, reject) => {
+          this.db = new sqlite3.Database(DB_PATH, (err) => {
+            if (err) {
+              console.error('Error connecting to SQLite database during fallback:', err);
+              reject(err);
+            } else {
+              console.log('📚 Connected to SQLite database (fallback after failure)');
+              resolve();
+            }
+          });
+        });
+      }
       throw error;
     }
   }

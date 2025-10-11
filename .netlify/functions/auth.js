@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodeCrypto = require('crypto');
-const { database } = require('../../config/database');
+const { database, initializeDatabase } = require('../../config/database');
 const { corsHeaders, json: jsonResponse, error: errorResponse, parseBody, authenticate } = require('../../utils/http');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 const generateTokens = (userId) => {
-  const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
-  const refreshToken = jwt.sign({ userId, type: 'refresh' }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d' });
+  const accessToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
+  const refreshToken = jwt.sign({ userId, type: 'refresh' }, JWT_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d' });
   return { accessToken, refreshToken };
 };
 
@@ -30,13 +31,18 @@ function rateLimit(key, limit = 5, windowMs = 5 * 60 * 1000) {
 
 // authenticate now provided by shared helper
 
+let dbInitialized = false;
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: corsHeaders };
   }
 
-  // Connect to database
-  await database.connect();
+  // Connect and initialize database (once per cold start)
+  if (!dbInitialized) {
+    await database.connect();
+    try { await initializeDatabase(); } catch (e) { /* tables may already exist */ }
+    dbInitialized = true;
+  }
 
   // Expect an action param via path or query (?action=login) or JSON body { action }
   let action = (event.queryStringParameters && event.queryStringParameters.action) || '';
@@ -108,10 +114,11 @@ exports.handler = async (event) => {
       const { refreshToken } = payload;
       if (!refreshToken) return errorResponse(401, 'Refresh token required');
       try {
-        const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+        const decoded = jwt.verify(refreshToken, JWT_SECRET);
         if (decoded.type !== 'refresh') return errorResponse(401, 'Invalid token type');
         const tokenHash = nodeCrypto.createHash('sha256').update(refreshToken).digest('hex');
-        const tokenRecord = await database.get('SELECT user_id FROM refresh_tokens WHERE token_hash = ? AND expires_at > datetime("now")', [tokenHash]);
+        const nowIso = new Date().toISOString();
+        const tokenRecord = await database.get('SELECT user_id FROM refresh_tokens WHERE token_hash = ? AND expires_at > ?', [tokenHash, nowIso]);
         if (!tokenRecord) return errorResponse(401, 'Invalid or expired refresh token');
         const user = await database.get('SELECT id, is_active FROM users WHERE id = ?', [tokenRecord.user_id]);
         if (!user || !user.is_active) return errorResponse(401, 'User not found or inactive');
@@ -131,7 +138,8 @@ exports.handler = async (event) => {
         const tokenHash = nodeCrypto.createHash('sha256').update(refreshToken).digest('hex');
         await database.run('DELETE FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
       }
-      await database.run('DELETE FROM refresh_tokens WHERE expires_at <= datetime("now")');
+      const nowIso = new Date().toISOString();
+      await database.run('DELETE FROM refresh_tokens WHERE expires_at <= ?', [nowIso]);
       return jsonResponse(200, { message: 'Logged out successfully' });
     }
 
