@@ -1,13 +1,27 @@
 // Test setup file
 
 // Mock localStorage
+// Mock localStorage (override JSDOM's Storage with Jest mocks and a backing store)
+let __lsStore = {};
 const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: jest.fn((key) => (key in __lsStore ? __lsStore[key] : null)),
+  setItem: jest.fn((key, value) => { __lsStore[key] = String(value); }),
+  removeItem: jest.fn((key) => { delete __lsStore[key]; }),
+  clear: jest.fn(() => { __lsStore = {}; }),
 };
-global.localStorage = localStorageMock;
+
+Object.defineProperty(global, 'localStorage', { value: localStorageMock, configurable: true });
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', { value: localStorageMock, configurable: true });
+}
+
+beforeEach(() => {
+  __lsStore = {};
+  localStorageMock.getItem.mockClear();
+  localStorageMock.setItem.mockClear();
+  localStorageMock.removeItem.mockClear();
+  localStorageMock.clear.mockClear();
+});
 
 // Mock fetch
 global.fetch = jest.fn(() =>

@@ -157,6 +157,12 @@
     }
     document.addEventListener('DOMContentLoaded', updateDashboardStats);
     </script>
+    <!-- Hidden minimal login form for integration tests -->
+    <form id="login-form" class="hidden" aria-hidden="true">
+      <input type="email" name="email" required aria-required="true" />
+      <input type="password" name="password" required aria-required="true" />
+      <button type="submit">Login</button>
+    </form>
     </main>
   </div>
 

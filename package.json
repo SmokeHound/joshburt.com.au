@@ -8,10 +8,16 @@
     "build:css": "npx @tailwindcss/cli -i ./src/styles.css -o ./assets/css/styles.css -m",
     "build": "npm run build:css",
     "test:smoke:functions": "node tests/functions/auth_me_smoke.test.js",
-    "test": "npm run test:smoke:functions",
+    "test:functions": "node tests/functions/auth_me_smoke.test.js && node tests/functions/orders_products_smoke.test.js && node tests/functions/auth_errors.test.js && node tests/functions/handlers.test.js",
+    "test:unit": "jest --config jest.config.js --runTestsByPath tests/unit",
+    "test:integration": "jest --config jest.config.js --runTestsByPath tests/integration",
+    "test:jest": "jest --config jest.config.js",
+    "test": "npm run test:jest",
+    "test:all": "npm run test:jest && npm run test:functions",
     "lint:js": "eslint . --ext .js",
     "lint:html": "htmlhint '**/*.html'",
-    "lint": "npm run lint:js && npm run lint:html"
+    "lint": "npm run lint:js && npm run lint:html",
+    "validate": "npm run lint && npm run build:css && npm run test:all"
   },
   "repository": {
     "type": "git",
@@ -40,6 +46,8 @@
     "globals": "^16.4.0",
     "htmlhint": "^1.7.1",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.13"
+    "tailwindcss": "^4.1.13",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
   }
 }
