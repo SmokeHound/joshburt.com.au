@@ -266,6 +266,19 @@
     </main>
     <script src="admin-audit-logger.js"></script>
     <script>
+        // Helper to send audit entries to serverless audit endpoint
+        async function sendAudit(action, details) {
+          try {
+            const token = localStorage.getItem('accessToken');
+            let userId = null;
+            try { const u = JSON.parse(localStorage.getItem('user')||'null'); if (u && typeof u.id === 'number') userId = u.id; } catch {}
+            await fetch('/.netlify/functions/audit-logs', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': 'Bearer ' + token } : {}) },
+              body: JSON.stringify({ action, details: (typeof details === 'string' ? details : details || {}), userId })
+            });
+          } catch (e) { /* non-fatal */ }
+        }
         // Tab switching functionality
         function initTabs() {
             const tabButtons = document.querySelectorAll('.tab-btn');
@@ -486,9 +499,13 @@
                   }
                 }
                 if (changes.length > 0) {
-                  AuditLogger.log('settings_change', `Modified settings: ${changes.join(', ')}`);
+                  const msg = `Modified settings: ${changes.join(', ')}`;
+                  AuditLogger.log('settings_change', msg);
+                  sendAudit('settings_change', msg);
                 } else {
-                  AuditLogger.log('settings_change', 'Settings updated via API (no changes detected)');
+                  const msg = 'Settings updated via API (no changes detected)';
+                  AuditLogger.log('settings_change', msg);
+                  sendAudit('settings_change', msg);
                 }
                 showToast('Settings saved successfully!');
             } catch (e) {
@@ -548,7 +565,9 @@
       document.getElementById('apply-theme').addEventListener('click', async () => {
         await saveSettings();
         applyDynamicColors();
-        AuditLogger.log('theme_change', 'Applied custom theme via API');
+        const msg = 'Applied custom theme via API';
+        AuditLogger.log('theme_change', msg);
+        sendAudit('theme_change', msg);
         showToast('Theme applied successfully!');
       });
     }
@@ -585,7 +604,9 @@
       }
       document.getElementById('schedule-enabled').addEventListener('change', async (e) => {
         await saveSettings();
-        AuditLogger.log('theme_schedule', `Theme scheduling ${e.target.checked ? 'enabled' : 'disabled'} via API`);
+        const msg = `Theme scheduling ${e.target.checked ? 'enabled' : 'disabled'} via API`;
+        AuditLogger.log('theme_schedule', msg);
+        sendAudit('theme_schedule', msg);
         showToast(e.target.checked ? 'Theme scheduling enabled' : 'Theme scheduling disabled');
       });
       document.getElementById('dark-mode-start').addEventListener('change', async (e) => {
@@ -601,7 +622,9 @@
     function initSecuritySettings() {
       document.getElementById('save-security').addEventListener('click', async () => {
         await saveSettings();
-        AuditLogger.log('security_change', 'Updated security settings via API');
+        const msg = 'Updated security settings via API';
+        AuditLogger.log('security_change', msg);
+        sendAudit('security_change', msg);
         showToast('Security settings saved successfully!');
       });
     }
@@ -656,6 +679,7 @@
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
           AuditLogger.log('settings_export', 'Exported site settings configuration');
+          sendAudit('settings_export', 'Exported site settings configuration');
           showToast('Settings exported successfully!');
         } catch (e) {
           showToast('Failed to export settings', 'error');
@@ -693,7 +717,9 @@
               body: JSON.stringify(defaultSettings)
             });
             loadSettings();
-            AuditLogger.log('settings_reset', `Reset all settings to defaults. Previous settings: ${JSON.stringify(previousSettings)}`);
+            const msg = `Reset all settings to defaults. Previous settings: ${JSON.stringify(previousSettings)}`;
+            AuditLogger.log('settings_reset', msg);
+            sendAudit('settings_reset', msg);
             showToast('Settings reset to defaults!');
           } catch (e) {
             showToast('Failed to reset settings', 'error');

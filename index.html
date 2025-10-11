@@ -103,24 +103,33 @@
         // Fetch stats from backend APIs
         let users = [], orders = [], products = [], auditLogs = [];
         let apiHealthy = false, dbHealthy = false, serverHealthy = true;
+        const token = localStorage.getItem('accessToken');
+        const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
         try {
             const FN_BASE='/.netlify/functions';
-            const res = await fetch(`${FN_BASE}/users`);
+            const res = await fetch(`${FN_BASE}/users`, { headers: authHeaders });
             apiHealthy = res.ok;
-            users = (await res.json()).users || [];
+            if (res.ok) {
+              users = (await res.json()).users || [];
+            } else if (res.status === 401 || res.status === 403) {
+              users = [];
+            }
         } catch (e) { apiHealthy = false; }
         try {
-            const res = await fetch(`${FN_BASE}/orders`);
+            const res = await fetch(`${FN_BASE}/orders`, { headers: authHeaders });
             dbHealthy = res.ok;
-            orders = await res.json();
+            if (res.ok) orders = await res.json();
         } catch (e) { dbHealthy = false; }
         try {
-            const res = await fetch(`${FN_BASE}/products`);
-            products = await res.json();
+            const res = await fetch(`${FN_BASE}/products`, { headers: authHeaders });
+            if (res.ok) products = await res.json();
         } catch (e) {}
         try {
-            const res = await fetch('/.netlify/functions/audit-logs');
-            auditLogs = Array.isArray(await res.json()) ? await res.json() : ((await res.json()).logs || []);
+            const res = await fetch('/.netlify/functions/audit-logs', { headers: authHeaders });
+            if (res.ok) {
+              const j = await res.json();
+              auditLogs = Array.isArray(j) ? j : (j.logs || []);
+            }
         } catch (e) {}
         // Update stats
         document.getElementById('stat-total-users').textContent = users.length;
