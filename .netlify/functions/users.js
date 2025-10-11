@@ -2,6 +2,7 @@
 const bcrypt = require('bcryptjs');
 const { database } = require('../../config/database');
 const { corsHeaders, json: respond, error: errorResponse, parseBody, requireAuth } = require('../../utils/http');
+const { getPagination } = require('../../utils/fn');
 
 function requireRole(user, roles) { return !!user && roles.includes(user.role); }
 
@@ -35,8 +36,9 @@ exports.handler = async (event) => {
     if (!/^[0-9]+$/.test(maybeId)) {
       if (method === 'GET') {
         if (!requireRole(user, ['admin','manager'])) return errorResponse(403, 'Insufficient permissions');
-        const { page = 1, limit = 10, search = '', role = '' } = event.queryStringParameters || {};
-        const offset = (page - 1) * limit;
+  const { page, limit, offset } = getPagination(event.queryStringParameters || {}, { page: 1, limit: 10 });
+  const search = (event.queryStringParameters && event.queryStringParameters.search) || '';
+  const role = (event.queryStringParameters && event.queryStringParameters.role) || '';
         let query = 'SELECT id, email, name, role, is_active, email_verified, created_at FROM users';
         let countQuery = 'SELECT COUNT(*) as total FROM users';
         const params = []; const countParams = [];
@@ -51,7 +53,7 @@ exports.handler = async (event) => {
           params.push(role); countParams.push(role);
         }
         query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), (page - 1) * limit);
+        params.push(parseInt(limit), offset);
         const [usersList, countResult] = await Promise.all([
           database.all(query, params),
           database.get(countQuery, countParams)

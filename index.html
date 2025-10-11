@@ -99,12 +99,12 @@
             </div>
     <!-- Dashboard Stats Script -->
     <script>
-    async function updateDashboardStats() {
+  async function updateDashboardStats() {
         // Fetch stats from backend APIs
         let users = [], orders = [], products = [], auditLogs = [];
         let apiHealthy = false, dbHealthy = false, serverHealthy = true;
-        const token = localStorage.getItem('accessToken');
-        const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+  const token = localStorage.getItem('accessToken');
+  const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
         try {
             const FN_BASE='/.netlify/functions';
             const res = await fetch(`${FN_BASE}/users`, { headers: authHeaders });
@@ -116,14 +116,26 @@
             }
         } catch (e) { apiHealthy = false; }
         try {
-            const res = await fetch(`${FN_BASE}/orders`, { headers: authHeaders });
-            dbHealthy = res.ok;
-            if (res.ok) orders = await res.json();
-        } catch (e) { dbHealthy = false; }
-        try {
-            const res = await fetch(`${FN_BASE}/products`, { headers: authHeaders });
-            if (res.ok) products = await res.json();
-        } catch (e) {}
+            if (!token) {
+              // Use public stats for anonymous view
+              const res = await fetch(`${FN_BASE}/public-stats`);
+              if (res.ok) {
+                const s = await res.json();
+                users = new Array(s.users).fill(0); // represent count for UI
+                orders = new Array(s.orders).fill(0);
+                products = new Array(s.products).fill(0);
+                apiHealthy = true; dbHealthy = true;
+              }
+            } else {
+              const res = await fetch(`${FN_BASE}/users`, { headers: authHeaders });
+              apiHealthy = res.ok;
+              if (res.ok) {
+                users = (await res.json()).users || [];
+              } else if (res.status === 401 || res.status === 403) {
+                users = [];
+              }
+            }
+        } catch (e) { apiHealthy = false; }
         try {
             const res = await fetch('/.netlify/functions/audit-logs', { headers: authHeaders });
             if (res.ok) {
