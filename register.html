@@ -108,7 +108,7 @@
                     id="submit-register"
                     class="w-full p-3 bg-primary text-white rounded-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-gray-800 font-medium"
                 >
-                    Create Account <span id="register-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
+                    Create Account <span id="register-spinner" class="hidden w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
                 </button>
             </form>
 
@@ -224,6 +224,7 @@
 
             // Show loading state
             registerSpinner.classList.remove('hidden');
+            registerSpinner.classList.add('inline-block');
             submitBtn.disabled = true;
 
             try {
@@ -283,6 +284,7 @@
                 registerError.classList.remove('hidden');
             } finally {
                 registerSpinner.classList.add('hidden');
+                registerSpinner.classList.remove('inline-block');
                 submitBtn.disabled = false;
             }
         });
