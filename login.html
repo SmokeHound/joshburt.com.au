@@ -163,6 +163,8 @@
             showToast('Registration successful! Please log in.', 'success');
         } else if (message === 'password-reset-success') {
             showToast('Password reset successful! Please log in with your new password.', 'success');
+        } else if (message === 'login-required') {
+            showToast('Please sign in to continue.', 'error');
         }
 
 
@@ -225,11 +227,18 @@
                     } catch {}
                     
                     showToast('Login successful! Redirecting...', 'success');
-                    
-                    // Redirect to main site after delay
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1500);
+                    // Redirect to returnUrl (same-origin path) or default
+                    const returnUrl = urlParams.get('returnUrl');
+                    let target = 'index.html';
+                    if (returnUrl && typeof returnUrl === 'string') {
+                        try {
+                            const u = new URL(returnUrl, window.location.origin);
+                            if (u.origin === window.location.origin) {
+                                target = u.pathname + u.search + u.hash;
+                            }
+                        } catch(_) { /* ignore malformed */ }
+                    }
+                    setTimeout(() => { window.location.href = target; }, 1000);
                 } else {
                     throw new Error(data.error || 'Login failed');
                 }

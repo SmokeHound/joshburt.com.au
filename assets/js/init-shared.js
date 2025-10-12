@@ -1,5 +1,6 @@
 // assets/js/init-shared.js
 (function initShared(){
+  const FN_BASE = '/.netlify/functions';
   // Inject shared-config and shared-theme fragments
   function injectFragment(url, filterTagNames){
     return fetch(url).then(r=>r.text()).then(html=>{
@@ -72,7 +73,7 @@
             // Best-effort serverless logout (invalidate refresh token)
             var refreshToken = localStorage.getItem('refreshToken');
             if (refreshToken) {
-              fetch('/.netlify/functions/auth?action=logout', {
+              fetch(FN_BASE + '/auth?action=logout', {
                 method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
               }).catch(()=>{});
             }
@@ -105,7 +106,7 @@
       var token = localStorage.getItem('accessToken');
       if (!token) return;
       // Ask backend who we are
-      var meRes = await fetch('/.netlify/functions/auth?action=me', {
+      var meRes = await fetch(FN_BASE + '/auth?action=me', {
         headers: { 'Authorization': 'Bearer ' + token }
       });
       if (meRes.ok) {
@@ -121,7 +122,7 @@
       if (meRes.status === 401) {
         var refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) return;
-        var refRes = await fetch('/.netlify/functions/auth?action=refresh', {
+        var refRes = await fetch(FN_BASE + '/auth?action=refresh', {
           method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
         });
         if (refRes.ok) {
@@ -129,7 +130,7 @@
           if (refData.accessToken) localStorage.setItem('accessToken', refData.accessToken);
           if (refData.refreshToken) localStorage.setItem('refreshToken', refData.refreshToken);
           // Recurse once to update user
-          var meRes2 = await fetch('/.netlify/functions/auth?action=me', { headers: { 'Authorization': 'Bearer ' + (refData.accessToken || token) }});
+          var meRes2 = await fetch(FN_BASE + '/auth?action=me', { headers: { 'Authorization': 'Bearer ' + (refData.accessToken || token) }});
           if (meRes2.ok) {
             var me2 = await meRes2.json();
             if (me2 && me2.user) {
@@ -137,8 +138,16 @@
               var cu2 = { name: me2.user.name || me2.user.email || 'User', role: me2.user.role || 'user', email: me2.user.email };
               localStorage.setItem('currentUser', JSON.stringify(cu2));
             }
+            return;
           }
         }
+        // Refresh failed: clear session
+        try {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
+          localStorage.removeItem('currentUser');
+        } catch(_){ /* clear session noop */ }
       }
     } catch (e) { /* silent session bootstrap */ }
   })();

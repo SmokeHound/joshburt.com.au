@@ -152,7 +152,11 @@
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
                 const res = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
-                if (res.status === 403) { showToast('Insufficient permissions to list users','error'); usersState.list=[]; renderUsers(); return; }
+                if (res.status === 401 || res.status === 403) { 
+                    const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                    window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`; 
+                    return; 
+                }
                 if (!res.ok) throw new Error('Failed (status '+res.status+')');
                 const data = await res.json();
                 usersState.list = data.users || [];
@@ -253,6 +257,13 @@
 
         // Event wiring
         document.addEventListener('DOMContentLoaded', () => {
+            // Require authentication for this page
+            const initialToken = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+            if (!initialToken) { 
+                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`; 
+                return; 
+            }
             if (typeof AuditLogger !== 'undefined') { AuditLogger.log('page_access','Accessed User Management page'); }
             loadUsers();
             loadAndApplySettings();
