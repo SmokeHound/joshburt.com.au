@@ -80,7 +80,7 @@
                     id="submit-login"
                     class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium btn-neon-blue"
                 >
-                    Sign In <span id="login-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
+                    Sign In <span id="login-spinner" class="hidden w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
                 </button>
             </form>
 
@@ -134,7 +134,7 @@
                 <div id="forgot-error" class="hidden text-red-500 text-sm mb-4"></div>
                 <div id="forgot-success" class="hidden text-green-500 text-sm mb-4"></div>
                 <button type="submit" id="submit-forgot" class="w-full p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary">
-                    Send Reset Link <span id="forgot-spinner" class="hidden inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
+                    Send Reset Link <span id="forgot-spinner" class="hidden w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin ml-2"></span>
                 </button>
             </form>
             <button id="close-forgot-modal" class="mt-4 w-full p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400">Close</button>
@@ -192,6 +192,7 @@
 
             // Show loading state
             loginSpinner.classList.remove('hidden');
+            loginSpinner.classList.add('inline-block');
             submitBtn.disabled = true;
 
             try {
@@ -238,6 +239,7 @@
                 showToast(error.message);
             } finally {
                 loginSpinner.classList.add('hidden');
+                loginSpinner.classList.remove('inline-block');
                 submitBtn.disabled = false;
             }
         });
@@ -296,6 +298,7 @@
                     return;
                 }
                 forgotSpinner.classList.remove('hidden');
+                forgotSpinner.classList.add('inline-block');
                 try {
                     const res = await fetch(`${FN_AUTH}?action=forgot-password`, {
                         method: 'POST',
@@ -311,6 +314,7 @@
                     forgotError.classList.remove('hidden');
                 } finally {
                     forgotSpinner.classList.add('hidden');
+                    forgotSpinner.classList.remove('inline-block');
                 }
             });
         }
