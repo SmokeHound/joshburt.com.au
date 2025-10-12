@@ -1,7 +1,7 @@
 // Enhanced Service Worker for PWA offline functionality with performance optimizations
-const STATIC_CACHE = 'joshburt-static-v3';
-const DYNAMIC_CACHE = 'joshburt-dynamic-v3';
-const API_CACHE = 'joshburt-api-v3';
+const STATIC_CACHE = 'joshburt-static-v4';
+const DYNAMIC_CACHE = 'joshburt-dynamic-v4';
+const API_CACHE = 'joshburt-api-v4';
 
 const urlsToCache = [
   '/',
@@ -24,6 +24,7 @@ const urlsToCache = [
 // API base patterns (serverless only; legacy /api removed)
 const apiUrls = [
   '/.netlify/functions/',
+  'https://joshburt.netlify.app/.netlify/functions/',
   'https://cdn.tailwindcss.com/',
   'https://cdn.jsdelivr.net/',
   'https://cdnjs.cloudflare.com/'

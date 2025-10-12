@@ -131,8 +131,8 @@
     </main>
 
     <script>
-        // Serverless base path and auth token helper
-        const FN_BASE = '/.netlify/functions';
+    // Serverless base path and auth token helper (computed in init-shared.js)
+    const FN_BASE = window.FN_BASE || '/.netlify/functions';
         const usersState = { list: [], pagination: { page:1, limit:10, total:0, pages:1 }, filters: { search:'', role:'', status:'', sort:'created_at_desc' }, editingId: null };
 
         function loadAndApplySettings() {
@@ -162,7 +162,7 @@
                 usersState.list = data.users || [];
                 usersState.pagination = data.pagination || { page:1, limit:limit, total:usersState.list.length, pages:1 };
                 renderUsers();
-            } catch(err){ console.error('loadUsers', err); showToast('Error loading users: '+err.message,'error'); usersState.list=[]; renderUsers(); }
+            } catch(err){ console.error('loadUsers', err); showToast('Error loading users: '+(err.message||'Network error'),'error'); usersState.list=[]; renderUsers(); }
         }
 
         function renderUsers(){

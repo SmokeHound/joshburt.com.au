@@ -1,6 +1,20 @@
 // assets/js/init-shared.js
 (function initShared(){
-  const FN_BASE = '/.netlify/functions';
+  // Compute a functions base that works on Netlify and non-Netlify hosts
+  (function computeFnBase(){
+    var defaultBase = '/.netlify/functions';
+    try {
+      var host = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
+      if (host.endsWith('netlify.app') || host === 'localhost') {
+        window.FN_BASE = defaultBase;
+      } else {
+        window.FN_BASE = 'https://joshburt.netlify.app/.netlify/functions';
+      }
+    } catch (e) {
+      window.FN_BASE = defaultBase;
+    }
+  })();
+  const FN_BASE = window.FN_BASE;
   // Inject shared-config and shared-theme fragments
   function injectFragment(url, filterTagNames){
     return fetch(url).then(r=>r.text()).then(html=>{
