@@ -35,9 +35,10 @@ function getBearerToken(event){
   return auth.split(' ')[1];
 }
 
-// Local JWT (HS256) verification
+// Local JWT (HS256) verification (use same default as auth function)
 function verifyLocalToken(token){
-  try { return jwt.verify(token, process.env.JWT_SECRET); } catch { return null; }
+  const secret = process.env.JWT_SECRET || 'dev-secret-change-me';
+  try { return jwt.verify(token, secret); } catch { return null; }
 }
 
 // Minimal JWKS cache per cold start container

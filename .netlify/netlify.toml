@@ -1,18 +1,7 @@
-headersOrigin = "config"
 functionsDirectory = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\.netlify\\functions"
 functionsDirectoryOrigin = "config-v1"
+headersOrigin = "config"
 redirects = []
-
-[functions]
-
-[functions."*"]
-
-[[plugins]]
-origin = "ui"
-package = "netlify-purge-cloudflare-on-deploy"
-pinned_version = "1"
-
-[plugins.inputs]
 
 [build]
 publish = "C:\\DEV\\joshburt.com.au\\joshburt.com.au"
@@ -35,6 +24,17 @@ NODE_VERSION = "22"
 [build.processing.js]
 
 [build.services]
+
+[functions]
+
+[functions."*"]
+
+[[plugins]]
+origin = "ui"
+package = "netlify-purge-cloudflare-on-deploy"
+pinned_version = "1"
+
+[plugins.inputs]
 
 [[headers]]
 for = "/.netlify/functions/*"
