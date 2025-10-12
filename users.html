@@ -18,6 +18,8 @@
     <!-- MOBILE MENU TOGGLE (copied from template.html) -->
     <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300 btn-neon-blue text-black" role="alert" aria-live="polite"></div>
     <div class="flex min-h-screen">
         <!-- Shared Navigation Loader -->
         <div id="main-nav"></div>
@@ -187,13 +189,19 @@
         }
         // Show toast notification
         function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.setAttribute('role','alert');
+                toast.setAttribute('aria-live','polite');
+                toast.className = 'hidden fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300';
+                document.body.appendChild(toast);
+            }
             toast.textContent = message;
-            toast.className = `toast ${type}`;
+            toast.className = `fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
             toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
+            setTimeout(() => { toast.classList.add('hidden'); }, 3000);
         }
 
         // Add or update user via backend API
