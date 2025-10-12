@@ -100,54 +100,81 @@
     <!-- Dashboard Stats Script -->
     <script>
   async function updateDashboardStats() {
-        // Fetch stats from backend APIs
-        let users = [], orders = [], products = [], auditLogs = [];
+        const FN_BASE='/.netlify/functions';
+        // Numeric counts with safe defaults
+        let usersCount = 0, ordersCount = 0, productsCount = 0;
+        let auditLogs = [];
         let apiHealthy = false, dbHealthy = false, serverHealthy = true;
-  const token = localStorage.getItem('accessToken');
-  const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+        const token = localStorage.getItem('accessToken');
+        const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+        // 1) Try lightweight public stats first for immediate numbers
         try {
-            const FN_BASE='/.netlify/functions';
+          const res = await fetch(`${FN_BASE}/public-stats`);
+          if (res.ok) {
+            const s = await res.json();
+            usersCount = Number(s.users) || 0;
+            ordersCount = Number(s.orders) || 0;
+            productsCount = Number(s.products) || 0;
+            apiHealthy = true; dbHealthy = true;
+          }
+        } catch (_) {}
+
+        // 2) If authenticated, try to refine counts with detailed endpoints
+        if (token) {
+          try {
             const res = await fetch(`${FN_BASE}/users`, { headers: authHeaders });
-            apiHealthy = res.ok;
-            if (res.ok) {
-              users = (await res.json()).users || [];
-            } else if (res.status === 401 || res.status === 403) {
-              users = [];
-            }
-        } catch (e) { apiHealthy = false; }
-        try {
-            if (!token) {
-              // Use public stats for anonymous view
-              const res = await fetch(`${FN_BASE}/public-stats`);
-              if (res.ok) {
-                const s = await res.json();
-                users = new Array(s.users).fill(0); // represent count for UI
-                orders = new Array(s.orders).fill(0);
-                products = new Array(s.products).fill(0);
-                apiHealthy = true; dbHealthy = true;
-              }
-            } else {
-              const res = await fetch(`${FN_BASE}/users`, { headers: authHeaders });
-              apiHealthy = res.ok;
-              if (res.ok) {
-                users = (await res.json()).users || [];
-              } else if (res.status === 401 || res.status === 403) {
-                users = [];
-              }
-            }
-        } catch (e) { apiHealthy = false; }
-        try {
-            const res = await fetch('/.netlify/functions/audit-logs', { headers: authHeaders });
+            apiHealthy = apiHealthy || res.ok;
             if (res.ok) {
               const j = await res.json();
-              auditLogs = Array.isArray(j) ? j : (j.logs || []);
+              usersCount = Array.isArray(j?.users) ? j.users.length : (Array.isArray(j) ? j.length : usersCount);
             }
-        } catch (e) {}
-        // Update stats
-        document.getElementById('stat-total-users').textContent = users.length;
-        document.getElementById('stat-total-orders').textContent = Array.isArray(orders) ? orders.length : (orders.orders ? orders.orders.length : '--');
-        document.getElementById('stat-total-products').textContent = Array.isArray(products) ? products.length : (products.products ? products.products.length : '--');
-        // Update status
+          } catch (_) {}
+          try {
+            const res = await fetch(`${FN_BASE}/orders`, { headers: authHeaders });
+            apiHealthy = apiHealthy || res.ok;
+            if (res.ok) {
+              const j = await res.json();
+              const arr = Array.isArray(j) ? j : (Array.isArray(j?.orders) ? j.orders : []);
+              ordersCount = arr.length;
+            }
+          } catch (_) {}
+          try {
+            const res = await fetch(`${FN_BASE}/products`, { headers: authHeaders });
+            apiHealthy = apiHealthy || res.ok;
+            if (res.ok) {
+              const j = await res.json();
+              const arr = Array.isArray(j) ? j : (Array.isArray(j?.products) ? j.products : []);
+              productsCount = arr.length;
+            }
+          } catch (_) {}
+        }
+
+        // 3) Health check for DB indicator (optional)
+        try {
+          const res = await fetch(`${FN_BASE}/health`);
+          if (res.ok) { dbHealthy = true; apiHealthy = apiHealthy || true; }
+        } catch (_) {}
+
+        // 4) Recent audit logs (best-effort)
+        try {
+          const res = await fetch(`${FN_BASE}/audit-logs`, { headers: authHeaders });
+          if (res.ok) {
+            const j = await res.json();
+            auditLogs = Array.isArray(j) ? j : (j.logs || []);
+          }
+        } catch (_) {}
+
+        // Update stats UI with numbers (fallback to 0s)
+        const elUsers = document.getElementById('stat-total-users');
+        const elOrders = document.getElementById('stat-total-orders');
+        const elProducts = document.getElementById('stat-total-products');
+        if (elUsers) elUsers.textContent = usersCount;
+        if (elOrders) elOrders.textContent = ordersCount;
+        if (elProducts) elProducts.textContent = productsCount;
+
+        // Update status indicators
         function setStatus(id, healthy) {
             const el = document.getElementById(id);
             if (!el) return;
@@ -157,14 +184,17 @@
         setStatus('status-api', apiHealthy);
         setStatus('status-db', dbHealthy);
         setStatus('status-server', serverHealthy);
-        // Recent audit log
+
+        // Update recent activity list
         const auditList = document.getElementById('recent-audit-log');
-        if (auditLogs && auditLogs.length > 0) {
+        if (auditList) {
+          if (auditLogs && auditLogs.length > 0) {
             auditList.innerHTML = auditLogs.slice(0, 5).map(log =>
-                `<li><span class="font-semibold">${log.action}</span> <span class="text-xs text-gray-500">${log.timestamp ? new Date(log.timestamp).toLocaleString() : ''}</span><br><span class="text-gray-400">${log.details ? (typeof log.details === 'string' ? log.details : JSON.stringify(log.details)) : ''}</span></li>`
+              `<li><span class="font-semibold">${log.action}</span> <span class="text-xs text-gray-500">${log.timestamp ? new Date(log.timestamp).toLocaleString() : ''}</span><br><span class="text-gray-400">${log.details ? (typeof log.details === 'string' ? log.details : JSON.stringify(log.details)) : ''}</span></li>`
             ).join('');
-        } else {
+          } else {
             auditList.innerHTML = '<li>No recent activity</li>';
+          }
         }
     }
     document.addEventListener('DOMContentLoaded', updateDashboardStats);
