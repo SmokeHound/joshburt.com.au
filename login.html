@@ -254,22 +254,33 @@
         });
 
         // Auth0 OIDC login buttons (guard if not configured)
-        const AUTH0_READY = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
-        const googleBtn = document.getElementById('google-oauth');
-        const githubBtn = document.getElementById('github-oauth');
-        if (!AUTH0_READY) {
-            if (googleBtn) { googleBtn.disabled = true; googleBtn.classList.add('opacity-60','cursor-not-allowed'); }
-            if (githubBtn) { githubBtn.disabled = true; githubBtn.classList.add('opacity-60','cursor-not-allowed'); }
-        } else {
-            googleBtn.addEventListener('click', async function(){
-                try { await (window.Auth && window.Auth.login('google-oauth2')); }
-                catch(e){ console.error(e); showToast('Google sign-in failed'); }
-            });
-            githubBtn.addEventListener('click', async function(){
-                try { await (window.Auth && window.Auth.login('github')); }
-                catch(e){ console.error(e); showToast('GitHub sign-in failed'); }
-            });
-        }
+                const googleBtn = document.getElementById('google-oauth');
+                const githubBtn = document.getElementById('github-oauth');
+                function setOauthEnabled(enabled){
+                    const btns=[googleBtn, githubBtn];
+                    btns.forEach(b=>{ if(!b) return; b.disabled = !enabled; b.classList.toggle('opacity-60', !enabled); b.classList.toggle('cursor-not-allowed', !enabled); });
+                    if (!enabled) return;
+                    if (googleBtn) googleBtn.addEventListener('click', async function(){ try { await (window.Auth && window.Auth.login('google-oauth2')); } catch(e){ console.error(e); showToast('Google sign-in failed'); } });
+                    if (githubBtn) githubBtn.addEventListener('click', async function(){ try { await (window.Auth && window.Auth.login('github')); } catch(e){ console.error(e); showToast('GitHub sign-in failed'); } });
+                }
+                (async function(){
+                    try {
+                        // If config already present via shared-config, use it; otherwise fetch server config
+                        if (!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID)){
+                            const res = await fetch('/.netlify/functions/public-config');
+                            if (res.ok){
+                                const cfg = await res.json();
+                                if (cfg && cfg.auth0){
+                                    window.AUTH0_DOMAIN = window.AUTH0_DOMAIN || cfg.auth0.domain || '';
+                                    window.AUTH0_CLIENT_ID = window.AUTH0_CLIENT_ID || cfg.auth0.clientId || '';
+                                    window.AUTH0_AUDIENCE = window.AUTH0_AUDIENCE || cfg.auth0.audience || '';
+                                }
+                            }
+                        }
+                    } catch(_){}
+                    const ready = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
+                    setOauthEnabled(ready);
+                })();
 
         // Forgot password modal wiring
         const forgotLink = document.getElementById('forgot-password');

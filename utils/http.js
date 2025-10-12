@@ -87,7 +87,9 @@ async function getOrCreateUserFromClaims(claims){
   if (!email) return null; // require email mapping for local account
   let user = await database.get('SELECT id, email, name, role, is_active, email_verified FROM users WHERE email = ?', [email]);
   if (user && user.is_active) return user;
-  const autoProvision = (process.env.AUTH0_AUTO_PROVISION || 'false').toLowerCase() === 'true';
+  // Default to auto-provision when Auth0 is configured, unless explicitly disabled
+  const autoProvisionDefault = process.env.AUTH0_DOMAIN ? 'true' : 'false';
+  const autoProvision = (process.env.AUTH0_AUTO_PROVISION || autoProvisionDefault).toLowerCase() === 'true';
   if (!user && autoProvision){
     const name = (claims.name && String(claims.name).slice(0, 100)) || email.split('@')[0];
     const verified = claims.email_verified ? 1 : 0;
