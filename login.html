@@ -274,6 +274,7 @@
                             const res = await fetch('/.netlify/functions/public-config');
                             if (res.ok){
                                 const cfg = await res.json();
+                                if (cfg && cfg.auth && typeof cfg.auth.disabled === 'boolean') { window.AUTH_DISABLED = cfg.auth.disabled; }
                                 if (cfg && cfg.auth0){
                                     window.AUTH0_DOMAIN = window.AUTH0_DOMAIN || cfg.auth0.domain || '';
                                     window.AUTH0_CLIENT_ID = window.AUTH0_CLIENT_ID || cfg.auth0.clientId || '';
@@ -284,7 +285,12 @@
                     } catch(_){}
                     const ready = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
                             try { const b = document.getElementById('auth0-banner'); if (b) b.classList.toggle('hidden', ready); } catch(_){}
-                    setOauthEnabled(ready);
+                                        setOauthEnabled(ready);
+                                        if (window.AUTH_DISABLED === true) {
+                                            // Pretend logged in for UX: set a local demo admin user
+                                            const demo = { id: 0, email: 'demo@local', name: 'Demo Admin', role: 'admin' };
+                                            try { localStorage.setItem('user', JSON.stringify(demo)); localStorage.setItem('currentUser', JSON.stringify(demo)); } catch(_){ }
+                                        }
                 })();
 
         // Forgot password modal wiring

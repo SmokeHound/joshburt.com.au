@@ -133,6 +133,7 @@
     <script>
     // Serverless base path and auth token helper (computed in init-shared.js)
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    const AUTH_DISABLED = window.AUTH_DISABLED === true;
         const usersState = { list: [], pagination: { page:1, limit:10, total:0, pages:1 }, filters: { search:'', role:'', status:'', sort:'created_at_desc' }, editingId: null };
 
         function loadAndApplySettings() {
@@ -152,7 +153,7 @@
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
                 const res = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
-                if (res.status === 401 || res.status === 403) { 
+                if ((res.status === 401 || res.status === 403) && !AUTH_DISABLED) { 
                     const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
                     window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`; 
                     return; 
@@ -259,7 +260,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Require authentication for this page
             const initialToken = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
-            if (!initialToken) { 
+            if (!initialToken && !AUTH_DISABLED) { 
                 const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
                 window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`; 
                 return; 

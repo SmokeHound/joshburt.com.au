@@ -53,6 +53,30 @@
   applyColors();
   registerSW();
 
+  // Fetch runtime config (auth disable flag) early
+  (async function loadRuntimeFlags(){
+    try {
+      const res = await fetch('/.netlify/functions/public-config');
+      if (res.ok){
+        const cfg = await res.json();
+        if (cfg && cfg.auth && typeof cfg.auth.disabled === 'boolean') {
+          window.AUTH_DISABLED = cfg.auth.disabled === true;
+        }
+      }
+    } catch(_) { /* ignore config fetch failure */ }
+    if (window.AUTH_DISABLED === true) {
+      // Ensure a demo user exists for UI that expects a user
+      try {
+        const existing = JSON.parse(localStorage.getItem('user')||'null');
+        if (!existing) {
+          const demo = { id: 0, email: 'demo@local', name: 'Demo Admin', role: 'admin' };
+          localStorage.setItem('user', JSON.stringify(demo));
+          localStorage.setItem('currentUser', JSON.stringify(demo));
+        }
+      } catch(_) { /* ignore localStorage parse/set errors */ }
+    }
+  })();
+
   // Auth-aware nav wiring (profile, login/logout)
   document.addEventListener('DOMContentLoaded', function(){
     try {
@@ -65,7 +89,7 @@
       var storedUser = null;
       try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch (e) { /* noop */ }
       if (userProfile) userProfile.classList.remove('hidden');
-      var isLoggedIn = !!(localStorage.getItem('accessToken') || (storedUser && storedUser.email));
+      var isLoggedIn = !!(window.AUTH_DISABLED === true || localStorage.getItem('accessToken') || (storedUser && storedUser.email));
       if (isLoggedIn) {
         if (userInfo) userInfo.classList.remove('hidden');
         if (loginBtn) loginBtn.classList.add('hidden');
@@ -116,7 +140,8 @@
 
   // Session bootstrap: verify current user and refresh if possible
   (async function(){
-    // Skip auth bootstrap on the login page to avoid noisy 401/refresh calls
+    // Skip when auth is globally disabled or on login page
+    if (window.AUTH_DISABLED === true) return;
     if (typeof window !== 'undefined' && window.location && /login\.html$/i.test(window.location.pathname)) {
       return;
     }

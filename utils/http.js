@@ -122,6 +122,11 @@ async function authenticate(event) {
 }
 
 async function requireAuth(event, roles = null) {
+  // Temporary global auth bypass for maintenance/demo
+  if ((process.env.DISABLE_AUTH || '').toString().toLowerCase() === 'true') {
+    const demoUser = { id: 0, email: 'demo@local', name: 'Demo Admin', role: 'admin', is_active: 1, email_verified: 1 };
+    return { user: demoUser, response: null };
+  }
   const user = await authenticate(event);
   if (!user) return { user: null, response: error(401, 'Authentication required') };
   if (roles && !roles.includes(user.role)) return { user, response: error(403, 'Insufficient permissions') };
