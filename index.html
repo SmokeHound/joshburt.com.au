@@ -100,7 +100,7 @@
     <!-- Dashboard Stats Script -->
     <script>
   async function updateDashboardStats() {
-        const FN_BASE='/.netlify/functions';
+        const FN_BASE = window.FN_BASE || '/.netlify/functions';
         // Numeric counts with safe defaults
         let usersCount = 0, ordersCount = 0, productsCount = 0;
         let auditLogs = [];
@@ -108,6 +108,12 @@
 
         const token = localStorage.getItem('accessToken');
         const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+        let currentRole = 'user';
+        try {
+          const cu = JSON.parse(localStorage.getItem('currentUser')||'{}');
+          const u = JSON.parse(localStorage.getItem('user')||'{}');
+          currentRole = cu.role || u.role || 'user';
+        } catch(_) {}
 
         // 1) Try lightweight public stats first for immediate numbers
         try {
@@ -121,14 +127,16 @@
           }
         } catch (_) {}
 
-        // 2) If authenticated, try to refine counts with detailed endpoints
-        if (token) {
+        // 2) If authenticated and privileged, refine counts with admin endpoints
+        if (token && (currentRole === 'admin' || currentRole === 'manager')) {
           try {
-            const res = await fetch(`${FN_BASE}/users`, { headers: authHeaders });
+            const res = await fetch(`${FN_BASE}/users/stats/overview`, { headers: authHeaders });
             apiHealthy = apiHealthy || res.ok;
             if (res.ok) {
               const j = await res.json();
-              usersCount = Array.isArray(j?.users) ? j.users.length : (Array.isArray(j) ? j.length : usersCount);
+              // shape: { stats: { total_users, ... } }
+              const total = j && j.stats && (j.stats.total_users || j.stats.total || j.total_users);
+              if (typeof total === 'number') usersCount = total;
             }
           } catch (_) {}
           try {
@@ -159,10 +167,12 @@
 
         // 4) Recent audit logs (best-effort)
         try {
-          const res = await fetch(`${FN_BASE}/audit-logs`, { headers: authHeaders });
-          if (res.ok) {
-            const j = await res.json();
-            auditLogs = Array.isArray(j) ? j : (j.logs || []);
+          if (token && (currentRole === 'admin' || currentRole === 'manager')) {
+            const res = await fetch(`${FN_BASE}/audit-logs`, { headers: authHeaders });
+            if (res.ok) {
+              const j = await res.json();
+              auditLogs = Array.isArray(j) ? j : (j.logs || []);
+            }
           }
         } catch (_) {}
 
