@@ -1,4 +1,4 @@
-// Netlify Function: Full CRUD /.netlify/functions/consumables (legacy /api/consumables deprecated)
+// Netlify Function: Full CRUD /.netlify/functions/consumables
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 

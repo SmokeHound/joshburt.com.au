@@ -1,4 +1,4 @@
-// Netlify Function: Full CRUD /.netlify/functions/products (legacy /api/products deprecated)
+// Netlify Function: Full CRUD /.netlify/functions/products
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 

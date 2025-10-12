@@ -1,5 +1,5 @@
 
-// Netlify Function: GET/POST/PATCH /.netlify/functions/orders (legacy /api/orders removed)
+// Netlify Function: GET/POST/PATCH /.netlify/functions/orders
 const { Client } = require('pg');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 

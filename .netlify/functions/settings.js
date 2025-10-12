@@ -1,4 +1,4 @@
-// Netlify Function: Site Settings CRUD /.netlify/functions/settings (legacy /api/settings deprecated)
+// Netlify Function: Site Settings CRUD /.netlify/functions/settings
 const { database } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
 

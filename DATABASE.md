@@ -15,7 +15,7 @@ The joshburt.com.au application supports multiple database backends:
 
 Set the following environment variables based on your deployment:
 
- LEGACY NOTE: Historical documentation elsewhere may reference REST paths like `/api/users`. The live system now serves all dynamic operations via Netlify Functions at `/.netlify/functions/users`.
+ All dynamic operations are served via Netlify Functions at `/.netlify/functions/users`.
 
 #### PostgreSQL (default, e.g. Neon)
 ```env
@@ -51,7 +51,7 @@ BCRYPT_ROUNDS=12
 ```
 
 #### SQLite (Development)
-> LEGACY NOTE: Access audit logs via `/.netlify/functions/audit-logs` (legacy `/api/audit-logs` path removed).
+ Access audit logs via `/.netlify/functions/audit-logs`.
 ```env
 # Database Type (default)
 DB_TYPE=sqlite
@@ -177,7 +177,7 @@ Example:
 
 ## Serverless API Endpoints (Current)
 
-All dynamic operations are served via Netlify Functions under `/.netlify/functions/*`. Legacy `/api/*` paths have been fully removed (see SERVERLESS_ENDPOINTS.md for historical mapping).
+All dynamic operations are served via Netlify Functions under `/.netlify/functions/*`.
 
 ### Authentication (Unified Function)
 
@@ -279,7 +279,7 @@ When `page` or `pageSize` is provided the JSON response is:
    "pagination": { "page": 1, "pageSize": 25, "total": 1234, "totalPages": 50 }
 }
 ```
-If neither is supplied the response is the legacy simple JSON array of logs (respecting `limit`).
+If neither is supplied the response is a simple JSON array of logs (respecting `limit`).
 
 #### DELETE Semantics
 
@@ -306,7 +306,7 @@ curl '/.netlify/functions/audit-logs?action=user_login&format=csv' -o login-even
 # Delete logs older than 90 days
 curl -X DELETE '/.netlify/functions/audit-logs?olderThanDays=90'
 
-# Legacy style (array) limited to 25 entries
+# Example (array) limited to 25 entries
 curl '/.netlify/functions/audit-logs?limit=25'
 ```
 

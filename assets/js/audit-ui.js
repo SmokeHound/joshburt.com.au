@@ -119,7 +119,7 @@
 
   function renderLoading(){
     const tbody = document.getElementById('audit-tbody');
-  if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Loading...</td></tr>`;
+    if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Loading...</td></tr>';
   }
 
   function renderTable(){
@@ -130,7 +130,7 @@
       return;
     }
     if (!state.data.length) {
-  tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">No audit log entries</td></tr>`;
+      tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No audit log entries</td></tr>';
       return;
     }
     tbody.innerHTML = state.data.map(row => {

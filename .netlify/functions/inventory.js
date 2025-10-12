@@ -1,4 +1,4 @@
-// Netlify Function: GET /.netlify/functions/inventory (legacy /api/inventory deprecated)
+// Netlify Function: GET /.netlify/functions/inventory
 const { Client } = require('pg');
 const { withHandler, ok, error } = require('../../utils/fn');
 
