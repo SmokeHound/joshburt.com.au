@@ -29,8 +29,21 @@
               document.getElementById('main-nav').innerHTML = html;
             });
         </script>
-        <!-- Main Content -->
-        <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
+                <!-- Main Content -->
+                <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
+                <!-- Header Card -->
+                <header class="sticky top-0 p-6 rounded-lg shadow-md mb-6 z-40 border card" role="banner">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-3xl font-bold text-white">User Management</h1>
+                            <p class="text-lg mt-2 nav-link-muted">Manage accounts, roles and access</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button id="open-add-user" class="btn-neon-green px-4 py-2 rounded">Add User</button>
+                            <button id="refresh-users" class="btn-neon-blue px-4 py-2 rounded">Refresh</button>
+                        </div>
+                    </div>
+                </header>
         <section>
             <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Manage user accounts and permissions. Add, edit, or remove users from the system.</p>
             <!-- User Filters/Search/Sort -->
@@ -235,6 +248,11 @@
             loadAndApplySettings();
             document.getElementById('user-form').addEventListener('submit', addOrUpdateUser);
             document.getElementById('cancel-edit').addEventListener('click', cancelEdit);
+            // Header actions
+            const refreshBtn = document.getElementById('refresh-users');
+            if (refreshBtn) refreshBtn.addEventListener('click', ()=> loadUsers(usersState.pagination.page || 1));
+            const openAddBtn = document.getElementById('open-add-user');
+            if (openAddBtn) openAddBtn.addEventListener('click', ()=> { try { cancelEdit(); } catch(_){} document.getElementById('user-form')?.scrollIntoView({ behavior:'smooth', block:'start' }); });
             document.getElementById('export-users-csv').addEventListener('click', exportUsersCSV);
             document.getElementById('export-users-excel').addEventListener('click', exportUsersExcel);
             document.getElementById('import-users-csv').addEventListener('change', importUsersCSV);
