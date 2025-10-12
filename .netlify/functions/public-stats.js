@@ -1,35 +1,16 @@
-// Netlify Function: Public read-only stats for homepage widgets
-// Returns aggregate counts only; no PII, no auth required.
-
+const { withHandler } = require('../../utils/fn');
+const { json } = require('../../utils/http');
 const { database } = require('../../config/database');
-const { withHandler, ok, error } = require('../../utils/fn');
 
-exports.handler = withHandler(async (event) => {
-  if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method not allowed' };
-  // Ensure DB is connected (connect is idempotent)
-  await database.connect();
+exports.handler = withHandler(async () => {
   try {
-    // Users count (active only)
-    const usersRow = await database.get('SELECT COUNT(*) AS total FROM users WHERE is_active = 1', []);
-    const users = usersRow ? Number(usersRow.total || 0) : 0;
-
-    // Orders count (if table exists; ignore error if not present on some engines)
-    let orders = 0;
-    try {
-      const ordersRow = await database.get('SELECT COUNT(*) AS total FROM orders', []);
-      orders = ordersRow ? Number(ordersRow.total || 0) : 0;
-    } catch (e) { console.warn('orders table not available', e && e.message ? e.message : e); }
-
-    // Products count (if table exists)
-    let products = 0;
-    try {
-      const productsRow = await database.get('SELECT COUNT(*) AS total FROM products', []);
-      products = productsRow ? Number(productsRow.total || 0) : 0;
-    } catch (e) { console.warn('products table not available', e && e.message ? e.message : e); }
-
-    return ok({ users, orders, products });
+    await database.connect();
+    const stats = { users: 0, orders: 0, products: 0 };
+    try { const u = await database.get('SELECT COUNT(1) AS c FROM users'); stats.users = (u && u.c) || 0; } catch (_) {}
+    try { const o = await database.get('SELECT COUNT(1) AS c FROM orders'); stats.orders = (o && o.c) || 0; } catch (_) {}
+    try { const p = await database.get('SELECT COUNT(1) AS c FROM products'); stats.products = (p && p.c) || 0; } catch (_) {}
+    return json(200, stats);
   } catch (e) {
-    console.error('public-stats error', e);
-    return error(500, 'Failed to load public stats');
+    return json(200, { users: 0, orders: 0, products: 0 });
   }
 });
