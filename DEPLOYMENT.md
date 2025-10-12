@@ -93,9 +93,6 @@ test@example.com / password
 manager@example.com / manager123
 ```
 
-## Migration From Legacy Express (Completed)
-Legacy Express artifacts have been fully removed. If checking out an older tag, follow upgrade guidance in `README.md` to transition fetch calls to serverless paths.
-
 ## Manual Verification Checklist
 - [ ] Static pages load (index, analytics, users, oil, settings)
 - [ ] Auth register/login/me flows succeed against serverless function
@@ -104,9 +101,6 @@ Legacy Express artifacts have been fully removed. If checking out an older tag, 
 - [ ] Analytics dashboard renders charts (Chart.js loaded)
 - [ ] Service worker installs & caches static assets
 - [ ] No console errors referencing removed `/api/` paths
-
-## Rollback Strategy (Discouraged)
-Reintroducing Express is not recommended. For WebSockets or streaming, add a minimal edge or proxy layer while keeping business logic inside functions.
 
 ---
 All dynamic capability now relies on Netlify Functions; ensure environment variables are configured before first deploy.

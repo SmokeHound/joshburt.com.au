@@ -85,7 +85,7 @@ INSERT OR IGNORE INTO settings (id, data) VALUES (1, '{}');
 
 The following fields are supported (see `settings.html` for UI):
 
-- siteTitle, siteDescription, logoUrl, faviconUrl, contactEmail, supportPhone, supportAddress
+- siteTitle, siteDescription, logoUrl, faviconUrl, contactEmail, 
 - theme, primaryColor, secondaryColor, accentColor, themeSchedule
 - maintenanceMode, enableRegistration, enableGuestCheckout, enableNewsletter
 - googleAnalyticsId, facebookPixelId, smtpHost, smtpPort, smtpUser, smtpPassword

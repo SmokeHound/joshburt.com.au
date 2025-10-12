@@ -110,16 +110,6 @@ Auth actions use a query/body `action` parameter, e.g. `/.netlify/functions/auth
 ## 🚀 Quick Start
 - Dynamic features require serverless environment (Netlify Functions). Static mirrors (GitHub Pages) will show UI but API calls fail.
 
-## 🧭 Migration Notes
-
-The project previously supported a dual backend (Express + Netlify Functions). All Express code (`server.js`, `api/`, `middleware/`) has now been removed. If working from an older fork, upgrade by:
-
-1. Deleting any `server.js`, `api/`, and `middleware/` directories/files.
-2. Replacing legacy `/api/...` fetch calls with `/.netlify/functions/...` equivalents.
-3. Verifying required secrets (e.g. `JWT_SECRET`) exist in Netlify environment settings.
-4. Re-running Tailwind build if you customize styles: `npm run build:css`.
-
-Need a traditional server again? Add a minimal proxy or edge layer only if required for websockets or streaming; keep business logic in functions.
 ### Development Setup
 ```bash
 # Clone the repository
