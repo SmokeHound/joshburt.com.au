@@ -1,8 +1,8 @@
 const { Pool } = require('pg');
-const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
 
-// Database configuration - support PostgreSQL, MySQL, and SQLite fallback
+// Database configuration - support PostgreSQL and SQLite fallback
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 
 // PostgreSQL configuration
@@ -16,21 +16,6 @@ const pgConfig = {
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-};
-
-// MySQL configuration
-const mysqlConfig = {
-  host: process.env.DB_HOST || 'mysql-28ad5375-joshburt.g.aivencloud.com',
-  user: process.env.DB_USER || 'avnadmin',
-  password: process.env.DB_PASSWORD || 'AVNS_ftCWIkMaUvsojeBNmAh',
-  database: process.env.DB_NAME || 'defaultdb',
-  port: process.env.DB_PORT || 12667,
-  // ssl: {
-  //   rejectUnauthorized: true
-  // },
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
 };
 
 // SQLite fallback for development
@@ -48,20 +33,12 @@ class Database {
   constructor() {
     this.pool = null; // PostgreSQL
     this.db = null;   // SQLite
-    this.mysqlPool = null; // MySQL
     this.type = DB_TYPE;
   }
 
   async connect() {
     try {
-      if (this.type === 'mysql') {
-        this.mysqlPool = await mysql.createPool(mysqlConfig);
-        // Test connection
-        const conn = await this.mysqlPool.getConnection();
-        await conn.query('SELECT 1');
-        conn.release();
-        console.log('🐬 Connected to MySQL database');
-      } else if (this.type === 'postgres' || this.type === 'postgresql') {
+      if (this.type === 'postgres' || this.type === 'postgresql') {
         this.pool = new Pool(pgConfig);
         // Test the connection
         const client = await this.pool.connect();
@@ -71,7 +48,7 @@ class Database {
       } else {
         // Fallback to SQLite for development
         if (!sqlite3) {
-          throw new Error('SQLite3 not available and PostgreSQL/MySQL not configured');
+          throw new Error('SQLite3 not available and PostgreSQL not configured');
         }
         return new Promise((resolve, reject) => {
           this.db = new sqlite3.Database(DB_PATH, (err) => {
@@ -132,10 +109,7 @@ class Database {
 
   // Utility to convert SQL with placeholders to the correct format
   _prepareQuery(sql, params = []) {
-    if (this.mysqlPool) {
-      // MySQL uses ?
-      return { sql, params };
-    } else if (this.pool) {
+    if (this.pool) {
       // PostgreSQL uses $1, $2, etc.
       let pgSql = sql;
       let paramIndex = 1;
@@ -149,15 +123,7 @@ class Database {
 
   async run(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
-    if (this.mysqlPool) {
-      // MySQL
-      const [result] = await this.mysqlPool.execute(preparedSql, preparedParams);
-      return {
-        id: result.insertId || null,
-        changes: result.affectedRows || 0,
-        rows: result
-      };
-    } else if (this.pool) {
+    if (this.pool) {
       // PostgreSQL
       const client = await this.pool.connect();
       try {
@@ -190,11 +156,7 @@ class Database {
 
   async get(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
-    if (this.mysqlPool) {
-      // MySQL
-      const [rows] = await this.mysqlPool.execute(preparedSql, preparedParams);
-      return rows[0] || null;
-    } else if (this.pool) {
+    if (this.pool) {
       // PostgreSQL
       const client = await this.pool.connect();
       try {
@@ -223,11 +185,7 @@ class Database {
 
   async all(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
-    if (this.mysqlPool) {
-      // MySQL
-      const [rows] = await this.mysqlPool.execute(preparedSql, preparedParams);
-      return rows;
-    } else if (this.pool) {
+    if (this.pool) {
       // PostgreSQL
       const client = await this.pool.connect();
       try {
@@ -255,75 +213,17 @@ class Database {
   }
 }
 
-// MySQL table creation
-async function createMySQLTables() {
-  // Create users table for MySQL
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      email VARCHAR(255) UNIQUE NOT NULL,
-      name VARCHAR(255) NOT NULL,
-      password_hash VARCHAR(255),
-      role VARCHAR(50) DEFAULT 'user',
-      is_active BOOLEAN DEFAULT true,
-      email_verified BOOLEAN DEFAULT false,
-      email_verification_token VARCHAR(255),
-      email_verification_expires BIGINT,
-      oauth_provider VARCHAR(50),
-      oauth_id VARCHAR(255),
-      avatar_url TEXT,
-      reset_token VARCHAR(255),
-      reset_token_expires BIGINT,
-      failed_login_attempts INT DEFAULT 0,
-      lockout_expires BIGINT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Create refresh tokens table for MySQL
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS refresh_tokens (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      user_id INT NOT NULL,
-      token_hash VARCHAR(255) NOT NULL,
-      expires_at TIMESTAMP NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )
-  `);
-
-  // Create audit log table for MySQL
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS audit_logs (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      user_id INT,
-      action VARCHAR(255) NOT NULL,
-      details TEXT,
-      ip_address VARCHAR(45),
-      user_agent TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-    )
-  `);
-
-  // Create indexes for better performance
-  await database.run('CREATE INDEX idx_users_email ON users(email)');
-  await database.run('CREATE INDEX idx_users_oauth ON users(oauth_provider, oauth_id)');
-  await database.run('CREATE INDEX idx_refresh_tokens_user ON refresh_tokens(user_id)');
-  await database.run('CREATE INDEX idx_refresh_tokens_expires ON refresh_tokens(expires_at)');
-  await database.run('CREATE INDEX idx_audit_logs_user ON audit_logs(user_id)');
-  await database.run('CREATE INDEX idx_audit_logs_created ON audit_logs(created_at)');
-}
 
 const database = new Database();
 
 async function initializeDatabase() {
   try {
     await database.connect();
-    if (database.type === 'mysql') {
-      await createMySQLTables();
-    } else if (database.type === 'postgres' || database.type === 'postgresql') {
+    if (database.type === 'postgres' || database.type === 'postgresql') {
+      // Apply project schema file for PostgreSQL if enabled
+      if (shouldApplySchemaOnStart()) {
+        await applyPostgresSchemaFromFile();
+      }
       await createPostgreSQLTables();
     } else {
       await createSQLiteTables();
@@ -334,6 +234,40 @@ async function initializeDatabase() {
     console.error('❌ Database initialization failed:', error);
     throw error;
   }
+}
+
+// Best-effort application of the repository schema on PostgreSQL
+async function applyPostgresSchemaFromFile() {
+  try {
+    const schemaPath = path.join(__dirname, '..', 'database-schema.sql');
+    if (!fs.existsSync(schemaPath)) {
+      return;
+    }
+    let sql = await fs.promises.readFile(schemaPath, 'utf8');
+
+    // Remove SQLite-specific audit_logs definition that uses AUTOINCREMENT
+    sql = sql.replace(/CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+audit_logs\s*\([\s\S]*?AUTOINCREMENT[\s\S]*?\);\s*/i, '');
+
+    const client = await database.pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query(sql);
+      await client.query('COMMIT');
+      console.log('🛠 Applied database-schema.sql to PostgreSQL');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.warn('⚠️ Applying database-schema.sql encountered an error; continuing with built-in schema:', err.message);
+    } finally {
+      client.release();
+    }
+  } catch (e) {
+    console.warn('⚠️ Skipping schema file application:', e.message);
+  }
+}
+
+function shouldApplySchemaOnStart() {
+  const val = String(process.env.APPLY_SCHEMA_ON_START || '').toLowerCase().trim();
+  return val === '1' || val === 'true' || val === 'yes';
 }
 
 async function createPostgreSQLTables() {
@@ -361,6 +295,70 @@ async function createPostgreSQLTables() {
       )
   `);
 
+  // Create products table for PostgreSQL
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS products (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      code VARCHAR(100) UNIQUE NOT NULL,
+      type VARCHAR(100) NOT NULL,
+      specs TEXT,
+      description TEXT,
+      image TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Create consumables table for PostgreSQL
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS consumables (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      code VARCHAR(100) UNIQUE NOT NULL,
+      type VARCHAR(100) NOT NULL,
+      category VARCHAR(100),
+      description TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Create orders table for PostgreSQL
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id SERIAL PRIMARY KEY,
+      customer_email VARCHAR(255) DEFAULT 'anonymous@example.com',
+      total_items INTEGER NOT NULL DEFAULT 0,
+      status VARCHAR(50) DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Create order_items table for PostgreSQL
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS order_items (
+      id SERIAL PRIMARY KEY,
+      order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+      product_name VARCHAR(255) NOT NULL,
+      product_code VARCHAR(100),
+      quantity INTEGER NOT NULL DEFAULT 1,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Inventory table to track stock for products and consumables (PostgreSQL)
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS inventory (
+      id SERIAL PRIMARY KEY,
+      item_type VARCHAR(20) NOT NULL CHECK (item_type IN ('product', 'consumable')),
+      item_id INTEGER NOT NULL,
+      stock_count INTEGER NOT NULL DEFAULT 0,
+      UNIQUE(item_type, item_id)
+    )
+  `);
+
   // Create refresh tokens table for PostgreSQL
   await database.run(`
     CREATE TABLE IF NOT EXISTS refresh_tokens (
@@ -386,6 +384,9 @@ async function createPostgreSQLTables() {
   `);
 
   // Create indexes for better performance
+  await database.run('CREATE INDEX IF NOT EXISTS idx_products_type ON products(type)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_users_oauth ON users(oauth_provider, oauth_id)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)');
@@ -496,6 +497,17 @@ async function createSQLiteTables() {
       user_agent TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+    )
+  `);
+
+  // Inventory table to track stock for products and consumables (SQLite)
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS inventory (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      item_type TEXT NOT NULL CHECK (item_type IN ('product', 'consumable')),
+      item_id INTEGER NOT NULL,
+      stock_count INTEGER NOT NULL DEFAULT 0,
+      UNIQUE(item_type, item_id)
     )
   `);
 }

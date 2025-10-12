@@ -66,6 +66,6 @@ This document lists all Netlify Functions (serverless API) and their behaviors. 
   - Returns tokens on `login` and `refresh`. Uses refresh-token rotation.
 
 ## Notes
-- Database access via `config/database.js` with SQLite/PostgreSQL/MySQL support.
+- Database access via `config/database.js` with PostgreSQL and SQLite support.
 - Most endpoints automatically connect as needed; connection calls are idempotent.
  - Errors are normalized with `{ error: message }`.

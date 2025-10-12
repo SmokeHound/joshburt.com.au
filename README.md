@@ -20,7 +20,7 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 - **CI/CD Pipeline**: Automated testing, linting, and deployment
 - **Admin Dashboard**: User management, analytics, and site settings (fully database-driven)
 - **Oil Ordering System**: Dynamic Castrol product ordering (API-driven, CSV export)
-- **API Backend**: Serverless-only (Netlify Functions) with MySQL / PostgreSQL / SQLite abstraction (legacy Express layer removed)
+- **API Backend**: Serverless-only (Netlify Functions) with PostgreSQL / SQLite abstraction (legacy Express layer removed)
 - **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
 
 ## ⚙️ Site Settings (Database-Backed)
@@ -35,7 +35,7 @@ All site settings are now stored in the database and managed via the admin dashb
 This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The backend has been fully migrated to Netlify Functions (serverless) – legacy Express server code has been removed.
 - **Feature Toggles**
 	- `maintenanceMode`, `enableRegistration`, `enableGuestCheckout`, `enableNewsletter`
-- **API Backend**: Netlify Functions (serverless) with MySQL / PostgreSQL / SQLite abstraction
+- **API Backend**: Netlify Functions (serverless) with PostgreSQL / SQLite abstraction
 	- `smtpHost`, `smtpPort`, `smtpUser`, `smtpPassword`
 - **Custom Code**
 ### Component / Serverless Structure
@@ -288,7 +288,7 @@ node scripts/prune-refresh-tokens.js
 
 What it does:
 - Scans the `refresh_tokens` (or equivalent) table for expired entries
-- Removes them in batches (works across MySQL, PostgreSQL, SQLite)
+- Removes them in batches (works across PostgreSQL, SQLite)
 - Outputs a summary count of deleted rows
 
 Recommended cadence:
@@ -325,14 +325,14 @@ Extending CI:
 
 ### Environment Variables Checklist
 Ensure the following are defined in Netlify (or locally in `.env`) for full functionality:
-- `DB_TYPE` (mysql | pg | sqlite)
+- `DB_TYPE` (postgres | sqlite)
 - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (if not sqlite)
 - `JWT_SECRET` (required for auth)
 - Optional: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` (email flows)
 
 ### Operational Tips
 - If switching database engines, clear or migrate the existing schema before first request so automatic table creation runs cleanly.
-- Use SQLite locally for quickest iteration, then confirm against MySQL/PostgreSQL in CI or a staging branch.
+- Use SQLite locally for quickest iteration, then confirm against PostgreSQL in CI or a staging branch.
 - Re-run the prune script after bulk auth / load testing to keep token tables lean.
 
 ## 🐛 Known Limitations

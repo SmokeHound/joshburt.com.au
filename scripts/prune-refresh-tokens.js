@@ -14,9 +14,7 @@ const { database, initializeDatabase } = require('../config/database');
     // Delete tokens where expires_at < now
     const driver = database.type;
     let sql;
-    if (driver === 'mysql') {
-      sql = 'DELETE FROM refresh_tokens WHERE expires_at < NOW()';
-    } else if (driver === 'postgres' || driver === 'postgresql') {
+    if (driver === 'postgres' || driver === 'postgresql') {
       sql = 'DELETE FROM refresh_tokens WHERE expires_at < NOW()';
     } else {
       // SQLite

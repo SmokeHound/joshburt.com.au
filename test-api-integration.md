@@ -65,7 +65,7 @@ Testing the integration between the static website frontend and the backend data
 
 ### 1. Database Connection
 ```javascript
-Testing the integration between the static website frontend and Neon (PostgreSQL) or MySQL backend via Netlify Functions. The codebase is fully audited and production-ready (no debug logic or dead code).
+Testing the integration between the static website frontend and Neon (PostgreSQL) or SQLite backend via Netlify Functions. The codebase is fully audited and production-ready (no debug logic or dead code).
 const pool = new Pool({
   connectionString: process.env.NEON_DATABASE_URL || 'fallback-connection-string'
 });

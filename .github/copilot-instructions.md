@@ -5,7 +5,7 @@ This site includes static HTML pages plus a serverless backend (Netlify Function
 - Responsive design with dark/light mode support
 - Admin dashboard and user management
 - Castrol oil product ordering system
-- **Dynamic backend**: Netlify serverless functions with MySQL/PostgreSQL/SQLite database integration (legacy Express removed)
+ - **Dynamic backend**: Netlify serverless functions with PostgreSQL/SQLite database integration (legacy Express removed)
 **Codebase is fully audited and production-ready (no dead code, debug logic, or unused variables)**
 
 Always reference these instructions first. Fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
@@ -18,7 +18,7 @@ Always reference these instructions first. Fallback to search or bash commands o
 - **Serverless backend**:
   - Set DB env vars (DB_TYPE, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT as needed)
   - Use `netlify dev` (optional) to run functions locally (`/.netlify/functions/*`)
-  - Test database connectivity: `node test-mysql-init.js`
+   - Test database connectivity: run `netlify dev` and call `/.netlify/functions/health`
 
 
 ### Build and Deploy Information
@@ -39,7 +39,7 @@ Always reference these instructions first. Fallback to search or bash commands o
    - Inventory: `/.netlify/functions/inventory`
    - Consumables: `/.netlify/functions/consumables`
    - Categories: `/.netlify/functions/consumable-categories`
-- **Database**: `node test-mysql-init.js`
+- **Database**: use the health function locally
 - **Local Functions**: `netlify dev` (optional)
 
 
@@ -63,13 +63,13 @@ ALWAYS manually validate changes by running through these complete end-to-end sc
    - Submit and list orders via `/.netlify/functions/orders`
 
 5. **Database Test**:
-   - Run `node test-mysql-init.js` to verify database connection and table creation
+   - Start local functions with `netlify dev` and call `/.netlify/functions/health` to verify database connectivity and required tables
 
 
 ### Known Limitations
 - **CDN resources blocked**: Styling may be limited in restricted environments
 - **Image loading blocked**: Placeholder images may not display
-- **MySQL connection**: Requires valid credentials and network access
+- **Database connection**: Requires valid credentials and network access
 - **API/serverless**: Only works in supported environments (Netlify, Node.js)
 
 
@@ -103,8 +103,7 @@ Two deployment workflows are configured:
 ├── users.html           # User management
 ├── login.html           # Login page
 ├── .netlify/functions/  # Serverless API endpoints (products.js, orders.js, users.js, auth.js, etc.)
-├── config/database.js   # Database abstraction (MySQL, PostgreSQL, SQLite)
-├── test-mysql-init.js   # MySQL test script
+├── config/database.js   # Database abstraction (PostgreSQL, SQLite)
 └── README.md            # Basic project info
 ```
 
@@ -114,7 +113,6 @@ Two deployment workflows are configured:
 - **oil.html**: Castrol product ordering (uses API)
 - **.netlify/functions/**: Serverless API endpoints (products, orders, users, auth, consumables, categories, audit logs, inventory, settings, health)
 - **config/database.js**: Database abstraction
-- **test-mysql-init.js**: MySQL test script
 
 
 ### Development Notes
@@ -132,8 +130,10 @@ python3 -m http.server 8000
 
 # (Legacy Express removed – no standalone API server to start)
 
-# Test database (MySQL/PostgreSQL/SQLite)
-node test-mysql-init.js
+# Test database (PostgreSQL/SQLite)
+# Start Netlify dev then call health
+netlify dev
+curl http://localhost:8888/.netlify/functions/health
 
 # Install backend dependencies
 npm install

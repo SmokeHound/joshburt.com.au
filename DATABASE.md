@@ -4,9 +4,8 @@
 ## Overview
 
 
-The joshburt.com.au application supports multiple database backends:
+The joshburt.com.au application supports two database backends:
 - **PostgreSQL** (default, supported, e.g. Neon)
-- **MySQL**
 - **SQLite** (for development and testing)
 
 ## Database Configuration
@@ -98,9 +97,9 @@ All changes to settings are audit-logged for compliance and traceability.
 
 ### Users Table
 ```sql
--- MySQL/PostgreSQL/SQLite compatible
-CREATE TABLE users (
-   id INTEGER PRIMARY KEY AUTO_INCREMENT,
+-- PostgreSQL
+CREATE TABLE IF NOT EXISTS users (
+   id SERIAL PRIMARY KEY,
    email VARCHAR(255) UNIQUE NOT NULL,
    name VARCHAR(255) NOT NULL,
    password_hash VARCHAR(255),
@@ -145,7 +144,7 @@ CREATE TABLE refresh_tokens (
 ### Connection Management
 
 
-The database abstraction in `config/database.js` automatically handles connections and query parameter conversion for MySQL, PostgreSQL, and SQLite:
+The database abstraction in `config/database.js` automatically handles connections and query parameter conversion for PostgreSQL and SQLite:
 
 ```javascript
 const { database } = require('./config/database');
@@ -166,7 +165,7 @@ await database.close();
 
 
 The database class automatically converts query parameters:
-- **SQLite/MySQL**: Uses `?` placeholders
+- **SQLite**: Uses `?` placeholders
 - **PostgreSQL**: Converts to `$1, $2, $3...` placeholders
 
 Example:
@@ -359,7 +358,7 @@ Customer order creation and administrative management.
 ## Database Migration
 
 
-### From SQLite to MySQL or PostgreSQL
+### From SQLite to PostgreSQL
 
 1. **Set up PostgreSQL database**:
 ```sql
@@ -378,10 +377,7 @@ DB_PASSWORD=secure_password
 DB_SSL=true
 ```
 
-3. **Run database initialization**:
-```bash
-node test-mysql-init.js
-```
+3. **Run database initialization**: application functions auto-create tables on first use.
 
 4. **Migrate existing data** (if needed):
 ```bash

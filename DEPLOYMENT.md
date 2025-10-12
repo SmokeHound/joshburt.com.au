@@ -46,9 +46,9 @@ JWT_SECRET=your-super-secure-jwt-secret
 JWT_EXPIRES_IN=7d
 JWT_REFRESH_EXPIRES_IN=30d
 BCRYPT_ROUNDS=12
-DB_TYPE=sqlite   # or mysql | postgres
+DB_TYPE=sqlite   # or postgres
 DB_PATH=./database.sqlite  # if sqlite
-# If MySQL / Postgres set: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+# If Postgres set: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
 ```
 Optional:
 ```
@@ -61,13 +61,14 @@ GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 GITHUB_CLIENT_ID=...
 GITHUB_CLIENT_SECRET=...
+APPLY_SCHEMA_ON_START=false  # set to true/1/yes to apply database-schema.sql on Postgres startup
 ```
 
 ## Database
-SQLite default (bundled `database.sqlite`). For remote DB (MySQL/PostgreSQL) supply credentials via env vars. The unified `config/database.js` selects driver based on `DB_TYPE`.
+SQLite default (bundled `database.sqlite`). For remote DB (PostgreSQL) supply credentials via env vars. The unified `config/database.js` selects driver based on `DB_TYPE`.
 
 ### Migrations / Schema
-Check `DATABASE.md` / `database-schema.sql`. On first run, functions lazily initialize tables if missing (ensure proper permissions).
+On PostgreSQL, the app will best‑effort apply `database-schema.sql` at startup before creating any missing tables. If it fails, the built‑in initializers still create the required tables. Review `DATABASE.md` and `database-schema.sql` for details.
 
 ## Security
 1. Strong `JWT_SECRET`
