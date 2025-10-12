@@ -141,13 +141,19 @@
             return;
           }
         }
-        // Refresh failed: clear session
+        // Refresh failed: clear session and redirect to login
         try {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
           localStorage.removeItem('currentUser');
         } catch(_){ /* clear session noop */ }
+        try {
+          if (!/login\.html$/i.test(window.location.pathname)) {
+            var ru = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = 'login.html?message=login-required&returnUrl=' + ru;
+          }
+        } catch(e){ /* navigation noop */ }
       }
     } catch (e) { /* silent session bootstrap */ }
   })();
