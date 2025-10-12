@@ -37,6 +37,7 @@ Serves static site and functions at http://localhost:8888
 /.netlify/functions/inventory
 /.netlify/functions/consumables
 /.netlify/functions/consumable-categories
+/.netlify/functions/public-config
 ```
 
 ## Environment Variables (Netlify)
@@ -62,6 +63,10 @@ GOOGLE_CLIENT_SECRET=...
 GITHUB_CLIENT_ID=...
 GITHUB_CLIENT_SECRET=...
 APPLY_SCHEMA_ON_START=false  # set to true/1/yes to apply database-schema.sql on Postgres startup
+AUTH0_DOMAIN=your-tenant.us.auth0.com
+AUTH0_CLIENT_ID=your-client-id
+AUTH0_AUDIENCE=optional-api-audience
+AUTH0_AUTO_PROVISION=true   # defaults to true when AUTH0_DOMAIN is set; set to false to disable
 ```
 
 ## Database
@@ -76,6 +81,14 @@ On PostgreSQL, the app will best‑effort apply `database-schema.sql` at startup
 3. Enforce HTTPS (Netlify auto) & set HSTS via Netlify headers if desired
 4. Limit origin access with Netlify site domain (optional future enhancement)
 5. Audit logs available via `/.netlify/functions/audit-logs`
+
+### Security/Ops Checklist (Production)
+- [ ] Rotate `JWT_SECRET` regularly and keep it unique per environment
+- [ ] Review `JWT_EXPIRES_IN` and `JWT_REFRESH_EXPIRES_IN` to match your policy
+- [ ] Enable function logs/alerts in Netlify; set up external uptime monitoring
+- [ ] Schedule `npm run prune:tokens` (via CI cron) to keep `refresh_tokens` lean
+- [ ] Decide on `APPLY_SCHEMA_ON_START` (prefer migrations for teams)
+- [ ] Lock down CORS to your domains when ready (optional)
 
 ## Performance
 Caching handled mostly client-side + service worker.

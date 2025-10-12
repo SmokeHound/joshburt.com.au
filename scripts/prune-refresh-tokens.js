@@ -1,33 +1,24 @@
-#!/usr/bin/env node
-/**
- * Maintenance script: remove expired refresh tokens.
- * Usage:
- *   DB_TYPE=sqlite node scripts/prune-refresh-tokens.js
- *   DB_TYPE=postgres DB_* env vars set accordingly, etc.
- */
-require('dotenv').config();
+// Prune expired refresh tokens from the database (PostgreSQL/SQLite)
+// Safe to run repeatedly; prints deleted row count.
+
 const { database, initializeDatabase } = require('../config/database');
 
-(async () => {
+(async function main(){
   try {
-    await initializeDatabase();
-    // Delete tokens where expires_at < now
-    const driver = database.type;
-    let sql;
-    if (driver === 'postgres' || driver === 'postgresql') {
-      sql = 'DELETE FROM refresh_tokens WHERE expires_at < NOW()';
-    } else {
-      // SQLite
-      sql = 'DELETE FROM refresh_tokens WHERE datetime(expires_at) < datetime(\'now\')';
-    }
-    const before = await database.all('SELECT id FROM refresh_tokens');
-    await database.run(sql);
-    const after = await database.all('SELECT id FROM refresh_tokens');
-    const removed = (before.length - after.length);
-    console.log(`🧹 Removed ${removed} expired refresh token(s).`);
+    await database.connect();
+    // Ensure tables exist in case this is run early
+    try { await initializeDatabase(); } catch(err) { /* tables may already exist */ }
+
+    // Use ISO timestamp to compare; works for both Postgres (TIMESTAMP) and SQLite (DATETIME as text)
+    const nowIso = new Date().toISOString();
+    const res = await database.run('DELETE FROM refresh_tokens WHERE expires_at <= ?', [nowIso]);
+    const deleted = res && (res.changes || 0);
+    console.log(`Pruned ${deleted} expired refresh token(s).`);
+    await database.close();
     process.exit(0);
-  } catch (e) {
-    console.error('Failed to prune refresh tokens', e);
+  } catch (e){
+    console.error('Prune failed:', e.message);
+    try { await database.close(); } catch(err) { /* ignore close errors */ }
     process.exit(1);
   }
 })();

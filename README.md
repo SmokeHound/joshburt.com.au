@@ -100,9 +100,11 @@ Serverless endpoints are accessible at:
 /.netlify/functions/inventory
 /.netlify/functions/consumables
 /.netlify/functions/consumable-categories
+/.netlify/functions/public-config
 ```
 
 Auth actions use a query/body `action` parameter, e.g. `/.netlify/functions/auth?action=login`.
+When `AUTH0_DOMAIN` is set, Auth0 RS256 JWTs are accepted and users are auto-provisioned by default unless `AUTH0_AUTO_PROVISION=false`.
 - **`consumables.html`**: Consumables order request page (for workshop staff)
 - **`consumables-mgmt.html`**: Consumables product list management (admin/staff CRUD)
 - Secure serverless endpoints (JWT auth, audit logging)
@@ -318,6 +320,7 @@ Ensure the following are defined in Netlify (or locally in `.env`) for full func
 - `DB_TYPE` (postgres | sqlite)
 - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (if not sqlite)
 - `JWT_SECRET` (required for auth)
+- `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_AUDIENCE` (optional; enables OAuth; buttons auto-enable via `/.netlify/functions/public-config`)
 - Optional: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` (email flows)
 
 ### Operational Tips

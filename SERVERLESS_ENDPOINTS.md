@@ -18,6 +18,11 @@ This document lists all Netlify Functions (serverless API) and their behaviors. 
   - Anonymous aggregate counts: `{ users, orders, products }`.
   - Ignores missing tables gracefully.
 
+- GET /.netlify/functions/public-config
+  - Returns limited client-safe configuration values. Current shape:
+    `{ auth0: { domain, clientId, audience } }`
+  - Used by login/register pages to auto-enable OAuth buttons when configured.
+
 - GET/POST/PATCH /.netlify/functions/orders
   - GET: Last 50 orders plus items.
   - POST: Create new order `{ items: [{ name, code, quantity }], requestedBy? }` → `{ orderId }`.
@@ -64,6 +69,7 @@ This document lists all Netlify Functions (serverless API) and their behaviors. 
 - Multi-action /.netlify/functions/auth
   - `action=register|verify-email|login|refresh|logout|forgot-password|reset-password|me` via query or JSON body.
   - Returns tokens on `login` and `refresh`. Uses refresh-token rotation.
+  - When `AUTH0_DOMAIN` is set, Auth0 JWTs are accepted and users are auto-provisioned by default unless `AUTH0_AUTO_PROVISION=false`.
 
 ## Notes
 - Database access via `config/database.js` with PostgreSQL and SQLite support.
