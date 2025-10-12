@@ -5,18 +5,27 @@ const fs = require('fs');
 // Database configuration - support PostgreSQL and SQLite fallback
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 
-// PostgreSQL configuration
-const pgConfig = {
-  user: process.env.DB_USER || 'neondb_owner',
-  host: process.env.DB_HOST || 'ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech',
-  database: process.env.DB_NAME || 'neondb',
-  password: process.env.DB_PASSWORD || 'npg_RCwEhZ2pm6vx',
-  port: process.env.DB_PORT || 5432,
-  ssl: { rejectUnauthorized: false },
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-};
+// PostgreSQL configuration (prefer single URL if provided)
+const DATABASE_URL = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL || null;
+const pgConfig = DATABASE_URL
+  ? {
+    connectionString: DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  }
+  : {
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT || 5432,
+    ssl: { rejectUnauthorized: false },
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  };
 
 // SQLite fallback for development
 let sqlite3;
@@ -27,7 +36,10 @@ try {
   console.log('SQLite3 not available, using PostgreSQL only');
 }
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, '..', 'database.sqlite');
+// Prefer a writable temp path on serverless platforms
+const DB_PATH = process.env.DB_PATH || (process.env.NETLIFY ? '/tmp/database.sqlite' : path.join(__dirname, '..', 'database.sqlite'));
+// Allow disabling SQLite fallback (recommended for production)
+const DISABLE_SQLITE_FALLBACK = String(process.env.DB_DISABLE_SQLITE_FALLBACK || (process.env.NETLIFY ? 'true' : 'false')).toLowerCase() === 'true';
 
 class Database {
   constructor() {
@@ -65,7 +77,7 @@ class Database {
     } catch (error) {
       console.error('Database connection failed:', error);
       // Attempt graceful fallback to SQLite if available and not already using it
-      if (this.type !== 'sqlite' && sqlite3) {
+      if (this.type !== 'sqlite' && sqlite3 && !DISABLE_SQLITE_FALLBACK) {
         console.warn('Falling back to SQLite database...');
         this.type = 'sqlite';
         return new Promise((resolve, reject) => {

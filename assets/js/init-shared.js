@@ -102,6 +102,10 @@
 
   // Session bootstrap: verify current user and refresh if possible
   (async function(){
+    // Skip auth bootstrap on the login page to avoid noisy 401/refresh calls
+    if (typeof window !== 'undefined' && window.location && /login\.html$/i.test(window.location.pathname)) {
+      return;
+    }
     try {
       var token = localStorage.getItem('accessToken');
       if (!token) return;
