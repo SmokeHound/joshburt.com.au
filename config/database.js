@@ -10,7 +10,7 @@ const DATABASE_URL = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL |
 const pgConfig = DATABASE_URL
   ? {
     connectionString: DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
+    ssl: true,
     max: 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
@@ -21,7 +21,7 @@ const pgConfig = DATABASE_URL
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT || 5432,
-    ssl: { rejectUnauthorized: false },
+    ssl: { rejectUnauthorized: true },
     max: 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
