@@ -324,6 +324,7 @@ async function createPostgreSQLTables() {
       specs TEXT,
       description TEXT,
       image TEXT,
+      model_qty INTEGER DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
@@ -338,6 +339,7 @@ async function createPostgreSQLTables() {
       type VARCHAR(100) NOT NULL,
       category VARCHAR(100),
       description TEXT,
+      model_qty INTEGER DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
@@ -449,6 +451,7 @@ async function createSQLiteTables() {
       specs TEXT,
       description TEXT,
       image TEXT,
+      model_qty INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -463,6 +466,7 @@ async function createSQLiteTables() {
       type TEXT NOT NULL,
       category TEXT,
       description TEXT,
+      model_qty INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
