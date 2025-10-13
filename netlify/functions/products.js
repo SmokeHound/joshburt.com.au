@@ -18,7 +18,7 @@ async function listProducts(event) {
     // Left join inventory to get stock
     const sql = `
       SELECT p.id, p.name, p.code, p.type, p.specs, p.description, p.image,
-             p.model_qty, i.stock_count AS currentStock
+             p.model_qty, p.soh, COALESCE(i.stock_count, p.soh) AS currentStock
       FROM products p
       LEFT JOIN inventory i ON i.item_type = 'product' AND i.item_id = p.id
       ${whereSql}
@@ -38,9 +38,10 @@ async function createProduct(event, user) {
     const { name, code, type, specs = '', description = '', image = '', model_qty, currentStock } = body;
     if (!name || !code || !type || !specs) return error(400, 'Missing required fields');
 
+    const sohVal = (typeof currentStock === 'number') ? Math.max(0, currentStock) : null;
     const insert = await database.run(
-      'INSERT INTO products (name, code, type, specs, description, image, model_qty) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [name, code, type, specs, description, image, typeof model_qty === 'number' ? model_qty : null]
+      'INSERT INTO products (name, code, type, specs, description, image, model_qty, soh) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [name, code, type, specs, description, image, (typeof model_qty === 'number' ? model_qty : null), sohVal]
     );
     const id = insert.id;
     if (typeof currentStock === 'number') {
@@ -48,7 +49,7 @@ async function createProduct(event, user) {
       await upsertInventory('product', id, Math.max(0, currentStock));
     }
     const created = await database.get(
-      'SELECT p.*, i.stock_count AS currentStock FROM products p LEFT JOIN inventory i ON i.item_type = ? AND i.item_id = p.id WHERE p.id = ?',
+      'SELECT p.*, COALESCE(i.stock_count, p.soh) AS currentStock FROM products p LEFT JOIN inventory i ON i.item_type = ? AND i.item_id = p.id WHERE p.id = ?',
       ['product', id]
     );
     return json(201, created);
@@ -74,6 +75,7 @@ async function updateProduct(event, user) {
     if (description !== undefined) { sets.push('description = ?'); params.push(description); }
     if (image !== undefined) { sets.push('image = ?'); params.push(image); }
     if (model_qty !== undefined) { sets.push('model_qty = ?'); params.push(model_qty); }
+    if (currentStock !== undefined) { sets.push('soh = ?'); params.push(Math.max(0, parseInt(currentStock, 10) || 0)); }
     if (sets.length) {
       params.push(id);
       await database.run(`UPDATE products SET ${sets.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, params);
@@ -82,7 +84,7 @@ async function updateProduct(event, user) {
       await upsertInventory('product', id, Math.max(0, parseInt(currentStock, 10) || 0));
     }
     const updated = await database.get(
-      'SELECT p.*, i.stock_count AS currentStock FROM products p LEFT JOIN inventory i ON i.item_type = ? AND i.item_id = p.id WHERE p.id = ?',
+      'SELECT p.*, COALESCE(i.stock_count, p.soh) AS currentStock FROM products p LEFT JOIN inventory i ON i.item_type = ? AND i.item_id = p.id WHERE p.id = ?',
       ['product', id]
     );
     return json(200, updated || { id });

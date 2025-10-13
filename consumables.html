@@ -250,7 +250,7 @@
         // Find the product in the products array to get model_qty
         const product = products.find(p => String(p.id) === idStr);
         const modelQty = product && typeof product.model_qty !== 'undefined' ? product.model_qty : '';
-        const currentStock = typeof product !== 'undefined' && typeof product.currentStock !== 'undefined' ? product.currentStock : Math.floor(Math.random() * 50);
+        const currentStock = (product && (product.soh ?? product.currentStock)) ?? Math.floor(Math.random() * 50);
         if (existingItem) {
           existingItem.quantity++;
         } else {
