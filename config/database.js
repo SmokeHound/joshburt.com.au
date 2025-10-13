@@ -39,7 +39,9 @@ try {
 // Prefer a writable temp path on serverless platforms
 const DB_PATH = process.env.DB_PATH || (process.env.NETLIFY ? '/tmp/database.sqlite' : path.join(__dirname, '..', 'database.sqlite'));
 // Allow disabling SQLite fallback (recommended for production)
-const DISABLE_SQLITE_FALLBACK = String(process.env.DB_DISABLE_SQLITE_FALLBACK || (process.env.NETLIFY ? 'true' : 'false')).toLowerCase() === 'true';
+const DISABLE_SQLITE_FALLBACK = String(
+  process.env.DB_DISABLE_SQLITE_FALLBACK || (process.env.NETLIFY ? 'true' : 'false')
+).toLowerCase() === 'true';
 
 class Database {
   constructor() {
@@ -80,6 +82,11 @@ class Database {
       if (this.type !== 'sqlite' && sqlite3 && !DISABLE_SQLITE_FALLBACK) {
         console.warn('Falling back to SQLite database...');
         this.type = 'sqlite';
+        // Dispose any existing PG pool before switching
+        if (this.pool) {
+          try { await this.pool.end(); } catch (e) { /* noop */ }
+          this.pool = null;
+        }
         return new Promise((resolve, reject) => {
           this.db = new sqlite3.Database(DB_PATH, (err) => {
             if (err) {
