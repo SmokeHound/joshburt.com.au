@@ -42,7 +42,7 @@
                                     <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Code</th>
                                     <th class="py-3 px-4 text-gray-900 dark:text-gray-100 font-semibold">Name</th>
                                     <th class="py-3 px-3">Type</th>
-                                    <th class="py-3 px-3">Current Stock</th>
+                                    <th class="py-3 px-3">Current Stock (SOH)</th>
                                     <th class="py-3 px-3">Reorder Point</th>
                                     <th class="py-3 px-3">Actions</th>
                                 </tr>
@@ -116,10 +116,8 @@
                 </div>
             </section>
         </main>
-        </body>
-        </html>
-
-    <script>
+        </div>
+        <script>
         let products = [];
         let editingProductId = null;
 
@@ -407,7 +405,7 @@
         }
 
         // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
             // Load products from API on page load
             loadProducts();
             
@@ -431,3 +429,5 @@
             document.getElementById('import-products').addEventListener('change', importProducts);
         });
     </script>
+        </body>
+        </html>
