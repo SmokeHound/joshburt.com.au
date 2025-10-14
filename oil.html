@@ -86,6 +86,8 @@
       .then(response => response.text())
       .then(html => {
         document.getElementById('main-nav').innerHTML = html;
+        // Call the function to highlight the active nav link after insertion
+        if (window.setActiveNavLink) window.setActiveNavLink();
       });
   </script>
 
@@ -231,20 +233,6 @@
 
   // Shared navigation functionality
   (function() {
-    // Set active navigation link based on current page
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const navLinks = document.querySelectorAll('#sidebar nav a');
-    navLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      if (href === currentPage || (currentPage === '' && href === 'index.html')) {
-        link.classList.add('bg-primary', 'text-white');
-        link.setAttribute('aria-current', 'page');
-      } else {
-        link.classList.remove('bg-primary', 'text-white');
-        link.removeAttribute('aria-current');
-      }
-    });
-
     // Mobile menu toggle functionality
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
