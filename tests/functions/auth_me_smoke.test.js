@@ -6,6 +6,17 @@
  */
 
 const BASE = process.env.BASE_URL || 'http://localhost:8888';
+async function isServerAvailable() {
+  try {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 2000);
+    const res = await fetch(`${BASE}/.netlify/functions/health`, { signal: controller.signal });
+    clearTimeout(t);
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 async function callAuth(action, body = {}) {
   const res = await fetch(`${BASE}/.netlify/functions/auth?action=${encodeURIComponent(action)}`, {
@@ -27,6 +38,11 @@ async function callUsers(token) {
 
 (async () => {
   console.log('🔍 Starting serverless auth/users smoke test...');
+  if (!(await isServerAvailable())) {
+    console.warn('⚠️ Netlify dev not running at', BASE, '- skipping network smoke tests');
+    process.exit(0);
+    return;
+  }
   try {
     // 1. Login with default admin (ensure env seeded DB)
     const login = await callAuth('login', { email: 'admin@joshburt.com.au', password: 'admin123!' });

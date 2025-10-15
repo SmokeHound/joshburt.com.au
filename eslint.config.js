@@ -16,47 +16,47 @@ const compat = new FlatCompat({
   allConfig: js.configs.all
 });
 
-module.exports = defineConfig([{
-  languageOptions: {
-    globals: {
-      ...globals.browser,
-      ...globals.jest,
-      ...globals.node,
-      "localStorage": "readonly",
-      "fetch": "readonly",
-      "tailwind": "readonly",
+module.exports = defineConfig([
+  { ignores: ['.netlify/**'] },
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.jest,
+        ...globals.node,
+        'localStorage': 'readonly',
+        'fetch': 'readonly',
+        'tailwind': 'readonly',
+      },
+      ecmaVersion: 12,
+      sourceType: 'script',
+      parserOptions: {},
     },
-
-    ecmaVersion: 12,
-    sourceType: "script",
-    parserOptions: {},
-  },
-
-  extends: compat.extends("eslint:recommended"),
-
-  rules: {
-    "indent": ["error", 2],
-    "linebreak-style": ["off", "unix"],
-    "quotes": ["error", "single"],
-    "semi": ["error", "always"],
-    "no-unused-vars": ["off"],
-    "no-console": "off",
-    "no-undef": "error",
-  },
-}, {
-  files: ["tests/**/*.js"],
-
-  languageOptions: {
-    globals: {
-      ...globals.jest,
-      "expect": "readonly",
-      "describe": "readonly",
-      "test": "readonly",
-      "beforeAll": "readonly",
-      "beforeEach": "readonly",
-      "afterAll": "readonly",
-      "afterEach": "readonly",
-      "jest": "readonly",
+    extends: compat.extends('eslint:recommended'),
+    rules: {
+      'indent': ['error', 2],
+      'linebreak-style': ['off', 'unix'],
+      'quotes': ['error', 'single'],
+      'semi': ['error', 'always'],
+      'no-unused-vars': ['off'],
+      'no-console': 'off',
+      'no-undef': 'error',
     },
   },
-}]);
+  {
+    files: ['tests/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+        'expect': 'readonly',
+        'describe': 'readonly',
+        'test': 'readonly',
+        'beforeAll': 'readonly',
+        'beforeEach': 'readonly',
+        'afterAll': 'readonly',
+        'afterEach': 'readonly',
+        'jest': 'readonly',
+      },
+    },
+  }
+]);
