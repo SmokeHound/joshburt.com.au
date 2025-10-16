@@ -149,12 +149,41 @@
 
         class AuditLogger { static log(action, details, userId='admin') { const logs = JSON.parse(localStorage.getItem('auditLogs')||'[]'); const entry={ id:Date.now(), timestamp:new Date().toISOString(), userId, action, details, ip:'localhost' }; logs.unshift(entry); if (logs.length>1000) logs.splice(1000); localStorage.setItem('auditLogs', JSON.stringify(logs)); window.dispatchEvent(new CustomEvent('auditLogUpdated',{ detail:entry })); } }
 
-    async function loadUsers(page=1){
+        async function loadUsers(page=1){
             try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+                let token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
-                const res = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
+
+                async function fetchUsers(withToken){
+                    const headers = withToken ? { 'Authorization': `Bearer ${withToken}` } : {};
+                    const resp = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers });
+                    return resp;
+                }
+
+                let res = await fetchUsers(token);
+
+                // If unauthorized, try a one-time refresh flow before redirecting
+                if ((res.status === 401 || res.status === 403) && !AUTH_DISABLED) {
+                    try {
+                        const refreshToken = localStorage.getItem('refreshToken');
+                        if (refreshToken) {
+                            const refRes = await fetch(`${FN_BASE}/auth?action=refresh`, {
+                                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken })
+                            });
+                            if (refRes.ok) {
+                                const ref = await refRes.json();
+                                if (ref && (ref.accessToken || ref.refreshToken)) {
+                                    if (ref.accessToken) localStorage.setItem('accessToken', ref.accessToken);
+                                    if (ref.refreshToken) localStorage.setItem('refreshToken', ref.refreshToken);
+                                    token = ref.accessToken || token;
+                                    res = await fetchUsers(token);
+                                }
+                            }
+                        }
+                    } catch (_) { /* ignore refresh errors; will redirect below */ }
+                }
+
                 if ((res.status === 401 || res.status === 403) && !AUTH_DISABLED) {
                     // Check for freshLogin flag to prevent redirect loop after successful login
                     const freshLoginTimestamp = localStorage.getItem('freshLogin');
@@ -167,15 +196,20 @@
                         }
                     }
                     const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
-                    window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`; 
-                    return; 
+                    window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`;
+                    return;
                 }
+
                 if (!res.ok) throw new Error('Failed (status '+res.status+')');
                 const data = await res.json();
                 usersState.list = data.users || [];
                 usersState.pagination = data.pagination || { page:1, limit:limit, total:usersState.list.length, pages:1 };
                 renderUsers();
-            } catch(err){ console.error('loadUsers', err); showToast('Error loading users: '+(err.message||'Network error'),'error'); usersState.list=[]; renderUsers(); }
+            } catch(err){
+                console.error('loadUsers', err);
+                showToast('Error loading users: '+(err.message||'Network error'),'error');
+                usersState.list=[]; renderUsers();
+            }
         }
 
         function renderUsers(){
