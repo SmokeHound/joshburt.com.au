@@ -236,6 +236,9 @@
                         localStorage.setItem('currentUser', JSON.stringify(currentUser));
                     } catch {}
                     
+                    // Set flag to indicate fresh login (prevent immediate re-validation loop)
+                    localStorage.setItem('freshLogin', Date.now().toString());
+                    
                     showToast('Login successful! Redirecting...', 'success');
                     // Redirect to returnUrl (same-origin path) or default
                     const returnUrl = urlParams.get('returnUrl');
