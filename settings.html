@@ -402,15 +402,22 @@
                 // Branding & contact
                 if (settings.logoUrl) document.getElementById('logo-url').value = settings.logoUrl;
                 if (settings.faviconUrl) document.getElementById('favicon-url').value = settings.faviconUrl;
-        // Feature toggles/flags (combined)
-        // Prefer nested featureFlags; fallback to legacy top-level toggle keys for backward compatibility
-        const flags = settings.featureFlags || {};
-        const enableRegistration = (flags.enableRegistration !== undefined) ? flags.enableRegistration : settings.enableRegistration;
-        const enableGuestCheckout = (flags.enableGuestCheckout !== undefined) ? flags.enableGuestCheckout : settings.enableGuestCheckout;
-        const enableNewsletter = (flags.enableNewsletter !== undefined) ? flags.enableNewsletter : settings.enableNewsletter;
-        if (enableRegistration !== undefined) document.getElementById('enable-registration').checked = !!enableRegistration;
-        if (enableGuestCheckout !== undefined) document.getElementById('enable-guest-checkout').checked = !!enableGuestCheckout;
-        if (enableNewsletter !== undefined) document.getElementById('enable-newsletter').checked = !!enableNewsletter;
+        // Feature toggles/flags - Use FeatureFlags.isEnabled for consistency
+        if (window.FeatureFlags) {
+          const enableRegistration = await window.FeatureFlags.isEnabled('enableRegistration');
+          const enableGuestCheckout = await window.FeatureFlags.isEnabled('enableGuestCheckout');
+          const enableNewsletter = await window.FeatureFlags.isEnabled('enableNewsletter');
+          const betaFeatures = await window.FeatureFlags.isEnabled('betaFeatures');
+          const newDashboard = await window.FeatureFlags.isEnabled('newDashboard');
+          const advancedReports = await window.FeatureFlags.isEnabled('advancedReports');
+          
+          document.getElementById('enable-registration').checked = !!enableRegistration;
+          document.getElementById('enable-guest-checkout').checked = !!enableGuestCheckout;
+          document.getElementById('enable-newsletter').checked = !!enableNewsletter;
+          document.getElementById('feature-beta-features').checked = !!betaFeatures;
+          document.getElementById('feature-new-dashboard').checked = !!newDashboard;
+          document.getElementById('feature-advanced-reports').checked = !!advancedReports;
+        }
                 // Integrations
                 if (settings.smtpHost) document.getElementById('smtp-host').value = settings.smtpHost;
                 if (settings.smtpPort) document.getElementById('smtp-port').value = settings.smtpPort;
@@ -418,12 +425,6 @@
                 if (settings.smtpPassword) document.getElementById('smtp-password').value = settings.smtpPassword;
                 if (settings.customCss) document.getElementById('custom-css').value = settings.customCss;
                 if (settings.customJs) document.getElementById('custom-js').value = settings.customJs;
-        if (settings.featureFlags) {
-          // Existing flags
-          if (settings.featureFlags.betaFeatures !== undefined) document.getElementById('feature-beta-features').checked = settings.featureFlags.betaFeatures;
-          if (settings.featureFlags.newDashboard !== undefined) document.getElementById('feature-new-dashboard').checked = settings.featureFlags.newDashboard;
-          if (settings.featureFlags.advancedReports !== undefined) document.getElementById('feature-advanced-reports').checked = settings.featureFlags.advancedReports;
-        }
                 // Theme customization
                 if (settings.primaryColor) document.getElementById('primaryColor').value = settings.primaryColor;
                 if (settings.secondaryColor) document.getElementById('secondaryColor').value = settings.secondaryColor;

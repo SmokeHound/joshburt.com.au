@@ -171,21 +171,24 @@
         return;
       }
 
-      const flags = await window.FeatureFlags.fetch();
+      // Use FeatureFlags.isEnabled for consistency
+      const betaFeatures = await window.FeatureFlags.isEnabled('betaFeatures');
+      const newDashboard = await window.FeatureFlags.isEnabled('newDashboard');
+      const advancedReports = await window.FeatureFlags.isEnabled('advancedReports');
       
       // Update status displays
       document.getElementById('beta-status').innerHTML = 
-        flags.betaFeatures 
+        betaFeatures 
           ? '<span class="text-green-400">✓ Enabled</span>' 
           : '<span class="text-red-400">✗ Disabled</span>';
       
       document.getElementById('dashboard-status').innerHTML = 
-        flags.newDashboard 
+        newDashboard 
           ? '<span class="text-green-400">✓ Enabled</span>' 
           : '<span class="text-red-400">✗ Disabled</span>';
       
       document.getElementById('reports-status').innerHTML = 
-        flags.advancedReports 
+        advancedReports 
           ? '<span class="text-green-400">✓ Enabled</span>' 
           : '<span class="text-red-400">✗ Disabled</span>';
 
