@@ -16,6 +16,7 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 - **Modular Components**: Reusable shared components for navigation, theming, and configuration
 - **Responsive Design**: Mobile-first approach with TailwindCSS v4
 - **Dark/Light Mode**: Persistent theme switching (settings stored in database, not localStorage)
+- **Feature Flags**: Toggleable features (Beta Features, New Dashboard, Advanced Reports) - see [FEATURE_FLAGS.md](FEATURE_FLAGS.md)
 - **Testing Suite**: Unit and integration tests with Jest
 - **CI/CD Pipeline**: Automated testing, linting, and deployment
 - **Admin Dashboard**: User management, analytics, and site settings (fully database-driven)
@@ -47,6 +48,19 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 
 **Theming**: Centralized theme & color settings stored in database (no per-page toggles)
 All settings are editable in the admin dashboard and changes are persisted instantly. See `settings.html` for the full UI and field list.
+
+### Feature Flags
+
+Three feature flags are available in the settings page to enable/disable premium features:
+
+- **Beta Features**: Experimental features including AI-Powered Insights, Predictive Analytics, and Advanced Automation (visible in Admin Dashboard)
+- **New Dashboard**: Enhanced dashboard experience with improved UI and customizable widgets (links from Admin Dashboard)
+- **Advanced Reports**: Premium analytics features including Customer Lifetime Value, Churn Rate, and comprehensive report generation (visible in Analytics page)
+
+Features are dynamically shown/hidden based on flag status. Changes take effect immediately after saving settings. See [FEATURE_FLAGS.md](FEATURE_FLAGS.md) for detailed documentation.
+
+Demo page available at `feature-flags-demo.html` for testing.
+
 ### Audit Logging (Enhanced)
 
 The audit log system now supports:
