@@ -31,11 +31,17 @@
       }
 
       const settings = await response.json();
-      featureFlagsCache = settings.featureFlags || {
-        betaFeatures: false,
-        newDashboard: false,
-        advancedReports: false
+      const nestedFlags = settings.featureFlags || {};
+      // Merge in legacy top-level toggles for backward compatibility
+      const merged = {
+        betaFeatures: !!nestedFlags.betaFeatures,
+        newDashboard: !!nestedFlags.newDashboard,
+        advancedReports: !!nestedFlags.advancedReports,
+        enableRegistration: nestedFlags.enableRegistration !== undefined ? !!nestedFlags.enableRegistration : !!settings.enableRegistration,
+        enableGuestCheckout: nestedFlags.enableGuestCheckout !== undefined ? !!nestedFlags.enableGuestCheckout : !!settings.enableGuestCheckout,
+        enableNewsletter: nestedFlags.enableNewsletter !== undefined ? !!nestedFlags.enableNewsletter : !!settings.enableNewsletter
       };
+      featureFlagsCache = merged;
       cacheTimestamp = now;
 
       return featureFlagsCache;

@@ -1,5 +1,13 @@
 const { withHandler, json, error, parseBody, requireAuth, corsHeaders } = require('../../utils/fn');
-const { database } = require('../../config/database');
+const { database, initializeDatabase } = require('../../config/database');
+
+let dbReady = false;
+async function ensureDb(){
+  if (!dbReady) {
+    await initializeDatabase();
+    dbReady = true;
+  }
+}
 
 async function listProducts(event) {
   try {
@@ -131,6 +139,7 @@ async function upsertInventory(itemType, itemId, stock) {
 }
 
 exports.handler = withHandler(async (event) => {
+  await ensureDb();
   // CORS preflight handled by withHandler
   // Support pseudo-subpath for import: /.netlify/functions/products/import
   if (event.path && /\/products\/import$/i.test(event.path)) {
