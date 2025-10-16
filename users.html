@@ -155,7 +155,17 @@
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
                 const res = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
-                if ((res.status === 401 || res.status === 403) && !AUTH_DISABLED) { 
+                if ((res.status === 401 || res.status === 403) && !AUTH_DISABLED) {
+                    // Check for freshLogin flag to prevent redirect loop after successful login
+                    const freshLoginTimestamp = localStorage.getItem('freshLogin');
+                    if (freshLoginTimestamp) {
+                        const timeSinceLogin = Date.now() - parseInt(freshLoginTimestamp, 10);
+                        if (timeSinceLogin < 5000) {
+                            // Skip redirect if login just happened
+                            console.log('Fresh login detected, skipping redirect');
+                            return;
+                        }
+                    }
                     const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
                     window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`; 
                     return; 
@@ -262,10 +272,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Require authentication for this page
             const initialToken = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
-            if (!initialToken && !AUTH_DISABLED) { 
-                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
-                window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`; 
-                return; 
+            if (!initialToken && !AUTH_DISABLED) {
+                // Check for freshLogin flag to prevent redirect loop after successful login
+                const freshLoginTimestamp = localStorage.getItem('freshLogin');
+                if (freshLoginTimestamp) {
+                    const timeSinceLogin = Date.now() - parseInt(freshLoginTimestamp, 10);
+                    if (timeSinceLogin < 5000) {
+                        // Skip redirect if login just happened, allow page to load
+                        console.log('Fresh login detected, allowing page load without token check');
+                    } else {
+                        // Clear old flag and redirect
+                        localStorage.removeItem('freshLogin');
+                        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                        window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`; 
+                        return;
+                    }
+                } else {
+                    const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                    window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`; 
+                    return;
+                }
             }
             if (typeof AuditLogger !== 'undefined') { AuditLogger.log('page_access','Accessed User Management page'); }
             loadUsers();
