@@ -14,7 +14,7 @@
       window.FN_BASE = defaultBase;
     }
   })();
-  const FN_BASE = window.FN_BASE;
+  const FN_BASE = window.FN_BASE; // Set the function base URL
   // Inject shared-config and shared-theme fragments
   function injectFragment(url, filterTagNames){
     return fetch(url).then(r=>r.text()).then(html=>{
@@ -76,6 +76,92 @@
       } catch(_) { /* ignore localStorage parse/set errors */ }
     }
   })();
+
+  // Centralized authenticated fetch with auto-refresh and redirect throttling
+  // Exposed globally as window.authFetch
+  window.authFetch = async function authFetch(input, init){
+    try {
+      const FN_BASE = window.FN_BASE || '/.netlify/functions';
+      const toUrl = (typeof input === 'string') ? input : (input && input.url) || '';
+      let token = null;
+      try {
+        token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+      } catch(_) {
+        void 0;
+      }
+
+      const makeInit = (tok) => {
+        const base = init || {};
+        const headers = Object.assign({}, base.headers || {});
+        if (tok && !headers.Authorization) headers.Authorization = 'Bearer ' + tok;
+        return Object.assign({}, base, { headers });
+      };
+
+      async function doFetch(tok){
+        return fetch(toUrl, makeInit(tok));
+      }
+
+      let res = await doFetch(token);
+      if (res.status !== 401 && res.status !== 403) return res;
+      if (window.AUTH_DISABLED === true) return res;
+
+      // If forbidden (insufficient role), don't redirect here; let caller decide
+      if (res.status === 403) {
+        return res;
+      }
+
+      // Fresh login loop guard: if login just happened, do not redirect yet
+      try {
+        const fl = localStorage.getItem('freshLogin');
+        if (fl && (Date.now() - parseInt(fl,10) < 10000)) {
+          return res;
+        }
+      } catch(_) {
+        void 0;
+      }
+
+      // Try refresh token once
+      try {
+        const rt = localStorage.getItem('refreshToken');
+        if (rt) {
+          const refRes = await fetch(FN_BASE + '/auth?action=refresh', {
+            method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken: rt })
+          });
+          if (refRes.ok) {
+            const data = await refRes.json();
+            if (data && (data.accessToken || data.refreshToken)) {
+              try {
+                if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
+                if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+              } catch(_){ void 0; }
+              token = data.accessToken || token;
+              res = await doFetch(token);
+              if (res.status !== 401) return res;
+            }
+          }
+        }
+      } catch(_) { /* ignore refresh errors */ }
+
+      // Throttle redirects to avoid loops
+      try {
+        const last = parseInt(localStorage.getItem('lastAuthRedirect')||'0',10);
+        if (Date.now() - last < 15000) return res;
+        localStorage.setItem('lastAuthRedirect', String(Date.now()));
+      } catch(_) {
+        void 0;
+      }
+      try {
+        const ru = encodeURIComponent((window.location && (window.location.pathname + window.location.search)) || '/');
+        window.location.href = 'login.html?message=login-required&returnUrl=' + ru;
+      } catch(_) {
+        void 0;
+      }
+      return res;
+    } catch (e) {
+      // Fallback to raw fetch on unexpected errors
+      return fetch(input, init);
+    }
+  };
 
   // Auth-aware nav wiring (profile, login/logout)
   document.addEventListener('DOMContentLoaded', function(){

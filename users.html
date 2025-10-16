@@ -155,22 +155,22 @@
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
 
-                async function fetchUsers(withToken){
-                    const headers = withToken ? { 'Authorization': `Bearer ${withToken}` } : {};
-                    const resp = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers });
+                        async function fetchUsers(withToken){
+                            const headers = withToken ? { 'Authorization': `Bearer ${withToken}` } : {};
+                            const resp = await (window.authFetch ? authFetch(`${FN_BASE}/users?${params.toString()}`, { headers }) : fetch(`${FN_BASE}/users?${params.toString()}`, { headers }));
                     return resp;
                 }
 
                 let res = await fetchUsers(token);
 
-                // If unauthorized, try a one-time refresh flow before redirecting
-                if ((res.status === 401 || res.status === 403) && !AUTH_DISABLED) {
+                // If unauthorized, delegate to authFetch behavior; only attempt manual refresh on 401 (authFetch already tries refresh)
+                if (res.status === 401 && !AUTH_DISABLED) {
                     try {
                         const refreshToken = localStorage.getItem('refreshToken');
                         if (refreshToken) {
-                            const refRes = await fetch(`${FN_BASE}/auth?action=refresh`, {
+                            const refRes = await (window.authFetch ? authFetch(`${FN_BASE}/auth?action=refresh`, {
                                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken })
-                            });
+                            }) : fetch(`${FN_BASE}/auth?action=refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken }) }));
                             if (refRes.ok) {
                                 const ref = await refRes.json();
                                 if (ref && (ref.accessToken || ref.refreshToken)) {
@@ -181,16 +181,23 @@
                                 }
                             }
                         }
-                    } catch (_) { /* ignore refresh errors; will redirect below */ }
+                    } catch (_) { /* ignore */ }
                 }
 
-                if ((res.status === 401 || res.status === 403) && !AUTH_DISABLED) {
-                    // Check for freshLogin flag to prevent redirect loop after successful login
+                // If forbidden, do not redirect to login; show message and stop
+                if (res.status === 403 && !AUTH_DISABLED) {
+                    showToast('Access denied: you do not have permission to view users.', 'error');
+                    usersState.list = [];
+                    renderUsers();
+                    return;
+                }
+
+                // If still unauthorized after attempts, consider redirect with fresh-login guard
+                if (res.status === 401 && !AUTH_DISABLED) {
                     const freshLoginTimestamp = localStorage.getItem('freshLogin');
                     if (freshLoginTimestamp) {
                         const timeSinceLogin = Date.now() - parseInt(freshLoginTimestamp, 10);
                         if (timeSinceLogin < 5000) {
-                            // Skip redirect if login just happened
                             console.log('Fresh login detected, skipping redirect');
                             return;
                         }
