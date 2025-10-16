@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Feature Flags Demo</title>
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/feature-flags.js" defer></script>
+  <style>
+    .demo-card {
+      transition: all 0.3s ease;
+      background: #111;
+      border: 1px solid #333;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .demo-card:hover {
+      border-color: #00d4ff;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+    }
+  </style>
+</head>
+<body class="dark min-h-screen bg-gray-900 text-white p-8">
+  <div class="max-w-6xl mx-auto">
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-4">Feature Flags Demo</h1>
+      <p class="text-gray-400">This page demonstrates the feature flag functionality. Use the Settings page to toggle features on/off.</p>
+    </header>
+
+    <!-- Control Panel -->
+    <section class="demo-card mb-8">
+      <h2 class="text-2xl font-semibold mb-4">Quick Controls</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button onclick="checkFlags()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded text-white font-semibold">
+          Check All Flags
+        </button>
+        <button onclick="toggleBetaFeatures()" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded text-black font-semibold">
+          Toggle Beta Features
+        </button>
+        <a href="settings.html" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 rounded text-white font-semibold text-center">
+          Go to Settings
+        </a>
+      </div>
+    </section>
+
+    <!-- Feature Status Display -->
+    <section class="demo-card mb-8">
+      <h2 class="text-2xl font-semibold mb-4">Feature Status</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-800 p-4 rounded">
+          <h3 class="font-semibold mb-2 text-yellow-400">Beta Features</h3>
+          <div id="beta-status" class="text-lg">Checking...</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded">
+          <h3 class="font-semibold mb-2 text-blue-400">New Dashboard</h3>
+          <div id="dashboard-status" class="text-lg">Checking...</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded">
+          <h3 class="font-semibold mb-2 text-purple-400">Advanced Reports</h3>
+          <div id="reports-status" class="text-lg">Checking...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature Sections (These will be shown/hidden based on flags) -->
+    
+    <!-- Beta Features Section -->
+    <section id="beta-demo" class="hidden demo-card border-2 border-yellow-500/30">
+      <div class="flex items-center gap-3 mb-4">
+        <h2 class="text-2xl font-semibold text-yellow-400">⚡ Beta Features</h2>
+        <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded">BETA</span>
+      </div>
+      <p class="text-gray-300 mb-4">These experimental features are only visible when Beta Features flag is enabled.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-800/50 p-4 rounded">
+          <h4 class="font-semibold mb-2">AI Insights</h4>
+          <p class="text-sm text-gray-400">Intelligent data analysis</p>
+        </div>
+        <div class="bg-gray-800/50 p-4 rounded">
+          <h4 class="font-semibold mb-2">Predictive Analytics</h4>
+          <p class="text-sm text-gray-400">Forecast future trends</p>
+        </div>
+        <div class="bg-gray-800/50 p-4 rounded">
+          <h4 class="font-semibold mb-2">Automation</h4>
+          <p class="text-sm text-gray-400">Advanced workflow automation</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- New Dashboard Section -->
+    <section id="dashboard-demo" class="hidden demo-card border-2 border-blue-500/30">
+      <div class="flex items-center gap-3 mb-4">
+        <h2 class="text-2xl font-semibold text-blue-400">🎨 New Dashboard</h2>
+        <span class="text-xs bg-blue-500 text-white px-2 py-1 rounded">NEW</span>
+      </div>
+      <p class="text-gray-300 mb-4">The new dashboard experience is available when the New Dashboard flag is enabled.</p>
+      <div class="bg-gray-800/50 p-6 rounded">
+        <h4 class="font-semibold mb-2">Enhanced Features:</h4>
+        <ul class="list-disc list-inside space-y-2 text-gray-300">
+          <li>Redesigned UI with modern components</li>
+          <li>Improved data visualization</li>
+          <li>Customizable widget layout</li>
+          <li>Real-time updates and notifications</li>
+        </ul>
+        <a href="shared-dashboards.html" class="inline-block mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded text-white font-semibold">
+          Launch New Dashboard
+        </a>
+      </div>
+    </section>
+
+    <!-- Advanced Reports Section -->
+    <section id="reports-demo" class="hidden demo-card border-2 border-purple-500/30">
+      <div class="flex items-center gap-3 mb-4">
+        <h2 class="text-2xl font-semibold text-purple-400">📊 Advanced Reports</h2>
+        <span class="text-xs bg-purple-500 text-white px-2 py-1 rounded">PREMIUM</span>
+      </div>
+      <p class="text-gray-300 mb-4">Advanced reporting capabilities shown when Advanced Reports flag is enabled.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-gray-800/50 p-4 rounded text-center">
+          <div class="text-2xl font-bold text-purple-400 mb-1">$2,456</div>
+          <div class="text-xs text-gray-400">Customer Lifetime Value</div>
+        </div>
+        <div class="bg-gray-800/50 p-4 rounded text-center">
+          <div class="text-2xl font-bold text-purple-400 mb-1">8.3%</div>
+          <div class="text-xs text-gray-400">Churn Rate</div>
+        </div>
+        <div class="bg-gray-800/50 p-4 rounded text-center">
+          <div class="text-2xl font-bold text-purple-400 mb-1">$127</div>
+          <div class="text-xs text-gray-400">Acquisition Cost</div>
+        </div>
+        <div class="bg-gray-800/50 p-4 rounded text-center">
+          <div class="text-2xl font-bold text-purple-400 mb-1">$182</div>
+          <div class="text-xs text-gray-400">Revenue Per User</div>
+        </div>
+      </div>
+      <a href="analytics.html" class="inline-block mt-4 px-4 py-2 bg-purple-500 hover:bg-purple-600 rounded text-white font-semibold">
+        View Full Analytics
+      </a>
+    </section>
+
+    <!-- Instructions -->
+    <section class="demo-card mt-8">
+      <h2 class="text-2xl font-semibold mb-4">How to Use</h2>
+      <ol class="list-decimal list-inside space-y-2 text-gray-300">
+        <li>Go to <a href="settings.html" class="text-blue-400 hover:underline">Settings page</a></li>
+        <li>Scroll to the "Feature Flags" section</li>
+        <li>Toggle any of the three feature flags (Beta Features, New Dashboard, Advanced Reports)</li>
+        <li>Click "Save Settings"</li>
+        <li>Return to this page and click "Check All Flags" to see the changes</li>
+        <li>The corresponding sections will show/hide based on your settings</li>
+      </ol>
+    </section>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-4 right-4 p-4 rounded bg-blue-500 text-white shadow-lg z-50" role="alert"></div>
+
+  <script>
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    async function checkFlags() {
+      if (!window.FeatureFlags) {
+        showToast('Feature flags system not loaded');
+        return;
+      }
+
+      const flags = await window.FeatureFlags.fetch();
+      
+      // Update status displays
+      document.getElementById('beta-status').innerHTML = 
+        flags.betaFeatures 
+          ? '<span class="text-green-400">✓ Enabled</span>' 
+          : '<span class="text-red-400">✗ Disabled</span>';
+      
+      document.getElementById('dashboard-status').innerHTML = 
+        flags.newDashboard 
+          ? '<span class="text-green-400">✓ Enabled</span>' 
+          : '<span class="text-red-400">✗ Disabled</span>';
+      
+      document.getElementById('reports-status').innerHTML = 
+        flags.advancedReports 
+          ? '<span class="text-green-400">✓ Enabled</span>' 
+          : '<span class="text-red-400">✗ Disabled</span>';
+
+      // Toggle visibility of demo sections
+      await window.FeatureFlags.toggleElements('#beta-demo', 'betaFeatures');
+      await window.FeatureFlags.toggleElements('#dashboard-demo', 'newDashboard');
+      await window.FeatureFlags.toggleElements('#reports-demo', 'advancedReports');
+
+      showToast('Feature flags checked!');
+    }
+
+    async function toggleBetaFeatures() {
+      try {
+        const response = await fetch('/.netlify/functions/settings');
+        const settings = await response.json();
+        
+        settings.featureFlags = settings.featureFlags || {};
+        settings.featureFlags.betaFeatures = !settings.featureFlags.betaFeatures;
+        
+        await fetch('/.netlify/functions/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings)
+        });
+
+        if (window.FeatureFlags) {
+          window.FeatureFlags.clearCache();
+        }
+
+        showToast('Beta Features toggled! Checking flags...');
+        setTimeout(checkFlags, 500);
+      } catch (error) {
+        showToast('Error toggling feature. Make sure serverless functions are running.');
+        console.error(error);
+      }
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', checkFlags);
+  </script>
+</body>
+</html>
