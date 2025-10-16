@@ -9,11 +9,15 @@
   <link rel="stylesheet" href="./assets/css/styles.css" />
     <script src="./assets/js/init-shared.js" defer></script>
     <script src="./assets/js/audit.js" defer></script>
+    <script src="./assets/js/feature-flags.js" defer></script>
   <style>
     .sidebar{transition:transform .3s ease-in-out}
   </style>
 </head>
 <body class="dark">
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 p-3 rounded bg-accent text-white shadow z-50" role="alert" aria-live="polite"></div>
+    
     <!-- Mobile Menu Toggle -->
     <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
@@ -86,6 +90,46 @@
                     <a href="orders-review.html" class="w-full block p-3 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 btn-neon-purple">Review Orders</a>
                 </div>
             </div>
+
+            <!-- Beta Features Section (Feature Flag Gated) -->
+            <div id="beta-features-section" class="hidden mt-8" role="region" aria-label="Beta Features">
+                <h3 class="text-xl font-semibold mb-4 text-yellow-400 flex items-center gap-2">
+                    <span>⚡</span> Beta Features
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded">BETA</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card widget-yellow p-6 rounded-lg shadow-md border-2 border-yellow-500/30" tabindex="0" role="article">
+                        <h4 class="text-lg font-semibold mb-3 text-white">AI-Powered Insights</h4>
+                        <p class="mb-4 nav-link-muted text-sm">Get intelligent recommendations based on your data patterns.</p>
+                        <button class="w-full p-3 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400 transition-colors duration-200 font-semibold" onclick="window.showBetaFeatureNotification('AI Insights')">Try AI Insights</button>
+                    </div>
+                    <div class="card widget-yellow p-6 rounded-lg shadow-md border-2 border-yellow-500/30" tabindex="0" role="article">
+                        <h4 class="text-lg font-semibold mb-3 text-white">Predictive Analytics</h4>
+                        <p class="mb-4 nav-link-muted text-sm">Forecast future trends and prepare in advance.</p>
+                        <button class="w-full p-3 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400 transition-colors duration-200 font-semibold" onclick="window.showBetaFeatureNotification('Predictive Analytics')">Explore Predictions</button>
+                    </div>
+                    <div class="card widget-yellow p-6 rounded-lg shadow-md border-2 border-yellow-500/30" tabindex="0" role="article">
+                        <h4 class="text-lg font-semibold mb-3 text-white">Advanced Automation</h4>
+                        <p class="mb-4 nav-link-muted text-sm">Automate complex workflows and save time.</p>
+                        <button class="w-full p-3 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400 transition-colors duration-200 font-semibold" onclick="window.showBetaFeatureNotification('Advanced Automation')">Setup Automation</button>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm text-gray-400 italic">
+                    Note: Beta features are experimental and may change. Provide feedback to help us improve!
+                </p>
+            </div>
+
+            <!-- New Dashboard Section (Feature Flag Gated) -->
+            <div id="new-dashboard-section" class="hidden mt-8" role="region" aria-label="New Dashboard">
+                <h3 class="text-xl font-semibold mb-4 text-blue-400 flex items-center gap-2">
+                    <span>🎨</span> New Dashboard Experience
+                    <span class="text-xs bg-blue-500 text-white px-2 py-1 rounded">NEW</span>
+                </h3>
+                <div class="card widget-primary p-6 rounded-lg shadow-md border-2 border-blue-500/30">
+                    <p class="mb-4">Experience our redesigned dashboard with enhanced visualization and better user experience.</p>
+                    <a href="shared-dashboards.html" class="inline-block px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-semibold">Launch New Dashboard</a>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -138,6 +182,22 @@
                             toast.classList.remove('hidden');
                             setTimeout(() => toast.classList.add('hidden'), 3000);
                         }
+
+                        // Beta feature notification helper
+                        window.showBetaFeatureNotification = function(featureName) {
+                            showToast(`${featureName} is coming soon! This is a beta preview.`);
+                        };
+
+                        // Initialize feature flags on page load
+                        document.addEventListener('DOMContentLoaded', async function() {
+                            if (window.FeatureFlags) {
+                                // Toggle beta features section
+                                await window.FeatureFlags.toggleElements('#beta-features-section', 'betaFeatures');
+                                
+                                // Toggle new dashboard section
+                                await window.FeatureFlags.toggleElements('#new-dashboard-section', 'newDashboard');
+                            }
+                        });
                     </script>
 </body>
 </html>

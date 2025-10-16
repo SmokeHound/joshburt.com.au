@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
   <script src="./assets/js/init-shared.js" defer></script>
+  <script src="./assets/js/feature-flags.js" defer></script>
   <style>
     .settings-item{transition:.2s all;background:#111;border:1px solid #333}
     .settings-item:hover{background:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
@@ -484,6 +485,12 @@
                     body: JSON.stringify(settings)
                 });
                 if (!res.ok) throw new Error('Failed to save settings');
+                
+                // Clear feature flags cache after settings update
+                if (window.FeatureFlags) {
+                    window.FeatureFlags.clearCache();
+                }
+                
                 // Compute changed fields (shallow diff)
                 const changes = [];
                 for (const key in settings) {
@@ -805,3 +812,5 @@
           });
         }
       </script>
+  </body>
+</html>
