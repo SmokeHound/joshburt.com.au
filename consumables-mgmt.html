@@ -7,6 +7,7 @@
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
   <script>
     fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName))document.head.appendChild(c.cloneNode(true));});});
     fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT')document.head.appendChild(c.cloneNode(true));});});
@@ -158,7 +159,7 @@
 async function addAuditLog(action, product, details) {
   try {
     // Send audit log to backend API (Netlify function or Express endpoint)
-    await fetch('/.netlify/functions/audit-logs', {
+    await (window.authFetch ? authFetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -166,7 +167,7 @@ async function addAuditLog(action, product, details) {
         details: product ? JSON.stringify(product) : details,
         extra: product ? details : undefined
       })
-    });
+    }) : fetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action, details: product ? JSON.stringify(product) : details, extra: product ? details : undefined }) }));
     // Optionally reload audit log after adding
     loadAuditLog();
   } catch (err) {
@@ -185,7 +186,7 @@ const categoryList = document.getElementById('categoryList');
 
 async function loadCategories() {
   try {
-    const res = await fetch('/.netlify/functions/consumable-categories');
+    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/consumable-categories`);
     if (!res.ok) throw new Error('Failed to load categories');
     categories = await res.json();
   } catch (err) {
@@ -288,7 +289,7 @@ syncInventoryBtn.onclick = async function() {
   syncInventoryBtn.disabled = true;
   syncInventoryBtn.textContent = 'Syncing...';
   try {
-    const res = await fetch('/.netlify/functions/consumables');
+    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/consumables`);
     if (!res.ok) throw new Error('API error');
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('Invalid data');
@@ -318,7 +319,7 @@ syncInventoryBtn.onclick = async function() {
 // --- Audit Log Logic (API only) ---
 async function loadAuditLog() {
   try {
-    const res = await fetch('/.netlify/functions/audit-logs?limit=100');
+    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs?limit=100`);
     if (!res.ok) throw new Error('Failed to load audit log');
     const log = await res.json();
     renderAuditLog(log);
@@ -551,9 +552,16 @@ deleteProductBtn.onclick = function() {
   }
 };
 window.addEventListener('DOMContentLoaded', async () => {
+  const AUTH_DISABLED = window.AUTH_DISABLED === true;
+  const token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+  if (!token && !AUTH_DISABLED) {
+    // Show sign-in CTA and skip initializing the management UI
+    showSignInCTA();
+    return;
+  }
   try {
     // Try to load from backend first
-    const res = await fetch('/.netlify/functions/consumables');
+    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/consumables`);
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -584,7 +592,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function addAuditLog(action, product, details) {
   try {
     // Send audit log to backend API (Netlify function or Express endpoint)
-    await fetch('/.netlify/functions/audit-logs', {
+    await (window.authFetch ? authFetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -592,13 +600,44 @@ async function addAuditLog(action, product, details) {
         details: product ? JSON.stringify(product) : details,
         extra: product ? details : undefined
       })
-    });
+    }) : fetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action, details: product ? JSON.stringify(product) : details, extra: product ? details : undefined }) }));
     // Optionally reload audit log after adding
     loadAuditLog();
   } catch (err) {
     // Fallback: log to console if API fails
     console.error('Failed to add audit log:', err);
   }
+}
+
+// Sign-in CTA helper
+function showSignInCTA() {
+  try {
+    const main = document.querySelector('main');
+    if (!main) return;
+    // Hide interactive sections while unauthenticated
+    Array.from(main.children).forEach(c => c.classList.add('hidden'));
+    let cta = document.getElementById('signin-cta');
+    if (!cta) {
+      cta = document.createElement('div');
+      cta.id = 'signin-cta';
+      cta.className = 'mt-6 p-6 border border-gray-700 rounded-lg text-center';
+      const msg = document.createElement('p');
+      msg.className = 'mb-4 text-gray-300';
+      msg.textContent = 'Please sign in to manage consumables.';
+      const btn = document.createElement('button');
+      btn.id = 'go-to-login';
+      btn.className = 'btn-neon-blue px-4 py-2 rounded';
+      btn.textContent = 'Sign in';
+      btn.addEventListener('click', () => {
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`;
+      });
+      cta.appendChild(msg);
+      cta.appendChild(btn);
+      main.appendChild(cta);
+    }
+    cta.classList.remove('hidden');
+  } catch (_) { /* noop */ }
 }
 </script>
 </body>

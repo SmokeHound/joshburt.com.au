@@ -7,6 +7,7 @@
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
+    <script src="./assets/js/init-shared.js" defer></script>
   <script>
     fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
     fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
@@ -120,6 +121,8 @@
         </main>
         </div>
         <script>
+    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    const AUTH_DISABLED = window.AUTH_DISABLED === true;
         let products = [];
         let editingProductId = null;
 
@@ -129,7 +132,7 @@
         async function loadProducts() {
             try {
                 showToast('Loading products...', 'info');
-                const response = await fetch('/.netlify/functions/products');
+                const response = await fetch(`${FN_BASE}/products`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -148,15 +151,15 @@
         // Save products to API (no localStorage)
         async function saveProductToAPI(product, isUpdate = false) {
             try {
-                const url = '/.netlify/functions/products';
+                const url = `${FN_BASE}/products`;
                 const method = isUpdate ? 'PUT' : 'POST';
-                const response = await fetch(url, {
+                const response = await (window.authFetch ? authFetch(url, {
                     method: method,
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(product)
-                });
+                }) : fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(product) }));
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
@@ -172,13 +175,12 @@
         // Delete product from API (no localStorage)
         async function deleteProductFromAPI(productId) {
             try {
-                const response = await fetch('/.netlify/functions/products', {
+                const url = `${FN_BASE}/products`;
+                const response = await (window.authFetch ? authFetch(url, {
                     method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: productId })
-                });
+                }) : fetch(url, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: productId }) }));
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
@@ -321,7 +323,7 @@
         // Export products to CSV (API only)
         async function exportProducts() {
             try {
-                const response = await fetch('/.netlify/functions/products');
+                const response = await fetch(`${FN_BASE}/products`);
                 if (!response.ok) throw new Error('Failed to fetch products for export');
                 const data = await response.json();
                 const headers = ['Code', 'Name', 'Type', 'Current Stock', 'Reorder Point', 'Specs', 'Description', 'Image URL'];
@@ -360,11 +362,8 @@
                 try {
                     const csv = e.target.result;
                     // Send CSV to API for bulk import
-                    const response = await fetch('/.netlify/functions/products/import', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/csv' },
-                        body: csv
-                    });
+                    const url = `${FN_BASE}/products/import`;
+                    const response = await (window.authFetch ? authFetch(url, { method: 'POST', headers: { 'Content-Type': 'text/csv' }, body: csv }) : fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/csv' }, body: csv }));
                     if (!response.ok) throw new Error('Bulk import failed');
                     showToast('Products imported successfully!', 'success');
                     await loadProducts();
@@ -408,6 +407,12 @@
 
         // Event listeners
     document.addEventListener('DOMContentLoaded', () => {
+            // Require authentication for the management page
+            const token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+            if (!token && !AUTH_DISABLED) {
+                showSignInCTA();
+                return; // stop initializing until signed in
+            }
             // Load products from API on page load
             loadProducts();
             
@@ -430,6 +435,40 @@
             document.getElementById('export-products').addEventListener('click', exportProducts);
             document.getElementById('import-products').addEventListener('change', importProducts);
         });
+
+        // Show sign-in CTA helper (mirrors users.html behavior)
+        function showSignInCTA() {
+            try {
+                const main = document.querySelector('main');
+                if (!main) return;
+                // Hide interactive sections while unauthenticated
+                const sections = main.querySelectorAll('section, .bg-gray-800');
+                sections.forEach(s => s.classList.add('hidden'));
+                // Create CTA once
+                let cta = document.getElementById('signin-cta');
+                if (!cta) {
+                    cta = document.createElement('div');
+                    cta.id = 'signin-cta';
+                    cta.className = 'mt-6 p-6 border border-gray-700 rounded-lg text-center';
+                    const msg = document.createElement('p');
+                    msg.className = 'mb-4 text-gray-300';
+                    msg.textContent = 'Please sign in to manage oil products.';
+                    const btn = document.createElement('button');
+                    btn.id = 'go-to-login';
+                    btn.className = 'btn-neon-blue px-4 py-2 rounded';
+                    btn.textContent = 'Sign in';
+                    btn.addEventListener('click', () => {
+                        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                        window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`;
+                    });
+                    cta.appendChild(msg);
+                    cta.appendChild(btn);
+                    main.appendChild(cta);
+                }
+                // Ensure visible
+                cta.classList.remove('hidden');
+            } catch (_) { /* noop */ }
+        }
     </script>
         </body>
         </html>

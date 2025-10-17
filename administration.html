@@ -188,16 +188,48 @@
                             showToast(`${featureName} is coming soon! This is a beta preview.`);
                         };
 
-                        // Initialize feature flags on page load
-                        document.addEventListener('DOMContentLoaded', async function() {
-                            if (window.FeatureFlags) {
-                                // Toggle beta features section
-                                await window.FeatureFlags.toggleElements('#beta-features-section', 'betaFeatures');
-                                
-                                // Toggle new dashboard section
-                                await window.FeatureFlags.toggleElements('#new-dashboard-section', 'newDashboard');
-                            }
-                        });
+                                                // Initialize feature flags on page load and show sign-in CTA if needed
+                                                document.addEventListener('DOMContentLoaded', async function() {
+                                                        const AUTH_DISABLED = window.AUTH_DISABLED === true;
+                                                        const token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+                                                        if (!token && !AUTH_DISABLED) {
+                                                                showSignInCTA();
+                                                                return;
+                                                        }
+                                                        if (window.FeatureFlags) {
+                                                                await window.FeatureFlags.toggleElements('#beta-features-section', 'betaFeatures');
+                                                                await window.FeatureFlags.toggleElements('#new-dashboard-section', 'newDashboard');
+                                                        }
+                                                });
+
+                                                function showSignInCTA(){
+                                                    try {
+                                                        const main = document.getElementById('main-content');
+                                                        if (!main) return;
+                                                        // Hide content sections
+                                                        Array.from(main.children).forEach(c => c.classList.add('hidden'));
+                                                        let cta = document.getElementById('signin-cta');
+                                                        if (!cta) {
+                                                            cta = document.createElement('div');
+                                                            cta.id = 'signin-cta';
+                                                            cta.className = 'mt-6 p-6 border border-gray-700 rounded-lg text-center';
+                                                            const msg = document.createElement('p');
+                                                            msg.className = 'mb-4 text-gray-300';
+                                                            msg.textContent = 'Please sign in to access the Administration dashboard.';
+                                                            const btn = document.createElement('button');
+                                                            btn.className = 'btn-neon-blue px-4 py-2 rounded';
+                                                            btn.textContent = 'Sign in';
+                                                            btn.addEventListener('click', function(){
+                                                                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                                                                window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`;
+                                                            });
+                                                            cta.appendChild(msg);
+                                                            cta.appendChild(btn);
+                                                            main.appendChild(cta);
+                                                        }
+                                                        cta.classList.remove('hidden');
+                                                    } catch(_) { /* noop */ }
+                                                }
                     </script>
 </body>
 </html>
