@@ -106,7 +106,7 @@
                 <button id="google-oauth" class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium btn-neon-pink text-white">
                     Continue with Google
                 </button>
-                <button id="github-oauth" class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium btn-neon-dark text-white">
+                <button id="github-oauth" class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium btn-neon-purple text-white">
                     Continue with GitHub
                 </button>
             </div>
@@ -153,7 +153,7 @@
 
     <script>
     // Serverless auth function base
-    const FN_AUTH = '/.netlify/functions/auth';
+    const FN_AUTH = `${(window.FN_BASE || '/.netlify/functions')}/auth`;
 
         // Show toast notification
         function showToast(message, type = 'error') {
@@ -280,7 +280,8 @@
                     try {
                         // If config already present via shared-config, use it; otherwise fetch server config
                         if (!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID)){
-                            const res = await fetch('/.netlify/functions/public-config');
+                            const FN_BASE = window.FN_BASE || '/.netlify/functions';
+                            const res = await fetch(`${FN_BASE}/public-config`);
                             if (res.ok){
                                 const cfg = await res.json();
                                 if (cfg && cfg.auth && typeof cfg.auth.disabled === 'boolean') { window.AUTH_DISABLED = cfg.auth.disabled; }

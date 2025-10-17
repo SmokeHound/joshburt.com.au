@@ -93,7 +93,8 @@
     if (state.startDate) params.set('startDate', state.startDate);
     if (state.endDate) params.set('endDate', state.endDate);
     try {
-      const res = await fetch('/.netlify/functions/audit-logs?' + params.toString());
+      const FN_BASE = window.FN_BASE || '/.netlify/functions';
+      const res = await fetch(`${FN_BASE}/audit-logs?` + params.toString());
       if (!res.ok) throw new Error('Failed to fetch');
       const json = await res.json();
       // Expect { data, pagination }
@@ -180,7 +181,8 @@
     if (state.startDate) params.set('startDate', state.startDate);
     if (state.endDate) params.set('endDate', state.endDate);
     params.set('limit', 1000);
-    const url = '/.netlify/functions/audit-logs?' + params.toString();
+    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    const url = `${FN_BASE}/audit-logs?` + params.toString();
     fetch(url).then(async res => {
       if (!res.ok) throw new Error('Failed export');
       if (format === 'csv') {
@@ -195,7 +197,8 @@
 
   function clearLogs(){
     if (!confirm('Clear all audit logs? This cannot be undone.')) return;
-    fetch('/.netlify/functions/audit-logs', { method: 'DELETE' })
+    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    fetch(`${FN_BASE}/audit-logs`, { method: 'DELETE' })
       .then(()=>fetchLogs())
       .catch(()=>{});
   }

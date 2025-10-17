@@ -24,7 +24,8 @@
     }
 
     try {
-      const response = await fetch('/.netlify/functions/settings');
+      const base = (window.FN_BASE || '/.netlify/functions');
+      const response = await fetch(`${base}/settings`);
       if (!response.ok) {
         console.warn('Failed to fetch settings for feature flags');
         return { betaFeatures: false, newDashboard: false, advancedReports: false };

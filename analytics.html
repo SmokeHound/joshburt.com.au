@@ -17,11 +17,6 @@
       const s=document.createElement('script'); s.src='analytics-manager.js'; s.defer=true; document.head.appendChild(s);
     })();
   </script>
-  <style>
-    /* Page-specific minor adjustments only */
-    .card{background:#111;border:1px solid #333;transition:.2s box-shadow,.2s transform}
-    .card:hover{box-shadow:0 4px 16px rgba(0,212,255,.25);transform:translateY(-3px);border-color:#00d4ff}
-  </style>
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
   <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
@@ -190,7 +185,7 @@
   </main>
   <div id="toast" class="toast hidden fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300 text-sm" role="alert" aria-live="polite"></div>
   <script>
-    const FN_BASE='/.netlify/functions';
+  const FN_BASE=window.FN_BASE||'/.netlify/functions';
     const REFRESH_INTERVAL=60000; let autoTimer=null; const filters={dateRange:30,userType:'all'};
     let visitorChart, engagementChart, salesChart, userGrowthSparkline;
     function showToast(msg){const t=document.getElementById('toast'); if(!t)return; t.textContent=msg; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3000);}

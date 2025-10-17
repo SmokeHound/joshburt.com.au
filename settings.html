@@ -277,11 +277,12 @@
             const token = localStorage.getItem('accessToken');
             let userId = null;
             try { const u = JSON.parse(localStorage.getItem('user')||'null'); if (u && typeof u.id === 'number') userId = u.id; } catch {}
-            await fetch('/.netlify/functions/audit-logs', {
+            const FN_BASE = window.FN_BASE || '/.netlify/functions';
+            await (window.authFetch ? window.authFetch(`${FN_BASE}/audit-logs`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': 'Bearer ' + token } : {}) },
               body: JSON.stringify({ action, details: (typeof details === 'string' ? details : details || {}), userId })
-            });
+            }) : fetch(`${FN_BASE}/audit-logs`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': 'Bearer ' + token } : {}) }, body: JSON.stringify({ action, details: (typeof details === 'string' ? details : details || {}), userId }) }));
           } catch (e) { /* non-fatal */ }
         }
         // Tab switching functionality
@@ -391,7 +392,8 @@
     // Load settings from API
     async function loadSettings() {
       try {
-        const res = await fetch('/.netlify/functions/settings');
+        const FN_BASE = window.FN_BASE || '/.netlify/functions';
+        const res = await fetch(`${FN_BASE}/settings`);
         if (!res.ok) throw new Error('Failed to load settings');
         const settings = await res.json();
                 if (settings.siteTitle) document.getElementById('site-title').value = settings.siteTitle;
@@ -488,9 +490,10 @@
             const settings = getFormSettings();
             try {
                 // Fetch previous settings for audit diff
-                const prevRes = await fetch('/.netlify/functions/settings');
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const prevRes = await fetch(`${FN_BASE}/settings`);
                 const previousSettings = prevRes.ok ? await prevRes.json() : {};
-                const res = await fetch('/.netlify/functions/settings', {
+          const res = await fetch(`${FN_BASE}/settings`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(settings)
@@ -686,7 +689,8 @@
     if (exportSettingsBtn) {
       exportSettingsBtn.addEventListener('click', async () => {
         try {
-          const res = await fetch('/.netlify/functions/settings');
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const res = await fetch(`${FN_BASE}/settings`);
           if (!res.ok) throw new Error('Failed to export settings');
           const settings = await res.json();
           const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
@@ -713,7 +717,8 @@
         if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
           try {
             // Fetch previous settings for audit
-            const prevRes = await fetch('/.netlify/functions/settings');
+            const FN_BASE = window.FN_BASE || '/.netlify/functions';
+            const prevRes = await fetch(`${FN_BASE}/settings`);
             const previousSettings = prevRes.ok ? await prevRes.json() : {};
             // Reset to hardcoded defaults (update as needed)
             const defaultSettings = {
@@ -740,7 +745,7 @@
                 enableNewsletter: false
               }
             };
-            await fetch('/.netlify/functions/settings', {
+            await fetch(`${FN_BASE}/settings`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(defaultSettings)
@@ -815,7 +820,8 @@
         // Apply theme/colors instantly from backend settings
         (async function() {
           try {
-            const res = await fetch('/.netlify/functions/settings');
+            const FN_BASE = window.FN_BASE || '/.netlify/functions';
+            const res = await fetch(`${FN_BASE}/settings`);
             const s = res.ok ? await res.json() : {};
             document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
             document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');

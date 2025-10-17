@@ -146,7 +146,7 @@
 
     <script>
         // Serverless auth function base
-        const FN_AUTH = '/.netlify/functions/auth';
+    const FN_AUTH = `${(window.FN_BASE || '/.netlify/functions')}/auth`;
         // Check Auth0 configuration presence
         const AUTH0_READY = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
 

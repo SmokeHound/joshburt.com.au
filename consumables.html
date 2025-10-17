@@ -7,31 +7,7 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
   <link rel="stylesheet" href="./assets/css/styles.css">
-      <!-- Load shared config and theme system -->
-      <script>
-        fetch('shared-config.html').then(r => r.text()).then(html => {
-          const temp = document.createElement('div');
-          temp.innerHTML = html;
-          Array.from(temp.children).forEach(child => {
-            if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
-              document.head.appendChild(child.cloneNode(true));
-            }
-          });
-        });
-        fetch('shared-theme.html').then(r => r.text()).then(html => {
-          const temp = document.createElement('div');
-          temp.innerHTML = html;
-          Array.from(temp.children).forEach(child => {
-            if (child.tagName === 'SCRIPT') {
-              document.head.appendChild(child.cloneNode(true));
-            }
-          });
-        });
-      </script>
-  <script>
-    fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
-    fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
-  </script>
+  <script src="./assets/js/init-shared.js" defer></script>
   <style>
     /* Page-specific styles only */
     .consumable-item {transition:all .2s ease;background-color:#111;border:1px solid #333}
@@ -348,7 +324,8 @@
       async function loadProducts() {
         try {
           // Load from Netlify function (database) only
-          const response = await fetch('/.netlify/functions/consumables');
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const response = await fetch(`${FN_BASE}/consumables`);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -474,7 +451,8 @@
           timestamp: new Date().toISOString()
         };
         try {
-          const response = await fetch('/.netlify/functions/order-drafts', {
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const response = await fetch(`${FN_BASE}/order-drafts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(orderData)
@@ -488,7 +466,8 @@
       
       async function loadSavedOrder() {
         try {
-          const response = await fetch('/.netlify/functions/order-drafts');
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const response = await fetch(`${FN_BASE}/order-drafts`);
           if (!response.ok) throw new Error('No saved draft found');
           const orderData = await response.json();
           requestedBy.value = orderData.requestedBy || '';
@@ -620,7 +599,8 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
                   quantity: item.quantity
                 }))
               };
-              const res = await fetch('/.netlify/functions/orders', {
+              const FN_BASE = window.FN_BASE || '/.netlify/functions';
+              const res = await fetch(`${FN_BASE}/orders`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

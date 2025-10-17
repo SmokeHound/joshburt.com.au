@@ -56,7 +56,8 @@
   // Fetch runtime config (auth disable flag) early
   (async function loadRuntimeFlags(){
     try {
-      const res = await fetch('/.netlify/functions/public-config');
+      const base = window.FN_BASE || '/.netlify/functions';
+      const res = await fetch(base + '/public-config');
       if (res.ok){
         const cfg = await res.json();
         if (cfg && cfg.auth && typeof cfg.auth.disabled === 'boolean') {

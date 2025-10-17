@@ -2,7 +2,7 @@
 // profile.js: User profile view/edit and activity log
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const FN_BASE = '/.netlify/functions';
+  const FN_BASE = window.FN_BASE || '/.netlify/functions';
   const token = localStorage.getItem('authToken');
   if (!token) {
     window.location.href = 'login.html';
@@ -20,9 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentUser = null;
   try {
     // Serverless auth "me" action
-    const res = await fetch(`${FN_BASE}/auth?action=me`, {
+    const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/auth?action=me`, {
       headers: { 'Authorization': `Bearer ${token}` }
-    });
+    }) : fetch(`${FN_BASE}/auth?action=me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }));
     if (!res.ok) throw new Error('Failed to load current user');
     currentUser = (await res.json()).user;
   } catch (e) {
@@ -36,9 +38,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (profileUserId && currentUser.role === 'admin') {
     // Admin viewing another user
     try {
-      const res = await fetch(`${FN_BASE}/users/${profileUserId}`, {
+      const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${profileUserId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
-      });
+      }) : fetch(`${FN_BASE}/users/${profileUserId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }));
       if (!res.ok) throw new Error('Failed to load user profile');
       user = (await res.json()).user;
     } catch (e) {
@@ -78,14 +82,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const body = { name };
       if (password) body.password = password;
-      const res = await fetch(`${FN_BASE}/users/${user.id}`, {
+      const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(body)
-      });
+      }) : fetch(`${FN_BASE}/users/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+      }));
       if (!res.ok) throw new Error('Failed to update profile');
       alert('Profile updated!');
     } catch (err) {
@@ -95,9 +106,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Fetch activity log (admin or self)
   try {
-    const res = await fetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
+    const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
       headers: { 'Authorization': `Bearer ${token}` }
-    });
+    }) : fetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }));
     if (res.ok) {
       const logs = await res.json();
       const logList = document.getElementById('activity-log');

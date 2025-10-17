@@ -8,9 +8,9 @@
 </head>
 <body>
 <!-- Sidebar -->
-<aside id="sidebar" class="sidebar sidebar-width fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" style="background-color: #111111; border-right: 1px solid #00d4ff20;" aria-label="Main navigation" role="navigation">
+<aside id="sidebar" class="sidebar sidebar-width fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
     <!-- App Branding -->
-    <h1 class="text-2xl font-bold mb-6" style="color: #00d4ff; text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);">Josh's App</h1>
+    <h1 class="text-2xl font-bold mb-6 text-blue-500">Josh's App</h1>
 
     <!-- User Profile Section (for pages that support it) -->
     <div id="user-profile" class="mb-6 hidden" role="region" aria-label="User profile">
@@ -18,21 +18,20 @@
             <img id="user-avatar" src="./assets/images/avatar-placeholder.svg" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
             <span id="user-name" class="text-white"></span>
         </div>
-        <button id="login-btn" class="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-blue" aria-label="Open login modal">Login</button>
-        <button id="logout-btn" class="hidden w-full p-2 text-white rounded focus:outline-none focus:ring-2 focus:ring-red-400 btn-neon-pink" aria-label="Logout">Logout</button>
+    <button id="login-btn" class="w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-blue" aria-label="Open login modal">Login</button>
+    <button id="logout-btn" class="hidden w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 btn-neon-pink" aria-label="Logout">Logout</button>
     </div>
 
     <!-- Navigation -->
     <nav aria-label="Main navigation" role="navigation">
         <ul class="space-y-2" role="list">
-            <li role="listitem"><a href="index.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2" style="color: #cccccc;" aria-current="page"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10.5L12 3l9 7.5V21a1.5 1.5 0 01-1.5 1.5H4.5A1.5 1.5 0 013 21V10.5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 22v-6h6v6"></path></svg>Home</a></li>
-            <li role="listitem"><a href="administration.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2" style="color: #cccccc;"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2.5l7 2.8v6.2c0 5-3.5 9.5-7 9.5s-7-4.5-7-9.5V5.3l7-2.8z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.5l2.2 2.2 4-4"></path></svg>Administration</a></li>
-
-            <li role="listitem"><a href="analytics.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2" style="color: #cccccc;"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 20.5h16"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 20.5V10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 20.5v-6"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20.5V7.5"></path></svg>Analytics</a></li>
-            <li role="listitem"><a href="settings.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2" style="color: #cccccc;"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7.5h16"></path><circle cx="10" cy="7.5" r="1.75" stroke-width="1.5" stroke="currentColor" fill="none"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 12.5h16"></path><circle cx="14" cy="12.5" r="1.75" stroke-width="1.5" stroke="currentColor" fill="none"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 17.5h16"></path><circle cx="8" cy="17.5" r="1.75" stroke-width="1.5" stroke="currentColor" fill="none"></circle></svg>Settings</a></li>
-            <li role="listitem"><a href="oil.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2" style="color: #cccccc;"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3c-3 4-6 6.5-6 10a6 6 0 0012 0c0-3.5-3-6-6-10z"></path></svg>Oil Orders</a></li>
-            <li role="listitem"><a href="consumables.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2" style="color: #cccccc;"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.5 7.5h10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.5 12.5h10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.5 17.5h10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7.5l1.75 1.75L8 7"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 12.5l1.75 1.75L8 12"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 17.5l1.75 1.75L8 17"></path></svg>Consumables Orders</a></li>
-            <li role="listitem"><a id="nav-logout" href="login.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 flex items-center gap-2" style="color: #ff0080;"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 9V5.25a.75.75 0 00-.75-.75H6.75A1.5 1.5 0 005.25 6v12a1.5 1.5 0 001.5 1.5h8.25a.75.75 0 00.75-.75V15"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9l3 3-3 3"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12H9"></path></svg>Logout</a></li>
+            <li role="listitem"><a href="index.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2" aria-current="page"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10.5L12 3l9 7.5V21a1.5 1.5 0 01-1.5 1.5H4.5A1.5 1.5 0 013 21V10.5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 22v-6h6v6"></path></svg>Home</a></li>
+            <li role="listitem"><a href="administration.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2.5l7 2.8v6.2c0 5-3.5 9.5-7 9.5s-7-4.5-7-9.5V5.3l7-2.8z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.5l2.2 2.2 4-4"></path></svg>Administration</a></li>
+            <li role="listitem"><a href="analytics.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 20.5h16"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 20.5V10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 20.5v-6"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20.5V7.5"></path></svg>Analytics</a></li>
+            <li role="listitem"><a href="settings.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7.5h16"></path><circle cx="10" cy="7.5" r="1.75" stroke-width="1.5" stroke="currentColor" fill="none"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 12.5h16"></path><circle cx="14" cy="12.5" r="1.75" stroke-width="1.5" stroke="currentColor" fill="none"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 17.5h16"></path><circle cx="8" cy="17.5" r="1.75" stroke-width="1.5" stroke="currentColor" fill="none"></circle></svg>Settings</a></li>
+            <li role="listitem"><a href="oil.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3c-3 4-6 6.5-6 10a6 6 0 0012 0c0-3.5-3-6-6-10z"></path></svg>Oil Orders</a></li>
+            <li role="listitem"><a href="consumables.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.5 7.5h10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.5 12.5h10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.5 17.5h10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7.5l1.75 1.75L8 7"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 12.5l1.75 1.75L8 12"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 17.5l1.75 1.75L8 17"></path></svg>Consumables Orders</a></li>
+            <li role="listitem"><a id="nav-logout" href="login.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 flex items-center gap-2 text-pink-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 9V5.25a.75.75 0 00-.75-.75H6.75A1.5 1.5 0 005.25 6v12a1.5 1.5 0 001.5 1.5h8.25a.75.75 0 00.75-.75V15"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9l3 3-3 3"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12H9"></path></svg>Logout</a></li>
         </ul>
     </nav>
 </aside>
@@ -43,13 +42,9 @@
     // Function to set active navigation link based on current page
     function setActiveNavLink() {
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
+        document.querySelectorAll('.nav-link').forEach(link => {
             const href = link.getAttribute('href');
             if (href === currentPage || (currentPage === '' && href === 'index.html')) {
-                link.style.color = '#00d4ff';
-                link.style.backgroundColor = '#00d4ff20';
-                link.style.borderLeft = '3px solid #00d4ff';
                 link.classList.add('active');
                 link.setAttribute('aria-current', 'page');
             }
@@ -112,22 +107,7 @@
         });
     }
 
-    // Navigation hover effects
-    navLinks.forEach(link => {
-        link.addEventListener('mouseenter', function() {
-            if (!this.classList.contains('active')) {
-                this.style.color = '#00d4ff';
-                this.style.textShadow = '0 0 8px rgba(0, 212, 255, 0.6)';
-            }
-        });
-        
-        link.addEventListener('mouseleave', function() {
-            if (!this.classList.contains('active')) {
-                this.style.color = '#cccccc';
-                this.style.textShadow = 'none';
-            }
-        });
-    });
+    // Hover effects handled by global CSS (.nav-link:hover)
 
     // Screen reader announcement function
     function announceToScreenReader(message) {
@@ -146,63 +126,7 @@
     window.announceToScreenReader = announceToScreenReader;
 })();
 
-// Add CSS styles for the neon buttons and components
-const neonStyles = document.createElement('style');
-neonStyles.textContent = `
-    /* Neon button styles */
-    .btn-neon-blue {
-        background: linear-gradient(45deg, #00d4ff, #0099cc);
-        border: 1px solid #00d4ff;
-        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-        color: #000000;
-        font-weight: 600;
-    }
-    .btn-neon-blue:hover {
-        box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
-        background: linear-gradient(45deg, #00eeff, #00b8e6);
-    }
-    .btn-neon-green {
-        background: linear-gradient(45deg, #00ff88, #00cc66);
-        border: 1px solid #00ff88;
-        box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-        color: #000000;
-        font-weight: 600;
-    }
-    .btn-neon-green:hover {
-        box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
-        background: linear-gradient(45deg, #00ff99, #00dd77);
-    }
-    .btn-neon-pink {
-        background: linear-gradient(45deg, #ff0080, #cc0066);
-        border: 1px solid #ff0080;
-        box-shadow: 0 0 10px rgba(255, 0, 128, 0.3);
-        color: #ffffff;
-        font-weight: 600;
-    }
-    .btn-neon-pink:hover {
-        box-shadow: 0 0 20px rgba(255, 0, 128, 0.6);
-        background: linear-gradient(45deg, #ff0099, #dd0077);
-    }
-    
-    /* Navigation link styling */
-    .nav-link {
-        transition: all 0.3s ease;
-    }
-    
-    /* Screen reader only class */
-    .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-    }
-`;
-document.head.appendChild(neonStyles);
+// Global CSS already contains neon button and nav styles
 </script>
 </body>
 </html>

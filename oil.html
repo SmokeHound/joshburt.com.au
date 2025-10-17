@@ -7,58 +7,20 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
   <link rel="stylesheet" href="./assets/css/styles.css">
+  <script src="./assets/js/init-shared.js" defer></script>
   <script>
     fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
     fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
   </script>
   <style>
-    /* Page-specific styles only (base layout & theme handled by global stylesheet) */
-    .oil-item {transition:all .2s ease;background-color:#111111;border:1px solid #333}
+    /* Page-specific styles only (global theme and neon styles are in assets/css/styles.css) */
+    .oil-item {transition:all .2s ease;background-color:#111;border:1px solid #333}
     .oil-item:hover {background-color:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
     .switch-bg {transition:background-color .2s ease-in-out;background-color:#333}
     .switch-toggle {transition:transform .2s ease-in-out;background-color:#fff}
     #useLocalData:checked + div .switch-bg {background-color:#00ff88}
     #useLocalData:checked + div .switch-toggle {transform:translateX(16px)}
     #useLocalData:focus + div {box-shadow:0 0 0 3px rgba(0,212,255,.3);border-radius:9999px}
-
-    /* Neon button styles */
-    .btn-neon-blue {
-      background: linear-gradient(45deg, #00d4ff, #0099cc);
-      border: 1px solid #00d4ff;
-      box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-      color: #000000;
-      font-weight: 600;
-    }
-    .btn-neon-blue:hover {
-      box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
-      background: linear-gradient(45deg, #00eeff, #00b8e6);
-    }
-    .btn-neon-green {
-      background: linear-gradient(45deg, #00ff88, #00cc66);
-      border: 1px solid #00ff88;
-      box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-      color: #000000;
-      font-weight: 600;
-    }
-    .btn-neon-green:hover {
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
-      background: linear-gradient(45deg, #00ff99, #00dd77);
-    }
-
-    /* Navigation link styling */
-    .nav-link {
-      color: #cccccc;
-      transition: all 0.3s ease;
-    }
-    .nav-link:hover {
-      color: #00d4ff;
-      text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
-    }
-    .nav-link.active {
-      color: #00d4ff;
-      background-color: #00d4ff20;
-      border-left: 3px solid #00d4ff;
-    }
   </style>
 </head>
 <body class="dark">
@@ -407,7 +369,8 @@
       async function loadFromAPI() {
         try {
           console.log('Attempting to load from API...');
-          const response = await fetch('/.netlify/functions/products');
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const response = await fetch(`${FN_BASE}/products`);
           
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -716,7 +679,8 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
               quantity: item.quantity
             }))
           };
-          const res = await fetch('/.netlify/functions/orders', {
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const res = await fetch(`${FN_BASE}/orders`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

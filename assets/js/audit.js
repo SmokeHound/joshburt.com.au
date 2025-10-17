@@ -3,7 +3,8 @@
 window.Audit = {
   async log(action, entity, details){
     try{
-      await fetch('/.netlify/functions/audit-logs',{
+      const base = (window.FN_BASE || '/.netlify/functions');
+      await fetch(`${base}/audit-logs`,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({ action, entity, details })
