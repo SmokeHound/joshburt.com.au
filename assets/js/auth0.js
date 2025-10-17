@@ -29,13 +29,23 @@
     return cfg;
   }
   async function init(){
-    await loadSdk();
+    try {
+      await loadSdk();
+    } catch (e) {
+      console.warn('[Auth0] SDK failed to load', e);
+      return null;
+    }
     var cfg = getConfig();
     if (!cfg.domain || !cfg.clientId){
       console.warn('[Auth0] Missing AUTH0_DOMAIN or AUTH0_CLIENT_ID');
       return null;
     }
-    client = await window.createAuth0Client({
+    var factory = (window.createAuth0Client || (window.auth0 && window.auth0.createAuth0Client));
+    if (typeof factory !== 'function') {
+      console.error('[Auth0] createAuth0Client factory not found on window');
+      return null;
+    }
+    client = await factory({
       domain: cfg.domain,
       clientId: cfg.clientId,
       authorizationParams: {
