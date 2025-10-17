@@ -295,7 +295,7 @@
                     } catch(_){}
                     const ready = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
                             try { const b = document.getElementById('auth0-banner'); if (b) b.classList.toggle('hidden', ready); } catch(_){}
-                            // Populate config debug banner
+                            // Populate config debug banner (only show when OAuth not ready)
                             try {
                                 const cfgWrap = document.getElementById('config-debug');
                                 const elAuth = document.getElementById('cfg-auth');
@@ -304,7 +304,8 @@
                                     const authDisabled = window.AUTH_DISABLED === true;
                                     elAuth.textContent = 'Auth: ' + (authDisabled ? 'disabled' : 'enabled');
                                     elOAuth.textContent = 'OAuth: ' + (ready ? 'configured' : 'not configured');
-                                    cfgWrap.classList.remove('hidden');
+                                    // Show only when buttons are not enabled
+                                    cfgWrap.classList.toggle('hidden', !!ready);
                                 }
                             } catch(_) {}
                                         setOauthEnabled(ready);

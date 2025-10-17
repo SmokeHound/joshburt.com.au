@@ -146,9 +146,7 @@
 
     <script>
         // Serverless auth function base
-    const FN_AUTH = `${(window.FN_BASE || '/.netlify/functions')}/auth`;
-        // Check Auth0 configuration presence
-        const AUTH0_READY = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
+        const FN_AUTH = `${(window.FN_BASE || '/.netlify/functions')}/auth`;
 
         // Show toast notification
         function showToast(message, type = 'error') {
@@ -289,27 +287,46 @@
             }
         });
 
-        // OAuth handlers via Auth0 (if available)
-        const googleBtn = document.getElementById('google-oauth');
-        const githubBtn = document.getElementById('github-oauth');
-        if (!AUTH0_READY) {
-            if (googleBtn) { googleBtn.disabled = true; googleBtn.classList.add('opacity-60','cursor-not-allowed'); }
-            if (githubBtn) { githubBtn.disabled = true; githubBtn.classList.add('opacity-60','cursor-not-allowed'); }
-            // Insert a small helper text if not already present
-            const helper = document.createElement('p');
-            helper.className = 'text-xs text-gray-400 mt-2';
-            helper.textContent = 'Social sign-in is not configured. Please use email/password.';
-            if (githubBtn && githubBtn.parentElement) githubBtn.parentElement.appendChild(helper);
-        } else {
-            googleBtn.addEventListener('click', async () => {
-                try { await (window.Auth && window.Auth.login('google-oauth2')); }
-                catch(e){ console.error(e); showToast('Google sign-in failed'); }
-            });
-            githubBtn.addEventListener('click', async () => {
-                try { await (window.Auth && window.Auth.login('github')); }
-                catch(e){ console.error(e); showToast('GitHub sign-in failed'); }
-            });
-        }
+        // OAuth handlers via Auth0 (dynamic config like login page)
+        (async function(){
+            const googleBtn = document.getElementById('google-oauth');
+            const githubBtn = document.getElementById('github-oauth');
+            function setOauthEnabled(enabled){
+                const btns=[googleBtn, githubBtn];
+                btns.forEach(b=>{ if(!b) return; b.disabled = !enabled; b.classList.toggle('opacity-60', !enabled); b.classList.toggle('cursor-not-allowed', !enabled); });
+                if (!enabled) return;
+                if (googleBtn) googleBtn.addEventListener('click', async function(){ try { await (window.Auth && window.Auth.login('google-oauth2')); } catch(e){ console.error(e); showToast('Google sign-in failed'); } });
+                if (githubBtn) githubBtn.addEventListener('click', async function(){ try { await (window.Auth && window.Auth.login('github')); } catch(e){ console.error(e); showToast('GitHub sign-in failed'); } });
+            }
+            // Try to populate config from server if not set
+            try {
+                if (!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID)){
+                    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+                    const res = await fetch(`${FN_BASE}/public-config`);
+                    if (res.ok){
+                        const cfg = await res.json();
+                        if (cfg && cfg.auth && typeof cfg.auth.disabled === 'boolean') { window.AUTH_DISABLED = cfg.auth.disabled; }
+                        if (cfg && cfg.auth0){
+                            window.AUTH0_DOMAIN = window.AUTH0_DOMAIN || cfg.auth0.domain || '';
+                            window.AUTH0_CLIENT_ID = window.AUTH0_CLIENT_ID || cfg.auth0.clientId || '';
+                            window.AUTH0_AUDIENCE = window.AUTH0_AUDIENCE || cfg.auth0.audience || '';
+                        }
+                    }
+                }
+            } catch(_){ }
+            const ready = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
+            setOauthEnabled(ready);
+            if (!ready){
+                // Insert a small helper text if not already present
+                try {
+                    const helper = document.createElement('p');
+                    helper.className = 'text-xs text-gray-400 mt-2';
+                    helper.textContent = 'Social sign-in is not configured. Please use email/password.';
+                    const githubBtn = document.getElementById('github-oauth');
+                    if (githubBtn && githubBtn.parentElement) githubBtn.parentElement.appendChild(helper);
+                } catch(_){ }
+            }
+        })();
     </script>
 </body>
 </html>
