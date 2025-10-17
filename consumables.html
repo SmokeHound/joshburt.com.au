@@ -178,6 +178,8 @@
   <script>
     // Workshop Consumables Stock Order Application
     document.addEventListener('DOMContentLoaded', function() {
+      // Local draft storage key
+      const DRAFT_KEY = 'consumablesOrderDraft';
       // State management
       const orderItems = [];
       let products = [];
@@ -433,10 +435,11 @@
           orderItems.length = 0;
           updateOrderDisplay();
           showToast('Order cleared successfully', 'info');
+          try { localStorage.removeItem(DRAFT_KEY); } catch {}
         }
       }
       
-      async function saveOrder() {
+      function saveOrder() {
         if (orderItems.length === 0) {
           showToast('No items to save', 'warning');
           return;
@@ -451,25 +454,18 @@
           timestamp: new Date().toISOString()
         };
         try {
-          const FN_BASE = window.FN_BASE || '/.netlify/functions';
-          const response = await fetch(`${FN_BASE}/order-drafts`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData)
-          });
-          if (!response.ok) throw new Error('Failed to save order draft');
-          showToast('Order draft saved successfully!', 'success');
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(orderData));
+          showToast('Order draft saved locally', 'success');
         } catch (error) {
-          showToast('Failed to save order draft: ' + error.message, 'error');
+          showToast('Failed to save draft locally: ' + error.message, 'error');
         }
       }
       
-      async function loadSavedOrder() {
+      function loadSavedOrder() {
         try {
-          const FN_BASE = window.FN_BASE || '/.netlify/functions';
-          const response = await fetch(`${FN_BASE}/order-drafts`);
-          if (!response.ok) throw new Error('No saved draft found');
-          const orderData = await response.json();
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (!raw) return;
+          const orderData = JSON.parse(raw);
           requestedBy.value = orderData.requestedBy || '';
           orderDate.value = orderData.orderDate || '';
           priority.value = orderData.priority || 'normal';
@@ -478,10 +474,11 @@
           orderItems.push(...(orderData.items || []));
           updateOrderDisplay();
           if (orderItems.length > 0) {
-            showToast('Previous order draft loaded', 'info');
+            showToast('Loaded saved draft from this browser', 'info');
           }
         } catch (error) {
-          // No saved draft or error
+          // Corrupt or unparsable draft
+          try { localStorage.removeItem(DRAFT_KEY); } catch {}
         }
       }
       
@@ -610,6 +607,7 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
               showToast('Order submitted successfully!', 'success');
               orderItems.length = 0;
               updateOrderDisplay();
+              try { localStorage.removeItem(DRAFT_KEY); } catch {}
             } catch (err) {
               submitOrderStatus.textContent = 'Error submitting order.';
               showToast('Error submitting order', 'error');
