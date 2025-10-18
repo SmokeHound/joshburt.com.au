@@ -98,6 +98,12 @@
           <h2 class="text-xl font-semibold text-gray-100">Available Consumables</h2>
           <p class="text-sm text-gray-400 mt-1">Click on items to add to order list</p>
         </div>
+        <div class="p-4 border-b border-gray-200 dark:border-gray-600 no-print bg-gray-900">
+          <div class="flex items-center justify-between text-sm text-gray-400">
+            <span>Data source is managed in Settings → Data Sources.</span>
+            <a href="settings.html" class="text-blue-400 hover:underline">Open Settings</a>
+          </div>
+        </div>
         
         <!-- Search and Filter -->
         <div class="p-4 border-b border-gray-200 dark:border-gray-600 no-print">
@@ -322,27 +328,53 @@
         orderList.innerHTML = orderHTML;
       }
       
+      // Data source preference
+      let consumablesDataSource = 'api';
+
+      async function loadConsumablesDataSourceSetting() {
+        try {
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const res = await fetch(`${FN_BASE}/settings`);
+          if (res.ok) {
+            const s = await res.json();
+            consumablesDataSource = (s && s.consumablesDataSource) ? s.consumablesDataSource : 'api';
+          } else {
+            consumablesDataSource = 'api';
+          }
+        } catch (e) {
+          consumablesDataSource = 'api';
+        }
+      }
+
       // Product loading and display
       async function loadProducts() {
         try {
-          // Load from Netlify function (database) only
           const FN_BASE = window.FN_BASE || '/.netlify/functions';
-          const response = await fetch(`${FN_BASE}/consumables`);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+          if (consumablesDataSource === 'local') {
+            const resp = await fetch('data/consumables.json');
+            if (!resp.ok) throw new Error(`Local JSON error ${resp.status}`);
+            const data = await resp.json();
+            products = Array.isArray(data) ? data : (data.products || []);
+            filteredProducts = [...products];
+            extractCategories();
+            displayProducts();
+            showToast('Consumables loaded from local JSON', 'info');
+          } else {
+            const response = await fetch(`${FN_BASE}/consumables`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            products = Array.isArray(data) ? data : (data.products || []);
+            filteredProducts = [...products];
+            extractCategories();
+            displayProducts();
+            console.log('Consumables loaded from API:', products.length);
           }
-          const data = await response.json();
-          products = Array.isArray(data) ? data : (data.products || []);
-          filteredProducts = [...products];
-          extractCategories();
-          displayProducts();
-          console.log('Consumables loaded from API:', products.length);
         } catch (error) {
-          console.error('Failed to load consumables from API:', error);
+          console.error('Failed to load consumables:', error);
           consumablesList.innerHTML = `
             <div class="p-6 text-center text-red-600 dark:text-red-400">
               <p class="mb-2">Unable to load consumables</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">API unavailable</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Failed to load from ${consumablesDataSource === 'local' ? 'JSON file' : 'API'}</p>
               <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
                 Retry Loading
               </button>
@@ -619,7 +651,10 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
         }
       
       // Load products and any saved draft
-      loadProducts();
+      (async () => {
+        await loadConsumablesDataSourceSetting();
+        loadProducts();
+      })();
       loadSavedOrder();
     });
   </script>

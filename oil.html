@@ -16,11 +16,6 @@
     /* Page-specific styles only (global theme and neon styles are in assets/css/styles.css) */
     .oil-item {transition:all .2s ease;background-color:#111;border:1px solid #333}
     .oil-item:hover {background-color:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
-    .switch-bg {transition:background-color .2s ease-in-out;background-color:#333}
-    .switch-toggle {transition:transform .2s ease-in-out;background-color:#fff}
-    #useLocalData:checked + div .switch-bg {background-color:#00ff88}
-    #useLocalData:checked + div .switch-toggle {transform:translateX(16px)}
-    #useLocalData:focus + div {box-shadow:0 0 0 3px rgba(0,212,255,.3);border-radius:9999px}
   </style>
 </head>
 <body class="dark">
@@ -110,25 +105,11 @@
           <p class="text-sm text-gray-400 mt-1">Click on items to add to order list</p>
         </div>
         
-        <!-- Data Source Switch -->
+        <!-- Data Source Switch moved to Settings page -->
         <div class="p-4 border-b border-gray-200 dark:border-gray-600 no-print bg-gray-900">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Data Source:</span>
-              <label class="inline-flex items-center">
-                <input type="checkbox" id="useLocalData" class="sr-only">
-                <div class="relative">
-                  <div class="w-10 h-6 bg-gray-200 dark:bg-gray-600 rounded-full shadow-inner transition-colors duration-200 ease-in-out switch-bg"></div>
-                  <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out switch-toggle"></div>
-                </div>
-                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400 switch-label">API (Online)</span>
-              </label>
-            </div>
-            <button id="reloadDataBtn" class="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400" title="Reload products">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-              </svg>
-            </button>
+          <div class="flex items-center justify-between text-sm text-gray-400">
+            <span>Data source is managed in Settings → Data Sources.</span>
+            <a href="settings.html" class="text-blue-400 hover:underline">Open Settings</a>
           </div>
         </div>
 
@@ -228,9 +209,7 @@
       const orderDate = document.getElementById('orderDate');
       const priority = document.getElementById('priority');
       const notes = document.getElementById('notes');
-      const useLocalData = document.getElementById('useLocalData');
-      const switchLabel = document.querySelector('.switch-label');
-      const reloadDataBtn = document.getElementById('reloadDataBtn');
+  let oilDataSource = 'api'; // default; will be loaded from Settings
       const submitOrderBtn = document.getElementById('submitOrderBtn');
       const submitOrderStatus = document.getElementById('submitOrderStatus');
       
@@ -355,8 +334,7 @@
           </div>
         `;
 
-        const useLocal = useLocalData.checked;
-        
+        const useLocal = oilDataSource === 'local';
         if (useLocal) {
           // Load from JSON file directly
           await loadFromJSON();
@@ -401,7 +379,7 @@
       async function loadFromJSON() {
         try {
           console.log('Attempting to load from JSON file...');
-          const backupResponse = await fetch('data/products.json'); // <-- fixed path
+          const backupResponse = await fetch('data/products.json');
 
           if (!backupResponse.ok) {
             throw new Error(`Local backup error! status: ${backupResponse.status}`);
@@ -427,7 +405,7 @@
           oilsList.innerHTML = `
             <div class="p-6 text-center text-red-600 dark:text-red-400">
               <p class="mb-2">Unable to load oil products</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Failed to load from ${useLocalData.checked ? 'JSON file' : 'API and local backup'}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Failed to load from ${oilDataSource === 'local' ? 'JSON file' : 'API and local backup'}</p>
               <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
                 Retry Loading
               </button>
@@ -641,28 +619,29 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
       window.updateQuantity = updateQuantity;
       window.loadProducts = loadProducts;
       
-      // Data source switch functionality
-      function updateSwitchLabel() {
-        switchLabel.textContent = useLocalData.checked ? 'JSON (Local)' : 'API (Online)';
-        // Save preference
-        localStorage.setItem('oilDataSource', useLocalData.checked ? 'local' : 'api');
-      }
-
-      function loadDataSourcePreference() {
-        const savedPreference = localStorage.getItem('oilDataSource');
-        if (savedPreference === 'local') {
-          useLocalData.checked = true;
+      // Load oil data source preference from Settings API
+      async function loadOilDataSourceSetting() {
+        try {
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const res = await fetch(`${FN_BASE}/settings`);
+          if (res.ok) {
+            const s = await res.json();
+            oilDataSource = (s && s.oilDataSource) ? s.oilDataSource : 'api';
+          } else {
+            oilDataSource = 'api';
+          }
+        } catch (e) {
+          oilDataSource = 'api';
         }
-        updateSwitchLabel();
       }
 
-      // Event listeners
+  // Event listeners
       document.getElementById('clearAllBtn').addEventListener('click', clearAll);
       document.getElementById('saveOrderBtn').addEventListener('click', saveOrder);
       document.getElementById('printOrderBtn').addEventListener('click', printOrder);
       document.getElementById('emailOrderBtn').addEventListener('click', emailOrder);
       
-      // Submit order to API
+  // Submit order to API
       submitOrderBtn.addEventListener('click', async function() {
         if (orderItems.length === 0) {
           showToast('No items to submit', 'warning');
@@ -702,20 +681,12 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
       searchOils.addEventListener('input', filterProducts);
       filterType.addEventListener('change', filterProducts);
       
-      // Data source controls
-      useLocalData.addEventListener('change', () => {
-        updateSwitchLabel();
-        showToast(`Switched to ${useLocalData.checked ? 'local JSON' : 'API'} data source`, 'info');
-      });
       
-      reloadDataBtn.addEventListener('click', () => {
-        showToast('Reloading products...', 'info');
+      // Initialize: fetch oil data source from Settings then load products
+      (async () => {
+        await loadOilDataSourceSetting();
         loadProducts();
-      });
-      
-      // Initialize data source preference and load products
-      loadDataSourcePreference();
-      loadProducts();
+      })();
       loadSavedOrder();
     });
   </script>
