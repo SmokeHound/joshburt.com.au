@@ -1,7 +1,52 @@
 <!DOCTYPE html>
-<!-- Role-based Custom Dashboards Framework -->
-<script>
-(function() {
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Dashboards</title>
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <script src="./assets/js/init-shared.js" defer></script>
+</head>
+<body class="dark">
+    <!-- MOBILE MENU TOGGLE -->
+    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+    <div class="flex min-h-screen">
+        <!-- Shared Navigation Loader -->
+        <div id="main-nav"></div>
+        <script>
+            // Dynamically load shared navigation
+            fetch('shared-nav.html')
+                .then(response => response.text())
+                .then(html => { 
+                    document.getElementById('main-nav').innerHTML = html;
+                    if (window.setActiveNavLink) window.setActiveNavLink();
+                });
+        </script>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-6 md:ml-64 bg-black min-h-screen">
+            <!-- Header Card -->
+            <header class="sticky top-0 p-6 rounded-lg shadow-md mb-6 z-40 border card">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white" data-dashboard-title>Dashboards</h1>
+                        <p class="nav-link-muted">Role-based, customizable dashboards</p>
+                    </div>
+                    <div id="role-switcher" class="hidden"></div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content Container -->
+            <section id="dashboard-content" class="space-y-6"></section>
+        </main>
+    </div>
+
+    <!-- Role-based Custom Dashboards Framework -->
+    <script>
+    (function() {
     // User roles configuration
     const userRoles = {
         admin: {
@@ -305,5 +350,32 @@
     } else {
         initDashboardSystem();
     }
-})();
-</script>
+    })();
+    </script>
+
+    <!-- Minimal mobile menu wiring after nav injection -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            function wireMenu(){
+                var menuToggle=document.getElementById('menu-toggle');
+                var sidebar=document.getElementById('sidebar');
+                var sidebarBackdrop=document.getElementById('sidebar-backdrop');
+                if(!(menuToggle && sidebar)) return;
+                function toggle(){
+                    var isOpen = sidebar.classList.toggle('open');
+                    menuToggle.setAttribute('aria-expanded', String(isOpen));
+                    if(sidebarBackdrop){
+                        if(isOpen){ sidebarBackdrop.classList.remove('hidden'); }
+                        else { sidebarBackdrop.classList.add('hidden'); }
+                    }
+                    document.body.classList.toggle('sidebar-open', isOpen);
+                }
+                menuToggle.addEventListener('click', toggle);
+                if(sidebarBackdrop){ sidebarBackdrop.addEventListener('click', function(){ if(sidebar.classList.contains('open')) toggle(); }); }
+            }
+            wireMenu();
+            setTimeout(wireMenu, 250);
+        });
+    </script>
+</body>
+</html>
