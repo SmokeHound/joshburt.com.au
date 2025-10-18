@@ -47,9 +47,11 @@
 <!-- Website Stats and Status Widgets -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Website stats and status">
                 <div class="card widget-primary p-6 rounded-lg shadow-md flex flex-col items-center">
-                    <span class="mb-2">
-                      <!-- Users Icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0zm6 8v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a6 6 0 0112 0z" /></svg>
+                    <span class="mb-2" aria-hidden="true">
+                      <!-- Users Icon (simplified for reliability) -->
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.879 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
                     </span>
                     <div class="text-2xl font-bold text-blue-400" id="stat-total-users">--</div>
                     <div class="text-sm text-gray-400 mt-2">Total Users</div>
