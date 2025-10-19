@@ -13,21 +13,7 @@ functions = "C:\\DEV\\joshburt.com.au\\joshburt.com.au\\netlify\\functions"
 [build.environment]
 NODE_VERSION = "22"
 
-[build.processing]
 
-[build.processing.css]
-
-[build.processing.html]
-
-[build.processing.images]
-
-[build.processing.js]
-
-[build.services]
-
-[functions]
-
-[functions."*"]
 
 [[plugins]]
 origin = "ui"
