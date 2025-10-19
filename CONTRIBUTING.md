@@ -41,7 +41,7 @@ Welcome to the joshburt.com.au project! This is a dynamic website and API with a
 ├── consumables-mgmt.html   # Consumables product list management (admin/staff CRUD)
 ├── login.html              # Login page
 ├── shared-nav.html         # Shared navigation component
-├── shared-theme.html       # Shared theme functionality
+├── shared-theme.html       # Centralized ThemeManager (multi-theme support)
 ├── shared-config.html      # Shared configuration
 ├── tests/                  # Test directory
 │   ├── unit/              # Unit tests
@@ -53,6 +53,24 @@ Welcome to the joshburt.com.au project! This is a dynamic website and API with a
 
 ## Development Workflow
 
+## Theme System
+
+The site uses a centralized ThemeManager (in `shared-theme.html`) that provides:
+
+- **Multiple Theme Presets**: dark, light, system (auto-detect), neon, ocean, high-contrast
+- **Custom Color Palettes**: Users can override primary/secondary/accent colors
+- **System Theme Detection**: Automatically follows OS dark/light preference when set to 'system'
+- **Cross-Tab Synchronization**: Theme changes sync across browser tabs
+- **Event-Driven Updates**: Responds to settings changes via custom events
+
+When working with themes:
+1. **Use the ThemeManager API**: Access via `window.Theme` for programmatic theme changes
+2. **Don't add inline color scripts**: ThemeManager handles this centrally and idempotently
+3. **Test all theme presets**: Ensure your UI works with dark, light, and high-contrast themes
+4. **Update theme tests**: If adding new theme features, add corresponding tests in `tests/unit/shared-theme.test.js`
+
+See README.md for complete ThemeManager API documentation.
+
 ## Settings System
 
 - All site settings are now stored in the database (see `DATABASE.md` for schema).
@@ -63,6 +81,7 @@ Welcome to the joshburt.com.au project! This is a dynamic website and API with a
    2. Update the JS logic to load/save the new field.
    3. Document the new field in `README.md` and `DATABASE.md`.
    4. Ensure audit logging covers the new field.
+   5. If theme-related, dispatch `siteSettingsUpdated` event so ThemeManager can respond
 
 ### 1. Code Style and Standards
 - Uses TailwindCSS for styling
