@@ -259,6 +259,45 @@ The `.page-header` utility provides:
 
 Defined in: `shared-config.html`
 
+### Text Utilities
+
+Consistent typography utilities for secondary text:
+
+```html
+<!-- Subtitle text under headers -->
+<p class="subtitle">Brief description or context</p>
+
+<!-- Muted text for less emphasis -->
+<span class="muted">Additional information</span>
+
+<!-- Description text blocks -->
+<p class="description">Longer explanatory text with proper spacing</p>
+```
+
+**Available utilities**:
+- `.subtitle` / `.text-subtitle` - Small gray text for subtitles (0.875rem)
+- `.muted` / `.text-muted` - Muted text for secondary information
+- `.description` / `.text-description` - Description blocks with proper line-height
+
+All utilities adapt to light/dark themes automatically.
+
+### Widget Background Variations
+
+Background color variants for visual separation:
+
+- `.widget-primary` - Blue-tinted background (light: sky-100, dark: blue with transparency)
+- `.widget-secondary` - Green-tinted background (light: emerald-100, dark: green with transparency)
+- `.widget-accent` - Purple-tinted background (light: violet-100, dark: purple with transparency)
+
+Use with `.card` for best results:
+```html
+<div class="card widget-primary rounded-lg shadow-md p-6">
+  <!-- Primary widget content -->
+</div>
+```
+
+Defined in: `shared-config.html`
+
 ### Accessibility Features
 
 - **Skip to Content Link**: Global skip link injected on every page (keyboard accessible, auto-positions on focus)
@@ -266,6 +305,23 @@ Defined in: `shared-config.html`
 - **ARIA Attributes**: Proper labeling on interactive elements
 - **Keyboard Navigation**: Full keyboard support for navigation and modals
 - **Focus Indicators**: Enhanced focus states for all interactive elements
+
+### Performance Features
+
+- **Resource Preloading**: Critical CSS preloaded for faster initial render
+- **DNS Prefetch**: Font CDN connections prefetched
+- **Lazy Loading**: Images and non-critical resources loaded on demand
+- **Error Tracking**: Global error handler captures and logs client-side errors
+  - View errors: `ErrorTracker.getErrorLog()`
+  - Export errors: `ErrorTracker.exportErrorLog()`
+  - Clear errors: `ErrorTracker.clearErrorLog()`
+
+**Error Tracker** (`assets/js/error-tracker.js`):
+- Automatically captures JavaScript errors and promise rejections
+- Tracks network errors (5xx responses)
+- Stores last 100 errors in localStorage for debugging
+- Shows user-friendly notifications for critical errors
+- Development-friendly console logging
 
 ### Colors
 - **Primary**: `#3b82f6` (Blue)

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <!-- Shared Tailwind CSS Configuration and Common Styles -->
 <link rel="stylesheet" href="./assets/css/styles.css">
+<!-- Preload critical resources for performance -->
+<link rel="preload" href="./assets/css/styles.css" as="style">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <!-- Ensure proper viewport meta tag is present -->
 <!-- tokens: tailwind primary secondary accent -->
 <script>
@@ -274,14 +277,44 @@
         margin-bottom: 1.5rem; /* mb-6 */
         border: 1px solid #e5e7eb; /* light: gray-200 */
         box-shadow: 0 4px 6px rgba(0,0,0,0.10); /* shadow-md */
-    background-color: rgba(255,255,255,0.85);
-    -webkit-backdrop-filter: saturate(180%) blur(8px);
-    backdrop-filter: saturate(180%) blur(8px);
+        background-color: rgba(255,255,255,0.85);
+        -webkit-backdrop-filter: saturate(180%) blur(8px);
+        backdrop-filter: saturate(180%) blur(8px);
     }
     .dark .page-header {
         border-color: #374151; /* dark: gray-700 */
         box-shadow: 0 4px 12px rgba(0,0,0,0.30);
         background-color: rgba(17,24,39,0.85); /* near gray-900 */
+    }
+    
+    /* Subtitle and muted text utilities for consistent secondary text */
+    .subtitle, .text-subtitle {
+        font-size: 0.875rem; /* text-sm */
+        line-height: 1.5;
+        color: #6b7280; /* gray-500 */
+        margin-top: 0.25rem;
+    }
+    .dark .subtitle, .dark .text-subtitle {
+        color: #9ca3af; /* gray-400 */
+    }
+    
+    .muted, .text-muted {
+        color: #9ca3af; /* gray-400 */
+        font-size: 0.875rem; /* text-sm */
+    }
+    .dark .muted, .dark .text-muted {
+        color: #6b7280; /* gray-500 */
+    }
+    
+    /* Description text for under headers */
+    .description, .text-description {
+        color: #6b7280; /* gray-500 */
+        line-height: 1.625; /* leading-relaxed */
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .dark .description, .dark .text-description {
+        color: #9ca3af; /* gray-400 */
     }
 </style>
 <script>
