@@ -41,13 +41,11 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 - **Custom Code**
 ### Component / Serverless Structure
 - **`shared-nav.html`**: Navigation sidebar with menu toggle, user profile, and navigation links
-- **`shared-theme.html`**: Theme handling (user settings + CSS variables)
+- **`shared-theme.html`**: Centralized ThemeManager - handles multi-theme support, color palettes, and system theme detection
 - **`shared-config.html`**: TailwindCSS configuration and common styles
 - **`netlify/functions/*`**: Serverless backend for products, orders, users, authentication, audit logs, inventory, consumables
-	- `sessionTimeout`, `maxLoginAttempts`, `enable2FA`, `auditAllActions`
 
-**Theming**: Centralized theme & color settings stored in database (no per-page toggles)
-All settings are editable in the admin dashboard and changes are persisted instantly. See `settings.html` for the full UI and field list.
+**Theming**: Centralized ThemeManager provides multi-theme support (dark, light, system, neon, ocean, high-contrast) with custom color palettes. All theme settings are stored in the database and synchronized across tabs. See the ThemeManager API section below for details.
 
 ### Feature Flags
 
@@ -60,6 +58,53 @@ Three feature flags are available in the settings page to enable/disable premium
 Features are dynamically shown/hidden based on flag status. Changes take effect immediately after saving settings. See [FEATURE_FLAGS.md](FEATURE_FLAGS.md) for detailed documentation.
 
 Demo page available at `feature-flags-demo.html` for testing.
+
+### ThemeManager API
+
+The centralized ThemeManager (loaded from `shared-theme.html`) provides a consistent theming system across all pages:
+
+**Available Theme Presets:**
+- `dark` - Default dark theme with blue/green/purple palette
+- `light` - Light theme with same palette
+- `system` - Automatically follows OS dark/light preference
+- `neon` - Dark theme with cyan/neon green/magenta palette
+- `ocean` - Dark theme with ocean blue palette
+- `high-contrast` - Dark theme with maximum contrast colors
+
+**JavaScript API (window.Theme):**
+```javascript
+// Apply theme from localStorage (called automatically on page load)
+window.Theme.applyFromStorage();
+
+// Set a theme preset
+window.Theme.setTheme('neon'); // persists to localStorage by default
+window.Theme.setTheme('ocean', false); // don't persist
+
+// Set custom color palette
+window.Theme.setPalette({
+  primary: '#ff0000',
+  secondary: '#00ff00',
+  accent: '#0000ff'
+});
+
+// Get current active theme
+const active = window.Theme.getActiveTheme();
+// Returns: { id: 'dark', resolvedId: 'dark', mode: 'dark', colors: {...} }
+
+// Get available presets
+const presets = window.Theme.getPresets();
+// Returns: ['dark', 'light', 'high-contrast', 'neon', 'ocean']
+```
+
+**Events:**
+- ThemeManager listens for `siteSettingsUpdated` custom event (dispatched by settings.html after save)
+- Automatically synchronizes theme changes across browser tabs via storage events
+- Responds to OS theme changes when theme is set to 'system'
+
+**Backward Compatibility:**
+- Honors existing `localStorage('siteSettings')` theme and color settings
+- Supports legacy `localStorage('theme')` key
+- Existing inline color application scripts work alongside ThemeManager (idempotent)
 
 ### Audit Logging (Enhanced)
 

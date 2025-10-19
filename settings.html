@@ -93,6 +93,10 @@
                       <select id="theme-select" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700">
                         <option value="dark">Dark</option>
                         <option value="light">Light</option>
+                        <option value="system">System (Auto)</option>
+                        <option value="neon">Neon</option>
+                        <option value="high-contrast">High Contrast</option>
+                        <option value="ocean">Ocean</option>
                       </select>
                     </div>
                     <div class="flex items-center gap-2 mt-6">
@@ -559,6 +563,11 @@
                   sendAudit('settings_change', msg);
                 }
                 showToast('Settings saved successfully!');
+                
+                // Dispatch event to notify ThemeManager and other listeners
+                try {
+                  window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: settings }));
+                } catch(e) { /* ignore event dispatch errors */ }
             } catch (e) {
                 showToast('Failed to save settings', 'error');
             }

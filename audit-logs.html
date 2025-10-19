@@ -28,20 +28,8 @@
       });
     });
   </script>
-  <script>
-    // Apply theme/colors instantly
-    (function() {
-      try {
-        const s = JSON.parse(localStorage.getItem('siteSettings')||'{}');
-        document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
-        document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
-        document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
-        const theme = s.theme || localStorage.getItem('theme') || 'dark';
-        document.documentElement.classList.toggle('dark', theme === 'dark');
-        document.documentElement.classList.toggle('light', theme === 'light');
-      } catch(e) {}
-    })();
-    if ('serviceWorker' in navigator) {
+  <!-- ThemeManager from shared-theme.html handles color/theme application -->
+  <script>if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(()=>{});
       });

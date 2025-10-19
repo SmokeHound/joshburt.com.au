@@ -28,17 +28,23 @@
     }).catch(()=>{});
   }
   function applyColors(){
-    try{
-      const s=JSON.parse(localStorage.getItem('siteSettings')||'{}');
-      document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
-      document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
-      document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
-      const theme=s.theme || localStorage.getItem('theme');
-      if(theme){
+    // Defer to ThemeManager if available (loaded from shared-theme.html)
+    if(typeof window !== 'undefined' && window.Theme && typeof window.Theme.applyFromStorage === 'function'){
+      try {
+        window.Theme.applyFromStorage();
+      } catch(e) { /* no-op: ThemeManager failed */ }
+    } else {
+      // Fallback: apply colors directly (if ThemeManager not loaded yet)
+      try{
+        const s=JSON.parse(localStorage.getItem('siteSettings')||'{}');
+        document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
+        document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
+        document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
+        const theme=s.theme || localStorage.getItem('theme') || 'dark';
         document.documentElement.classList.toggle('dark', theme === 'dark');
         document.documentElement.classList.toggle('light', theme === 'light');
-      }
-    } catch(e) { /* no-op: invalid or missing settings */ }
+      } catch(e) { /* no-op: invalid or missing settings */ }
+    }
   }
   function registerSW(){
     if('serviceWorker' in navigator){
