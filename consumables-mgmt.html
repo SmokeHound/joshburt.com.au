@@ -36,16 +36,18 @@
     <!-- Main Content -->
     <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
       <div class="max-w-6xl mx-auto">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Consumables Product Management</h2>
-          <div class="flex gap-2">
-            <button id="addProductBtn" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
-            <button id="importBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Import CSV</button>
-            <button id="exportBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Export CSV</button>
-            <button id="syncInventoryBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Sync Inventory</button>
-            <button id="manageCategoriesBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Categories</button>
+        <header class="page-header card border">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Consumables Product Management</h2>
+            <div class="flex flex-wrap gap-2">
+              <button id="addProductBtn" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
+              <button id="importBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Import CSV</button>
+              <button id="exportBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Export CSV</button>
+              <button id="syncInventoryBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Sync Inventory</button>
+              <button id="manageCategoriesBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Categories</button>
+            </div>
           </div>
-        </div>
+        </header>
         <!-- Audit Log Section (moved from sidebar) -->
         <section class="bg-gray-900 rounded-lg shadow p-4 mb-8 mt-8">
           <h3 class="text-lg font-bold text-accent mb-2">Audit Log</h3>
@@ -155,26 +157,6 @@
     </div>
   </div>
 <script>
-// --- Audit Log Helper ---
-async function addAuditLog(action, product, details) {
-  try {
-    // Send audit log to backend API (Netlify function or Express endpoint)
-    await (window.authFetch ? authFetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action,
-        details: product ? JSON.stringify(product) : details,
-        extra: product ? details : undefined
-      })
-    }) : fetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action, details: product ? JSON.stringify(product) : details, extra: product ? details : undefined }) }));
-    // Optionally reload audit log after adding
-    loadAuditLog();
-  } catch (err) {
-    // Fallback: log to console if API fails
-    console.error('Failed to add audit log:', err);
-  }
-}
 // --- Category Management Logic ---
 let categories = [];
 const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
