@@ -12,10 +12,10 @@ describe('Navigation & Shared Components Integration', () => {
     const expectedLinks = [
       'index.html',
       'administration.html',
-      'users.html',
       'analytics.html',
       'settings.html',
-      'oil.html'
+      'oil.html',
+      'consumables.html'
     ];
 
     expectedLinks.forEach(href => {

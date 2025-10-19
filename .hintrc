@@ -25,11 +25,5 @@
     "not and_ff <= 142",
     "not firefox <= 142",
     "not opera <= 121"
-  ],
-  "ignoredUrls": [
-    {
-      "domain": "/shared-nav.html",
-      "hints": ["no-inline-styles"]
-    }
   ]
 }
