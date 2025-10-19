@@ -39,8 +39,7 @@
         newDashboard: !!nestedFlags.newDashboard,
         advancedReports: !!nestedFlags.advancedReports,
         enableRegistration: nestedFlags.enableRegistration !== undefined ? !!nestedFlags.enableRegistration : !!settings.enableRegistration,
-        enableGuestCheckout: nestedFlags.enableGuestCheckout !== undefined ? !!nestedFlags.enableGuestCheckout : !!settings.enableGuestCheckout,
-        enableNewsletter: nestedFlags.enableNewsletter !== undefined ? !!nestedFlags.enableNewsletter : !!settings.enableNewsletter
+        enableGuestCheckout: nestedFlags.enableGuestCheckout !== undefined ? !!nestedFlags.enableGuestCheckout : !!settings.enableGuestCheckout
       };
       featureFlagsCache = merged;
       cacheTimestamp = now;

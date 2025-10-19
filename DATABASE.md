@@ -87,7 +87,7 @@ The following fields are supported (see `settings.html` for UI):
 
 - siteTitle, siteDescription, logoUrl, faviconUrl, contactEmail, 
 - theme, primaryColor, secondaryColor, accentColor, themeSchedule
-- maintenanceMode, enableRegistration, enableGuestCheckout, enableNewsletter
+- maintenanceMode, enableRegistration, enableGuestCheckout
 - googleAnalyticsId, facebookPixelId, smtpHost, smtpPort, smtpUser, smtpPassword
 - customCss, customJs
 - featureFlags (betaFeatures, newDashboard, advancedReports)

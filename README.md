@@ -35,7 +35,7 @@ All site settings are now stored in the database and managed via the admin dashb
 - **Theme**
 This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The backend has been fully migrated to Netlify Functions (serverless) – legacy Express server code has been removed.
 - **Feature Toggles**
-	- `maintenanceMode`, `enableRegistration`, `enableGuestCheckout`, `enableNewsletter`
+	- `maintenanceMode`, `enableRegistration`, `enableGuestCheckout`
 - **API Backend**: Netlify Functions (serverless) with PostgreSQL / SQLite abstraction
 	- `smtpHost`, `smtpPort`, `smtpUser`, `smtpPassword`
 - **Custom Code**
