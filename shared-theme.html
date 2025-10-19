@@ -1,1 +1,252 @@
+<script>
+// Centralized ThemeManager - handles theme application, persistence, and multi-theme support
+(function() {
+  'use strict';
 
+  // Theme presets with color palettes and dark/light designation
+  const THEME_PRESETS = {
+    dark: {
+      mode: 'dark',
+      colors: {
+        primary: '#3b82f6',
+        secondary: '#10b981',
+        accent: '#8b5cf6'
+      }
+    },
+    light: {
+      mode: 'light',
+      colors: {
+        primary: '#3b82f6',
+        secondary: '#10b981',
+        accent: '#8b5cf6'
+      }
+    },
+    'high-contrast': {
+      mode: 'dark',
+      colors: {
+        primary: '#00ffff',
+        secondary: '#00ff00',
+        accent: '#ff00ff'
+      }
+    },
+    neon: {
+      mode: 'dark',
+      colors: {
+        primary: '#00d4ff',
+        secondary: '#00ff88',
+        accent: '#ff00aa'
+      }
+    },
+    ocean: {
+      mode: 'dark',
+      colors: {
+        primary: '#0284c7',
+        secondary: '#06b6d4',
+        accent: '#0ea5e9'
+      }
+    }
+  };
+
+  const DEFAULT_THEME = 'dark';
+
+  // Get system preference
+  function getSystemTheme() {
+    if (typeof window === 'undefined' || !window.matchMedia) return 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  // Get stored theme from localStorage (backward compatible)
+  function getStoredTheme() {
+    try {
+      // Check siteSettings.theme first (new format)
+      const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+      if (siteSettings.theme) return siteSettings.theme;
+      
+      // Fallback to legacy localStorage('theme')
+      const legacyTheme = localStorage.getItem('theme');
+      if (legacyTheme) return legacyTheme;
+    } catch (e) {
+      // Ignore parse errors
+    }
+    return null;
+  }
+
+  // Get stored custom colors from localStorage (backward compatible)
+  function getStoredColors() {
+    try {
+      const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+      return {
+        primary: siteSettings.primaryColor || localStorage.getItem('primaryColor') || null,
+        secondary: siteSettings.secondaryColor || localStorage.getItem('secondaryColor') || null,
+        accent: siteSettings.accentColor || localStorage.getItem('accentColor') || null
+      };
+    } catch (e) {
+      return { primary: null, secondary: null, accent: null };
+    }
+  }
+
+  // Resolve theme ID to actual theme (handles 'system' special case)
+  function resolveThemeId(themeId) {
+    if (themeId === 'system') {
+      return getSystemTheme();
+    }
+    return themeId || DEFAULT_THEME;
+  }
+
+  // Apply CSS variables to documentElement
+  function applyCSSVariables(colors) {
+    const root = document.documentElement;
+    if (colors.primary) root.style.setProperty('--tw-color-primary', colors.primary);
+    if (colors.secondary) root.style.setProperty('--tw-color-secondary', colors.secondary);
+    if (colors.accent) root.style.setProperty('--tw-color-accent', colors.accent);
+  }
+
+  // Apply dark/light class to documentElement
+  function applyModeClass(mode) {
+    const root = document.documentElement;
+    root.classList.toggle('dark', mode === 'dark');
+    root.classList.toggle('light', mode === 'light');
+  }
+
+  // Apply a theme (by ID or preset)
+  function applyTheme(themeId, customColors) {
+    const resolvedId = resolveThemeId(themeId);
+    const preset = THEME_PRESETS[resolvedId] || THEME_PRESETS[DEFAULT_THEME];
+    
+    // Determine colors: custom overrides preset
+    const colors = {
+      primary: (customColors && customColors.primary) || preset.colors.primary,
+      secondary: (customColors && customColors.secondary) || preset.colors.secondary,
+      accent: (customColors && customColors.accent) || preset.colors.accent
+    };
+    
+    applyCSSVariables(colors);
+    applyModeClass(preset.mode);
+    
+    return { id: themeId, resolvedId, mode: preset.mode, colors };
+  }
+
+  // Public API
+  const ThemeManager = {
+    // Apply theme from storage (called on page load)
+    applyFromStorage: function() {
+      const storedTheme = getStoredTheme() || DEFAULT_THEME;
+      const storedColors = getStoredColors();
+      
+      // Only apply custom colors if at least one is set
+      const hasCustomColors = storedColors.primary || storedColors.secondary || storedColors.accent;
+      const customColors = hasCustomColors ? storedColors : null;
+      
+      return applyTheme(storedTheme, customColors);
+    },
+
+    // Set theme by ID (optionally persist to localStorage)
+    setTheme: function(themeId, persist) {
+      const result = applyTheme(themeId, null);
+      
+      if (persist !== false) {
+        try {
+          const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+          siteSettings.theme = themeId;
+          localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
+          localStorage.setItem('theme', themeId); // Legacy compatibility
+        } catch (e) {
+          // Ignore storage errors
+        }
+      }
+      
+      return result;
+    },
+
+    // Set custom palette (optionally persist)
+    setPalette: function(colors, persist) {
+      const currentTheme = getStoredTheme() || DEFAULT_THEME;
+      const result = applyTheme(currentTheme, colors);
+      
+      if (persist !== false) {
+        try {
+          const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+          if (colors.primary) siteSettings.primaryColor = colors.primary;
+          if (colors.secondary) siteSettings.secondaryColor = colors.secondary;
+          if (colors.accent) siteSettings.accentColor = colors.accent;
+          localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
+          
+          // Legacy compatibility
+          if (colors.primary) localStorage.setItem('primaryColor', colors.primary);
+          if (colors.secondary) localStorage.setItem('secondaryColor', colors.secondary);
+          if (colors.accent) localStorage.setItem('accentColor', colors.accent);
+        } catch (e) {
+          // Ignore storage errors
+        }
+      }
+      
+      return result;
+    },
+
+    // Get active theme info
+    getActiveTheme: function() {
+      const storedTheme = getStoredTheme() || DEFAULT_THEME;
+      const storedColors = getStoredColors();
+      const resolvedId = resolveThemeId(storedTheme);
+      const preset = THEME_PRESETS[resolvedId] || THEME_PRESETS[DEFAULT_THEME];
+      
+      return {
+        id: storedTheme,
+        resolvedId: resolvedId,
+        mode: preset.mode,
+        colors: {
+          primary: storedColors.primary || preset.colors.primary,
+          secondary: storedColors.secondary || preset.colors.secondary,
+          accent: storedColors.accent || preset.colors.accent
+        }
+      };
+    },
+
+    // Get available theme presets
+    getPresets: function() {
+      return Object.keys(THEME_PRESETS);
+    }
+  };
+
+  // Listen for system theme changes (only if theme is set to 'system')
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = function() {
+      const currentTheme = getStoredTheme();
+      if (currentTheme === 'system') {
+        ThemeManager.applyFromStorage();
+      }
+    };
+    
+    // Modern browsers
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleSystemThemeChange);
+    } else if (mediaQuery.addListener) {
+      // Legacy browsers
+      mediaQuery.addListener(handleSystemThemeChange);
+    }
+  }
+
+  // Listen for siteSettingsUpdated custom event (dispatched by settings.html)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('siteSettingsUpdated', function() {
+      ThemeManager.applyFromStorage();
+    });
+
+    // Listen for storage events (cross-tab synchronization)
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'siteSettings' || e.key === 'theme') {
+        ThemeManager.applyFromStorage();
+      }
+    });
+  }
+
+  // Expose API on window
+  if (typeof window !== 'undefined') {
+    window.Theme = ThemeManager;
+  }
+
+  // Apply theme immediately on load
+  ThemeManager.applyFromStorage();
+})();
+</script>
