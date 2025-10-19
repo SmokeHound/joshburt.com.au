@@ -487,21 +487,6 @@
             // Preview functionality can be expanded later
         }
 
-        // Apply dynamic colors from settings
-        function applyDynamicColors() {
-            const themeSettings = JSON.parse(localStorage.getItem('themeSettings') || '{}');
-            
-            if (themeSettings.primaryColor) {
-                document.documentElement.style.setProperty('--tw-color-primary', themeSettings.primaryColor);
-            }
-            if (themeSettings.secondaryColor) {
-                document.documentElement.style.setProperty('--tw-color-secondary', themeSettings.secondaryColor);
-            }
-            if (themeSettings.accentColor) {
-                document.documentElement.style.setProperty('--tw-color-accent', themeSettings.accentColor);
-            }
-        }
-
         // Mock AuditLogger if not available
         if (typeof AuditLogger === 'undefined') {
             window.AuditLogger = {
@@ -624,7 +609,7 @@
       });
       document.getElementById('apply-theme').addEventListener('click', async () => {
         await saveSettings();
-        applyDynamicColors();
+        // Theme will be applied automatically via ThemeManager when siteSettingsUpdated event fires
         const msg = 'Applied custom theme via API';
         AuditLogger.log('theme_change', msg);
         sendAudit('theme_change', msg);
@@ -857,20 +842,20 @@
     });
   </script>
     <script>
-        // Apply theme/colors instantly from backend settings
-        (async function() {
-          try {
-            const FN_BASE = window.FN_BASE || '/.netlify/functions';
-            const res = await fetch(`${FN_BASE}/settings`);
-            const s = res.ok ? await res.json() : {};
-            document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
-            document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
-            document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
-            const theme = s.theme || 'dark';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-            document.documentElement.classList.toggle('light', theme === 'light');
-          } catch(e) {}
-        })();
+        // Load centralized theme manager
+        fetch('shared-theme.html')
+            .then(r => r.text())
+            .then(html => {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                const scripts = temp.getElementsByTagName('script');
+                for (let script of scripts) {
+                    const newScript = document.createElement('script');
+                    newScript.textContent = script.textContent;
+                    document.head.appendChild(newScript);
+                }
+            })
+            .catch(err => console.warn('Failed to load shared-theme.html:', err));
         // Register service worker
         if ('serviceWorker' in navigator) {
           window.addEventListener('load', () => {
