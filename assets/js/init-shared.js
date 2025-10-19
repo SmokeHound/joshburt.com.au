@@ -53,6 +53,24 @@
   applyColors();
   registerSW();
 
+  // Unified token accessor (accessToken only)
+  window.getToken = function getToken(){
+    try {
+      return localStorage.getItem('accessToken') || null;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  // Unified refresh token accessor (refreshToken only)
+  window.getRefreshToken = function getRefreshToken(){
+    try {
+      return localStorage.getItem('refreshToken') || null;
+    } catch (_) {
+      return null;
+    }
+  };
+
   // Fetch runtime config (auth disable flag) early
   (async function loadRuntimeFlags(){
     try {
@@ -84,12 +102,7 @@
     try {
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
       const toUrl = (typeof input === 'string') ? input : (input && input.url) || '';
-      let token = null;
-      try {
-        token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
-      } catch(_) {
-        void 0;
-      }
+      let token = window.getToken();
 
       const makeInit = (tok) => {
         const base = init || {};
@@ -123,7 +136,7 @@
 
       // Try refresh token once
       try {
-        const rt = localStorage.getItem('refreshToken');
+        const rt = (window.getRefreshToken && window.getRefreshToken()) || null;
         if (rt) {
           const refRes = await fetch(FN_BASE + '/auth?action=refresh', {
             method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken: rt })
@@ -176,7 +189,7 @@
       var storedUser = null;
       try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch (e) { /* noop */ }
       if (userProfile) userProfile.classList.remove('hidden');
-      var isLoggedIn = !!(window.AUTH_DISABLED === true || localStorage.getItem('accessToken') || (storedUser && storedUser.email));
+      		var isLoggedIn = !!(window.AUTH_DISABLED === true || window.getToken() || (storedUser && storedUser.email));
       if (isLoggedIn) {
         if (userInfo) userInfo.classList.remove('hidden');
         if (loginBtn) loginBtn.classList.add('hidden');
@@ -196,7 +209,7 @@
         logoutBtn.addEventListener('click', async function(){
           try {
             // Best-effort serverless logout (invalidate refresh token)
-            var refreshToken = localStorage.getItem('refreshToken');
+            var refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
             if (refreshToken) {
               fetch(FN_BASE + '/auth?action=logout', {
                 method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
@@ -247,7 +260,7 @@
     }
     
     try {
-      var token = localStorage.getItem('accessToken');
+      		var token = window.getToken();
       if (!token) return;
       // Ask backend who we are
       var meRes = await fetch(FN_BASE + '/auth?action=me', {
@@ -264,7 +277,7 @@
       }
       // Try refresh flow if 401
       if (meRes.status === 401) {
-        var refreshToken = localStorage.getItem('refreshToken');
+        var refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
         if (!refreshToken) return;
         var refRes = await fetch(FN_BASE + '/auth?action=refresh', {
           method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })

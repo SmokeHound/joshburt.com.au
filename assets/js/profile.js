@@ -3,7 +3,8 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
   const FN_BASE = window.FN_BASE || '/.netlify/functions';
-  const token = localStorage.getItem('authToken');
+  // Use centralized token accessor
+  const token = (window.getToken && window.getToken()) || null;
   if (!token) {
     window.location.href = 'login.html';
     return;

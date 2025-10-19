@@ -408,7 +408,7 @@
         // Event listeners
     document.addEventListener('DOMContentLoaded', () => {
             // Require authentication for the management page
-            const token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+            const token = (window.getToken && window.getToken()) || null;
             if (!token && !AUTH_DISABLED) {
                 showSignInCTA();
                 return; // stop initializing until signed in

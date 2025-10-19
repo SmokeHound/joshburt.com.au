@@ -553,7 +553,7 @@ deleteProductBtn.onclick = function() {
 };
 window.addEventListener('DOMContentLoaded', async () => {
   const AUTH_DISABLED = window.AUTH_DISABLED === true;
-  const token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+  const token = (window.getToken && window.getToken()) || null;
   if (!token && !AUTH_DISABLED) {
     // Show sign-in CTA and skip initializing the management UI
     showSignInCTA();

@@ -151,7 +151,7 @@
 
         async function loadUsers(page=1){
             try {
-                let token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+                let token = (window.getToken && window.getToken()) || null;
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
 
@@ -297,7 +297,7 @@
             const name = form.querySelector('input[type="text"]').value.trim();
             const email = form.querySelector('input[type="email"]').value.trim();
             const role = form.querySelector('select').value;
-            const token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+            const token = (window.getToken && window.getToken()) || null;
             if(!name||!email||!role){ showToast('Please fill in all fields'); return; }
             try {
                 if (usersState.editingId){
@@ -320,25 +320,25 @@
         function editUser(id){ const u=usersState.list.find(x=>x.id===id); if(!u) return; const form=document.getElementById('user-form'); form.querySelector('input[type="text"]').value=u.name; form.querySelector('input[type="email"]').value=u.email; form.querySelector('select').value=u.role; usersState.editingId=id; form.querySelector('button[type="submit"]').textContent='Update User'; form.querySelector('h3').textContent='Edit User'; document.getElementById('cancel-edit').classList.remove('hidden'); form.scrollIntoView({ behavior:'smooth' }); }
 
         // Delete user via backend API
-    async function deleteUser(id){ if(!confirm('Delete this user?')) return; const token=localStorage.getItem('accessToken') || localStorage.getItem('authToken'); try { const res=await fetch(`${FN_BASE}/users/${id}`, { method:'DELETE', headers: token?{ 'Authorization':`Bearer ${token}` }:{} }); if(!res.ok) throw new Error('Failed to delete user'); showToast('User deleted','success'); await loadUsers(); } catch(err){ showToast('Error: '+err.message,'error'); } }
+    async function deleteUser(id){ if(!confirm('Delete this user?')) return; const token=(window.getToken && window.getToken()) || null; try { const res=await fetch(`${FN_BASE}/users/${id}`, { method:'DELETE', headers: token?{ 'Authorization':`Bearer ${token}` }:{} }); if(!res.ok) throw new Error('Failed to delete user'); showToast('User deleted','success'); await loadUsers(); } catch(err){ showToast('Error: '+err.message,'error'); } }
 
         // Cancel edit
         function cancelEdit(){ usersState.editingId=null; const form=document.getElementById('user-form'); form.reset(); form.querySelector('button[type="submit"]').textContent='Add User'; form.querySelector('h3').textContent='Add New User'; document.getElementById('cancel-edit').classList.add('hidden'); }
 
         // Export users to CSV via backend API
-    async function exportUsersCSV(){ const token=localStorage.getItem('accessToken') || localStorage.getItem('authToken'); try { const res=await fetch(`${FN_BASE}/users?limit=1000`, { headers: token?{ 'Authorization':`Bearer ${token}` }:{} }); if(!res.ok) throw new Error('Failed to fetch users'); const data=await res.json(); const headers=['Name','Email','Role']; const csv=[ headers.join(','), ...(data.users||[]).map(u=>`"${u.name}","${u.email}","${u.role}"`) ].join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='users.csv'; a.click(); URL.revokeObjectURL(url); showToast('Exported CSV','success'); } catch(err){ showToast('Error: '+err.message,'error'); } }
+    async function exportUsersCSV(){ const token=(window.getToken && window.getToken()) || null; try { const res=await fetch(`${FN_BASE}/users?limit=1000`, { headers: token?{ 'Authorization':`Bearer ${token}` }:{} }); if(!res.ok) throw new Error('Failed to fetch users'); const data=await res.json(); const headers=['Name','Email','Role']; const csv=[ headers.join(','), ...(data.users||[]).map(u=>`"${u.name}","${u.email}","${u.role}"`) ].join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='users.csv'; a.click(); URL.revokeObjectURL(url); showToast('Exported CSV','success'); } catch(err){ showToast('Error: '+err.message,'error'); } }
 
         // Export users to Excel (tab-separated) via backend API
-    async function exportUsersExcel(){ const token=localStorage.getItem('accessToken') || localStorage.getItem('authToken'); try { const res=await fetch(`${FN_BASE}/users?limit=1000`, { headers: token?{ 'Authorization':`Bearer ${token}` }:{} }); if(!res.ok) throw new Error('Failed to fetch users'); const data=await res.json(); const headers=['Name','Email','Role']; const tsv=[ headers.join('\t'), ...(data.users||[]).map(u=>[u.name,u.email,u.role].join('\t')) ].join('\n'); const blob=new Blob([tsv],{type:'application/vnd.ms-excel'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='users.xls'; a.click(); URL.revokeObjectURL(url); showToast('Exported Excel','success'); } catch(err){ showToast('Error: '+err.message,'error'); } }
+    async function exportUsersExcel(){ const token=(window.getToken && window.getToken()) || null; try { const res=await fetch(`${FN_BASE}/users?limit=1000`, { headers: token?{ 'Authorization':`Bearer ${token}` }:{} }); if(!res.ok) throw new Error('Failed to fetch users'); const data=await res.json(); const headers=['Name','Email','Role']; const tsv=[ headers.join('\t'), ...(data.users||[]).map(u=>[u.name,u.email,u.role].join('\t')) ].join('\n'); const blob=new Blob([tsv],{type:'application/vnd.ms-excel'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='users.xls'; a.click(); URL.revokeObjectURL(url); showToast('Exported Excel','success'); } catch(err){ showToast('Error: '+err.message,'error'); } }
 
         // Import users from CSV via backend API
-    async function importUsersCSV(evt){ const file=evt.target.files[0]; if(!file) return; const token=localStorage.getItem('accessToken') || localStorage.getItem('authToken'); const reader=new FileReader(); reader.onload=async e=>{ try { const lines=e.target.result.split('\n'); const start = lines[0].toLowerCase().includes('name')?1:0; let imported=0; for(let i=start;i<lines.length;i++){ const line=lines[i].trim(); if(!line) continue; const parts=line.split(',').map(f=>f.replace(/^"|"$/g,'').trim()); if(parts.length<3) continue; const [name,email,roleRaw]=parts; const role=roleRaw.toLowerCase(); const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/; if(!emailRegex.test(email)) continue; if(!['user','admin','manager'].includes(role)) continue; const password=Math.random().toString(36).slice(-10)+'A1!'; const res=await fetch(`${FN_BASE}/users`, { method:'POST', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ name,email,role,password }) }); if(res.ok) imported++; }
+    async function importUsersCSV(evt){ const file=evt.target.files[0]; if(!file) return; const token=(window.getToken && window.getToken()) || null; const reader=new FileReader(); reader.onload=async e=>{ try { const lines=e.target.result.split('\n'); const start = lines[0].toLowerCase().includes('name')?1:0; let imported=0; for(let i=start;i<lines.length;i++){ const line=lines[i].trim(); if(!line) continue; const parts=line.split(',').map(f=>f.replace(/^\"|\"$/g,'').trim()); if(parts.length<3) continue; const [name,email,roleRaw]=parts; const role=roleRaw.toLowerCase(); const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/; if(!emailRegex.test(email)) continue; if(!['user','admin','manager'].includes(role)) continue; const password=Math.random().toString(36).slice(-10)+'A1!'; const res=await fetch(`${FN_BASE}/users`, { method:'POST', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ name,email,role,password }) }); if(res.ok) imported++; }
             await loadUsers(); showToast(imported+' users imported','success'); } catch(err){ showToast('Import error: '+err.message,'error'); } }; reader.readAsText(file); evt.target.value=''; }
 
         // Event wiring
         document.addEventListener('DOMContentLoaded', () => {
             // Require authentication for this page
-            const initialToken = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+            const initialToken = (window.getToken && window.getToken()) || null;
             if (!initialToken && !AUTH_DISABLED) {
                 // Do not auto-redirect; show CTA
                 showSignInCTA();
@@ -375,7 +375,7 @@
                 const id=e.target.dataset.id; if(!id) return;
                 if(e.target.classList.contains('edit-user')) { editUser(parseInt(id)); return; }
                 if(e.target.classList.contains('delete-user')) { deleteUser(parseInt(id)); return; }
-                const token=localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+                const token=(window.getToken && window.getToken()) || null;
                 if(e.target.classList.contains('lock-user')){ const u=usersState.list.find(x=>x.id==id); if(!u) return; try { const res=await fetch(`${FN_BASE}/users/${id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ is_active: !u.is_active }) }); if(!res.ok) throw new Error('Failed to update'); showToast(u.is_active?'User locked':'User unlocked','success'); await loadUsers(usersState.pagination.page); } catch(err){ showToast('Error: '+err.message,'error'); } return; }
                 if(e.target.classList.contains('reset-password-user')){ if(!confirm('Reset password for this user?')) return; try { const newPassword=Math.random().toString(36).slice(-10)+'A1!'; const res=await fetch(`${FN_BASE}/users/${id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ newPassword }) }); if(!res.ok) throw new Error('Failed to reset'); showToast('Temp password: '+newPassword,'success'); } catch(err){ showToast('Error: '+err.message,'error'); } return; }
                 if(e.target.classList.contains('impersonate-user')){ showToast('Impersonation not implemented'); }

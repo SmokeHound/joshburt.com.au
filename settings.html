@@ -296,7 +296,7 @@
         // Helper to send audit entries to serverless audit endpoint
         async function sendAudit(action, details) {
           try {
-            const token = localStorage.getItem('accessToken');
+            const token = (window.getToken && window.getToken()) || null;
             let userId = null;
             try { const u = JSON.parse(localStorage.getItem('user')||'null'); if (u && typeof u.id === 'number') userId = u.id; } catch {}
             const FN_BASE = window.FN_BASE || '/.netlify/functions';

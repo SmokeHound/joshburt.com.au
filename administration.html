@@ -189,9 +189,9 @@
                         };
 
                                                 // Initialize feature flags on page load and show sign-in CTA if needed
-                                                document.addEventListener('DOMContentLoaded', async function() {
+                        document.addEventListener('DOMContentLoaded', async function() {
                                                         const AUTH_DISABLED = window.AUTH_DISABLED === true;
-                                                        const token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+                            const token = (window.getToken && window.getToken()) || null;
                                                         if (!token && !AUTH_DISABLED) {
                                                                 showSignInCTA();
                                                                 return;

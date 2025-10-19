@@ -112,7 +112,7 @@
         let auditLogs = [];
         let apiHealthy = false, dbHealthy = false, serverHealthy = true;
 
-        const token = localStorage.getItem('accessToken');
+  const token = (window.getToken && window.getToken()) || null;
         const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
         let currentRole = 'user';
         try {
