@@ -15,7 +15,7 @@
     <div id="main-nav"></div>
     <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
     <main class="max-w-2xl mx-auto p-6 md:ml-64">
-                <header class="sticky top-0 p-6 rounded-lg shadow-md mb-6 z-40 border card">
+        <header class="page-header card border">
           <h1 class="text-2xl font-bold">My Profile</h1>
         </header>
         <form id="profile-form" class="card widget-primary rounded-lg shadow-md p-6 flex flex-col gap-4">
