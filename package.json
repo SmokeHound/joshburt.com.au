@@ -16,7 +16,7 @@
     "test": "npm run test:jest",
     "test:all": "echo Running Jest suite && npm run test:jest && echo Running Node smoke tests && npm run test:functions",
   "lint:js": "eslint . --ext .js -f stylish",
-    "lint:html": "htmlhint '**/*.html'",
+  "lint:html": "htmlhint .",
     "lint": "echo Linting JS && npm run lint:js && echo Linting HTML && npm run lint:html",
     "validate": "echo Lint + Build + Tests start && npm run lint && echo Build CSS && npm run build:css && echo Run tests && npm run test:all"
   },
