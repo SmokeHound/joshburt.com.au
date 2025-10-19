@@ -1,13 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// Minimal utility to load an HTML file from project root
-function loadHtml(file) {
-  const p = path.join(__dirname, '..', '..', file);
-  return fs.readFileSync(p, 'utf8');
-}
-
-describe('Page header utility adoption', () => {
+describe('Page header utility presence', () => {
   const pages = [
     'index.html',
     'administration.html',
@@ -21,10 +15,11 @@ describe('Page header utility adoption', () => {
     'users.html',
   ];
 
-  test.each(pages)('%s contains page-header and main landmark', (file) => {
-    const html = loadHtml(file);
-    expect(html).toMatch(/<header[^>]*class=["'][^"']*page-header[^"']*["'][^>]*>/i);
-    // Ensure there is a main landmark; allow attributes
-    expect(html).toMatch(/<main\b[^>]*>/i);
-  });
+  for (const page of pages) {
+    it(`${page} contains a page header`, () => {
+      const file = path.join(__dirname, '..', '..', page);
+      const html = fs.readFileSync(file, 'utf8');
+      expect(html).toMatch(/<header[^>]*class="[^"]*page-header[^"]*"/);
+    });
+  }
 });

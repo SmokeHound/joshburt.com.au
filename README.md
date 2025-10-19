@@ -133,14 +133,25 @@ UI Features:
 See `DATABASE.md` for full parameter reference.
 ## 🏗️ Architecture
 
-# Start static development server (serves HTML/CSS/JS only)
-python3 -m http.server 8000
+### Development Server Options
 
-# Netlify Functions local dev (optional, if using Netlify CLI)
-# npm install -g netlify-cli
-# netlify dev
+```bash
+# Static-only development (HTML/CSS/JS)
+npm run dev
+# Or: python3 -m http.server 8000
+# Visit http://localhost:8000
 
-# Visit http://localhost:8888 (Netlify Dev) OR http://localhost:8000 (static only)
+# Netlify Functions local dev (for API endpoints)
+npm run dev:functions
+# Visit http://localhost:8888
+
+# Health check (verify functions are running)
+npm run health
+
+# For full-stack development:
+# Terminal 1: npm run dev
+# Terminal 2: npm run dev:functions
+```
 - **`shared-config.html`**: TailwindCSS configuration and common styles
 - **`API/Netlify Functions`**: Dynamic backend for products, orders, users, and authentication
 ### Automated Deployment
@@ -197,12 +208,14 @@ npm run test:unit
 # Run integration tests
 npm run test:integration
 
-# Run linting
+# Run linting (JS + HTML)
 npm run lint
 
-# Run complete validation
+# Run complete validation (lint + build + tests)
 npm run validate
 ```
+
+**Note for Windows**: HTML linting uses `htmlhint .` to scan all HTML files recursively. On older versions or restricted environments, you may need to use `htmlhint "**/*.html"` instead.
 
 ## 🧪 Testing Infrastructure
 
@@ -225,6 +238,34 @@ npm run validate
 - **API**: Products, orders, users, authentication endpoints
 
 ## 🎨 Design System
+
+### Page Header Utility
+
+All main pages use a standardized `.page-header` utility class for consistent sticky headers:
+
+```html
+<header class="page-header card border">
+  <h1>Page Title</h1>
+  <!-- header content -->
+</header>
+```
+
+The `.page-header` utility provides:
+- Sticky positioning (stays at top on scroll)
+- Proper z-index layering (z-40)
+- Consistent padding, rounded corners, shadow
+- Light/dark theme-aware backgrounds with frosted glass effect
+- Safari-compatible backdrop blur
+
+Defined in: `shared-config.html`
+
+### Accessibility Features
+
+- **Skip to Content Link**: Global skip link injected on every page (keyboard accessible, auto-positions on focus)
+- **Main Landmark**: Auto-assigns `id="main"` to the first `<main>` element if missing
+- **ARIA Attributes**: Proper labeling on interactive elements
+- **Keyboard Navigation**: Full keyboard support for navigation and modals
+- **Focus Indicators**: Enhanced focus states for all interactive elements
 
 ### Colors
 - **Primary**: `#3b82f6` (Blue)
