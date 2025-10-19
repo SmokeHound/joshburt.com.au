@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+# Sitemap: https://joshburt.com.au/sitemap.xml

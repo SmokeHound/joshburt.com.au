@@ -13,3 +13,18 @@
     Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With"
     Access-Control-Allow-Methods = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
     Access-Control-Max-Age = "86400"
+
+[[headers]]
+  # Global security headers for all routes
+  for = "/*"
+  [headers.values]
+    # Enforce HTTPS and enable HSTS for 6 months; includeSubDomains optional depending on subdomain use
+    Strict-Transport-Security = "max-age=15552000; includeSubDomains; preload"
+    # Prevent MIME type sniffing
+    X-Content-Type-Options = "nosniff"
+    # Mitigate clickjacking
+    X-Frame-Options = "SAMEORIGIN"
+    # Limit referrer data
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Conservative permissions policy (expand as needed)
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"

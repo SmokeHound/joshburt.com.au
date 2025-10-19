@@ -35,7 +35,14 @@ jobs:
           DB_TYPE: sqlite
           JWT_SECRET: test-secret
           BCRYPT_ROUNDS: 6
-        run: npm run test:jest
+        run: npm run test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
 
   smoke-functions:
     runs-on: ubuntu-latest

@@ -16,6 +16,7 @@
   "test:unit": "jest --config jest.config.js --testPathPattern=tests[\\/ ]unit[\\/ ].*\\.test\\.js$ --passWithNoTests",
   "test:integration": "jest --config jest.config.js --testPathPattern=tests[\\/ ]integration[\\/ ].*\\.test\\.js$ --passWithNoTests",
   "test:jest": "jest --config jest.config.js",
+  "test:coverage": "jest --config jest.config.js --coverage",
     "test": "npm run test:jest",
     "test:all": "echo Running Jest suite && npm run test:jest && echo Running Node smoke tests && npm run test:functions",
   "lint:js": "eslint . --ext .js -f stylish",
