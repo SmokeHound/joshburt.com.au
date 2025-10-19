@@ -15,15 +15,20 @@
     <link rel="stylesheet" href="./assets/css/styles.css">
     <script src="./assets/js/auth0.js" defer></script>
     <script>
-        // Configuration for dynamic color updates from settings
-        function applyDynamicColors() {
-            const settingsHead = JSON.parse(localStorage.getItem('siteSettings')) || {};
-            // Apply CSS variables for instant color update
-            document.documentElement.style.setProperty('--tw-color-primary', settingsHead.primaryColor || '#3b82f6');
-            document.documentElement.style.setProperty('--tw-color-secondary', settingsHead.secondaryColor || '#10b981');
-            document.documentElement.style.setProperty('--tw-color-accent', settingsHead.accentColor || '#8b5cf6');
-        }
-        applyDynamicColors();
+        // Load centralized theme manager
+        fetch('shared-theme.html')
+            .then(r => r.text())
+            .then(html => {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                const scripts = temp.getElementsByTagName('script');
+                for (let script of scripts) {
+                    const newScript = document.createElement('script');
+                    newScript.textContent = script.textContent;
+                    document.head.appendChild(newScript);
+                }
+            })
+            .catch(err => console.warn('Failed to load shared-theme.html:', err));
         // Service Worker Registration for PWA
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
