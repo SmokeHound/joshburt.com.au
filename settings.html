@@ -331,6 +331,9 @@
                   <option value="neon">Neon</option>
                   <option value="high-contrast">High Contrast</option>
                   <option value="ocean">Ocean</option>
+                  <option value="forest">Forest</option>
+                  <option value="sunset">Sunset</option>
+                  <option value="mono">Monochrome</option>
                 </select>
                 
                 <!-- Theme Cards Grid -->
@@ -347,9 +350,9 @@
                         </div>
                       </div>
                       <div class="flex gap-2 mb-2">
-                        <div class="w-8 h-8 rounded" style="background-color: #3b82f6;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #10b981;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #8b5cf6;"></div>
+                        <div class="w-8 h-8 rounded sw-3b82f6"></div>
+                        <div class="w-8 h-8 rounded sw-10b981"></div>
+                        <div class="w-8 h-8 rounded sw-8b5cf6"></div>
                       </div>
                       <p class="text-xs text-gray-400">Classic dark theme</p>
                     </div>
@@ -367,9 +370,9 @@
                         </div>
                       </div>
                       <div class="flex gap-2 mb-2">
-                        <div class="w-8 h-8 rounded" style="background-color: #3b82f6;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #10b981;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #8b5cf6;"></div>
+                        <div class="w-8 h-8 rounded sw-3b82f6"></div>
+                        <div class="w-8 h-8 rounded sw-10b981"></div>
+                        <div class="w-8 h-8 rounded sw-8b5cf6"></div>
                       </div>
                       <p class="text-xs text-gray-500">Bright and clean</p>
                     </div>
@@ -387,9 +390,9 @@
                         </div>
                       </div>
                       <div class="flex gap-2 mb-2">
-                        <div class="w-8 h-8 rounded" style="background-color: #3b82f6;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #10b981;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #8b5cf6;"></div>
+                        <div class="w-8 h-8 rounded sw-3b82f6"></div>
+                        <div class="w-8 h-8 rounded sw-10b981"></div>
+                        <div class="w-8 h-8 rounded sw-8b5cf6"></div>
                       </div>
                       <p class="text-xs text-white drop-shadow">Follows system preference</p>
                     </div>
@@ -407,9 +410,9 @@
                         </div>
                       </div>
                       <div class="flex gap-2 mb-2">
-                        <div class="w-8 h-8 rounded" style="background-color: #00d4ff; box-shadow: 0 0 10px #00d4ff;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #00ff88; box-shadow: 0 0 10px #00ff88;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #ff00aa; box-shadow: 0 0 10px #ff00aa;"></div>
+                        <div class="w-8 h-8 rounded sw-00d4ff"></div>
+                        <div class="w-8 h-8 rounded sw-00ff88"></div>
+                        <div class="w-8 h-8 rounded sw-ff00aa"></div>
                       </div>
                       <p class="text-xs text-cyan-300">Vibrant neon glow</p>
                     </div>
@@ -427,9 +430,9 @@
                         </div>
                       </div>
                       <div class="flex gap-2 mb-2">
-                        <div class="w-8 h-8 rounded" style="background-color: #00ffff;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #00ff00;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #ff00ff;"></div>
+                        <div class="w-8 h-8 rounded sw-00ffff"></div>
+                        <div class="w-8 h-8 rounded sw-00ff00"></div>
+                        <div class="w-8 h-8 rounded sw-ff00ff"></div>
                       </div>
                       <p class="text-xs text-yellow-300">Maximum readability</p>
                     </div>
@@ -447,11 +450,71 @@
                         </div>
                       </div>
                       <div class="flex gap-2 mb-2">
-                        <div class="w-8 h-8 rounded" style="background-color: #0284c7;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #06b6d4;"></div>
-                        <div class="w-8 h-8 rounded" style="background-color: #0ea5e9;"></div>
+                        <div class="w-8 h-8 rounded sw-0284c7"></div>
+                        <div class="w-8 h-8 rounded sw-06b6d4"></div>
+                        <div class="w-8 h-8 rounded sw-0ea5e9"></div>
                       </div>
                       <p class="text-xs text-blue-300">Deep sea blues</p>
+                    </div>
+                  </div>
+
+                  <!-- Forest Theme -->
+                  <div class="theme-card relative cursor-pointer rounded-lg border-2 border-gray-600 hover:border-green-500 transition-all overflow-hidden group" data-theme="forest">
+                    <div class="p-4 bg-gray-900">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-green-300">Forest</h4>
+                        <div class="theme-active-indicator hidden">
+                          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 mb-2">
+                        <div class="w-8 h-8 rounded sw-166534"></div>
+                        <div class="w-8 h-8 rounded sw-22c55e"></div>
+                        <div class="w-8 h-8 rounded sw-84cc16"></div>
+                      </div>
+                      <p class="text-xs text-green-300">Earthy greens</p>
+                    </div>
+                  </div>
+
+                  <!-- Sunset Theme -->
+                  <div class="theme-card relative cursor-pointer rounded-lg border-2 border-gray-600 hover:border-orange-400 transition-all overflow-hidden group" data-theme="sunset">
+                    <div class="p-4 bg-white">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-orange-500">Sunset</h4>
+                        <div class="theme-active-indicator hidden">
+                          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 mb-2">
+                        <div class="w-8 h-8 rounded sw-f59e42"></div>
+                        <div class="w-8 h-8 rounded sw-ef4444"></div>
+                        <div class="w-8 h-8 rounded sw-f472b6"></div>
+                      </div>
+                      <p class="text-xs text-gray-500">Warm sunset hues</p>
+                    </div>
+                  </div>
+
+                  <!-- Monochrome Theme -->
+                  <div class="theme-card relative cursor-pointer rounded-lg border-2 border-gray-600 hover:border-gray-400 transition-all overflow-hidden group" data-theme="mono">
+                    <div class="p-4 bg-gray-800">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-gray-200">Monochrome</h4>
+                        <div class="theme-active-indicator hidden">
+                          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 mb-2">
+                        <div class="w-8 h-8 rounded sw-22223b"></div>
+                        <div class="w-8 h-8 rounded sw-4a4e69"></div>
+                        <div class="w-8 h-8 rounded sw-9a8c98"></div>
+                      </div>
+                      <p class="text-xs text-gray-400">Subtle monochrome tones</p>
                     </div>
                   </div>
                 </div>
@@ -476,41 +539,41 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
                   <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="default">
                     <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded" style="background-color: #3b82f6;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #10b981;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #8b5cf6;"></div>
+                      <div class="w-full h-6 rounded sw-3b82f6"></div>
+                      <div class="w-full h-6 rounded sw-10b981"></div>
+                      <div class="w-full h-6 rounded sw-8b5cf6"></div>
                     </div>
                     <p class="text-xs font-semibold">Default</p>
                   </button>
                   <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="ocean">
                     <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded" style="background-color: #0284c7;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #06b6d4;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #0ea5e9;"></div>
+                      <div class="w-full h-6 rounded sw-0284c7"></div>
+                      <div class="w-full h-6 rounded sw-06b6d4"></div>
+                      <div class="w-full h-6 rounded sw-0ea5e9"></div>
                     </div>
                     <p class="text-xs font-semibold">Ocean</p>
                   </button>
                   <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="forest">
                     <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded" style="background-color: #166534;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #22c55e;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #84cc16;"></div>
+                      <div class="w-full h-6 rounded sw-166534"></div>
+                      <div class="w-full h-6 rounded sw-22c55e"></div>
+                      <div class="w-full h-6 rounded sw-84cc16"></div>
                     </div>
                     <p class="text-xs font-semibold">Forest</p>
                   </button>
                   <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="sunset">
                     <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded" style="background-color: #f59e42;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #ef4444;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #f472b6;"></div>
+                      <div class="w-full h-6 rounded sw-f59e42"></div>
+                      <div class="w-full h-6 rounded sw-ef4444"></div>
+                      <div class="w-full h-6 rounded sw-f472b6"></div>
                     </div>
                     <p class="text-xs font-semibold">Sunset</p>
                   </button>
                   <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="mono">
                     <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded" style="background-color: #22223b;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #4a4e69;"></div>
-                      <div class="w-full h-6 rounded" style="background-color: #9a8c98;"></div>
+                      <div class="w-full h-6 rounded sw-22223b"></div>
+                      <div class="w-full h-6 rounded sw-4a4e69"></div>
+                      <div class="w-full h-6 rounded sw-9a8c98"></div>
                     </div>
                     <p class="text-xs font-semibold">Mono</p>
                   </button>
@@ -521,16 +584,19 @@
                   <div class="flex items-center gap-3">
                     <label for="primaryColor" class="w-24 font-semibold">Primary</label>
                     <input id="primaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#3b82f6" />
+                    <div aria-hidden="true" title="Primary preview" class="w-10 h-8 rounded preview-box-primary border border-gray-600"></div>
                     <input id="primaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#3b82f6" title="Primary color hex" placeholder="#3b82f6" />
                   </div>
                   <div class="flex items-center gap-3">
                     <label for="secondaryColor" class="w-24 font-semibold">Secondary</label>
                     <input id="secondaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#10b981" />
+                    <div aria-hidden="true" title="Secondary preview" class="w-10 h-8 rounded preview-box-secondary border border-gray-600"></div>
                     <input id="secondaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#10b981" title="Secondary color hex" placeholder="#10b981" />
                   </div>
                   <div class="flex items-center gap-3">
                     <label for="accentColor" class="w-24 font-semibold">Accent</label>
                     <input id="accentColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#8b5cf6" />
+                    <div aria-hidden="true" title="Accent preview" class="w-10 h-8 rounded preview-box-accent border border-gray-600"></div>
                     <input id="accentColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#8b5cf6" title="Accent color hex" placeholder="#8b5cf6" />
                   </div>
                 </div>
@@ -975,14 +1041,20 @@
       });
       
       // Color pickers and text inputs sync
-      colorInputs.forEach((inputId, index) => {
+        colorInputs.forEach((inputId, index) => {
         const colorInput = document.getElementById(inputId);
         const textInput = document.getElementById(colorTexts[index]);
-        const preview = document.getElementById(previews[index]);
+        const varName = ['--preview-primary','--preview-secondary','--preview-accent'][index];
         
+        // initialize from existing inputs
+        if (colorInput && colorInput.value) {
+          document.documentElement.style.setProperty(varName, colorInput.value);
+        }
+
         colorInput.addEventListener('change', (e) => {
           textInput.value = e.target.value;
-          if (preview) preview.style.backgroundColor = e.target.value;
+          // set CSS variable on :root for live preview styling
+          document.documentElement.style.setProperty(varName, e.target.value);
           presetSelect.value = '';
           // Reset preset button styling
           colorPresetButtons.forEach(b => {
@@ -990,11 +1062,11 @@
             b.classList.add('border-2', 'border-gray-600');
           });
         });
-        
+
         textInput.addEventListener('change', (e) => {
           if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
             colorInput.value = e.target.value;
-            if (preview) preview.style.backgroundColor = e.target.value;
+            document.documentElement.style.setProperty(varName, e.target.value);
             presetSelect.value = '';
             // Reset preset button styling
             colorPresetButtons.forEach(b => {
@@ -1216,6 +1288,29 @@
       initThemeSchedule();
       initSecuritySettings();
       loadSettings();
+      // Initialize preview boxes from ThemeManager if available
+      try {
+        if (window.Theme && typeof window.Theme.getActiveTheme === 'function') {
+          const active = window.Theme.getActiveTheme();
+          if (active && active.colors) {
+            document.documentElement.style.setProperty('--preview-primary', active.colors.primary);
+            document.documentElement.style.setProperty('--preview-secondary', active.colors.secondary);
+            document.documentElement.style.setProperty('--preview-accent', active.colors.accent);
+          }
+        }
+      } catch (e) {}
+      // Update previews when site settings change
+      window.addEventListener('siteSettingsUpdated', (evt) => {
+        try {
+          const detail = (evt && evt.detail) || (window.Theme ? window.Theme.getActiveTheme().colors : null);
+          if (detail) {
+            const c = detail.colors || detail;
+            if (c.primary) document.documentElement.style.setProperty('--preview-primary', c.primary);
+            if (c.secondary) document.documentElement.style.setProperty('--preview-secondary', c.secondary);
+            if (c.accent) document.documentElement.style.setProperty('--preview-accent', c.accent);
+          }
+        } catch (e) {}
+      });
       // Character counters
       const titleEl = document.getElementById('site-title');
       const descEl = document.getElementById('site-description');

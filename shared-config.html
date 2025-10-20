@@ -316,6 +316,54 @@
     .dark .description, .dark .text-description {
         color: #9ca3af; /* gray-400 */
     }
+
+    /* Theme swatch utilities (used by settings UI) */
+    .sw-3b82f6 { background-color: #3b82f6; }
+    .sw-10b981 { background-color: #10b981; }
+    .sw-8b5cf6 { background-color: #8b5cf6; }
+    .sw-00d4ff { background-color: #00d4ff; box-shadow: 0 0 10px #00d4ff; }
+    .sw-00ff88 { background-color: #00ff88; box-shadow: 0 0 10px #00ff88; }
+    .sw-ff00aa { background-color: #ff00aa; box-shadow: 0 0 10px #ff00aa; }
+    .sw-00ffff { background-color: #00ffff; }
+    .sw-00ff00 { background-color: #00ff00; }
+    .sw-ff00ff { background-color: #ff00ff; }
+    .sw-0284c7 { background-color: #0284c7; }
+    .sw-06b6d4 { background-color: #06b6d4; }
+    .sw-0ea5e9 { background-color: #0ea5e9; }
+    .sw-166534 { background-color: #166534; }
+    .sw-22c55e { background-color: #22c55e; }
+    .sw-84cc16 { background-color: #84cc16; }
+    .sw-f59e42 { background-color: #f59e42; }
+    .sw-ef4444 { background-color: #ef4444; }
+    .sw-f472b6 { background-color: #f472b6; }
+    .sw-22223b { background-color: #22223b; }
+    .sw-4a4e69 { background-color: #4a4e69; }
+    .sw-9a8c98 { background-color: #9a8c98; }
+    /* Preview variables for the settings preview boxes */
+    :root {
+        --preview-primary: #3b82f6;
+        --preview-secondary: #10b981;
+        --preview-accent: #8b5cf6;
+    }
+    .preview-box-primary { background-color: var(--preview-primary); }
+    .preview-box-secondary { background-color: var(--preview-secondary); }
+    .preview-box-accent { background-color: var(--preview-accent); }
+    /* Preview box visual polish */
+    .preview-box-primary, .preview-box-secondary, .preview-box-accent {
+        transition: background-color 240ms ease, box-shadow 240ms ease;
+    }
+    .preview-box-primary:focus, .preview-box-secondary:focus, .preview-box-accent:focus {
+        outline: 2px solid rgba(59,130,246,0.6);
+        outline-offset: 2px;
+    }
+    @keyframes preview-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.0); }
+        50% { box-shadow: 0 0 10px 4px rgba(59,130,246,0.08); }
+        100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.0); }
+    }
+    .preview-pulse {
+        animation: preview-pulse 800ms ease-in-out;
+    }
 </style>
 <script>
     // Accessibility: inject Skip to main content link and ensure main has an id
