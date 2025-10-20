@@ -17,6 +17,9 @@
   <style>
     .consumable-item{transition:all .2s ease;background:#111;border:1px solid #333}
     .consumable-item:hover{background:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
+    /* Column width helpers to avoid inline styles */
+    .col-image { width: 72px; }
+    .col-actions { width: 120px; }
   </style>
 </head>
 <body class="dark">
@@ -50,17 +53,18 @@
         </header>
         <!-- Audit Log removed: moved out of management UI -->
         <div class="overflow-x-auto rounded-lg shadow mb-8">
-          <table class="min-w-full bg-gray-900 text-white">
+          <!-- Use fixed table layout and explicit column widths to keep action buttons aligned -->
+          <table class="min-w-full bg-gray-900 text-white table-fixed w-full">
             <thead>
               <tr class="bg-accent text-left">
-                <th class="p-3">Image</th>
+                <th class="p-3 col-image">Image</th>
                 <th class="p-3">Name</th>
                 <th class="p-3">Type</th>
                 <th class="p-3">Category</th>
                 <th class="p-3">Code</th>
                 <th class="p-3">Stock</th>
                 <th class="p-3">Reorder</th>
-                <th class="p-3">Actions</th>
+                <th class="p-3 col-actions">Actions</th>
               </tr>
             </thead>
             <tbody id="productTableBody">
