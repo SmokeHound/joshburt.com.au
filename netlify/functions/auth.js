@@ -125,8 +125,26 @@ exports.handler = withHandler(async (event) => {
         const tokens = generateTokens(user.id);
         await storeRefreshToken(user.id, tokens.refreshToken);
         await database.run('DELETE FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
+        // Audit: successful refresh
+        try {
+          const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || '';
+          const ua = (event.headers && event.headers['user-agent']) || '';
+          const details = JSON.stringify({ message: 'Tokens refreshed' });
+          await database.run('INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)', [user.id, 'auth_refresh_success', details, ip, ua]);
+        } catch (auditErr) { console.warn('Audit insert failed (refresh success):', auditErr && auditErr.message); }
+
         return jsonResponse(200, { message: 'Tokens refreshed', accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
       } catch (e) {
+        // Attempt to audit failure (best-effort) with any available context
+        try {
+          const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || '';
+          const ua = (event.headers && event.headers['user-agent']) || '';
+          // Try to glean a user id from a decoded token if present
+          let possibleUserId = null;
+          try { const maybe = jwt.decode(refreshToken); if (maybe && maybe.userId) possibleUserId = maybe.userId; } catch(_) { /* noop */ }
+          const details = JSON.stringify({ message: 'Token refresh failed', error: (e && e.message) ? e.message : String(e) });
+          await database.run('INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)', [possibleUserId, 'auth_refresh_failed', details, ip, ua]);
+        } catch (auditErr) { console.warn('Audit insert failed (refresh failure):', auditErr && auditErr.message); }
         return jsonResponse(401, { error: 'Token refresh failed' });
       }
     }
