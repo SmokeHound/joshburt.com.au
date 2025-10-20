@@ -821,6 +821,15 @@
       };
     }
 
+    // Small helper to pulse preview boxes
+    function pulsePreviews(timeout = 900) {
+      try {
+        const els = document.querySelectorAll('.preview-box-primary, .preview-box-secondary, .preview-box-accent');
+        els.forEach(el => el.classList.add('preview-pulse'));
+        setTimeout(() => { els.forEach(el => el.classList.remove('preview-pulse')); }, timeout);
+      } catch (e) {}
+    }
+
     // Load settings from API
     async function loadSettings() {
       try {
@@ -1001,6 +1010,8 @@
           const themeId = card.getAttribute('data-theme');
           themeSelect.value = themeId;
           updateActiveThemeCard(themeId);
+          // Provide immediate visual feedback
+          try { pulsePreviews(700); } catch (e) {}
           await saveSettings();
           const msg = `Changed theme to ${themeId} via theme card`;
           AuditLogger.log('theme_change', msg);
@@ -1078,6 +1089,8 @@
       });
       
       document.getElementById('apply-theme').addEventListener('click', async () => {
+        // Immediate pulse for instant feedback
+        try { pulsePreviews(700); } catch (e) {}
         await saveSettings();
         // Theme will be applied automatically via ThemeManager when siteSettingsUpdated event fires
         const msg = 'Applied custom theme via API';
