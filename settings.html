@@ -1311,6 +1311,14 @@
           }
         } catch (e) {}
       });
+      // Add brief pulse animation to preview boxes when settings are applied
+      window.addEventListener('siteSettingsUpdated', () => {
+        try {
+          const els = document.querySelectorAll('.preview-box-primary, .preview-box-secondary, .preview-box-accent');
+          els.forEach(el => el.classList.add('preview-pulse'));
+          setTimeout(() => { els.forEach(el => el.classList.remove('preview-pulse')); }, 900);
+        } catch (e) {}
+      });
       // Character counters
       const titleEl = document.getElementById('site-title');
       const descEl = document.getElementById('site-description');
