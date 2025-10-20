@@ -399,5 +399,48 @@
                 ensureMainId(); makeSkip();
             }
         } catch (e) {}
+
+                // Global handler: show a sign-in CTA when authentication is required.
+                try {
+                    window.addEventListener('auth:required', (ev) => {
+                        try {
+                            // If a page implements a showSignInCTA function, call it
+                            if (typeof window.showSignInCTA === 'function') {
+                                try { window.showSignInCTA(ev && ev.detail ? ev.detail : {}); } catch(_){}
+                                return true; // event handled
+                            }
+                            // Otherwise, show shared modal fallback (insert modal once)
+                            try {
+                                if (!document.getElementById('global-auth-modal')) {
+                                    const modal = document.createElement('div');
+                                    modal.id = 'global-auth-modal';
+                                    modal.className = 'hidden fixed inset-0 z-50 flex items-center justify-center';
+                                    modal.innerHTML = `
+                                        <div class="absolute inset-0 bg-black bg-opacity-50" id="global-auth-backdrop"></div>
+                                        <div class="bg-gray-900 text-white rounded-lg p-6 z-60 max-w-md w-full">
+                                            <h3 class="text-lg font-semibold mb-2">Sign in required</h3>
+                                            <p class="mb-4">You need to sign in to continue using this page.</p>
+                                            <div class="flex gap-2 justify-end">
+                                                <button id="global-auth-cancel" class="btn-neon-green px-4 py-2 rounded">Cancel</button>
+                                                <button id="global-auth-signin" class="btn-neon-blue px-4 py-2 rounded">Sign in</button>
+                                            </div>
+                                        </div>`;
+                                    document.body.appendChild(modal);
+                                    // Wire modal buttons
+                                    document.getElementById('global-auth-signin').addEventListener('click', () => {
+                                        const ru = encodeURIComponent((ev && ev.detail && ev.detail.returnUrl) ? ev.detail.returnUrl : (window.location.pathname + window.location.search));
+                                        window.location.href = `login.html?message=login-required&returnUrl=${ru}`;
+                                    });
+                                    document.getElementById('global-auth-cancel').addEventListener('click', () => {
+                                        try { document.getElementById('global-auth-modal').classList.add('hidden'); } catch(_){}
+                                    });
+                                }
+                                // Show it
+                                try { document.getElementById('global-auth-modal').classList.remove('hidden'); } catch(_){}
+                            } catch (e) { /* noop */ }
+                            return true;
+                        } catch (e) { return false; }
+                    });
+                } catch (e) { /* noop if events unsupported */ }
     })();
     </script>

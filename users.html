@@ -354,6 +354,15 @@
                 // Stop further initialization until signed in
                 return;
             }
+
+                        // Listen for global auth required events and show CTA instead of redirect
+                        try {
+                            window.addEventListener('auth:required', (ev) => {
+                                try { showSignInCTA(); } catch(_){}
+                                // Return false to signal that the event was not handled if we want fallback redirect
+                                return true;
+                            });
+                        } catch(e) { /* noop */ }
             if (typeof AuditLogger !== 'undefined') { AuditLogger.log('page_access','Accessed User Management page'); }
             loadUsers();
             loadAndApplySettings();

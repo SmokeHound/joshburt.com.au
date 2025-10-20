@@ -304,7 +304,9 @@
             return;
           }
         }
-        // Refresh failed: clear session and redirect to login
+        // Refresh failed: clear session and notify the page instead of forcing a redirect.
+        // Pages can listen for 'auth:required' and show a sign-in CTA. We fall back to redirect
+        // only if no handler is present (rare) to preserve existing behavior.
         try {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
@@ -312,11 +314,38 @@
           localStorage.removeItem('currentUser');
         } catch(_){ /* clear session noop */ }
         try {
-          if (!/login\.html$/i.test(window.location.pathname)) {
-            var ru = encodeURIComponent(window.location.pathname + window.location.search);
-            window.location.href = 'login.html?message=login-required&returnUrl=' + ru;
+          var returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+          var handled = false;
+          try {
+            // Dispatch a cancellable event so pages can handle auth prompts.
+            var ev = new CustomEvent('auth:required', { detail: { returnUrl: returnUrl, reason: 'refresh_failed' }, cancelable: true });
+            // Audit that auth was required for debugging/telemetry (best-effort)
+            try {
+              if (window.AuditLogger && typeof window.AuditLogger.log === 'function') {
+                // Best-effort current user info from localStorage
+                var currentUserInfo = null;
+                try { currentUserInfo = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('user') || 'null'); } catch(_) { currentUserInfo = null; }
+                var auditPayload = { reason: 'refresh_failed', returnUrl: returnUrl };
+                try {
+                  auditPayload.route = (window.location && (window.location.pathname + window.location.search)) || null;
+                } catch(_) { auditPayload.route = null; }
+                try { auditPayload.pageTitle = document.title || null; } catch(_) { auditPayload.pageTitle = null; }
+                try { auditPayload.userAgent = navigator.userAgent || null; } catch(_) { auditPayload.userAgent = null; }
+                try { auditPayload.hasRefreshToken = !!localStorage.getItem('refreshToken'); } catch(_) { auditPayload.hasRefreshToken = null; }
+                try { auditPayload.timestamp = new Date().toISOString(); } catch(_) { auditPayload.timestamp = null; }
+                if (currentUserInfo) auditPayload.user = { id: currentUserInfo.id || currentUserInfo.email || null, email: currentUserInfo.email || null, name: currentUserInfo.name || null, role: currentUserInfo.role || null };
+                window.AuditLogger.log('auth_required', auditPayload);
+              }
+            } catch (err) { console.debug('AuditLogger.log failed', err); }
+            handled = window.dispatchEvent(ev);
+          } catch (e) { handled = false; }
+          if (!handled) {
+            // No handler consumed the event; fall back to previous redirect behavior.
+            if (!/login\.html$/i.test(window.location.pathname)) {
+              window.location.href = 'login.html?message=login-required&returnUrl=' + returnUrl;
+            }
           }
-        } catch(e){ /* navigation noop */ }
+        } catch (e) { /* navigation noop */ }
       }
     } catch (e) { /* silent session bootstrap */ }
   })();
