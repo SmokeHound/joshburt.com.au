@@ -129,6 +129,7 @@
                       <input id="maintenance-mode" type="checkbox" />
                       <label for="maintenance-mode">Enable maintenance mode</label>
                     </div>
+                  </div>
                   </fieldset>
                 </div>
 
@@ -215,7 +216,7 @@
                     <!-- Feature Toggles (moved here) -->
                     <label class="flex items-center gap-2"><input id="enable-registration" type="checkbox"> <span>Enable Registration</span></label>
                     <label class="flex items-center gap-2"><input id="enable-guest-checkout" type="checkbox"> <span>Enable Guest Checkout</span></label>
-                    
+                  </div>
                   </fieldset>
                 </div>
 
@@ -247,6 +248,7 @@
                       </select>
                       <p class="text-xs text-gray-500 mt-1">Controls where the Consumables page loads its items from.</p>
                     </div>
+                  </div>
                   </fieldset>
                 </div>
 
@@ -315,85 +317,266 @@
                 <p class="text-sm text-gray-400 mt-1">Customize colors, presets and scheduling</p>
               </div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Theme Selection Cards -->
+            <div class="space-y-6">
               <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
-                <h3 class="text-lg font-bold text-white mb-6">Color Settings</h3>
-                <div class="space-y-4">
-                <!-- Default Theme Selector -->
-                <div class="flex items-center gap-3 mb-2">
-                  <label for="theme-select" class="w-32 font-semibold">Default Theme</label>
-                  <select id="theme-select" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700">
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                    <option value="system">System (Auto)</option>
-                    <option value="neon">Neon</option>
-                    <option value="high-contrast">High Contrast</option>
-                    <option value="ocean">Ocean</option>
-                  </select>
-                </div>
-                <!-- Preset Theme Selector -->
-                <div class="flex items-center gap-3 mb-2">
-                  <label for="theme-preset" class="w-32 font-semibold">Preset Theme</label>
-                  <select id="theme-preset" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700">
-                    <option value="">Custom</option>
-                    <option value="default">Default (Blue/Green/Purple)</option>
-                    <option value="ocean">Ocean</option>
-                    <option value="forest">Forest</option>
-                    <option value="sunset">Sunset</option>
-                    <option value="mono">Monochrome</option>
-                  </select>
-                </div>
-                <div class="flex items-center gap-3">
-                  <label for="primaryColor" class="w-32">Primary</label>
-                  <input id="primaryColor" type="color" class="w-12 h-10" value="#3b82f6" />
-                  <input id="primaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700" value="#3b82f6" title="Primary color hex" placeholder="#3b82f6" />
-                </div>
-                <div class="flex items-center gap-3">
-                  <label for="secondaryColor" class="w-32">Secondary</label>
-                  <input id="secondaryColor" type="color" class="w-12 h-10" value="#10b981" />
-                  <input id="secondaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700" value="#10b981" title="Secondary color hex" placeholder="#10b981" />
-                </div>
-                <div class="flex items-center gap-3">
-                  <label for="accentColor" class="w-32">Accent</label>
-                  <input id="accentColor" type="color" class="w-12 h-10" value="#8b5cf6" />
-                  <input id="accentColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700" value="#8b5cf6" title="Accent color hex" placeholder="#8b5cf6" />
-                </div>
-                  <button id="apply-theme" class="w-full btn-neon-green px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all mt-2">
-                    <span class="flex items-center justify-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                      Apply Theme Changes
-                    </span>
-                  </button>
+                <h3 class="text-lg font-bold text-white mb-4">Choose Theme</h3>
+                <p class="text-sm text-gray-400 mb-6">Select a theme to customize the appearance of your site</p>
+                
+                <!-- Hidden select for compatibility -->
+                <select id="theme-select" class="hidden">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                  <option value="system">System (Auto)</option>
+                  <option value="neon">Neon</option>
+                  <option value="high-contrast">High Contrast</option>
+                  <option value="ocean">Ocean</option>
+                </select>
+                
+                <!-- Theme Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <!-- Dark Theme -->
+                  <div class="theme-card relative cursor-pointer rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all overflow-hidden group" data-theme="dark">
+                    <div class="p-4 bg-gray-900">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-white">Dark</h4>
+                        <div class="theme-active-indicator hidden">
+                          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 mb-2">
+                        <div class="w-8 h-8 rounded" style="background-color: #3b82f6;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #10b981;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #8b5cf6;"></div>
+                      </div>
+                      <p class="text-xs text-gray-400">Classic dark theme</p>
+                    </div>
+                  </div>
+
+                  <!-- Light Theme -->
+                  <div class="theme-card relative cursor-pointer rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all overflow-hidden group" data-theme="light">
+                    <div class="p-4 bg-white">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-gray-900">Light</h4>
+                        <div class="theme-active-indicator hidden">
+                          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 mb-2">
+                        <div class="w-8 h-8 rounded" style="background-color: #3b82f6;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #10b981;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #8b5cf6;"></div>
+                      </div>
+                      <p class="text-xs text-gray-500">Bright and clean</p>
+                    </div>
+                  </div>
+
+                  <!-- System Auto Theme -->
+                  <div class="theme-card relative cursor-pointer rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all overflow-hidden group" data-theme="system">
+                    <div class="p-4 bg-gradient-to-br from-gray-900 to-gray-100">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-white drop-shadow-lg">System Auto</h4>
+                        <div class="theme-active-indicator hidden">
+                          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 mb-2">
+                        <div class="w-8 h-8 rounded" style="background-color: #3b82f6;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #10b981;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #8b5cf6;"></div>
+                      </div>
+                      <p class="text-xs text-white drop-shadow">Follows system preference</p>
+                    </div>
+                  </div>
+
+                  <!-- Neon Theme -->
+                  <div class="theme-card relative cursor-pointer rounded-lg border-2 border-gray-600 hover:border-cyan-400 transition-all overflow-hidden group" data-theme="neon">
+                    <div class="p-4 bg-black">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-cyan-400">Neon</h4>
+                        <div class="theme-active-indicator hidden">
+                          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 mb-2">
+                        <div class="w-8 h-8 rounded" style="background-color: #00d4ff; box-shadow: 0 0 10px #00d4ff;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #00ff88; box-shadow: 0 0 10px #00ff88;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #ff00aa; box-shadow: 0 0 10px #ff00aa;"></div>
+                      </div>
+                      <p class="text-xs text-cyan-300">Vibrant neon glow</p>
+                    </div>
+                  </div>
+
+                  <!-- High Contrast Theme -->
+                  <div class="theme-card relative cursor-pointer rounded-lg border-2 border-gray-600 hover:border-yellow-400 transition-all overflow-hidden group" data-theme="high-contrast">
+                    <div class="p-4 bg-black">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-yellow-400">High Contrast</h4>
+                        <div class="theme-active-indicator hidden">
+                          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 mb-2">
+                        <div class="w-8 h-8 rounded" style="background-color: #00ffff;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #00ff00;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #ff00ff;"></div>
+                      </div>
+                      <p class="text-xs text-yellow-300">Maximum readability</p>
+                    </div>
+                  </div>
+
+                  <!-- Ocean Theme -->
+                  <div class="theme-card relative cursor-pointer rounded-lg border-2 border-gray-600 hover:border-blue-400 transition-all overflow-hidden group" data-theme="ocean">
+                    <div class="p-4 bg-gray-900">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-blue-300">Ocean</h4>
+                        <div class="theme-active-indicator hidden">
+                          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 mb-2">
+                        <div class="w-8 h-8 rounded" style="background-color: #0284c7;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #06b6d4;"></div>
+                        <div class="w-8 h-8 rounded" style="background-color: #0ea5e9;"></div>
+                      </div>
+                      <p class="text-xs text-blue-300">Deep sea blues</p>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              <!-- Color Customization Section -->
               <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
-                <h3 class="text-lg font-bold text-white mb-6">Preview & Schedule</h3>
-                <h4 class="font-semibold mb-2">Live Preview</h4>
-                <div class="p-6 rounded flex items-center gap-4">
-                  <div class="w-12 h-12 rounded bg-primary border-4 border-primary"></div>
-                  <div class="w-12 h-12 rounded bg-secondary border-4 border-secondary"></div>
-                  <div class="w-12 h-12 rounded bg-accent border-4 border-accent"></div>
+                <h3 class="text-lg font-bold text-white mb-4">Custom Colors</h3>
+                <p class="text-sm text-gray-400 mb-6">Fine-tune your theme colors</p>
+                
+                <!-- Hidden select for preset compatibility -->
+                <select id="theme-preset" class="hidden">
+                  <option value="">Custom</option>
+                  <option value="default">Default (Blue/Green/Purple)</option>
+                  <option value="ocean">Ocean</option>
+                  <option value="forest">Forest</option>
+                  <option value="sunset">Sunset</option>
+                  <option value="mono">Monochrome</option>
+                </select>
+                
+                <!-- Color Preset Buttons -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="default">
+                    <div class="flex gap-1 mb-2">
+                      <div class="w-full h-6 rounded" style="background-color: #3b82f6;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #10b981;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #8b5cf6;"></div>
+                    </div>
+                    <p class="text-xs font-semibold">Default</p>
+                  </button>
+                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="ocean">
+                    <div class="flex gap-1 mb-2">
+                      <div class="w-full h-6 rounded" style="background-color: #0284c7;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #06b6d4;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #0ea5e9;"></div>
+                    </div>
+                    <p class="text-xs font-semibold">Ocean</p>
+                  </button>
+                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="forest">
+                    <div class="flex gap-1 mb-2">
+                      <div class="w-full h-6 rounded" style="background-color: #166534;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #22c55e;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #84cc16;"></div>
+                    </div>
+                    <p class="text-xs font-semibold">Forest</p>
+                  </button>
+                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="sunset">
+                    <div class="flex gap-1 mb-2">
+                      <div class="w-full h-6 rounded" style="background-color: #f59e42;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #ef4444;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #f472b6;"></div>
+                    </div>
+                    <p class="text-xs font-semibold">Sunset</p>
+                  </button>
+                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="mono">
+                    <div class="flex gap-1 mb-2">
+                      <div class="w-full h-6 rounded" style="background-color: #22223b;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #4a4e69;"></div>
+                      <div class="w-full h-6 rounded" style="background-color: #9a8c98;"></div>
+                    </div>
+                    <p class="text-xs font-semibold">Mono</p>
+                  </button>
                 </div>
-                <!-- Theme toggle removed: mode managed via settings and presets -->
-                <div class="mt-4">
-                  <h5 class="font-medium mb-2">Schedule</h5>
-                  <div class="flex items-center gap-2 mb-2">
-                    <input id="schedule-enabled" type="checkbox" />
-                    <label for="schedule-enabled">Auto dark mode</label>
+
+                <!-- Color Pickers -->
+                <div class="space-y-4">
+                  <div class="flex items-center gap-3">
+                    <label for="primaryColor" class="w-24 font-semibold">Primary</label>
+                    <input id="primaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#3b82f6" />
+                    <input id="primaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#3b82f6" title="Primary color hex" placeholder="#3b82f6" />
                   </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div class="flex items-center gap-3">
+                    <label for="secondaryColor" class="w-24 font-semibold">Secondary</label>
+                    <input id="secondaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#10b981" />
+                    <input id="secondaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#10b981" title="Secondary color hex" placeholder="#10b981" />
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <label for="accentColor" class="w-24 font-semibold">Accent</label>
+                    <input id="accentColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#8b5cf6" />
+                    <input id="accentColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#8b5cf6" title="Accent color hex" placeholder="#8b5cf6" />
+                  </div>
+                </div>
+
+                <button id="apply-theme" class="w-full btn-neon-green px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all mt-6">
+                  <span class="flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Apply Theme Changes
+                  </span>
+                </button>
+              </div>
+
+              <!-- Theme Schedule Section -->
+              <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
+                <h3 class="text-lg font-bold text-white mb-4">Theme Schedule</h3>
+                <p class="text-sm text-gray-400 mb-6">Automatically switch themes based on time of day</p>
+                
+                <div class="space-y-4">
+                  <div class="flex items-center gap-3">
+                    <input id="schedule-enabled" type="checkbox" class="w-5 h-5 rounded" />
+                    <label for="schedule-enabled" class="font-semibold">Enable automatic dark mode</label>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-xs mb-1" for="dark-mode-start">Dark start</label>
+                      <label class="block text-sm font-semibold mb-2" for="dark-mode-start">Dark mode starts at</label>
                       <input id="dark-mode-start" type="time" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" value="18:00" />
                     </div>
                     <div>
-                      <label class="block text-xs mb-1" for="light-mode-start">Light start</label>
+                      <label class="block text-sm font-semibold mb-2" for="light-mode-start">Light mode starts at</label>
                       <input id="light-mode-start" type="time" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" value="06:00" />
                     </div>
                   </div>
-                  <p class="text-xs text-gray-400 mt-2">Scheduled: <span id="scheduled-mode">Manual</span> • Now: <span id="current-time">--:--</span></p>
+                  
+                  <div class="p-4 rounded-lg bg-gray-800 border border-gray-700">
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-gray-400">Current time:</span>
+                      <span id="current-time" class="font-bold text-white">--:--</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm mt-2">
+                      <span class="text-gray-400">Scheduled mode:</span>
+                      <span id="scheduled-mode" class="font-bold">Manual</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -443,6 +626,7 @@
                   Save Security Settings
                 </span>
               </button>
+            </div>
             </div>
           </div>
 
@@ -716,6 +900,7 @@
       const colorInputs = ['primaryColor', 'secondaryColor', 'accentColor'];
       const colorTexts = ['primaryColorText', 'secondaryColorText', 'accentColorText'];
       const previews = ['primary-preview', 'secondary-preview', 'accent-preview'];
+      
       // Preset themes
       const themePresets = {
         default: { primary: '#3b82f6', secondary: '#10b981', accent: '#8b5cf6' },
@@ -724,42 +909,102 @@
         sunset:  { primary: '#f59e42', secondary: '#ef4444', accent: '#f472b6' },
         mono:    { primary: '#22223b', secondary: '#4a4e69', accent: '#9a8c98' }
       };
-      // Handle preset selection
-      const presetSelect = document.getElementById('theme-preset');
-      presetSelect.addEventListener('change', () => {
-        const preset = presetSelect.value;
-        if (themePresets[preset]) {
-          document.getElementById('primaryColor').value = themePresets[preset].primary;
-          document.getElementById('secondaryColor').value = themePresets[preset].secondary;
-          document.getElementById('accentColor').value = themePresets[preset].accent;
-          document.getElementById('primaryColorText').value = themePresets[preset].primary;
-          document.getElementById('secondaryColorText').value = themePresets[preset].secondary;
-          document.getElementById('accentColorText').value = themePresets[preset].accent;
-          // Optionally update preview swatches if present
-          colorInputs.forEach((inputId, idx) => {
-            const preview = document.getElementById(previews[idx]);
-            if (preview) preview.style.backgroundColor = document.getElementById(inputId).value;
-          });
-        }
+      
+      // Handle theme card selection
+      const themeCards = document.querySelectorAll('.theme-card');
+      const themeSelect = document.getElementById('theme-select');
+      
+      function updateActiveThemeCard(themeId) {
+        themeCards.forEach(card => {
+          const cardTheme = card.getAttribute('data-theme');
+          const indicator = card.querySelector('.theme-active-indicator');
+          if (cardTheme === themeId) {
+            card.classList.add('border-green-500', 'border-4');
+            card.classList.remove('border-2', 'border-gray-600');
+            if (indicator) indicator.classList.remove('hidden');
+          } else {
+            card.classList.remove('border-green-500', 'border-4');
+            card.classList.add('border-2', 'border-gray-600');
+            if (indicator) indicator.classList.add('hidden');
+          }
+        });
+      }
+      
+      themeCards.forEach(card => {
+        card.addEventListener('click', async () => {
+          const themeId = card.getAttribute('data-theme');
+          themeSelect.value = themeId;
+          updateActiveThemeCard(themeId);
+          await saveSettings();
+          const msg = `Changed theme to ${themeId} via theme card`;
+          AuditLogger.log('theme_change', msg);
+          sendAudit('theme_change', msg);
+          showToast(`Theme changed to ${themeId}!`);
+        });
       });
+      
+      // Initialize active theme on load
+      const currentTheme = themeSelect.value || 'dark';
+      updateActiveThemeCard(currentTheme);
+      
+      // Handle color preset buttons
+      const colorPresetButtons = document.querySelectorAll('.color-preset-btn');
+      const presetSelect = document.getElementById('theme-preset');
+      
+      colorPresetButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const preset = btn.getAttribute('data-preset');
+          presetSelect.value = preset;
+          if (themePresets[preset]) {
+            document.getElementById('primaryColor').value = themePresets[preset].primary;
+            document.getElementById('secondaryColor').value = themePresets[preset].secondary;
+            document.getElementById('accentColor').value = themePresets[preset].accent;
+            document.getElementById('primaryColorText').value = themePresets[preset].primary;
+            document.getElementById('secondaryColorText').value = themePresets[preset].secondary;
+            document.getElementById('accentColorText').value = themePresets[preset].accent;
+            
+            // Update button styling
+            colorPresetButtons.forEach(b => {
+              b.classList.remove('border-blue-500', 'border-4');
+              b.classList.add('border-2', 'border-gray-600');
+            });
+            btn.classList.add('border-blue-500', 'border-4');
+            btn.classList.remove('border-2', 'border-gray-600');
+          }
+        });
+      });
+      
       // Color pickers and text inputs sync
       colorInputs.forEach((inputId, index) => {
         const colorInput = document.getElementById(inputId);
         const textInput = document.getElementById(colorTexts[index]);
         const preview = document.getElementById(previews[index]);
+        
         colorInput.addEventListener('change', (e) => {
           textInput.value = e.target.value;
           if (preview) preview.style.backgroundColor = e.target.value;
           presetSelect.value = '';
+          // Reset preset button styling
+          colorPresetButtons.forEach(b => {
+            b.classList.remove('border-blue-500', 'border-4');
+            b.classList.add('border-2', 'border-gray-600');
+          });
         });
+        
         textInput.addEventListener('change', (e) => {
           if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
             colorInput.value = e.target.value;
             if (preview) preview.style.backgroundColor = e.target.value;
             presetSelect.value = '';
+            // Reset preset button styling
+            colorPresetButtons.forEach(b => {
+              b.classList.remove('border-blue-500', 'border-4');
+              b.classList.add('border-2', 'border-gray-600');
+            });
           }
         });
       });
+      
       document.getElementById('apply-theme').addEventListener('click', async () => {
         await saveSettings();
         // Theme will be applied automatically via ThemeManager when siteSettingsUpdated event fires
