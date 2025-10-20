@@ -55,6 +55,16 @@
         <div class="overflow-x-auto rounded-lg shadow mb-8">
           <!-- Use fixed table layout and explicit column widths to keep action buttons aligned -->
           <table class="min-w-full bg-gray-900 text-white table-fixed w-full">
+            <colgroup>
+              <col class="col-image" />
+              <col />
+              <col />
+              <col />
+              <col />
+              <col />
+              <col />
+              <col class="col-actions" />
+            </colgroup>
             <thead>
               <tr class="bg-accent text-left">
                 <th class="p-3 col-image">Image</th>
@@ -361,22 +371,26 @@ function saveProducts() {
 function renderProducts() {
   productTableBody.innerHTML = products.map((p, i) => `
     <tr class="border-b border-gray-700">
-      <td class="p-2">${p.image ? `<img src="${p.image}" class="h-10 w-10 object-cover rounded">` : ''}</td>
+      <td class="p-2 col-image">${p.image ? `<img src="${p.image}" class="h-10 w-10 object-cover rounded">` : ''}</td>
       <td class="p-2">${p.name}</td>
       <td class="p-2">${p.type || ''}</td>
       <td class="p-2">${p.category || ''}</td>
       <td class="p-2">${p.code || ''}</td>
-      <td class="p-2 flex items-center gap-2">
-        <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Decrease Stock" onclick="adjustStock(${i},-1)">−</button>
-        <span>${p.stock ?? ''}</span>
-        <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Increase Stock" onclick="adjustStock(${i},1)">+</button>
+      <td class="p-2 whitespace-nowrap">
+        <div class="inline-flex items-center gap-2">
+          <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Decrease Stock" onclick="adjustStock(${i},-1)">−</button>
+          <span>${p.stock ?? ''}</span>
+          <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Increase Stock" onclick="adjustStock(${i},1)">+</button>
+        </div>
       </td>
-      <td class="p-2 flex items-center gap-2">
-        <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Decrease Reorder" onclick="adjustReorder(${i},-1)">−</button>
-        <span>${p.reorder ?? ''}</span>
-        <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Increase Reorder" onclick="adjustReorder(${i},1)">+</button>
+      <td class="p-2 whitespace-nowrap">
+        <div class="inline-flex items-center gap-2">
+          <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Decrease Reorder" onclick="adjustReorder(${i},-1)">−</button>
+          <span>${p.reorder ?? ''}</span>
+          <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Increase Reorder" onclick="adjustReorder(${i},1)">+</button>
+        </div>
       </td>
-      <td class="p-2">
+      <td class="p-2 col-actions">
         <button class="btn-neon-blue px-2 py-1 rounded text-xs font-semibold" onclick="editProduct(${i})">Edit</button>
       </td>
     </tr>
