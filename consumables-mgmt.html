@@ -48,26 +48,7 @@
             </div>
           </div>
         </header>
-        <!-- Audit Log Section (moved from sidebar) -->
-        <section class="bg-gray-900 rounded-lg shadow p-4 mb-8 mt-8">
-          <h3 class="text-lg font-bold text-accent mb-2">Audit Log</h3>
-          <div class="overflow-x-auto max-h-64">
-            <table class="min-w-full text-xs bg-gray-900 text-white">
-              <thead>
-                <tr class="bg-accent text-left">
-                  <th class="p-2">Time</th>
-                  <th class="p-2">Action</th>
-                  <th class="p-2">Product</th>
-                  <th class="p-2">Details</th>
-                </tr>
-              </thead>
-              <tbody id="auditLogBody">
-                <!-- Audit log entries -->
-              </tbody>
-            </table>
-          </div>
-          <button id="clearAuditLogBtn" class="btn-neon-pink px-3 py-1 mt-2 rounded text-xs font-semibold">Clear Log</button>
-        </section>
+        <!-- Audit Log removed: moved out of management UI -->
         <div class="overflow-x-auto rounded-lg shadow mb-8">
           <table class="min-w-full bg-gray-900 text-white">
             <thead>
@@ -263,8 +244,7 @@ removeImageBtn.onclick = function() {
 };
 const importBtn = document.getElementById('importBtn');
 const exportBtn = document.getElementById('exportBtn');
-const auditLogBody = document.getElementById('auditLogBody');
-const clearAuditLogBtn = document.getElementById('clearAuditLogBtn');
+// Audit log UI removed for management page
 const syncInventoryBtn = document.getElementById('syncInventoryBtn');
 // --- Sync with Inventory API (Consumables Only) ---
 syncInventoryBtn.onclick = async function() {
@@ -298,30 +278,7 @@ syncInventoryBtn.onclick = async function() {
   }
 };
 
-// --- Audit Log Logic (API only) ---
-async function loadAuditLog() {
-  try {
-    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs?limit=100`);
-    if (!res.ok) throw new Error('Failed to load audit log');
-    const log = await res.json();
-    renderAuditLog(log);
-  } catch (err) {
-    auditLogBody.innerHTML = '<tr><td colspan="4" class="p-2">Failed to load audit log</td></tr>';
-  }
-}
-function renderAuditLog(log) {
-  auditLogBody.innerHTML = (log || []).map(entry => `
-    <tr>
-      <td class="p-2">${entry.created_at ? new Date(entry.created_at).toLocaleString() : ''}</td>
-      <td class="p-2">${entry.action}</td>
-      <td class="p-2">${entry.details ? (JSON.parse(entry.details).name || '') : ''}</td>
-      <td class="p-2">${entry.details ? entry.details : ''}</td>
-    </tr>
-  `).join('');
-}
-clearAuditLogBtn.onclick = function() {
-  alert('Audit log clearing is not available via the UI. Please contact an administrator.');
-};
+// Audit log helpers removed from management UI to simplify the page.
 
 // --- CSV Export ---
 function exportProductsCSV() {
@@ -567,7 +524,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     loadProducts();
   }
   renderProducts();
-  loadAuditLog();
 });
 
 // --- Audit Log Helper ---
