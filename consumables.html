@@ -621,7 +621,7 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
             submitOrderStatus.textContent = 'Submitting order...';
             try {
               const payload = {
-                created_by: requestedBy.value || 'mechanic',
+                requestedBy: requestedBy.value || 'mechanic',
                 items: orderItems.map(item => ({
                   name: item.name,
                   code: item.code,

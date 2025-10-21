@@ -60,7 +60,7 @@ async function login() {
     // Create order (fake order with first product)
     if (products.json.length) {
       const first = products.json[0];
-      const orderBody = { customer_email: 'smoke@test.local', items: [{ name: first.name || first.product_name || 'Test Product', quantity: 1 }] };
+      const orderBody = { requestedBy: 'smoke-test-user', items: [{ name: first.name || first.product_name || 'Test Product', quantity: 1 }] };
       const create = await call('orders', { method: 'POST', headers, body: JSON.stringify(orderBody) });
       if (!(create.status === 200 || create.status === 201)) {
         console.error('❌ Order create failed', create); process.exitCode = 1; return;

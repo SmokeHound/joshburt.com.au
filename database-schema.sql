@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS consumables (
 
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
-    customer_email VARCHAR(255) DEFAULT 'anonymous@example.com',
+    created_by VARCHAR(255) DEFAULT 'mechanic',
     total_items INTEGER NOT NULL DEFAULT 0,
     status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
