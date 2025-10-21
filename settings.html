@@ -1278,17 +1278,24 @@
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
         
         if (menuToggle && sidebar) {
-            menuToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('open');
-                if (sidebarBackdrop) sidebarBackdrop.classList.toggle('open');
-                this.setAttribute('aria-expanded', sidebar.classList.contains('open'));
-            });
+            // Check if already wired to prevent duplicate listeners
+            if (menuToggle.dataset.wired !== 'true') {
+                menuToggle.dataset.wired = 'true';
+                menuToggle.addEventListener('click', function() {
+                    const isOpen = sidebar.classList.toggle('open');
+                    if (sidebarBackdrop) {
+                        if (isOpen) { sidebarBackdrop.classList.remove('hidden'); }
+                        else { sidebarBackdrop.classList.add('hidden'); }
+                    }
+                    this.setAttribute('aria-expanded', String(isOpen));
+                });
+            }
         }
         
         if (sidebarBackdrop) {
             sidebarBackdrop.addEventListener('click', function() {
                 if (sidebar) sidebar.classList.remove('open');
-                sidebarBackdrop.classList.remove('open');
+                sidebarBackdrop.classList.add('hidden');
                 if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
             });
         }
