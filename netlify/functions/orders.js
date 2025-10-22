@@ -41,8 +41,8 @@ exports.handler = withHandler(async function(event){
         return error(400, 'Order must contain at least one item');
       }
       const inserted = await database.run(
-        'INSERT INTO orders (customer_email, total_items, status) VALUES (?, ?, ?)',
-        [orderData.requestedBy || 'mechanic', orderData.items.length, 'pending']
+        'INSERT INTO orders (created_by, total_items, status, priority, notes) VALUES (?, ?, ?, ?, ?)',
+        [orderData.requestedBy || 'mechanic', orderData.items.length, 'pending', orderData.priority || 'normal', orderData.notes || null]
       );
       const orderId = inserted.id;
       for (const item of orderData.items) {
