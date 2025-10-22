@@ -81,13 +81,15 @@
                         <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold" aria-label="Close">&times;</button>
                         <h3 class="text-xl font-bold text-accent mb-4" id="form-title">Add New Product</h3>
                         <form id="product-form" class="space-y-4">
-                            <div>
-                                <label for="product-code" class="block mb-2 font-medium">Product Code</label>
-                                <input type="text" id="product-code" name="product-code" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter product code">
-                            </div>
-                            <div>
-                                <label for="product-name" class="block mb-2 font-medium">Product Name</label>
-                                <input type="text" id="product-name" name="product-name" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter product name">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="product-code" class="block mb-2 font-medium">Product Code</label>
+                                    <input type="text" id="product-code" name="product-code" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter product code">
+                                </div>
+                                <div>
+                                    <label for="product-name" class="block mb-2 font-medium">Product Name</label>
+                                    <input type="text" id="product-name" name="product-name" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter product name">
+                                </div>
                             </div>
                             <div>
                                 <label for="product-type" class="block mb-2 font-medium">Type</label>
