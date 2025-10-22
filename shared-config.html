@@ -374,11 +374,13 @@
             position: fixed;
             inset: 0;
             z-index: 50;
-            display: flex;
+            /* do not set display here to avoid overriding the hidden utility */
             align-items: center;
             justify-content: center;
             background: rgba(0, 0, 0, 0.7);
         }
+        /* Ensure hidden takes precedence when applied */
+        .modal-backdrop.hidden { display: none !important; }
         .modal-panel {
             width: 100%;
             max-width: 42rem; /* ~max-w-2xl */
