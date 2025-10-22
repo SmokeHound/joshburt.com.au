@@ -162,19 +162,35 @@
                         loadAndApplySettings();
 
                         // Sidebar toggle for mobile
-                        const menuToggle = document.getElementById('menu-toggle');
-                        const sidebar = document.getElementById('sidebar');
-                        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-                        menuToggle.addEventListener('click', function() {
-                            sidebar.classList.toggle('open');
-                            sidebarBackdrop.classList.toggle('open');
-                            this.setAttribute('aria-expanded', sidebar.classList.contains('open'));
-                        });
-                        sidebarBackdrop.addEventListener('click', function() {
-                            sidebar.classList.remove('open');
-                            sidebarBackdrop.classList.remove('open');
-                            menuToggle.setAttribute('aria-expanded', 'false');
-                        });
+                        function wireMenu() {
+                            const menuToggle = document.getElementById('menu-toggle');
+                            const sidebar = document.getElementById('sidebar');
+                            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+                            if (!(menuToggle && sidebar)) return;
+                            // Check if already wired to prevent duplicate listeners
+                            if (menuToggle.dataset.wired === 'true') return;
+                            menuToggle.dataset.wired = 'true';
+                            
+                            menuToggle.addEventListener('click', function() {
+                                const isOpen = sidebar.classList.toggle('open');
+                                this.setAttribute('aria-expanded', String(isOpen));
+                                if (sidebarBackdrop) {
+                                    if (isOpen) { sidebarBackdrop.classList.remove('hidden'); }
+                                    else { sidebarBackdrop.classList.add('hidden'); }
+                                }
+                            });
+                            if (sidebarBackdrop) {
+                                sidebarBackdrop.addEventListener('click', function() {
+                                    if (sidebar.classList.contains('open')) {
+                                        sidebar.classList.remove('open');
+                                        sidebarBackdrop.classList.add('hidden');
+                                        menuToggle.setAttribute('aria-expanded', 'false');
+                                    }
+                                });
+                            }
+                        }
+                        wireMenu();
+                        setTimeout(wireMenu, 250);
                         // Toast notification helper
                         function showToast(message) {
                             const toast = document.getElementById('toast');

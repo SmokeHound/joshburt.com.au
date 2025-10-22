@@ -1273,25 +1273,39 @@
         // Legacy manual theme toggle removed
 
         // Sidebar toggle for mobile
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        
-        if (menuToggle && sidebar) {
-            menuToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('open');
-                if (sidebarBackdrop) sidebarBackdrop.classList.toggle('open');
-                this.setAttribute('aria-expanded', sidebar.classList.contains('open'));
-            });
+        function wireMenu() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+            
+            if (menuToggle && sidebar) {
+                // Check if already wired to prevent duplicate listeners
+                if (menuToggle.dataset.wired !== 'true') {
+                    menuToggle.dataset.wired = 'true';
+                    menuToggle.addEventListener('click', function() {
+                        const isOpen = sidebar.classList.toggle('open');
+                        if (sidebarBackdrop) {
+                            if (isOpen) { sidebarBackdrop.classList.remove('hidden'); }
+                            else { sidebarBackdrop.classList.add('hidden'); }
+                        }
+                        this.setAttribute('aria-expanded', String(isOpen));
+                    });
+                }
+            }
+            
+            if (sidebarBackdrop && sidebar && menuToggle) {
+                sidebarBackdrop.addEventListener('click', function() {
+                    if (sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                        sidebarBackdrop.classList.add('hidden');
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
         }
-        
-        if (sidebarBackdrop) {
-            sidebarBackdrop.addEventListener('click', function() {
-                if (sidebar) sidebar.classList.remove('open');
-                sidebarBackdrop.classList.remove('open');
-                if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
-            });
-        }
+        // Call immediately and again after delay to handle async nav loading
+        wireMenu();
+        setTimeout(wireMenu, 250);
 
     // Initialize all functionality when page loads
     document.addEventListener('DOMContentLoaded', () => {

@@ -275,6 +275,10 @@
         var sidebar=document.getElementById('sidebar');
         var sidebarBackdrop=document.getElementById('sidebar-backdrop');
         if(!(menuToggle && sidebar)) return;
+        // Check if already wired to prevent duplicate listeners
+        if(menuToggle.dataset.wired === 'true') return;
+        menuToggle.dataset.wired = 'true';
+        
         function toggle(){
           var isOpen = sidebar.classList.toggle('open');
           menuToggle.setAttribute('aria-expanded', String(isOpen));
