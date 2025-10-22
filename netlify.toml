@@ -5,6 +5,8 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  # Allow SQLite fallback on Netlify when Postgres isn't configured, to avoid 500s on read-only endpoints
+  DB_DISABLE_SQLITE_FALLBACK = "false"
   
 [[headers]]
   for = "/.netlify/functions/*"
