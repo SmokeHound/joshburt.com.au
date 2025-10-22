@@ -17,6 +17,41 @@
     Access-Control-Max-Age = "86400"
 
 [[headers]]
+  # Static assets - Long cache with compression
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  # CSS files - Long cache with compression
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  # JavaScript files - Long cache with compression
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  # Images - Long cache
+  for = "/*.{jpg,jpeg,png,gif,svg,webp,ico}"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  # HTML files - Short cache
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
   # Global security headers for all routes
   for = "/*"
   [headers.values]

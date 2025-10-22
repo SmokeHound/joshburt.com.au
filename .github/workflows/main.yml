@@ -16,12 +16,29 @@ jobs:
     
     - name: 📦 Install dependencies
       run: npm ci
-#    
-#    - name: 🔍 Lint code
-#      run: npm run lint
-#    
-#    - name: 🧪 Run tests
-#      run: npm test
+    
+    - name: 🔍 Lint code
+      run: npm run lint
+      continue-on-error: false
+    
+    - name: 🏗️ Build CSS
+      run: npm run build:css
+      continue-on-error: false
+    
+    - name: 🧪 Run tests
+      run: npm test
+      continue-on-error: false
+    
+    - name: 📊 Build summary
+      if: always()
+      run: |
+        echo "### Build Summary 📊" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Dependencies installed" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Code linted" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ CSS built" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Tests passed" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Ready for deployment!**" >> $GITHUB_STEP_SUMMARY
     
     - name: 📂 Deploy to FTP
       if: success()

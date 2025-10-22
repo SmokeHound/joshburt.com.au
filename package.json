@@ -22,7 +22,10 @@
   "lint:js": "eslint . --ext .js -f stylish",
   "lint:html": "htmlhint .",
     "lint": "echo Linting JS && npm run lint:js && echo Linting HTML && npm run lint:html",
-    "validate": "echo Lint + Build + Tests start && npm run lint && echo Build CSS && npm run build:css && echo Run tests && npm run test:all"
+    "validate": "echo Lint + Build + Tests start && npm run lint && echo Build CSS && npm run build:css && echo Run tests && npm run test:all",
+    "version:patch": "npm version patch -m 'chore: bump version to %s'",
+    "version:minor": "npm version minor -m 'feat: bump version to %s'",
+    "version:major": "npm version major -m 'feat!: bump version to %s (breaking changes)'"
   },
   "repository": {
     "type": "git",
