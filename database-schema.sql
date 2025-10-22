@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS orders (
     created_by VARCHAR(255) DEFAULT 'mechanic',
     total_items INTEGER NOT NULL DEFAULT 0,
     status VARCHAR(50) DEFAULT 'pending',
+    priority VARCHAR(50) DEFAULT 'normal',
+    notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

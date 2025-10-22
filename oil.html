@@ -652,6 +652,8 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
         try {
           const payload = {
             requestedBy: requestedBy.value || 'mechanic',
+            priority: priority.value || 'normal',
+            notes: notes.value || '',
             items: orderItems.map(item => ({
               name: item.name,
               code: item.code,
