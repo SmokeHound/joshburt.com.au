@@ -351,9 +351,11 @@ async function createPostgreSQLTables() {
   await database.run(`
     CREATE TABLE IF NOT EXISTS orders (
       id SERIAL PRIMARY KEY,
-      customer_email VARCHAR(255) DEFAULT 'anonymous@example.com',
+      created_by VARCHAR(255) DEFAULT 'mechanic',
       total_items INTEGER NOT NULL DEFAULT 0,
       status VARCHAR(50) DEFAULT 'pending',
+      priority VARCHAR(50) DEFAULT 'normal',
+      notes TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
@@ -480,9 +482,11 @@ async function createSQLiteTables() {
   await database.run(`
     CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      customer_email TEXT DEFAULT 'anonymous@example.com',
+      created_by TEXT DEFAULT 'mechanic',
       total_items INTEGER NOT NULL DEFAULT 0,
       status TEXT DEFAULT 'pending',
+      priority TEXT DEFAULT 'normal',
+      notes TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
