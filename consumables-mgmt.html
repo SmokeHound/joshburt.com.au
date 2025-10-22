@@ -17,9 +17,6 @@
   <style>
     .consumable-item{transition:all .2s ease;background:#111;border:1px solid #333}
     .consumable-item:hover{background:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
-    /* Column width helpers to avoid inline styles */
-    .col-image { width: 72px; }
-    .col-actions { width: 120px; }
   </style>
 </head>
 <body class="dark">
@@ -54,7 +51,7 @@
         <!-- Audit Log removed: moved out of management UI -->
         <div class="overflow-x-auto rounded-lg shadow mb-8">
           <!-- Use fixed table layout and explicit column widths to keep action buttons aligned -->
-          <table class="min-w-full bg-gray-900 text-white table-fixed w-full">
+          <table class="min-w-full bg-gray-900 text-white table-fixed w-full responsive-table">
             <colgroup>
               <col class="col-image" />
               <col />
@@ -87,8 +84,8 @@
   </div>
 
   <!-- Category Management Modal (now direct child of body) -->
-  <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6 relative border-2 border-accent">
+  <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6 relative border-2 border-accent modal-panel">
       <button id="closeCategoryModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
       <h3 class="text-xl font-bold text-accent mb-4">Manage Categories</h3>
       <form id="categoryForm" class="flex gap-2 mb-4">
@@ -102,8 +99,8 @@
   </div>
 
   <!-- Product Modal (now direct child of body) -->
-  <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6 relative border-2 border-accent">
+  <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6 relative border-2 border-accent modal-panel">
       <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
       <h3 class="text-xl font-bold text-accent mb-4" id="productModalTitle">Add Product</h3>
       <form id="productForm" class="space-y-4">
@@ -371,26 +368,26 @@ function saveProducts() {
 function renderProducts() {
   productTableBody.innerHTML = products.map((p, i) => `
     <tr class="border-b border-gray-700">
-      <td class="p-2 col-image">${p.image ? `<img src="${p.image}" class="h-10 w-10 object-cover rounded">` : ''}</td>
-      <td class="p-2">${p.name}</td>
-      <td class="p-2">${p.type || ''}</td>
-      <td class="p-2">${p.category || ''}</td>
-      <td class="p-2">${p.code || ''}</td>
-      <td class="p-2 whitespace-nowrap">
+      <td class="p-2 col-image" data-label="Image">${p.image ? `<img src="${p.image}" class="h-10 w-10 object-cover rounded">` : ''}</td>
+      <td class="p-2" data-label="Name">${p.name}</td>
+      <td class="p-2" data-label="Type">${p.type || ''}</td>
+      <td class="p-2" data-label="Category">${p.category || ''}</td>
+      <td class="p-2" data-label="Code">${p.code || ''}</td>
+      <td class="p-2 whitespace-nowrap" data-label="Stock">
         <div class="inline-flex items-center gap-2">
           <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Decrease Stock" onclick="adjustStock(${i},-1)">−</button>
           <span>${p.stock ?? ''}</span>
           <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Increase Stock" onclick="adjustStock(${i},1)">+</button>
         </div>
       </td>
-      <td class="p-2 whitespace-nowrap">
+      <td class="p-2 whitespace-nowrap" data-label="Reorder">
         <div class="inline-flex items-center gap-2">
           <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Decrease Reorder" onclick="adjustReorder(${i},-1)">−</button>
           <span>${p.reorder ?? ''}</span>
           <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Increase Reorder" onclick="adjustReorder(${i},1)">+</button>
         </div>
       </td>
-      <td class="p-2 col-actions">
+      <td class="p-2 col-actions" data-label="Actions">
         <button class="btn-neon-blue px-2 py-1 rounded text-xs font-semibold" onclick="editProduct(${i})">Edit</button>
       </td>
     </tr>
@@ -557,8 +554,7 @@ async function addAuditLog(action, product, details) {
         extra: product ? details : undefined
       })
     }) : fetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action, details: product ? JSON.stringify(product) : details, extra: product ? details : undefined }) }));
-    // Optionally reload audit log after adding
-    loadAuditLog();
+  // audit UI removed; no client-side reload
   } catch (err) {
     // Fallback: log to console if API fails
     console.error('Failed to add audit log:', err);

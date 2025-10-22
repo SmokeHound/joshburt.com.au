@@ -364,6 +364,48 @@
     .preview-pulse {
         animation: preview-pulse 800ms ease-in-out;
     }
+
+        /* Shared column width helpers */
+        .col-image { width: 72px; }
+        .col-actions { width: 120px; }
+
+        /* Modal utilities (shared) */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        .modal-panel {
+            width: 100%;
+            max-width: 42rem; /* ~max-w-2xl */
+            background-color: #111827; /* gray-900 */
+            color: #fff;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            border: 2px solid var(--tw-color-accent, #a855f7);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* Responsive stacked table pattern */
+        @media (max-width: 768px) {
+            table.responsive-table thead { display: none; }
+            table.responsive-table,
+            table.responsive-table tbody,
+            table.responsive-table tr,
+            table.responsive-table td { display: block; width: 100%; }
+            table.responsive-table tr { margin-bottom: 0.75rem; }
+            table.responsive-table td { display: flex; align-items: center; justify-content: space-between; }
+            table.responsive-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #9ca3af; /* gray-400 */
+                margin-right: 1rem;
+            }
+        }
 </style>
 <script>
     // Accessibility: inject Skip to main content link and ensure main has an id

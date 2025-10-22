@@ -37,11 +37,16 @@
                         <!-- Main Content -->
                         <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
                         <div class="max-w-6xl mx-auto">
-                            <header class="page-header card border mb-6">
+                                            <header class="page-header card border mb-6">
                                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                                     <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Oil Products Management</h2>
                                     <div class="flex flex-wrap gap-2">
-                                        <button id="addProductBtn" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
+                                                        <button id="addProductBtn" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
+                                                        <button id="export-products" class="px-4 py-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">Export Products (CSV)</button>
+                                                        <label for="import-products" class="px-4 py-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer">
+                                                                Import Products (CSV)
+                                                                <input type="file" id="import-products" accept=".csv" class="hidden">
+                                                        </label>
                                     </div>
                                 </div>
                             </header>
@@ -66,23 +71,13 @@
                     </div>
                                         <!-- Inline form removed; replaced by modal dialog -->
                 </div>
-                <!-- Bulk Operations -->
-                <div class="bg-gray-800 p-6 rounded shadow mt-6">
-                    <h3 class="text-xl font-semibold mb-4">Bulk Operations</h3>
-                    <div class="flex flex-wrap gap-4">
-                        <button id="export-products" class="px-4 py-2 bg-secondary text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">Export Products (CSV)</button>
-                        <label for="import-products" class="px-4 py-2 bg-accent text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer">
-                            Import Products (CSV)
-                            <input type="file" id="import-products" accept=".csv" class="hidden">
-                        </label>
-                    </div>
-                </div>
+                                    <!-- Bulk Operations removed: controls moved to header -->
             </section>
         </main>
         </div>
                 <!-- Product Modal (dialog) -->
-                <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-                    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl p-6 relative border-2 border-accent">
+                        <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop">
+                            <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl p-6 relative border-2 border-accent modal-panel">
                         <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold" aria-label="Close">&times;</button>
                         <h3 class="text-xl font-bold text-accent mb-4" id="form-title">Add New Product</h3>
                         <form id="product-form" class="space-y-4">
@@ -138,8 +133,10 @@
     const AUTH_DISABLED = window.AUTH_DISABLED === true;
     let products = [];
     let editingProductId = null;
-    // Modal refs
+    // Modal refs and focus management
     let productModalEl, closeProductModalBtn, addProductBtn, cancelEditBtn;
+    let lastFocusedEl = null;
+    let modalKeydownHandler = null;
 
         // No localStorage fallback or default products: all data is from API
 
@@ -305,14 +302,47 @@
         }
 
         // Modal controls
-        function openProductModal() {
+                function getFocusableInModal() {
+                        if (!productModalEl) return [];
+                        return Array.from(productModalEl.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+                                .filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+                }
+
+                function openProductModal() {
             if (!productModalEl) return;
+                        lastFocusedEl = document.activeElement;
             productModalEl.classList.remove('hidden');
             // basic focus management
-            setTimeout(() => {
-              const first = document.getElementById('product-code');
-              if (first) first.focus();
-            }, 0);
+                        setTimeout(() => {
+                            const first = document.getElementById('product-code');
+                            if (first) first.focus();
+                        }, 0);
+                        // focus trap and ESC
+                        modalKeydownHandler = (e) => {
+                            if (e.key === 'Escape') {
+                                e.preventDefault();
+                                closeProductModal();
+                                return;
+                            }
+                            if (e.key === 'Tab') {
+                                const focusables = getFocusableInModal();
+                                if (focusables.length === 0) return;
+                                const first = focusables[0];
+                                const last = focusables[focusables.length - 1];
+                                if (e.shiftKey) {
+                                    if (document.activeElement === first) {
+                                        e.preventDefault();
+                                        last.focus();
+                                    }
+                                } else {
+                                    if (document.activeElement === last) {
+                                        e.preventDefault();
+                                        first.focus();
+                                    }
+                                }
+                            }
+                        };
+                        document.addEventListener('keydown', modalKeydownHandler);
         }
 
         function closeProductModal() {
@@ -324,6 +354,13 @@
             form.querySelector('button[type="submit"]').textContent = 'Add Product';
             document.getElementById('form-title').textContent = 'Add New Product';
             renderProducts();
+                        if (modalKeydownHandler) {
+                            document.removeEventListener('keydown', modalKeydownHandler);
+                            modalKeydownHandler = null;
+                        }
+                        if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') {
+                            setTimeout(() => { try { lastFocusedEl.focus(); } catch(_){} }, 0);
+                        }
         }
 
         // Delete product
