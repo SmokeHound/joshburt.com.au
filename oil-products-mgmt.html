@@ -34,9 +34,18 @@
                 if (window.setActiveNavLink) window.setActiveNavLink();
               });
             </script>
-            <!-- Main Content -->
-            <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
-            <section>
+                        <!-- Main Content -->
+                        <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
+                        <div class="max-w-6xl mx-auto">
+                            <header class="page-header card border mb-6">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                    <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Oil Products Management</h2>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button id="addProductBtn" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
+                                    </div>
+                                </div>
+                            </header>
+                        <section>
                 <div class="widget-primary rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left mb-6" role="table" aria-label="Oil products table">
@@ -55,56 +64,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- Add/Edit Product Form -->
-                    <div class="bg-gray-800 p-6 rounded shadow">
-                        <h3 class="text-xl font-semibold mb-4" id="form-title">Add New Product</h3>
-                        <form id="product-form">
-                            <div class="mb-4">
-                                <label for="product-code" class="block mb-2 font-medium">Product Code</label>
-                                <input type="text" id="product-code" name="product-code" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter product code">
-                            </div>
-                            <div class="mb-4">
-                                <label for="product-name" class="block mb-2 font-medium">Product Name</label>
-                                <input type="text" id="product-name" name="product-name" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter product name">
-                            </div>
-                            <div class="mb-4">
-                                <label for="product-type" class="block mb-2 font-medium">Type</label>
-                                <select id="product-type" name="product-type" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                    <option value="">Select type</option>
-                                    <option value="Engine oil">Engine oil</option>
-                                    <option value="Coolant">Coolant</option>
-                                    <option value="Brake fluid">Brake fluid</option>
-                                    <option value="Transmission fluid">Transmission fluid</option>
-                                </select>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div class="mb-4">
-                                  <label for="product-current-stock" class="block mb-2 font-medium">Current Stock</label>
-                                  <input type="number" min="0" id="product-current-stock" name="product-current-stock" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. 25">
-                              </div>
-                              <div class="mb-4">
-                                  <label for="product-reorder-point" class="block mb-2 font-medium">Reorder Point</label>
-                                  <input type="number" min="0" id="product-reorder-point" name="product-reorder-point" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. 10">
-                              </div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="product-specs" class="block mb-2 font-medium">Specifications</label>
-                                <textarea id="product-specs" name="product-specs" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter product specifications"></textarea>
-                            </div>
-                            <div class="mb-4">
-                                <label for="product-description" class="block mb-2 font-medium">Description</label>
-                                <textarea id="product-description" name="product-description" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter detailed product description"></textarea>
-                            </div>
-                            <div class="mb-4">
-                                <label for="product-image" class="block mb-2 font-medium">Image URL</label>
-                                <input type="url" id="product-image" name="product-image" class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter image URL">
-                            </div>
-                            <div class="flex gap-2">
-                                <button type="submit" class="flex-1 p-2 bg-primary text-white rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary">Add Product</button>
-                                <button type="button" id="cancel-edit" class="px-4 p-2 bg-gray-600 text-white rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 hidden">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
+                                        <!-- Inline form removed; replaced by modal dialog -->
                 </div>
                 <!-- Bulk Operations -->
                 <div class="bg-gray-800 p-6 rounded shadow mt-6">
@@ -120,11 +80,66 @@
             </section>
         </main>
         </div>
+                <!-- Product Modal (dialog) -->
+                <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+                    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl p-6 relative border-2 border-accent">
+                        <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold" aria-label="Close">&times;</button>
+                        <h3 class="text-xl font-bold text-accent mb-4" id="form-title">Add New Product</h3>
+                        <form id="product-form" class="space-y-4">
+                            <div>
+                                <label for="product-code" class="block mb-2 font-medium">Product Code</label>
+                                <input type="text" id="product-code" name="product-code" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter product code">
+                            </div>
+                            <div>
+                                <label for="product-name" class="block mb-2 font-medium">Product Name</label>
+                                <input type="text" id="product-name" name="product-name" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter product name">
+                            </div>
+                            <div>
+                                <label for="product-type" class="block mb-2 font-medium">Type</label>
+                                <select id="product-type" name="product-type" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="">Select type</option>
+                                    <option value="Engine oil">Engine oil</option>
+                                    <option value="Coolant">Coolant</option>
+                                    <option value="Brake fluid">Brake fluid</option>
+                                    <option value="Transmission fluid">Transmission fluid</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="product-current-stock" class="block mb-2 font-medium">Current Stock</label>
+                                    <input type="number" min="0" id="product-current-stock" name="product-current-stock" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. 25">
+                                </div>
+                                <div>
+                                    <label for="product-reorder-point" class="block mb-2 font-medium">Reorder Point</label>
+                                    <input type="number" min="0" id="product-reorder-point" name="product-reorder-point" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. 10">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="product-specs" class="block mb-2 font-medium">Specifications</label>
+                                <textarea id="product-specs" name="product-specs" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter product specifications"></textarea>
+                            </div>
+                            <div>
+                                <label for="product-description" class="block mb-2 font-medium">Description</label>
+                                <textarea id="product-description" name="product-description" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter detailed product description"></textarea>
+                            </div>
+                            <div>
+                                <label for="product-image" class="block mb-2 font-medium">Image URL</label>
+                                <input type="url" id="product-image" name="product-image" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter image URL">
+                            </div>
+                            <div class="flex justify-end gap-2 mt-2">
+                                <button type="button" id="cancelEditBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold">Cancel</button>
+                                <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
         <script>
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
     const AUTH_DISABLED = window.AUTH_DISABLED === true;
-        let products = [];
-        let editingProductId = null;
+    let products = [];
+    let editingProductId = null;
+    // Modal refs
+    let productModalEl, closeProductModalBtn, addProductBtn, cancelEditBtn;
 
         // No localStorage fallback or default products: all data is from API
 
@@ -254,7 +269,6 @@
                     editingProductId = null;
                     form.querySelector('button[type="submit"]').textContent = 'Add Product';
                     document.getElementById('form-title').textContent = 'Add New Product';
-                    document.getElementById('cancel-edit').classList.add('hidden');
                 } else {
                     // Add new product
                     await saveProductToAPI(productData, false);
@@ -262,6 +276,7 @@
                 }
                 
                 form.reset();
+                closeProductModal();
                 await loadProducts(); // Reload from API
             } catch (error) {
                 showToast(`Error: ${error.message}`, 'error');
@@ -285,23 +300,30 @@
             editingProductId = productId;
             form.querySelector('button[type="submit"]').textContent = 'Update Product';
             document.getElementById('form-title').textContent = 'Edit Product';
-            document.getElementById('cancel-edit').classList.remove('hidden');
             renderProducts(); // Highlight the row being edited
-            // Auto-scroll to form
-            setTimeout(() => {
-                form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+            openProductModal();
         }
 
-        // Cancel edit
-        function cancelEdit() {
+        // Modal controls
+        function openProductModal() {
+            if (!productModalEl) return;
+            productModalEl.classList.remove('hidden');
+            // basic focus management
+            setTimeout(() => {
+              const first = document.getElementById('product-code');
+              if (first) first.focus();
+            }, 0);
+        }
+
+        function closeProductModal() {
+            if (!productModalEl) return;
             const form = document.getElementById('product-form');
+            productModalEl.classList.add('hidden');
             form.reset();
             editingProductId = null;
             form.querySelector('button[type="submit"]').textContent = 'Add Product';
             document.getElementById('form-title').textContent = 'Add New Product';
-            document.getElementById('cancel-edit').classList.add('hidden');
-            renderProducts(); // Remove highlight
+            renderProducts();
         }
 
         // Delete product
@@ -416,11 +438,28 @@
             // Load products from API on page load
             loadProducts();
             
-            // Form submission
-            document.getElementById('product-form').addEventListener('submit', addOrUpdateProduct);
-            
-            // Cancel edit button
-            document.getElementById('cancel-edit').addEventListener('click', cancelEdit);
+                        // Cache modal elements
+                        productModalEl = document.getElementById('productModal');
+                        closeProductModalBtn = document.getElementById('closeProductModal');
+                        addProductBtn = document.getElementById('addProductBtn');
+                        cancelEditBtn = document.getElementById('cancelEditBtn');
+
+                        // Form submission (modal)
+                        document.getElementById('product-form').addEventListener('submit', addOrUpdateProduct);
+
+                        // Modal open/close
+                        if (addProductBtn) addProductBtn.addEventListener('click', () => {
+                                closeProductModal(); // reset state
+                                openProductModal();
+                        });
+                        if (closeProductModalBtn) closeProductModalBtn.addEventListener('click', closeProductModal);
+                        if (cancelEditBtn) cancelEditBtn.addEventListener('click', closeProductModal);
+                        // close on backdrop click
+                        if (productModalEl) {
+                            productModalEl.addEventListener('click', (e) => {
+                                if (e.target === productModalEl) closeProductModal();
+                            });
+                        }
             
             // Edit and delete buttons
             document.getElementById('products-table').addEventListener('click', (e) => {
