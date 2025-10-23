@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const { database } = require('../../config/database');
 const { parseBody, requireAuth } = require('../../utils/http');
 const { getPagination, withHandler, ok, error } = require('../../utils/fn');
+const { logAudit } = require('../../utils/audit');
 
 function requireRole(user, roles) { return !!user && roles.includes(user.role); }
 
@@ -68,6 +69,8 @@ exports.handler = withHandler(async (event) => {
       const hash = await bcrypt.hash(password, rounds);
       const result = await database.run('INSERT INTO users (email, name, password_hash, role, email_verified) VALUES (?, ?, ?, ?, ?)', [email, name, hash, role, 1]);
       const newUser = await database.get('SELECT id, email, name, role, is_active, email_verified, created_at FROM users WHERE id = ?', [result.id]);
+      // Audit
+      await logAudit(event, { action: 'user.create', userId: user.id, details: { id: result.id, email, role } });
       return ok({ message: 'User created successfully', user: newUser }, 201);
     }
     return error(405, 'Method not allowed');
@@ -100,6 +103,8 @@ exports.handler = withHandler(async (event) => {
     updates.push('updated_at = CURRENT_TIMESTAMP'); values.push(id);
     await database.run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, values);
     const updated = await database.get('SELECT id, email, name, role, is_active, email_verified, updated_at FROM users WHERE id = ?', [id]);
+    // Audit
+    await logAudit(event, { action: 'user.update', userId: user.id, details: { id, isOwn, fields: updates.map(f=>f.split('=')[0].trim()) } });
     return ok({ message: 'User updated successfully', user: updated });
   }
 
@@ -111,6 +116,8 @@ exports.handler = withHandler(async (event) => {
     if (!exists) return error(404, 'User not found');
     await database.run('DELETE FROM refresh_tokens WHERE user_id = ?', [id]);
     await database.run('DELETE FROM users WHERE id = ?', [id]);
+    // Audit
+    await logAudit(event, { action: 'user.delete', userId: user.id, details: { id } });
     return ok({ message: 'User deleted successfully' });
   }
 

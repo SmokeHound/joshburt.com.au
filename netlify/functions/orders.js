@@ -1,5 +1,6 @@
 // Netlify Function: GET/POST/PATCH /.netlify/functions/orders
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
+const { logAudit } = require('../../utils/audit');
 const { database, initializeDatabase } = require('../../config/database');
 
 let dbReady = false;
@@ -33,6 +34,8 @@ exports.handler = withHandler(async function(event){
       );
       if (!updateRes || updateRes.changes === 0) return error(404, 'Order not found');
       const updated = await database.get('SELECT * FROM orders WHERE id = ?', [orderId]);
+      // Audit
+      await logAudit(event, { action: 'order.status_update', userId: null, details: { orderId, status } });
       return ok({ success: true, order: updated });
     }
     if (method === 'POST') {
@@ -73,6 +76,8 @@ exports.handler = withHandler(async function(event){
           [orderId, item.name, item.code, item.quantity]
         );
       }
+      // Audit
+      await logAudit(event, { action: 'order.create', userId: null, details: { orderId, requestedBy: orderData.requestedBy || 'mechanic', priority: orderData.priority || 'normal', totalItems: orderData.items.length } });
       return ok({ orderId }, 201);
     }
     return error(405, 'Method Not Allowed');

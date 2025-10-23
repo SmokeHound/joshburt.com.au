@@ -405,4 +405,4 @@ test-api-server.js
 FIX_SUMMARY.md
 
 # Local Netlify folder
-.netlify
+.netlify/

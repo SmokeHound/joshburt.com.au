@@ -1,4 +1,5 @@
 const { withHandler, json, error, parseBody, requireAuth, corsHeaders } = require('../../utils/fn');
+const { logAudit } = require('../../utils/audit');
 const { database, initializeDatabase } = require('../../config/database');
 
 let dbReady = false;
@@ -60,6 +61,8 @@ async function createProduct(event, user) {
       'SELECT p.*, COALESCE(i.stock_count, p.soh) AS currentStock FROM products p LEFT JOIN inventory i ON i.item_type = ? AND i.item_id = p.id WHERE p.id = ?',
       ['product', id]
     );
+    // Audit
+    await logAudit(event, { action: 'product.create', userId: user && user.id, details: { id, code, type } });
     return json(201, created);
   } catch (e) {
     console.error('createProduct', e);
@@ -95,6 +98,8 @@ async function updateProduct(event, user) {
       'SELECT p.*, COALESCE(i.stock_count, p.soh) AS currentStock FROM products p LEFT JOIN inventory i ON i.item_type = ? AND i.item_id = p.id WHERE p.id = ?',
       ['product', id]
     );
+    // Audit
+    await logAudit(event, { action: 'product.update', userId: user && user.id, details: { id } });
     return json(200, updated || { id });
   } catch (e) {
     console.error('updateProduct', e);
@@ -109,6 +114,8 @@ async function deleteProduct(event, user) {
     if (!id) return error(400, 'Product id is required');
     await database.run('DELETE FROM products WHERE id = ?', [id]);
     await database.run('DELETE FROM inventory WHERE item_type = \'product\' AND item_id = ?', [id]);
+    // Audit
+    await logAudit(event, { action: 'product.delete', userId: user && user.id, details: { id } });
     return json(200, { ok: true });
   } catch (e) {
     console.error('deleteProduct', e);
