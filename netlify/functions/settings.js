@@ -1,9 +1,14 @@
 // Netlify Function: Site Settings CRUD /.netlify/functions/settings
-const { database } = require('../../config/database');
+const { database, initializeDatabase } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
 
+let dbReady = false;
+async function ensureDb(){
+  if (!dbReady) { await initializeDatabase(); dbReady = true; }
+}
+
 exports.handler = withHandler(async function(event){
-  await database.connect();
+  await ensureDb();
   const method = event.httpMethod;
   if (method === 'GET') return handleGet();
   if (method === 'PUT') return handlePut(event);
@@ -23,7 +28,8 @@ exports.handler = withHandler(async function(event){
 
   async function handlePut(event) {
     const data = event.body || '{}';
-    await database.run('INSERT INTO settings (id, data) VALUES (1, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data;', [data]);
+    // Upsert settings row id=1 for both SQLite and PostgreSQL
+    await database.run('INSERT INTO settings (id, data) VALUES (1, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP;', [data]);
     return ok({ message: 'Settings updated' });
   }
 });

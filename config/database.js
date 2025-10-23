@@ -408,6 +408,15 @@ async function createPostgreSQLTables() {
     )
   `);
 
+  // Create settings table for PostgreSQL (store JSON as TEXT for cross-DB parity)
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS settings (
+      id INTEGER PRIMARY KEY,
+      data TEXT,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Create indexes for better performance
   await database.run('CREATE INDEX IF NOT EXISTS idx_products_type ON products(type)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at)');
@@ -539,6 +548,15 @@ async function createSQLiteTables() {
       item_id INTEGER NOT NULL,
       stock_count INTEGER NOT NULL DEFAULT 0,
       UNIQUE(item_type, item_id)
+    )
+  `);
+
+  // Create settings table for SQLite (store JSON as TEXT)
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS settings (
+      id INTEGER PRIMARY KEY,
+      data TEXT,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 }
