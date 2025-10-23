@@ -5,6 +5,7 @@ const { createHash, randomBytes } = require('node:crypto');
 const { database, initializeDatabase } = require('../../config/database');
 const { json: jsonResponse, error: errorResponse, parseBody, authenticate } = require('../../utils/http');
 const { withHandler } = require('../../utils/fn');
+const { logAudit } = require('../../utils/audit');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 
@@ -64,6 +65,8 @@ exports.handler = withHandler(async (event) => {
         'INSERT INTO users (email, name, password_hash, role, email_verified, email_verification_token, email_verification_expires) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [email, name, passwordHash, 'user', 0, verificationToken, verificationExpires]
       );
+      // Audit (best-effort)
+      await logAudit(event, { action: 'auth.register', userId: result.id, details: { email } });
       return jsonResponse(201, { message: 'Registered. Verify email.', userId: result.id });
     }
 
@@ -75,6 +78,7 @@ exports.handler = withHandler(async (event) => {
       if (!u) return jsonResponse(400, { error: 'Invalid or expired verification token' });
       if (u.email_verification_expires && u.email_verification_expires < Date.now()) return jsonResponse(400, { error: 'Verification token expired' });
       await database.run('UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?', [u.id]);
+      await logAudit(event, { action: 'auth.verify_email', userId: u.id });
       return jsonResponse(200, { message: 'Email verified' });
     }
 
@@ -87,7 +91,10 @@ exports.handler = withHandler(async (event) => {
       if (!rateLimit(rlKey, 5, 5 * 60 * 1000)) return jsonResponse(429, { error: 'Too many login attempts. Please wait a few minutes and try again.' });
 
       const user = await database.get('SELECT id, email, name, password_hash, role, is_active, email_verified, failed_login_attempts, lockout_expires FROM users WHERE email = ?', [email]);
-      if (!user || !user.is_active) return jsonResponse(401, { error: 'Invalid credentials' });
+      if (!user || !user.is_active) {
+        await logAudit(event, { action: 'auth.login_failed', details: { email } });
+        return jsonResponse(401, { error: 'Invalid credentials' });
+      }
       if (user.lockout_expires && user.lockout_expires > Date.now()) {
         const minutes = Math.ceil((user.lockout_expires - Date.now())/60000);
         return jsonResponse(403, { error: `Account locked. Try again in ${minutes} minute(s).` });
@@ -98,7 +105,11 @@ exports.handler = withHandler(async (event) => {
         const attempts = (user.failed_login_attempts || 0) + 1;
         let lockout = null; if (attempts >= MAX_ATTEMPTS) lockout = Date.now() + LOCKOUT_MINUTES*60000;
         await database.run('UPDATE users SET failed_login_attempts = ?, lockout_expires = ? WHERE id = ?', [attempts, lockout, user.id]);
-        if (lockout) return jsonResponse(403, { error: `Account locked due to too many failed attempts. Try again in ${LOCKOUT_MINUTES} minutes.` });
+        if (lockout) {
+          await logAudit(event, { action: 'auth.login_locked', userId: user.id, details: { email } });
+          return jsonResponse(403, { error: `Account locked due to too many failed attempts. Try again in ${LOCKOUT_MINUTES} minutes.` });
+        }
+        await logAudit(event, { action: 'auth.login_failed', userId: user.id, details: { email } });
         return jsonResponse(401, { error: `Invalid credentials. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.` });
       }
       if (user.failed_login_attempts > 0 || user.lockout_expires) {
@@ -106,6 +117,7 @@ exports.handler = withHandler(async (event) => {
       }
       const { accessToken, refreshToken } = generateTokens(user.id);
       await storeRefreshToken(user.id, refreshToken);
+      await logAudit(event, { action: 'auth.login_success', userId: user.id });
       return jsonResponse(200, { message: 'Login successful', user: { id: user.id, email: user.email, name: user.name, role: user.role, emailVerified: user.email_verified }, accessToken, refreshToken });
     }
 
@@ -125,26 +137,14 @@ exports.handler = withHandler(async (event) => {
         const tokens = generateTokens(user.id);
         await storeRefreshToken(user.id, tokens.refreshToken);
         await database.run('DELETE FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
-        // Audit: successful refresh
-        try {
-          const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || '';
-          const ua = (event.headers && event.headers['user-agent']) || '';
-          const details = JSON.stringify({ message: 'Tokens refreshed' });
-          await database.run('INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)', [user.id, 'auth_refresh_success', details, ip, ua]);
-        } catch (auditErr) { console.warn('Audit insert failed (refresh success):', auditErr && auditErr.message); }
+        await logAudit(event, { action: 'auth.refresh_success', userId: user.id, details: { message: 'Tokens refreshed' } });
 
         return jsonResponse(200, { message: 'Tokens refreshed', accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
       } catch (e) {
         // Attempt to audit failure (best-effort) with any available context
-        try {
-          const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || '';
-          const ua = (event.headers && event.headers['user-agent']) || '';
-          // Try to glean a user id from a decoded token if present
-          let possibleUserId = null;
-          try { const maybe = jwt.decode(refreshToken); if (maybe && maybe.userId) possibleUserId = maybe.userId; } catch(_) { /* noop */ }
-          const details = JSON.stringify({ message: 'Token refresh failed', error: (e && e.message) ? e.message : String(e) });
-          await database.run('INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)', [possibleUserId, 'auth_refresh_failed', details, ip, ua]);
-        } catch (auditErr) { console.warn('Audit insert failed (refresh failure):', auditErr && auditErr.message); }
+        let possibleUserId = null;
+        try { const maybe = jwt.decode(refreshToken); if (maybe && maybe.userId) possibleUserId = maybe.userId; } catch(_) { /* noop */ }
+        await logAudit(event, { action: 'auth.refresh_failed', userId: possibleUserId, details: { message: 'Token refresh failed', error: (e && e.message) ? e.message : String(e) } });
         return jsonResponse(401, { error: 'Token refresh failed' });
       }
     }
@@ -158,6 +158,10 @@ exports.handler = withHandler(async (event) => {
       }
       const nowIso = new Date().toISOString();
       await database.run('DELETE FROM refresh_tokens WHERE expires_at <= ?', [nowIso]);
+      // Audit logout (best-effort)
+      let possibleUserId = null;
+      try { const maybe = jwt.decode(refreshToken); if (maybe && maybe.userId) possibleUserId = maybe.userId; } catch(_) { /* noop */ }
+      await logAudit(event, { action: 'auth.logout', userId: possibleUserId });
       return jsonResponse(200, { message: 'Logged out successfully' });
     }
 
@@ -185,6 +189,7 @@ exports.handler = withHandler(async (event) => {
       const rounds = parseInt(process.env.BCRYPT_ROUNDS, 10) || 12;
       const hash = await bcrypt.hash(password, rounds);
       await database.run('UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?', [hash, user.id]);
+      await logAudit(event, { action: 'auth.reset_password', userId: user.id });
       await database.run('DELETE FROM refresh_tokens WHERE user_id = ?', [user.id]);
       return jsonResponse(200, { message: 'Password reset successfully' });
     }
