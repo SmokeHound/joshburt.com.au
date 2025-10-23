@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="./assets/css/styles.css">
   <script src="./assets/js/init-shared.js" defer></script>
   <script>
+    // Purge legacy role demo key to avoid stale UI state
+    try { localStorage.removeItem('currentUser'); } catch (_) {}
+  </script>
+  <script>
     fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
     fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
   </script>

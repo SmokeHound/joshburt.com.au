@@ -10,6 +10,10 @@
   <script src="./assets/js/init-shared.js" defer></script>
   <script src="./assets/js/feature-flags.js" defer></script>
   <script>
+    // Purge legacy role demo key to avoid stale UI state
+    try { localStorage.removeItem('currentUser'); } catch (_) {}
+  </script>
+  <script>
     // Defer heavy analytics deps and then load manager
     (async()=>{
       if(!window.Chart){ await import('https://cdn.jsdelivr.net/npm/chart.js'); }

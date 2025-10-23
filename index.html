@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="./assets/css/styles.css" />
   <script src="./assets/js/init-shared.js" defer></script>
   <script src="./assets/js/notifications.js" defer></script>
+  <!-- Cleanup legacy role demo storage -->
+  <script>
+    try { localStorage.removeItem('currentUser'); } catch (e) {}
+  </script>
 </head>
 <body class="dark">
   <!-- MOBILE MENU TOGGLE -->
@@ -38,7 +42,6 @@
             <p class="text-lg mt-2 nav-link-muted">Your dashboard overview</p>
           </div>
           <div class="flex items-start gap-4">
-            <div id="role-switcher" class="hidden"></div>
             <div id="notification-bell-wrapper" class="relative"></div>
           </div>
         </div>
@@ -224,48 +227,7 @@
     </main>
   </div>
 
-  <!-- Role-based Dashboard System (kept minimal and safe) -->
-  <script>
-    (function(){
-      var userRoles = {
-        admin: { name: 'Administrator', dashboards: ['admin','analytics'] },
-        manager: { name: 'Manager', dashboards: ['manager'] },
-        user: { name: 'User', dashboards: ['user'] }
-      };
-      var currentUser;
-      try { currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"role":"admin","name":"Josh"}'); } catch(e){ currentUser = { role:'admin', name:'Josh' }; }
-      function updateDashboard(){
-        var welcomeMessage = document.getElementById('welcome-message');
-        if (welcomeMessage){
-          var roleObj = userRoles[currentUser.role];
-          var roleName = roleObj ? roleObj.name : 'User';
-          welcomeMessage.textContent = 'Welcome, ' + roleName + '!';
-        }
-      }
-      window.setUserRole = function(role){
-        if (userRoles[role]){
-          currentUser.role = role;
-          localStorage.setItem('currentUser', JSON.stringify(currentUser));
-          updateDashboard();
-          if (window.showNotification){ window.showNotification('Switched to ' + userRoles[role].name + ' role','success'); }
-        }
-      };
-      document.addEventListener('DOMContentLoaded', function(){
-        var roleSwitcher = document.getElementById('role-switcher');
-        if (roleSwitcher){
-          roleSwitcher.classList.remove('hidden');
-          var options = Object.keys(userRoles).map(function(key){
-            var selected = key === currentUser.role ? 'selected' : '';
-            return '<option value="'+key+'" '+selected+'>'+userRoles[key].name+'</option>';
-          }).join('');
-          roleSwitcher.innerHTML = '<div><label class="block text-sm font-medium text-gray-300 mb-1">Role (Demo)</label><select id="role-selector" class="w-full px-2 py-1 text-sm bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-secondary">'+options+'</select></div>';
-          var sel = document.getElementById('role-selector');
-          if (sel){ sel.addEventListener('change', function(e){ window.setUserRole(e.target.value); }); }
-        }
-        updateDashboard();
-      });
-    })();
-  </script>
+  
 
   <!-- Minimal mobile menu wiring after nav injection -->
   <script>
