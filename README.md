@@ -1,12 +1,10 @@
 # Josh Burt - Website with Server-Side Authentication
 
 [![🚀 Deploy website via FTP on push.](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml)
-[![⬆️ Deploy to GitHub Pages](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/static.yml/badge.svg)](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/static.yml)
 
 # Links to site
 - https://joshburt.netlify.app/
 - https://joshburt.com.au/
-- https://smokehound.github.io/joshburt.com.au/
 - https://joshburt-com-au.onrender.com/
 
 ## Overview
@@ -157,7 +155,6 @@ npm run health
 ### Automated Deployment
 - **Netlify**: Deploys static assets + functions (primary runtime)
 - **FTP Deployment**: Still available for static mirror (optional)
-- **GitHub Pages**: Secondary static mirror (no dynamic features)
 
 Serverless endpoints are accessible at:
 
@@ -180,7 +177,7 @@ When `AUTH0_DOMAIN` is set, Auth0 RS256 JWTs are accepted and users are auto-pro
 - Secure serverless endpoints (JWT auth, audit logging)
 
 ## 🚀 Quick Start
-- Dynamic features require serverless environment (Netlify Functions). Static mirrors (GitHub Pages) will show UI but API calls fail.
+- Dynamic features require serverless environment (Netlify Functions). Static mirrors will show UI but API calls fail.
 
 ### Development Setup
 ```bash
@@ -383,7 +380,6 @@ Defined in: `shared-config.html`
 ### Automated Deployment
 - **GitHub Actions**: Runs tests and linting on every push
 - **FTP Deployment**: Automatic deployment to production server
-- **GitHub Pages**: Secondary deployment target
 
 ### Manual Testing Checklist
 - [ ] Homepage loads with navigation and cards
