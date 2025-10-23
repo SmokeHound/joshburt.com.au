@@ -23,7 +23,6 @@ Serves static site and functions at http://localhost:8888
 
 ## Secondary Deployment (Static Mirrors)
 - FTP deployment (GitHub Action) maintains a static mirror at production host
-- GitHub Pages provides a static fallback (dynamic API calls will fail there)
 
 ## Serverless Endpoints
 ```

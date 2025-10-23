@@ -77,9 +77,8 @@ ALWAYS manually validate changes by running through these complete end-to-end sc
 
 ### GitHub Actions Workflows
 Two deployment workflows are configured:
-1. **GitHub Pages** (`.github/workflows/static.yml`): Deploys static site on push to main
-2. **FTP Deployment** (`.github/workflows/main.yml`): Deploys static and backend files to joshburt.com.au via FTP on any push
-3. **Netlify Functions**: Deploys serverless API endpoints automatically
+1. **FTP Deployment** (`.github/workflows/main.yml`): Deploys static and backend files to joshburt.com.au via FTP on any push
+2. **Netlify Functions**: Deploys serverless API endpoints automatically
 
 **Build steps:**
 - Static: No build required
@@ -93,8 +92,7 @@ Two deployment workflows are configured:
 /home/runner/work/joshburt.com.au/joshburt.com.au/
 ├── .github/
 │   └── workflows/
-│       ├── main.yml      # FTP deployment
-│       └── static.yml    # GitHub Pages deployment
+│       └── main.yml      # FTP deployment
 ├── index.html           # Main homepage
 ├── oil.html             # Castrol oil ordering system
 ├── administration.html  # Administration dashboard
