@@ -72,17 +72,19 @@
     // Order Review Script (copied from administration.html)
         document.addEventListener('DOMContentLoaded', function() {
             const ordersList = document.getElementById('orders-list');
+            let ordersState = [];
             async function loadOrders() {
                 try {
                     const FN_BASE = window.FN_BASE || '/.netlify/functions';
                     const res = await fetch(`${FN_BASE}/orders`);
                     if (!res.ok) throw new Error('Failed to fetch orders');
                     const orders = await res.json();
-                    if (!Array.isArray(orders) || orders.length === 0) {
+                    ordersState = Array.isArray(orders) ? orders : [];
+                    if (!Array.isArray(ordersState) || ordersState.length === 0) {
                         ordersList.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">No orders found.</div>';
                         return;
                     }
-                    ordersList.innerHTML = orders.map((order, idx) => `
+                    ordersList.innerHTML = ordersState.map((order, idx) => `
                         <div class="mb-6 p-4 border-b border-gray-200 dark:border-gray-600">
                             <div class="flex justify-between items-center mb-2">
                                 <div>
@@ -113,6 +115,7 @@
                                 <div class="flex gap-2 mt-4">
                                     <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400" onclick="updateOrderStatus(${order.id}, 'approved')">Approve</button>
                                     <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" onclick="updateOrderStatus(${order.id}, 'rejected')">Reject</button>
+                                    <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400" onclick="emailOrder(${order.id})">Email</button>
                                 </div>
                             </div>
                         </div>
@@ -153,6 +156,26 @@
                 } catch (err) {
                     alert('Error: ' + err.message);
                 }
+            };
+
+            window.emailOrder = function(orderId) {
+                const order = ordersState.find(o => o.id === orderId);
+                if (!order) { alert('Order not found'); return; }
+                const recipient = 'purchasing@workshop.com';
+                const createdAt = order.created_at ? new Date(order.created_at).toLocaleString() : '';
+                const items = (order.items || []).map(i => `- ${i.name}${i.code ? ' ('+i.code+')' : ''} x ${i.quantity}`).join('\n');
+                const subject = `Workshop Order #${order.id} - ${new Date().toISOString().split('T')[0]}`;
+                const body = `Workshop Stock Order\n\n`+
+`Order ID: ${order.id}\n`+
+`Created: ${createdAt}\n`+
+`Requested by: ${order.created_by || 'mechanic'}\n`+
+`Priority: ${order.priority || 'normal'}\n`+
+`Status: ${order.status || 'pending'}\n`+
+`Notes: ${order.notes || ''}\n\n`+
+`Items:\n${items || '(none)'}\n\n`+
+`Total Items: ${order.total_items || (order.items ? order.items.length : 0)}\n`;
+                const mailto = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailto;
             };
 
             loadOrders();
