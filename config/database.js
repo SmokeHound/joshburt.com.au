@@ -361,6 +361,15 @@ async function createPostgreSQLTables() {
     )
   `);
 
+  // Backfill missing columns for legacy deployments (safe no-ops with IF NOT EXISTS)
+  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_by VARCHAR(255) DEFAULT \'mechanic\'');
+  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_items INTEGER NOT NULL DEFAULT 0');
+  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT \'pending\'');
+  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT \'normal\'');
+  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS notes TEXT');
+  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+
   // Create order_items table for PostgreSQL
   await database.run(`
     CREATE TABLE IF NOT EXISTS order_items (
@@ -372,6 +381,12 @@ async function createPostgreSQLTables() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Ensure legacy order_items have expected columns
+  await database.run('ALTER TABLE order_items ADD COLUMN IF NOT EXISTS product_name VARCHAR(255)');
+  await database.run('ALTER TABLE order_items ADD COLUMN IF NOT EXISTS product_code VARCHAR(100)');
+  await database.run('ALTER TABLE order_items ADD COLUMN IF NOT EXISTS quantity INTEGER NOT NULL DEFAULT 1');
+  await database.run('ALTER TABLE order_items ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
 
   // Inventory table to track stock for products and consumables (PostgreSQL)
   await database.run(`
