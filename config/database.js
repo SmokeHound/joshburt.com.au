@@ -423,6 +423,16 @@ async function createPostgreSQLTables() {
     )
   `);
 
+  // Create login attempts table for PostgreSQL (for DB-backed rate limiting)
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS login_attempts (
+      id SERIAL PRIMARY KEY,
+      ip_address VARCHAR(45) NOT NULL,
+      email VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Create settings table for PostgreSQL (store JSON as TEXT for cross-DB parity)
   await database.run(`
     CREATE TABLE IF NOT EXISTS settings (
@@ -442,6 +452,12 @@ async function createPostgreSQLTables() {
   await database.run('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action)');
+  // Expression indexes on common JSON fields in details for faster filtering (PostgreSQL)
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs ((details::json->>\'path\'))');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs ((details::json->>\'method\'))');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs ((details::json->>\'requestId\'))');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip_address, created_at)');
 }
 
 async function createSQLiteTables() {
@@ -555,6 +571,16 @@ async function createSQLiteTables() {
     )
   `);
 
+  // Create login attempts table for SQLite (for DB-backed rate limiting)
+  await database.run(`
+    CREATE TABLE IF NOT EXISTS login_attempts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ip_address TEXT NOT NULL,
+      email TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Inventory table to track stock for products and consumables (SQLite)
   await database.run(`
     CREATE TABLE IF NOT EXISTS inventory (
@@ -565,6 +591,7 @@ async function createSQLiteTables() {
       UNIQUE(item_type, item_id)
     )
   `);
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action)');
 
   // Create settings table for SQLite (store JSON as TEXT)
   await database.run(`
@@ -574,6 +601,11 @@ async function createSQLiteTables() {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Expression indexes on common JSON fields in details for faster filtering (SQLite JSON1)
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs (json_extract(details, \'$.path\'))');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs (json_extract(details, \'$.method\'))');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs (json_extract(details, \'$.requestId\'))');
 }
 
 async function createDefaultUsers() {

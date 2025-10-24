@@ -29,9 +29,9 @@ async function storeRefreshToken(userId, refreshToken) {
   await database.run('INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)', [userId, tokenHash, expiresAt.toISOString()]);
 }
 
-// In-memory rate limiter (per cold start container). Basic protection for login brute force.
+// In-memory rate limiter (per cold start container) as fallback
 const rateBuckets = {};
-function rateLimit(key, limit = 5, windowMs = 5 * 60 * 1000) {
+function rateLimitMemory(key, limit = 5, windowMs = 5 * 60 * 1000) {
   const now = Date.now();
   if (!rateBuckets[key]) rateBuckets[key] = [];
   // purge old
@@ -39,6 +39,26 @@ function rateLimit(key, limit = 5, windowMs = 5 * 60 * 1000) {
   if (rateBuckets[key].length >= limit) return false;
   rateBuckets[key].push(now);
   return true;
+}
+
+// DB-backed rate limiter for distributed enforcement
+async function rateLimitDb(ip, email, limit = 5, windowMs = 5 * 60 * 1000) {
+  try {
+    const threshold = new Date(Date.now() - windowMs).toISOString();
+    // Count attempts in window
+    const row = await database.get('SELECT COUNT(*) AS cnt FROM login_attempts WHERE ip_address = ? AND created_at > ?', [ip, threshold]);
+    const count = row && (row.cnt || row.count) ? Number(row.cnt || row.count) : 0;
+    if (count >= limit) return false;
+    // Insert current attempt
+    await database.run('INSERT INTO login_attempts (ip_address, email) VALUES (?, ?)', [ip, email || null]);
+    // Best-effort cleanup for records older than 1 day to keep table lean
+    const old = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    database.run('DELETE FROM login_attempts WHERE created_at <= ?', [old]).catch(() => {});
+    return true;
+  } catch (_) {
+    // On any DB error, return null to signal fallback
+    return null;
+  }
 }
 
 exports.handler = withHandler(async (event) => {
@@ -87,8 +107,13 @@ exports.handler = withHandler(async (event) => {
       const { email, password } = payload;
       if (!email || !password) return jsonResponse(400, { error: 'Invalid email or password format' });
       const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || 'unknown';
-      const rlKey = `login:${ip}`;
-      if (!rateLimit(rlKey, 5, 5 * 60 * 1000)) return jsonResponse(429, { error: 'Too many login attempts. Please wait a few minutes and try again.' });
+      // Try DB-backed rate limiting first, fallback to memory
+      const allowed = await rateLimitDb(ip, email, 5, 5 * 60 * 1000);
+      if (allowed === false) return jsonResponse(429, { error: 'Too many login attempts. Please wait a few minutes and try again.' });
+      if (allowed === null) {
+        const rlKey = `login:${ip}`;
+        if (!rateLimitMemory(rlKey, 5, 5 * 60 * 1000)) return jsonResponse(429, { error: 'Too many login attempts. Please wait a few minutes and try again.' });
+      }
 
       const user = await database.get('SELECT id, email, name, password_hash, role, is_active, email_verified, failed_login_attempts, lockout_expires FROM users WHERE email = ?', [email]);
       if (!user || !user.is_active) {

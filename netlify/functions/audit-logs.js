@@ -52,18 +52,30 @@ exports.handler = withHandler(async function(event){
 
   async function handleGet(event){
     try {
-      const { userId, action, startDate, endDate, limit, format, q } = event.queryStringParameters || {};
-      const { page, limit: pageLimit, offset } = getPagination(event.queryStringParameters || {}, { page: 1, limit: 25 });
+      const { userId, action, startDate, endDate, limit, format, q, method, path, requestId, from, to } = event.queryStringParameters || {};
+      const qs = event.queryStringParameters || {};
+      // Support page and limit; treat pageSize as alias of limit for UI compatibility
+      const effectiveQs = { ...qs };
+      if (!effectiveQs.limit && effectiveQs.pageSize) effectiveQs.limit = effectiveQs.pageSize;
+      const { page, limit: pageLimit, offset } = getPagination(effectiveQs, { page: 1, limit: 25 });
       const hasPagination = !!(event.queryStringParameters && (event.queryStringParameters.page || event.queryStringParameters.limit));
 
       const whereParts = ['1=1'];
       const params = [];
+      // Helper to build JSON extraction in a cross-DB way
+      const dbType = (database.type || '').toLowerCase();
+      const j = (key) => dbType.startsWith('postg') ? `(details::json->>'${key}')` : `json_extract(details, '$.${key}')`;
       if (userId) { whereParts.push('user_id = ?'); params.push(userId); }
       if (action) { whereParts.push('action = ?'); params.push(action); }
-      if (startDate) { whereParts.push('created_at >= ?'); params.push(startDate); }
-      if (endDate) { whereParts.push('created_at <= ?'); params.push(endDate); }
+      const start = startDate || from;
+      const end = endDate || to;
+      if (start) { whereParts.push('created_at >= ?'); params.push(start); }
+      if (end) { whereParts.push('created_at <= ?'); params.push(end); }
+      if (method) { whereParts.push(`${j('method')} = ?`); params.push(method); }
+      if (path) { whereParts.push(`${j('path')} = ?`); params.push(path); }
+      if (requestId) { whereParts.push(`${j('requestId')} = ?`); params.push(requestId); }
       if (q) {
-        whereParts.push('(action LIKE ? OR details LIKE ? OR user_id LIKE ?)');
+        whereParts.push('(action LIKE ? OR details LIKE ? OR CAST(user_id AS TEXT) LIKE ?)');
         const like = `%${q}%`;
         params.push(like, like, like);
       }

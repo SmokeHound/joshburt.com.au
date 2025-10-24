@@ -17,6 +17,10 @@
     pageSize: 25,
     q: '',
     action: '',
+    method: '',
+    path: '',
+    requestId: '',
+    userId: '',
     startDate: '',
     endDate: '',
     loading: false,
@@ -43,6 +47,10 @@
               <option value="security_change">Security Change</option>
               <option value="error_occurred">Error</option>
             </select>
+            <input id="audit-method" placeholder="Method (GET/POST)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-36" />
+            <input id="audit-path" placeholder="Path (/fn)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-48" />
+            <input id="audit-request-id" placeholder="Request ID" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-48" />
+            <input id="audit-user-id" placeholder="User ID" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-28" />
             <input type="date" id="audit-start" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
             <input type="date" id="audit-end" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
             <select id="audit-page-size" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm">
