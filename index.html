@@ -97,15 +97,18 @@
                     <div class="text-sm text-gray-400 mt-2">System Status</div>
                 </div>
             </div>
-            <!-- Recent Audit Log (optional) -->
-            <div class="mt-8">
-                <div class="card widget-secondary p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold mb-3 text-white">Recent Activity</h3>
-                    <ul id="recent-audit-log" class="space-y-2 text-sm text-gray-300">
-                        <li>Loading...</li>
-                    </ul>
-                </div>
-            </div>
+      <!-- Recent Activity -->
+      <div class="mt-8">
+        <div class="card widget-secondary p-6 rounded-lg shadow-md">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-white">Recent Activity</h3>
+            <a id="view-all-activity" href="audit-logs.html" class="text-cyan-400 hover:underline text-sm">View all</a>
+          </div>
+          <ul id="recent-audit-log" class="space-y-2 text-sm text-gray-300" aria-live="polite" aria-busy="true">
+            <li class="text-gray-400">Loading recent activity…</li>
+          </ul>
+        </div>
+      </div>
     <!-- Dashboard Stats Script -->
     <script>
   async function updateDashboardStats() {
@@ -174,14 +177,36 @@
           if (res.ok) { dbHealthy = true; apiHealthy = apiHealthy || true; }
         } catch (_) {}
 
-        // 4) Recent audit logs (best-effort)
+        // 4) Recent audit logs (best-effort, last 24h, limit 8) with fallback to localStorage
         try {
+          const since = new Date(Date.now() - 24*60*60*1000).toISOString();
           if (token && (currentRole === 'admin' || currentRole === 'manager')) {
-            const res = await fetch(`${FN_BASE}/audit-logs`, { headers: authHeaders });
+            const res = await fetch(`${FN_BASE}/audit-logs?limit=8&startDate=${encodeURIComponent(since)}`, { headers: authHeaders });
             if (res.ok) {
               const j = await res.json();
-              auditLogs = Array.isArray(j) ? j : (j.logs || []);
+              auditLogs = Array.isArray(j) ? j : (j.data || j.logs || []);
             }
+          }
+          if ((!auditLogs || auditLogs.length === 0)) {
+            // Fallback to local in-browser audit log cache (if present)
+            try {
+              const local = JSON.parse(localStorage.getItem('auditLogs') || '[]');
+              if (Array.isArray(local) && local.length) {
+                // Normalize to expected fields
+                auditLogs = local
+                  .filter(x => x && x.timestamp && new Date(x.timestamp) >= new Date(Date.now() - 24*60*60*1000))
+                  .slice(0, 8)
+                  .map(x => ({
+                    id: x.id,
+                    user_id: x.userId || x.user_id || null,
+                    action: x.action,
+                    details: x.details,
+                    created_at: x.timestamp,
+                    ip_address: x.ip || '',
+                    user_agent: ''
+                  }));
+              }
+            } catch(_) {}
           }
         } catch (_) {}
 
@@ -204,15 +229,74 @@
         setStatus('status-db', dbHealthy);
         setStatus('status-server', serverHealthy);
 
-        // Update recent activity list
+        // Update recent activity list (improved layout)
         const auditList = document.getElementById('recent-audit-log');
+        const viewAll = document.getElementById('view-all-activity');
+        function relTime(iso){
+          try {
+            const d = new Date(iso);
+            const diff = Date.now() - d.getTime();
+            const s = Math.floor(diff/1000), m=Math.floor(s/60), h=Math.floor(m/60), dys=Math.floor(h/24);
+            if (dys>0) return `${dys}d ago`;
+            if (h>0) return `${h}h ago`;
+            if (m>0) return `${m}m ago`;
+            return `${s}s ago`;
+          } catch(_) { return ''; }
+        }
+        function safeJsonParse(val){
+          if (!val) return null;
+          if (typeof val !== 'string') return val;
+          try { return JSON.parse(val); } catch(_) { return val; }
+        }
+        const actionIcon = (action) => {
+          const a = String(action || '').toLowerCase();
+          if (a.includes('login')) return '🔐';
+          if (a.includes('logout')) return '🚪';
+          if (a.includes('order')) return '🧾';
+          if (a.includes('product')) return '📦';
+          if (a.includes('user')) return '👤';
+          if (a.includes('settings')) return '⚙️';
+          return '•';
+        };
+        const methodBadge = (method) => {
+          if (!method) return '';
+          const color = method === 'GET' ? 'bg-gray-700' : method === 'POST' ? 'bg-blue-700' : method === 'PUT' ? 'bg-yellow-700' : method === 'DELETE' ? 'bg-red-700' : 'bg-gray-700';
+          return `<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] ${color}">${method}</span>`;
+        };
         if (auditList) {
+          auditList.setAttribute('aria-busy','false');
+          const since = new Date(Date.now() - 24*60*60*1000).toISOString();
+          if (viewAll) viewAll.href = `audit-logs.html?start=${encodeURIComponent(since)}`;
           if (auditLogs && auditLogs.length > 0) {
-            auditList.innerHTML = auditLogs.slice(0, 5).map(log =>
-              `<li><span class="font-semibold">${log.action}</span> <span class="text-xs text-gray-500">${log.timestamp ? new Date(log.timestamp).toLocaleString() : ''}</span><br><span class="text-gray-400">${log.details ? (typeof log.details === 'string' ? log.details : JSON.stringify(log.details)) : ''}</span></li>`
-            ).join('');
+            const items = auditLogs.slice(0, 8).map(log => {
+              const created = log.created_at || log.timestamp || '';
+              const details = safeJsonParse(log.details);
+              const method = (details && typeof details === 'object' && (details.method || details.httpMethod)) || '';
+              const path = (details && typeof details === 'object' && (details.path || details.endpoint || details.url)) || '';
+              const reqId = (details && typeof details === 'object' && (details.requestId || details.request_id)) || '';
+              const who = (function(){
+                try {
+                  const stored = JSON.parse(localStorage.getItem('user')||'{}');
+                  if (stored && stored.id && log.user_id && Number(stored.id) === Number(log.user_id)) return 'You';
+                } catch(_) {}
+                return log.user_id ? `User #${log.user_id}` : 'System';
+              })();
+              const metaLine = [who, path].filter(Boolean).join(' · ');
+              return `<li class="flex items-start gap-3">
+                <span class="mt-0.5" aria-hidden="true">${actionIcon(log.action)}</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center flex-wrap gap-1">
+                    <span class="font-semibold text-white truncate">${log.action || 'Activity'}</span>
+                    ${methodBadge(method)}
+                    <span class="text-xs text-gray-500">${created ? relTime(created) : ''}</span>
+                  </div>
+                  ${metaLine ? `<div class="text-xs text-gray-400 truncate">${metaLine}${reqId ? ` · ${reqId}`:''}</div>` : ''}
+                </div>
+              </li>`;
+            }).join('');
+            auditList.innerHTML = items;
           } else {
-            auditList.innerHTML = '<li>No recent activity</li>';
+            auditList.innerHTML = '<li class="text-gray-400">No activity in the last 24 hours</li>';
           }
         }
     }
