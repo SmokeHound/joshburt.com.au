@@ -22,6 +22,7 @@
     requestId: '',
     startDate: '',
     endDate: '',
+    truncateLen: 120,
     loading: false,
     total: 0,
     totalPages: 0,
@@ -49,6 +50,7 @@
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
+            <input id="audit-truncate" type="number" min="40" max="1000" step="10" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-24" title="Preview length" placeholder="Preview" />
           </div>
           <div class="flex flex-wrap gap-2">
             <button id="audit-export-json" class="btn-neon-blue px-3 py-1 rounded text-sm">Export JSON</button>
@@ -172,8 +174,12 @@
         pretty = '';
       }
 
-      const truncated = (pretty && pretty.length > 120) ? (pretty.slice(0,117) + '…') : pretty;
-      const preId = `audit-details-${idx}`;
+      const tlen = Math.max(40, Math.min(1000, parseInt(state.truncateLen) || 120));
+      const truncated = (pretty && pretty.length > tlen) ? (pretty.slice(0, tlen - 3) + '…') : pretty;
+      const baseId = `audit-${idx}`;
+      const boxId = `${baseId}-box`;
+      const prePrettyId = `${baseId}-pretty`;
+      const preRawId = `${baseId}-raw`;
 
       return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
@@ -182,12 +188,16 @@
         <td class="p-2 align-top max-w-sm break-words">
           ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
           <div class="text-xs text-gray-300 dark:text-gray-400 break-words">${escapeHtml(truncated || '')}</div>
-          ${pretty ? `
+          ${(pretty || raw) ? `
           <div class="mt-1 flex gap-2">
-            <button class="audit-toggle px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${preId}">View</button>
-            <button class="audit-copy px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${preId}">Copy</button>
+            <button class="audit-toggle px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${boxId}">View</button>
+            ${parsed ? `<button class="audit-mode px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}" data-mode="pretty">Raw</button>` : ''}
+            <button class="audit-copy px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}">Copy</button>
           </div>
-          <pre id="${preId}" class="hidden mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(pretty)}</pre>
+          <div id="${boxId}" class="hidden mt-2">
+            ${parsed ? `<pre id="${prePrettyId}" class="mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(pretty)}</pre>` : ''}
+            <pre id="${preRawId}" class="${parsed ? 'hidden ' : ''}mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(raw || '')}</pre>
+          </div>
           ` : ''}
         </td>
         <td class="p-2 align-top whitespace-nowrap text-xs">${ip}</td>
@@ -198,17 +208,42 @@
     tbody.onclick = (e) => {
       const t = e.target;
       if (t && t.classList.contains('audit-toggle')) {
-        const id = t.getAttribute('data-target');
-        const pre = document.getElementById(id);
-        if (pre) {
-          if (pre.classList.contains('hidden')) { pre.classList.remove('hidden'); t.textContent = 'Hide'; }
-          else { pre.classList.add('hidden'); t.textContent = 'View'; }
+        const boxId2 = t.getAttribute('data-target');
+        const box = document.getElementById(boxId2);
+        if (box) {
+          if (box.classList.contains('hidden')) { box.classList.remove('hidden'); t.textContent = 'Hide'; }
+          else { box.classList.add('hidden'); t.textContent = 'View'; }
+        }
+      } else if (t && t.classList.contains('audit-mode')) {
+        const base = t.getAttribute('data-base');
+        const mode = t.getAttribute('data-mode') || 'pretty';
+        const preP = document.getElementById(`${base}-pretty`);
+        const preR = document.getElementById(`${base}-raw`);
+        if (preP && preR) {
+          if (mode === 'pretty') {
+            // Switch to raw
+            preP.classList.add('hidden');
+            preR.classList.remove('hidden');
+            t.setAttribute('data-mode', 'raw');
+            t.textContent = 'Pretty';
+          } else {
+            // Switch to pretty
+            preR.classList.add('hidden');
+            preP.classList.remove('hidden');
+            t.setAttribute('data-mode', 'pretty');
+            t.textContent = 'Raw';
+          }
         }
       } else if (t && t.classList.contains('audit-copy')) {
-        const id = t.getAttribute('data-target');
-        const pre = document.getElementById(id);
-        if (pre) {
-          const text = pre.textContent || '';
+        const base = t.getAttribute('data-base');
+        let text = '';
+        if (base) {
+          const preP = document.getElementById(`${base}-pretty`);
+          const preR = document.getElementById(`${base}-raw`);
+          const visible = preR && !preR.classList.contains('hidden') ? preR : preP;
+          text = visible ? (visible.textContent || '') : '';
+        }
+        if (text) {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).catch(()=>{});
           } else {
@@ -297,6 +332,7 @@
     const method = document.getElementById('audit-method');
     const path = document.getElementById('audit-path');
     const requestId = document.getElementById('audit-request-id');
+    const truncate = document.getElementById('audit-truncate');
     const start = document.getElementById('audit-start');
     const end = document.getElementById('audit-end');
     const pageSize = document.getElementById('audit-page-size');
@@ -309,6 +345,22 @@
     if (method) method.addEventListener('input', debounce(e=>{ state.method = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
     if (path) path.addEventListener('input', debounce(e=>{ state.path = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
     if (requestId) requestId.addEventListener('input', debounce(e=>{ state.requestId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
+    if (truncate) {
+      // Initialize from state/localStorage
+      try {
+        const saved = localStorage.getItem('audit.truncateLen');
+        if (saved) state.truncateLen = parseInt(saved) || state.truncateLen;
+      } catch(err){ /* no-op */ }
+      truncate.value = state.truncateLen;
+      truncate.addEventListener('input', debounce(e=>{
+        const v = parseInt(e.target.value);
+        if (!isNaN(v)) {
+          state.truncateLen = Math.max(40, Math.min(1000, v));
+          try { localStorage.setItem('audit.truncateLen', String(state.truncateLen)); } catch(err){ /* no-op */ }
+          renderTable(); // no refetch needed
+        }
+      }, 200));
+    }
     if (start) start.addEventListener('change', e=>{ state.startDate = e.target.value; state.page=1; fetchLogs(); });
     if (end) end.addEventListener('change', e=>{ state.endDate = e.target.value; state.page=1; fetchLogs(); });
     if (pageSize) pageSize.addEventListener('change', e=>{ state.pageSize = parseInt(e.target.value); state.page=1; fetchLogs(); });
