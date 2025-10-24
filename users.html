@@ -75,6 +75,11 @@
                     <option value="name_desc">Name Z-A</option>
                 </select>
             </div>
+            <!-- Deep-link banner (shown when focusing a specific userId) -->
+            <div id="user-deeplink-banner" class="hidden mb-4 p-3 rounded border border-gray-700 bg-gray-900 text-gray-200 flex items-center justify-between">
+                <div><span id="deeplink-text"></span></div>
+                <button id="deeplink-clear" class="btn-neon-blue px-3 py-1 rounded">Clear</button>
+            </div>
             <!-- User Table Card (neon theme, .card + .widget-primary) -->
             <div class="card widget-primary rounded-lg shadow-md p-6">
                 <div class="overflow-x-auto">
@@ -222,6 +227,8 @@
             usersState.list.forEach(u => {
                 const tr = document.createElement('tr');
                 tr.className='border-b border-gray-700';
+                tr.dataset.userId = String(u.id);
+                tr.id = `user-row-${u.id}`;
                 const avatar = u.avatar_url ? `<img src="${u.avatar_url}" class="inline w-8 h-8 rounded-full mr-2"/>` : `<span class="inline-block w-8 h-8 rounded-full bg-gray-600 mr-2"></span>`;
                 const status = u.is_active ? '<span class="text-green-400">Active</span>' : '<span class="text-red-400">Inactive</span>';
                 const lastLogin = u.last_login ? new Date(u.last_login).toLocaleString() : '--';
@@ -243,6 +250,41 @@
             const pagDiv = document.getElementById('user-pagination');
             const { page, pages } = usersState.pagination; pagDiv.innerHTML='';
             if (pages>1){ for(let i=1;i<=pages;i++){ const b=document.createElement('button'); b.textContent=i; b.className='px-2 py-1 rounded '+(i===page?'bg-primary text-white':'bg-gray-700 text-gray-300 hover:bg-gray-600'); b.onclick=()=>loadUsers(i); pagDiv.appendChild(b);} }
+        }
+        // Highlight a specific row (used for deep-links)
+        function highlightUserRow(userId){
+            try {
+                const row = document.getElementById(`user-row-${userId}`);
+                if (!row) return false;
+                row.classList.add('ring-2','ring-cyan-400','ring-offset-2','ring-offset-gray-900');
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => { row.classList.remove('ring-2','ring-cyan-400','ring-offset-2','ring-offset-gray-900'); }, 5000);
+                return true;
+            } catch (_) { return false; }
+        }
+
+        // Show a banner indicating deep-linked user view with a clear option
+        function showDeeplinkBanner(user){
+            const banner = document.getElementById('user-deeplink-banner');
+            const text = document.getElementById('deeplink-text');
+            const clearBtn = document.getElementById('deeplink-clear');
+            if (!banner || !text || !clearBtn) return;
+            text.textContent = `Focusing on user #${user.id} (${user.name || user.email || 'unknown'})`;
+            banner.classList.remove('hidden');
+            clearBtn.onclick = () => {
+                banner.classList.add('hidden');
+                // Reset filters and reload full list
+                usersState.filters.search = '';
+                document.getElementById('user-search').value = '';
+                loadUsers(1);
+                // Also remove the query param from URL without reloading
+                try {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('userId');
+                    url.searchParams.delete('user_id');
+                    window.history.replaceState({}, '', url.toString());
+                } catch(_){ /* noop */ }
+            };
         }
     // Show toast notification
         function showToast(message, type = 'success') {
@@ -342,6 +384,13 @@
 
         // Event wiring
         document.addEventListener('DOMContentLoaded', () => {
+            // Parse deep-link id (?userId= or ?user_id=)
+            let deepLinkId = null;
+            try {
+                const url = new URL(window.location.href);
+                const idParam = url.searchParams.get('userId') || url.searchParams.get('user_id');
+                if (idParam && /^[0-9]+$/.test(idParam)) deepLinkId = parseInt(idParam, 10);
+            } catch(_) { /* noop */ }
             // Require authentication for this page
             const initialToken = (window.getToken && window.getToken()) || null;
             if (!initialToken && !AUTH_DISABLED) {
@@ -368,7 +417,34 @@
                             });
                         } catch(e) { /* noop */ }
             if (typeof AuditLogger !== 'undefined') { AuditLogger.log('page_access','Accessed User Management page'); }
-            loadUsers();
+            // Load users and handle deep-link focus
+            (async () => {
+                await loadUsers();
+                if (deepLinkId) {
+                    // If the user is already in the rendered list, highlight and banner
+                    if (highlightUserRow(deepLinkId)) {
+                        const found = usersState.list.find(u => u.id === deepLinkId);
+                        if (found) showDeeplinkBanner(found);
+                    } else {
+                        // Fetch the specific user and render a focused view
+                        try {
+                            const token = (window.getToken && window.getToken()) || null;
+                            const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                            const res = await fetch(`${FN_BASE}/users/${deepLinkId}`, { headers });
+                            if (res.ok) {
+                                const data = await res.json();
+                                if (data && data.user) {
+                                    usersState.list = [data.user];
+                                    usersState.pagination = { page:1, limit:1, total:1, pages:1 };
+                                    renderUsers();
+                                    highlightUserRow(deepLinkId);
+                                    showDeeplinkBanner(data.user);
+                                }
+                            }
+                        } catch(_) { /* ignore */ }
+                    }
+                }
+            })();
             loadAndApplySettings();
             document.getElementById('user-form').addEventListener('submit', addOrUpdateUser);
             document.getElementById('cancel-edit').addEventListener('click', cancelEdit);
