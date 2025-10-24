@@ -20,7 +20,6 @@
     method: '',
     path: '',
     requestId: '',
-    userId: '',
     startDate: '',
     endDate: '',
     loading: false,
@@ -38,19 +37,10 @@
         <div class="flex flex-col md:flex-row gap-2 md:items-end md:justify-between">
           <div class="flex flex-wrap gap-2 items-center">
             <input id="audit-search" placeholder="Search..." class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
-            <select id="audit-action" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm">
-              <option value="">All Actions</option>
-              <option value="user_login">User Login</option>
-              <option value="user_logout">User Logout</option>
-              <option value="settings_changed">Settings Changed</option>
-              <option value="theme_change">Theme Change</option>
-              <option value="security_change">Security Change</option>
-              <option value="error_occurred">Error</option>
-            </select>
-            <input id="audit-method" placeholder="Method (GET/POST)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-36" />
-            <input id="audit-path" placeholder="Path (/fn)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-48" />
+            <input id="audit-action" placeholder="Action (e.g. auth.login_success)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
+            <input id="audit-method" placeholder="Method (GET/POST)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-28" />
+            <input id="audit-path" placeholder="Path (/..../orders)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-48" />
             <input id="audit-request-id" placeholder="Request ID" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-48" />
-            <input id="audit-user-id" placeholder="User ID" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-28" />
             <input type="date" id="audit-start" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
             <input type="date" id="audit-end" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
             <select id="audit-page-size" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm">
@@ -98,6 +88,9 @@
     params.set('pageSize', state.pageSize);
     if (state.q) params.set('q', state.q);
     if (state.action) params.set('action', state.action);
+    if (state.method) params.set('method', state.method);
+    if (state.path) params.set('path', state.path);
+    if (state.requestId) params.set('requestId', state.requestId);
     if (state.startDate) params.set('startDate', state.startDate);
     if (state.endDate) params.set('endDate', state.endDate);
     try {
@@ -226,6 +219,9 @@
   function wireEvents(){
     const search = document.getElementById('audit-search');
     const action = document.getElementById('audit-action');
+    const method = document.getElementById('audit-method');
+    const path = document.getElementById('audit-path');
+    const requestId = document.getElementById('audit-request-id');
     const start = document.getElementById('audit-start');
     const end = document.getElementById('audit-end');
     const pageSize = document.getElementById('audit-page-size');
@@ -234,7 +230,10 @@
     const clearBtn = document.getElementById('audit-clear');
 
     if (search) search.addEventListener('input', debounce(e=>{ state.q = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
-    if (action) action.addEventListener('change', e=>{ state.action = e.target.value; state.page=1; fetchLogs(); });
+    if (action) action.addEventListener('input', debounce(e=>{ state.action = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
+    if (method) method.addEventListener('input', debounce(e=>{ state.method = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
+    if (path) path.addEventListener('input', debounce(e=>{ state.path = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
+    if (requestId) requestId.addEventListener('input', debounce(e=>{ state.requestId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
     if (start) start.addEventListener('change', e=>{ state.startDate = e.target.value; state.page=1; fetchLogs(); });
     if (end) end.addEventListener('change', e=>{ state.endDate = e.target.value; state.page=1; fetchLogs(); });
     if (pageSize) pageSize.addEventListener('change', e=>{ state.pageSize = parseInt(e.target.value); state.page=1; fetchLogs(); });

@@ -591,7 +591,6 @@ async function createSQLiteTables() {
       UNIQUE(item_type, item_id)
     )
   `);
-  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action)');
 
   // Create settings table for SQLite (store JSON as TEXT)
   await database.run(`
@@ -606,6 +605,7 @@ async function createSQLiteTables() {
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs (json_extract(details, \'$.path\'))');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs (json_extract(details, \'$.method\'))');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs (json_extract(details, \'$.requestId\'))');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action)');
 }
 
 async function createDefaultUsers() {
