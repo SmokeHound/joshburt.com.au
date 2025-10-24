@@ -20,13 +20,15 @@
     method: '',
     path: '',
     requestId: '',
+    userId: '',
     startDate: '',
     endDate: '',
     truncateLen: 120,
     loading: false,
     total: 0,
     totalPages: 0,
-    data: []
+    data: [],
+    usersById: {}
   };
 
   // Create base structure if none
@@ -42,6 +44,7 @@
             <input id="audit-method" placeholder="Method (GET/POST)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-28" />
             <input id="audit-path" placeholder="Path (/..../orders)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-48" />
             <input id="audit-request-id" placeholder="Request ID" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-48" />
+            <input id="audit-user-id" placeholder="User ID" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-32" />
             <input type="date" id="audit-start" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
             <input type="date" id="audit-end" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
             <select id="audit-page-size" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm">
@@ -51,6 +54,12 @@
               <option value="100">100</option>
             </select>
             <input id="audit-truncate" type="number" min="40" max="1000" step="10" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-24" title="Preview length" placeholder="Preview" />
+          </div>
+          <div class="flex flex-wrap gap-2 items-center mt-2">
+            <button id="audit-chip-24h" class="px-2 py-1 text-xs rounded bg-gray-800">24h</button>
+            <button id="audit-chip-7d" class="px-2 py-1 text-xs rounded bg-gray-800">7d</button>
+            <button id="audit-chip-30d" class="px-2 py-1 text-xs rounded bg-gray-800">30d</button>
+            <button id="audit-chip-clear" class="px-2 py-1 text-xs rounded bg-gray-800">Clear</button>
           </div>
           <div class="flex flex-wrap gap-2">
             <button id="audit-export-json" class="btn-neon-blue px-3 py-1 rounded text-sm">Export JSON</button>
@@ -93,6 +102,7 @@
     if (state.method) params.set('method', state.method);
     if (state.path) params.set('path', state.path);
     if (state.requestId) params.set('requestId', state.requestId);
+    if (state.userId) params.set('userId', state.userId);
     if (state.startDate) params.set('startDate', state.startDate);
     if (state.endDate) params.set('endDate', state.endDate);
     try {
@@ -139,7 +149,12 @@
     }
     tbody.innerHTML = state.data.map((row, idx) => {
       const created = formatDate(row.created_at || row.timestamp);
-      const user = row.user_id || row.userId || '';
+      const uid = row.user_id || row.userId || '';
+      const mapped = (uid && state.usersById[String(uid)]) || null;
+      const disp = mapped ? `${mapped} (${uid})` : (uid || '');
+      const userHtml = uid
+        ? `<a href="profile.html?userId=${encodeURIComponent(String(uid))}" class="text-blue-400 hover:underline">${escapeHtml(disp)}</a>`
+        : '';
       const action = row.action || '';
       const ip = row.ip_address || row.ip || '';
 
@@ -183,7 +198,7 @@
 
       return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
-        <td class="p-2 align-top">${user}</td>
+  <td class="p-2 align-top">${userHtml}</td>
         <td class="p-2 align-top font-medium">${action}</td>
         <td class="p-2 align-top max-w-sm break-words">
           ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
@@ -289,6 +304,10 @@
     // Export large subset (no pagination) - respect search filters
     if (state.q) params.set('q', state.q);
     if (state.action) params.set('action', state.action);
+    if (state.method) params.set('method', state.method);
+    if (state.path) params.set('path', state.path);
+    if (state.requestId) params.set('requestId', state.requestId);
+    if (state.userId) params.set('userId', state.userId);
     if (state.startDate) params.set('startDate', state.startDate);
     if (state.endDate) params.set('endDate', state.endDate);
     params.set('limit', 1000);
@@ -326,16 +345,43 @@
 
   function debounce(fn, ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); }; }
 
+  function formatYMD(d){
+    try { return d.toISOString().slice(0,10); } catch(e){ return ''; }
+  }
+
+  async function fetchUsersMap(){
+    try {
+      const FN_BASE = window.FN_BASE || '/.netlify/functions';
+      const res = await fetch(`${FN_BASE}/users`);
+      if (!res.ok) return;
+      const json = await res.json();
+      const arr = (json && json.users) || [];
+      const map = {};
+      arr.forEach(u=>{
+        const id = String(u.id || u.user_id || u.uid || '');
+        if (!id) return;
+        map[id] = u.username || u.name || `User #${id}`;
+      });
+      state.usersById = map;
+      renderTable(); // refresh names in current page
+    } catch(_) { /* ignore */ }
+  }
+
   function wireEvents(){
     const search = document.getElementById('audit-search');
     const action = document.getElementById('audit-action');
     const method = document.getElementById('audit-method');
     const path = document.getElementById('audit-path');
     const requestId = document.getElementById('audit-request-id');
+    const userId = document.getElementById('audit-user-id');
     const truncate = document.getElementById('audit-truncate');
     const start = document.getElementById('audit-start');
     const end = document.getElementById('audit-end');
     const pageSize = document.getElementById('audit-page-size');
+    const chip24h = document.getElementById('audit-chip-24h');
+    const chip7d = document.getElementById('audit-chip-7d');
+    const chip30d = document.getElementById('audit-chip-30d');
+    const chipClear = document.getElementById('audit-chip-clear');
     const expJson = document.getElementById('audit-export-json');
     const expCsv = document.getElementById('audit-export-csv');
     const clearBtn = document.getElementById('audit-clear');
@@ -345,6 +391,7 @@
     if (method) method.addEventListener('input', debounce(e=>{ state.method = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
     if (path) path.addEventListener('input', debounce(e=>{ state.path = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
     if (requestId) requestId.addEventListener('input', debounce(e=>{ state.requestId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
+    if (userId) userId.addEventListener('input', debounce(e=>{ state.userId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
     if (truncate) {
       // Initialize from state/localStorage
       try {
@@ -364,6 +411,20 @@
     if (start) start.addEventListener('change', e=>{ state.startDate = e.target.value; state.page=1; fetchLogs(); });
     if (end) end.addEventListener('change', e=>{ state.endDate = e.target.value; state.page=1; fetchLogs(); });
     if (pageSize) pageSize.addEventListener('change', e=>{ state.pageSize = parseInt(e.target.value); state.page=1; fetchLogs(); });
+    function setRangeDays(days){
+      const endD = new Date();
+      const startD = new Date();
+      startD.setDate(endD.getDate() - (days - 1));
+      state.startDate = formatYMD(startD);
+      state.endDate = formatYMD(endD);
+      if (start) start.value = state.startDate;
+      if (end) end.value = state.endDate;
+      state.page=1; fetchLogs();
+    }
+    if (chip24h) chip24h.addEventListener('click', ()=> setRangeDays(1));
+    if (chip7d) chip7d.addEventListener('click', ()=> setRangeDays(7));
+    if (chip30d) chip30d.addEventListener('click', ()=> setRangeDays(30));
+    if (chipClear) chipClear.addEventListener('click', ()=>{ state.startDate=''; state.endDate=''; if (start) start.value=''; if (end) end.value=''; state.page=1; fetchLogs(); });
     if (expJson) expJson.addEventListener('click', ()=>exportData('json'));
     if (expCsv) expCsv.addEventListener('click', ()=>exportData('csv'));
     if (clearBtn) clearBtn.addEventListener('click', clearLogs);
@@ -372,5 +433,6 @@
   // Initialize
   ensureStructure();
   wireEvents();
+  fetchUsersMap();
   fetchLogs();
 })();
