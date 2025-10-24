@@ -64,16 +64,22 @@ exports.handler = withHandler(async function(event){
       if (endDate) { whereParts.push('created_at <= ?'); params.push(endDate); }
       // JSON details filters (portable via DB-specific expressions)
       if (method) {
-        const expr = (database.type === 'postgres' || database.type === 'postgresql') ? '(details::json->>\'method\')' : 'json_extract(details, \'$.method\')';
-        whereParts.push(expr + ' = ?'); params.push(method);
+        const isPg = (database.type === 'postgres' || database.type === 'postgresql');
+        const expr = isPg ? '(details::json->>\'method\')' : 'json_extract(details, \'$.method\')';
+        const guard = isPg ? 'substring(details from 1 for 1) IN (\'{\',\'[\')' : null;
+        whereParts.push((guard ? `${guard} AND ` : '') + expr + ' = ?'); params.push(method);
       }
       if (path) {
-        const expr = (database.type === 'postgres' || database.type === 'postgresql') ? '(details::json->>\'path\')' : 'json_extract(details, \'$.path\')';
-        whereParts.push(expr + ' = ?'); params.push(path);
+        const isPg = (database.type === 'postgres' || database.type === 'postgresql');
+        const expr = isPg ? '(details::json->>\'path\')' : 'json_extract(details, \'$.path\')';
+        const guard = isPg ? 'substring(details from 1 for 1) IN (\'{\',\'[\')' : null;
+        whereParts.push((guard ? `${guard} AND ` : '') + expr + ' = ?'); params.push(path);
       }
       if (requestId) {
-        const expr = (database.type === 'postgres' || database.type === 'postgresql') ? '(details::json->>\'requestId\')' : 'json_extract(details, \'$.requestId\')';
-        whereParts.push(expr + ' = ?'); params.push(requestId);
+        const isPg = (database.type === 'postgres' || database.type === 'postgresql');
+        const expr = isPg ? '(details::json->>\'requestId\')' : 'json_extract(details, \'$.requestId\')';
+        const guard = isPg ? 'substring(details from 1 for 1) IN (\'{\',\'[\')' : null;
+        whereParts.push((guard ? `${guard} AND ` : '') + expr + ' = ?'); params.push(requestId);
       }
       if (q) {
         whereParts.push('(action LIKE ? OR details LIKE ? OR user_id LIKE ?)');

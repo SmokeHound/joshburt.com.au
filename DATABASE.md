@@ -39,14 +39,6 @@ JWT_REFRESH_EXPIRES_IN=30d
 BCRYPT_ROUNDS=12
 DB_PASSWORD=your-secure-password
 DB_SSL=true
-
-# JWT Configuration (required)
-JWT_SECRET=your-super-secure-jwt-secret-key
-JWT_EXPIRES_IN=7d
-JWT_REFRESH_EXPIRES_IN=30d
-
-# Security
-BCRYPT_ROUNDS=12
 ```
 
 #### SQLite (Development)
