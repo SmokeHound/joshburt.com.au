@@ -135,17 +135,92 @@
       tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No audit log entries</td></tr>';
       return;
     }
-    tbody.innerHTML = state.data.map(row => {
-      let details = row.details;
-      if (details && details.length > 200) details = details.slice(0,197) + '…';
+    tbody.innerHTML = state.data.map((row, idx) => {
+      const created = formatDate(row.created_at || row.timestamp);
+      const user = row.user_id || row.userId || '';
+      const action = row.action || '';
+      const ip = row.ip_address || row.ip || '';
+
+      // Build details view: parse JSON if possible
+      let raw = row.details;
+      let parsed = null;
+      if (raw && typeof raw === 'string') {
+        try { parsed = JSON.parse(raw); } catch (_) { /* not JSON */ }
+      } else if (raw && typeof raw === 'object') {
+        parsed = raw;
+        raw = JSON.stringify(raw);
+      }
+
+      // Summarize chips
+      let chipsHtml = '';
+      if (parsed) {
+        const m = parsed.method ? String(parsed.method).toUpperCase() : '';
+        const p = parsed.path || '';
+        const rid = parsed.requestId || '';
+        if (m) chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(m)}</span>`;
+        if (p) chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(p.length>40 ? p.slice(0,37)+'…' : p)}</span>`;
+        if (rid) chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(String(rid).slice(0,12))}</span>`;
+      }
+
+      // Collapsible pretty JSON or raw text
+      let pretty = '';
+      if (parsed) {
+        pretty = JSON.stringify(parsed, null, 2);
+      } else if (typeof raw === 'string') {
+        pretty = raw;
+      } else {
+        pretty = '';
+      }
+
+      const truncated = (pretty && pretty.length > 120) ? (pretty.slice(0,117) + '…') : pretty;
+      const preId = `audit-details-${idx}`;
+
       return `<tr>
-        <td class="p-2 align-top whitespace-nowrap">${formatDate(row.created_at || row.timestamp)}</td>
-        <td class="p-2 align-top">${row.user_id || row.userId || ''}</td>
-        <td class="p-2 align-top font-medium">${row.action}</td>
-        <td class="p-2 align-top max-w-sm break-words">${escapeHtml(details||'')}</td>
-        <td class="p-2 align-top whitespace-nowrap text-xs">${row.ip_address || row.ip || ''}</td>
+        <td class="p-2 align-top whitespace-nowrap">${created}</td>
+        <td class="p-2 align-top">${user}</td>
+        <td class="p-2 align-top font-medium">${action}</td>
+        <td class="p-2 align-top max-w-sm break-words">
+          ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
+          <div class="text-xs text-gray-300 dark:text-gray-400 break-words">${escapeHtml(truncated || '')}</div>
+          ${pretty ? `
+          <div class="mt-1 flex gap-2">
+            <button class="audit-toggle px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${preId}">View</button>
+            <button class="audit-copy px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${preId}">Copy</button>
+          </div>
+          <pre id="${preId}" class="hidden mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(pretty)}</pre>
+          ` : ''}
+        </td>
+        <td class="p-2 align-top whitespace-nowrap text-xs">${ip}</td>
       </tr>`;
     }).join('');
+
+    // Row actions: toggle/copy via event delegation
+    tbody.onclick = (e) => {
+      const t = e.target;
+      if (t && t.classList.contains('audit-toggle')) {
+        const id = t.getAttribute('data-target');
+        const pre = document.getElementById(id);
+        if (pre) {
+          if (pre.classList.contains('hidden')) { pre.classList.remove('hidden'); t.textContent = 'Hide'; }
+          else { pre.classList.add('hidden'); t.textContent = 'View'; }
+        }
+      } else if (t && t.classList.contains('audit-copy')) {
+        const id = t.getAttribute('data-target');
+        const pre = document.getElementById(id);
+        if (pre) {
+          const text = pre.textContent || '';
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(()=>{});
+          } else {
+            // Fallback
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); } catch(err) { /* no-op */ }
+            document.body.removeChild(ta);
+          }
+        }
+      }
+    };
   }
 
   function renderPagination(){
