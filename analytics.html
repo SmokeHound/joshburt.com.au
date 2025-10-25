@@ -192,7 +192,6 @@
   const FN_BASE=window.FN_BASE||'/.netlify/functions';
     const REFRESH_INTERVAL=60000; let autoTimer=null; const filters={dateRange:30,userType:'all'};
     let visitorChart, engagementChart, salesChart, userGrowthSparkline;
-    function showToast(msg){const t=document.getElementById('toast'); if(!t)return; t.textContent=msg; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3000);}
     function setupQuickChips(){const ranges=[1,7,30,90,365]; const wrap=document.getElementById('quick-date-chips'); ranges.forEach(r=>{ const btn=document.createElement('button'); btn.className='px-3 py-1 rounded-full bg-gray-800 text-gray-200 text-xs'; btn.textContent=r===1?'Today': (r===365?'YTD': r+'d'); btn.dataset.range=r; btn.addEventListener('click',()=>{ filters.dateRange=r; document.getElementById('date-range').value=r; highlight(); updateAll();}); wrap.appendChild(btn);}); function highlight(){wrap.querySelectorAll('button').forEach(b=>{const active=parseInt(b.dataset.range)===filters.dateRange; b.classList.toggle('bg-primary',active); b.classList.toggle('text-white',active);});} highlight(); }
   async function fetchJSON(url){ try{ const r=await fetch(url); if(!r.ok) throw new Error(r.status); return await r.json(); }catch(e){ return null; } }
   async function fetchAuditLogs(limit=2000){ const res=await fetchJSON(`${FN_BASE}/audit-logs?limit=${limit}`); if(!res) return []; return Array.isArray(res.data)? res.data : (Array.isArray(res)? res : []); }

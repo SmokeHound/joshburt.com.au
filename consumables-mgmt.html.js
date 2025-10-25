@@ -33,27 +33,27 @@ document.addEventListener('DOMContentLoaded', function() {
   // API Functions
   async function loadProducts() {
     try {
-      showToast('Loading consumables...', 'info');
+      (window.showToast || function(){})('Loading consumables...', 'info');
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
       const res = await fetch(`${FN_BASE}/consumables`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       products = Array.isArray(data) ? data : (data.products || []);
       renderTable();
-      showToast(`Loaded ${products.length} consumables from database`, 'success');
+      (window.showToast || function(){})(`Loaded ${products.length} consumables from database`, 'success');
     } catch (e) {
       console.error('Failed to load from API:', e);
-      showToast('Database unavailable, loading from local files...', 'error');
+      (window.showToast || function(){})('Database unavailable, loading from local files...', 'error');
       // Fallback to local JSON
       try {
         const res = await fetch('data/consumables.json');
         const data = await res.json();
         products = Array.isArray(data) ? data : (data.products || []);
         renderTable();
-        showToast(`Loaded ${products.length} consumables from local files`, 'success');
+        (window.showToast || function(){})(`Loaded ${products.length} consumables from local files`, 'success');
       } catch (localError) {
         console.error('Failed to load from local files:', localError);
-        showToast('Failed to load consumables data', 'error');
+        (window.showToast || function(){})('Failed to load consumables data', 'error');
       }
     }
   }
@@ -158,10 +158,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     try {
       await deleteProductFromAPI(id);
-      showToast('Consumable deleted successfully!', 'success');
+      (window.showToast || function(){})('Consumable deleted successfully!', 'success');
       await loadProducts(); // Reload from API
     } catch (error) {
-      showToast(`Error deleting consumable: ${error.message}`, 'error');
+      (window.showToast || function(){})(`Error deleting consumable: ${error.message}`, 'error');
       console.error('Delete error:', error);
     }
   }
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const code = document.getElementById('product-code').value.trim();
     
     if (!name || !type || !category) {
-      showToast('Please fill in all required fields', 'error');
+      (window.showToast || function(){})('Please fill in all required fields', 'error');
       return;
     }
     
@@ -189,40 +189,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Edit
         productData.id = editingId;
         await saveProductToAPI(productData, true);
-        showToast('Consumable updated successfully!', 'success');
+        (window.showToast || function(){})('Consumable updated successfully!', 'success');
       } else {
         // Add
         await saveProductToAPI(productData, false);
-        showToast('Consumable added successfully!', 'success');
+        (window.showToast || function(){})('Consumable added successfully!', 'success');
       }
       
       hideModal();
       await loadProducts(); // Reload from API
     } catch (error) {
-      showToast(`Error: ${error.message}`, 'error');
+      (window.showToast || function(){})(`Error: ${error.message}`, 'error');
       console.error('Save error:', error);
     }
   }
 
-  // Toast notification utility
-  function showToast(message, type = 'info') {
-    // Create toast if it doesn't exist
-    let toast = document.getElementById('toast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'toast';
-      toast.className = 'fixed bottom-4 right-4 p-4 text-white rounded shadow-lg transition-opacity duration-300 hidden';
-      document.body.appendChild(toast);
-    }
-    
-    toast.textContent = message;
-    toast.className = `fixed bottom-4 right-4 p-4 text-white rounded shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'}`;
-    toast.classList.remove('hidden');
-    
-    setTimeout(() => {
-      toast.classList.add('hidden');
-    }, 3000);
-  }
+  // Toasts are provided by global adapter (init-shared.js)
 
   // Modal events
   addBtn.addEventListener('click', onAdd);

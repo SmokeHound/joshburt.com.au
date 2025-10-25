@@ -441,21 +441,7 @@
             event.target.value = '';
         }
 
-        // Toast notification utility
-        function showToast(message, type = 'info') {
-            let toast = document.getElementById('toast');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'toast';
-                document.body.appendChild(toast);
-            }
-            toast.textContent = message;
-            toast.className = `fixed bottom-4 right-4 p-4 text-white rounded shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-secondary' : type === 'error' ? 'bg-red-500' : 'bg-accent'}`;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
+        // Toast notifications use the global adapter (init-shared.js)
 
         // Legacy theme toggle removed; theme managed via siteSettings presets.
 

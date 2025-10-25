@@ -748,28 +748,7 @@
             });
         }
 
-        // Toast notification functionality
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            if (!toast) return;
-            
-            toast.textContent = message;
-            toast.classList.remove('hidden', 'bg-accent', 'bg-red-500', 'bg-green-500', 'bg-blue-500');
-            
-            if (type === 'error') {
-                toast.classList.add('bg-red-500');
-            } else if (type === 'success') {
-                toast.classList.add('bg-green-500');
-            } else if (type === 'info') {
-                toast.classList.add('bg-blue-500');
-            } else {
-                toast.classList.add('bg-accent');
-            }
-            
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
+    // Toast notifications are unified via global showToast (init-shared.js)
 
 
     // Get form settings (all panels)

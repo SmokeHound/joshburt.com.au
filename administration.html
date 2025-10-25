@@ -191,13 +191,7 @@
                         }
                         wireMenu();
                         setTimeout(wireMenu, 250);
-                        // Toast notification helper
-                        function showToast(message) {
-                            const toast = document.getElementById('toast');
-                            toast.textContent = message;
-                            toast.classList.remove('hidden');
-                            setTimeout(() => toast.classList.add('hidden'), 3000);
-                        }
+                        // Toast notifications use the global adapter (init-shared.js)
 
                         // Beta feature notification helper
                         window.showBetaFeatureNotification = function(featureName) {

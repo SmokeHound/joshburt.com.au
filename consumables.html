@@ -568,36 +568,7 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
         return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
       }
       
-      function showToast(message, type = 'info') {
-        const toast = document.getElementById('toast');
-        if (!toast) return;
-        
-        // Set toast styling based on type
-        toast.className = 'toast fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300';
-        switch (type) {
-          case 'success':
-            toast.classList.add('bg-green-500', 'text-white');
-            break;
-          case 'error':
-            toast.classList.add('bg-red-500', 'text-white');
-            break;
-          case 'warning':
-            toast.classList.add('bg-yellow-500', 'text-white');
-            break;
-          case 'info':
-          default:
-            toast.classList.add('bg-blue-500', 'text-white');
-            break;
-        }
-        
-        toast.textContent = message;
-        toast.classList.remove('hidden');
-        
-        // Auto-hide after 4 seconds
-        setTimeout(() => {
-          toast.classList.add('hidden');
-        }, 4000);
-      }
+      // Toast notifications are unified globally via init-shared.js (window.showToast -> window.showNotification)
       
       // Make functions globally available
       window.addToOrder = addToOrder;

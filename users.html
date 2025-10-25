@@ -22,7 +22,7 @@
     <!-- MOBILE MENU TOGGLE (copied from template.html) -->
     <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
-    <!-- Toast Notification -->
+    <!-- Toast Notification (legacy element kept for fallback adapter; no mock toasts) -->
     <div id="toast" class="hidden fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300 btn-neon-blue text-black" role="alert" aria-live="polite"></div>
     <div class="flex min-h-screen">
         <!-- Shared Navigation Loader -->
@@ -286,22 +286,7 @@
                 } catch(_){ /* noop */ }
             };
         }
-    // Show toast notification
-        function showToast(message, type = 'success') {
-            let toast = document.getElementById('toast');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'toast';
-                toast.setAttribute('role','alert');
-                toast.setAttribute('aria-live','polite');
-                toast.className = 'hidden fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300';
-                document.body.appendChild(toast);
-            }
-            toast.textContent = message;
-            toast.className = `fixed bottom-4 right-4 p-4 rounded shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
-            toast.classList.remove('hidden');
-            setTimeout(() => { toast.classList.add('hidden'); }, 3000);
-        }
+    // Toast adapter now handled globally via window.showToast -> window.showNotification
 
         // Show sign-in CTA instead of auto-redirecting
         function showSignInCTA() {

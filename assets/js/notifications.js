@@ -161,5 +161,10 @@
     }
   }
   updateBadge();
-  document.addEventListener('DOMContentLoaded',()=>{ensureBell();render();if(!notifications.length) window.showNotification('Welcome! Future features are now active.','success');setInterval(()=>{if(Math.random()<0.25){const msgs=['New system update available','User login detected','Backup completed successfully','New order received'];const types=['info','success','warning'];const msg=msgs[Math.floor(Math.random()*msgs.length)];const type=types[Math.floor(Math.random()*types.length)];window.showNotification(msg,type,4500);}},60000);});
+  document.addEventListener('DOMContentLoaded',()=>{
+    // Initialize notifications UI without mock/demo toasts
+    ensureBell();
+    render();
+    // Note: Removed welcome and random demo notifications to avoid mock toasts in production
+  });
 })();

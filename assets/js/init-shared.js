@@ -349,4 +349,26 @@
       }
     } catch (e) { /* silent session bootstrap */ }
   })();
+
+  // Back-compat toast adapter: route legacy showToast calls to unified notifications
+  // Usage: showToast(message, type='info') -> showNotification(message, type)
+  if (typeof window.showToast !== 'function') {
+    window.showToast = function(message, type) {
+      try {
+        if (typeof window.showNotification === 'function') {
+          return window.showNotification(String(message || ''), String(type || 'info'));
+        }
+      } catch(_) { /* noop */ }
+      // Minimal fallback: ephemeral inline banner if notifications system isn't loaded
+      try {
+        var el = document.getElementById('toast') || (function(){
+          var d=document.createElement('div'); d.id='toast'; d.className='fixed bottom-4 right-4 p-3 rounded bg-gray-800 text-white hidden'; document.body.appendChild(d); return d;
+        })();
+        el.textContent = String(message || '');
+        el.classList.remove('hidden');
+        setTimeout(function(){ el.classList.add('hidden'); }, 3000);
+      } catch(_) { /* noop */ }
+      return null;
+    };
+  }
 })();
