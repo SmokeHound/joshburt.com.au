@@ -171,27 +171,7 @@
                     const headers = withToken ? { 'Authorization': `Bearer ${withToken}` } : {};
                     return fetch(`${FN_BASE}/users?${params.toString()}`, { headers });
                 }
-
                 let res = await fetchUsers(token);
-
-                // If unauthorized, attempt a manual refresh once (no redirect)
-                if (res.status === 401 && !AUTH_DISABLED) {
-                    try {
-                        const refreshToken = localStorage.getItem('refreshToken');
-                        if (refreshToken) {
-                            const refRes = await fetch(`${FN_BASE}/auth?action=refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken }) });
-                            if (refRes.ok) {
-                                const ref = await refRes.json();
-                                if (ref && (ref.accessToken || ref.refreshToken)) {
-                                    if (ref.accessToken) localStorage.setItem('accessToken', ref.accessToken);
-                                    if (ref.refreshToken) localStorage.setItem('refreshToken', ref.refreshToken);
-                                    token = ref.accessToken || token;
-                                    res = await fetchUsers(token);
-                                }
-                            }
-                        }
-                    } catch (_) { /* ignore */ }
-                }
 
                 // If forbidden, do not redirect to login; show message and stop
                 if (res.status === 403 && !AUTH_DISABLED) {
@@ -329,7 +309,38 @@
             try {
                 const res = await fetch(`${FN_BASE}/auth?action=me`, { headers: { 'Authorization': `Bearer ${token}` }});
                 if (!res.ok) {
-                    if (res.status === 401) { showSignInCTA(); return false; }
+                    if (res.status === 401) {
+                        // Try refresh once, then re-check
+                        try {
+                            const rt = localStorage.getItem('refreshToken');
+                            if (rt) {
+                                const refRes = await fetch(`${FN_BASE}/auth?action=refresh`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken: rt }) });
+                                if (refRes.ok) {
+                                    const data = await refRes.json();
+                                    if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
+                                    if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+                                    const chk = await fetch(`${FN_BASE}/auth?action=me`, { headers: { 'Authorization': `Bearer ${data.accessToken || token}` } });
+                                    if (!chk.ok) { showSignInCTA(); return false; }
+                                    const me2 = await chk.json();
+                                    if (me2 && me2.user) {
+                                        try { localStorage.setItem('user', JSON.stringify(me2.user)); localStorage.setItem('currentUser', JSON.stringify({ name: me2.user.name || me2.user.email || 'User', role: me2.user.role || 'user', email: me2.user.email })); } catch(_) {}
+                                        if (['admin','manager'].includes(me2.user.role)) return true;
+                                        showToast('Access denied: you do not have permission to view users.','error');
+                                        return false;
+                                    }
+                                } else {
+                                    showSignInCTA();
+                                    return false;
+                                }
+                            } else {
+                                showSignInCTA();
+                                return false;
+                            }
+                        } catch(_) {
+                            showSignInCTA();
+                            return false;
+                        }
+                    }
                     return false;
                 }
                 const me = await res.json();
@@ -449,7 +460,12 @@
             document.getElementById('export-users-csv').addEventListener('click', exportUsersCSV);
             document.getElementById('export-users-excel').addEventListener('click', exportUsersExcel);
             document.getElementById('import-users-csv').addEventListener('change', importUsersCSV);
-            document.getElementById('user-search').addEventListener('input', e => { usersState.filters.search=e.target.value; loadUsers(1); });
+            let filterDebounce = null;
+            document.getElementById('user-search').addEventListener('input', e => {
+                usersState.filters.search=e.target.value;
+                if (filterDebounce) clearTimeout(filterDebounce);
+                filterDebounce = setTimeout(()=> loadUsers(1), 250);
+            });
             document.getElementById('user-role-filter').addEventListener('change', e => { usersState.filters.role=e.target.value; loadUsers(1); });
             document.getElementById('user-status-filter').addEventListener('change', e => { usersState.filters.status=e.target.value; loadUsers(1); });
             document.getElementById('user-sort').addEventListener('change', e => { usersState.filters.sort=e.target.value; loadUsers(1); });
