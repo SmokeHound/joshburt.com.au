@@ -130,6 +130,14 @@
           currentRole = cu.role || u.role || 'user';
         } catch(_) {}
 
+        // Helper: prefer global authFetch (handles token + refresh); fallback attaches Authorization header
+        const fetchAuth = (url, init) => {
+          if (typeof window.authFetch === 'function') return window.authFetch(url, init);
+          const base = init || {};
+          const headers = Object.assign({}, base.headers || {}, authHeaders);
+          return fetch(url, Object.assign({}, base, { headers }));
+        };
+
         // 1) Try lightweight public stats first for immediate numbers
         try {
           const res = await fetch(`${FN_BASE}/public-stats`);
@@ -168,8 +176,7 @@
         // 2) If authenticated and privileged, refine counts with admin endpoints (after trying a silent refresh)
         if (token && (currentRole === 'admin' || currentRole === 'manager')) {
           try {
-            const freshToken = await ensureFreshToken(token);
-            const res = await fetch(`${FN_BASE}/users/stats/overview`, { headers: freshToken ? { 'Authorization': `Bearer ${freshToken}` } : {} });
+            const res = await fetchAuth(`${FN_BASE}/users/stats/overview`);
             apiHealthy = apiHealthy || res.ok;
             if (res.ok) {
               const j = await res.json();
@@ -179,8 +186,7 @@
             }
           } catch (_) {}
           try {
-            const freshToken = (window.getToken && window.getToken()) || token;
-            const res = await fetch(`${FN_BASE}/orders`, { headers: freshToken ? { 'Authorization': `Bearer ${freshToken}` } : {} });
+            const res = await fetchAuth(`${FN_BASE}/orders`);
             apiHealthy = apiHealthy || res.ok;
             if (res.ok) {
               const j = await res.json();
@@ -189,8 +195,7 @@
             }
           } catch (_) {}
           try {
-            const freshToken = (window.getToken && window.getToken()) || token;
-            const res = await fetch(`${FN_BASE}/products`, { headers: freshToken ? { 'Authorization': `Bearer ${freshToken}` } : {} });
+            const res = await fetchAuth(`${FN_BASE}/products`);
             apiHealthy = apiHealthy || res.ok;
             if (res.ok) {
               const j = await res.json();
@@ -210,7 +215,7 @@
         try {
           const since = new Date(Date.now() - 24*60*60*1000).toISOString();
           if (token && (currentRole === 'admin' || currentRole === 'manager')) {
-            const res = await fetch(`${FN_BASE}/audit-logs?limit=8&startDate=${encodeURIComponent(since)}`, { headers: authHeaders });
+            const res = await fetchAuth(`${FN_BASE}/audit-logs?limit=8&startDate=${encodeURIComponent(since)}`);
             if (res.ok) {
               const j = await res.json();
               auditLogs = Array.isArray(j) ? j : (j.data || j.logs || []);
