@@ -1,5 +1,20 @@
 <!DOCTYPE html>
 <!-- Real-time Notifications Framework -->
+<style>
+/* Centralized notification styles */
+.toast {
+    position: fixed;
+    z-index: 9999; /* ensure above other UI */
+    right: 1rem;
+    bottom: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.35);
+    background-color: #111827; /* neutral dark fallback */
+    color: #ffffff;
+    max-width: 22rem;
+}
+</style>
 <script>
 (function() {
     // Notification types and their configurations

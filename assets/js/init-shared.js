@@ -56,6 +56,8 @@
   // Start
   injectFragment('shared-config.html', ['LINK','STYLE','SCRIPT']).then(applyColors);
   injectFragment('shared-theme.html', ['SCRIPT']);
+  // Load shared notifications (styles + logic) to centralize all notification UI/styling
+  injectFragment('shared-notifications.html', ['STYLE','SCRIPT']);
   applyColors();
   registerSW();
 
