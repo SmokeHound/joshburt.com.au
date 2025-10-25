@@ -107,6 +107,9 @@
           <ul id="recent-audit-log" class="space-y-2 text-sm text-gray-300" aria-live="polite" aria-busy="true">
             <li class="text-gray-400">Loading recent activity…</li>
           </ul>
+          <div id="recent-activity-actions" class="mt-3 hidden">
+            <button id="recent-activity-toggle" class="text-xs text-cyan-300 hover:text-cyan-200 underline">Show more</button>
+          </div>
         </div>
       </div>
     <!-- Dashboard Stats Script -->
@@ -139,10 +142,34 @@
           }
         } catch (_) {}
 
-        // 2) If authenticated and privileged, refine counts with admin endpoints
+        // Small helper: proactively refresh token to avoid noisy 401s on public homepage
+        async function ensureFreshToken(tok){
+          try {
+            const rt = (window.getRefreshToken && window.getRefreshToken()) || null;
+            if (!rt) return tok;
+            // If we don't yet have a user cached, or token exists but might be expired, do a lightweight refresh once
+            const refRes = await fetch(`${FN_BASE}/auth?action=refresh`, {
+              method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken: rt })
+            });
+            if (refRes.ok) {
+              const data = await refRes.json();
+              if (data && (data.accessToken || data.refreshToken)) {
+                try {
+                  if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
+                  if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+                } catch(_) { /* noop */ }
+                return data.accessToken || tok;
+              }
+            }
+            return tok;
+          } catch(_) { return tok; }
+        }
+
+        // 2) If authenticated and privileged, refine counts with admin endpoints (after trying a silent refresh)
         if (token && (currentRole === 'admin' || currentRole === 'manager')) {
           try {
-            const res = await fetch(`${FN_BASE}/users/stats/overview`, { headers: authHeaders });
+            const freshToken = await ensureFreshToken(token);
+            const res = await fetch(`${FN_BASE}/users/stats/overview`, { headers: freshToken ? { 'Authorization': `Bearer ${freshToken}` } : {} });
             apiHealthy = apiHealthy || res.ok;
             if (res.ok) {
               const j = await res.json();
@@ -152,7 +179,8 @@
             }
           } catch (_) {}
           try {
-            const res = await fetch(`${FN_BASE}/orders`, { headers: authHeaders });
+            const freshToken = (window.getToken && window.getToken()) || token;
+            const res = await fetch(`${FN_BASE}/orders`, { headers: freshToken ? { 'Authorization': `Bearer ${freshToken}` } : {} });
             apiHealthy = apiHealthy || res.ok;
             if (res.ok) {
               const j = await res.json();
@@ -161,7 +189,8 @@
             }
           } catch (_) {}
           try {
-            const res = await fetch(`${FN_BASE}/products`, { headers: authHeaders });
+            const freshToken = (window.getToken && window.getToken()) || token;
+            const res = await fetch(`${FN_BASE}/products`, { headers: freshToken ? { 'Authorization': `Bearer ${freshToken}` } : {} });
             apiHealthy = apiHealthy || res.ok;
             if (res.ok) {
               const j = await res.json();
@@ -232,6 +261,8 @@
         // Update recent activity list (improved layout)
         const auditList = document.getElementById('recent-audit-log');
         const viewAll = document.getElementById('view-all-activity');
+        const activityActions = document.getElementById('recent-activity-actions');
+        const toggleBtn = document.getElementById('recent-activity-toggle');
         function relTime(iso){
           try {
             const d = new Date(iso);
@@ -248,6 +279,7 @@
           if (typeof val !== 'string') return val;
           try { return JSON.parse(val); } catch(_) { return val; }
         }
+        function isSameDay(a,b){ try{ const da=new Date(a), db=new Date(b); return da.getFullYear()===db.getFullYear() && da.getMonth()===db.getMonth() && da.getDate()===db.getDate(); } catch(_) { return false; } }
         const actionIcon = (action) => {
           const a = String(action || '').toLowerCase();
           if (a.includes('login')) return '🔐';
@@ -263,40 +295,101 @@
           const color = method === 'GET' ? 'bg-gray-700' : method === 'POST' ? 'bg-blue-700' : method === 'PUT' ? 'bg-yellow-700' : method === 'DELETE' ? 'bg-red-700' : 'bg-gray-700';
           return `<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] ${color}">${method}</span>`;
         };
+        const severityOf = (action, details) => {
+          const a = String(action||'').toLowerCase();
+          let status = null, success = null;
+          if (details && typeof details === 'object') {
+            status = details.status || details.statusCode || details.code || null;
+            success = typeof details.success === 'boolean' ? details.success : null;
+          }
+          if (a.includes('failed') || a.includes('error') || (typeof status === 'number' && status >= 400) || success === false) return 'err';
+          if (a.includes('locked') || a.includes('rate') || a.includes('limit') || (typeof status === 'number' && status >= 300 && status < 400)) return 'warn';
+          return 'ok';
+        };
+        const severityColors = { ok: { text: 'text-gray-200', icon: 'text-gray-300' }, warn: { text: 'text-yellow-200', icon: 'text-yellow-300' }, err: { text: 'text-red-200', icon: 'text-red-300' } };
+        const buildLogLink = (log, details) => {
+          try {
+            const since = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+            const url = new URL('audit-logs.html', window.location.origin);
+            url.searchParams.set('start', since);
+            if (log.action) url.searchParams.set('action', log.action);
+            const rid = (details && (details.requestId || details.request_id)) || '';
+            if (rid) url.searchParams.set('requestId', rid);
+            const method = (details && (details.method || details.httpMethod)) || '';
+            if (method) url.searchParams.set('method', method);
+            const path = (details && (details.path || details.endpoint || details.url)) || '';
+            if (path) url.searchParams.set('path', path);
+            return url.toString();
+          } catch(_) { return 'audit-logs.html'; }
+        };
         if (auditList) {
           auditList.setAttribute('aria-busy','false');
           const since = new Date(Date.now() - 24*60*60*1000).toISOString();
           if (viewAll) viewAll.href = `audit-logs.html?start=${encodeURIComponent(since)}`;
           if (auditLogs && auditLogs.length > 0) {
-            const items = auditLogs.slice(0, 8).map(log => {
-              const created = log.created_at || log.timestamp || '';
-              const details = safeJsonParse(log.details);
-              const method = (details && typeof details === 'object' && (details.method || details.httpMethod)) || '';
-              const path = (details && typeof details === 'object' && (details.path || details.endpoint || details.url)) || '';
-              const reqId = (details && typeof details === 'object' && (details.requestId || details.request_id)) || '';
-              const who = (function(){
-                try {
-                  const stored = JSON.parse(localStorage.getItem('user')||'{}');
-                  if (stored && stored.id && log.user_id && Number(stored.id) === Number(log.user_id)) return 'You';
-                } catch(_) {}
-                return log.user_id ? `User #${log.user_id}` : 'System';
-              })();
-              const metaLine = [who, path].filter(Boolean).join(' · ');
-              return `<li class="flex items-start gap-3">
-                <span class="mt-0.5" aria-hidden="true">${actionIcon(log.action)}</span>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center flex-wrap gap-1">
-                    <span class="font-semibold text-white truncate">${log.action || 'Activity'}</span>
-                    ${methodBadge(method)}
-                    <span class="text-xs text-gray-500">${created ? relTime(created) : ''}</span>
-                  </div>
-                  ${metaLine ? `<div class="text-xs text-gray-400 truncate">${metaLine}${reqId ? ` · ${reqId}`:''}</div>` : ''}
-                </div>
-              </li>`;
-            }).join('');
-            auditList.innerHTML = items;
+            const maxCollapsed = 6;
+            const maxExpanded = Math.min(12, auditLogs.length);
+            let lastDate = null;
+            function render(limit){
+              const slice = auditLogs.slice(0, limit);
+              const parts = [];
+              slice.forEach((log, idx) => {
+                const created = log.created_at || log.timestamp || '';
+                const details = safeJsonParse(log.details);
+                const method = (details && typeof details === 'object' && (details.method || details.httpMethod)) || '';
+                const path = (details && typeof details === 'object' && (details.path || details.endpoint || details.url)) || '';
+                const reqId = (details && typeof details === 'object' && (details.requestId || details.request_id)) || '';
+                const who = (function(){
+                  try {
+                    const stored = JSON.parse(localStorage.getItem('user')||'{}');
+                    if (stored && stored.id && log.user_id && Number(stored.id) === Number(log.user_id)) return 'You';
+                  } catch(_) {}
+                  return log.user_id ? `User #${log.user_id}` : 'System';
+                })();
+                const sev = severityOf(log.action, details);
+                const colors = severityColors[sev] || severityColors.ok;
+                // Date separator when day changes
+                if (!lastDate || !isSameDay(lastDate, created)) {
+                  lastDate = created;
+                  const dateLabel = (()=>{ try { const d=new Date(created); return d.toLocaleDateString(); } catch(_) { return ''; } })();
+                  parts.push(`<li class="mt-2 first:mt-0"><div class="text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-700 pb-1">${dateLabel || ''}</div></li>`);
+                }
+                const metaLine = [who, path].filter(Boolean).join(' · ');
+                const link = buildLogLink(log, details);
+                parts.push(`
+                  <li class="flex items-start gap-3 p-2 rounded hover:bg-gray-800/60">
+                    <span class="mt-0.5 ${colors.icon}" aria-hidden="true">${actionIcon(log.action)}</span>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center flex-wrap gap-1 min-w-0">
+                          <span class="font-semibold text-white truncate">${log.action || 'Activity'}</span>
+                          ${methodBadge(method)}
+                        </div>
+                        <span class="text-xs text-gray-500 whitespace-nowrap ml-2">${created ? relTime(created) : ''}</span>
+                      </div>
+                      ${metaLine ? `<div class="text-xs ${colors.text} truncate">${metaLine}${reqId ? ` · ${reqId}`:''}</div>` : ''}
+                      <div class="mt-1">
+                        <a href="${link}" class="text-[11px] text-cyan-300 hover:text-cyan-200 underline">View in Audit Logs</a>
+                      </div>
+                    </div>
+                  </li>`);
+              });
+              auditList.innerHTML = parts.join('');
+            }
+            render(maxCollapsed);
+            if (activityActions && toggleBtn) {
+              activityActions.classList.toggle('hidden', auditLogs.length <= maxCollapsed);
+              toggleBtn.textContent = 'Show more';
+              let expanded = false;
+              toggleBtn.onclick = () => {
+                expanded = !expanded;
+                if (expanded) { render(maxExpanded); toggleBtn.textContent = 'Show less'; }
+                else { render(maxCollapsed); toggleBtn.textContent = 'Show more'; }
+              };
+            }
           } else {
             auditList.innerHTML = '<li class="text-gray-400">No activity in the last 24 hours</li>';
+            if (activityActions) activityActions.classList.add('hidden');
           }
         }
     }
