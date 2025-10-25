@@ -339,8 +339,22 @@
     a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
-  function escapeHtml(str){
-    return str.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  function escapeHtml(input){
+    try {
+      if (input === null || input === undefined) return '';
+      let str = input;
+      // If it's an object, stringify; otherwise coerce to string
+      if (typeof str === 'object') {
+        try { str = JSON.stringify(str); }
+        catch (_) { str = String(str); }
+      } else if (typeof str !== 'string') {
+        str = String(str);
+      }
+      return str.replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]); });
+    } catch(_) {
+      // Fallback to empty string on any unexpected error
+      return '';
+    }
   }
 
   function debounce(fn, ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); }; }
