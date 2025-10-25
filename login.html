@@ -42,7 +42,7 @@
                             <span class="mx-1">•</span>
                             <span id="cfg-oauth"></span>
                         </div>
-            <form method="post" action="admin.php" id="login-form" role="form" aria-labelledby="login-heading">
+            <form id="login-form" role="form" aria-labelledby="login-heading">
 
                 <h2 id="login-heading" class="sr-only">Login credentials</h2>
                 
@@ -163,9 +163,11 @@
             setTimeout(function(){ try { if (typeof window.showToast === 'function') window.showToast(String(msg||''), String(type||'info')); } catch(_){} }, 0);
         }
 
+        // Pre-parse URL params once for reuse
+        const urlParams = new URLSearchParams(window.location.search);
+
         // Check for URL messages after DOM is parsed (deferred scripts run before DOMContentLoaded)
         document.addEventListener('DOMContentLoaded', function(){
-            const urlParams = new URLSearchParams(window.location.search);
             const message = urlParams.get('message');
             if (message === 'registration-success') {
                 safeToast('Registration successful! Please log in.', 'success');
