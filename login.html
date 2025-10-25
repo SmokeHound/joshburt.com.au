@@ -151,21 +151,30 @@
     </div>
 
     <script>
-    // Serverless auth function base
-    const FN_AUTH = `${(window.FN_BASE || '/.netlify/functions')}/auth`;
+        // Serverless auth function base
+        const FN_AUTH = `${(window.FN_BASE || '/.netlify/functions')}/auth`;
 
-        // Toast notifications are routed via global showToast (init-shared.js)
-
-        // Check for URL messages
-        const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get('message');
-        if (message === 'registration-success') {
-            showToast('Registration successful! Please log in.', 'success');
-        } else if (message === 'password-reset-success') {
-            showToast('Password reset successful! Please log in with your new password.', 'success');
-        } else if (message === 'login-required') {
-            showToast('Please sign in to continue.', 'error');
+        // Safe toast helper so we don't depend on script execution order
+        function safeToast(msg, type){
+            try {
+                if (typeof window.showToast === 'function') return window.showToast(String(msg||''), String(type||'info'));
+            } catch(_) { /* noop */ }
+            // Defer once to allow deferred scripts (init-shared) to register
+            setTimeout(function(){ try { if (typeof window.showToast === 'function') window.showToast(String(msg||''), String(type||'info')); } catch(_){} }, 0);
         }
+
+        // Check for URL messages after DOM is parsed (deferred scripts run before DOMContentLoaded)
+        document.addEventListener('DOMContentLoaded', function(){
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            if (message === 'registration-success') {
+                safeToast('Registration successful! Please log in.', 'success');
+            } else if (message === 'password-reset-success') {
+                safeToast('Password reset successful! Please log in with your new password.', 'success');
+            } else if (message === 'login-required') {
+                safeToast('Please sign in to continue.', 'error');
+            }
+        });
 
 
 
@@ -183,12 +192,12 @@
 
             // Basic client-side validation
             if (!username.trim() || !password.trim()) {
-                showToast('Please fill in all fields');
+                safeToast('Please fill in all fields');
                 return;
             }
 
             if (password.length < 3) {
-                showToast('Password must be at least 3 characters long');
+                safeToast('Password must be at least 3 characters long');
                 return;
             }
 
@@ -229,7 +238,7 @@
                     // Set flag to indicate fresh login (prevent immediate re-validation loop)
                     localStorage.setItem('freshLogin', Date.now().toString());
                     
-                    showToast('Login successful! Redirecting...', 'success');
+                    safeToast('Login successful! Redirecting...', 'success');
                     // Redirect to returnUrl (same-origin path) or default
                     const returnUrl = urlParams.get('returnUrl');
                     let target = 'index.html';
@@ -248,7 +257,7 @@
 
             } catch (error) {
                 console.error('Login error:', error);
-                showToast(error.message);
+                safeToast(error.message);
             } finally {
                 loginSpinner.classList.add('hidden');
                 loginSpinner.classList.remove('inline-block');
@@ -263,8 +272,8 @@
                     const btns=[googleBtn, githubBtn];
                     btns.forEach(b=>{ if(!b) return; b.disabled = !enabled; b.classList.toggle('opacity-60', !enabled); b.classList.toggle('cursor-not-allowed', !enabled); });
                     if (!enabled) return;
-                    if (googleBtn) googleBtn.addEventListener('click', async function(){ try { await (window.Auth && window.Auth.login('google-oauth2')); } catch(e){ console.error(e); showToast('Google sign-in failed'); } });
-                    if (githubBtn) githubBtn.addEventListener('click', async function(){ try { await (window.Auth && window.Auth.login('github')); } catch(e){ console.error(e); showToast('GitHub sign-in failed'); } });
+                    if (googleBtn) googleBtn.addEventListener('click', async function(){ try { await (window.Auth && window.Auth.login('google-oauth2')); } catch(e){ console.error(e); safeToast('Google sign-in failed'); } });
+                    if (githubBtn) githubBtn.addEventListener('click', async function(){ try { await (window.Auth && window.Auth.login('github')); } catch(e){ console.error(e); safeToast('GitHub sign-in failed'); } });
                 }
                 (async function(){
                     try {
