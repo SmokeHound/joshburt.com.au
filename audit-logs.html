@@ -7,6 +7,8 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
   <link rel="stylesheet" href="./assets/css/styles.css">
+  <!-- Shared bootstrap: functions base, auth, notifications, and auth-aware fetch -->
+  <script src="./assets/js/init-shared.js" defer></script>
   <!-- Load shared config and theme system -->
   <script>
     fetch('shared-config.html').then(r => r.text()).then(html => {

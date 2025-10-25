@@ -107,7 +107,8 @@
     if (state.endDate) params.set('endDate', state.endDate);
     try {
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
-      const res = await fetch(`${FN_BASE}/audit-logs?` + params.toString());
+      const url = `${FN_BASE}/audit-logs?` + params.toString();
+      const res = await (window.authFetch ? window.authFetch(url) : fetch(url));
       if (!res.ok) throw new Error('Failed to fetch');
       const json = await res.json();
       // Expect { data, pagination }
@@ -313,7 +314,7 @@
     params.set('limit', 1000);
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
     const url = `${FN_BASE}/audit-logs?` + params.toString();
-    fetch(url).then(async res => {
+    (window.authFetch ? window.authFetch(url) : fetch(url)).then(async res => {
       if (!res.ok) throw new Error('Failed export');
       if (format === 'csv') {
         const text = await res.text();
@@ -328,7 +329,8 @@
   function clearLogs(){
     if (!confirm('Clear all audit logs? This cannot be undone.')) return;
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
-    fetch(`${FN_BASE}/audit-logs`, { method: 'DELETE' })
+    const url = `${FN_BASE}/audit-logs`;
+    (window.authFetch ? window.authFetch(url, { method: 'DELETE' }) : fetch(url, { method: 'DELETE' }))
       .then(()=>fetchLogs())
       .catch(()=>{});
   }
@@ -366,7 +368,16 @@
   async function fetchUsersMap(){
     try {
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
-      const res = await fetch(`${FN_BASE}/users`);
+      const url = `${FN_BASE}/users`;
+      let res;
+      if (window.authFetch) {
+        res = await window.authFetch(url);
+      } else {
+        // Fallback: attach token manually if present
+        const token = (window.getToken && window.getToken()) || null;
+        const headers = token ? { Authorization: 'Bearer ' + token } : {};
+        res = await fetch(url, { headers });
+      }
       if (!res.ok) return;
       const json = await res.json();
       const arr = (json && json.users) || [];
