@@ -441,6 +441,8 @@ async function createPostgreSQLTables() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  // Backfill legacy settings tables missing updated_at
+  await database.run('ALTER TABLE settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
 
   // Create indexes for better performance
   await database.run('CREATE INDEX IF NOT EXISTS idx_products_type ON products(type)');
@@ -601,6 +603,12 @@ async function createSQLiteTables() {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  // Backfill legacy settings tables missing updated_at (SQLite lacks IF NOT EXISTS on ADD COLUMN in some versions)
+  try {
+    await database.run('ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP');
+  } catch (e) {
+    // Ignore if column already exists
+  }
 
   // Expression indexes on common JSON fields in details for faster filtering (SQLite JSON1)
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs (json_extract(details, \'$.path\'))');
