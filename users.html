@@ -164,22 +164,21 @@
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
 
-                        async function fetchUsers(withToken){
-                            const headers = withToken ? { 'Authorization': `Bearer ${withToken}` } : {};
-                            const resp = await (window.authFetch ? authFetch(`${FN_BASE}/users?${params.toString()}`, { headers }) : fetch(`${FN_BASE}/users?${params.toString()}`, { headers }));
-                    return resp;
+                // Intentionally avoid authFetch here to prevent auto-redirect loops on 401.
+                // We handle 401 locally and show a sign-in CTA.
+                async function fetchUsers(withToken){
+                    const headers = withToken ? { 'Authorization': `Bearer ${withToken}` } : {};
+                    return fetch(`${FN_BASE}/users?${params.toString()}`, { headers });
                 }
 
                 let res = await fetchUsers(token);
 
-                // If unauthorized, delegate to authFetch behavior; only attempt manual refresh on 401 (authFetch already tries refresh)
+                // If unauthorized, attempt a manual refresh once (no redirect)
                 if (res.status === 401 && !AUTH_DISABLED) {
                     try {
                         const refreshToken = localStorage.getItem('refreshToken');
                         if (refreshToken) {
-                            const refRes = await (window.authFetch ? authFetch(`${FN_BASE}/auth?action=refresh`, {
-                                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken })
-                            }) : fetch(`${FN_BASE}/auth?action=refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken }) }));
+                            const refRes = await fetch(`${FN_BASE}/auth?action=refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken }) });
                             if (refRes.ok) {
                                 const ref = await refRes.json();
                                 if (ref && (ref.accessToken || ref.refreshToken)) {
