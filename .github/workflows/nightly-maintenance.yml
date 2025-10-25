@@ -30,13 +30,19 @@ jobs:
 
       - name: 🧹 Prune expired tokens
         env:
-          DB_TYPE: ${{ secrets.DB_TYPE || 'sqlite' }}
+          # Pass secrets directly (do not use JS-style || fallbacks in expressions)
+          DB_TYPE: ${{ secrets.DB_TYPE }}
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
+          # Provide defaults at runtime using shell parameter expansion
+          DB_TYPE=${DB_TYPE:-sqlite}
+          DB_PORT=${DB_PORT:-5432}
+          export DB_TYPE DB_HOST DB_PORT DB_USER DB_PASSWORD DB_NAME
+
           echo "🧹 Pruning expired refresh tokens..."
           node scripts/prune-refresh-tokens.js || echo "⚠️ Token pruning failed - may need manual cleanup"
 
