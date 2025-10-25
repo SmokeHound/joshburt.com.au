@@ -154,6 +154,24 @@
         // Serverless auth function base
         const FN_AUTH = `${(window.FN_BASE || '/.netlify/functions')}/auth`;
 
+        // Minimal inline fallback for showToast to prevent ReferenceError before shared notifications load
+        if (typeof window.showToast !== 'function') {
+            window.showToast = function(message) {
+                try {
+                    var el = document.getElementById('toast') || (function(){
+                        var d=document.createElement('div');
+                        d.id='toast';
+                        d.className='fixed bottom-4 right-4 p-3 rounded bg-gray-800 text-white hidden z-50';
+                        document.body.appendChild(d);
+                        return d;
+                    })();
+                    el.textContent = String(message || '');
+                    el.classList.remove('hidden');
+                    setTimeout(function(){ el.classList.add('hidden'); }, 3000);
+                } catch(_) { /* noop */ }
+            };
+        }
+
         // Safe toast helper so we don't depend on script execution order
         function safeToast(msg, type){
             try {
