@@ -145,7 +145,7 @@
     // Serverless base path and auth token helper (computed in init-shared.js)
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
     const AUTH_DISABLED = window.AUTH_DISABLED === true;
-        const usersState = { list: [], pagination: { page:1, limit:10, total:0, pages:1 }, filters: { search:'', role:'', status:'', sort:'created_at_desc' }, editingId: null };
+    const usersState = { list: [], pagination: { page:1, limit:10, total:0, pages:1 }, filters: { search:'', role:'', status:'', sort:'created_at_desc' }, editingId: null, loading: false };
 
         function loadAndApplySettings() {
             const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
@@ -158,8 +158,9 @@
 
         class AuditLogger { static log(action, details, userId='admin') { const logs = JSON.parse(localStorage.getItem('auditLogs')||'[]'); const entry={ id:Date.now(), timestamp:new Date().toISOString(), userId, action, details, ip:'localhost' }; logs.unshift(entry); if (logs.length>1000) logs.splice(1000); localStorage.setItem('auditLogs', JSON.stringify(logs)); window.dispatchEvent(new CustomEvent('auditLogUpdated',{ detail:entry })); } }
 
-        async function loadUsers(page=1){
+    async function loadUsers(page=1){
             try {
+        if (usersState.loading) return; usersState.loading = true;
                 let token = (window.getToken && window.getToken()) || null;
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
@@ -216,7 +217,7 @@
                 console.error('loadUsers', err);
                 showToast('Error loading users: '+(err.message||'Network error'),'error');
                 usersState.list=[]; renderUsers();
-            }
+            } finally { usersState.loading = false; }
         }
 
         function renderUsers(){
@@ -320,6 +321,28 @@
             } catch (_) { /* noop */ }
         }
 
+        // Verify session and role before loading users to avoid 401 loops
+        async function ensureSessionAndRole(){
+            if (AUTH_DISABLED) return true;
+            const token = (window.getToken && window.getToken()) || null;
+            if (!token) { showSignInCTA(); return false; }
+            try {
+                const res = await fetch(`${FN_BASE}/auth?action=me`, { headers: { 'Authorization': `Bearer ${token}` }});
+                if (!res.ok) {
+                    if (res.status === 401) { showSignInCTA(); return false; }
+                    return false;
+                }
+                const me = await res.json();
+                if (me && me.user) {
+                    try { localStorage.setItem('user', JSON.stringify(me.user)); localStorage.setItem('currentUser', JSON.stringify({ name: me.user.name || me.user.email || 'User', role: me.user.role || 'user', email: me.user.email })); } catch(_) {}
+                    if (['admin','manager'].includes(me.user.role)) return true;
+                    showToast('Access denied: you do not have permission to view users.','error');
+                    return false;
+                }
+                return false;
+            } catch(_) { return false; }
+        }
+
         // Add or update user via backend API
         async function addOrUpdateUser(e){
             e.preventDefault();
@@ -366,7 +389,7 @@
             await loadUsers(); showToast(imported+' users imported','success'); } catch(err){ showToast('Import error: '+err.message,'error'); } }; reader.readAsText(file); evt.target.value=''; }
 
         // Event wiring
-        document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
             // Parse deep-link id (?userId= or ?user_id=)
             let deepLinkId = null;
             try {
@@ -374,22 +397,9 @@
                 const idParam = url.searchParams.get('userId') || url.searchParams.get('user_id');
                 if (idParam && /^[0-9]+$/.test(idParam)) deepLinkId = parseInt(idParam, 10);
             } catch(_) { /* noop */ }
-            // Require authentication for this page
-            const initialToken = (window.getToken && window.getToken()) || null;
-            if (!initialToken && !AUTH_DISABLED) {
-                // Do not auto-redirect; show CTA
-                showSignInCTA();
-                // Respect freshLogin flag by not hiding content if just logged in
-                const freshLoginTimestamp = localStorage.getItem('freshLogin');
-                if (freshLoginTimestamp) {
-                    const timeSinceLogin = Date.now() - parseInt(freshLoginTimestamp, 10);
-                    if (timeSinceLogin < 5000) {
-                        console.log('Fresh login detected, allowing page load');
-                    }
-                }
-                // Stop further initialization until signed in
-                return;
-            }
+            // Require authentication and proper role before loading content
+            const allowed = await ensureSessionAndRole();
+            if (!allowed) return;
 
                         // Listen for global auth required events and show CTA instead of redirect
                         try {
