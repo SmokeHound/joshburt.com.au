@@ -159,10 +159,12 @@ All of the following require authentication:
 #### Users (Admin/Manager)
 - `GET /.netlify/functions/users` - List users (admin, manager)
 - `POST /.netlify/functions/users` - Create user (admin only)
-- `GET /.netlify/functions/users/:id` - Get user (admin, manager)
-- `PUT /.netlify/functions/users/:id` - Update user (admin, or self)
-- `DELETE /.netlify/functions/users/:id` - Delete user (admin only)
+- `GET /.netlify/functions/users/{id}` - Get user by ID (admin, manager)
+- `PUT /.netlify/functions/users/{id}` - Update user (admin, or self)
+- `DELETE /.netlify/functions/users/{id}` - Delete user (admin only)
 - `GET /.netlify/functions/users/stats/overview` - User statistics (admin, manager)
+
+**Note**: The `{id}` in the path represents the user ID as part of the URL path, parsed by the function handler.
 
 #### Products (All authenticated users can read)
 - `GET /.netlify/functions/products` - List products (all)
@@ -213,43 +215,54 @@ All of the following require authentication:
 
 ## Default Users
 
-The system creates default users for testing and initial setup:
+The system creates default users for testing and initial setup. **These should only be used in development:**
 
-- **Admin**: admin@joshburt.com.au / Admin123!
-- **Test User**: test@example.com / Password123!
-- **Test Manager**: manager@example.com / Manager123!
+- **Admin**: admin@joshburt.com.au / (generated strong password)
+- **Test User**: test@example.com / (generated strong password)
+- **Test Manager**: manager@example.com / (generated strong password)
 
-**⚠️ Important**: Change these passwords in production!
+**⚠️ CRITICAL SECURITY WARNING**: 
+- Change ALL default passwords immediately in production
+- Consider disabling default user creation in production via environment variable
+- Use environment variables to set initial admin credentials securely
+- Delete test users in production environments
 
 ## Environment Variables
 
 Configure the following environment variables:
 
 ```env
-# JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key-change-in-production
+# JWT Configuration (REQUIRED - Generate a strong random secret)
+JWT_SECRET=use-a-cryptographically-secure-random-string-here
 JWT_EXPIRES_IN=7d
 JWT_REFRESH_EXPIRES_IN=30d
 
 # Password Hashing
 BCRYPT_ROUNDS=12
 
-# Database
+# Database (REQUIRED)
 DB_TYPE=postgres
 DATABASE_URL=postgres://user:pass@host/db
 
-# Email (optional)
+# Email (optional - for password reset and verification)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 FROM_EMAIL=noreply@joshburt.com.au
 
-# OAuth (optional)
+# OAuth (optional - Auth0 integration)
+# Note: OAuth users are auto-provisioned and use JWT tokens after OAuth login
+# The system supports both traditional login and OAuth side-by-side
 AUTH0_DOMAIN=your-tenant.us.auth0.com
 AUTH0_CLIENT_ID=your-auth0-client-id
 AUTH0_AUDIENCE=optional-api-audience
-AUTH0_AUTO_PROVISION=true
+AUTH0_AUTO_PROVISION=true  # Auto-create user accounts from OAuth
+```
+
+**To generate a secure JWT_SECRET**:
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
 ## Testing
