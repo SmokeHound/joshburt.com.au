@@ -158,15 +158,15 @@
 
         class AuditLogger { static log(action, details, userId='admin') { const logs = JSON.parse(localStorage.getItem('auditLogs')||'[]'); const entry={ id:Date.now(), timestamp:new Date().toISOString(), userId, action, details, ip:'localhost' }; logs.unshift(entry); if (logs.length>1000) logs.splice(1000); localStorage.setItem('auditLogs', JSON.stringify(logs)); window.dispatchEvent(new CustomEvent('auditLogUpdated',{ detail:entry })); } }
 
-    async function loadUsers(page = 1, tokenOverride = null){
+    async function loadUsers(page = 1){
             try {
         if (usersState.loading) return; usersState.loading = true;
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
 
-                // The ensureSessionAndRole function now guarantees a valid token,
-                // so we can use a simpler fetch. This avoids race conditions with authFetch's own refresh logic.
-                const token = tokenOverride || (window.getToken && window.getToken()) || null;
+                // Now that ensureSessionAndRole guarantees a valid token in localStorage,
+                // we can reliably get it here without passing it around.
+                const token = (window.getToken && window.getToken()) || null;
                 const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
                 const res = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers });
 
@@ -318,7 +318,7 @@
                                     const me2 = await chk.json();
                                     if (me2 && me2.user) {
                                         try { localStorage.setItem('user', JSON.stringify(me2.user)); localStorage.setItem('currentUser', JSON.stringify({ name: me2.user.name || me2.user.email || 'User', role: me2.user.role || 'user', email: me2.user.email })); } catch(_) {}
-                                        if (['admin','manager'].includes(me2.user.role)) return data.accessToken;
+                                        if (['admin','manager'].includes(me2.user.role)) return true;
                                         showToast('Access denied: you do not have permission to view users.','error');
                                         return false;
                                     }
@@ -347,7 +347,7 @@
                 const me = await res.json();
                 if (me && me.user) {
                     try { localStorage.setItem('user', JSON.stringify(me.user)); localStorage.setItem('currentUser', JSON.stringify({ name: me.user.name || me.user.email || 'User', role: me.user.role || 'user', email: me.user.email })); } catch(_) {}
-                    if (['admin','manager'].includes(me.user.role)) return token;
+                    if (['admin','manager'].includes(me.user.role)) return true;
                     showToast('Access denied: you do not have permission to view users.','error');
                     return false;
                 }
@@ -427,7 +427,7 @@
             if (typeof AuditLogger !== 'undefined') { AuditLogger.log('page_access','Accessed User Management page'); }
             // Load users and handle deep-link focus
             (async () => {
-                await loadUsers(1, allowed);
+                await loadUsers();
                 if (deepLinkId) {
                     // If the user is already in the rendered list, highlight and banner
                     if (highlightUserRow(deepLinkId)) {
@@ -468,11 +468,11 @@
             document.getElementById('user-search').addEventListener('input', e => {
                 usersState.filters.search=e.target.value;
                 if (filterDebounce) clearTimeout(filterDebounce);
-                filterDebounce = setTimeout(()=> loadUsers(1, window.getToken && window.getToken()), 250);
+                filterDebounce = setTimeout(()=> loadUsers(1), 250);
             });
-            document.getElementById('user-role-filter').addEventListener('change', e => { usersState.filters.role=e.target.value; loadUsers(1, window.getToken && window.getToken()); });
-            document.getElementById('user-status-filter').addEventListener('change', e => { usersState.filters.status=e.target.value; loadUsers(1, window.getToken && window.getToken()); });
-            document.getElementById('user-sort').addEventListener('change', e => { usersState.filters.sort=e.target.value; loadUsers(1, window.getToken && window.getToken()); });
+            document.getElementById('user-role-filter').addEventListener('change', e => { usersState.filters.role=e.target.value; loadUsers(1); });
+            document.getElementById('user-status-filter').addEventListener('change', e => { usersState.filters.status=e.target.value; loadUsers(1); });
+            document.getElementById('user-sort').addEventListener('change', e => { usersState.filters.sort=e.target.value; loadUsers(1); });
             const tbody=document.querySelector('tbody');
             tbody.addEventListener('click', async e => {
                 const id=e.target.dataset.id; if(!id) return;
