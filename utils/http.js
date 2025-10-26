@@ -133,11 +133,35 @@ async function requireAuth(event, roles = null) {
   return { user, response: null };
 }
 
+/**
+ * Require user to have permission for a specific resource/action
+ * Uses RBAC (Role-Based Access Control) system
+ * @param {object} event - Netlify event object
+ * @param {string} resource - Resource name (e.g., 'products', 'users')
+ * @param {string} action - Action name (e.g., 'create', 'read', 'update', 'delete')
+ * @returns {object} - { user, response } - response is null if authorized, error response otherwise
+ */
+async function requirePermission(event, resource, action) {
+  const { hasPermission } = require('./rbac');
+  
+  // Check authentication first
+  const { user, response: authResponse } = await requireAuth(event);
+  if (authResponse) return { user, response: authResponse };
+  
+  // Check permission
+  if (!hasPermission(user, resource, action)) {
+    return { user, response: error(403, 'Insufficient permissions for this action') };
+  }
+  
+  return { user, response: null };
+}
+
 module.exports = {
   corsHeaders,
   json,
   error,
   parseBody,
   authenticate,
-  requireAuth
+  requireAuth,
+  requirePermission
 };

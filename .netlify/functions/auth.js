@@ -4,6 +4,8 @@ const nodeCrypto = require('crypto');
 const { database, initializeDatabase } = require('../../config/database');
 const { corsHeaders, json: jsonResponse, error: errorResponse, parseBody, authenticate } = require('../../utils/http');
 const { withHandler } = require('../../utils/fn');
+const { validatePassword } = require('../../utils/password');
+const { isValidRole } = require('../../utils/rbac');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 const generateTokens = (userId) => {
@@ -53,6 +55,13 @@ exports.handler = withHandler(async (event) => {
     if ((action === 'register' || (method === 'POST' && event.path.endsWith('/auth/register')))) {
       const { email, password, name } = payload;
       if (!email || !password || !name) return errorResponse(400, 'Missing email, password or name');
+      
+      // Validate password strength
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        return errorResponse(400, 'Password does not meet requirements', { errors: passwordValidation.errors });
+      }
+      
       const existing = await database.get('SELECT id FROM users WHERE email = ?', [email]);
       if (existing) return errorResponse(409, 'User already exists with this email');
       const rounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
@@ -160,6 +169,13 @@ exports.handler = withHandler(async (event) => {
     if (action === 'reset-password') {
       const { token, password } = payload;
       if (!token || !password) return errorResponse(400, 'Invalid token or password format');
+      
+      // Validate new password strength
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        return errorResponse(400, 'Password does not meet requirements', { errors: passwordValidation.errors });
+      }
+      
       const user = await database.get('SELECT id FROM users WHERE reset_token = ? AND reset_token_expires > ?', [token, Date.now()]);
       if (!user) return errorResponse(400, 'Invalid or expired reset token');
       const rounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;

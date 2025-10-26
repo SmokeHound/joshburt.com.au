@@ -1,6 +1,7 @@
 // Netlify Function: Full CRUD /.netlify/functions/products
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
+const { requirePermission } = require('../../utils/http');
 
 exports.handler = withHandler(async function(event) {
   // Initialize database connection (idempotent)
@@ -14,6 +15,10 @@ exports.handler = withHandler(async function(event) {
   return error(405, 'Method Not Allowed');
 
   async function handleGet(event) {
+    // Products can be read by all authenticated users
+    const { user, response: authResponse } = await requirePermission(event, 'products', 'read');
+    if (authResponse) return authResponse;
+    
     try {
       let query = 'SELECT * FROM products ORDER BY name';
       let params = [];
@@ -31,6 +36,10 @@ exports.handler = withHandler(async function(event) {
   }
 
   async function handlePost(event) {
+    // Only admins and managers can create products
+    const { user, response: authResponse } = await requirePermission(event, 'products', 'create');
+    if (authResponse) return authResponse;
+    
     try {
       const body = parseBody(event);
       const { name, code, type, specs, description, image } = body;
@@ -58,6 +67,10 @@ exports.handler = withHandler(async function(event) {
   }
 
   async function handlePut(event) {
+    // Only admins and managers can update products
+    const { user, response: authResponse } = await requirePermission(event, 'products', 'update');
+    if (authResponse) return authResponse;
+    
     try {
       const body = parseBody(event);
       const { id, name, code, type, specs, description, image } = body;
@@ -88,6 +101,10 @@ exports.handler = withHandler(async function(event) {
   }
 
   async function handleDelete(event) {
+    // Only admins can delete products
+    const { user, response: authResponse } = await requirePermission(event, 'products', 'delete');
+    if (authResponse) return authResponse;
+    
     try {
       const { id } = parseBody(event);
       if (!id) return error(400, 'Missing required field: id');
