@@ -1,16 +1,19 @@
 // Netlify Function: GET /.netlify/functions/inventory
-const { Client } = require('pg');
+const { database } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
+const { requirePermission } = require('../../utils/http');
 
-exports.handler = withHandler(async function(){
-  const client = new Client({ connectionString: process.env.NEON_DATABASE_URL });
+exports.handler = withHandler(async function(event){
+  // Only admins and managers can view inventory
+  const { user, response: authResponse } = await requirePermission(event, 'inventory', 'read');
+  if (authResponse) return authResponse;
+  
   try {
-    await client.connect();
-    const res = await client.query('SELECT * FROM inventory');
-    await client.end();
-    return ok(res.rows);
+    await database.connect();
+    const inventory = await database.all('SELECT * FROM inventory');
+    return ok(inventory);
   } catch (e) {
-    try { await client.end(); } catch (endErr) { console.warn('inventory end error', endErr && endErr.message ? endErr.message : endErr); }
+    console.error('Inventory API error:', e);
     return error(500, 'Failed to fetch inventory', { message: e.message });
   }
 });

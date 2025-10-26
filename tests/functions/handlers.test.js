@@ -30,7 +30,7 @@ function makeEvent({ path='/.netlify/functions/auth', httpMethod='POST', query={
     console.log('✅ register handler ok');
 
     // Login (using admin account)
-    const login = await authFn.handler(makeEvent({ query:{ action:'login' }, body:{ action:'login', email:'admin@joshburt.com.au', password:'admin123!' }}));
+    const login = await authFn.handler(makeEvent({ query:{ action:'login' }, body:{ action:'login', email:'admin@joshburt.com.au', password:'Admin123!' }}));
     const loginBody = JSON.parse(login.body||'{}');
     if (login.statusCode!==200 || !loginBody.accessToken) { console.error('❌ login handler failed', login); process.exitCode=1; return; }
     console.log('✅ login handler ok');
