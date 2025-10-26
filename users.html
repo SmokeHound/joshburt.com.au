@@ -161,17 +161,12 @@
     async function loadUsers(page=1){
             try {
         if (usersState.loading) return; usersState.loading = true;
-                let token = (window.getToken && window.getToken()) || null;
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
 
-                // Intentionally avoid authFetch here to prevent auto-redirect loops on 401.
-                // We handle 401 locally and show a sign-in CTA.
-                async function fetchUsers(withToken){
-                    const headers = withToken ? { 'Authorization': `Bearer ${withToken}` } : {};
-                    return fetch(`${FN_BASE}/users?${params.toString()}`, { headers });
-                }
-                let res = await fetchUsers(token);
+                // Use authFetch, which handles token refresh and redirects automatically.
+                // The ensureSessionAndRole check prevents this from running if not logged in.
+                const res = await window.authFetch(`${FN_BASE}/users?${params.toString()}`);
 
                 // If forbidden, do not redirect to login; show message and stop
                 if (res.status === 403 && !AUTH_DISABLED) {
@@ -181,14 +176,8 @@
                     return;
                 }
 
-                // If still unauthorized after attempts, show a sign-in CTA instead of redirecting
-                if (res.status === 401 && !AUTH_DISABLED) {
-                    try { localStorage.removeItem('accessToken'); localStorage.removeItem('refreshToken'); } catch (_) {}
-                    showSignInCTA();
-                    return;
-                }
-
-                if (!res.ok) throw new Error('Failed (status '+res.status+')');
+                // Any other error is now handled by authFetch or is a server error.
+                if (!res.ok) throw new Error('Failed to load users (status '+res.status+')');
                 const data = await res.json();
                 usersState.list = data.users || [];
                 usersState.pagination = data.pagination || { page:1, limit:limit, total:usersState.list.length, pages:1 };
