@@ -164,9 +164,11 @@
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
 
-                // Use authFetch, which handles token refresh and redirects automatically.
-                // The ensureSessionAndRole check prevents this from running if not logged in.
-                const res = await window.authFetch(`${FN_BASE}/users?${params.toString()}`);
+                // The ensureSessionAndRole function now guarantees a valid token,
+                // so we can use a simpler fetch. This avoids race conditions with authFetch's own refresh logic.
+                const token = (window.getToken && window.getToken()) || null;
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const res = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers });
 
                 // If forbidden, do not redirect to login; show message and stop
                 if (res.status === 403 && !AUTH_DISABLED) {
@@ -176,7 +178,7 @@
                     return;
                 }
 
-                // Any other error is now handled by authFetch or is a server error.
+                // Any other error is now handled by ensureSessionAndRole or is a server error.
                 if (!res.ok) throw new Error('Failed to load users (status '+res.status+')');
                 const data = await res.json();
                 usersState.list = data.users || [];
