@@ -25,11 +25,12 @@
     return Array.from(new Set(bases));
   }
 
-  async function fetchJsonWithTimeout(url, opts = {}, timeoutMs = 5000) {
+  async function fetchJsonWithTimeout(url, opts = {}, timeoutMs = 5000, fetchImpl) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
-      const res = await fetch(url, { ...opts, signal: ctrl.signal });
+      const _fetch = typeof fetchImpl === 'function' ? fetchImpl : fetch;
+      const res = await _fetch(url, { ...opts, signal: ctrl.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } finally {
@@ -55,7 +56,9 @@
       let lastErr = null;
       for (const base of bases) {
         try {
-          settings = await fetchJsonWithTimeout(`${base}/settings`, { headers: { 'Accept': 'application/json' } }, 6000);
+          const useAuthFetch = (typeof window !== 'undefined' && typeof window.authFetch === 'function') ? window.authFetch : null;
+          // Give a bit more time; this runs in the background and shouldn't spam logs on slow links
+          settings = await fetchJsonWithTimeout(`${base}/settings`, { headers: { 'Accept': 'application/json' } }, 10000, useAuthFetch);
           if (settings) break;
         } catch (e) {
           lastErr = e;
@@ -69,7 +72,12 @@
         if (lsRaw && (now - lsTs) < 5 * CACHE_DURATION) {
           try { featureFlagsCache = JSON.parse(lsRaw); cacheTimestamp = lsTs; return featureFlagsCache; } catch (_) { /* ignore */ }
         }
-        console.warn('Failed to fetch settings for feature flags', lastErr);
+        // Downgrade AbortError noise to debug and fail closed to defaults
+        if (lastErr && lastErr.name === 'AbortError') {
+          console.debug('Feature flags fetch aborted (timeout). Using defaults or cache.');
+        } else if (lastErr) {
+          console.warn('Failed to fetch settings for feature flags', lastErr);
+        }
         return { betaFeatures: false, newDashboard: false, advancedReports: false };
       }
       const nestedFlags = settings.featureFlags || {};
