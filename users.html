@@ -301,43 +301,7 @@ async function loadUsers(page = 1) {
             try {
                 const res = await fetch(`${FN_BASE}/auth?action=me`, { headers: { 'Authorization': `Bearer ${token}` }});
                 if (!res.ok) {
-                    if (res.status === 401) {
-                        // Try refresh once, then re-check
-                        try {
-                            const rt = localStorage.getItem('refreshToken');
-                            if (rt) {
-                                const refRes = await fetch(`${FN_BASE}/auth?action=refresh`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken: rt }) });
-                                if (refRes.ok) {
-                                    const data = await refRes.json();
-                                    if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
-                                    if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-                                    // Wait a moment for localStorage to sync
-                                    await new Promise(resolve => setTimeout(resolve, 100));
-                                    const chk = await fetch(`${FN_BASE}/auth?action=me`, { headers: { 'Authorization': `Bearer ${data.accessToken}` } });
-                                    if (!chk.ok) { try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');}catch(_){} showSignInCTA(); return false; }
-                                    const me2 = await chk.json();
-                                    if (me2 && me2.user) {
-                                        try { localStorage.setItem('user', JSON.stringify(me2.user)); localStorage.setItem('currentUser', JSON.stringify({ name: me2.user.name || me2.user.email || 'User', role: me2.user.role || 'user', email: me2.user.email })); } catch(_) {}
-                                        if (['admin','manager'].includes(me2.user.role)) return true; // Session is valid
-                                        showToast('Access denied: you do not have permission to view users.','error');
-                                        return false;
-                                    }
-                                } else {
-                                    try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');}catch(_){}
-                                    showSignInCTA();
-                                    return false;
-                                }
-                            } else {
-                                showSignInCTA();
-                                return false;
-                            }
-                        } catch(_) {
-                            try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');}catch(_){}
-                            showSignInCTA();
-                            return false;
-                        }
-                    }
-                    // Any other non-OK (e.g., 404 User not found): clear and prompt re-login
+                    // Token is invalid - clear session and show sign-in CTA
                     try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');}catch(_){}
                     let msg = 'Please sign in to view and manage users.';
                     try { const body = await res.json(); if (body && body.error) { msg = body.error + '. Please sign in again.'; } } catch(_){}
@@ -347,7 +311,7 @@ async function loadUsers(page = 1) {
                 const me = await res.json();
                 if (me && me.user) {
                     try { localStorage.setItem('user', JSON.stringify(me.user)); localStorage.setItem('currentUser', JSON.stringify({ name: me.user.name || me.user.email || 'User', role: me.user.role || 'user', email: me.user.email })); } catch(_) {}
-                    if (['admin','manager'].includes(me.user.role)) return true; // Session is valid
+                    if (['admin','manager'].includes(me.user.role)) return true;
                     showToast('Access denied: you do not have permission to view users.','error');
                     return false;
                 }
@@ -355,7 +319,10 @@ async function loadUsers(page = 1) {
                 try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');}catch(_){}
                 showSignInCTA('Account not found. Please sign in again.');
                 return false;
-            } catch(_) { return false; }
+            } catch(_) { 
+                showSignInCTA('Unable to verify session. Please sign in.');
+                return false; 
+            }
         }
 
         // Add or update user via backend API
@@ -412,6 +379,10 @@ async function loadUsers(page = 1) {
                 const idParam = url.searchParams.get('userId') || url.searchParams.get('user_id');
                 if (idParam && /^[0-9]+$/.test(idParam)) deepLinkId = parseInt(idParam, 10);
             } catch(_) { /* noop */ }
+            
+            // Wait a moment for init-shared.js session bootstrap to complete any token refresh
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
             // Require authentication and proper role before loading content
             const allowed = await ensureSessionAndRole();
             if (!allowed) return;
