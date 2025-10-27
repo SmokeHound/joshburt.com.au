@@ -316,7 +316,7 @@ async function loadUsers(page = 1) {
                                     const me2 = await chk.json();
                                     if (me2 && me2.user) {
                                         try { localStorage.setItem('user', JSON.stringify(me2.user)); localStorage.setItem('currentUser', JSON.stringify({ name: me2.user.name || me2.user.email || 'User', role: me2.user.role || 'user', email: me2.user.email })); } catch(_) {}
-                                        if (['admin','manager'].includes(me2.user.role)) return data.accessToken; // Return the NEW token
+                                        if (['admin','manager'].includes(me2.user.role)) return true; // Session is valid
                                         showToast('Access denied: you do not have permission to view users.','error');
                                         return false;
                                     }
@@ -345,7 +345,7 @@ async function loadUsers(page = 1) {
                 const me = await res.json();
                 if (me && me.user) {
                     try { localStorage.setItem('user', JSON.stringify(me.user)); localStorage.setItem('currentUser', JSON.stringify({ name: me.user.name || me.user.email || 'User', role: me.user.role || 'user', email: me.user.email })); } catch(_) {}
-                    if (['admin','manager'].includes(me.user.role)) return token; // Return the existing valid token
+                    if (['admin','manager'].includes(me.user.role)) return true; // Session is valid
                     showToast('Access denied: you do not have permission to view users.','error');
                     return false;
                 }
