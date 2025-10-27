@@ -299,14 +299,27 @@ async function loadUsers(page = 1) {
         // Verify session and role before loading users to avoid 401 loops
         async function ensureSessionAndRole(){
             if (AUTH_DISABLED) return true;
+            
+            // First check if we have any tokens at all
             const token = (window.getToken && window.getToken()) || null;
-            if (!token) { showSignInCTA(); return false; }
+            const refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
+            
+            if (!token && !refreshToken) { 
+                showSignInCTA('Please sign in to view and manage users.'); 
+                return false; 
+            }
+            
+            if (!token) {
+                showSignInCTA('Session expired. Please sign in again.');
+                return false;
+            }
+            
             try {
                 const res = await fetch(`${FN_BASE}/auth?action=me`, { headers: { 'Authorization': `Bearer ${token}` }});
                 if (!res.ok) {
                     // Token is invalid - clear session and show sign-in CTA
-                    try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');}catch(_){}
-                    let msg = 'Please sign in to view and manage users.';
+                    try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');localStorage.removeItem('user');localStorage.removeItem('currentUser');}catch(_){}
+                    let msg = 'Session expired. Please sign in again.';
                     try { const body = await res.json(); if (body && body.error) { msg = body.error + '. Please sign in again.'; } } catch(_){}
                     showSignInCTA(msg);
                     return false;
@@ -319,7 +332,7 @@ async function loadUsers(page = 1) {
                     return false;
                 }
                 // me was OK but no user field -> treat as invalid session
-                try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');}catch(_){}
+                try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');localStorage.removeItem('user');localStorage.removeItem('currentUser');}catch(_){}
                 showSignInCTA('Account not found. Please sign in again.');
                 return false;
             } catch(_) { 
