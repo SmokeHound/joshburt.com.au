@@ -164,8 +164,7 @@ async function loadUsers(page = 1, tokenOverride = null){
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
 
-                // Use the override for the initial load, otherwise get from storage for subsequent calls.
-                const token = tokenOverride || (window.getToken && window.getToken()) || null;
+                const token = (window.getToken && window.getToken()) || null;
                 const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
                 const res = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers });
 
