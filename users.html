@@ -164,9 +164,12 @@ async function loadUsers(page = 1) {
                 const { limit, filters } = { limit: usersState.pagination.limit, filters: usersState.filters };
                 const params = new URLSearchParams({ page, limit, search:filters.search, role:filters.role, status:filters.status, sort:filters.sort });
 
-                const token = (window.getToken && window.getToken()) || null;
-                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-                const res = await fetch(`${FN_BASE}/users?${params.toString()}`, { headers });
+                // Use authFetch which handles token refresh automatically
+                const res = window.authFetch 
+                    ? await window.authFetch(`${FN_BASE}/users?${params.toString()}`)
+                    : await fetch(`${FN_BASE}/users?${params.toString()}`, { 
+                        headers: { 'Authorization': `Bearer ${(window.getToken && window.getToken()) || ''}` }
+                      });
 
                 // If forbidden, do not redirect to login; show message and stop
                 if (res.status === 403 && !AUTH_DISABLED) {
