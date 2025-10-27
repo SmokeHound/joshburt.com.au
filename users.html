@@ -311,7 +311,9 @@ async function loadUsers(page = 1) {
                                     const data = await refRes.json();
                                     if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
                                     if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-                                    const chk = await fetch(`${FN_BASE}/auth?action=me`, { headers: { 'Authorization': `Bearer ${data.accessToken || token}` } });
+                                    // Wait a moment for localStorage to sync
+                                    await new Promise(resolve => setTimeout(resolve, 100));
+                                    const chk = await fetch(`${FN_BASE}/auth?action=me`, { headers: { 'Authorization': `Bearer ${data.accessToken}` } });
                                     if (!chk.ok) { try{localStorage.removeItem('accessToken');localStorage.removeItem('refreshToken');}catch(_){} showSignInCTA(); return false; }
                                     const me2 = await chk.json();
                                     if (me2 && me2.user) {
