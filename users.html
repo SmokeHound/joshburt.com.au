@@ -16,6 +16,61 @@
   <style>
     .user-item{transition:all .2s ease;background:#111;border:1px solid #333}
     .user-item:hover{background:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
+    
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.hidden {
+      display: none;
+    }
+    .modal-content {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 0.5rem;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+      z-index: 9999;
+    }
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-body {
+      padding: 1.5rem;
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: #999;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.25rem;
+      transition: all 0.2s;
+    }
+    .modal-close:hover {
+      background: #333;
+      color: #fff;
+    }
   </style>
 </head>
     <body class="dark">
@@ -139,6 +194,43 @@
             </div>
         </section>
     </main>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="text-xl font-semibold text-gray-100">Edit User</h3>
+          <button class="modal-close" id="close-modal" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-user-form">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                <input type="text" id="edit-name" required class="w-full p-3 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <input type="email" id="edit-email" disabled class="w-full p-3 rounded-lg border border-gray-600 bg-gray-700 text-gray-400 cursor-not-allowed" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Role</label>
+                <select id="edit-role" required class="w-full p-3 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="">Select Role</option>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                  <option value="manager">Manager</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+              <button type="submit" class="btn-neon-blue flex-1 p-3 rounded-lg">Update User</button>
+              <button type="button" id="cancel-modal" class="btn-neon-green px-6 p-3 rounded-lg">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -351,24 +443,54 @@ async function loadUsers(page = 1) {
             const token = (window.getToken && window.getToken()) || null;
             if(!name||!email||!role){ showToast('Please fill in all fields'); return; }
             try {
-                if (usersState.editingId){
-                    const res = await fetch(`${FN_BASE}/users/${usersState.editingId}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ name, role }) });
-                    if(!res.ok) throw new Error('Failed to update user');
-                    showToast('User updated','success');
-                    usersState.editingId=null; form.querySelector('button[type="submit"]').textContent='Add User'; form.querySelector('h3').textContent='Add New User'; document.getElementById('cancel-edit').classList.add('hidden');
-                } else {
-                    const password = Math.random().toString(36).slice(-10)+'A1!';
-                    const res = await fetch(`${FN_BASE}/users`, { method:'POST', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ name,email,role,password }) });
-                    if(!res.ok){ const err=await res.json().catch(()=>({})); throw new Error(err.error||'Failed to add user'); }
-                    showToast('User added','success');
-                }
+                const password = Math.random().toString(36).slice(-10)+'A1!';
+                const res = await fetch(`${FN_BASE}/users`, { method:'POST', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ name,email,role,password }) });
+                if(!res.ok){ const err=await res.json().catch(()=>({})); throw new Error(err.error||'Failed to add user'); }
+                showToast('User added','success');
                 form.reset();
                 await loadUsers(1);
             } catch(err){ showToast('Error: '+err.message,'error'); }
         }
 
-        // Edit user
-        function editUser(id){ const u=usersState.list.find(x=>x.id===id); if(!u) return; const form=document.getElementById('user-form'); form.querySelector('input[type="text"]').value=u.name; form.querySelector('input[type="email"]').value=u.email; form.querySelector('select').value=u.role; usersState.editingId=id; form.querySelector('button[type="submit"]').textContent='Update User'; form.querySelector('h3').textContent='Edit User'; document.getElementById('cancel-edit').classList.remove('hidden'); form.scrollIntoView({ behavior:'smooth' }); }
+        // Update user from modal
+        async function updateUserFromModal(e){
+            e.preventDefault();
+            const name = document.getElementById('edit-name').value.trim();
+            const role = document.getElementById('edit-role').value;
+            const token = (window.getToken && window.getToken()) || null;
+            if(!name||!role){ showToast('Please fill in all fields'); return; }
+            if(!usersState.editingId){ showToast('No user selected for editing','error'); return; }
+            try {
+                const res = await fetch(`${FN_BASE}/users/${usersState.editingId}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ name, role }) });
+                if(!res.ok) throw new Error('Failed to update user');
+                showToast('User updated','success');
+                closeEditModal();
+                await loadUsers(usersState.pagination.page || 1);
+            } catch(err){ showToast('Error: '+err.message,'error'); }
+        }
+
+        // Open edit modal
+        function openEditModal(id){ 
+            const u=usersState.list.find(x=>x.id===id); 
+            if(!u) return; 
+            document.getElementById('edit-name').value=u.name; 
+            document.getElementById('edit-email').value=u.email; 
+            document.getElementById('edit-role').value=u.role; 
+            usersState.editingId=id; 
+            document.getElementById('edit-user-modal').classList.remove('hidden');
+            // Focus the name field
+            setTimeout(() => document.getElementById('edit-name').focus(), 100);
+        }
+
+        // Close edit modal
+        function closeEditModal(){ 
+            usersState.editingId=null; 
+            document.getElementById('edit-user-modal').classList.add('hidden');
+            document.getElementById('edit-user-form').reset();
+        }
+
+        // Edit user (deprecated - now opens modal)
+        function editUser(id){ openEditModal(id); }
 
         // Delete user via backend API
     async function deleteUser(id){ if(!confirm('Delete this user?')) return; const token=(window.getToken && window.getToken()) || null; try { const res=await fetch(`${FN_BASE}/users/${id}`, { method:'DELETE', headers: token?{ 'Authorization':`Bearer ${token}` }:{} }); if(!res.ok) throw new Error('Failed to delete user'); showToast('User deleted','success'); await loadUsers(1); } catch(err){ showToast('Error: '+err.message,'error'); } }
@@ -444,6 +566,22 @@ async function loadUsers(page = 1) {
             loadAndApplySettings();
             document.getElementById('user-form').addEventListener('submit', addOrUpdateUser);
             document.getElementById('cancel-edit').addEventListener('click', cancelEdit);
+            
+            // Modal event listeners
+            document.getElementById('edit-user-form').addEventListener('submit', updateUserFromModal);
+            document.getElementById('close-modal').addEventListener('click', closeEditModal);
+            document.getElementById('cancel-modal').addEventListener('click', closeEditModal);
+            // Close modal when clicking outside
+            document.getElementById('edit-user-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'edit-user-modal') closeEditModal();
+            });
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !document.getElementById('edit-user-modal').classList.contains('hidden')) {
+                    closeEditModal();
+                }
+            });
+            
             // Header actions
             const refreshBtn = document.getElementById('refresh-users');
             if (refreshBtn) refreshBtn.addEventListener('click', ()=> loadUsers(usersState.pagination.page || 1));
