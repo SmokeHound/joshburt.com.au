@@ -108,25 +108,9 @@
                                 <div class="text-gray-600 dark:text-gray-300">Priority: <span class="font-medium">${order.priority || 'normal'}</span></div>
                             </div>
                             <div class="text-gray-600 dark:text-gray-300 mb-2">Notes: <span class="font-medium">${order.notes || ''}</span></div>
-                            <button class="mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary" onclick="toggleOrderDetails(${idx})" aria-expanded="false" aria-controls="order-details-${order.id}">
-                                <span>Show Details</span>
+                            <button class="mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary" onclick="showOrderDetailsModal(${order.id})">
+                                <span>View Details</span>
                             </button>
-                            <div id="order-details-${order.id}" class="hidden mt-4 bg-gray-50 dark:bg-gray-800 rounded p-4">
-                                <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">Order Items</h4>
-                                <ul class="mb-2">
-                                    ${(order.items || []).map(item => `
-                                        <li class="mb-1 flex justify-between">
-                                            <span>${item.name} <span class="text-xs text-gray-500">(${item.code})</span></span>
-                                            <span class="font-medium">Qty: ${item.quantity}</span>
-                                        </li>
-                                    `).join('')}
-                                </ul>
-                                <div class="flex gap-2 mt-4">
-                                    <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400" onclick="updateOrderStatus(${order.id}, 'approved')">Approve</button>
-                                    <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" onclick="updateOrderStatus(${order.id}, 'rejected')">Reject</button>
-                                    <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400" onclick="emailOrder(${order.id})">Email</button>
-                                </div>
-                            </div>
                         </div>
                     `).join('');
                 } catch (err) {
@@ -134,21 +118,96 @@
                 }
             }
 
-            window.toggleOrderDetails = function(idx) {
-                const ordersList = document.getElementById('orders-list');
-                const orderDivs = ordersList.querySelectorAll('[id^="order-details-"]');
-                const buttons = ordersList.querySelectorAll('button[aria-controls^="order-details-"]');
-                orderDivs.forEach((div, i) => {
-                    if (i === idx) {
-                        const isOpen = div.classList.toggle('hidden') === false;
-                        buttons[i].setAttribute('aria-expanded', isOpen);
-                        buttons[i].querySelector('span').textContent = isOpen ? 'Hide Details' : 'Show Details';
-                    } else {
-                        div.classList.add('hidden');
-                        buttons[i].setAttribute('aria-expanded', false);
-                        buttons[i].querySelector('span').textContent = 'Show Details';
-                    }
-                });
+            // Show order details in modal
+            window.showOrderDetailsModal = function(orderId) {
+                const order = ordersState.find(o => o.id === orderId);
+                if (!order) {
+                    console.error('Order not found:', orderId);
+                    return;
+                }
+
+                const statusBadge = order.status === 'pending' 
+                    ? '<span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Pending</span>'
+                    : order.status === 'approved'
+                    ? '<span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Approved</span>'
+                    : '<span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">Rejected</span>';
+
+                const itemsHtml = (order.items || []).map(item => `
+                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                        <td class="py-2 px-3 text-gray-900 dark:text-white">${item.name}</td>
+                        <td class="py-2 px-3 text-gray-600 dark:text-gray-400 text-sm">${item.code}</td>
+                        <td class="py-2 px-3 text-gray-900 dark:text-white text-right font-medium">${item.quantity}</td>
+                    </tr>
+                `).join('');
+
+                const content = `
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start border-b border-gray-200 dark:border-gray-700 pb-3">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Order #${order.id}</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${new Date(order.created_at).toLocaleString()}</p>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Requested By</p>
+                                <p class="font-medium text-gray-900 dark:text-white">${order.created_by || 'mechanic'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Priority</p>
+                                <p class="font-medium text-gray-900 dark:text-white">${order.priority || 'normal'}</p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Notes</p>
+                                <p class="font-medium text-gray-900 dark:text-white">${order.notes || 'No notes provided'}</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Order Items (${order.total_items || order.items?.length || 0})</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-gray-100 dark:bg-gray-700">
+                                        <tr>
+                                            <th class="py-2 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Product</th>
+                                            <th class="py-2 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Code</th>
+                                            <th class="py-2 px-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Quantity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${itemsHtml}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <button class="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors" onclick="updateOrderStatus(${order.id}, 'approved')">
+                                Approve Order
+                            </button>
+                            <button class="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors" onclick="updateOrderStatus(${order.id}, 'rejected')">
+                                Reject Order
+                            </button>
+                            <button class="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors" onclick="emailOrder(${order.id})">
+                                Email Order
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                if (window.ModalUtils && window.ModalUtils.create) {
+                    window.ModalUtils.create({
+                        title: 'Order Details',
+                        content: content,
+                        size: 'lg',
+                        showClose: true
+                    });
+                } else {
+                    // Fallback: show alert with basic info
+                    alert(`Order #${order.id}\nStatus: ${order.status}\nRequested by: ${order.created_by || 'mechanic'}\nItems: ${order.total_items || order.items?.length || 0}\n\nUse the action buttons on the order card to approve/reject.`);
+                }
             };
 
             window.updateOrderStatus = async function(orderId, status) {
