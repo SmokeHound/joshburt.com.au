@@ -1,12 +1,21 @@
 // Netlify Function: CRUD & management /.netlify/functions/users
 const bcrypt = require('bcryptjs');
-const { database } = require('../../config/database');
+const { database, initializeDatabase } = require('../../config/database');
 const { corsHeaders, parseBody, requireAuth, requirePermission } = require('../../utils/http');
 const { getPagination, withHandler, ok, error } = require('../../utils/fn');
 const { validatePassword } = require('../../utils/password');
 const { isValidRole, hasPermission } = require('../../utils/rbac');
 
+let dbInitialized = false;
 exports.handler = withHandler(async (event) => {
+
+  // Connect and initialize database (once per cold start)
+  if (!dbInitialized) {
+    await database.connect();
+    try { await initializeDatabase(); } catch (e) { /* tables may already exist */ }
+    dbInitialized = true;
+  }
+
   const method = event.httpMethod;
   const pathParts = event.path.split('/').filter(Boolean);
   const maybeId = pathParts[pathParts.length - 1];
