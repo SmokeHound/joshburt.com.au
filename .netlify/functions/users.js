@@ -12,7 +12,14 @@ exports.handler = withHandler(async (event) => {
   // Connect and initialize database (once per cold start)
   if (!dbInitialized) {
     await database.connect();
-    try { await initializeDatabase(); } catch (e) { /* tables may already exist */ }
+    try { 
+      await initializeDatabase(); 
+    } catch (e) { 
+      // Log initialization errors but continue if tables already exist
+      if (e.message && !e.message.includes('already exists')) {
+        console.warn('Database initialization warning:', e.message);
+      }
+    }
     dbInitialized = true;
   }
 
