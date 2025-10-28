@@ -157,13 +157,19 @@
                     const orderLabel = order ? `Order #${orderId}` : `Order #${orderId}`;
                     const actionText = status === 'approved' ? 'approve' : 'reject';
                     
-                    const confirmed = await window.ModalUtils.confirm({
-                        title: `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Order`,
-                        message: `Are you sure you want to ${actionText} ${orderLabel}?`,
-                        confirmText: actionText.charAt(0).toUpperCase() + actionText.slice(1),
-                        cancelText: 'Cancel',
-                        type: status === 'approved' ? 'success' : 'warning'
-                    });
+                    // Fallback to native confirm if ModalUtils not loaded yet
+                    let confirmed = false;
+                    if (window.ModalUtils && window.ModalUtils.confirm) {
+                        confirmed = await window.ModalUtils.confirm({
+                            title: `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Order`,
+                            message: `Are you sure you want to ${actionText} ${orderLabel}?`,
+                            confirmText: actionText.charAt(0).toUpperCase() + actionText.slice(1),
+                            cancelText: 'Cancel',
+                            type: status === 'approved' ? 'success' : 'warning'
+                        });
+                    } else {
+                        confirmed = confirm(`Are you sure you want to ${actionText} ${orderLabel}?`);
+                    }
                     
                     if (!confirmed) return;
                     
@@ -175,30 +181,42 @@
                     });
                     if (!res.ok) throw new Error('Failed to update order');
                     
-                    await window.ModalUtils.alert({
-                        title: 'Order Updated',
-                        message: `Order #${orderId} has been ${status === 'approved' ? 'approved' : 'rejected'}.`,
-                        type: 'success'
-                    });
+                    if (window.ModalUtils && window.ModalUtils.alert) {
+                        await window.ModalUtils.alert({
+                            title: 'Order Updated',
+                            message: `Order #${orderId} has been ${status === 'approved' ? 'approved' : 'rejected'}.`,
+                            type: 'success'
+                        });
+                    } else {
+                        alert(`Order #${orderId} has been ${status === 'approved' ? 'approved' : 'rejected'}.`);
+                    }
                     
                     await loadOrders();
                 } catch (err) {
-                    await window.ModalUtils.alert({
-                        title: 'Error',
-                        message: `Failed to update order: ${err.message}`,
-                        type: 'danger'
-                    });
+                    if (window.ModalUtils && window.ModalUtils.alert) {
+                        await window.ModalUtils.alert({
+                            title: 'Error',
+                            message: `Failed to update order: ${err.message}`,
+                            type: 'danger'
+                        });
+                    } else {
+                        alert(`Failed to update order: ${err.message}`);
+                    }
                 }
             };
 
             window.emailOrder = async function(orderId) {
                 const order = ordersState.find(o => o.id === orderId);
                 if (!order) { 
-                    await window.ModalUtils.alert({
-                        title: 'Order Not Found',
-                        message: 'The requested order could not be found.',
-                        type: 'warning'
-                    });
+                    if (window.ModalUtils && window.ModalUtils.alert) {
+                        await window.ModalUtils.alert({
+                            title: 'Order Not Found',
+                            message: 'The requested order could not be found.',
+                            type: 'warning'
+                        });
+                    } else {
+                        alert('Order not found');
+                    }
                     return; 
                 }
                 const recipient = 'purchasing@workshop.com';
