@@ -28,6 +28,15 @@
                 }
             })
             .catch(err => console.warn('Failed to load shared-theme.html:', err));
+        // Load shared modal utilities
+        fetch('shared-modals.html')
+            .then(r => r.text())
+            .then(html => {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                Array.from(temp.children).forEach(c => document.head.appendChild(c.cloneNode(true)));
+            })
+            .catch(err => console.warn('Failed to load shared-modals.html:', err));
         // Service Worker Registration for PWA
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
@@ -144,6 +153,20 @@
 
             window.updateOrderStatus = async function(orderId, status) {
                 try {
+                    const order = ordersState.find(o => o.id === orderId);
+                    const orderLabel = order ? `Order #${orderId}` : `Order #${orderId}`;
+                    const actionText = status === 'approved' ? 'approve' : 'reject';
+                    
+                    const confirmed = await window.ModalUtils.confirm({
+                        title: `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Order`,
+                        message: `Are you sure you want to ${actionText} ${orderLabel}?`,
+                        confirmText: actionText.charAt(0).toUpperCase() + actionText.slice(1),
+                        cancelText: 'Cancel',
+                        type: status === 'approved' ? 'success' : 'warning'
+                    });
+                    
+                    if (!confirmed) return;
+                    
                     const FN_BASE = window.FN_BASE || '/.netlify/functions';
                     const res = await fetch(`${FN_BASE}/orders`, {
                         method: 'PATCH',
@@ -151,16 +174,33 @@
                         body: JSON.stringify({ orderId, status })
                     });
                     if (!res.ok) throw new Error('Failed to update order');
-                    alert('Order #' + orderId + ' ' + (status === 'approved' ? 'approved' : 'rejected'));
+                    
+                    await window.ModalUtils.alert({
+                        title: 'Order Updated',
+                        message: `Order #${orderId} has been ${status === 'approved' ? 'approved' : 'rejected'}.`,
+                        type: 'success'
+                    });
+                    
                     await loadOrders();
                 } catch (err) {
-                    alert('Error: ' + err.message);
+                    await window.ModalUtils.alert({
+                        title: 'Error',
+                        message: `Failed to update order: ${err.message}`,
+                        type: 'danger'
+                    });
                 }
             };
 
-            window.emailOrder = function(orderId) {
+            window.emailOrder = async function(orderId) {
                 const order = ordersState.find(o => o.id === orderId);
-                if (!order) { alert('Order not found'); return; }
+                if (!order) { 
+                    await window.ModalUtils.alert({
+                        title: 'Order Not Found',
+                        message: 'The requested order could not be found.',
+                        type: 'warning'
+                    });
+                    return; 
+                }
                 const recipient = 'purchasing@workshop.com';
                 const createdAt = order.created_at ? new Date(order.created_at).toLocaleString() : '';
                 const items = (order.items || []).map(i => `- ${i.name}${i.code ? ' ('+i.code+')' : ''} x ${i.quantity}`).join('\n');

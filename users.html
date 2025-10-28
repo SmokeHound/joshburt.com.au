@@ -10,6 +10,10 @@
     <script src="./assets/js/init-shared.js" defer></script>
     <script src="./assets/js/audit.js" defer></script>
     <script>
+        // Load shared modal utilities
+        fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>document.head.appendChild(c.cloneNode(true)));});
+    </script>
+    <script>
         // Purge legacy role demo key to avoid stale UI state
         try { localStorage.removeItem('currentUser'); } catch (_) {}
     </script>
@@ -493,7 +497,27 @@ async function loadUsers(page = 1) {
         function editUser(id){ openEditModal(id); }
 
         // Delete user via backend API
-    async function deleteUser(id){ if(!confirm('Delete this user?')) return; const token=(window.getToken && window.getToken()) || null; try { const res=await fetch(`${FN_BASE}/users/${id}`, { method:'DELETE', headers: token?{ 'Authorization':`Bearer ${token}` }:{} }); if(!res.ok) throw new Error('Failed to delete user'); showToast('User deleted','success'); await loadUsers(1); } catch(err){ showToast('Error: '+err.message,'error'); } }
+    async function deleteUser(id){ 
+        const user = usersState.list.find(u => u.id == id);
+        const userName = user ? (user.name || user.email) : 'this user';
+        const confirmed = await window.ModalUtils.confirm({
+            title: 'Delete User',
+            message: `Are you sure you want to delete ${userName}? This action cannot be undone.`,
+            confirmText: 'Delete',
+            cancelText: 'Cancel',
+            type: 'danger'
+        });
+        if(!confirmed) return; 
+        const token=(window.getToken && window.getToken()) || null; 
+        try { 
+            const res=await fetch(`${FN_BASE}/users/${id}`, { method:'DELETE', headers: token?{ 'Authorization':`Bearer ${token}` }:{} }); 
+            if(!res.ok) throw new Error('Failed to delete user'); 
+            showToast('User deleted','success'); 
+            await loadUsers(1); 
+        } catch(err){ 
+            showToast('Error: '+err.message,'error'); 
+        } 
+    }
 
         // Cancel edit
         function cancelEdit(){ usersState.editingId=null; const form=document.getElementById('user-form'); form.reset(); form.querySelector('button[type="submit"]').textContent='Add User'; form.querySelector('h3').textContent='Add New User'; document.getElementById('cancel-edit').classList.add('hidden'); }
@@ -606,7 +630,31 @@ async function loadUsers(page = 1) {
                 if(e.target.classList.contains('delete-user')) { deleteUser(parseInt(id)); return; }
                 const token=(window.getToken && window.getToken()) || null;
                 if(e.target.classList.contains('lock-user')){ const u=usersState.list.find(x=>x.id==id); if(!u) return; try { const res=await fetch(`${FN_BASE}/users/${id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ is_active: !u.is_active }) }); if(!res.ok) throw new Error('Failed to update'); showToast(u.is_active?'User locked':'User unlocked','success'); await loadUsers(usersState.pagination.page); } catch(err){ showToast('Error: '+err.message,'error'); } return; }
-                if(e.target.classList.contains('reset-password-user')){ if(!confirm('Reset password for this user?')) return; try { const newPassword=Math.random().toString(36).slice(-10)+'A1!'; const res=await fetch(`${FN_BASE}/users/${id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ newPassword }) }); if(!res.ok) throw new Error('Failed to reset'); showToast('Temp password: '+newPassword,'success'); } catch(err){ showToast('Error: '+err.message,'error'); } return; }
+                if(e.target.classList.contains('reset-password-user')){ 
+                    const user = usersState.list.find(u => u.id == id);
+                    const userName = user ? (user.name || user.email) : 'this user';
+                    const confirmed = await window.ModalUtils.confirm({
+                        title: 'Reset Password',
+                        message: `Reset password for ${userName}? A temporary password will be generated.`,
+                        confirmText: 'Reset',
+                        cancelText: 'Cancel',
+                        type: 'warning'
+                    });
+                    if(!confirmed) return;
+                    try { 
+                        const newPassword=Math.random().toString(36).slice(-10)+'A1!'; 
+                        const res=await fetch(`${FN_BASE}/users/${id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ newPassword }) }); 
+                        if(!res.ok) throw new Error('Failed to reset'); 
+                        await window.ModalUtils.alert({
+                            title: 'Password Reset',
+                            message: `Temporary password for ${userName}:\n\n${newPassword}\n\nPlease save this password and share it securely with the user.`,
+                            type: 'success'
+                        });
+                    } catch(err){ 
+                        showToast('Error: '+err.message,'error'); 
+                    } 
+                    return; 
+                }
                 if(e.target.classList.contains('impersonate-user')){ showToast('Impersonation not implemented'); }
             });
         });

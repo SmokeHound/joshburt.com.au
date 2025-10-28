@@ -15,6 +15,7 @@
   <script>
     fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
     fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
+    fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>document.head.appendChild(c.cloneNode(true)));});
   </script>
   <style>
     /* Page-specific styles only (global theme and neon styles are in assets/css/styles.css) */
@@ -487,18 +488,31 @@
 
       
       // Action handlers
-      function clearAll() {
+      async function clearAll() {
         if (orderItems.length === 0) return;
         
-        if (confirm('Are you sure you want to clear all items from the order?')) {
+        const confirmed = await window.ModalUtils.confirm({
+          title: 'Clear Order',
+          message: `Are you sure you want to clear all ${orderItems.length} item(s) from the order?`,
+          confirmText: 'Clear All',
+          cancelText: 'Cancel',
+          type: 'warning'
+        });
+        
+        if (confirmed) {
           orderItems.length = 0;
           updateOrderDisplay();
+          showToast('Order cleared', 'info');
         }
       }
       
-      function saveOrder() {
+      async function saveOrder() {
         if (orderItems.length === 0) {
-          alert('No items to save');
+          await window.ModalUtils.alert({
+            title: 'No Items',
+            message: 'Please add items to your order before saving.',
+            type: 'warning'
+          });
           return;
         }
         
@@ -513,7 +527,11 @@
         };
         
         localStorage.setItem('oilOrderDraft', JSON.stringify(orderData));
-        alert('Order draft saved successfully!');
+        await window.ModalUtils.alert({
+          title: 'Order Saved',
+          message: 'Order draft saved successfully! You can load it later from the Load Draft button.',
+          type: 'success'
+        });
       }
       
       function loadSavedOrder() {
@@ -535,17 +553,25 @@
         }
       }
       
-      function printOrder() {
+      async function printOrder() {
         if (orderItems.length === 0) {
-          alert('No items to print');
+          await window.ModalUtils.alert({
+            title: 'No Items',
+            message: 'Please add items to your order before printing.',
+            type: 'warning'
+          });
           return;
         }
         window.print();
       }
       
-      function emailOrder() {
+      async function emailOrder() {
         if (orderItems.length === 0) {
-          alert('No items to email');
+          await window.ModalUtils.alert({
+            title: 'No Items',
+            message: 'Please add items to your order before emailing.',
+            type: 'warning'
+          });
           return;
         }
         

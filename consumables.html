@@ -12,6 +12,9 @@
     // Purge legacy role demo key to avoid stale UI state
     try { localStorage.removeItem('currentUser'); } catch (_) {}
   </script>
+  <script>
+    fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>document.head.appendChild(c.cloneNode(true)));});
+  </script>
   <style>
     /* Page-specific styles only */
     .consumable-item {transition:all .2s ease;background-color:#111;border:1px solid #333}
@@ -463,10 +466,18 @@
 
       
       // Action handlers
-      function clearAll() {
+      async function clearAll() {
         if (orderItems.length === 0) return;
         
-        if (confirm('Are you sure you want to clear all items from the order?')) {
+        const confirmed = await window.ModalUtils.confirm({
+          title: 'Clear Order',
+          message: `Are you sure you want to clear all ${orderItems.length} item(s) from the order?`,
+          confirmText: 'Clear All',
+          cancelText: 'Cancel',
+          type: 'warning'
+        });
+        
+        if (confirmed) {
           orderItems.length = 0;
           updateOrderDisplay();
           showToast('Order cleared successfully', 'info');
@@ -474,9 +485,13 @@
         }
       }
       
-      function saveOrder() {
+      async function saveOrder() {
         if (orderItems.length === 0) {
-          showToast('No items to save', 'warning');
+          await window.ModalUtils.alert({
+            title: 'No Items',
+            message: 'Please add items to your order before saving.',
+            type: 'warning'
+          });
           return;
         }
         const orderData = {

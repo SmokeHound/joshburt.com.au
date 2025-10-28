@@ -1,0 +1,338 @@
+<!-- Shared Modal Utilities and Styles -->
+<style>
+  /* Base Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease-out;
+  }
+  .modal-overlay.hidden {
+    display: none;
+  }
+  .modal-content {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+    z-index: 9999;
+    animation: slideUp 0.3s ease-out;
+  }
+  .modal-content.modal-sm {
+    max-width: 400px;
+  }
+  .modal-content.modal-lg {
+    max-width: 800px;
+  }
+  .modal-content.modal-xl {
+    max-width: 1200px;
+  }
+  .modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-body {
+    padding: 1.5rem;
+  }
+  .modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    transition: all 0.2s;
+  }
+  .modal-close:hover {
+    background: #333;
+    color: #fff;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Confirmation Modal Specific */
+  .modal-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+  }
+  .modal-icon-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+  }
+  .modal-icon-warning {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+  }
+  .modal-icon-info {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+  }
+  .modal-icon-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+  }
+</style>
+
+<script>
+// Global Modal Utilities
+(function() {
+  'use strict';
+  
+  window.ModalUtils = {
+    // Show a confirmation dialog
+    confirm: function(options) {
+      return new Promise((resolve) => {
+        const defaults = {
+          title: 'Confirm Action',
+          message: 'Are you sure you want to proceed?',
+          confirmText: 'Confirm',
+          cancelText: 'Cancel',
+          type: 'warning', // danger, warning, info, success
+          onConfirm: null,
+          onCancel: null
+        };
+        const config = Object.assign({}, defaults, options);
+        
+        // Create modal HTML
+        const modalId = 'confirm-modal-' + Date.now();
+        const iconMap = {
+          danger: '⚠️',
+          warning: '⚠️',
+          info: 'ℹ️',
+          success: '✓'
+        };
+        
+        const modal = document.createElement('div');
+        modal.id = modalId;
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+          <div class="modal-content modal-sm">
+            <div class="modal-header">
+              <h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>
+              <button class="modal-close" data-action="cancel" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+              <div class="modal-icon modal-icon-${config.type}">
+                ${iconMap[config.type] || '?'}
+              </div>
+              <p class="text-gray-300">${config.message}</p>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-neon-green px-4 py-2 rounded" data-action="cancel">${config.cancelText}</button>
+              <button class="btn-neon-blue px-4 py-2 rounded" data-action="confirm">${config.confirmText}</button>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Handle actions
+        const handleAction = (action) => {
+          const result = action === 'confirm';
+          modal.remove();
+          if (result && config.onConfirm) config.onConfirm();
+          if (!result && config.onCancel) config.onCancel();
+          resolve(result);
+        };
+        
+        modal.querySelectorAll('[data-action]').forEach(btn => {
+          btn.addEventListener('click', (e) => handleAction(e.target.dataset.action));
+        });
+        
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) handleAction('cancel');
+        });
+        
+        // Close on Escape
+        const escHandler = (e) => {
+          if (e.key === 'Escape') {
+            document.removeEventListener('keydown', escHandler);
+            handleAction('cancel');
+          }
+        };
+        document.addEventListener('keydown', escHandler);
+        
+        // Focus confirm button
+        setTimeout(() => {
+          const confirmBtn = modal.querySelector('[data-action="confirm"]');
+          if (confirmBtn) confirmBtn.focus();
+        }, 100);
+      });
+    },
+    
+    // Show an alert/info modal
+    alert: function(options) {
+      return new Promise((resolve) => {
+        const defaults = {
+          title: 'Information',
+          message: '',
+          okText: 'OK',
+          type: 'info'
+        };
+        const config = Object.assign({}, defaults, options);
+        
+        const modalId = 'alert-modal-' + Date.now();
+        const iconMap = {
+          danger: '⚠️',
+          warning: '⚠️',
+          info: 'ℹ️',
+          success: '✓'
+        };
+        
+        const modal = document.createElement('div');
+        modal.id = modalId;
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+          <div class="modal-content modal-sm">
+            <div class="modal-header">
+              <h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>
+              <button class="modal-close" data-action="ok" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+              <div class="modal-icon modal-icon-${config.type}">
+                ${iconMap[config.type] || 'ℹ️'}
+              </div>
+              <p class="text-gray-300">${config.message}</p>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-neon-blue px-4 py-2 rounded" data-action="ok">${config.okText}</button>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const handleClose = () => {
+          modal.remove();
+          resolve();
+        };
+        
+        modal.querySelectorAll('[data-action="ok"]').forEach(btn => {
+          btn.addEventListener('click', handleClose);
+        });
+        
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) handleClose();
+        });
+        
+        const escHandler = (e) => {
+          if (e.key === 'Escape') {
+            document.removeEventListener('keydown', escHandler);
+            handleClose();
+          }
+        };
+        document.addEventListener('keydown', escHandler);
+        
+        setTimeout(() => {
+          const okBtn = modal.querySelector('[data-action="ok"]');
+          if (okBtn) okBtn.focus();
+        }, 100);
+      });
+    },
+    
+    // Create a custom modal
+    create: function(options) {
+      const defaults = {
+        title: '',
+        content: '',
+        size: 'md', // sm, md, lg, xl
+        showClose: true,
+        onClose: null
+      };
+      const config = Object.assign({}, defaults, options);
+      
+      const modalId = 'custom-modal-' + Date.now();
+      const modal = document.createElement('div');
+      modal.id = modalId;
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `
+        <div class="modal-content modal-${config.size}">
+          ${config.title ? `
+            <div class="modal-header">
+              <h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>
+              ${config.showClose ? '<button class="modal-close" data-action="close" aria-label="Close">&times;</button>' : ''}
+            </div>
+          ` : ''}
+          <div class="modal-body">
+            ${config.content}
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      const close = () => {
+        modal.remove();
+        if (config.onClose) config.onClose();
+      };
+      
+      if (config.showClose) {
+        modal.querySelectorAll('[data-action="close"]').forEach(btn => {
+          btn.addEventListener('click', close);
+        });
+        
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) close();
+        });
+        
+        const escHandler = (e) => {
+          if (e.key === 'Escape') {
+            document.removeEventListener('keydown', escHandler);
+            close();
+          }
+        };
+        document.addEventListener('keydown', escHandler);
+      }
+      
+      return {
+        element: modal,
+        close: close
+      };
+    }
+  };
+})();
+</script>

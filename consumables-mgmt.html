@@ -11,6 +11,7 @@
   <script>
     fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName))document.head.appendChild(c.cloneNode(true));});});
     fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT')document.head.appendChild(c.cloneNode(true));});});
+    fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>document.head.appendChild(c.cloneNode(true)));});
   </script>
   <!-- ThemeManager from shared-theme.html handles color/theme application -->
   <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
@@ -174,10 +175,14 @@ function renderCategories() {
     </li>
   `).join('');
 }
-categoryForm.onsubmit = function(e) {
+categoryForm.onsubmit = async function(e) {
   e.preventDefault();
   // Adding a category is done by creating a product with a new category
-  alert('To add a new category, create a product with the new category name.');
+  await window.ModalUtils.alert({
+    title: 'Add Category',
+    message: 'To add a new category, create a product with the new category name. Categories are automatically created when you add a product with a new category.',
+    type: 'info'
+  });
   newCategoryInput.value = '';
 };
 manageCategoriesBtn.onclick = async function() {
@@ -279,9 +284,17 @@ syncInventoryBtn.onclick = async function() {
     saveProducts();
     renderProducts();
     await addAuditLog('Sync', null, `Synced ${products.length} consumables from database`);
-    alert('Consumables inventory synced successfully!');
+    await window.ModalUtils.alert({
+      title: 'Sync Complete',
+      message: `Successfully synced ${products.length} consumables from the database.`,
+      type: 'success'
+    });
   } catch (err) {
-    alert('Failed to sync consumables: ' + (err.message || err));
+    await window.ModalUtils.alert({
+      title: 'Sync Failed',
+      message: `Failed to sync consumables: ${err.message || err}`,
+      type: 'danger'
+    });
     await addAuditLog('Sync Failed', null, err.message || String(err));
   } finally {
     syncInventoryBtn.disabled = false;
@@ -320,7 +333,7 @@ exportBtn.onclick = exportProductsCSV;
 // --- CSV Import ---
 function importProductsCSV(file) {
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = async function(e) {
     const text = e.target.result;
     const lines = text.split(/\r?\n/).filter(Boolean);
     if (lines.length < 2) return;
@@ -343,7 +356,11 @@ function importProductsCSV(file) {
     saveProducts();
     renderProducts();
     addAuditLog('Import', null, `Imported ${imported.length} consumables from CSV`);
-    alert('Consumables imported successfully!');
+    await window.ModalUtils.alert({
+      title: 'Import Complete',
+      message: `Successfully imported ${imported.length} consumables from CSV file.`,
+      type: 'success'
+    });
   };
   reader.readAsText(file);
 }
