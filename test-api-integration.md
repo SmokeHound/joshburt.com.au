@@ -105,7 +105,9 @@ productsContainer.innerHTML = `
    - Deploy site
 
 3. **Testing**:
-   - Verify products load on oil.html page
+      - Check analytics data loads correctly
+   - Verify products load on oil-products.html page
+   - Check orders data loads correctly
    - Test order submission functionality
    - Confirm orders appear in Neon DB
 

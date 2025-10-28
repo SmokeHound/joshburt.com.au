@@ -71,7 +71,7 @@ class AnalyticsDataManager {
   generatePageViewData(days) {
     const pages = [
       { path: '/index.html', name: 'Home', weight: 0.4 },
-      { path: '/oil.html', name: 'Oil Orders', weight: 0.25 },
+      { path: '/oil-products.html', name: 'Oil Orders', weight: 0.25 },
       { path: '/analytics.html', name: 'Analytics', weight: 0.15 },
       { path: '/administration.html', name: 'Administration', weight: 0.08 },
       { path: '/users.html', name: 'User Management', weight: 0.07 },
@@ -388,7 +388,7 @@ class AnalyticsDataManager {
   getPageName(path) {
     const pageNames = {
       '/index.html': 'Home',
-      '/oil.html': 'Oil Orders',
+      '/oil-products.html': 'Oil Orders',
       '/analytics.html': 'Analytics',
       '/administration.html': 'Administration',
       '/users.html': 'User Management',

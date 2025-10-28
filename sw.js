@@ -9,7 +9,7 @@ const urlsToCache = [
   '/administration.html',
   '/analytics.html',
   '/login.html', 
-  '/oil.html',
+  '/oil-products.html',
   '/settings.html',
   '/users.html',
   '/shared-config.html',

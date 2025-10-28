@@ -8,7 +8,7 @@ describe('Page header utility presence', () => {
     'analytics.html',
     'audit-logs.html',
     'consumables.html',
-    'oil.html',
+    'oil-products.html',
     'profile.html',
     'settings.html',
     'shared-dashboards.html',

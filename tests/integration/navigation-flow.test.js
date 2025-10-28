@@ -14,7 +14,7 @@ describe('Navigation & Shared Components Integration', () => {
       'administration.html',
       'analytics.html',
       'settings.html',
-      'oil.html',
+      'oil-products.html',
       'consumables.html'
     ];
 

@@ -52,7 +52,7 @@ ALWAYS manually validate changes by running through these complete end-to-end sc
    - As before
 
 2. **Oil Ordering System Test** (dynamic):
-   - Navigate to oil.html and test product API (`/.netlify/functions/products`)
+   - Navigate to oil-products.html and test product API (`/.netlify/functions/products`)
    - Add product, view, and order via serverless endpoints
 
 3. **Admin Dashboard & User Management**:
@@ -94,7 +94,7 @@ Two deployment workflows are configured:
 │   └── workflows/
 │       └── main.yml      # FTP deployment
 ├── index.html           # Main homepage
-├── oil.html             # Castrol oil ordering system
+├── oil-products.html    # Castrol oil ordering system
 ├── administration.html  # Administration dashboard
 ├── analytics.html       # Analytics page
 ├── settings.html        # Settings configuration
@@ -108,7 +108,7 @@ Two deployment workflows are configured:
 
 ### Key Files Reference
 - **index.html**: Main website template
-- **oil.html**: Castrol product ordering (uses API)
+- **oil-products.html**: Castrol product ordering (uses API)
 - **.netlify/functions/**: Serverless API endpoints (products, orders, users, auth, consumables, categories, audit logs, inventory, settings, health)
 - **config/database.js**: Database abstraction
 

@@ -27,7 +27,7 @@ Created a new shared utility file with:
 - ✅ Delete product confirmation modal with product details
 - **Result:** Prevents accidental deletions, shows what's being deleted
 
-### 4. Oil Ordering System (`oil.html`)
+### 4. Oil Ordering System (`oil-products.html`)
 **Changes:**
 - ✅ Clear cart confirmation modal with item count
 - ✅ Save order success modal with instructions
@@ -115,7 +115,7 @@ const modal = window.ModalUtils.create({
 1. `shared-modals.html` - NEW
 2. `users.html`
 3. `oil-products-mgmt.html`
-4. `oil.html`
+4. `oil-products.html`
 5. `consumables.html`
 6. `consumables-mgmt.html`
 7. `orders-review.html`

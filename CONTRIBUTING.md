@@ -36,7 +36,7 @@ Welcome to the joshburt.com.au project! This is a dynamic website and API with a
 ├── users.html              # User management
 ├── analytics.html          # Analytics page
 ├── settings.html           # Settings configuration
-├── oil.html                # Oil ordering system
+├── oil-products.html       # Oil ordering system
 ├── consumables.html        # Consumables order request (for staff)
 ├── consumables-mgmt.html   # Consumables product list management (admin/staff CRUD)
 ├── login.html              # Login page
