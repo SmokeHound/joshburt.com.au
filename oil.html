@@ -64,7 +64,7 @@
         <div class="flex flex-wrap gap-2 mt-2 md:mt-0 no-print">
           <button id="clearAllBtn" class="btn-neon-pink px-4 py-2 rounded-lg font-semibold">Clear All</button>
           <button id="saveOrderBtn" class="btn-neon-green px-4 py-2 rounded-lg font-semibold">Save Draft</button>
-          <button id="printOrderBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Print Order</button>
+          <button id="manageProductsBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Manage Products</button>
           <button id="emailOrderBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Email Order</button>
         </div>
       </div>
@@ -553,16 +553,8 @@
         }
       }
       
-      async function printOrder() {
-        if (orderItems.length === 0) {
-          await window.ModalUtils.alert({
-            title: 'No Items',
-            message: 'Please add items to your order before printing.',
-            type: 'warning'
-          });
-          return;
-        }
-        window.print();
+      function manageProducts() {
+        window.location.href = 'oil-products-management.html';
       }
       
       async function emailOrder() {
@@ -638,7 +630,7 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
   // Event listeners
       document.getElementById('clearAllBtn').addEventListener('click', clearAll);
       document.getElementById('saveOrderBtn').addEventListener('click', saveOrder);
-      document.getElementById('printOrderBtn').addEventListener('click', printOrder);
+      document.getElementById('manageProductsBtn').addEventListener('click', manageProducts);
       document.getElementById('emailOrderBtn').addEventListener('click', emailOrder);
       
   // Submit order to API
