@@ -13,13 +13,12 @@ This is a modern, production-ready website for joshburt.com.au featuring a modul
 ## ✨ Features
 - **Modular Components**: Reusable shared components for navigation, theming, and configuration
 - **Responsive Design**: Mobile-first approach with TailwindCSS v4
-- **Dark/Light Mode**: Persistent theme switching (settings stored in database, not localStorage)
 - **Feature Flags**: Toggleable features (Beta Features, New Dashboard, Advanced Reports) - see [FEATURE_FLAGS.md](FEATURE_FLAGS.md)
 - **Testing Suite**: Unit and integration tests with Jest
 - **CI/CD Pipeline**: Automated testing, linting, and deployment
 - **Admin Dashboard**: User management, analytics, and site settings (fully database-driven)
 - **Oil Ordering System**: Dynamic Castrol product ordering (API-driven, CSV export)
-- **API Backend**: Serverless-only (Netlify Functions) with PostgreSQL / SQLite abstraction (legacy Express layer removed)
+- **API Backend**: Serverless-only (Netlify Functions) with PostgreSQL / SQLite abstraction
 - **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
 
 ## ⚙️ Site Settings (Database-Backed)
@@ -31,7 +30,7 @@ All site settings are now stored in the database and managed via the admin dashb
 -- **Branding & Contact**
 	- `siteTitle`, `siteDescription`, `logoUrl`, `faviconUrl`, `contactEmail`
 - **Theme**
-This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The backend has been fully migrated to Netlify Functions (serverless) – legacy Express server code has been removed.
+This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The backend has been fully migrated to Netlify Functions (serverless). 
 - **Feature Toggles**
 	- `maintenanceMode`, `enableRegistration`, `enableGuestCheckout`
 - **API Backend**: Netlify Functions (serverless) with PostgreSQL / SQLite abstraction
