@@ -33,10 +33,12 @@ body {
   transform: translateX(-100%);
   background-color: #111111;
   border-right: 1px solid #00d4ff20;
+  pointer-events: none; /* Prevent click interception when closed */
 }
 
 .sidebar.open {
   transform: translateX(0);
+  pointer-events: auto; /* Re-enable clicks when open */
 }
 
 @media (min-width: 768px) {
