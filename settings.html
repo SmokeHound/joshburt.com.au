@@ -140,6 +140,47 @@
                   </fieldset>
                 </div>
 
+                <!-- Features Section -->
+                <div class="card widget-secondary p-8 rounded-xl border border-yellow-500/20 shadow-xl hover:border-yellow-500/40 transition-all duration-300">
+                  <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center shadow-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="text-2xl font-bold text-white">Features</h3>
+                      <p class="text-sm text-gray-400 mt-1">Enable or disable site features and toggles</p>
+                    </div>
+                  </div>
+                  <fieldset class="space-y-4">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Feature Flags -->
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input type="checkbox" id="feature-beta-features" class="w-5 h-5" />
+                      <span class="text-sm font-medium text-gray-200">Enable Beta Features</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input type="checkbox" id="feature-new-dashboard" class="w-5 h-5" />
+                      <span class="text-sm font-medium text-gray-200">Enable New Dashboard</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input type="checkbox" id="feature-advanced-reports" class="w-5 h-5" />
+                      <span class="text-sm font-medium text-gray-200">Enable Advanced Reports</span>
+                    </label>
+                    <!-- Feature Toggles (moved here) -->
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input type="checkbox" id="enable-registration" class="w-5 h-5" />
+                      <span class="text-sm font-medium text-gray-200">Enable User Registration</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input type="checkbox" id="enable-guest-checkout" class="w-5 h-5" />
+                      <span class="text-sm font-medium text-gray-200">Enable Guest Checkout</span>
+                    </label>
+                  </div>
+                  </fieldset>
+                </div>
+
                 <!-- SMTP Configuration Section -->
                 <div class="card widget-secondary p-8 rounded-xl border border-green-500/20 shadow-xl hover:border-green-500/40 transition-all duration-300">
                   <details class="group">
@@ -251,20 +292,24 @@
                   </fieldset>
                 </div>
 
-                <!-- Data Sources Section -->
+                <!-- Data Sources Section (Collapsible) -->
                 <div class="card widget-secondary p-8 rounded-xl border border-cyan-400/20 shadow-xl hover:border-cyan-400/40 transition-all duration-300">
-                  <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-4">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-500 flex items-center justify-center shadow-lg">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                  <details class="group">
+                    <summary class="cursor-pointer font-bold text-xl flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-500 flex items-center justify-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                        </svg>
+                      </div>
+                      <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-white">Data Sources</h3>
+                        <p class="text-sm text-gray-400 mt-1 font-normal">Configure data source preferences</p>
+                      </div>
+                      <svg class="w-6 h-6 text-gray-400 group-open:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                       </svg>
-                    </div>
-                    <div>
-                      <h3 class="text-2xl font-bold text-white">Data Sources</h3>
-                      <p class="text-sm text-gray-400 mt-1">Configure data source preferences</p>
-                    </div>
-                  </div>
-                  <fieldset class="space-y-4">
+                    </summary>
+                  <fieldset class="space-y-4 mt-6">
                   <div class="grid gap-6 md:grid-cols-2">
                     <div class="p-6 rounded-xl bg-gray-800/30 border border-gray-700/50">
                       <label for="oil-data-source" class="block mb-3 font-bold text-gray-300">Oil Products Data Source</label>
@@ -284,6 +329,7 @@
                     </div>
                   </div>
                   </fieldset>
+                  </details>
                 </div>
 
                 <!-- Advanced Section -->
