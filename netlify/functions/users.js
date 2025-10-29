@@ -5,6 +5,7 @@ const { corsHeaders, parseBody, requireAuth, requirePermission } = require('../.
 const { getPagination, withHandler, ok, error } = require('../../utils/fn');
 const { validatePassword } = require('../../utils/password');
 const { isValidRole, hasPermission } = require('../../utils/rbac');
+const { logAudit } = require('../../utils/audit');
 
 let dbInitialized = false;
 exports.handler = withHandler(async (event) => {
@@ -99,6 +100,7 @@ exports.handler = withHandler(async (event) => {
         const hash = await bcrypt.hash(password, rounds);
         const result = await database.run('INSERT INTO users (email, name, password_hash, role, email_verified) VALUES (?, ?, ?, ?, ?)', [email, name, hash, role, 1]);
         const newUser = await database.get('SELECT id, email, name, role, is_active, email_verified, created_at FROM users WHERE id = ?', [result.id]);
+        await logAudit(event, { action: 'user.create', userId: user.id, details: { targetUserId: result.id, email, name, role } });
         return ok({ message: 'User created successfully', user: newUser }, 201);
       }
       return error(405, 'Method not allowed');
@@ -151,6 +153,11 @@ exports.handler = withHandler(async (event) => {
       updates.push('updated_at = CURRENT_TIMESTAMP'); values.push(id);
       await database.run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, values);
       const updated = await database.get('SELECT id, email, name, role, is_active, email_verified, updated_at FROM users WHERE id = ?', [id]);
+      const auditDetails = { targetUserId: id };
+      if (name !== undefined) auditDetails.name = name;
+      if (role !== undefined) auditDetails.role = role;
+      if (is_active !== undefined) auditDetails.is_active = is_active;
+      await logAudit(event, { action: 'user.update', userId: user.id, details: auditDetails });
       return ok({ message: 'User updated successfully', user: updated });
     }
     if (method === 'DELETE') {
@@ -158,10 +165,11 @@ exports.handler = withHandler(async (event) => {
       if (authResponse) return authResponse;
       
       if (user.id === id) return error(400, 'Cannot delete your own account');
-      const exists = await database.get('SELECT id FROM users WHERE id = ?', [id]);
+      const exists = await database.get('SELECT id, email FROM users WHERE id = ?', [id]);
       if (!exists) return error(404, 'User not found');
       await database.run('DELETE FROM refresh_tokens WHERE user_id = ?', [id]);
       await database.run('DELETE FROM users WHERE id = ?', [id]);
+      await logAudit(event, { action: 'user.delete', userId: user.id, details: { targetUserId: id, email: exists.email } });
       return ok({ message: 'User deleted successfully' });
     }
     // Password change: not implemented
