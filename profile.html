@@ -14,33 +14,96 @@
     <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
     <div id="main-nav"></div>
     <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
-    <main class="max-w-2xl mx-auto p-6 md:ml-64">
-        <header class="page-header card border">
-          <h1 class="text-2xl font-bold">My Profile</h1>
+    <main class="max-w-4xl mx-auto p-6 md:ml-64">
+        <header class="page-header card border mb-6">
+          <h1 class="text-3xl font-bold flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="8" r="4" stroke-width="1.5"></circle>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 21c0-3.3 2.7-6 6-6s6 2.7 6 6"></path>
+            </svg>
+            My Profile
+          </h1>
         </header>
-        <form id="profile-form" class="card widget-primary rounded-lg shadow-md p-6 flex flex-col gap-4">
-            <div class="flex items-center gap-4">
-                <img id="profile-avatar" src="https://via.placeholder.com/80" alt="Avatar" class="w-20 h-20 rounded-full border border-gray-700">
-                <input type="file" id="avatar-upload" accept="image/*" class="hidden">
-                <button type="button" id="change-avatar" class="btn-neon-blue px-3 py-1 rounded">Change Avatar</button>
+        
+        <!-- Profile Overview Card -->
+        <div class="card widget-primary rounded-lg shadow-md p-6 mb-6">
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+                <div class="flex flex-col items-center gap-3">
+                    <img id="profile-avatar" src="https://via.placeholder.com/120" alt="Avatar" class="w-32 h-32 rounded-full border-4 border-blue-500 shadow-lg">
+                    <input type="file" id="avatar-upload" accept="image/*" class="hidden">
+                    <button type="button" id="change-avatar" class="btn-neon-blue px-4 py-2 rounded text-sm">Change Avatar</button>
+                </div>
+                <div class="flex-1 text-center md:text-left">
+                    <h2 id="profile-display-name" class="text-2xl font-bold mb-2">Loading...</h2>
+                    <p id="profile-display-email" class="text-gray-400 mb-3">Loading...</p>
+                    <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+                        <span id="profile-role-badge" class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-600 text-white">User</span>
+                        <span id="profile-status-badge" class="px-3 py-1 rounded-full text-sm font-semibold bg-green-600 text-white">Active</span>
+                        <span id="profile-member-since" class="px-3 py-1 rounded-full text-sm bg-gray-700 text-gray-300">Member since: Loading...</span>
+                    </div>
+                </div>
             </div>
-            <label>
-                Name
-                <input type="text" id="profile-name" class="w-full p-2 rounded border border-gray-600 bg-gray-900 text-white" />
+        </div>
+
+        <!-- Profile Edit Form -->
+        <form id="profile-form" class="card widget-primary rounded-lg shadow-md p-6 flex flex-col gap-6 mb-6">
+            <h3 class="text-xl font-semibold border-b border-gray-700 pb-2">Edit Profile Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold text-gray-300">Name</span>
+                    <input type="text" id="profile-name" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter your name" />
+                </label>
+                <label class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold text-gray-300">Email</span>
+                    <input type="email" id="profile-email" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-gray-500 cursor-not-allowed" disabled />
+                </label>
+            </div>
+            <label class="flex flex-col gap-2">
+                <span class="text-sm font-semibold text-gray-300">Change Password</span>
+                <input type="password" id="profile-password" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Leave blank to keep current password" />
+                <span class="text-xs text-gray-400">Leave this field empty if you don't want to change your password</span>
             </label>
-            <label>
-                Email
-                <input type="email" id="profile-email" class="w-full p-2 rounded border border-gray-600 bg-gray-900 text-white" disabled />
-            </label>
-            <label>
-                New Password
-                <input type="password" id="profile-password" class="w-full p-2 rounded border border-gray-600 bg-gray-900 text-white" placeholder="Leave blank to keep current" />
-            </label>
-            <button type="submit" class="btn-neon-green px-4 py-2 rounded">Save Changes</button>
+            <div class="flex gap-3">
+                <button type="submit" class="btn-neon-green px-6 py-3 rounded font-semibold flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save Changes
+                </button>
+                <button type="button" id="cancel-edit" class="px-6 py-3 rounded font-semibold bg-gray-700 hover:bg-gray-600 text-white transition">Cancel</button>
+            </div>
         </form>
-        <section class="mt-8">
-            <h2 class="text-xl font-semibold mb-4">Activity Log</h2>
-            <ul id="activity-log" class="card rounded-lg shadow-md p-4 text-sm space-y-2"></ul>
+
+        <!-- Account Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="card rounded-lg shadow-md p-4 text-center">
+                <div class="text-3xl font-bold text-blue-500" id="stats-orders">0</div>
+                <div class="text-sm text-gray-400">Total Orders</div>
+            </div>
+            <div class="card rounded-lg shadow-md p-4 text-center">
+                <div class="text-3xl font-bold text-green-500" id="stats-logins">0</div>
+                <div class="text-sm text-gray-400">Login Count</div>
+            </div>
+            <div class="card rounded-lg shadow-md p-4 text-center">
+                <div class="text-3xl font-bold text-purple-500" id="stats-activities">0</div>
+                <div class="text-sm text-gray-400">Activities</div>
+            </div>
+        </div>
+
+        <!-- Activity Log Section -->
+        <section class="card rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
+                <h2 class="text-xl font-semibold flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Recent Activity
+                </h2>
+                <span id="activity-count" class="text-sm text-gray-400">0 activities</span>
+            </div>
+            <div id="activity-log" class="space-y-2 max-h-96 overflow-y-auto">
+                <div class="text-center text-gray-400 py-8">Loading activity log...</div>
+            </div>
         </section>
     </main>
     <script src="./assets/js/profile.js"></script>
