@@ -37,47 +37,47 @@
       </script>
 
       <!-- Main -->
-      <main class="flex-1 p-4 md:p-6">
+      <main class="flex-1 p-4 md:p-6 md:ml-64">
         <!-- Page Header with Icon -->
-        <header class="page-header card border mb-6">
+        <header class="page-header card border mb-8 shadow-xl">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
             <div>
-              <h2 class="text-3xl font-bold text-white">Site Settings</h2>
-              <p class="text-lg mt-1 nav-link-muted">Configure appearance, behavior, and preferences</p>
+              <h2 class="text-4xl font-bold text-white">Site Settings</h2>
+              <p class="text-lg mt-2 nav-link-muted">Configure appearance, behavior, and preferences</p>
             </div>
           </div>
         </header>
 
         <!-- Settings Section: Neon theme, accessible, organized -->
-        <section class="space-y-6">
-          <!-- Tabs Navigation: simplified to remove extra empty space under tabs -->
-          <nav class="mb-2" aria-label="Settings Tabs">
-            <div class="flex border-b border-gray-700">
-              <button class="tab-btn px-6 py-3 font-semibold text-white bg-blue-600 border-b-2 border-blue-400 transition-all" data-tab="general" aria-controls="general-tab">
-                <span class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <section class="space-y-8">
+          <!-- Tabs Navigation: Enhanced with better styling -->
+          <nav class="mb-6" aria-label="Settings Tabs">
+            <div class="flex border-b-2 border-gray-700/50 rounded-t-lg overflow-hidden shadow-md">
+              <button class="tab-btn px-8 py-4 font-bold text-white bg-gradient-to-br from-blue-600 to-blue-700 border-b-4 border-blue-400 transition-all duration-300 hover:shadow-lg" data-tab="general" aria-controls="general-tab">
+                <span class="flex items-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                   </svg>
                   General
                 </span>
               </button>
-              <button class="tab-btn px-6 py-3 font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition-all" data-tab="theme" aria-controls="theme-tab">
-                <span class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button class="tab-btn px-8 py-4 font-bold text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-300" data-tab="theme" aria-controls="theme-tab">
+                <span class="flex items-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                   </svg>
                   Theme
                 </span>
               </button>
-              <button class="tab-btn px-6 py-3 font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition-all" data-tab="security" aria-controls="security-tab">
-                <span class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button class="tab-btn px-8 py-4 font-bold text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-300" data-tab="security" aria-controls="security-tab">
+                <span class="flex items-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                   Security
@@ -87,86 +87,92 @@
           </nav>
 
           <!-- General Settings Panel -->
-          <div id="general-tab" class="tab-panel card widget-primary rounded-lg border border-gray-700 shadow-lg p-6 md:p-8">
-              <form id="settings-form" class="space-y-8" autocomplete="off">
+          <div id="general-tab" class="tab-panel card widget-primary rounded-xl border border-gray-700/50 shadow-2xl p-8 md:p-10 backdrop-blur-sm">
+              <form id="settings-form" class="space-y-10" autocomplete="off">
                 <!-- Core Identity Section -->
-                <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
-                  <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="card widget-secondary p-8 rounded-xl border border-blue-500/20 shadow-xl hover:border-blue-500/40 transition-all duration-300">
+                  <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-white">Core Identity</h3>
+                    <div>
+                      <h3 class="text-2xl font-bold text-white">Core Identity</h3>
+                      <p class="text-sm text-gray-400 mt-1">Basic site information and branding</p>
+                    </div>
                   </div>
                   <fieldset class="space-y-6">
                   <div class="grid gap-6 md:grid-cols-2">
                     <div class="col-span-2 md:col-span-1">
-                      <label for="site-title" class="block mb-1 font-semibold">Site Title <span class="text-xs text-gray-500" id="site-title-count"></span></label>
-                      <input id="site-title" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="Josh's App" />
+                      <label for="site-title" class="block mb-2 font-bold text-gray-300">Site Title <span class="text-xs text-gray-500 font-normal" id="site-title-count"></span></label>
+                      <input id="site-title" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" maxlength="100" placeholder="Josh's App" />
                     </div>
                     <div class="col-span-2 md:col-span-1">
-                      <label for="contact-email" class="block mb-1 font-semibold">Contact Email</label>
-                      <input id="contact-email" type="email" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" placeholder="admin@example.com" />
+                      <label for="contact-email" class="block mb-2 font-bold text-gray-300">Contact Email</label>
+                      <input id="contact-email" type="email" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" placeholder="admin@example.com" />
                     </div>
                     <div class="col-span-2">
-                      <label for="site-description" class="block mb-1 font-semibold">Site Description <span class="text-xs text-gray-500" id="site-description-count"></span></label>
-                      <textarea id="site-description" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" rows="3" maxlength="500" placeholder="Responsive website template with admin features"></textarea>
+                      <label for="site-description" class="block mb-2 font-bold text-gray-300">Site Description <span class="text-xs text-gray-500 font-normal" id="site-description-count"></span></label>
+                      <textarea id="site-description" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" rows="4" maxlength="500" placeholder="Responsive website template with admin features"></textarea>
                     </div>
                     <div>
-                      <label for="logo-url" class="block mb-1 font-semibold">Logo URL</label>
-                      <input id="logo-url" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="300" placeholder="https://example.com/logo.png" />
-                      <div class="mt-2 h-12 flex items-center gap-4" id="logo-preview-wrapper">
-                        <img id="logo-preview" alt="Logo preview" class="h-12 w-auto hidden border border-gray-700 rounded p-1 bg-gray-900" />
-                        <button type="button" id="logo-test" class="text-xs px-3 py-1 rounded bg-gray-800 hover:bg-gray-700 border border-gray-600">Preview</button>
+                      <label for="logo-url" class="block mb-2 font-bold text-gray-300">Logo URL</label>
+                      <input id="logo-url" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" maxlength="300" placeholder="https://example.com/logo.png" />
+                      <div class="mt-3 h-12 flex items-center gap-4" id="logo-preview-wrapper">
+                        <img id="logo-preview" alt="Logo preview" class="h-12 w-auto hidden border-2 border-gray-700 rounded-lg p-1 bg-gray-900/50" />
+                        <button type="button" id="logo-test" class="text-sm px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-600 transition-all duration-200">Preview</button>
                       </div>
                     </div>
                     <div>
-                      <label for="favicon-url" class="block mb-1 font-semibold">Favicon URL</label>
-                      <input id="favicon-url" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="300" placeholder="https://example.com/favicon.ico" />
-                      <div class="mt-2 flex items-center gap-4" id="favicon-preview-wrapper">
-                        <img id="favicon-preview" alt="Favicon preview" class="h-10 w-10 hidden border border-gray-700 rounded p-1 bg-gray-900" />
-                        <button type="button" id="favicon-test" class="text-xs px-3 py-1 rounded bg-gray-800 hover:bg-gray-700 border border-gray-600">Preview</button>
+                      <label for="favicon-url" class="block mb-2 font-bold text-gray-300">Favicon URL</label>
+                      <input id="favicon-url" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" maxlength="300" placeholder="https://example.com/favicon.ico" />
+                      <div class="mt-3 flex items-center gap-4" id="favicon-preview-wrapper">
+                        <img id="favicon-preview" alt="Favicon preview" class="h-10 w-10 hidden border-2 border-gray-700 rounded-lg p-1 bg-gray-900/50" />
+                        <button type="button" id="favicon-test" class="text-sm px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-600 transition-all duration-200">Preview</button>
                       </div>
                     </div>
-                    <div class="flex items-center gap-2 mt-6">
-                      <input id="maintenance-mode" type="checkbox" />
-                      <label for="maintenance-mode">Enable maintenance mode</label>
+                    <div class="flex items-center gap-3 mt-6 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50">
+                      <input id="maintenance-mode" type="checkbox" class="w-5 h-5 rounded" />
+                      <label for="maintenance-mode" class="font-semibold text-gray-300">Enable maintenance mode</label>
                     </div>
                   </div>
                   </fieldset>
                 </div>
 
                 <!-- SMTP Configuration Section -->
-                <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
+                <div class="card widget-secondary p-8 rounded-xl border border-green-500/20 shadow-xl hover:border-green-500/40 transition-all duration-300">
                   <details class="group">
-                    <summary class="cursor-pointer font-bold text-lg flex items-center gap-3 hover:text-blue-400 transition-colors">
-                      <div class="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <summary class="cursor-pointer font-bold text-xl flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                       </div>
-                      <span>SMTP Configuration</span>
-                      <span class="text-xs text-gray-500 group-open:hidden ml-auto">(click to expand)</span>
-                      <span class="text-xs text-gray-500 hidden group-open:inline ml-auto">(expanded)</span>
+                      <div class="flex-1">
+                        <span>SMTP Configuration</span>
+                        <p class="text-sm text-gray-400 font-normal mt-1">Email server settings</p>
+                      </div>
+                      <span class="text-sm px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 group-open:hidden">Click to expand</span>
+                      <span class="text-sm px-4 py-2 rounded-lg bg-blue-500/20 text-blue-400 hidden group-open:inline">Expanded</span>
                     </summary>
-                  <fieldset class="space-y-6 mt-4">
+                  <fieldset class="space-y-6 mt-6">
                     <div class="grid gap-6 md:grid-cols-2">
                       <div>
-                        <label for="smtp-host" class="block mb-1 font-semibold">SMTP Host</label>
-                        <input id="smtp-host" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="smtp.example.com" />
+                        <label for="smtp-host" class="block mb-2 font-bold text-gray-300">SMTP Host</label>
+                        <input id="smtp-host" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-200" maxlength="100" placeholder="smtp.example.com" />
                       </div>
                       <div>
-                        <label for="smtp-port" class="block mb-1 font-semibold">SMTP Port</label>
-                        <input id="smtp-port" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="10" placeholder="587" />
+                        <label for="smtp-port" class="block mb-2 font-bold text-gray-300">SMTP Port</label>
+                        <input id="smtp-port" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-200" maxlength="10" placeholder="587" />
                       </div>
                       <div>
-                        <label for="smtp-user" class="block mb-1 font-semibold">SMTP User</label>
-                        <input id="smtp-user" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="user@example.com" />
+                        <label for="smtp-user" class="block mb-2 font-bold text-gray-300">SMTP User</label>
+                        <input id="smtp-user" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-200" maxlength="100" placeholder="user@example.com" />
                       </div>
                       <div>
-                        <label for="smtp-password" class="block mb-1 font-semibold">SMTP Password</label>
-                        <input id="smtp-password" type="password" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" maxlength="100" placeholder="Password" />
+                        <label for="smtp-password" class="block mb-2 font-bold text-gray-300">SMTP Password</label>
+                        <input id="smtp-password" type="password" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-200" maxlength="100" placeholder="Password" />
                       </div>
                     </div>
                     </fieldset>
@@ -174,27 +180,30 @@
                 </div>
 
                 <!-- Customization Section -->
-                <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
+                <div class="card widget-secondary p-8 rounded-xl border border-purple-500/20 shadow-xl hover:border-purple-500/40 transition-all duration-300">
                   <details class="group">
-                    <summary class="cursor-pointer font-bold text-lg flex items-center gap-3 hover:text-blue-400 transition-colors">
-                      <div class="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <summary class="cursor-pointer font-bold text-xl flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                         </svg>
                       </div>
-                      <span>Customization</span>
-                      <span class="text-xs text-gray-500 group-open:hidden ml-auto">(click to expand)</span>
-                      <span class="text-xs text-gray-500 hidden group-open:inline ml-auto">(expanded)</span>
+                      <div class="flex-1">
+                        <span>Customization</span>
+                        <p class="text-sm text-gray-400 font-normal mt-1">Custom CSS and JavaScript</p>
+                      </div>
+                      <span class="text-sm px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 group-open:hidden">Click to expand</span>
+                      <span class="text-sm px-4 py-2 rounded-lg bg-purple-500/20 text-purple-400 hidden group-open:inline">Expanded</span>
                     </summary>
-                  <fieldset class="space-y-6 mt-4">
+                  <fieldset class="space-y-6 mt-6">
                     <div class="grid gap-6 md:grid-cols-2">
                       <div class="md:col-span-1">
-                        <label for="custom-css" class="block mb-1 font-semibold">Custom CSS <span class="text-xs text-gray-500" id="custom-css-count"></span></label>
-                        <textarea id="custom-css" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" rows="4" maxlength="2000" placeholder="/* Custom CSS */"></textarea>
+                        <label for="custom-css" class="block mb-2 font-bold text-gray-300">Custom CSS <span class="text-xs text-gray-500 font-normal" id="custom-css-count"></span></label>
+                        <textarea id="custom-css" class="w-full p-4 rounded-lg bg-gray-900/50 border border-gray-700/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all duration-200 font-mono text-sm" rows="6" maxlength="2000" placeholder="/* Custom CSS */"></textarea>
                       </div>
                       <div class="md:col-span-1">
-                        <label for="custom-js" class="block mb-1 font-semibold">Custom JS <span class="text-xs text-gray-500" id="custom-js-count"></span></label>
-                        <textarea id="custom-js" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" rows="4" maxlength="2000" placeholder="// Custom JS"></textarea>
+                        <label for="custom-js" class="block mb-2 font-bold text-gray-300">Custom JS <span class="text-xs text-gray-500 font-normal" id="custom-js-count"></span></label>
+                        <textarea id="custom-js" class="w-full p-4 rounded-lg bg-gray-900/50 border border-gray-700/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all duration-200 font-mono text-sm" rows="6" maxlength="2000" placeholder="// Custom JS"></textarea>
                       </div>
                     </div>
                     </fieldset>
@@ -202,101 +211,127 @@
                 </div>
 
                 <!-- Features Section -->
-                <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
-                  <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-lg bg-yellow-600 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="card widget-secondary p-8 rounded-xl border border-yellow-500/20 shadow-xl hover:border-yellow-500/40 transition-all duration-300">
+                  <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center shadow-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                       </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-white">Features</h3>
+                    <div>
+                      <h3 class="text-2xl font-bold text-white">Features</h3>
+                      <p class="text-sm text-gray-400 mt-1">Enable or disable site features</p>
+                    </div>
                   </div>
                   <fieldset class="space-y-4">
-                  <div class="flex flex-wrap gap-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Feature Flags -->
-                    <label class="flex items-center gap-2"><input id="feature-beta-features" type="checkbox"> <span>Beta Features</span></label>
-                    <label class="flex items-center gap-2"><input id="feature-new-dashboard" type="checkbox"> <span>New Dashboard</span></label>
-                    <label class="flex items-center gap-2"><input id="feature-advanced-reports" type="checkbox"> <span>Advanced Reports</span></label>
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input id="feature-beta-features" type="checkbox" class="w-5 h-5 rounded" />
+                      <span class="font-semibold text-gray-300">Beta Features</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input id="feature-new-dashboard" type="checkbox" class="w-5 h-5 rounded" />
+                      <span class="font-semibold text-gray-300">New Dashboard</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input id="feature-advanced-reports" type="checkbox" class="w-5 h-5 rounded" />
+                      <span class="font-semibold text-gray-300">Advanced Reports</span>
+                    </label>
                     <!-- Feature Toggles (moved here) -->
-                    <label class="flex items-center gap-2"><input id="enable-registration" type="checkbox"> <span>Enable Registration</span></label>
-                    <label class="flex items-center gap-2"><input id="enable-guest-checkout" type="checkbox"> <span>Enable Guest Checkout</span></label>
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input id="enable-registration" type="checkbox" class="w-5 h-5 rounded" />
+                      <span class="font-semibold text-gray-300">Enable Registration</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
+                      <input id="enable-guest-checkout" type="checkbox" class="w-5 h-5 rounded" />
+                      <span class="font-semibold text-gray-300">Enable Guest Checkout</span>
+                    </label>
                   </div>
                   </fieldset>
                 </div>
 
                 <!-- Data Sources Section -->
-                <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
-                  <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-lg bg-cyan-400 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="card widget-secondary p-8 rounded-xl border border-cyan-400/20 shadow-xl hover:border-cyan-400/40 transition-all duration-300">
+                  <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-500 flex items-center justify-center shadow-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                       </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-white">Data Sources</h3>
+                    <div>
+                      <h3 class="text-2xl font-bold text-white">Data Sources</h3>
+                      <p class="text-sm text-gray-400 mt-1">Configure data source preferences</p>
+                    </div>
                   </div>
                   <fieldset class="space-y-4">
-                  <div class="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <label for="oil-data-source" class="block mb-1 font-semibold">Oil Products Data Source</label>
-                      <select id="oil-data-source" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700">
+                  <div class="grid gap-6 md:grid-cols-2">
+                    <div class="p-6 rounded-xl bg-gray-800/30 border border-gray-700/50">
+                      <label for="oil-data-source" class="block mb-3 font-bold text-gray-300">Oil Products Data Source</label>
+                      <select id="oil-data-source" class="w-full p-4 rounded-lg bg-gray-900/50 border border-gray-700/50 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 transition-all duration-200">
                         <option value="api">API (Online)</option>
                         <option value="local">JSON (Local)</option>
                       </select>
-                      <p class="text-xs text-gray-500 mt-1">Controls where the Oil page loads its products from.</p>
+                      <p class="text-xs text-gray-500 mt-3">Controls where the Oil page loads its products from.</p>
                     </div>
-                    <div>
-                      <label for="consumables-data-source" class="block mb-1 font-semibold">Consumables Data Source</label>
-                      <select id="consumables-data-source" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700">
+                    <div class="p-6 rounded-xl bg-gray-800/30 border border-gray-700/50">
+                      <label for="consumables-data-source" class="block mb-3 font-bold text-gray-300">Consumables Data Source</label>
+                      <select id="consumables-data-source" class="w-full p-4 rounded-lg bg-gray-900/50 border border-gray-700/50 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 transition-all duration-200">
                         <option value="api">API (Online)</option>
                         <option value="local">JSON (Local)</option>
                       </select>
-                      <p class="text-xs text-gray-500 mt-1">Controls where the Consumables page loads its items from.</p>
+                      <p class="text-xs text-gray-500 mt-3">Controls where the Consumables page loads its items from.</p>
                     </div>
                   </div>
                   </fieldset>
                 </div>
 
                 <!-- Advanced Section -->
-                <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
+                <div class="card widget-secondary p-8 rounded-xl border border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300">
                   <details class="group">
-                    <summary class="cursor-pointer font-bold text-lg flex items-center gap-3 hover:text-blue-400 transition-colors">
-                      <div class="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <summary class="cursor-pointer font-bold text-xl flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                         </svg>
                       </div>
-                      <span>Advanced</span>
-                      <span class="text-xs text-gray-500 group-open:hidden ml-auto">(optional)</span>
-                      <span class="text-xs text-gray-500 hidden group-open:inline ml-auto">(expanded)</span>
+                      <div class="flex-1">
+                        <span>Advanced</span>
+                        <p class="text-sm text-gray-400 font-normal mt-1">Advanced configuration options</p>
+                      </div>
+                      <span class="text-sm px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 group-open:hidden">Optional</span>
+                      <span class="text-sm px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hidden group-open:inline">Expanded</span>
                     </summary>
-                    <p>No advanced options currently. Reserved for future expansion (API keys, webhooks, etc.).</p>
+                    <div class="mt-6 p-6 rounded-xl bg-gray-800/30 border border-gray-700/50">
+                      <p class="text-gray-400">No advanced options currently. Reserved for future expansion (API keys, webhooks, etc.).</p>
+                    </div>
                   </details>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="card widget-primary p-6 rounded-lg border border-blue-500/30 shadow-lg">
-                  <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
-                    <div class="flex gap-3 flex-wrap">
-                      <button type="button" data-action="reset-defaults" class="btn-neon-blue px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all">
-                        <span class="flex items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="card widget-primary p-8 rounded-xl border-2 border-blue-500/30 shadow-2xl bg-gradient-to-br from-gray-900/50 to-gray-800/50">
+                  <div class="flex flex-col md:flex-row gap-6 md:items-center md:justify-between">
+                    <div class="flex gap-4 flex-wrap">
+                      <button type="button" data-action="reset-defaults" class="btn-neon-blue px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+                        <span class="flex items-center gap-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
                           Reset to Defaults
                         </span>
                       </button>
-                      <button type="button" data-action="export-settings" class="btn-neon-blue px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all">
-                        <span class="flex items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <button type="button" data-action="export-settings" class="btn-neon-blue px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+                        <span class="flex items-center gap-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                           </svg>
                           Export Settings
                         </span>
                       </button>
                     </div>
-                    <button class="w-full md:w-auto btn-neon-green px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all" type="submit">
-                      <span class="flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button class="w-full md:w-auto btn-neon-green px-10 py-5 rounded-xl font-bold text-xl shadow-2xl hover:shadow-[0_0_30px_rgba(0,255,136,0.6)] hover:scale-105 transition-all duration-200" type="submit">
+                      <span class="flex items-center justify-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                         Save All Settings
@@ -728,13 +763,13 @@
                     
                     // Remove active state from all buttons
                     tabButtons.forEach(btn => {
-                        btn.classList.remove('bg-blue-600', 'text-white', 'border-b-2', 'border-blue-400');
-                        btn.classList.add('text-gray-300', 'hover:text-white', 'hover:bg-gray-800');
+                        btn.classList.remove('bg-gradient-to-br', 'from-blue-600', 'to-blue-700', 'text-white', 'border-b-4', 'border-blue-400', 'shadow-lg');
+                        btn.classList.add('text-gray-400');
                     });
                     
                     // Add active state to clicked button
-                    button.classList.add('bg-blue-600', 'text-white', 'border-b-2', 'border-blue-400');
-                    button.classList.remove('text-gray-300', 'hover:text-white', 'hover:bg-gray-800');
+                    button.classList.add('bg-gradient-to-br', 'from-blue-600', 'to-blue-700', 'text-white', 'border-b-4', 'border-blue-400', 'shadow-lg');
+                    button.classList.remove('text-gray-400');
                     
                     // Hide all panels
                     tabPanels.forEach(panel => {
