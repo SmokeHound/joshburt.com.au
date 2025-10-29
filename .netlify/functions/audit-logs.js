@@ -74,9 +74,23 @@ exports.handler = withHandler(async function(event){
       if (action) { whereParts.push('action = ?'); params.push(action); }
       if (startDate) { whereParts.push('created_at >= ?'); params.push(startDate); }
       if (endDate) { whereParts.push('created_at <= ?'); params.push(endDate); }
-      if (method) { whereParts.push('details LIKE ?'); params.push(`%"method":"${method}"%`); }
-      if (path) { whereParts.push('details LIKE ?'); params.push(`%"path":"${path}"%`); }
-      if (requestId) { whereParts.push('details LIKE ?'); params.push(`%"requestId":"${requestId}"%`); }
+      // JSON field searches - use LIKE with escaped parameters for cross-database compatibility
+      if (method) { 
+        whereParts.push('details LIKE ?'); 
+        // Escape special characters for LIKE pattern matching
+        const escapedMethod = method.replace(/[%_\\]/g, '\\$&');
+        params.push(`%"method":"${escapedMethod}"%`); 
+      }
+      if (path) { 
+        whereParts.push('details LIKE ?'); 
+        const escapedPath = path.replace(/[%_\\]/g, '\\$&');
+        params.push(`%"path":"${escapedPath}"%`); 
+      }
+      if (requestId) { 
+        whereParts.push('details LIKE ?'); 
+        const escapedRequestId = requestId.replace(/[%_\\]/g, '\\$&');
+        params.push(`%"requestId":"${escapedRequestId}"%`); 
+      }
       if (q) {
         whereParts.push('(action LIKE ? OR details LIKE ? OR user_id LIKE ?)');
         const like = `%${q}%`;
