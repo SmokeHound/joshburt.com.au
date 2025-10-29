@@ -8,7 +8,7 @@
 </head>
 <body>
 <!-- Mobile Menu Toggle (static for tests and pages that don't inject it) -->
-<button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+<button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
 <!-- Sidebar -->
 <aside id="sidebar" class="sidebar sidebar-width fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg md:static md:translate-x-0" aria-label="Main navigation" role="navigation">
     <!-- App Branding -->
@@ -16,10 +16,10 @@
 
     <!-- User Profile Section (for pages that support it) -->
     <div id="user-profile" class="mb-6 hidden" role="region" aria-label="User profile">
-        <a href="profile.html" id="user-info" class="hidden flex items-center space-x-2 p-2 rounded hover:bg-gray-700 transition-colors" title="View my profile">
+        <div id="user-info" class="hidden flex items-center space-x-2">
             <img id="user-avatar" src="./assets/images/avatar-placeholder.svg" alt="User avatar" class="w-10 h-10 rounded-full" loading="lazy">
             <span id="user-name" class="text-white"></span>
-        </a>
+        </div>
     <button id="login-btn" class="w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary btn-neon-blue" aria-label="Open login modal">Login</button>
     <button id="logout-btn" class="hidden w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 btn-neon-pink" aria-label="Logout">Logout</button>
     </div>
@@ -28,7 +28,6 @@
     <nav aria-label="Main navigation" role="navigation">
         <ul class="space-y-2" role="list">
             <li role="listitem"><a href="index.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2" aria-current="page"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10.5L12 3l9 7.5V21a1.5 1.5 0 01-1.5 1.5H4.5A1.5 1.5 0 013 21V10.5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 22v-6h6v6"></path></svg>Home</a></li>
-            <li role="listitem"><a href="profile.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><circle cx="12" cy="8" r="4" stroke-width="1.5"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 21c0-3.3 2.7-6 6-6s6 2.7 6 6"></path></svg>My Profile</a></li>
             <li role="listitem"><a href="administration.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2.5l7 2.8v6.2c0 5-3.5 9.5-7 9.5s-7-4.5-7-9.5V5.3l7-2.8z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.5l2.2 2.2 4-4"></path></svg>Administration</a></li>
             <li role="listitem"><a href="analytics.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 20.5h16"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 20.5V10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 20.5v-6"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20.5V7.5"></path></svg>Analytics</a></li>
             <li role="listitem"><a href="settings.html" class="nav-link block p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7.5h16"></path><circle cx="10" cy="7.5" r="1.75" stroke-width="1.5" stroke="currentColor" fill="none"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 12.5h16"></path><circle cx="14" cy="12.5" r="1.75" stroke-width="1.5" stroke="currentColor" fill="none"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 17.5h16"></path><circle cx="8" cy="17.5" r="1.75" stroke-width="1.5" stroke="currentColor" fill="none"></circle></svg>Settings</a></li>
@@ -90,13 +89,13 @@
         if (isOpen) {
             // Close sidebar
             sidebar.classList.remove('open');
-            if (sidebarBackdrop) sidebarBackdrop.classList.add('hidden');
+            if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
             document.body.classList.remove('sidebar-open');
             menuToggle.setAttribute('aria-expanded', 'false');
         } else {
             // Open sidebar
             sidebar.classList.add('open');
-            if (sidebarBackdrop) sidebarBackdrop.classList.remove('hidden');
+            if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
             document.body.classList.add('sidebar-open');
             menuToggle.setAttribute('aria-expanded', 'true');
         }
