@@ -64,7 +64,7 @@ exports.handler = withHandler(async function(event){
     if (authResponse) return authResponse;
     
     try {
-      const { userId, action, startDate, endDate, limit, format, q } = event.queryStringParameters || {};
+      const { userId, action, startDate, endDate, limit, format, q, method, path, requestId } = event.queryStringParameters || {};
       const { page, limit: pageLimit, offset } = getPagination(event.queryStringParameters || {}, { page: 1, limit: 25 });
       const hasPagination = !!(event.queryStringParameters && (event.queryStringParameters.page || event.queryStringParameters.limit));
 
@@ -74,6 +74,9 @@ exports.handler = withHandler(async function(event){
       if (action) { whereParts.push('action = ?'); params.push(action); }
       if (startDate) { whereParts.push('created_at >= ?'); params.push(startDate); }
       if (endDate) { whereParts.push('created_at <= ?'); params.push(endDate); }
+      if (method) { whereParts.push('details LIKE ?'); params.push(`%"method":"${method}"%`); }
+      if (path) { whereParts.push('details LIKE ?'); params.push(`%"path":"${path}"%`); }
+      if (requestId) { whereParts.push('details LIKE ?'); params.push(`%"requestId":"${requestId}"%`); }
       if (q) {
         whereParts.push('(action LIKE ? OR details LIKE ? OR user_id LIKE ?)');
         const like = `%${q}%`;
