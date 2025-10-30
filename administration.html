@@ -13,8 +13,13 @@
   <style>
     .sidebar{transition:transform .3s ease-in-out}
   </style>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
 </head>
 <body class="dark">
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <!-- Toast Notification -->
     
     <!-- Mobile Menu Toggle -->
@@ -36,7 +41,7 @@
         </script>
         <!-- Main Content -->
     <!-- Main Content -->
-    <main id="main-content" class="flex-1 p-4" role="main">
+    <main id="main-content" id="main-content" class="flex-1 p-4" role="main" role="main">
         <!-- Sticky Header -->
     <header class="page-header card border">
             <h2 class="text-3xl font-bold text-white" id="welcome-message">Welcome, Admin!</h2>
