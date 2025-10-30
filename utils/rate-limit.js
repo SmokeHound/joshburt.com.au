@@ -30,12 +30,13 @@ function checkRateLimit(key, limit = 30, windowMs = 60 * 1000) {
   // Remove expired entries
   rateBuckets[key] = rateBuckets[key].filter(timestamp => now - timestamp < windowMs);
   
-  const remaining = Math.max(0, limit - rateBuckets[key].length);
   const allowed = rateBuckets[key].length < limit;
   
   if (allowed) {
     rateBuckets[key].push(now);
   }
+  
+  const remaining = Math.max(0, limit - rateBuckets[key].length);
   
   // Calculate reset time (when oldest entry expires)
   const resetAt = rateBuckets[key].length > 0 
@@ -121,8 +122,21 @@ function cleanupRateLimits() {
   const maxAge = 3600 * 1000; // 1 hour
   
   for (const key in rateBuckets) {
-    rateBuckets[key] = rateBuckets[key].filter(timestamp => now - timestamp < maxAge);
-    if (rateBuckets[key].length === 0) {
+    if (Object.prototype.hasOwnProperty.call(rateBuckets, key)) {
+      rateBuckets[key] = rateBuckets[key].filter(timestamp => now - timestamp < maxAge);
+      if (rateBuckets[key].length === 0) {
+        delete rateBuckets[key];
+      }
+    }
+  }
+}
+
+/**
+ * Clear all rate limit buckets (for testing)
+ */
+function clearRateLimits() {
+  for (const key in rateBuckets) {
+    if (Object.prototype.hasOwnProperty.call(rateBuckets, key)) {
       delete rateBuckets[key];
     }
   }
@@ -136,5 +150,6 @@ module.exports = {
   getClientIP,
   withRateLimit,
   cleanupRateLimits,
+  clearRateLimits,
   RATE_LIMITS
 };

@@ -1,4 +1,5 @@
 // Input sanitization and validation utilities
+/* eslint-disable indent */
 
 /**
  * Sanitize string input by removing dangerous characters
@@ -23,8 +24,10 @@ function sanitizeString(input, options = {}) {
   
   // Remove control characters (except newlines and tabs if allowed)
   if (options.allowNewlines) {
+    // eslint-disable-next-line no-control-regex
     sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
   } else {
+    // eslint-disable-next-line no-control-regex
     sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
   }
   
@@ -96,7 +99,7 @@ function isValidURL(url, options = {}) {
  * @returns {boolean} - True if valid
  */
 function isValidInteger(value, options = {}) {
-  const num = parseInt(value, 10);
+  const num = Number(value);
   
   if (isNaN(num) || !Number.isInteger(num)) {
     return false;
@@ -224,9 +227,10 @@ function isSQLSafe(input) {
   // Check for common SQL injection patterns
   const sqlInjectionPatterns = [
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE)\b)/i,
-    /(--|\*\/|\/\*|;)/,
-    /(\bOR\b|\bAND\b).*=.*(OR|AND)/i,
-    /(\'|\")(.*)(\'|\")\s*(OR|AND)/i
+    /(--|\/\*|\*\/|;)/,
+    /(\bOR\b|\bAND\b).*=.*\1/i,
+    /(['"])\s*(OR|AND)\s*\1/i,
+    /['"].*['"].*=/i
   ];
   
   return !sqlInjectionPatterns.some(pattern => pattern.test(input));

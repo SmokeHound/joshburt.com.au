@@ -1,7 +1,7 @@
 // Two-Factor Authentication (2FA) utilities using TOTP
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
-const crypto = require('crypto');
+const nodeCrypto = require('crypto');
 
 /**
  * Generate a TOTP secret for a user
@@ -74,7 +74,7 @@ function generateBackupCodes(count = 10) {
   
   for (let i = 0; i < count; i++) {
     // Generate 8-character alphanumeric code
-    const code = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const code = nodeCrypto.randomBytes(4).toString('hex').toUpperCase();
     codes.push(code);
   }
   
@@ -87,7 +87,7 @@ function generateBackupCodes(count = 10) {
  * @returns {string} - SHA256 hash of the code
  */
 function hashBackupCode(code) {
-  return crypto.createHash('sha256').update(code).digest('hex');
+  return nodeCrypto.createHash('sha256').update(code).digest('hex');
 }
 
 /**

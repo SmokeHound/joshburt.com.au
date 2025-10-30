@@ -1,5 +1,5 @@
 // CSRF protection utilities for state-changing operations
-const crypto = require('crypto');
+const nodeCrypto = require('crypto');
 
 // In-memory CSRF token storage (per cold start container)
 const csrfTokens = new Map();
@@ -16,7 +16,7 @@ const TOKEN_LENGTH = 32;
  * @returns {string} - CSRF token
  */
 function generateCSRFToken(sessionId) {
-  const token = crypto.randomBytes(TOKEN_LENGTH).toString('hex');
+  const token = nodeCrypto.randomBytes(TOKEN_LENGTH).toString('hex');
   const expiry = Date.now() + TOKEN_EXPIRY;
   
   csrfTokens.set(token, {
