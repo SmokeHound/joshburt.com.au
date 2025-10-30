@@ -76,8 +76,13 @@
       color: #fff;
     }
   </style>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
 </head>
     <body class="dark">
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <!-- MOBILE MENU TOGGLE (copied from template.html) -->
     <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
@@ -96,7 +101,7 @@
             });
         </script>
                 <!-- Main Content -->
-                <main class="flex-1 p-4 md:p-6 ml-64 md:ml-0">
+                <main id="main-content" class="flex-1 p-4 md:p-6 ml-64 md:ml-0" role="main">
                 <!-- Header Card -->
                 <header class="page-header card border" role="banner">
                     <div class="flex items-center justify-between gap-4">

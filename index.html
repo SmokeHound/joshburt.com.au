@@ -8,14 +8,19 @@
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
   <script src="./assets/js/init-shared.js" defer></script>
   <script src="./assets/js/notifications.js" defer></script>
+  <script src="./assets/js/accessibility.js" defer></script>
   <!-- Cleanup legacy role demo storage -->
   <script>
     try { localStorage.removeItem('currentUser'); } catch (e) {}
   </script>
 </head>
 <body class="dark">
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
   <!-- MOBILE MENU TOGGLE -->
   <button id="menu-toggle" class="md:hidden fixed top-4 left-4 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" style="z-index: 150;" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
   <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
@@ -34,9 +39,9 @@
     </script>
 
     <!-- Main Content -->
-  <main class="flex-1 p-4 md:p-6 md:ml-64">
+  <main id="main-content" class="flex-1 p-4 md:p-6 md:ml-64" role="main">
       <!-- Header with Welcome + Actions -->
-  <header class="page-header card border">
+  <header class="page-header card border" role="banner">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 id="welcome-message" class="text-3xl md:text-4xl font-bold text-white">Welcome!</h1>
