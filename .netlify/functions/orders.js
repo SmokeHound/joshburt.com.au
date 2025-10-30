@@ -4,6 +4,7 @@ const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requirePermission, requireAuth } = require('../../utils/http');
 const { hasPermission } = require('../../utils/rbac');
+const cache = require('../../utils/cache');
 
 exports.handler = withHandler(async function(event){
   await database.connect();
@@ -15,15 +16,49 @@ exports.handler = withHandler(async function(event){
       const { user, response: authResponse } = await requirePermission(event, 'orders', 'list');
       if (authResponse) return authResponse;
       
-      const orders = await database.all('SELECT * FROM orders ORDER BY created_at DESC LIMIT 50');
-      for (const order of orders) {
-        const items = await database.all(
-          'SELECT product_name AS name, product_code AS code, quantity FROM order_items WHERE order_id = ?',
-          [order.id]
-        );
-        order.items = items;
+      // Check cache first (1 minute TTL for orders list)
+      const cached = cache.get('orders', 'list');
+      if (cached) {
+        return ok(cached, 200, { 'X-Cache': 'HIT' });
       }
-      return ok(orders);
+      
+      // Optimized query to avoid N+1 - fetch orders and items in one go
+      const orders = await database.all('SELECT * FROM orders ORDER BY created_at DESC LIMIT 50');
+      
+      if (orders.length > 0) {
+        const orderIds = orders.map(o => o.id);
+        // Use IN clause to fetch all items at once instead of N queries
+        const placeholders = orderIds.map(() => '?').join(',');
+        const allItems = await database.all(
+          `SELECT order_id, product_name AS name, product_code AS code, quantity 
+           FROM order_items 
+           WHERE order_id IN (${placeholders})`,
+          orderIds
+        );
+        
+        // Group items by order_id
+        const itemsByOrderId = {};
+        allItems.forEach(item => {
+          if (!itemsByOrderId[item.order_id]) {
+            itemsByOrderId[item.order_id] = [];
+          }
+          itemsByOrderId[item.order_id].push({
+            name: item.name,
+            code: item.code,
+            quantity: item.quantity
+          });
+        });
+        
+        // Attach items to orders
+        orders.forEach(order => {
+          order.items = itemsByOrderId[order.id] || [];
+        });
+      }
+      
+      // Cache for 1 minute (60 seconds)
+      cache.set('orders', 'list', orders, 60);
+      
+      return ok(orders, 200, { 'X-Cache': 'MISS' });
     }
     
     if (method === 'PATCH') {
@@ -40,6 +75,10 @@ exports.handler = withHandler(async function(event){
         [status, orderId]
       );
       if (result.changes === 0) return error(404, 'Order not found');
+      
+      // Invalidate orders cache on update
+      cache.del('orders', 'list');
+      
       const updatedOrder = await database.get('SELECT * FROM orders WHERE id = ?', [orderId]);
       return ok({ success: true, order: updatedOrder });
     }
@@ -69,6 +108,9 @@ exports.handler = withHandler(async function(event){
           [orderId, item.name, item.code, item.quantity]
         );
       }
+      
+      // Invalidate orders cache on create
+      cache.del('orders', 'list');
       
       return ok({ orderId }, 201);
     }

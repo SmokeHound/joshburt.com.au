@@ -2,6 +2,7 @@
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
+const cache = require('../../utils/cache');
 
 exports.handler = withHandler(async function(event) {
   // Initialize database connection (idempotent)
@@ -20,15 +21,28 @@ exports.handler = withHandler(async function(event) {
     if (authResponse) return authResponse;
     
     try {
+      const type = event.queryStringParameters?.type;
+      const cacheKey = type ? `type:${type}` : 'all';
+      
+      // Try cache first (2 minute TTL)
+      const cachedProducts = cache.get('products', cacheKey);
+      if (cachedProducts) {
+        return ok(cachedProducts, 200, { 'X-Cache': 'HIT' });
+      }
+      
       let query = 'SELECT * FROM products ORDER BY name';
       let params = [];
       // Optional filter by type
-      if (event.queryStringParameters && event.queryStringParameters.type) {
+      if (type) {
         query = 'SELECT * FROM products WHERE type = ? ORDER BY name';
-        params = [event.queryStringParameters.type];
+        params = [type];
       }
       const products = await database.all(query, params);
-      return ok(products);
+      
+      // Cache for 2 minutes (120 seconds)
+      cache.set('products', cacheKey, products, 120);
+      
+      return ok(products, 200, { 'X-Cache': 'MISS' });
     } catch (e) {
       console.error('GET /products error:', e);
       return error(500, 'Failed to fetch products');
@@ -52,6 +66,10 @@ exports.handler = withHandler(async function(event) {
       `;
       const params = [name, code, type, specs || '', description || '', image || ''];
       const result = await database.run(query, params);
+      
+      // Invalidate products cache on create
+      cache.clearNamespace('products');
+      
       return ok({ 
         id: result.id,
         message: 'Product created successfully',
@@ -87,6 +105,10 @@ exports.handler = withHandler(async function(event) {
       if (result.changes === 0) {
         return error(404, 'Product not found');
       }
+      
+      // Invalidate products cache on update
+      cache.clearNamespace('products');
+      
       return ok({
         message: 'Product updated successfully',
         product: { id, name, code, type, specs, description, image }
@@ -110,6 +132,10 @@ exports.handler = withHandler(async function(event) {
       if (!id) return error(400, 'Missing required field: id');
       const result = await database.run('DELETE FROM products WHERE id = ?', [id]);
       if (result.changes === 0) return error(404, 'Product not found');
+      
+      // Invalidate products cache on delete
+      cache.clearNamespace('products');
+      
       return ok({ message: 'Product deleted successfully' });
     } catch (e) {
       console.error('DELETE /products error:', e);

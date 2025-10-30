@@ -11,9 +11,14 @@ const pgConfig = DATABASE_URL
   ? {
     connectionString: DATABASE_URL,
     ssl: true,
-    max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    max: parseInt(process.env.DB_POOL_MAX) || 20,  // Increased for better concurrency
+    min: parseInt(process.env.DB_POOL_MIN) || 2,   // Maintain minimum connections
+    idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
+    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
+    // Query timeout to prevent long-running queries
+    query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
+    // Enable statement timeout for PostgreSQL
+    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000,
   }
   : {
     user: process.env.DB_USER,
@@ -22,9 +27,12 @@ const pgConfig = DATABASE_URL
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT || 5432,
     ssl: { rejectUnauthorized: true },
-    max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    max: parseInt(process.env.DB_POOL_MAX) || 20,
+    min: parseInt(process.env.DB_POOL_MIN) || 2,
+    idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
+    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
+    query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
+    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000,
   };
 
 // SQLite fallback for development
@@ -451,15 +459,27 @@ async function createPostgreSQLTables() {
 
   // Create indexes for better performance
   await database.run('CREATE INDEX IF NOT EXISTS idx_products_type ON products(type)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_products_code ON products(code)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_products_created_at ON products(created_at)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_orders_created_by ON orders(created_by)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_order_items_product_code ON order_items(product_code)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_users_is_active ON users(is_active)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_users_oauth ON users(oauth_provider, oauth_id)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_consumables_category ON consumables(category)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_consumables_code ON consumables(code)');
+  // Composite indexes for common query patterns
+  await database.run('CREATE INDEX IF NOT EXISTS idx_orders_status_created ON orders(status, created_at DESC)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_users_active_role ON users(is_active, role)');
   // Expression indexes on common JSON fields in details for faster filtering (PostgreSQL)
   // Use partial indexes guarded to rows where details appears to be JSON to avoid cast errors on legacy text rows
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs ((details::json->>\'path\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')');
