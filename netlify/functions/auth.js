@@ -6,6 +6,7 @@ const { corsHeaders, json: jsonResponse, error: errorResponse, parseBody, authen
 const { withHandler } = require('../../utils/fn');
 const { validatePassword } = require('../../utils/password');
 const { isValidRole } = require('../../utils/rbac');
+const { logAudit } = require('../../utils/audit');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 const generateTokens = (userId) => {
@@ -69,6 +70,7 @@ exports.handler = withHandler(async (event) => {
       const verificationToken = nodeCrypto.randomBytes(32).toString('hex');
       const verificationExpires = Date.now() + 24*60*60*1000;
       const result = await database.run('INSERT INTO users (email, name, password_hash, role, email_verified, email_verification_token, email_verification_expires) VALUES (?, ?, ?, ?, ?, ?, ?)', [email, name, passwordHash, 'user', 0, verificationToken, verificationExpires]);
+      await logAudit(event, { action: 'auth.register', userId: result.id, details: { email, name } });
       return jsonResponse(201, { message: 'Registered. Verify email.', userId: result.id });
     }
 
@@ -80,6 +82,7 @@ exports.handler = withHandler(async (event) => {
       if (!user) return errorResponse(400, 'Invalid or expired verification token');
       if (user.email_verification_expires && user.email_verification_expires < Date.now()) return errorResponse(400, 'Verification token expired');
       await database.run('UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?', [user.id]);
+      await logAudit(event, { action: 'auth.email_verified', userId: user.id, details: { token: token.slice(0, 8) + '...' } });
       return jsonResponse(200, { message: 'Email verified' });
     }
 
@@ -105,6 +108,7 @@ exports.handler = withHandler(async (event) => {
         const attempts = (user.failed_login_attempts || 0) + 1;
         let lockout = null; if (attempts >= MAX_ATTEMPTS) lockout = Date.now() + LOCKOUT_MINUTES*60000;
         await database.run('UPDATE users SET failed_login_attempts = ?, lockout_expires = ? WHERE id = ?', [attempts, lockout, user.id]);
+        await logAudit(event, { action: 'auth.login_failed', userId: user.id, details: { email, attempts } });
         if (lockout) return errorResponse(403, `Account locked due to too many failed attempts. Try again in ${LOCKOUT_MINUTES} minutes.`);
         return errorResponse(401, `Invalid credentials. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.`);
       }
@@ -113,6 +117,7 @@ exports.handler = withHandler(async (event) => {
       }
       const { accessToken, refreshToken } = generateTokens(user.id);
       await storeRefreshToken(user.id, refreshToken);
+      await logAudit(event, { action: 'auth.login_success', userId: user.id, details: { email } });
       return jsonResponse(200, { message: 'Login successful', user: { id: user.id, email: user.email, name: user.name, role: user.role, emailVerified: user.email_verified }, accessToken, refreshToken });
     }
 
@@ -132,6 +137,7 @@ exports.handler = withHandler(async (event) => {
         const tokens = generateTokens(user.id);
         await storeRefreshToken(user.id, tokens.refreshToken);
         await database.run('DELETE FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
+        await logAudit(event, { action: 'auth.token_refresh', userId: user.id, details: {} });
         return jsonResponse(200, { message: 'Tokens refreshed', accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
       } catch (e) {
         return errorResponse(401, 'Token refresh failed');
@@ -141,12 +147,16 @@ exports.handler = withHandler(async (event) => {
     // LOGOUT
     if (action === 'logout') {
       const { refreshToken } = payload || {};
+      let userId = null;
       if (refreshToken) {
         const tokenHash = nodeCrypto.createHash('sha256').update(refreshToken).digest('hex');
+        const tokenRecord = await database.get('SELECT user_id FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
+        if (tokenRecord) userId = tokenRecord.user_id;
         await database.run('DELETE FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
       }
       const nowIso = new Date().toISOString();
       await database.run('DELETE FROM refresh_tokens WHERE expires_at <= ?', [nowIso]);
+      await logAudit(event, { action: 'auth.logout', userId, details: {} });
       return jsonResponse(200, { message: 'Logged out successfully' });
     }
 
@@ -159,6 +169,7 @@ exports.handler = withHandler(async (event) => {
           const resetToken = nodeCrypto.randomBytes(32).toString('hex');
           const resetTokenExpires = Date.now() + 3600000; // 1h
           await database.run('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?', [resetToken, resetTokenExpires, user.id]);
+          await logAudit(event, { action: 'auth.password_reset_requested', userId: user.id, details: { email } });
           // Email sending is omitted here (previously via nodemailer) – can integrate later.
         }
       }
@@ -182,6 +193,7 @@ exports.handler = withHandler(async (event) => {
       const hash = await bcrypt.hash(password, rounds);
       await database.run('UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?', [hash, user.id]);
       await database.run('DELETE FROM refresh_tokens WHERE user_id = ?', [user.id]);
+      await logAudit(event, { action: 'auth.password_reset_completed', userId: user.id, details: {} });
       return jsonResponse(200, { message: 'Password reset successfully' });
     }
 
