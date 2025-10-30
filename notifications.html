@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Notifications - Josh Burt</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
+</head>
+<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+  
+  <div id="main-nav"></div>
+  <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
+
+  <main id="main-content" class="flex-1 p-4 md:p-6 space-y-6" role="main">
+    <header class="page-header card border">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold">Notifications</h1>
+          <p class="text-sm text-gray-400 mt-1">View and manage your notifications</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="mark-all-read" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+            Mark All Read
+          </button>
+          <button id="clear-all-read" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
+            Clear Read
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Filter Tabs -->
+    <div class="card p-4">
+      <div class="flex gap-2 flex-wrap">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="unread">Unread</button>
+        <button class="filter-tab" data-filter="order_status">Orders</button>
+        <button class="filter-tab" data-filter="system">System</button>
+        <button class="filter-tab" data-filter="product">Products</button>
+      </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div id="notifications-container" class="space-y-3">
+      <div class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <p class="mt-2 text-gray-400">Loading notifications...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="card p-12 text-center hidden">
+      <svg class="w-24 h-24 mx-auto mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+      </svg>
+      <h3 class="text-xl font-semibold mb-2">No notifications</h3>
+      <p class="text-gray-400">You're all caught up!</p>
+    </div>
+  </main>
+
+  <style>
+    .filter-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .filter-tab:hover {
+      background: var(--hover-bg);
+    }
+
+    .filter-tab.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .notification-card {
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .notification-card:hover {
+      background: var(--hover-bg);
+      transform: translateX(4px);
+    }
+
+    .notification-card.unread {
+      background: rgba(59, 130, 246, 0.1);
+      border-left-color: #3b82f6;
+    }
+
+    .notification-card.priority-high {
+      border-left-color: #ef4444;
+    }
+
+    .notification-card.priority-urgent {
+      border-left-color: #dc2626;
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .notification-type-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .notification-type-order_status {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .notification-type-system {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .notification-type-product {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .notification-type-announcement {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+  </style>
+
+  <script>
+    (function() {
+      'use strict';
+
+      let allNotifications = [];
+      let currentFilter = 'all';
+
+      const container = document.getElementById('notifications-container');
+      const emptyState = document.getElementById('empty-state');
+      const markAllReadBtn = document.getElementById('mark-all-read');
+      const clearAllReadBtn = document.getElementById('clear-all-read');
+      const filterTabs = document.querySelectorAll('.filter-tab');
+
+      // Load notifications
+      async function loadNotifications() {
+        try {
+          const response = await fetch('/.netlify/functions/notifications?limit=100', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            allNotifications = data.notifications || [];
+            renderNotifications();
+          } else if (response.status === 401) {
+            window.location.href = '/login.html';
+          }
+        } catch (error) {
+          console.error('Failed to load notifications:', error);
+          container.innerHTML = `
+            <div class="card p-8 text-center text-red-400">
+              <p>Failed to load notifications. Please try again.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Render notifications
+      function renderNotifications() {
+        const filtered = filterNotifications(allNotifications, currentFilter);
+
+        if (filtered.length === 0) {
+          container.classList.add('hidden');
+          emptyState.classList.remove('hidden');
+          return;
+        }
+
+        container.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+
+        container.innerHTML = filtered.map(n => {
+          const unreadClass = n.is_read ? '' : 'unread';
+          const priorityClass = n.priority ? `priority-${n.priority}` : '';
+          const typeClass = `notification-type-${n.type}`;
+          const timeAgo = formatTimeAgo(n.created_at);
+
+          return `
+            <div class="notification-card ${unreadClass} ${priorityClass}" data-id="${n.id}" data-url="${n.action_url || ''}">
+              <div class="flex justify-between items-start mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="notification-type-badge ${typeClass}">${n.type.replace('_', ' ')}</span>
+                  ${!n.is_read ? '<span class="w-2 h-2 bg-blue-500 rounded-full"></span>' : ''}
+                </div>
+                <div class="flex gap-2">
+                  <button class="text-xs text-gray-400 hover:text-gray-300" onclick="markAsRead(${n.id}, event)">
+                    ${n.is_read ? 'Unread' : 'Mark Read'}
+                  </button>
+                  <button class="text-xs text-red-400 hover:text-red-300" onclick="deleteNotification(${n.id}, event)">
+                    Delete
+                  </button>
+                </div>
+              </div>
+              <h3 class="font-semibold mb-1">${escapeHtml(n.title)}</h3>
+              <p class="text-sm text-gray-400 mb-2">${escapeHtml(n.message)}</p>
+              <div class="flex justify-between items-center text-xs text-gray-500">
+                <span>${timeAgo}</span>
+                ${n.action_url ? '<span class="text-blue-400">Click to view →</span>' : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Add click handlers
+        container.querySelectorAll('.notification-card').forEach(card => {
+          card.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) {
+              handleNotificationClick(card);
+            }
+          });
+        });
+      }
+
+      // Filter notifications
+      function filterNotifications(notifications, filter) {
+        if (filter === 'all') return notifications;
+        if (filter === 'unread') return notifications.filter(n => !n.is_read);
+        return notifications.filter(n => n.type === filter);
+      }
+
+      // Handle notification click
+      async function handleNotificationClick(card) {
+        const id = parseInt(card.dataset.id);
+        const url = card.dataset.url;
+
+        await window.markAsRead(id);
+
+        if (url) {
+          window.location.href = url;
+        }
+      }
+
+      // Mark as read
+      window.markAsRead = async function(id, event) {
+        if (event) event.stopPropagation();
+
+        try {
+          const response = await fetch('/.netlify/functions/notifications', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ notification_id: id })
+          });
+
+          if (response.ok) {
+            await loadNotifications();
+            if (window.notificationCenter) {
+              window.notificationCenter.refresh();
+            }
+          }
+        } catch (error) {
+          console.error('Failed to mark as read:', error);
+        }
+      };
+
+      // Delete notification
+      window.deleteNotification = async function(id, event) {
+        if (event) event.stopPropagation();
+
+        if (!confirm('Delete this notification?')) return;
+
+        try {
+          const response = await fetch('/.netlify/functions/notifications', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ notification_id: id })
+          });
+
+          if (response.ok) {
+            await loadNotifications();
+          }
+        } catch (error) {
+          console.error('Failed to delete notification:', error);
+        }
+      };
+
+      // Mark all as read
+      markAllReadBtn.addEventListener('click', async () => {
+        try {
+          const response = await fetch('/.netlify/functions/notifications', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ mark_all_read: true })
+          });
+
+          if (response.ok) {
+            await loadNotifications();
+            if (window.notificationCenter) {
+              window.notificationCenter.refresh();
+            }
+          }
+        } catch (error) {
+          console.error('Failed to mark all as read:', error);
+        }
+      });
+
+      // Clear all read
+      clearAllReadBtn.addEventListener('click', async () => {
+        if (!confirm('Delete all read notifications?')) return;
+
+        try {
+          const response = await fetch('/.netlify/functions/notifications', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ delete_all_read: true })
+          });
+
+          if (response.ok) {
+            await loadNotifications();
+          }
+        } catch (error) {
+          console.error('Failed to clear read notifications:', error);
+        }
+      });
+
+      // Filter tabs
+      filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          filterTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentFilter = tab.dataset.filter;
+          renderNotifications();
+        });
+      });
+
+      // Format time ago
+      function formatTimeAgo(timestamp) {
+        const now = new Date();
+        const time = new Date(timestamp);
+        const diff = Math.floor((now - time) / 1000);
+
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+        if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+        return time.toLocaleDateString();
+      }
+
+      // Escape HTML
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Load on page load
+      loadNotifications();
+    })();
+  </script>
+</body>
+</html>

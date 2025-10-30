@@ -218,8 +218,168 @@ const sendWelcomeEmail = async (email, name) => {
   }
 };
 
+// Send order status change notification
+const sendOrderStatusEmail = async (email, name, orderId, oldStatus, newStatus) => {
+  const statusMessages = {
+    pending: 'Your order is pending review',
+    processing: 'Your order is being processed',
+    requested: 'Your order has been requested from supplier',
+    received: 'Your order has been received',
+    approved: 'Your order has been approved',
+    rejected: 'Your order has been rejected',
+    cancelled: 'Your order has been cancelled'
+  };
+
+  const mailOptions = {
+    from: process.env.FROM_EMAIL || 'noreply@joshburt.com.au',
+    to: email,
+    subject: `Order #${orderId} Status Update - ${newStatus}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Order Status Update</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #3b82f6; color: white; padding: 20px; text-align: center; }
+            .content { padding: 20px; background: #f9f9f9; }
+            .status-box { background: #e0f2fe; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0; }
+            .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+            .footer { text-align: center; font-size: 12px; color: #666; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Order Status Update</h1>
+            </div>
+            <div class="content">
+              <p>Hello ${name},</p>
+              <p>Your order status has been updated:</p>
+              <div class="status-box">
+                <strong>Order #${orderId}</strong><br>
+                Status changed from: <strong>${oldStatus}</strong><br>
+                To: <strong>${newStatus}</strong><br>
+                <em>${statusMessages[newStatus] || 'Status updated'}</em>
+              </div>
+              <a href="${process.env.FRONTEND_URL || 'https://joshburt.com.au'}/orders-review.html?order=${orderId}" class="button">View Order Details</a>
+              <p>If you have any questions about your order, please contact our support team.</p>
+            </div>
+            <div class="footer">
+              <p>&copy; 2025 Josh Burt. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+      Hello ${name},
+      
+      Your order #${orderId} status has been updated.
+      
+      Status changed from: ${oldStatus}
+      To: ${newStatus}
+      
+      ${statusMessages[newStatus] || 'Status updated'}
+      
+      View order details: ${process.env.FRONTEND_URL || 'https://joshburt.com.au'}/orders-review.html?order=${orderId}
+      
+      If you have any questions about your order, please contact our support team.
+      
+      © 2025 Josh Burt. All rights reserved.
+    `
+  };
+
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    console.error('📧 Failed to send order status email:', error);
+    throw error;
+  }
+};
+
+// Send order created notification
+const sendOrderCreatedEmail = async (email, name, orderId) => {
+  const mailOptions = {
+    from: process.env.FROM_EMAIL || 'noreply@joshburt.com.au',
+    to: email,
+    subject: `Order #${orderId} Created Successfully`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Order Created</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #10b981; color: white; padding: 20px; text-align: center; }
+            .content { padding: 20px; background: #f9f9f9; }
+            .order-box { background: #d1fae5; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0; }
+            .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+            .footer { text-align: center; font-size: 12px; color: #666; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Order Created Successfully!</h1>
+            </div>
+            <div class="content">
+              <p>Hello ${name},</p>
+              <p>Thank you for your order. We have received it and will process it shortly.</p>
+              <div class="order-box">
+                <strong>Order #${orderId}</strong><br>
+                Status: <strong>Pending</strong><br>
+                <em>Your order is currently pending review by our team.</em>
+              </div>
+              <a href="${process.env.FRONTEND_URL || 'https://joshburt.com.au'}/orders-review.html?order=${orderId}" class="button">View Order Details</a>
+              <p>You will receive email notifications when your order status changes.</p>
+              <p>If you have any questions, please don't hesitate to contact us.</p>
+            </div>
+            <div class="footer">
+              <p>&copy; 2025 Josh Burt. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+      Hello ${name},
+      
+      Thank you for your order. We have received it and will process it shortly.
+      
+      Order #${orderId}
+      Status: Pending
+      
+      Your order is currently pending review by our team.
+      
+      View order details: ${process.env.FRONTEND_URL || 'https://joshburt.com.au'}/orders-review.html?order=${orderId}
+      
+      You will receive email notifications when your order status changes.
+      
+      If you have any questions, please don't hesitate to contact us.
+      
+      © 2025 Josh Burt. All rights reserved.
+    `
+  };
+
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    console.error('📧 Failed to send order created email:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendResetEmail,
   sendWelcomeEmail,
-  sendVerificationEmail
+  sendVerificationEmail,
+  sendOrderStatusEmail,
+  sendOrderCreatedEmail
 };
