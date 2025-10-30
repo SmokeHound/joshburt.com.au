@@ -196,9 +196,10 @@
       // Create formatted preview with each parameter on a separate line
       let formattedPreview = '';
       if (parsed && typeof parsed === 'object') {
+        const MAX_PREVIEW_KEYS = 5; // Show first 5 parameters in preview
+        const MAX_VALUE_LENGTH = 50; // Max length for individual parameter values
         const keys = Object.keys(parsed);
-        const maxKeys = 5; // Show first 5 parameters in preview
-        const previewKeys = keys.slice(0, maxKeys);
+        const previewKeys = keys.slice(0, MAX_PREVIEW_KEYS);
         formattedPreview = previewKeys.map(key => {
           const val = parsed[key];
           let valStr = '';
@@ -206,15 +207,15 @@
             valStr = String(val);
           } else if (typeof val === 'object') {
             valStr = JSON.stringify(val);
-            if (valStr.length > 50) valStr = valStr.slice(0, 47) + '...';
+            if (valStr.length > MAX_VALUE_LENGTH) valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
           } else {
             valStr = String(val);
-            if (valStr.length > 50) valStr = valStr.slice(0, 47) + '...';
+            if (valStr.length > MAX_VALUE_LENGTH) valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
           }
           return `${key}: ${valStr}`;
         }).join('\n');
-        if (keys.length > maxKeys) {
-          formattedPreview += `\n... (${keys.length - maxKeys} more)`;
+        if (keys.length > MAX_PREVIEW_KEYS) {
+          formattedPreview += `\n... (${keys.length - MAX_PREVIEW_KEYS} more)`;
         }
       } else {
         formattedPreview = truncated;
