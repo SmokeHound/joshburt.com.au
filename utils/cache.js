@@ -11,7 +11,7 @@ const stats = {
   hits: 0,
   misses: 0,
   sets: 0,
-  deletes: 0,
+  deletes: 0
 };
 
 /**
@@ -34,19 +34,19 @@ function generateKey(namespace, key) {
 function get(namespace, key) {
   const cacheKey = generateKey(namespace, key);
   const entry = cache.get(cacheKey);
-  
+
   if (!entry) {
     stats.misses++;
     return null;
   }
-  
+
   // Check if entry has expired
   if (entry.expiresAt && Date.now() > entry.expiresAt) {
     cache.delete(cacheKey);
     stats.misses++;
     return null;
   }
-  
+
   stats.hits++;
   return entry.value;
 }
@@ -63,9 +63,9 @@ function set(namespace, key, value, ttl = null) {
   const entry = {
     value,
     expiresAt: ttl ? Date.now() + (ttl * 1000) : null,
-    createdAt: Date.now(),
+    createdAt: Date.now()
   };
-  
+
   cache.set(cacheKey, entry);
   stats.sets++;
 }
@@ -93,14 +93,14 @@ function del(namespace, key) {
 function clearNamespace(namespace) {
   let count = 0;
   const prefix = `${namespace}:`;
-  
+
   for (const key of cache.keys()) {
     if (key.startsWith(prefix)) {
       cache.delete(key);
       count++;
     }
   }
-  
+
   stats.deletes += count;
   return count;
 }
@@ -119,14 +119,14 @@ function clearAll() {
  * @returns {object} - Cache statistics
  */
 function getStats() {
-  const hitRate = stats.hits + stats.misses > 0 
+  const hitRate = stats.hits + stats.misses > 0
     ? (stats.hits / (stats.hits + stats.misses) * 100).toFixed(2)
     : 0;
-    
+
   return {
     ...stats,
     size: cache.size,
-    hitRate: `${hitRate}%`,
+    hitRate: `${hitRate}%`
   };
 }
 
@@ -154,7 +154,7 @@ async function wrap(namespace, key, fn, ttl = 300) {
   if (cached !== null) {
     return cached;
   }
-  
+
   // Execute function and cache result
   const result = await fn();
   set(namespace, key, result, ttl);
@@ -172,7 +172,7 @@ function invalidate(namespace, pattern) {
   let count = 0;
   const prefix = `${namespace}:`;
   const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern);
-  
+
   for (const key of cache.keys()) {
     if (key.startsWith(prefix)) {
       const keyPart = key.substring(prefix.length);
@@ -182,7 +182,7 @@ function invalidate(namespace, pattern) {
       }
     }
   }
-  
+
   stats.deletes += count;
   return count;
 }
@@ -197,5 +197,5 @@ module.exports = {
   resetStats,
   wrap,
   invalidate,
-  generateKey,
+  generateKey
 };
