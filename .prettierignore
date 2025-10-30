@@ -1,0 +1,34 @@
+# Dependencies
+node_modules
+package-lock.json
+
+# Build outputs
+.netlify
+dist
+build
+coverage
+
+# Database
+*.sqlite
+*.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Minified files
+*.min.js
+*.min.css
+
+# Generated files
+assets/css/styles.css
