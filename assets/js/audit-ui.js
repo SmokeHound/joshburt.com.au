@@ -192,6 +192,33 @@
 
       const tlen = Math.max(40, Math.min(1000, parseInt(state.truncateLen) || 120));
       const truncated = (pretty && pretty.length > tlen) ? (pretty.slice(0, tlen - 3) + '…') : pretty;
+
+      // Create formatted preview with each parameter on a separate line
+      let formattedPreview = '';
+      if (parsed && typeof parsed === 'object') {
+        const keys = Object.keys(parsed);
+        const maxKeys = 5; // Show first 5 parameters in preview
+        const previewKeys = keys.slice(0, maxKeys);
+        formattedPreview = previewKeys.map(key => {
+          const val = parsed[key];
+          let valStr = '';
+          if (val === null || val === undefined) {
+            valStr = String(val);
+          } else if (typeof val === 'object') {
+            valStr = JSON.stringify(val);
+            if (valStr.length > 50) valStr = valStr.slice(0, 47) + '...';
+          } else {
+            valStr = String(val);
+            if (valStr.length > 50) valStr = valStr.slice(0, 47) + '...';
+          }
+          return `${key}: ${valStr}`;
+        }).join('\n');
+        if (keys.length > maxKeys) {
+          formattedPreview += `\n... (${keys.length - maxKeys} more)`;
+        }
+      } else {
+        formattedPreview = truncated;
+      }
       const baseId = `audit-${idx}`;
       const boxId = `${baseId}-box`;
       const prePrettyId = `${baseId}-pretty`;
@@ -203,7 +230,7 @@
         <td class="p-2 align-top font-medium">${action}</td>
         <td class="p-2 align-top max-w-sm break-words">
           ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
-          <div class="text-xs text-gray-300 dark:text-gray-400 break-words">${escapeHtml(truncated || '')}</div>
+          <div class="text-xs text-gray-300 dark:text-gray-400 break-words whitespace-pre-wrap">${escapeHtml(formattedPreview || '')}</div>
           ${(pretty || raw) ? `
           <div class="mt-1 flex gap-2">
             <button class="audit-toggle px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${boxId}">View</button>
