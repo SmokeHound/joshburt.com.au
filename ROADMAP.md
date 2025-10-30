@@ -103,7 +103,7 @@ This roadmap outlines the phased implementation of features and improvements for
 - [ ] **Deliverable**: Rich product browsing experience
 
 ### Week 13: Order Management
-- [ ] Add order status tracking (pending → processing → shipped → delivered)
+- [ ] Add order status tracking (pending → processing → requested → received)
 - [ ] Create order status update UI for admins
 - [ ] Send email notifications on status changes
 - [ ] Add order history export (CSV format)
@@ -113,9 +113,9 @@ This roadmap outlines the phased implementation of features and improvements for
 ### Week 14-15: Enhanced Analytics
 - [ ] Add custom date range picker to analytics
 - [ ] Implement comparative analytics (vs previous period)
-- [ ] Create sales trend charts (Chart.js or similar)
+- [ ] Create order trend charts (Chart.js or similar)
 - [ ] Add top products report
-- [ ] Build customer segmentation view
+- [ ] Build product category segmentation view
 - [ ] **Deliverable**: Data-driven insights dashboard
 
 ### Week 16: Notification System
@@ -185,19 +185,19 @@ This roadmap outlines the phased implementation of features and improvements for
 - [ ] **Deliverable**: Reliable, automated deployments
 
 ### Week 23: Monitoring Expansion
-- [ ] Set up Application Performance Monitoring (Datadog/New Relic)
 - [ ] Create custom dashboards for key metrics
 - [ ] Add alerting rules (error rate, response time)
-- [ ] Implement log aggregation (Papertrail/Loggly)
+- [ ] Implement log aggregation
 - [ ] Set up weekly performance reports
 - [ ] **Deliverable**: Comprehensive system visibility
 
 ### Week 24: Documentation
 - [ ] Create architecture diagrams (system overview, data flow)
-- [ ] Write API documentation (OpenAPI/Swagger)
+- [ ] Write API documentation
 - [ ] Document deployment procedures
 - [ ] Create developer onboarding guide
 - [ ] Write troubleshooting guides for common issues
+- [ ] Consolidate docs into a more streamlined amount of documents
 - [ ] **Deliverable**: Complete technical documentation
 
 ---
@@ -229,34 +229,10 @@ This roadmap outlines the phased implementation of features and improvements for
 - [ ] Build inventory reports (turnover rate, dead stock)
 - [ ] **Deliverable**: Professional inventory system
 
-### Week 29: Email Marketing Integration
-- [ ] Integrate with email provider (Mailchimp/SendGrid)
-- [ ] Create email subscription system
-- [ ] Build email templates (order confirmation, newsletters)
-- [ ] Add email preference center
-- [ ] Track email engagement metrics
-- [ ] **Deliverable**: Automated email campaigns
-
-### Week 30: Payment Gateway
-- [ ] Integrate Stripe payment processing
-- [ ] Add payment method management
-- [ ] Implement payment retry logic
-- [ ] Create payment receipt generation
-- [ ] Add refund processing flow
-- [ ] **Deliverable**: Complete payment system
-
 ---
 
 ## **Phase 8: Scale & Innovation** (Weeks 31+)
 *Focus: Preparing for growth and future technologies*
-
-### Internationalization (i18n)
-- [ ] Set up i18n framework (i18next or similar)
-- [ ] Extract all UI strings to translation files
-- [ ] Add language selector to navigation
-- [ ] Support multiple currencies with conversion
-- [ ] Implement RTL support for applicable languages
-- [ ] **Deliverable**: Multi-language support
 
 ### TypeScript Migration
 - [ ] Set up TypeScript configuration
@@ -271,7 +247,6 @@ This roadmap outlines the phased implementation of features and improvements for
 - [ ] Implement demand forecasting
 - [ ] Add anomaly detection for orders
 - [ ] Create smart search with NLP
-- [ ] Build customer segmentation model
 - [ ] **Deliverable**: AI-powered insights
 
 ### Mobile Applications
@@ -279,7 +254,6 @@ This roadmap outlines the phased implementation of features and improvements for
 - [ ] Set up mobile project structure
 - [ ] Build core mobile features (products, orders, profile)
 - [ ] Implement mobile-specific features (push notifications, biometrics)
-- [ ] Submit to App Store and Google Play
 - [ ] **Deliverable**: Native mobile apps
 
 ---
