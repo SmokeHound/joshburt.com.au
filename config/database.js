@@ -18,7 +18,7 @@ const pgConfig = DATABASE_URL
     // Query timeout to prevent long-running queries
     query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
     // Enable statement timeout for PostgreSQL
-    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000,
+    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
   }
   : {
     user: process.env.DB_USER,
@@ -32,7 +32,7 @@ const pgConfig = DATABASE_URL
     idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
     connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
     query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
-    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000,
+    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
   };
 
 // SQLite fallback for development
@@ -156,8 +156,8 @@ class Database {
       try {
         const result = await client.query(preparedSql, preparedParams);
         client.release();
-        return { 
-          id: result.rows[0]?.id || null, 
+        return {
+          id: result.rows[0]?.id || null,
           changes: result.rowCount || 0,
           rows: result.rows
         };
@@ -457,6 +457,12 @@ async function createPostgreSQLTables() {
   // Backfill legacy settings tables missing updated_at
   await database.run('ALTER TABLE settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
 
+  // Ensure all timestamp columns exist before creating indexes (for legacy databases)
+  await database.run('ALTER TABLE products ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  await database.run('ALTER TABLE products ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  await database.run('ALTER TABLE consumables ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  await database.run('ALTER TABLE consumables ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+
   // Create indexes for better performance
   await database.run('CREATE INDEX IF NOT EXISTS idx_products_type ON products(type)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_products_code ON products(code)');
@@ -662,15 +668,15 @@ async function createSQLiteTables() {
 async function createDefaultUsers() {
   // Create default admin user if it doesn't exist
   const existingAdmin = await database.get('SELECT id FROM users WHERE email = ?', ['admin@joshburt.com.au']);
-  
+
   if (!existingAdmin) {
     const adminPassword = await bcrypt.hash('Admin123!', parseInt(process.env.BCRYPT_ROUNDS) || 12);
-    
+
     await database.run(`
       INSERT INTO users (email, name, password_hash, role, email_verified)
       VALUES (?, ?, ?, ?, ?)
     `, ['admin@joshburt.com.au', 'Admin User', adminPassword, 'admin', true]);
-    
+
     console.log('👑 Default admin user created: admin@joshburt.com.au / Admin123!');
   }
 
@@ -678,24 +684,24 @@ async function createDefaultUsers() {
   const testUser = await database.get('SELECT id FROM users WHERE email = ?', ['test@example.com']);
   if (!testUser) {
     const testPassword = await bcrypt.hash('Password123!', parseInt(process.env.BCRYPT_ROUNDS) || 12);
-    
+
     await database.run(`
       INSERT INTO users (email, name, password_hash, role, email_verified)
       VALUES (?, ?, ?, ?, ?)
     `, ['test@example.com', 'Test User', testPassword, 'user', true]);
-    
+
     console.log('👤 Test user created: test@example.com / Password123!');
   }
 
   const managerUser = await database.get('SELECT id FROM users WHERE email = ?', ['manager@example.com']);
   if (!managerUser) {
     const managerPassword = await bcrypt.hash('Manager123!', parseInt(process.env.BCRYPT_ROUNDS) || 12);
-    
+
     await database.run(`
       INSERT INTO users (email, name, password_hash, role, email_verified)
       VALUES (?, ?, ?, ?, ?)
     `, ['manager@example.com', 'Manager User', managerPassword, 'manager', true]);
-    
+
     console.log('👔 Manager user created: manager@example.com / Manager123!');
   }
 }
