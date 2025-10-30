@@ -1,0 +1,80 @@
+# Netlify Staging Environment Configuration
+# This file should be used for staging deployments
+
+[build]
+  command = "npm install"
+  functions = "netlify/functions"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Staging-specific: Allow SQLite fallback for testing
+  DB_DISABLE_SQLITE_FALLBACK = "false"
+  
+# Staging context configuration
+[context.staging]
+  environment = { NODE_ENV = "staging" }
+  
+[context.branch-deploy]
+  command = "npm install"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With"
+    Access-Control-Allow-Methods = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Access-Control-Max-Age = "86400"
+
+[[headers]]
+  # Static assets - Medium cache for staging (1 day)
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  # CSS files - Medium cache for staging
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  # JavaScript files - Medium cache for staging
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  # Images - Medium cache for staging
+  for = "/*.{jpg,jpeg,png,gif,svg,webp,ico}"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  # HTML files - Short cache for staging
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  # Security headers for staging (less strict than production)
+  for = "/*"
+  [headers.values]
+    # Shorter HSTS for staging
+    Strict-Transport-Security = "max-age=3600"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+
+# Redirect rules for staging
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
