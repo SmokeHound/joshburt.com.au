@@ -33,7 +33,12 @@ function sanitizeString(input, options = {}) {
   
   // Remove HTML tags if specified
   if (options.stripHtml) {
-    sanitized = sanitized.replace(/<[^>]*>/g, '');
+    // Use a loop to handle nested or incomplete tags
+    let prevLength;
+    do {
+      prevLength = sanitized.length;
+      sanitized = sanitized.replace(/<[^>]*>/g, '');
+    } while (sanitized.length !== prevLength);
   }
   
   // Escape HTML entities if specified
