@@ -370,6 +370,11 @@ async function createPostgreSQLTables() {
   await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
   await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
 
+  // Add 2FA columns to users table for PostgreSQL
+  await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_secret VARCHAR(255)');
+  await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN DEFAULT false');
+  await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS backup_codes TEXT');
+
   // Create order_items table for PostgreSQL
   await database.run(`
     CREATE TABLE IF NOT EXISTS order_items (
@@ -606,6 +611,23 @@ async function createSQLiteTables() {
   // Backfill legacy settings tables missing updated_at (SQLite lacks IF NOT EXISTS on ADD COLUMN in some versions)
   try {
     await database.run('ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP');
+  } catch (e) {
+    // Ignore if column already exists
+  }
+
+  // Add 2FA columns to users table for SQLite
+  try {
+    await database.run('ALTER TABLE users ADD COLUMN totp_secret TEXT');
+  } catch (e) {
+    // Ignore if column already exists
+  }
+  try {
+    await database.run('ALTER TABLE users ADD COLUMN totp_enabled BOOLEAN DEFAULT 0');
+  } catch (e) {
+    // Ignore if column already exists
+  }
+  try {
+    await database.run('ALTER TABLE users ADD COLUMN backup_codes TEXT');
   } catch (e) {
     // Ignore if column already exists
   }
