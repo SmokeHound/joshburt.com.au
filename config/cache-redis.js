@@ -53,7 +53,7 @@ function generateKey(namespace, key) {
 async function get(namespace, key) {
   if (!USE_REDIS) {
     // Fallback to in-memory cache
-    return require('./cache').get(namespace, key);
+    return require('../utils/cache').get(namespace, key);
   }
 
   const cacheKey = generateKey(namespace, key);
@@ -78,7 +78,7 @@ async function get(namespace, key) {
 async function set(namespace, key, value, ttl = null) {
   if (!USE_REDIS) {
     // Fallback to in-memory cache
-    return require('./cache').set(namespace, key, value, ttl);
+    return require('../utils/cache').set(namespace, key, value, ttl);
   }
 
   const cacheKey = generateKey(namespace, key);
@@ -100,7 +100,7 @@ async function set(namespace, key, value, ttl = null) {
  */
 async function del(namespace, key) {
   if (!USE_REDIS) {
-    return require('./cache').del(namespace, key);
+    return require('../utils/cache').del(namespace, key);
   }
 
   const cacheKey = generateKey(namespace, key);
@@ -121,7 +121,7 @@ async function del(namespace, key) {
  */
 async function clearNamespace(namespace) {
   if (!USE_REDIS) {
-    return require('./cache').clearNamespace(namespace);
+    return require('../utils/cache').clearNamespace(namespace);
   }
 
   try {
@@ -143,7 +143,7 @@ async function clearNamespace(namespace) {
  */
 async function clearAll() {
   if (!USE_REDIS) {
-    return require('./cache').clearAll();
+    return require('../utils/cache').clearAll();
   }
 
   try {
@@ -158,7 +158,7 @@ async function clearAll() {
  */
 function getStats() {
   if (!USE_REDIS) {
-    return require('./cache').getStats();
+    return require('../utils/cache').getStats();
   }
 
   const hitRate = stats.hits + stats.misses > 0
@@ -203,7 +203,7 @@ async function wrap(namespace, key, fn, ttl = 300) {
  */
 async function invalidate(namespace, pattern) {
   if (!USE_REDIS) {
-    return require('./cache').invalidate(namespace, pattern);
+    return require('../utils/cache').invalidate(namespace, pattern);
   }
 
   try {

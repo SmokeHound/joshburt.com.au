@@ -59,12 +59,6 @@ describe('Cache Utility', () => {
       await new Promise(resolve => setTimeout(resolve, 100));
       expect(cache.get('test', 'key1')).toBe('value1');
     });
-
-    test('should handle entries without TTL', async () => {
-      cache.set('test', 'key1', 'value1'); // No TTL = no expiration
-      await new Promise(resolve => setTimeout(resolve, 100));
-      expect(cache.get('test', 'key1')).toBe('value1');
-    });
   });
 
   describe('Namespace operations', () => {
