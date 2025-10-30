@@ -1,6 +1,8 @@
 // Netlify Function: Full CRUD /.netlify/functions/consumables
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
+const { logAudit } = require('../../utils/audit');
+const { requirePermission } = require('../../utils/http');
 
 exports.handler = withHandler(async function(event){
   await database.connect();
@@ -37,6 +39,9 @@ exports.handler = withHandler(async function(event){
 
   async function handlePost(event) {
     try {
+      const { user, response: authResponse } = await requirePermission(event, 'consumables', 'create');
+      if (authResponse) return authResponse;
+      
       const body = parseBody(event);
       const { name, code, type, category, description } = body;
       if (!name || !type || !category) {
@@ -48,6 +53,7 @@ exports.handler = withHandler(async function(event){
       `;
       const params = [name, code || '', type, category, description || ''];
       const result = await database.run(query, params);
+      await logAudit(event, { action: 'consumable.create', userId: user && user.id, details: { id: result.id, name, code, type, category } });
       return ok({
         id: result.id,
         message: 'Consumable created successfully',
@@ -64,6 +70,9 @@ exports.handler = withHandler(async function(event){
 
   async function handlePut(event) {
     try {
+      const { user, response: authResponse } = await requirePermission(event, 'consumables', 'update');
+      if (authResponse) return authResponse;
+      
       const body = parseBody(event);
       const { id, name, code, type, category, description } = body;
       if (!id || !name || !type || !category) {
@@ -77,6 +86,7 @@ exports.handler = withHandler(async function(event){
       const params = [name, code || '', type, category, description || '', id];
       const result = await database.run(query, params);
       if (result.changes === 0) return error(404, 'Consumable not found');
+      await logAudit(event, { action: 'consumable.update', userId: user && user.id, details: { id, name, code, type, category } });
       return ok({
         message: 'Consumable updated successfully',
         consumable: { id, name, code, type, category, description }
@@ -92,10 +102,15 @@ exports.handler = withHandler(async function(event){
 
   async function handleDelete(event) {
     try {
+      const { user, response: authResponse } = await requirePermission(event, 'consumables', 'delete');
+      if (authResponse) return authResponse;
+      
       const { id } = parseBody(event);
       if (!id) return error(400, 'Missing required field: id');
+      const existing = await database.get('SELECT name, code FROM consumables WHERE id = ?', [id]);
+      if (!existing) return error(404, 'Consumable not found');
       const result = await database.run('DELETE FROM consumables WHERE id = ?', [id]);
-      if (result.changes === 0) return error(404, 'Consumable not found');
+      await logAudit(event, { action: 'consumable.delete', userId: user && user.id, details: { id, name: existing.name, code: existing.code } });
       return ok({ message: 'Consumable deleted successfully' });
     } catch (e) {
       console.error('DELETE /consumables error:', e);
