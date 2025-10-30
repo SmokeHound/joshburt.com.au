@@ -1032,6 +1032,12 @@
           const themeId = card.getAttribute('data-theme');
           themeSelect.value = themeId;
           updateActiveThemeCard(themeId);
+          
+          // Apply theme immediately using ThemeManager
+          if (window.Theme) {
+            window.Theme.setTheme(themeId, true);
+          }
+          
           // Provide immediate visual feedback
           try { pulsePreviews(700); } catch (e) {}
           await saveSettings();
