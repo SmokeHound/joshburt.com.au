@@ -80,6 +80,14 @@
                     <div id="password-error" class="sr-only" role="alert" aria-live="polite"></div>
                 </div>
 
+                <!-- Remember Me Checkbox -->
+                <div class="mb-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="remember-me" class="rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-800">
+                        <span class="ml-2 text-sm text-gray-300">Remember me for 90 days</span>
+                    </label>
+                </div>
+
                 <!-- Login Error Display -->
                 <div id="login-error" class="hidden text-sm mb-4 text-pink-500"></div>
 
@@ -209,6 +217,7 @@
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
 
             // Basic client-side validation
             if (!username.trim() || !password.trim()) {
@@ -234,7 +243,8 @@
                     },
                     body: JSON.stringify({
                         email: username, // function expects email field
-                        password: password
+                        password: password,
+                        rememberMe: rememberMe
                     })
                 });
 

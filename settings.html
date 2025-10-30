@@ -720,9 +720,19 @@
                 <label class="block mb-1 font-semibold" for="max-login-attempts">Max Login Attempts</label>
                 <input id="max-login-attempts" type="number" min="3" max="10" value="5" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" />
               </div>
-              <div class="flex items-center gap-2">
-                <input id="enable-2fa" type="checkbox" />
-                <label for="enable-2fa">Enable Two-Factor Authentication (future)</label>
+              <div>
+                <label class="block mb-2 font-semibold text-white">Two-Factor Authentication (2FA)</label>
+                <div id="2fa-status" class="mb-3 p-3 rounded bg-gray-800/50 border border-gray-700">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span id="2fa-status-text" class="text-sm text-gray-400">Status: Not configured</span>
+                    </div>
+                    <button id="toggle-2fa" type="button" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors">
+                      Setup 2FA
+                    </button>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-400 mb-3">Add an extra layer of security by requiring a time-based code in addition to your password.</p>
               </div>
               <div class="flex items-center gap-2">
                 <input id="audit-all-actions" type="checkbox" checked />
@@ -741,6 +751,75 @@
 
         </section>
     </main>
+
+    <!-- 2FA Setup Modal -->
+    <div id="2fa-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div class="bg-gray-800 rounded-lg shadow-2xl max-w-md w-full p-6 border border-gray-700">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold text-white">Setup Two-Factor Authentication</h3>
+          <button id="close-2fa-modal" class="text-gray-400 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Setup Step -->
+        <div id="2fa-setup-step" class="space-y-4">
+          <p class="text-gray-300 text-sm">Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)</p>
+          <div class="flex justify-center p-4 bg-white rounded">
+            <img id="2fa-qr-code" src="" alt="QR Code" class="max-w-full" />
+          </div>
+          <div class="text-center">
+            <p class="text-xs text-gray-400 mb-2">Or enter this code manually:</p>
+            <code id="2fa-secret" class="text-sm bg-gray-900 px-3 py-2 rounded text-green-400"></code>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Enter verification code:</label>
+            <input 
+              type="text" 
+              id="2fa-verify-token" 
+              maxlength="6"
+              placeholder="000000"
+              class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl tracking-widest"
+            />
+          </div>
+          <button id="verify-2fa" class="w-full px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors">
+            Verify and Enable 2FA
+          </button>
+        </div>
+
+        <!-- Backup Codes Step -->
+        <div id="2fa-backup-codes-step" class="hidden space-y-4">
+          <p class="text-gray-300 text-sm">Save these backup codes in a safe place. You can use them to login if you lose access to your authenticator app.</p>
+          <div id="backup-codes-list" class="bg-gray-900 p-4 rounded space-y-2 max-h-64 overflow-y-auto">
+            <!-- Backup codes will be inserted here -->
+          </div>
+          <button id="finish-2fa-setup" class="w-full px-4 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
+            I've Saved My Backup Codes
+          </button>
+        </div>
+
+        <!-- Disable Step -->
+        <div id="2fa-disable-step" class="hidden space-y-4">
+          <p class="text-gray-300 text-sm">Enter your password to disable two-factor authentication.</p>
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Password:</label>
+            <input 
+              type="password" 
+              id="2fa-disable-password" 
+              class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button id="confirm-disable-2fa" class="w-full px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition-colors">
+            Disable 2FA
+          </button>
+        </div>
+
+        <div id="2fa-error" class="hidden mt-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200 text-sm"></div>
+      </div>
+    </div>
+
     <script src="admin-audit-logger.js"></script>
     <script>
         // Helper to send audit entries to serverless audit endpoint
@@ -1182,6 +1261,164 @@
         AuditLogger.log('security_change', msg);
         sendAudit('security_change', msg);
         showToast('Security settings saved successfully!');
+      });
+
+      // 2FA Management
+      const toggle2FABtn = document.getElementById('toggle-2fa');
+      const modal2FA = document.getElementById('2fa-modal');
+      const closeModalBtn = document.getElementById('close-2fa-modal');
+      const setupStep = document.getElementById('2fa-setup-step');
+      const backupCodesStep = document.getElementById('2fa-backup-codes-step');
+      const disableStep = document.getElementById('2fa-disable-step');
+      const errorDiv = document.getElementById('2fa-error');
+
+      // Check 2FA status on load
+      async function check2FAStatus() {
+        try {
+          const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+          const response = await fetch(`${window.FN_BASE || '/.netlify/functions'}/auth?action=me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const data = await response.json();
+          
+          if (data.user && data.user.totpEnabled) {
+            document.getElementById('2fa-status-text').textContent = 'Status: Enabled ✓';
+            document.getElementById('2fa-status-text').className = 'text-sm text-green-400';
+            toggle2FABtn.textContent = 'Disable 2FA';
+            toggle2FABtn.className = 'px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors';
+          }
+        } catch (e) {
+          console.error('Failed to check 2FA status:', e);
+        }
+      }
+
+      check2FAStatus();
+
+      toggle2FABtn.addEventListener('click', async () => {
+        const isEnabled = toggle2FABtn.textContent === 'Disable 2FA';
+        modal2FA.classList.remove('hidden');
+        errorDiv.classList.add('hidden');
+        
+        if (isEnabled) {
+          setupStep.classList.add('hidden');
+          backupCodesStep.classList.add('hidden');
+          disableStep.classList.remove('hidden');
+        } else {
+          setupStep.classList.remove('hidden');
+          backupCodesStep.classList.add('hidden');
+          disableStep.classList.add('hidden');
+          
+          // Start 2FA setup
+          try {
+            const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+            const response = await fetch(`${window.FN_BASE || '/.netlify/functions'}/auth?action=2fa-setup`, {
+              method: 'POST',
+              headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
+              document.getElementById('2fa-qr-code').src = data.qrCode;
+              document.getElementById('2fa-secret').textContent = data.secret;
+            } else {
+              errorDiv.textContent = data.error || 'Failed to setup 2FA';
+              errorDiv.classList.remove('hidden');
+            }
+          } catch (e) {
+            errorDiv.textContent = 'Network error. Please try again.';
+            errorDiv.classList.remove('hidden');
+          }
+        }
+      });
+
+      closeModalBtn.addEventListener('click', () => {
+        modal2FA.classList.add('hidden');
+      });
+
+      // Verify and enable 2FA
+      document.getElementById('verify-2fa').addEventListener('click', async () => {
+        const token = document.getElementById('2fa-verify-token').value.trim();
+        
+        if (!token || token.length !== 6) {
+          errorDiv.textContent = 'Please enter a 6-digit code';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+
+        try {
+          const authToken = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+          const response = await fetch(`${window.FN_BASE || '/.netlify/functions'}/auth?action=2fa-enable`, {
+            method: 'POST',
+            headers: { 
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ totpToken: token })
+          });
+          const data = await response.json();
+          
+          if (response.ok) {
+            // Show backup codes
+            setupStep.classList.add('hidden');
+            backupCodesStep.classList.remove('hidden');
+            
+            const codesList = document.getElementById('backup-codes-list');
+            codesList.innerHTML = data.backupCodes.map(code => 
+              `<div class="font-mono text-green-400 text-center py-2 px-3 bg-gray-800 rounded">${code}</div>`
+            ).join('');
+          } else {
+            errorDiv.textContent = data.error || 'Invalid verification code';
+            errorDiv.classList.remove('hidden');
+          }
+        } catch (e) {
+          errorDiv.textContent = 'Network error. Please try again.';
+          errorDiv.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('finish-2fa-setup').addEventListener('click', () => {
+        modal2FA.classList.add('hidden');
+        showToast('2FA enabled successfully!');
+        check2FAStatus();
+      });
+
+      // Disable 2FA
+      document.getElementById('confirm-disable-2fa').addEventListener('click', async () => {
+        const password = document.getElementById('2fa-disable-password').value;
+        
+        if (!password) {
+          errorDiv.textContent = 'Please enter your password';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+
+        try {
+          const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+          const response = await fetch(`${window.FN_BASE || '/.netlify/functions'}/auth?action=2fa-disable`, {
+            method: 'POST',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password })
+          });
+          const data = await response.json();
+          
+          if (response.ok) {
+            modal2FA.classList.add('hidden');
+            showToast('2FA disabled successfully');
+            check2FAStatus();
+          } else {
+            errorDiv.textContent = data.error || 'Failed to disable 2FA';
+            errorDiv.classList.remove('hidden');
+          }
+        } catch (e) {
+          errorDiv.textContent = 'Network error. Please try again.';
+          errorDiv.classList.remove('hidden');
+        }
       });
     }
 
