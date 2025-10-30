@@ -3,7 +3,7 @@
 
 /**
  * Role hierarchy and permissions
- * 
+ *
  * Roles (in order of privilege):
  * - admin: Full system access
  * - manager: Content management and user viewing
@@ -83,14 +83,20 @@ const PERMISSIONS = {
  * @returns {boolean} - True if user has permission
  */
 function hasPermission(user, resource, action) {
-  if (!user || !user.role) return false;
-  
+  if (!user || !user.role) {
+    return false;
+  }
+
   const resourcePerms = PERMISSIONS[resource];
-  if (!resourcePerms) return false;
-  
+  if (!resourcePerms) {
+    return false;
+  }
+
   const allowedRoles = resourcePerms[action];
-  if (!allowedRoles) return false;
-  
+  if (!allowedRoles) {
+    return false;
+  }
+
   return allowedRoles.includes(user.role);
 }
 
@@ -101,7 +107,9 @@ function hasPermission(user, resource, action) {
  * @returns {boolean} - True if user has one of the roles
  */
 function hasRole(user, roles) {
-  if (!user || !user.role) return false;
+  if (!user || !user.role) {
+    return false;
+  }
   return roles.includes(user.role);
 }
 

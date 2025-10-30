@@ -30,7 +30,7 @@ function initSentry() {
     integrations: [
       // Add integrations as needed
     ],
-    beforeSend(event, hint) {
+    beforeSend(event, _hint) {
       // Filter or modify events before sending
       // Remove sensitive data
       if (event.request) {
@@ -171,7 +171,7 @@ async function flush(timeout = 2000) {
     return true;
   }
 
-  return await Sentry.close(timeout);
+  return Sentry.close(timeout);
 }
 
 /**

@@ -24,31 +24,31 @@ const PASSWORD_REGEX = {
  */
 function validatePassword(password) {
   const errors = [];
-  
+
   if (!password || typeof password !== 'string') {
     return { valid: false, errors: ['Password is required'] };
   }
-  
+
   if (password.length < PASSWORD_MIN_LENGTH) {
     errors.push(`Password must be at least ${PASSWORD_MIN_LENGTH} characters long`);
   }
-  
+
   if (!PASSWORD_REGEX.uppercase.test(password)) {
     errors.push('Password must contain at least one uppercase letter');
   }
-  
+
   if (!PASSWORD_REGEX.lowercase.test(password)) {
     errors.push('Password must contain at least one lowercase letter');
   }
-  
+
   if (!PASSWORD_REGEX.number.test(password)) {
     errors.push('Password must contain at least one number');
   }
-  
+
   if (!PASSWORD_REGEX.special.test(password)) {
     errors.push('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
   }
-  
+
   return {
     valid: errors.length === 0,
     errors
