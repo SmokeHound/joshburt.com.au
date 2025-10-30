@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Notification Preferences - Josh Burt</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
+</head>
+<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+  
+  <div id="main-nav"></div>
+  <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
+
+  <main id="main-content" class="flex-1 p-4 md:p-6 space-y-6" role="main">
+    <header class="page-header card border">
+      <h1 class="text-2xl font-bold">Notification Preferences</h1>
+      <p class="text-sm text-gray-400 mt-1">Manage how you receive notifications</p>
+    </header>
+
+    <!-- Preferences Form -->
+    <div class="card p-6">
+      <form id="preferences-form" class="space-y-6">
+        <!-- Email Notifications -->
+        <div>
+          <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            Email Notifications
+          </h2>
+          <div class="space-y-3">
+            <label class="flex items-center justify-between p-4 rounded-lg border border-gray-700 hover:bg-gray-800 cursor-pointer transition-colors">
+              <div>
+                <div class="font-medium">Order Status Updates</div>
+                <div class="text-sm text-gray-400">Receive emails when your order status changes</div>
+              </div>
+              <input type="checkbox" id="email_order_status" class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" />
+            </label>
+
+            <label class="flex items-center justify-between p-4 rounded-lg border border-gray-700 hover:bg-gray-800 cursor-pointer transition-colors">
+              <div>
+                <div class="font-medium">System Announcements</div>
+                <div class="text-sm text-gray-400">Important system updates and maintenance notifications</div>
+              </div>
+              <input type="checkbox" id="email_system_announcements" class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" />
+            </label>
+
+            <label class="flex items-center justify-between p-4 rounded-lg border border-gray-700 hover:bg-gray-800 cursor-pointer transition-colors">
+              <div>
+                <div class="font-medium">Product Updates</div>
+                <div class="text-sm text-gray-400">New products and special offers</div>
+              </div>
+              <input type="checkbox" id="email_product_updates" class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" />
+            </label>
+          </div>
+        </div>
+
+        <!-- In-App Notifications -->
+        <div>
+          <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            In-App Notifications
+          </h2>
+          <div class="space-y-3">
+            <label class="flex items-center justify-between p-4 rounded-lg border border-gray-700 hover:bg-gray-800 cursor-pointer transition-colors">
+              <div>
+                <div class="font-medium">Order Status Updates</div>
+                <div class="text-sm text-gray-400">Show in-app notifications for order status changes</div>
+              </div>
+              <input type="checkbox" id="in_app_order_status" class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" />
+            </label>
+
+            <label class="flex items-center justify-between p-4 rounded-lg border border-gray-700 hover:bg-gray-800 cursor-pointer transition-colors">
+              <div>
+                <div class="font-medium">System Announcements</div>
+                <div class="text-sm text-gray-400">Show important system announcements</div>
+              </div>
+              <input type="checkbox" id="in_app_system_announcements" class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" />
+            </label>
+
+            <label class="flex items-center justify-between p-4 rounded-lg border border-gray-700 hover:bg-gray-800 cursor-pointer transition-colors">
+              <div>
+                <div class="font-medium">Product Updates</div>
+                <div class="text-sm text-gray-400">Show notifications about new products</div>
+              </div>
+              <input type="checkbox" id="in_app_product_updates" class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 pt-4">
+          <button type="submit" class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            Save Preferences
+          </button>
+          <button type="button" id="reset-btn" class="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium">
+            Reset to Defaults
+          </button>
+        </div>
+
+        <!-- Status Message -->
+        <div id="status-message" class="hidden p-4 rounded-lg"></div>
+      </form>
+    </div>
+
+    <!-- Information Card -->
+    <div class="card p-6">
+      <h3 class="text-lg font-semibold mb-3">About Notifications</h3>
+      <div class="space-y-2 text-sm text-gray-400">
+        <p>• <strong>Email notifications</strong> are sent to your registered email address.</p>
+        <p>• <strong>In-app notifications</strong> appear in the notification center (bell icon) when you're logged in.</p>
+        <p>• You can change these preferences at any time.</p>
+        <p>• Some critical system notifications cannot be disabled for security and account management purposes.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      'use strict';
+
+      const form = document.getElementById('preferences-form');
+      const resetBtn = document.getElementById('reset-btn');
+      const statusMessage = document.getElementById('status-message');
+
+      // Load current preferences
+      async function loadPreferences() {
+        try {
+          const response = await fetch('/.netlify/functions/notification-preferences', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+
+          if (response.ok) {
+            const prefs = await response.json();
+            
+            // Set form values
+            document.getElementById('email_order_status').checked = prefs.email_order_status !== false;
+            document.getElementById('email_system_announcements').checked = prefs.email_system_announcements !== false;
+            document.getElementById('email_product_updates').checked = prefs.email_product_updates === true;
+            document.getElementById('in_app_order_status').checked = prefs.in_app_order_status !== false;
+            document.getElementById('in_app_system_announcements').checked = prefs.in_app_system_announcements !== false;
+            document.getElementById('in_app_product_updates').checked = prefs.in_app_product_updates !== false;
+          } else if (response.status === 401) {
+            window.location.href = '/login.html';
+          }
+        } catch (error) {
+          console.error('Failed to load preferences:', error);
+          showMessage('Failed to load preferences. Please try again.', 'error');
+        }
+      }
+
+      // Save preferences
+      async function savePreferences(event) {
+        event.preventDefault();
+
+        const preferences = {
+          email_order_status: document.getElementById('email_order_status').checked,
+          email_system_announcements: document.getElementById('email_system_announcements').checked,
+          email_product_updates: document.getElementById('email_product_updates').checked,
+          in_app_order_status: document.getElementById('in_app_order_status').checked,
+          in_app_system_announcements: document.getElementById('in_app_system_announcements').checked,
+          in_app_product_updates: document.getElementById('in_app_product_updates').checked
+        };
+
+        try {
+          const response = await fetch('/.netlify/functions/notification-preferences', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(preferences)
+          });
+
+          if (response.ok) {
+            showMessage('Preferences saved successfully!', 'success');
+          } else {
+            const error = await response.json();
+            showMessage(error.error || 'Failed to save preferences', 'error');
+          }
+        } catch (error) {
+          console.error('Failed to save preferences:', error);
+          showMessage('Failed to save preferences. Please try again.', 'error');
+        }
+      }
+
+      // Reset to defaults
+      function resetToDefaults() {
+        if (!confirm('Reset all notification preferences to defaults?')) return;
+
+        document.getElementById('email_order_status').checked = true;
+        document.getElementById('email_system_announcements').checked = true;
+        document.getElementById('email_product_updates').checked = false;
+        document.getElementById('in_app_order_status').checked = true;
+        document.getElementById('in_app_system_announcements').checked = true;
+        document.getElementById('in_app_product_updates').checked = true;
+
+        showMessage('Preferences reset to defaults. Click "Save Preferences" to apply.', 'info');
+      }
+
+      // Show status message
+      function showMessage(message, type) {
+        statusMessage.textContent = message;
+        statusMessage.className = `p-4 rounded-lg ${
+          type === 'success' ? 'bg-green-900 text-green-100 border border-green-700' :
+          type === 'error' ? 'bg-red-900 text-red-100 border border-red-700' :
+          'bg-blue-900 text-blue-100 border border-blue-700'
+        }`;
+        statusMessage.classList.remove('hidden');
+
+        setTimeout(() => {
+          statusMessage.classList.add('hidden');
+        }, 5000);
+      }
+
+      // Event listeners
+      form.addEventListener('submit', savePreferences);
+      resetBtn.addEventListener('click', resetToDefaults);
+
+      // Load preferences on page load
+      loadPreferences();
+    })();
+  </script>
+</body>
+</html>
