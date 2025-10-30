@@ -1,8 +1,10 @@
 // Enhanced Service Worker for PWA offline functionality with performance optimizations
-const STATIC_CACHE = 'joshburt-static-v4';
-const DYNAMIC_CACHE = 'joshburt-dynamic-v4';
-const API_CACHE = 'joshburt-api-v4';
+const STATIC_CACHE = 'joshburt-static-v5';
+const DYNAMIC_CACHE = 'joshburt-dynamic-v5';
+const API_CACHE = 'joshburt-api-v5';
+const IMAGE_CACHE = 'joshburt-images-v1';
 
+// Static resources to cache on install
 const urlsToCache = [
   '/',
   '/index.html',
@@ -25,6 +27,10 @@ const urlsToCache = [
 const apiUrls = [
   '/.netlify/functions/',
   'https://joshburt.netlify.app/.netlify/functions/',
+];
+
+// CDN resources to cache
+const cdnUrls = [
   'https://cdn.tailwindcss.com/',
   'https://cdn.jsdelivr.net/',
   'https://cdnjs.cloudflare.com/'
@@ -41,7 +47,9 @@ self.addEventListener('install', event => {
       // Initialize dynamic cache
       caches.open(DYNAMIC_CACHE),
       // Initialize API cache
-      caches.open(API_CACHE)
+      caches.open(API_CACHE),
+      // Initialize image cache
+      caches.open(IMAGE_CACHE)
     ]).then(() => {
       return self.skipWaiting();
     })
@@ -54,8 +62,8 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
-          // Remove old caches
-          if (cache !== STATIC_CACHE && cache !== DYNAMIC_CACHE && cache !== API_CACHE) {
+          // Remove old caches - keep only current versions
+          if (cache !== STATIC_CACHE && cache !== DYNAMIC_CACHE && cache !== API_CACHE && cache !== IMAGE_CACHE) {
             return caches.delete(cache);
           }
         })
@@ -76,10 +84,14 @@ self.addEventListener('fetch', event => {
   }
 
   // Handle different resource types with appropriate strategies
-  if (isStaticResource(event.request.url)) {
+  if (isImageRequest(event.request.url)) {
+    event.respondWith(cacheFirstStrategy(event.request, IMAGE_CACHE));
+  } else if (isStaticResource(event.request.url)) {
     event.respondWith(cacheFirstStrategy(event.request, STATIC_CACHE));
   } else if (isAPIRequest(event.request.url)) {
     event.respondWith(networkFirstStrategy(event.request, API_CACHE));
+  } else if (isCDNRequest(event.request.url)) {
+    event.respondWith(cacheFirstStrategy(event.request, STATIC_CACHE));
   } else if (isHTMLRequest(event.request)) {
     event.respondWith(staleWhileRevalidateStrategy(event.request, DYNAMIC_CACHE));
   } else {
@@ -188,12 +200,20 @@ async function staleWhileRevalidateStrategy(request, cacheName) {
 }
 
 // Helper functions
+function isImageRequest(url) {
+  return /\.(png|jpg|jpeg|gif|svg|webp|avif|ico)$/i.test(url);
+}
+
 function isStaticResource(url) {
-  return /\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/i.test(url);
+  return /\.(css|js|woff|woff2|ttf|eot)$/i.test(url);
 }
 
 function isAPIRequest(url) {
   return apiUrls.some(apiUrl => url.includes(apiUrl));
+}
+
+function isCDNRequest(url) {
+  return cdnUrls.some(cdnUrl => url.includes(cdnUrl));
 }
 
 function isHTMLRequest(request) {

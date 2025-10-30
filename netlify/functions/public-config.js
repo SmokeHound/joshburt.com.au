@@ -1,5 +1,8 @@
 // Netlify Function: public-config
 // Returns client-safe auth0 config values to enable OAuth buttons on login/register
+// Implements caching for improved performance
+
+const cache = require('../../utils/cache');
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -11,6 +14,23 @@ exports.handler = async (event) => {
         'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
         'Access-Control-Max-Age': '86400'
       }
+    };
+  }
+
+  // Try to get from cache (5 minute TTL)
+  const cached = cache.get('public-config', 'auth-config');
+  if (cached) {
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+        'Access-Control-Max-Age': '86400',
+        'X-Cache': 'HIT'
+      },
+      body: JSON.stringify(cached),
     };
   }
 
@@ -30,6 +50,9 @@ exports.handler = async (event) => {
     } : null,
   };
 
+  // Cache for 5 minutes (300 seconds)
+  cache.set('public-config', 'auth-config', body, 300);
+
   return {
     statusCode: 200,
     headers: {
@@ -37,7 +60,8 @@ exports.handler = async (event) => {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-      'Access-Control-Max-Age': '86400'
+      'Access-Control-Max-Age': '86400',
+      'X-Cache': 'MISS'
     },
     body: JSON.stringify(body),
   };
