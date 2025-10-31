@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS product_categories (
 -- Add category_id to products table
 ALTER TABLE products ADD COLUMN IF NOT EXISTS category_id INTEGER REFERENCES product_categories(id) ON DELETE SET NULL;
 
--- Add price and stock columns for filtering
-ALTER TABLE products ADD COLUMN IF NOT EXISTS price DECIMAL(10,2) DEFAULT 0.00;
+-- Add stock and active status columns for filtering
 ALTER TABLE products ADD COLUMN IF NOT EXISTS stock_quantity INTEGER DEFAULT 0;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
 
@@ -27,7 +26,6 @@ CREATE TABLE IF NOT EXISTS product_variants (
     product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
     variant_type VARCHAR(50) NOT NULL, -- 'size', 'color', etc.
     variant_value VARCHAR(100) NOT NULL,
-    price_modifier DECIMAL(10,2) DEFAULT 0.00,
     stock_quantity INTEGER DEFAULT 0,
     sku VARCHAR(100) UNIQUE,
     is_active BOOLEAN DEFAULT true,
@@ -58,7 +56,6 @@ ON CONFLICT (name) DO NOTHING;
 
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
-CREATE INDEX IF NOT EXISTS idx_products_price ON products(price);
 CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active);
 CREATE INDEX IF NOT EXISTS idx_product_categories_name ON product_categories(name);
 CREATE INDEX IF NOT EXISTS idx_product_categories_parent_id ON product_categories(parent_id);
