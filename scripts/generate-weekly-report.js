@@ -9,7 +9,6 @@ const path = require('path');
 
 // Time constants
 const ONE_DAY = 24 * 60 * 60 * 1000;
-// const ONE_WEEK = 7 * ONE_DAY; // Reserved for future use
 
 async function loadMetrics() {
   const metricsFile = path.join(__dirname, '../data/metrics.json');
