@@ -8,6 +8,7 @@
     "dev:functions": "netlify dev",
     "dev:all": "echo Run 'npm run dev' in one terminal and 'npm run dev:functions' in another for full stack development",
     "health": "node scripts/health-check.js",
+    "migrate": "node scripts/run-migrations.js",
     "build:css": "npx @tailwindcss/cli -i ./src/styles.css -o ./assets/css/styles.css -m",
     "build": "npm run build:css",
     "prune:tokens": "node scripts/prune-refresh-tokens.js",
