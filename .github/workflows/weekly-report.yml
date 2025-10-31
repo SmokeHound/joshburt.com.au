@@ -1,0 +1,74 @@
+name: 📊 Weekly Performance Report
+
+on:
+  schedule:
+    # Run every Monday at 9:00 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: read
+  actions: write  # For uploading artifacts
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 📊 Generate weekly report
+        env:
+          DB_TYPE: ${{ secrets.DB_TYPE || 'sqlite' }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: |
+          echo "📊 Generating weekly performance report..."
+          node scripts/generate-weekly-report.js
+
+      - name: 📤 Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-report-${{ github.run_number }}
+          path: data/reports/weekly-report-*.md
+          retention-days: 90
+
+      - name: 📝 Create report summary
+        if: always()
+        run: |
+          REPORT_FILE=$(ls -t data/reports/weekly-report-*.md | head -1)
+          if [ -f "$REPORT_FILE" ]; then
+            echo "### 📊 Weekly Performance Report Generated" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Report Date:** $(date -u +'%Y-%m-%d')" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            # Include first 20 lines of the report
+            head -20 "$REPORT_FILE" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Full report available in workflow artifacts.**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ No report generated" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 💬 Post results comment (optional)
+        if: always()
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          script: |
+            // This can be extended to post to Slack, email, or create an issue
+            const status = '${{ job.status }}';
+            console.log(`Weekly report generation: ${status}`);
