@@ -2,6 +2,10 @@
 /**
  * Database Migration Runner
  * Applies SQL migrations in order to the database
+ * 
+ * Usage:
+ *   node scripts/run-migrations.js          # Apply all pending migrations
+ *   node scripts/run-migrations.js --dry-run # Check pending migrations without applying
  */
 
 const fs = require('fs');
@@ -9,9 +13,11 @@ const path = require('path');
 const { database } = require('../config/database');
 
 const MIGRATIONS_DIR = path.join(__dirname, '../migrations');
+const DRY_RUN = process.argv.includes('--dry-run');
 
 async function runMigrations() {
-  console.log('🔄 Starting database migrations...');
+  const mode = DRY_RUN ? 'DRY RUN' : 'LIVE';
+  console.log(`🔄 Starting database migrations (${mode} mode)...`);
 
   try {
     // Connect to database
@@ -44,13 +50,23 @@ async function runMigrations() {
 
     let appliedCount = 0;
     let skippedCount = 0;
+    let pendingMigrations = [];
 
     for (const file of migrationFiles) {
       const migrationName = file;
 
       if (appliedSet.has(migrationName)) {
-        console.log(`⏭️  Skipping ${migrationName} (already applied)`);
+        if (!DRY_RUN) {
+          console.log(`⏭️  Skipping ${migrationName} (already applied)`);
+        }
         skippedCount++;
+        continue;
+      }
+
+      pendingMigrations.push(migrationName);
+      
+      if (DRY_RUN) {
+        console.log(`📝 Pending: ${migrationName}`);
         continue;
       }
 
@@ -90,10 +106,24 @@ async function runMigrations() {
       }
     }
 
-    console.log('\n✅ Migration complete!');
-    console.log(`   - Applied: ${appliedCount}`);
-    console.log(`   - Skipped: ${skippedCount}`);
-    console.log(`   - Total: ${migrationFiles.length}\n`);
+    if (DRY_RUN) {
+      console.log('\n✅ Dry run complete!');
+      console.log(`   - Pending migrations: ${pendingMigrations.length}`);
+      console.log(`   - Already applied: ${skippedCount}`);
+      console.log(`   - Total migrations: ${migrationFiles.length}\n`);
+      
+      if (pendingMigrations.length > 0) {
+        console.log('📝 Migrations ready to apply:');
+        pendingMigrations.forEach(m => console.log(`   - ${m}`));
+      } else {
+        console.log('✅ Database is up to date - no pending migrations');
+      }
+    } else {
+      console.log('\n✅ Migration complete!');
+      console.log(`   - Applied: ${appliedCount}`);
+      console.log(`   - Skipped: ${skippedCount}`);
+      console.log(`   - Total: ${migrationFiles.length}\n`);
+    }
 
   } catch (error) {
     console.error('❌ Migration failed:', error);

@@ -406,3 +406,14 @@ FIX_SUMMARY.md
 
 # Local Netlify folder
 .netlify/
+
+# Runtime data and logs (keep directory structure but ignore content)
+data/logs/*.log
+data/reports/*.md
+data/reports/*.json
+data/metrics/*.json
+
+# Keep directory structure with .gitkeep files
+!data/logs/.gitkeep
+!data/reports/.gitkeep
+!data/metrics/.gitkeep
