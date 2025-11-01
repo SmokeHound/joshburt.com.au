@@ -151,9 +151,6 @@ async function applyPostgresSchemaFromFile() {
     }
     let sql = await fs.promises.readFile(schemaPath, 'utf8');
 
-    // Remove SQLite-specific audit_logs definition that uses AUTOINCREMENT
-    sql = sql.replace(/CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+audit_logs\s*\([\s\S]*?AUTOINCREMENT[\s\S]*?\);\s*/i, '');
-
     const client = await database.pool.connect();
     try {
       await client.query('BEGIN');

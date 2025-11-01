@@ -4,9 +4,7 @@
 ## Overview
 
 
-The joshburt.com.au application supports two database backends:
-- **PostgreSQL** (default, supported, e.g. Neon)
-- **SQLite** (for development and testing)
+The joshburt.com.au application uses PostgreSQL as its database backend (e.g. Neon).
 
 ## Database Configuration
 
@@ -16,7 +14,7 @@ Set the following environment variables based on your deployment:
 
  All dynamic operations are served via Netlify Functions at `/.netlify/functions/users`.
 
-#### PostgreSQL (default, e.g. Neon)
+#### PostgreSQL Configuration
 ```env
 # Database Type
 DB_TYPE=postgres
@@ -41,7 +39,7 @@ DB_PASSWORD=your-secure-password
 DB_SSL=true
 ```
 
-#### SQLite (Development)
+#### Development Environment
  Access audit logs via `/.netlify/functions/audit-logs`.
 ```env
 # Database Type (PostgreSQL only)
@@ -142,7 +140,7 @@ CREATE TABLE refresh_tokens (
 ### Connection Management
 
 
-The database abstraction in `config/database.js` automatically handles connections and query parameter conversion for PostgreSQL and SQLite:
+The database abstraction in `config/database.js` automatically handles connections and query parameter conversion for PostgreSQL:
 
 ```javascript
 const { database } = require('./config/database');
@@ -162,13 +160,12 @@ await database.close();
 ### Query Parameter Conversion
 
 
-The database class automatically converts query parameters:
-- **SQLite**: Uses `?` placeholders
-- **PostgreSQL**: Converts to `$1, $2, $3...` placeholders
+The database class automatically converts query parameters to PostgreSQL format:
+- **PostgreSQL**: Uses `$1, $2, $3...` placeholders
 
 Example:
 ```javascript
-// SQLite: SELECT * FROM users WHERE email = ? AND is_active = ?
+// Query: SELECT * FROM users WHERE email = ? AND is_active = ?
 // PostgreSQL: SELECT * FROM users WHERE email = $1 AND is_active = $2
 ```
 
@@ -356,7 +353,7 @@ Customer order creation and administrative management.
 ## Database Migration
 
 
-### From SQLite to PostgreSQL
+### Setting up PostgreSQL
 
 1. **Set up PostgreSQL database**:
 ```sql
@@ -395,11 +392,6 @@ DB_SSL=true
 3. **Permission denied for relation**
    - Ensure database user has proper permissions
    - Run `GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO username;`
-
-4. **SQLite database locked**
-   - Ensure only one connection at a time
-   - Check file permissions
-   - Restart application if needed
 
 ### Performance Optimization
 

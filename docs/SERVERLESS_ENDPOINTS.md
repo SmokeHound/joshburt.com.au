@@ -72,6 +72,6 @@ This document lists all Netlify Functions (serverless API) and their behaviors. 
   - When `AUTH0_DOMAIN` is set, Auth0 JWTs are accepted and users are auto-provisioned by default unless `AUTH0_AUTO_PROVISION=false`.
 
 ## Notes
-- Database access via `config/database.js` with PostgreSQL and SQLite support.
+- Database access via `config/database.js` with PostgreSQL support.
 - Most endpoints automatically connect as needed; connection calls are idempotent.
  - Errors are normalized with `{ error: message }`.

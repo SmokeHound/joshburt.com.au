@@ -15,13 +15,13 @@ This document provides a comprehensive overview of the joshburt.com.au applicati
 The joshburt.com.au application is a modern, serverless web application built on:
 - **Frontend**: Static HTML/CSS/JavaScript with TailwindCSS
 - **Backend**: Netlify Serverless Functions (Node.js)
-- **Database**: PostgreSQL (Neon) / SQLite fallback
+- **Database**: PostgreSQL (Neon)
 - **Hosting**: Netlify (primary), FTP mirror (secondary)
 - **CI/CD**: GitHub Actions
 
 ### Key Characteristics
 - **Serverless Architecture**: No dedicated server, scales automatically
-- **Database Agnostic**: Supports both PostgreSQL and SQLite
+- **PostgreSQL Database**: Production-ready database with connection pooling
 - **Progressive Enhancement**: Works without JavaScript, enhanced with it
 - **Mobile-First**: Responsive design for all screen sizes
 
@@ -74,12 +74,12 @@ The joshburt.com.au application is a modern, serverless web application built on
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        DATABASE LAYER                                │
 │                                                                       │
-│  ┌────────────────────────────┐    ┌─────────────────────────────┐  │
-│  │  PostgreSQL (Neon)         │    │  SQLite (Local/Fallback)    │  │
-│  │  - Production database     │    │  - Development database     │  │
-│  │  - Connection pooling      │    │  - Testing database         │  │
-│  │  - Managed backups         │    │  - Offline capability       │  │
-│  └────────────────────────────┘    └─────────────────────────────┘  │
+│  ┌────────────────────────────┐                                      │
+│  │  PostgreSQL (Neon)         │                                      │
+│  │  - Production database     │                                      │
+│  │  - Connection pooling      │                                      │
+│  │  - Managed backups         │                                      │
+│  └────────────────────────────┘                                      │
 │                                                                       │
 │  Schema Tables:                                                       │
 │  - users, products, orders, consumables                              │
@@ -204,12 +204,6 @@ Located in `utils/` and `config/`:
    - Connection pooling
    - Automatic backups
    - High availability
-
-2. **SQLite (Development/Testing)**
-   - Single-file database
-   - No setup required
-   - Perfect for local development
-   - Fallback for read operations
 
 ### Monitoring & Logging
 
