@@ -93,6 +93,12 @@ Two deployment workflows are configured:
 ├── .github/
 │   └── workflows/
 │       └── main.yml      # FTP deployment
+├── docs/                 # All technical documentation
+│   ├── archive/         # Historical phase documentation
+│   ├── ARCHITECTURE.md
+│   ├── API_DOCUMENTATION.md
+│   ├── DATABASE.md
+│   └── ...              # See DOCS_INDEX.md for complete list
 ├── index.html           # Main homepage
 ├── oil-products.html    # Castrol oil ordering system
 ├── administration.html  # Administration dashboard
@@ -102,6 +108,8 @@ Two deployment workflows are configured:
 ├── login.html           # Login page
 ├── .netlify/functions/  # Serverless API endpoints (products.js, orders.js, users.js, auth.js, etc.)
 ├── config/database.js   # Database abstraction (PostgreSQL, SQLite)
+├── migrations/          # Database migration files
+├── DOCS_INDEX.md        # Documentation index (see this first!)
 └── README.md            # Basic project info
 ```
 
@@ -111,6 +119,8 @@ Two deployment workflows are configured:
 - **oil-products.html**: Castrol product ordering (uses API)
 - **.netlify/functions/**: Serverless API endpoints (products, orders, users, auth, consumables, categories, audit logs, inventory, settings, health)
 - **config/database.js**: Database abstraction
+- **docs/**: All technical documentation (see DOCS_INDEX.md)
+- **migrations/**: Database schema migrations
 
 
 ### Development Notes
