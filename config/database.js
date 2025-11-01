@@ -2,8 +2,8 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 
-// Database configuration - support PostgreSQL and SQLite fallback
-const DB_TYPE = process.env.DB_TYPE || 'postgres';
+// Database configuration - PostgreSQL only
+const DB_TYPE = 'postgres';
 
 // PostgreSQL configuration (prefer single URL if provided)
 const DATABASE_URL = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL || null;
@@ -35,78 +35,22 @@ const pgConfig = DATABASE_URL
     statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
   };
 
-// SQLite fallback for development
-let sqlite3;
-const path = require('path');
-try {
-  sqlite3 = require('sqlite3').verbose();
-} catch (err) {
-  console.log('SQLite3 not available, using PostgreSQL only');
-}
-
-// Prefer a writable temp path on serverless platforms
-const DB_PATH = process.env.DB_PATH || (process.env.NETLIFY ? '/tmp/database.sqlite' : path.join(__dirname, '..', 'database.sqlite'));
-// Allow disabling SQLite fallback (recommended for production)
-const DISABLE_SQLITE_FALLBACK = String(
-  process.env.DB_DISABLE_SQLITE_FALLBACK || (process.env.NETLIFY ? 'true' : 'false')
-).toLowerCase() === 'true';
-
 class Database {
   constructor() {
     this.pool = null; // PostgreSQL
-    this.db = null;   // SQLite
     this.type = DB_TYPE;
   }
 
   async connect() {
     try {
-      if (this.type === 'postgres' || this.type === 'postgresql') {
-        this.pool = new Pool(pgConfig);
-        // Test the connection
-        const client = await this.pool.connect();
-        await client.query('SELECT NOW()');
-        client.release();
-        console.log('📚 Connected to PostgreSQL database');
-      } else {
-        // Fallback to SQLite for development
-        if (!sqlite3) {
-          throw new Error('SQLite3 not available and PostgreSQL not configured');
-        }
-        return new Promise((resolve, reject) => {
-          this.db = new sqlite3.Database(DB_PATH, (err) => {
-            if (err) {
-              console.error('Error connecting to SQLite database:', err);
-              reject(err);
-            } else {
-              console.log('📚 Connected to SQLite database (fallback mode)');
-              resolve();
-            }
-          });
-        });
-      }
+      this.pool = new Pool(pgConfig);
+      // Test the connection
+      const client = await this.pool.connect();
+      await client.query('SELECT NOW()');
+      client.release();
+      console.log('📚 Connected to PostgreSQL database');
     } catch (error) {
       console.error('Database connection failed:', error);
-      // Attempt graceful fallback to SQLite if available and not already using it
-      if (this.type !== 'sqlite' && sqlite3 && !DISABLE_SQLITE_FALLBACK) {
-        console.warn('Falling back to SQLite database...');
-        this.type = 'sqlite';
-        // Dispose any existing PG pool before switching
-        if (this.pool) {
-          try { await this.pool.end(); } catch (e) { /* noop */ }
-          this.pool = null;
-        }
-        return new Promise((resolve, reject) => {
-          this.db = new sqlite3.Database(DB_PATH, (err) => {
-            if (err) {
-              console.error('Error connecting to SQLite database during fallback:', err);
-              reject(err);
-            } else {
-              console.log('📚 Connected to SQLite database (fallback after failure)');
-              resolve();
-            }
-          });
-        });
-      }
       throw error;
     }
   }
@@ -116,17 +60,6 @@ class Database {
       if (this.pool) {
         await this.pool.end();
         console.log('📚 PostgreSQL database connection closed');
-      } else if (this.db) {
-        return new Promise((resolve, reject) => {
-          this.db.close((err) => {
-            if (err) {
-              reject(err);
-            } else {
-              console.log('📚 SQLite database connection closed');
-              resolve();
-            }
-          });
-        });
       }
     } catch (error) {
       console.error('Error closing database connection:', error);
@@ -136,106 +69,56 @@ class Database {
 
   // Utility to convert SQL with placeholders to the correct format
   _prepareQuery(sql, params = []) {
-    if (this.pool) {
-      // PostgreSQL uses $1, $2, etc.
-      let pgSql = sql;
-      let paramIndex = 1;
-      pgSql = pgSql.replace(/\?/g, () => `$${paramIndex++}`);
-      return { sql: pgSql, params };
-    } else {
-      // SQLite uses ?
-      return { sql, params };
-    }
+    // PostgreSQL uses $1, $2, etc.
+    let pgSql = sql;
+    let paramIndex = 1;
+    pgSql = pgSql.replace(/\?/g, () => `$${paramIndex++}`);
+    return { sql: pgSql, params };
   }
 
   async run(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
-    if (this.pool) {
-      // PostgreSQL
-      const client = await this.pool.connect();
-      try {
-        const result = await client.query(preparedSql, preparedParams);
-        client.release();
-        return {
-          id: result.rows[0]?.id || null,
-          changes: result.rowCount || 0,
-          rows: result.rows
-        };
-      } catch (error) {
-        client.release();
-        throw error;
-      }
-    } else if (this.db) {
-      // SQLite
-      return new Promise((resolve, reject) => {
-        this.db.run(preparedSql, preparedParams, function(err) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve({ id: this.lastID, changes: this.changes });
-          }
-        });
-      });
-    } else {
-      throw new Error('Database not connected');
+    // PostgreSQL
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(preparedSql, preparedParams);
+      client.release();
+      return {
+        id: result.rows[0]?.id || null,
+        changes: result.rowCount || 0,
+        rows: result.rows
+      };
+    } catch (error) {
+      client.release();
+      throw error;
     }
   }
 
   async get(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
-    if (this.pool) {
-      // PostgreSQL
-      const client = await this.pool.connect();
-      try {
-        const result = await client.query(preparedSql, preparedParams);
-        client.release();
-        return result.rows[0] || null;
-      } catch (error) {
-        client.release();
-        throw error;
-      }
-    } else if (this.db) {
-      // SQLite
-      return new Promise((resolve, reject) => {
-        this.db.get(preparedSql, preparedParams, (err, row) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(row);
-          }
-        });
-      });
-    } else {
-      throw new Error('Database not connected');
+    // PostgreSQL
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(preparedSql, preparedParams);
+      client.release();
+      return result.rows[0] || null;
+    } catch (error) {
+      client.release();
+      throw error;
     }
   }
 
   async all(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
-    if (this.pool) {
-      // PostgreSQL
-      const client = await this.pool.connect();
-      try {
-        const result = await client.query(preparedSql, preparedParams);
-        client.release();
-        return result.rows;
-      } catch (error) {
-        client.release();
-        throw error;
-      }
-    } else if (this.db) {
-      // SQLite
-      return new Promise((resolve, reject) => {
-        this.db.all(preparedSql, preparedParams, (err, rows) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(rows);
-          }
-        });
-      });
-    } else {
-      throw new Error('Database not connected');
+    // PostgreSQL
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(preparedSql, preparedParams);
+      client.release();
+      return result.rows;
+    } catch (error) {
+      client.release();
+      throw error;
     }
   }
 }
@@ -246,15 +129,11 @@ const database = new Database();
 async function initializeDatabase() {
   try {
     await database.connect();
-    if (database.type === 'postgres' || database.type === 'postgresql') {
-      // Apply project schema file for PostgreSQL if enabled
-      if (shouldApplySchemaOnStart()) {
-        await applyPostgresSchemaFromFile();
-      }
-      await createPostgreSQLTables();
-    } else {
-      await createSQLiteTables();
+    // Apply project schema file for PostgreSQL if enabled
+    if (shouldApplySchemaOnStart()) {
+      await applyPostgresSchemaFromFile();
     }
+    await createPostgreSQLTables();
     await createDefaultUsers();
     console.log('✅ Database initialized successfully');
   } catch (error) {
@@ -492,177 +371,6 @@ async function createPostgreSQLTables() {
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs ((details::json->>\'method\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs ((details::json->>\'requestId\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')');
   await database.run('CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip_address, created_at)');
-}
-
-async function createSQLiteTables() {
-  // Create users table for SQLite
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
-      name TEXT NOT NULL,
-      password_hash TEXT,
-      role TEXT DEFAULT 'user' CHECK(role IN ('user', 'manager', 'admin')),
-      is_active BOOLEAN DEFAULT 1,
-      email_verified BOOLEAN DEFAULT 0,
-      email_verification_token TEXT,
-      email_verification_expires INTEGER,
-      oauth_provider TEXT,
-      oauth_id TEXT,
-      avatar_url TEXT,
-      reset_token TEXT,
-      reset_token_expires INTEGER,
-      failed_login_attempts INTEGER DEFAULT 0,
-      lockout_expires INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Create products table for SQLite
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS products (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      code TEXT UNIQUE NOT NULL,
-      type TEXT NOT NULL,
-      specs TEXT,
-      description TEXT,
-      image TEXT,
-      model_qty INTEGER DEFAULT 0,
-      soh INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Create consumables table for SQLite
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS consumables (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      code TEXT UNIQUE NOT NULL,
-      type TEXT NOT NULL,
-      category TEXT,
-      description TEXT,
-      model_qty INTEGER DEFAULT 0,
-      soh INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Create orders table for SQLite
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS orders (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      created_by TEXT DEFAULT 'mechanic',
-      total_items INTEGER NOT NULL DEFAULT 0,
-      status TEXT DEFAULT 'pending',
-      priority TEXT DEFAULT 'normal',
-      notes TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Create order_items table for SQLite
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS order_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_id INTEGER,
-      product_name TEXT NOT NULL,
-      product_code TEXT,
-      quantity INTEGER NOT NULL DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
-    )
-  `);
-
-  // Create refresh tokens table for SQLite
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS refresh_tokens (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      token_hash TEXT NOT NULL,
-      expires_at DATETIME NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-    )
-  `);
-
-  // Create audit log table for SQLite
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS audit_logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER,
-      action TEXT NOT NULL,
-      details TEXT,
-      ip_address TEXT,
-      user_agent TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
-    )
-  `);
-
-  // Create login attempts table for SQLite (for DB-backed rate limiting)
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS login_attempts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ip_address TEXT NOT NULL,
-      email TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Inventory table to track stock for products and consumables (SQLite)
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS inventory (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      item_type TEXT NOT NULL CHECK (item_type IN ('product', 'consumable')),
-      item_id INTEGER NOT NULL,
-      stock_count INTEGER NOT NULL DEFAULT 0,
-      UNIQUE(item_type, item_id)
-    )
-  `);
-
-  // Create settings table for SQLite (store JSON as TEXT)
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS settings (
-      id INTEGER PRIMARY KEY,
-      data TEXT,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  // Backfill legacy settings tables missing updated_at (SQLite lacks IF NOT EXISTS on ADD COLUMN in some versions)
-  try {
-    await database.run('ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP');
-  } catch (e) {
-    // Ignore if column already exists
-  }
-
-  // Add 2FA columns to users table for SQLite
-  try {
-    await database.run('ALTER TABLE users ADD COLUMN totp_secret TEXT');
-  } catch (e) {
-    // Ignore if column already exists
-  }
-  try {
-    await database.run('ALTER TABLE users ADD COLUMN totp_enabled BOOLEAN DEFAULT 0');
-  } catch (e) {
-    // Ignore if column already exists
-  }
-  try {
-    await database.run('ALTER TABLE users ADD COLUMN backup_codes TEXT');
-  } catch (e) {
-    // Ignore if column already exists
-  }
-
-  // Expression indexes on common JSON fields in details for faster filtering (SQLite JSON1)
-  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs (json_extract(details, \'$.path\'))');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs (json_extract(details, \'$.method\'))');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs (json_extract(details, \'$.requestId\'))');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action)');
 }
 
 async function createDefaultUsers() {

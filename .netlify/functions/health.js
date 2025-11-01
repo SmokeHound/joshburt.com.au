@@ -24,7 +24,7 @@ exports.handler = withHandler(async (event) => {
 
     let dbOk = false;
     let dbLatency = 0;
-    const dbDriver = process.env.DB_TYPE || 'sqlite';
+    const dbDriver = 'postgres';
 
     try {
       const dbStart = Date.now();

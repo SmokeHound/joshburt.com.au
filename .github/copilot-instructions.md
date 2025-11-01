@@ -5,7 +5,7 @@ This site includes static HTML pages plus a serverless backend (Netlify Function
 - Responsive design with dark/light mode support
 - Admin dashboard and user management
 - Castrol oil product ordering system
- - **Dynamic backend**: Netlify serverless functions with PostgreSQL/SQLite database integration (legacy Express removed)
+ - **Dynamic backend**: Netlify serverless functions with PostgreSQL database integration (legacy Express removed)
 **Codebase is fully audited and production-ready (no dead code, debug logic, or unused variables)**
 
 Always reference these instructions first. Fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
@@ -24,7 +24,7 @@ Always reference these instructions first. Fallback to search or bash commands o
 ### Build and Deploy Information
 - **Static files**: No build required
 - **Backend/API**: Requires Node.js dependencies (run `npm install`)
-- **Database**: PostgreSQL (e.g. Neon), or SQLite (see config/database.js for credentials)
+- **Database**: PostgreSQL (e.g. Neon) - see config/database.js for credentials
 - **Deployment**: GitHub Actions for FTP and Netlify; API/serverless functions deploy automatically
 
 
