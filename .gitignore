@@ -417,3 +417,7 @@ data/metrics/*.json
 !data/logs/.gitkeep
 !data/reports/.gitkeep
 !data/metrics/.gitkeep
+
+# SQLite database files (no longer used)
+*.sqlite
+*.sqlite3

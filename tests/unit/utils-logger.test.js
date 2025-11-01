@@ -5,7 +5,7 @@ jest.mock('../../config/database', () => ({
   connect: jest.fn(),
   query: jest.fn(),
   getClient: jest.fn(),
-  DB_TYPE: 'sqlite'
+  DB_TYPE: 'postgres'
 }));
 
 const {
