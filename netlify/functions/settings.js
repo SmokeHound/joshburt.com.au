@@ -1,62 +1,65 @@
 // Netlify Function: Site Settings CRUD /.netlify/functions/settings
-const { database, initializeDatabase } = require('../../config/database');
-const { withHandler, ok, error, requireAuth } = require('../../utils/fn');
-const { logAudit } = require('../../utils/audit');
-
-let dbReady = false;
-async function ensureDb(){
-  if (!dbReady) { await initializeDatabase(); dbReady = true; }
-}
+const { database } = require('../../config/database');
+const { withHandler, ok, error } = require('../../utils/fn');
+const { requirePermission } = require('../../utils/http');
+const cache = require('../../utils/cache');
 
 exports.handler = withHandler(async function(event){
-  await ensureDb();
+  await database.connect();
   const method = event.httpMethod;
-  if (method === 'GET') return handleGet();
+  if (method === 'GET') return handleGet(event);
   if (method === 'PUT') return handlePut(event);
   return error(405, 'Method Not Allowed');
 
-  async function handleGet() {
+  async function handleGet(event) {
+    // Only admins can view settings
+    const { user, response: authResponse } = await requirePermission(event, 'settings', 'read');
+    if (authResponse) return authResponse;
+    
+    // Try cache first (5 minute TTL)
+    const cached = cache.get('settings', 'config');
+    if (cached) {
+      return {
+        statusCode: 200,
+        headers: { 
+          'Content-Type': 'application/json', 
+          'X-Cache': 'HIT',
+          ...require('../../utils/http').corsHeaders 
+        },
+        body: cached,
+      };
+    }
+    
     // Single row table: settings (id INTEGER PRIMARY KEY, data TEXT)
     const row = await database.get('SELECT data FROM settings WHERE id = 1');
     // If no row, return empty object
     const data = row && row.data ? row.data : '{}';
+    
+    // Cache for 5 minutes (300 seconds)
+    cache.set('settings', 'config', data, 300);
+    
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json', ...require('../../utils/http').corsHeaders },
+      headers: { 
+        'Content-Type': 'application/json', 
+        'X-Cache': 'MISS',
+        ...require('../../utils/http').corsHeaders 
+      },
       body: data,
     };
   }
 
   async function handlePut(event) {
+    // Only admins can update settings
+    const { user, response: authResponse } = await requirePermission(event, 'settings', 'update');
+    if (authResponse) return authResponse;
+    
     const data = event.body || '{}';
-    // Try to attach user context (admin preferred), but do not block if unauthenticated to avoid breaking callers
-    let userId = null;
-    try {
-      const { user } = await requireAuth(event, ['admin']);
-      if (user) userId = user.id;
-    } catch (_) { /* non-fatal */ }
-
-    // Upsert settings row id=1 for PostgreSQL
-    try {
-      await database.run('INSERT INTO settings (id, data) VALUES (1, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP;', [data]);
-    } catch (e) {
-      // Attempt to backfill missing updated_at column, then retry
-      try {
-        await database.run('ALTER TABLE settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-      } catch(_) { /* ignore backfill errors */ }
-      try {
-        await database.run('INSERT INTO settings (id, data) VALUES (1, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP;', [data]);
-      } catch (e2) {
-        // Final fallback: upsert without touching updated_at to avoid breaking callers
-        try {
-          await database.run('INSERT INTO settings (id, data) VALUES (1, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data;', [data]);
-        } catch (e3) {
-          return error(500, 'Failed to save settings');
-        }
-      }
-    }
-    // Audit
-    await logAudit(event, { action: 'settings.update', userId, details: { size: data.length } });
+    await database.run('INSERT INTO settings (id, data) VALUES (1, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data;', [data]);
+    
+    // Invalidate cache on update
+    cache.del('settings', 'config');
+    
     return ok({ message: 'Settings updated' });
   }
 });
