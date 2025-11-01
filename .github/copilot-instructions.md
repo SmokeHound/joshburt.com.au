@@ -5,7 +5,7 @@ This site includes static HTML pages plus a serverless backend (Netlify Function
 - Responsive design with dark/light mode support
 - Admin dashboard and user management
 - Castrol oil product ordering system
- - **Dynamic backend**: Netlify serverless functions with PostgreSQL/SQLite database integration (legacy Express removed)
+ - **Dynamic backend**: Netlify serverless functions with PostgreSQL database integration 
 **Codebase is fully audited and production-ready (no dead code, debug logic, or unused variables)**
 
 Always reference these instructions first. Fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
@@ -24,7 +24,7 @@ Always reference these instructions first. Fallback to search or bash commands o
 ### Build and Deploy Information
 - **Static files**: No build required
 - **Backend/API**: Requires Node.js dependencies (run `npm install`)
-- **Database**: PostgreSQL (e.g. Neon), or SQLite (see config/database.js for credentials)
+- **Database**: PostgreSQL (e.g. Neon), (see config/database.js for credentials)
 - **Deployment**: GitHub Actions for FTP and Netlify; API/serverless functions deploy automatically
 
 
@@ -126,7 +126,7 @@ Two deployment workflows are configured:
 ### Development Notes
 - Static pages use TailwindCSS v4.1 and unified navigation
 - Backend/API uses Netlify Functions only (Node.js runtime)
-- Database: PostgreSQL (e.g. Neon), SQLite supported
+- Database: PostgreSQL (e.g. Neon)
 - Run `npm install` for backend dependencies
 - FTP credentials stored in GitHub Secrets for deployment
 
@@ -135,8 +135,6 @@ Two deployment workflows are configured:
 ```bash
 # Start static development server
 python3 -m http.server 8000
-
-# (Legacy Express removed – no standalone API server to start)
 
 # Test database (PostgreSQL/SQLite)
 # Start Netlify dev then call health
@@ -165,7 +163,7 @@ cat README.md
 
 # Main navigation structure (from index.html)
 grep -A10 "<nav>" index.html
-# Shows sidebar navigation with Home, Admin, User Management, Analytics, Settings, Logout
+# Shows sidebar navigation with Home, Administration, Consumables Orders, Analytics, Settings, Oil Orders, Logout
 ```
 
 
