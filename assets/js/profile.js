@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Populate form
   document.getElementById('profile-name').value = user.name || '';
   document.getElementById('profile-email').value = user.email || '';
-  document.getElementById('profile-avatar').src = user.avatar_url || user.picture || 'https://via.placeholder.com/120';
+  document.getElementById('profile-avatar').src = user.avatar_url || user.picture || './assets/images/avatar-placeholder.svg';
 
   // Avatar upload (only for self)
   document.getElementById('change-avatar').onclick = () => {
