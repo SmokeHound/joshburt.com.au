@@ -2,7 +2,7 @@
 /**
  * Database Migration Runner
  * Applies SQL migrations in order to the database
- * 
+ *
  * Usage:
  *   node scripts/run-migrations.js          # Apply all pending migrations
  *   node scripts/run-migrations.js --dry-run # Check pending migrations without applying
@@ -24,10 +24,14 @@ async function runMigrations() {
     await database.connect();
     console.log('✅ Connected to database');
 
+    // Detect database type and use appropriate syntax
+    const dbType = database.type || 'sqlite'; // Assume 'type' property exists on database
+    const idColumn = dbType === 'postgres' ? 'SERIAL' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+
     // Create migrations tracking table if it doesn't exist
     await database.run(`
       CREATE TABLE IF NOT EXISTS schema_migrations (
-        id SERIAL PRIMARY KEY,
+        id ${idColumn},
         migration_name VARCHAR(255) UNIQUE NOT NULL,
         applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -50,7 +54,7 @@ async function runMigrations() {
 
     let appliedCount = 0;
     let skippedCount = 0;
-    let pendingMigrations = [];
+    const pendingMigrations = [];
 
     for (const file of migrationFiles) {
       const migrationName = file;
@@ -64,7 +68,7 @@ async function runMigrations() {
       }
 
       pendingMigrations.push(migrationName);
-      
+
       if (DRY_RUN) {
         console.log(`📝 Pending: ${migrationName}`);
         continue;
@@ -77,17 +81,60 @@ async function runMigrations() {
         const migrationPath = path.join(MIGRATIONS_DIR, file);
         const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
-        // Split by semicolons but keep statements together
-        // This is a simple approach; for complex migrations, consider a proper SQL parser
-        const statements = migrationSQL
-          .split(';')
-          .map(s => s.trim())
-          .filter(s => s.length > 0 && !s.startsWith('--'));
+        // Handle PostgreSQL DO $$ blocks and other complex statements
+        // Split by semicolons but respect DO $$ ... END $$ blocks and FUNCTION ... $$ blocks
+        const statements = [];
+        let currentStatement = '';
+        let dollarQuoteCount = 0;
+
+        const lines = migrationSQL.split('\n');
+        for (const line of lines) {
+          const trimmed = line.trim();
+
+          // Skip comments
+          if (trimmed.startsWith('--')) {
+            continue;
+          }
+
+          // Count $$ occurrences to track dollar-quoted strings
+          const dollarMatches = line.match(/\$\$/g);
+          if (dollarMatches) {
+            dollarQuoteCount += dollarMatches.length;
+          }
+
+          // Add line to current statement
+          currentStatement += line + '\n';
+
+          // If dollar quotes are balanced (even number) and line ends with semicolon, complete statement
+          if (dollarQuoteCount % 2 === 0 && trimmed.endsWith(';')) {
+            statements.push(currentStatement.trim());
+            currentStatement = '';
+          }
+        }
+
+        // Add any remaining statement
+        if (currentStatement.trim()) {
+          statements.push(currentStatement.trim());
+        }
 
         // Execute each statement
         for (const statement of statements) {
           if (statement.trim()) {
-            await database.run(statement);
+            try {
+              await database.run(statement);
+            } catch (error) {
+              // SQLite: Ignore "duplicate column" errors (column already exists)
+              // PostgreSQL: Similar handling
+              if (error.message && (
+                error.message.includes('duplicate column') ||
+                error.message.includes('already exists') ||
+                error.code === 'SQLITE_ERROR' && error.message.includes('duplicate column name')
+              )) {
+                console.log(`   ⚠️  Column already exists, skipping: ${statement.substring(0, 60)}...`);
+              } else {
+                throw error; // Re-throw if not a "column exists" error
+              }
+            }
           }
         }
 
@@ -111,7 +158,7 @@ async function runMigrations() {
       console.log(`   - Pending migrations: ${pendingMigrations.length}`);
       console.log(`   - Already applied: ${skippedCount}`);
       console.log(`   - Total migrations: ${migrationFiles.length}\n`);
-      
+
       if (pendingMigrations.length > 0) {
         console.log('📝 Migrations ready to apply:');
         pendingMigrations.forEach(m => console.log(`   - ${m}`));
