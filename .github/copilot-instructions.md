@@ -107,7 +107,7 @@ Two deployment workflows are configured:
 ├── users.html           # User management
 ├── login.html           # Login page
 ├── .netlify/functions/  # Serverless API endpoints (products.js, orders.js, users.js, auth.js, etc.)
-├── config/database.js   # Database abstraction (PostgreSQL, SQLite)
+├── config/database.js   # Database abstraction (PostgreSQL)
 ├── migrations/          # Database migration files
 ├── DOCS_INDEX.md        # Documentation index (see this first!)
 └── README.md            # Basic project info
@@ -136,7 +136,7 @@ Two deployment workflows are configured:
 # Start static development server
 python3 -m http.server 8000
 
-# Test database (PostgreSQL/SQLite)
+# Test database (PostgreSQL)
 # Start Netlify dev then call health
 netlify dev
 curl http://localhost:8888/.netlify/functions/health

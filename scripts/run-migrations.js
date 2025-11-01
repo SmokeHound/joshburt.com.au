@@ -123,12 +123,10 @@ async function runMigrations() {
             try {
               await database.run(statement);
             } catch (error) {
-              // SQLite: Ignore "duplicate column" errors (column already exists)
-              // PostgreSQL: Similar handling
+              // PostgreSQL: Ignore "duplicate column" or "already exists" errors
               if (error.message && (
                 error.message.includes('duplicate column') ||
-                error.message.includes('already exists') ||
-                error.code === 'SQLITE_ERROR' && error.message.includes('duplicate column name')
+                error.message.includes('already exists')
               )) {
                 console.log(`   ⚠️  Column already exists, skipping: ${statement.substring(0, 60)}...`);
               } else {

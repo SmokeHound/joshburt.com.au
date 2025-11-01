@@ -1,6 +1,6 @@
 -- Audit Logs Table for admin and API actions
 CREATE TABLE IF NOT EXISTS audit_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     user_id INTEGER,
     action VARCHAR(255) NOT NULL,
     details TEXT,

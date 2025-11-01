@@ -16,7 +16,7 @@ The application runs as a static frontend plus Netlify Functions (serverless bac
 ### Architecture
 - **Frontend**: Static HTML/CSS/JavaScript
 - **Backend**: Netlify Serverless Functions
-- **Database**: PostgreSQL (Neon) or SQLite
+- **Database**: PostgreSQL (Neon)
 - **CI/CD**: GitHub Actions (automated)
 - **Monitoring**: Custom metrics and logging
 

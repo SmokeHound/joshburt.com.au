@@ -44,23 +44,12 @@ exports.handler = withHandler(async function(event){
         return error(400, 'Order must contain at least one item');
       }
 
-      // Ensure we always get an orderId for both Postgres and SQLite
-      let orderId = null;
-      if (database.pool) {
-        // PostgreSQL: use RETURNING to get the id
-        const inserted = await database.run(
-          'INSERT INTO orders (created_by, total_items, status, priority, notes) VALUES (?, ?, ?, ?, ?) RETURNING id',
-          [orderData.requestedBy || 'mechanic', orderData.items.length, 'pending', orderData.priority || 'normal', orderData.notes || null]
-        );
-        orderId = (inserted && (inserted.id || (inserted.rows && inserted.rows[0] && inserted.rows[0].id))) || null;
-      } else {
-        // SQLite: lastID is provided by database.run
-        const inserted = await database.run(
-          'INSERT INTO orders (created_by, total_items, status, priority, notes) VALUES (?, ?, ?, ?, ?)',
-          [orderData.requestedBy || 'mechanic', orderData.items.length, 'pending', orderData.priority || 'normal', orderData.notes || null]
-        );
-        orderId = inserted && inserted.id;
-      }
+      // PostgreSQL: use RETURNING to get the id
+      const inserted = await database.run(
+        'INSERT INTO orders (created_by, total_items, status, priority, notes) VALUES (?, ?, ?, ?, ?) RETURNING id',
+        [orderData.requestedBy || 'mechanic', orderData.items.length, 'pending', orderData.priority || 'normal', orderData.notes || null]
+      );
+      const orderId = (inserted && (inserted.id || (inserted.rows && inserted.rows[0] && inserted.rows[0].id))) || null;
 
       if (!orderId && orderId !== 0) {
         // As a last resort, try to read back the most recent order (non-transactional; best-effort)

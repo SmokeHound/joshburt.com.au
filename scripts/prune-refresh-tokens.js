@@ -1,4 +1,4 @@
-// Prune expired refresh tokens from the database (PostgreSQL/SQLite)
+// Prune expired refresh tokens from the database (PostgreSQL)
 // Safe to run repeatedly; prints deleted row count.
 
 const { database, initializeDatabase } = require('../config/database');
@@ -9,7 +9,7 @@ const { database, initializeDatabase } = require('../config/database');
     // Ensure tables exist in case this is run early
     try { await initializeDatabase(); } catch(err) { /* tables may already exist */ }
 
-    // Use ISO timestamp to compare; works for both Postgres (TIMESTAMP) and SQLite (DATETIME as text)
+    // Use ISO timestamp to compare with PostgreSQL TIMESTAMP columns
     const nowIso = new Date().toISOString();
     const res = await database.run('DELETE FROM refresh_tokens WHERE expires_at <= ?', [nowIso]);
     const deleted = res && (res.changes || 0);
