@@ -46,17 +46,17 @@
       <!-- Main -->
       <main id="main-content" class="flex-1 p-4 md:p-6 md:ml-64" role="main">
         <!-- Page Header with Icon -->
-        <header class="page-header card border mb-8 shadow-xl">
+        <header class="page-header card border mb-6 shadow-xl bg-gradient-to-br from-gray-900 via-blue-900/20 to-purple-900/20">
           <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-2xl">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
             <div>
-              <h2 class="text-4xl font-bold text-white">Site Settings</h2>
-              <p class="text-lg mt-2 nav-link-muted">Configure appearance, behavior, and preferences</p>
+              <h2 class="text-4xl font-bold text-white bg-clip-text">Site Settings</h2>
+              <p class="text-base mt-2 text-gray-300">Configure your site's appearance, features, and behavior</p>
             </div>
           </div>
         </header>
@@ -64,30 +64,30 @@
         <!-- Settings Section: Neon theme, accessible, organized -->
         <section class="space-y-8">
           <!-- Tabs Navigation: Enhanced with better styling -->
-          <nav class="mb-6" aria-label="Settings Tabs">
-            <div class="flex border-b-2 border-gray-700/50 rounded-t-lg overflow-hidden shadow-md">
-              <button class="tab-btn px-8 py-4 font-bold text-white bg-gradient-to-br from-blue-600 to-blue-700 border-b-4 border-blue-400 transition-all duration-300 hover:shadow-lg" data-tab="general" aria-controls="general-tab">
-                <span class="flex items-center gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <nav class="mb-8" aria-label="Settings Tabs">
+            <div class="flex flex-wrap gap-2 sm:gap-0 sm:border-b-2 sm:border-gray-700/50 rounded-t-lg overflow-hidden">
+              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-white bg-gradient-to-br from-blue-600 to-blue-700 border-2 sm:border-b-4 border-blue-400 rounded-lg sm:rounded-none sm:rounded-tl-lg transition-all duration-300 hover:shadow-lg hover:scale-105 sm:hover:scale-100" data-tab="general" aria-controls="general-tab">
+                <span class="flex items-center justify-center gap-2 sm:gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                   </svg>
-                  General
+                  <span class="hidden sm:inline">General</span>
                 </span>
               </button>
-              <button class="tab-btn px-8 py-4 font-bold text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-300" data-tab="theme" aria-controls="theme-tab">
-                <span class="flex items-center gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-gray-400 hover:text-white hover:bg-gray-800/50 border-2 border-transparent hover:border-gray-600 rounded-lg sm:rounded-none transition-all duration-300" data-tab="theme" aria-controls="theme-tab">
+                <span class="flex items-center justify-center gap-2 sm:gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                   </svg>
-                  Theme
+                  <span class="hidden sm:inline">Theme</span>
                 </span>
               </button>
-              <button class="tab-btn px-8 py-4 font-bold text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-300" data-tab="security" aria-controls="security-tab">
-                <span class="flex items-center gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-gray-400 hover:text-white hover:bg-gray-800/50 border-2 border-transparent hover:border-gray-600 rounded-lg sm:rounded-none sm:rounded-tr-lg transition-all duration-300" data-tab="security" aria-controls="security-tab">
+                <span class="flex items-center justify-center gap-2 sm:gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
-                  Security
+                  <span class="hidden sm:inline">Security</span>
                 </span>
               </button>
             </div>
@@ -112,36 +112,69 @@
                   <fieldset class="space-y-6">
                   <div class="grid gap-6 md:grid-cols-2">
                     <div class="col-span-2 md:col-span-1">
-                      <label for="site-title" class="block mb-2 font-bold text-gray-300">Site Title <span class="text-xs text-gray-500 font-normal" id="site-title-count"></span></label>
-                      <input id="site-title" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" maxlength="100" placeholder="Josh's App" />
+                      <label for="site-title" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        Site Title <span class="text-xs text-gray-500 font-normal" id="site-title-count"></span>
+                      </label>
+                      <input id="site-title" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 hover:border-gray-600" maxlength="100" placeholder="Josh's App" />
                     </div>
                     <div class="col-span-2 md:col-span-1">
-                      <label for="contact-email" class="block mb-2 font-bold text-gray-300">Contact Email</label>
-                      <input id="contact-email" type="email" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" placeholder="admin@example.com" />
+                      <label for="contact-email" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Contact Email
+                      </label>
+                      <input id="contact-email" type="email" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 hover:border-gray-600" placeholder="admin@example.com" />
                     </div>
                     <div class="col-span-2">
-                      <label for="site-description" class="block mb-2 font-bold text-gray-300">Site Description <span class="text-xs text-gray-500 font-normal" id="site-description-count"></span></label>
-                      <textarea id="site-description" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" rows="4" maxlength="500" placeholder="Responsive website template with admin features"></textarea>
+                      <label for="site-description" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                        Site Description <span class="text-xs text-gray-500 font-normal" id="site-description-count"></span>
+                      </label>
+                      <textarea id="site-description" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 hover:border-gray-600 resize-none" rows="4" maxlength="500" placeholder="Responsive website template with admin features"></textarea>
                     </div>
                     <div>
-                      <label for="logo-url" class="block mb-2 font-bold text-gray-300">Logo URL</label>
-                      <input id="logo-url" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" maxlength="300" placeholder="https://example.com/logo.png" />
+                      <label for="logo-url" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Logo URL
+                      </label>
+                      <input id="logo-url" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 hover:border-gray-600" maxlength="300" placeholder="https://example.com/logo.png" />
                       <div class="mt-3 h-12 flex items-center gap-4" id="logo-preview-wrapper">
                         <img id="logo-preview" alt="Logo preview" class="h-12 w-auto hidden border-2 border-gray-700 rounded-lg p-1 bg-gray-900/50" />
-                        <button type="button" id="logo-test" class="text-sm px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-600 transition-all duration-200">Preview</button>
+                        <button type="button" id="logo-test" class="text-sm px-5 py-2.5 rounded-lg bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 border border-gray-600 transition-all duration-200 font-medium shadow-md hover:shadow-lg">Preview</button>
                       </div>
                     </div>
                     <div>
-                      <label for="favicon-url" class="block mb-2 font-bold text-gray-300">Favicon URL</label>
-                      <input id="favicon-url" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200" maxlength="300" placeholder="https://example.com/favicon.ico" />
+                      <label for="favicon-url" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        Favicon URL
+                      </label>
+                      <input id="favicon-url" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 hover:border-gray-600" maxlength="300" placeholder="https://example.com/favicon.ico" />
                       <div class="mt-3 flex items-center gap-4" id="favicon-preview-wrapper">
                         <img id="favicon-preview" alt="Favicon preview" class="h-10 w-10 hidden border-2 border-gray-700 rounded-lg p-1 bg-gray-900/50" />
-                        <button type="button" id="favicon-test" class="text-sm px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-600 transition-all duration-200">Preview</button>
+                        <button type="button" id="favicon-test" class="text-sm px-5 py-2.5 rounded-lg bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 border border-gray-600 transition-all duration-200 font-medium shadow-md hover:shadow-lg">Preview</button>
                       </div>
                     </div>
-                    <div class="flex items-center gap-3 mt-6 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50">
-                      <input id="maintenance-mode" type="checkbox" class="w-5 h-5 rounded" />
-                      <label for="maintenance-mode" class="font-semibold text-gray-300">Enable maintenance mode</label>
+                    <div class="col-span-2 flex items-center gap-3 mt-6 p-5 rounded-lg bg-gradient-to-r from-orange-900/20 to-red-900/20 border-2 border-orange-500/30 hover:border-orange-500/50 transition-all duration-200">
+                      <input id="maintenance-mode" type="checkbox" class="w-5 h-5 rounded border-2 border-orange-500 text-orange-500 focus:ring-2 focus:ring-orange-500/30" />
+                      <div>
+                        <label for="maintenance-mode" class="font-bold text-orange-200 cursor-pointer flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                          Enable maintenance mode
+                        </label>
+                        <p class="text-xs text-orange-300/70 mt-1">Visitors will see a maintenance page</p>
+                      </div>
                     </div>
                   </div>
                   </fieldset>
@@ -163,26 +196,41 @@
                   <fieldset class="space-y-4">
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Feature Flags -->
-                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
-                      <input type="checkbox" id="feature-beta-features" class="w-5 h-5" />
-                      <span class="text-sm font-medium text-gray-200">Enable Beta Features</span>
+                    <label class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                      <input type="checkbox" id="feature-beta-features" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div class="flex-1">
+                        <span class="text-sm font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable Beta Features</span>
+                        <p class="text-xs text-gray-500 mt-0.5">Access experimental functionality</p>
+                      </div>
                     </label>
-                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
-                      <input type="checkbox" id="feature-new-dashboard" class="w-5 h-5" />
-                      <span class="text-sm font-medium text-gray-200">Enable New Dashboard</span>
+                    <label class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                      <input type="checkbox" id="feature-new-dashboard" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div class="flex-1">
+                        <span class="text-sm font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable New Dashboard</span>
+                        <p class="text-xs text-gray-500 mt-0.5">Try the redesigned interface</p>
+                      </div>
                     </label>
-                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
-                      <input type="checkbox" id="feature-advanced-reports" class="w-5 h-5" />
-                      <span class="text-sm font-medium text-gray-200">Enable Advanced Reports</span>
+                    <label class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                      <input type="checkbox" id="feature-advanced-reports" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div class="flex-1">
+                        <span class="text-sm font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable Advanced Reports</span>
+                        <p class="text-xs text-gray-500 mt-0.5">Detailed analytics and insights</p>
+                      </div>
                     </label>
                     <!-- Feature Toggles (moved here) -->
-                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
-                      <input type="checkbox" id="enable-registration" class="w-5 h-5" />
-                      <span class="text-sm font-medium text-gray-200">Enable User Registration</span>
+                    <label class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                      <input type="checkbox" id="enable-registration" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div class="flex-1">
+                        <span class="text-sm font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable User Registration</span>
+                        <p class="text-xs text-gray-500 mt-0.5">Allow new users to sign up</p>
+                      </div>
                     </label>
-                    <label class="flex items-center gap-3 p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-yellow-500/50 transition-all cursor-pointer">
-                      <input type="checkbox" id="enable-guest-checkout" class="w-5 h-5" />
-                      <span class="text-sm font-medium text-gray-200">Enable Guest Checkout</span>
+                    <label class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                      <input type="checkbox" id="enable-guest-checkout" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div class="flex-1">
+                        <span class="text-sm font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable Guest Checkout</span>
+                        <p class="text-xs text-gray-500 mt-0.5">Purchase without account</p>
+                      </div>
                     </label>
                   </div>
                   </fieldset>
@@ -207,20 +255,40 @@
                   <fieldset class="space-y-6 mt-6">
                     <div class="grid gap-6 md:grid-cols-2">
                       <div>
-                        <label for="smtp-host" class="block mb-2 font-bold text-gray-300">SMTP Host</label>
-                        <input id="smtp-host" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-200" maxlength="100" placeholder="smtp.example.com" />
+                        <label for="smtp-host" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+                          </svg>
+                          SMTP Host
+                        </label>
+                        <input id="smtp-host" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 transition-all duration-200 hover:border-gray-600" maxlength="100" placeholder="smtp.example.com" />
                       </div>
                       <div>
-                        <label for="smtp-port" class="block mb-2 font-bold text-gray-300">SMTP Port</label>
-                        <input id="smtp-port" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-200" maxlength="10" placeholder="587" />
+                        <label for="smtp-port" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          SMTP Port
+                        </label>
+                        <input id="smtp-port" type="number" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 transition-all duration-200 hover:border-gray-600" maxlength="10" placeholder="587" />
                       </div>
                       <div>
-                        <label for="smtp-user" class="block mb-2 font-bold text-gray-300">SMTP User</label>
-                        <input id="smtp-user" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-200" maxlength="100" placeholder="user@example.com" />
+                        <label for="smtp-user" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          SMTP User
+                        </label>
+                        <input id="smtp-user" type="email" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 transition-all duration-200 hover:border-gray-600" maxlength="100" placeholder="user@example.com" />
                       </div>
                       <div>
-                        <label for="smtp-password" class="block mb-2 font-bold text-gray-300">SMTP Password</label>
-                        <input id="smtp-password" type="password" class="w-full p-4 rounded-lg bg-gray-800/50 border border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-200" maxlength="100" placeholder="Password" />
+                        <label for="smtp-password" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                          SMTP Password
+                        </label>
+                        <input id="smtp-password" type="password" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 transition-all duration-200 hover:border-gray-600" maxlength="100" placeholder="••••••••" />
                       </div>
                     </div>
                     </fieldset>
@@ -246,9 +314,25 @@
                   <fieldset class="space-y-6 mt-6">
                     <div class="grid gap-6 md:grid-cols-2">
                       <div class="md:col-span-1">
-                        <label for="custom-css" class="block mb-2 font-bold text-gray-300">Custom CSS <span class="text-xs text-gray-500 font-normal" id="custom-css-count"></span></label>
-                        <textarea id="custom-css" class="w-full p-4 rounded-lg bg-gray-900/50 border border-gray-700/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all duration-200 font-mono text-sm" rows="6" maxlength="2000" placeholder="/* Custom CSS */"></textarea>
+                        <label for="custom-css" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                          </svg>
+                          Custom CSS <span class="text-xs text-gray-500 font-normal" id="custom-css-count"></span>
+                        </label>
+                        <textarea id="custom-css" class="w-full p-4 rounded-lg bg-gray-900/70 border-2 border-gray-700/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all duration-200 hover:border-gray-600 font-mono text-sm resize-none" rows="6" maxlength="2000" placeholder="/* Custom CSS rules... */&#10;.my-class {&#10;  color: #3B82F6;&#10;}"></textarea>
                       </div>
+                      <div class="md:col-span-1">
+                        <label for="custom-js" class="block mb-2 font-bold text-gray-300 flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                          </svg>
+                          Custom JavaScript <span class="text-xs text-gray-500 font-normal" id="custom-js-count"></span>
+                        </label>
+                        <textarea id="custom-js" class="w-full p-4 rounded-lg bg-gray-900/70 border-2 border-gray-700/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all duration-200 hover:border-gray-600 font-mono text-sm resize-none" rows="6" maxlength="2000" placeholder="// Custom JavaScript...&#10;console.log('Hello!');"></textarea>
+                      </div>
+                    </div>
+                    </fieldset>
                       <div class="md:col-span-1">
                         <label for="custom-js" class="block mb-2 font-bold text-gray-300">Custom JS <span class="text-xs text-gray-500 font-normal" id="custom-js-count"></span></label>
                         <textarea id="custom-js" class="w-full p-4 rounded-lg bg-gray-900/50 border border-gray-700/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all duration-200 font-mono text-sm" rows="6" maxlength="2000" placeholder="// Custom JS"></textarea>
@@ -682,46 +766,67 @@
 
           <!-- Security Panel -->
           <div id="security-tab" class="tab-panel card widget-primary rounded-lg border border-gray-700 shadow-lg p-6 md:p-8 hidden">
-            <div class="flex items-center gap-3 mb-8">
-              <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-red-500 to-orange-600 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-6">
+              <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
               <div>
-                <h2 class="text-2xl font-bold text-white">Security Settings</h2>
-                <p class="text-sm text-gray-400 mt-1">Manage authentication and security preferences</p>
+                <h2 class="text-3xl font-bold text-white">Security Settings</h2>
+                <p class="text-sm text-gray-400 mt-2">Manage authentication and security preferences</p>
               </div>
             </div>
-            <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
+            <div class="card widget-secondary p-8 rounded-xl border-2 border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300">
               <div class="space-y-6">
               <div>
-                <label class="block mb-1 font-semibold" for="session-timeout">Session Timeout (minutes)</label>
-                <select id="session-timeout" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700">
-                  <option value="30">30</option>
-                  <option value="60" selected>60</option>
-                  <option value="120">120</option>
-                  <option value="240">240</option>
+                <label class="block mb-2 font-bold text-gray-300 flex items-center gap-2" for="session-timeout">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Session Timeout (minutes)
+                </label>
+                <select id="session-timeout" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 transition-all duration-200 hover:border-gray-600 cursor-pointer">
+                  <option value="30">30 minutes</option>
+                  <option value="60" selected>60 minutes (1 hour)</option>
+                  <option value="120">120 minutes (2 hours)</option>
+                  <option value="240">240 minutes (4 hours)</option>
                 </select>
             </div>
               </div>
               <div>
-                <label class="block mb-1 font-semibold" for="max-login-attempts">Max Login Attempts</label>
-                <input id="max-login-attempts" type="number" min="3" max="10" value="5" class="w-full p-3 rounded bg-gray-100 dark:bg-gray-700" />
+                <label class="block mb-2 font-bold text-gray-300 flex items-center gap-2" for="max-login-attempts">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                  Max Login Attempts
+                </label>
+                <input id="max-login-attempts" type="number" min="3" max="10" value="5" class="w-full p-4 rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 transition-all duration-200 hover:border-gray-600" />
+                <p class="text-xs text-gray-500 mt-2">Number of failed attempts before account lockout</p>
               </div>
               <div>
-                <label class="block mb-2 font-semibold text-white">Two-Factor Authentication (2FA)</label>
-                <div id="2fa-status" class="mb-3 p-3 rounded bg-gray-800/50 border border-gray-700">
+                <label class="block mb-3 font-bold text-gray-300 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  Two-Factor Authentication (2FA)
+                </label>
+                <div id="2fa-status" class="mb-4 p-5 rounded-lg bg-gradient-to-br from-gray-800/70 to-gray-900/50 border-2 border-gray-700/50 shadow-md">
                   <div class="flex items-center justify-between">
                     <div>
-                      <span id="2fa-status-text" class="text-sm text-gray-400">Status: Not configured</span>
+                      <span id="2fa-status-text" class="text-sm font-medium text-gray-300">Status: Not configured</span>
                     </div>
-                    <button id="toggle-2fa" type="button" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors">
+                    <button id="toggle-2fa" type="button" class="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-sm font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105">
                       Setup 2FA
                     </button>
                   </div>
                 </div>
-                <p class="text-xs text-gray-400 mb-3">Add an extra layer of security by requiring a time-based code in addition to your password.</p>
+                <p class="text-xs text-gray-400 mb-3 flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Add an extra layer of security by requiring a time-based code in addition to your password.</span>
+                </p>
               </div>
               <div class="flex items-center gap-2">
                 <input id="audit-all-actions" type="checkbox" checked />
@@ -746,7 +851,7 @@
       <div class="bg-gray-800 rounded-lg shadow-2xl max-w-md w-full p-6 border border-gray-700">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-2xl font-bold text-white">Setup Two-Factor Authentication</h3>
-          <button id="close-2fa-modal" class="text-gray-400 hover:text-white">
+          <button id="close-2fa-modal" class="text-gray-400 hover:text-white transition-colors" aria-label="Close 2FA setup modal" title="Close">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
