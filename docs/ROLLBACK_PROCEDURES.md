@@ -119,18 +119,12 @@ node scripts/run-migrations.js
 ```bash
 # PostgreSQL backup
 pg_dump -h $DB_HOST -U $DB_USER -d $DB_NAME > backup_$(date +%Y%m%d_%H%M%S).sql
-
-# SQLite backup
-cp database.sqlite database.sqlite.backup_$(date +%Y%m%d_%H%M%S)
 ```
 
 **Restore from backup:**
 ```bash
 # PostgreSQL restore
 psql -h $DB_HOST -U $DB_USER -d $DB_NAME < backup_file.sql
-
-# SQLite restore
-cp database.sqlite.backup_YYYYMMDD_HHMMSS database.sqlite
 ```
 
 ### 4. Static File Rollback (FTP)
@@ -212,7 +206,7 @@ To minimize the need for rollbacks:
 3. **Test migrations thoroughly:**
    ```bash
    # Always test in development first
-   DB_TYPE=sqlite node scripts/run-migrations.js
+   DB_TYPE=postgres node scripts/run-migrations.js
    ```
 
 4. **Use staging environment:**

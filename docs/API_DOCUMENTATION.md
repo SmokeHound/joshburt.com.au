@@ -1005,8 +1005,8 @@ Response includes pagination metadata:
 
 Required:
 - `JWT_SECRET`: Secret key for JWT token signing
-- `DB_TYPE`: Database type (postgresql or sqlite)
-- `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`: Database connection details (PostgreSQL)
+- `DB_TYPE`: Database type (postgresql only)
+- `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`: PostgreSQL connection details
 
 Optional:
 - `BCRYPT_ROUNDS`: BCrypt hashing rounds (default: 12)

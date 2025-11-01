@@ -25,8 +25,8 @@ async function runMigrations() {
     console.log('✅ Connected to database');
 
     // Detect database type and use appropriate syntax
-    const dbType = database.type || 'sqlite'; // Assume 'type' property exists on database
-    const idColumn = dbType === 'postgres' ? 'SERIAL' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    const dbType = database.type || 'postgres'; // Always PostgreSQL
+    const idColumn = 'SERIAL';
 
     // Create migrations tracking table if it doesn't exist
     await database.run(`

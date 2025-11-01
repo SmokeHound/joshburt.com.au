@@ -44,11 +44,17 @@ DB_SSL=true
 #### SQLite (Development)
  Access audit logs via `/.netlify/functions/audit-logs`.
 ```env
-# Database Type (default)
-DB_TYPE=sqlite
+# Database Type (PostgreSQL only)
+DB_TYPE=postgres
 
-# SQLite Configuration
-DB_PATH=./database.sqlite
+# PostgreSQL Configuration (required)
+DATABASE_URL=postgres://user:password@host/database
+# Or use individual credentials:
+# DB_HOST=localhost
+# DB_PORT=5432
+# DB_USER=joshburt_user
+# DB_PASSWORD=secure_password
+# DB_NAME=joshburt_website
 
 # JWT Configuration (required)
 JWT_SECRET=development-jwt-secret
@@ -371,13 +377,7 @@ DB_SSL=true
 
 3. **Run database initialization**: application functions auto-create tables on first use.
 
-4. **Migrate existing data** (if needed):
-```bash
-# Export from SQLite
-sqlite3 database.sqlite .dump > export.sql
-
-# Import to PostgreSQL (with manual conversion)
-psql -h your-host -U joshburt_user -d joshburt_website < converted_export.sql
+4. **Migrate existing data** (if needed): Manual PostgreSQL import scripts may be required.
 ```
 
 ## Troubleshooting
@@ -420,14 +420,13 @@ npm test
 # Run authentication tests only
 npm test tests/auth.test.js
 
-# Run with specific database
-DB_TYPE=sqlite npm test
+# Run with PostgreSQL database (required)
 DB_TYPE=postgres npm test  # Requires PostgreSQL server
 ```
 
 ### Test Database
 
-Tests automatically use a separate test database (`test_database.sqlite`) to avoid affecting development data. No debug logic or dead code is present in test files.
+Tests use mocked database connections to avoid requiring a live database. No debug logic or dead code is present in test files.
 
 ## Monitoring and Maintenance
 

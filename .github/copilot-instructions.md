@@ -24,7 +24,7 @@ Always reference these instructions first. Fallback to search or bash commands o
 ### Build and Deploy Information
 - **Static files**: No build required
 - **Backend/API**: Requires Node.js dependencies (run `npm install`)
-- **Database**: PostgreSQL (e.g. Neon), (see config/database.js for credentials)
+- **Database**: PostgreSQL (e.g. Neon), or SQLite (see config/database.js for credentials)
 - **Deployment**: GitHub Actions for FTP and Netlify; API/serverless functions deploy automatically
 
 

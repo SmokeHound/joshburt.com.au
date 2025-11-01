@@ -334,8 +334,8 @@ await logger.shutdown();
 ### Required for Monitoring
 
 ```bash
-# Database (for metrics storage)
-DB_TYPE=postgres  # or sqlite
+# Database (PostgreSQL required)
+DB_TYPE=postgres
 DB_HOST=your-host
 DB_PORT=5432
 DB_USER=your-user

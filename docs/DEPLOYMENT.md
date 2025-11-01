@@ -131,9 +131,8 @@ JWT_SECRET=your-super-secure-jwt-secret
 JWT_EXPIRES_IN=7d
 JWT_REFRESH_EXPIRES_IN=30d
 BCRYPT_ROUNDS=12
-DB_TYPE=sqlite   # or postgres
-DB_PATH=./database.sqlite  # if sqlite
-# If Postgres set: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+DB_TYPE=postgres
+# PostgreSQL credentials required: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
 ```
 Optional:
 ```
@@ -455,7 +454,7 @@ npm run dev:functions
 - **Rollback**: [ROLLBACK_PROCEDURES.md](ROLLBACK_PROCEDURES.md)
 
 ## Database
-SQLite default (bundled `database.sqlite`). For remote DB (PostgreSQL) supply credentials via env vars. The unified `config/database.js` selects driver based on `DB_TYPE`.
+PostgreSQL is required. Supply credentials via env vars. The unified `config/database.js` handles connection pooling and query execution.
 
 ### Migrations / Schema
 On PostgreSQL, the app will best‑effort apply `database-schema.sql` at startup before creating any missing tables. If it fails, the built‑in initializers still create the required tables. Review `DATABASE.md` and `database-schema.sql` for details.
@@ -511,7 +510,6 @@ All dynamic capability now relies on Netlify Functions; ensure environment varia
 
 ### Optional
 - `PORT`: Server port (default: 3000)
-- `DB_PATH`: SQLite database file path (default: ./database.sqlite)
 - `FRONTEND_URL`: Frontend URL for CORS and redirects
 - `PRODUCTION_URL`: Production domain
 - `BCRYPT_ROUNDS`: Password hashing rounds (default: 12)

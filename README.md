@@ -526,8 +526,8 @@ Extending CI:
 
 ### Environment Variables Checklist
 Ensure the following are defined in Netlify (or locally in `.env`) for full functionality:
-- `DB_TYPE` (postgres | sqlite)
-- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (if not sqlite)
+- `DB_TYPE` (postgres only)
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (PostgreSQL credentials)
 - `JWT_SECRET` (required for auth)
 - `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_AUDIENCE` (optional; enables OAuth; buttons auto-enable via `/.netlify/functions/public-config`)
 - Optional: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` (email flows)

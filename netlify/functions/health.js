@@ -20,7 +20,7 @@ exports.handler = withHandler(async (event) => {
       dbInitialized = true;
     }
 
-    let dbOk = false; const dbDriver = process.env.DB_TYPE || 'sqlite';
+    let dbOk = false; const dbDriver = 'postgres';
     try {
       const row = await database.get('SELECT 1 as ok');
       dbOk = !!row;
