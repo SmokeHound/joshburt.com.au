@@ -38,12 +38,12 @@ exports.handler = withHandler(async (event) => {
       
       const stats = await database.all(`SELECT 
         COUNT(*) as total_users,
-        SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_users,
+        SUM(CASE WHEN is_active = TRUE THEN 1 ELSE 0 END) as active_users,
         SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) as admin_users,
         SUM(CASE WHEN role = 'manager' THEN 1 ELSE 0 END) as manager_users,
         SUM(CASE WHEN role = 'user' THEN 1 ELSE 0 END) as regular_users,
-        SUM(CASE WHEN email_verified = 1 THEN 1 ELSE 0 END) as verified_users,
-        SUM(CASE WHEN created_at >= datetime('now', '-30 days') THEN 1 ELSE 0 END) as new_users_30d
+        SUM(CASE WHEN email_verified = TRUE THEN 1 ELSE 0 END) as verified_users,
+        SUM(CASE WHEN created_at >= NOW() - INTERVAL '30 days' THEN 1 ELSE 0 END) as new_users_30d
       FROM users`);
       return ok({ stats: stats[0] });
     }
@@ -174,8 +174,8 @@ exports.handler = withHandler(async (event) => {
     }
     // Password change: not implemented
     return error(405, 'Method not allowed');
-  } catch (error) {
-    console.error('Users function error', error);
+  } catch (err) {
+    console.error('Users function error', err);
     return error(500, 'Internal server error');
   }
 });
