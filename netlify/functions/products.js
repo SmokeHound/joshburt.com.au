@@ -1,176 +1,218 @@
-const { withHandler, json, error, parseBody, requireAuth, corsHeaders } = require('../../utils/fn');
-const { logAudit } = require('../../utils/audit');
-const { database, initializeDatabase } = require('../../config/database');
+// Netlify Function: Full CRUD /.netlify/functions/products
+const { database } = require('../../config/database');
+const { withHandler, ok, error, parseBody } = require('../../utils/fn');
+const { requirePermission } = require('../../utils/http');
 
-let dbReady = false;
-async function ensureDb(){
-  if (!dbReady) {
-    await initializeDatabase();
-    dbReady = true;
-  }
-}
+exports.handler = withHandler(async function(event) {
+  // Initialize database connection (idempotent)
+  await database.connect();
 
-async function listProducts(event) {
-  try {
-    const q = (event.queryStringParameters && (event.queryStringParameters.q || event.queryStringParameters.search)) || '';
-    const type = event.queryStringParameters && event.queryStringParameters.type;
-    const where = [];
-    const params = [];
-    if (q) { 
-      const pat = `%${String(q).toLowerCase()}%`;
-      where.push('(LOWER(name) LIKE ? OR LOWER(code) LIKE ? OR LOWER(type) LIKE ?)'); 
-      params.push(pat, pat, pat); 
+  const method = event.httpMethod;
+  if (method === 'GET') return handleGet(event);
+  if (method === 'POST') return handlePost(event);
+  if (method === 'PUT') return handlePut(event);
+  if (method === 'DELETE') return handleDelete(event);
+  return error(405, 'Method Not Allowed');
+
+  async function handleGet(event) {
+    // Products can be read by all authenticated users
+    const { user, response: authResponse } = await requirePermission(event, 'products', 'read');
+    if (authResponse) return authResponse;
+    
+    try {
+      const params = event.queryStringParameters || {};
+      const {
+        search,
+        category_id,
+        type,
+        is_active,
+        page = 1,
+        limit = 50
+      } = params;
+
+      // Build query with filters
+      let query = 'SELECT p.*, pc.name as category_name FROM products p LEFT JOIN product_categories pc ON p.category_id = pc.id WHERE 1=1';
+      const queryParams = [];
+
+      // Search functionality (full-text search on name, description, specs)
+      if (search) {
+        query += ' AND (p.name LIKE ? OR p.description LIKE ? OR p.specs LIKE ? OR p.code LIKE ?)';
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern);
+      }
+
+      // Filter by category
+      if (category_id) {
+        query += ' AND p.category_id = ?';
+        queryParams.push(parseInt(category_id));
+      }
+
+      // Filter by type (legacy support)
+      if (type) {
+        query += ' AND p.type = ?';
+        queryParams.push(type);
+      }
+
+      // Filter by active status
+      if (is_active !== undefined) {
+        query += ' AND p.is_active = ?';
+        queryParams.push(is_active === 'true' || is_active === true);
+      }
+
+      // Add ordering
+      query += ' ORDER BY p.name';
+
+      // Add pagination
+      const offset = (parseInt(page) - 1) * parseInt(limit);
+      query += ' LIMIT ? OFFSET ?';
+      queryParams.push(parseInt(limit), offset);
+
+      const products = await database.all(query, queryParams);
+
+      // Get total count for pagination
+      let countQuery = 'SELECT COUNT(*) as total FROM products p WHERE 1=1';
+      const countParams = [];
+      
+      if (search) {
+        countQuery += ' AND (p.name LIKE ? OR p.description LIKE ? OR p.specs LIKE ? OR p.code LIKE ?)';
+        const searchPattern = `%${search}%`;
+        countParams.push(searchPattern, searchPattern, searchPattern, searchPattern);
+      }
+      if (category_id) {
+        countQuery += ' AND p.category_id = ?';
+        countParams.push(parseInt(category_id));
+      }
+      if (type) {
+        countQuery += ' AND p.type = ?';
+        countParams.push(type);
+      }
+      if (is_active !== undefined) {
+        countQuery += ' AND p.is_active = ?';
+        countParams.push(is_active === 'true' || is_active === true);
+      }
+
+      const countResult = await database.get(countQuery, countParams);
+      const total = countResult.total || 0;
+
+      return ok({
+        products,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / parseInt(limit))
+        }
+      });
+    } catch (e) {
+      console.error('GET /products error:', e);
+      return error(500, 'Failed to fetch products');
     }
-    if (type) { where.push('type = ?'); params.push(type); }
-    const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
-
-    // Left join inventory to get stock
-    const sql = `
-      SELECT p.id, p.name, p.code, p.type, p.specs, p.description, p.image,
-             p.model_qty, p.soh, COALESCE(i.stock_count, p.soh) AS currentStock
-      FROM products p
-      LEFT JOIN inventory i ON i.item_type = 'product' AND i.item_id = p.id
-      ${whereSql}
-      ORDER BY p.name ASC
-    `;
-    const rows = await database.all(sql, params);
-    return json(200, Array.isArray(rows) ? rows : []);
-  } catch (e) {
-    console.error('listProducts', e);
-    return error(500, 'Failed to fetch products');
   }
-}
 
-async function createProduct(event, user) {
-  try {
-    const body = parseBody(event);
-    const { name, code, type, specs = '', description = '', image = '', model_qty, currentStock } = body;
-    if (!name || !code || !type || !specs) return error(400, 'Missing required fields');
-
-    const sohVal = (typeof currentStock === 'number') ? Math.max(0, currentStock) : null;
-    const insert = await database.run(
-      'INSERT INTO products (name, code, type, specs, description, image, model_qty, soh) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [name, code, type, specs, description, image, (typeof model_qty === 'number' ? model_qty : null), sohVal]
-    );
-    const id = insert.id;
-    if (typeof currentStock === 'number') {
-      // Upsert inventory
-      await upsertInventory('product', id, Math.max(0, currentStock));
+  async function handlePost(event) {
+    // Only admins and managers can create products
+    const { user, response: authResponse } = await requirePermission(event, 'products', 'create');
+    if (authResponse) return authResponse;
+    
+    try {
+      const body = parseBody(event);
+      const { name, code, type, specs, description, image, category_id, stock_quantity, is_active } = body;
+      if (!name || !code || !type) {
+        return error(400, 'Missing required fields: name, code, type');
+      }
+      const query = `
+        INSERT INTO products (name, code, type, specs, description, image, category_id, stock_quantity, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      const params = [
+        name, 
+        code, 
+        type, 
+        specs || '', 
+        description || '', 
+        image || '',
+        category_id || null,
+        stock_quantity || 0,
+        is_active !== undefined ? is_active : true
+      ];
+      const result = await database.run(query, params);
+      
+      return ok({ 
+        id: result.id,
+        message: 'Product created successfully',
+        product: { id: result.id, name, code, type, specs, description, image, category_id, stock_quantity, is_active }
+      }, 201);
+    } catch (e) {
+      console.error('POST /products error:', e);
+      if (e.message && e.message.includes('UNIQUE constraint')) {
+        return error(409, 'Product code already exists');
+      }
+      return error(500, 'Failed to create product');
     }
-    const created = await database.get(
-      'SELECT p.*, COALESCE(i.stock_count, p.soh) AS currentStock FROM products p LEFT JOIN inventory i ON i.item_type = ? AND i.item_id = p.id WHERE p.id = ?',
-      ['product', id]
-    );
-    // Audit
-    await logAudit(event, { action: 'product.create', userId: user && user.id, details: { id, code, type } });
-    return json(201, created);
-  } catch (e) {
-    console.error('createProduct', e);
-    return error(500, 'Failed to create product');
   }
-}
 
-async function updateProduct(event, user) {
-  try {
-    const body = parseBody(event);
-    const { id, name, code, type, specs, description, image, model_qty, currentStock } = body;
-    if (!id) return error(400, 'Product id is required');
-
-    // Build dynamic update
-    const sets = [];
-    const params = [];
-    if (name !== undefined) { sets.push('name = ?'); params.push(name); }
-    if (code !== undefined) { sets.push('code = ?'); params.push(code); }
-    if (type !== undefined) { sets.push('type = ?'); params.push(type); }
-    if (specs !== undefined) { sets.push('specs = ?'); params.push(specs); }
-    if (description !== undefined) { sets.push('description = ?'); params.push(description); }
-    if (image !== undefined) { sets.push('image = ?'); params.push(image); }
-    if (model_qty !== undefined) { sets.push('model_qty = ?'); params.push(model_qty); }
-    if (currentStock !== undefined) { sets.push('soh = ?'); params.push(Math.max(0, parseInt(currentStock, 10) || 0)); }
-    if (sets.length) {
-      params.push(id);
-      await database.run(`UPDATE products SET ${sets.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, params);
+  async function handlePut(event) {
+    // Only admins and managers can update products
+    const { user, response: authResponse } = await requirePermission(event, 'products', 'update');
+    if (authResponse) return authResponse;
+    
+    try {
+      const body = parseBody(event);
+      const { id, name, code, type, specs, description, image, category_id, stock_quantity, is_active } = body;
+      if (!id || !name || !code || !type) {
+        return error(400, 'Missing required fields: id, name, code, type');
+      }
+      const query = `
+        UPDATE products 
+        SET name = ?, code = ?, type = ?, specs = ?, description = ?, image = ?, 
+            category_id = ?, stock_quantity = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `;
+      const params = [
+        name, 
+        code, 
+        type, 
+        specs || '', 
+        description || '', 
+        image || '', 
+        category_id || null,
+        stock_quantity !== undefined ? stock_quantity : 0,
+        is_active !== undefined ? is_active : true,
+        id
+      ];
+      const result = await database.run(query, params);
+      if (result.changes === 0) {
+        return error(404, 'Product not found');
+      }
+      
+      return ok({
+        message: 'Product updated successfully',
+        product: { id, name, code, type, specs, description, image, category_id, stock_quantity, is_active }
+      });
+    } catch (e) {
+      console.error('PUT /products error:', e);
+      if (e.message && e.message.includes('UNIQUE constraint')) {
+        return error(409, 'Product code already exists');
+      }
+      return error(500, 'Failed to update product');
     }
-    if (currentStock !== undefined) {
-      await upsertInventory('product', id, Math.max(0, parseInt(currentStock, 10) || 0));
+  }
+
+  async function handleDelete(event) {
+    // Only admins can delete products
+    const { user, response: authResponse } = await requirePermission(event, 'products', 'delete');
+    if (authResponse) return authResponse;
+    
+    try {
+      const { id } = parseBody(event);
+      if (!id) return error(400, 'Missing required field: id');
+      const result = await database.run('DELETE FROM products WHERE id = ?', [id]);
+      if (result.changes === 0) return error(404, 'Product not found');
+      
+      return ok({ message: 'Product deleted successfully' });
+    } catch (e) {
+      console.error('DELETE /products error:', e);
+      return error(500, 'Failed to delete product');
     }
-    const updated = await database.get(
-      'SELECT p.*, COALESCE(i.stock_count, p.soh) AS currentStock FROM products p LEFT JOIN inventory i ON i.item_type = ? AND i.item_id = p.id WHERE p.id = ?',
-      ['product', id]
-    );
-    // Audit
-    await logAudit(event, { action: 'product.update', userId: user && user.id, details: { id } });
-    return json(200, updated || { id });
-  } catch (e) {
-    console.error('updateProduct', e);
-    return error(500, 'Failed to update product');
   }
-}
-
-async function deleteProduct(event, user) {
-  try {
-    const body = parseBody(event);
-    const { id } = body;
-    if (!id) return error(400, 'Product id is required');
-    await database.run('DELETE FROM products WHERE id = ?', [id]);
-    await database.run('DELETE FROM inventory WHERE item_type = \'product\' AND item_id = ?', [id]);
-    // Audit
-    await logAudit(event, { action: 'product.delete', userId: user && user.id, details: { id } });
-    return json(200, { ok: true });
-  } catch (e) {
-    console.error('deleteProduct', e);
-    return error(500, 'Failed to delete product');
-  }
-}
-
-async function upsertInventory(itemType, itemId, stock) {
-  // Try update first
-  const updated = await database.run(
-    'UPDATE inventory SET stock_count = ? WHERE item_type = ? AND item_id = ?',
-    [stock, itemType, itemId]
-  );
-  if (updated && updated.changes > 0) return;
-  // Insert if not existing
-  try {
-    await database.run(
-      'INSERT INTO inventory (item_type, item_id, stock_count) VALUES (?, ?, ?)',
-      [itemType, itemId, stock]
-    );
-  } catch (e) {
-    // Handle race: try update again
-    await database.run(
-      'UPDATE inventory SET stock_count = ? WHERE item_type = ? AND item_id = ?',
-      [stock, itemType, itemId]
-    );
-  }
-}
-
-exports.handler = withHandler(async (event) => {
-  await ensureDb();
-  // CORS preflight handled by withHandler
-  // Support pseudo-subpath for import: /.netlify/functions/products/import
-  if (event.path && /\/products\/import$/i.test(event.path)) {
-    return error(405, 'Use dedicated import function or POST CSV not supported here');
-  }
-
-  if (event.httpMethod === 'GET') {
-    return listProducts(event);
-  }
-  if (event.httpMethod === 'POST') {
-    const { user, response } = await requireAuth(event, ['admin', 'manager']);
-    if (response) return response;
-    return createProduct(event, user);
-  }
-  if (event.httpMethod === 'PUT' || event.httpMethod === 'PATCH') {
-    const { user, response } = await requireAuth(event, ['admin', 'manager']);
-    if (response) return response;
-    return updateProduct(event, user);
-  }
-  if (event.httpMethod === 'DELETE') {
-    const { user, response } = await requireAuth(event, ['admin', 'manager']);
-    if (response) return response;
-    return deleteProduct(event, user);
-  }
-
-  return { statusCode: 405, headers: corsHeaders, body: 'Method Not Allowed' };
 });
