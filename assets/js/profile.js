@@ -200,17 +200,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         logList.innerHTML = logs.map(log => {
           const date = new Date(log.created_at || log.timestamp);
           const timeAgo = getTimeAgo(date);
-          const actionClass = getActionClass(log.action);
+          const actionInfo = getActionInfo(log.action);
 
           return `
-            <div class="flex items-start gap-3 p-3 rounded hover:bg-gray-800 transition">
-              <div class="w-2 h-2 mt-2 rounded-full ${actionClass}"></div>
-              <div class="flex-1">
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold">${escapeHtml(log.action || 'Unknown action')}</span>
-                  <span class="text-xs text-gray-400">${timeAgo}</span>
+            <div class="group flex items-start gap-4 p-4 rounded-lg bg-gradient-to-r from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-${actionInfo.color}-500/50 hover:shadow-lg hover:shadow-${actionInfo.color}-500/10 transition-all duration-200">
+              <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br ${actionInfo.bgGradient} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                ${actionInfo.icon}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2 mb-1">
+                  <span class="font-bold text-white text-sm sm:text-base">${escapeHtml(log.action || 'Unknown action')}</span>
+                  <span class="flex-shrink-0 text-xs font-medium text-gray-400 bg-gray-800/50 px-2 py-1 rounded">${timeAgo}</span>
                 </div>
-                ${log.details ? `<p class="text-sm text-gray-400 mt-1">${escapeHtml(log.details)}</p>` : ''}
+                ${log.details ? `<p class="text-sm text-gray-400 mt-2 leading-relaxed">${escapeHtml(log.details)}</p>` : ''}
+                <div class="text-xs text-gray-500 mt-2">${date.toLocaleString()}</div>
               </div>
             </div>
           `;
@@ -224,16 +227,95 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('activity-log').innerHTML = '<div class="text-center text-gray-400 py-8">Activity log unavailable.</div>';
   }
 
-  // Helper function to get action color class
-  function getActionClass(action) {
-    if (!action) {return 'bg-gray-500';}
+  // Helper function to get action styling and icon
+  function getActionInfo(action) {
+    if (!action) {
+      return {
+        color: 'gray',
+        bgGradient: 'from-gray-500 to-gray-600',
+        icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+      };
+    }
     const actionLower = action.toLowerCase();
-    if (actionLower.includes('login') || actionLower.includes('success')) {return 'bg-green-500';}
-    if (actionLower.includes('error') || actionLower.includes('fail')) {return 'bg-red-500';}
-    if (actionLower.includes('create') || actionLower.includes('add')) {return 'bg-blue-500';}
-    if (actionLower.includes('update') || actionLower.includes('edit')) {return 'bg-yellow-500';}
-    if (actionLower.includes('delete') || actionLower.includes('remove')) {return 'bg-red-500';}
-    return 'bg-gray-500';
+    
+    // Login/Authentication actions
+    if (actionLower.includes('login') || actionLower.includes('sign in')) {
+      return {
+        color: 'green',
+        bgGradient: 'from-green-500 to-green-600',
+        icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>'
+      };
+    }
+    
+    // Logout actions
+    if (actionLower.includes('logout') || actionLower.includes('sign out')) {
+      return {
+        color: 'orange',
+        bgGradient: 'from-orange-500 to-orange-600',
+        icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>'
+      };
+    }
+    
+    // Error/Failure actions
+    if (actionLower.includes('error') || actionLower.includes('fail')) {
+      return {
+        color: 'red',
+        bgGradient: 'from-red-500 to-red-600',
+        icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+      };
+    }
+    
+    // Create/Add actions
+    if (actionLower.includes('create') || actionLower.includes('add') || actionLower.includes('new')) {
+      return {
+        color: 'blue',
+        bgGradient: 'from-blue-500 to-blue-600',
+        icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>'
+      };
+    }
+    
+    // Update/Edit actions
+    if (actionLower.includes('update') || actionLower.includes('edit') || actionLower.includes('modify')) {
+      return {
+        color: 'yellow',
+        bgGradient: 'from-yellow-500 to-yellow-600',
+        icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>'
+      };
+    }
+    
+    // Delete/Remove actions
+    if (actionLower.includes('delete') || actionLower.includes('remove')) {
+      return {
+        color: 'red',
+        bgGradient: 'from-red-500 to-red-600',
+        icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>'
+      };
+    }
+    
+    // Order actions
+    if (actionLower.includes('order')) {
+      return {
+        color: 'purple',
+        bgGradient: 'from-purple-500 to-purple-600',
+        icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>'
+      };
+    }
+    
+    // Success actions
+    if (actionLower.includes('success') || actionLower.includes('approved')) {
+      return {
+        color: 'green',
+        bgGradient: 'from-green-500 to-green-600',
+        icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+      };
+    }
+    
+    // Default
+    return {
+      color: 'gray',
+      bgGradient: 'from-gray-500 to-gray-600',
+      icon: '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+    };
   }
 
   // Helper function to get time ago string
