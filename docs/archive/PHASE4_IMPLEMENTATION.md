@@ -196,10 +196,10 @@ NODE_ENV=development
 ```
 
 ### Database Configuration
-The application supports both PostgreSQL and SQLite through `config/database.js`. Database connection is configured via environment variables:
+The application uses PostgreSQL exclusively through `config/database.js`. Database connection is configured via environment variables:
 
 ```bash
-DB_TYPE=postgres  # or 'sqlite'
+DB_TYPE=postgres
 DB_HOST=your-host
 DB_USER=your-user
 DB_PASSWORD=your-password

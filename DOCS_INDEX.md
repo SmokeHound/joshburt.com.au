@@ -298,7 +298,7 @@ All major documentation follows this structure:
 See [DEPLOYMENT.md](DEPLOYMENT.md) for complete environment variable documentation.
 
 Key variables:
-- `DB_TYPE` - Database type (postgres/sqlite)
+- `DB_TYPE` - Database type (postgres only)
 - `JWT_SECRET` - JWT signing secret
 - `NODE_ENV` - Environment (production/development)
 
