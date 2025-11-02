@@ -93,7 +93,9 @@
   }
 
   async function fetchLogs() {
-    state.loading = true; renderLoading();
+    state.loading = true;
+    state.error = null; // Clear any previous errors
+    renderLoading();
     const params = new URLSearchParams();
     params.set('page', state.page);
     params.set('pageSize', state.pageSize);
@@ -109,7 +111,12 @@
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
       const url = `${FN_BASE}/audit-logs?` + params.toString();
       const res = await (window.authFetch ? window.authFetch(url) : fetch(url));
-      if (!res.ok) {throw new Error('Failed to fetch');}
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          throw new Error('Authentication required. Please log in as an admin to view audit logs.');
+        }
+        throw new Error(`Failed to fetch audit logs (${res.status})`);
+      }
       const json = await res.json();
       // Expect { data, pagination }
       if (Array.isArray(json)) {
@@ -141,7 +148,7 @@
     const tbody = document.getElementById('audit-tbody');
     if (!tbody) {return;}
     if (state.error) {
-      tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">${state.error}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">${escapeHtml(state.error)}</td></tr>`;
       return;
     }
     if (!state.data.length) {
@@ -484,6 +491,23 @@
   // Initialize
   ensureStructure();
   wireEvents();
-  fetchUsersMap();
-  fetchLogs();
+
+  // Wait for auth to be ready before fetching
+  function init() {
+    fetchUsersMap();
+    fetchLogs();
+  }
+
+  // Check if we need to wait for auth initialization
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    // DOM already loaded, check if auth is ready
+    if (window.authFetch || window.getToken) {
+      init();
+    } else {
+      // Wait a bit for init-shared.js to set up authFetch
+      setTimeout(init, 100);
+    }
+  }
 })();
