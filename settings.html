@@ -14,6 +14,24 @@
   <script src="./assets/js/theme-enhanced.js" defer></script>
   <script src="./assets/js/theme-ui.js" defer></script>
   <script>
+    // Load centralized theme manager early
+    (function() {
+      fetch('shared-theme.html')
+        .then(r => r.text())
+        .then(html => {
+          const temp = document.createElement('div');
+          temp.innerHTML = html;
+          const scripts = temp.getElementsByTagName('script');
+          for (let script of scripts) {
+            const newScript = document.createElement('script');
+            newScript.textContent = script.textContent;
+            document.head.appendChild(newScript);
+          }
+        })
+        .catch(err => console.warn('Failed to load shared-theme.html:', err));
+    })();
+  </script>
+  <script>
     // Purge legacy role demo key to avoid stale UI state
     try { localStorage.removeItem('currentUser'); } catch (_) {}
   </script>
@@ -1203,6 +1221,33 @@
           // Apply theme immediately using ThemeManager
           if (window.Theme) {
             window.Theme.setTheme(themeId, true);
+          } else {
+            // Fallback: manually apply theme if ThemeManager not loaded yet
+            console.warn('ThemeManager not loaded, applying theme manually');
+            const body = document.body;
+            const html = document.documentElement;
+            
+            // Update body and html classes
+            body.classList.remove('dark', 'light');
+            html.classList.remove('dark', 'light');
+            
+            if (themeId === 'light' || themeId === 'sunset') {
+              body.classList.add('light');
+              html.classList.add('light');
+            } else {
+              body.classList.add('dark');
+              html.classList.add('dark');
+            }
+            
+            // Save to localStorage for persistence
+            try {
+              const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+              siteSettings.theme = themeId;
+              localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
+              localStorage.setItem('theme', themeId);
+            } catch (e) {
+              console.error('Failed to save theme to localStorage:', e);
+            }
           }
           
           // Provide immediate visual feedback
@@ -1736,20 +1781,6 @@
     });
   </script>
     <script>
-        // Load centralized theme manager
-        fetch('shared-theme.html')
-            .then(r => r.text())
-            .then(html => {
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                const scripts = temp.getElementsByTagName('script');
-                for (let script of scripts) {
-                    const newScript = document.createElement('script');
-                    newScript.textContent = script.textContent;
-                    document.head.appendChild(newScript);
-                }
-            })
-            .catch(err => console.warn('Failed to load shared-theme.html:', err));
         // Register service worker
         if ('serviceWorker' in navigator) {
           window.addEventListener('load', () => {
