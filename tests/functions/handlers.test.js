@@ -4,13 +4,95 @@
  */
 
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
-// Lazy require functions
+// Pre-generate password hash for consistent testing
+const adminPasswordHash = bcrypt.hashSync('Admin123!', 10);
+
+// Mock database before requiring functions
+const mockDb = {
+  connect: () => { console.log('📚 Using mocked database connection'); return Promise.resolve(); },
+  close: async () => {},
+  get: (sql) => {
+    // Mock count queries
+    if (sql.includes('COUNT(*)')) {
+      return Promise.resolve({ total: 1 });
+    }
+    // Mock admin user for login by email
+    if (sql.includes('SELECT') && sql.includes('FROM users WHERE email')) {
+      return Promise.resolve({
+        id: 1,
+        email: 'admin@joshburt.com.au',
+        password_hash: adminPasswordHash,
+        name: 'Admin User',
+        role: 'admin',
+        is_verified: 1,
+        is_active: 1,
+        email_verified: 1,
+        failed_login_attempts: 0,
+        lockout_expires: null,
+        totp_enabled: 0,
+        totp_secret: null,
+        backup_codes: null,
+        created_at: new Date().toISOString()
+      });
+    }
+    // Mock admin user for token verification by ID
+    if (sql.includes('SELECT') && sql.includes('FROM users WHERE id')) {
+      return Promise.resolve({
+        id: 1,
+        email: 'admin@joshburt.com.au',
+        name: 'Admin User',
+        role: 'admin',
+        is_active: 1,
+        email_verified: 1,
+        created_at: new Date().toISOString()
+      });
+    }
+    return Promise.resolve(null);
+  },
+  run: (sql) => {
+    // Mock user registration
+    if (sql.includes('INSERT INTO users')) {
+      return Promise.resolve({ lastID: Math.floor(Math.random() * 1000) + 100 });
+    }
+    return Promise.resolve({ changes: 1 });
+  },
+  all: (sql) => {
+    // Mock users list
+    if (sql.includes('SELECT') && sql.includes('FROM users')) {
+      return Promise.resolve([{
+        id: 1,
+        email: 'admin@joshburt.com.au',
+        name: 'Admin User',
+        role: 'admin',
+        is_verified: 1,
+        is_active: 1,
+        created_at: new Date().toISOString()
+      }]);
+    }
+    return Promise.resolve([]);
+  }
+};
+
+// Mock the database module exports
+const dbPath = path.join('..', '..', 'config', 'database.js');
+require.cache[require.resolve(dbPath)] = {
+  id: dbPath,
+  filename: dbPath,
+  loaded: true,
+  exports: {
+    Database: function() { return mockDb; },
+    database: mockDb,
+    initializeDatabase: () => Promise.resolve()
+  }
+};
+
+// Lazy require functions after mocking
 const authFn = require(path.join('..','..','netlify','functions','auth.js'));
 const usersFn = require(path.join('..','..','netlify','functions','users.js'));
 
 function makeEvent({ path='/.netlify/functions/auth', httpMethod='POST', query={}, body={}, headers={}, authorization } = {}) {
-  const qs = new URLSearchParams(query).toString();
   return {
     path,
     httpMethod,
@@ -48,6 +130,7 @@ function makeEvent({ path='/.netlify/functions/auth', httpMethod='POST', query={
     console.log('✅ users list with token ok');
 
     console.log('🎉 Direct handler tests PASSED');
+    process.exitCode = 0;
   } catch (e) {
     console.error('❌ Direct handler tests exception', e); process.exitCode=1;
   }
