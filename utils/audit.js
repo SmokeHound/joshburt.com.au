@@ -27,7 +27,7 @@ async function logAudit(event, { action, userId = null, details = {} } = {}) {
       console.warn('⚠️ Audit log skipped: database not connected');
       return;
     }
-    
+
     const method = event && event.httpMethod;
     const path = event && event.path;
     const qs = (event && event.queryStringParameters) || null;
