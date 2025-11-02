@@ -2,6 +2,7 @@
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
+const { logAudit } = require('../../utils/audit');
 
 exports.handler = withHandler(async function(event) {
   // Initialize database connection (idempotent)
@@ -136,6 +137,19 @@ exports.handler = withHandler(async function(event) {
         is_active !== undefined ? is_active : true
       ];
       const result = await database.run(query, params);
+      
+      // Log product creation
+      await logAudit(event, {
+        action: 'product.create',
+        userId: user.id,
+        details: {
+          productId: result.id,
+          name,
+          code,
+          type,
+          categoryId: category_id
+        }
+      });
       
       return ok({ 
         id: result.id,

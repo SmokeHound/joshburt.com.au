@@ -5,6 +5,7 @@ const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requirePermission, requireAuth } = require('../../utils/http');
 const { hasPermission } = require('../../utils/rbac');
 const { sendOrderStatusEmail } = require('../../utils/email');
+const { logAudit } = require('../../utils/audit');
 
 exports.handler = withHandler(async function(event){
   await database.connect();
@@ -158,6 +159,20 @@ exports.handler = withHandler(async function(event){
         [orderId, currentOrder.status, status, user.id || null, notes || null]
       );
 
+      // Log order status change
+      await logAudit(event, {
+        action: 'order.update_status',
+        userId: user.id,
+        details: {
+          orderId,
+          oldStatus: currentOrder.status,
+          newStatus: status,
+          notes,
+          trackingNumber: tracking_number,
+          estimatedDelivery: estimated_delivery
+        }
+      });
+
       // Send email notification (async, don't wait)
       sendOrderStatusNotification(orderId, currentOrder.created_by, status, currentOrder.status).catch(err => {
         console.error('Failed to send order status email:', err);
@@ -199,6 +214,18 @@ exports.handler = withHandler(async function(event){
       'INSERT INTO order_status_history (order_id, old_status, new_status, changed_by, notes) VALUES (?, ?, ?, ?, ?)',
       [orderId, null, 'pending', user.id || null, 'Order created']
     );
+
+    // Log order creation
+    await logAudit(event, {
+      action: 'order.create',
+      userId: user.id,
+      details: {
+        orderId,
+        totalItems: orderData.items.length,
+        priority: orderData.priority || 'normal',
+        createdBy
+      }
+    });
 
     // Send order created notification
     sendOrderCreatedNotification(orderId, createdBy).catch(err => {
@@ -247,6 +274,18 @@ exports.handler = withHandler(async function(event){
       'INSERT INTO order_status_history (order_id, old_status, new_status, changed_by, notes) VALUES (?, ?, ?, ?, ?)',
       [orderId, order.status, 'cancelled', user.id || null, reason || 'Cancelled by user']
     );
+
+    // Log order cancellation
+    await logAudit(event, {
+      action: 'order.cancel',
+      userId: user.id,
+      details: {
+        orderId,
+        oldStatus: order.status,
+        reason: reason || 'Cancelled by user',
+        createdBy: order.created_by
+      }
+    });
 
     return ok({ message: 'Order cancelled successfully' });
   }

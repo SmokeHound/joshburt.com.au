@@ -8,6 +8,7 @@ const { validatePassword } = require('../../utils/password');
 const { isValidRole } = require('../../utils/rbac');
 const { checkRateLimit, getClientIP } = require('../../utils/rate-limit');
 const { generateCSRFToken } = require('../../utils/csrf');
+const { logAudit } = require('../../utils/audit');
 const { 
   generateTOTPSecret, 
   verifyTOTPToken, 
@@ -74,6 +75,14 @@ exports.handler = withHandler(async (event) => {
       const verificationToken = nodeCrypto.randomBytes(32).toString('hex');
       const verificationExpires = Date.now() + 24*60*60*1000;
       const result = await database.run('INSERT INTO users (email, name, password_hash, role, email_verified, email_verification_token, email_verification_expires) VALUES (?, ?, ?, ?, ?, ?, ?)', [email, name, passwordHash, 'user', 0, verificationToken, verificationExpires]);
+      
+      // Log user registration
+      await logAudit(event, { 
+        action: 'auth.register', 
+        userId: result.id, 
+        details: { email, name }
+      });
+      
       return jsonResponse(201, { message: 'Registered. Verify email.', userId: result.id });
     }
 
@@ -102,7 +111,15 @@ exports.handler = withHandler(async (event) => {
       }
       
       const user = await database.get('SELECT id, email, name, password_hash, role, is_active, email_verified, failed_login_attempts, lockout_expires, totp_enabled, totp_secret, backup_codes FROM users WHERE email = ?', [email]);
-      if (!user || !user.is_active) return errorResponse(401, 'Invalid credentials');
+      if (!user || !user.is_active) {
+        // Log failed login attempt (user not found or inactive)
+        await logAudit(event, { 
+          action: 'auth.login_failed', 
+          userId: null, 
+          details: { email, reason: 'invalid_credentials' }
+        });
+        return errorResponse(401, 'Invalid credentials');
+      }
       if (user.lockout_expires && user.lockout_expires > Date.now()) {
         const minutes = Math.ceil((user.lockout_expires - Date.now())/60000);
         return errorResponse(403, `Account locked. Try again in ${minutes} minute(s).`);
@@ -113,6 +130,14 @@ exports.handler = withHandler(async (event) => {
         const attempts = (user.failed_login_attempts || 0) + 1;
         let lockout = null; if (attempts >= MAX_ATTEMPTS) lockout = Date.now() + LOCKOUT_MINUTES*60000;
         await database.run('UPDATE users SET failed_login_attempts = ?, lockout_expires = ? WHERE id = ?', [attempts, lockout, user.id]);
+        
+        // Log failed password attempt
+        await logAudit(event, { 
+          action: 'auth.login_failed', 
+          userId: user.id, 
+          details: { email: user.email, reason: 'invalid_password', attempts, locked: !!lockout }
+        });
+        
         if (lockout) return errorResponse(403, `Account locked due to too many failed attempts. Try again in ${LOCKOUT_MINUTES} minutes.`);
         return errorResponse(401, `Invalid credentials. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.`);
       }
@@ -149,6 +174,14 @@ exports.handler = withHandler(async (event) => {
       }
       const { accessToken, refreshToken } = generateTokens(user.id, rememberMe);
       await storeRefreshToken(user.id, refreshToken, rememberMe);
+      
+      // Log successful login
+      await logAudit(event, { 
+        action: 'auth.login', 
+        userId: user.id, 
+        details: { email: user.email, role: user.role, rememberMe: !!rememberMe, twoFactorUsed: !!user.totp_enabled }
+      });
+      
       return jsonResponse(200, { message: 'Login successful', user: { id: user.id, email: user.email, name: user.name, role: user.role, emailVerified: user.email_verified }, accessToken, refreshToken });
     }
 
@@ -177,12 +210,30 @@ exports.handler = withHandler(async (event) => {
     // LOGOUT
     if (action === 'logout') {
       const { refreshToken } = payload || {};
+      
+      // Try to get user from token before deleting
+      let userId = null;
       if (refreshToken) {
+        try {
+          const decoded = jwt.verify(refreshToken, JWT_SECRET);
+          userId = decoded.userId;
+        } catch (_) {
+          // Token invalid or expired, continue with deletion
+        }
         const tokenHash = nodeCrypto.createHash('sha256').update(refreshToken).digest('hex');
         await database.run('DELETE FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
       }
+      
       const nowIso = new Date().toISOString();
       await database.run('DELETE FROM refresh_tokens WHERE expires_at <= ?', [nowIso]);
+      
+      // Log logout
+      await logAudit(event, { 
+        action: 'auth.logout', 
+        userId, 
+        details: { tokenProvided: !!refreshToken }
+      });
+      
       return jsonResponse(200, { message: 'Logged out successfully' });
     }
 
@@ -195,6 +246,13 @@ exports.handler = withHandler(async (event) => {
           const resetToken = nodeCrypto.randomBytes(32).toString('hex');
           const resetTokenExpires = Date.now() + 3600000; // 1h
           await database.run('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?', [resetToken, resetTokenExpires, user.id]);
+          
+          // Log password reset request
+          await logAudit(event, { 
+            action: 'auth.password_reset_requested', 
+            userId: user.id, 
+            details: { email }
+          });
           // Email sending is omitted here (previously via nodemailer) – can integrate later.
         }
       }
@@ -218,6 +276,14 @@ exports.handler = withHandler(async (event) => {
       const hash = await bcrypt.hash(password, rounds);
       await database.run('UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?', [hash, user.id]);
       await database.run('DELETE FROM refresh_tokens WHERE user_id = ?', [user.id]);
+      
+      // Log successful password reset
+      await logAudit(event, { 
+        action: 'auth.password_reset_completed', 
+        userId: user.id, 
+        details: { allSessionsInvalidated: true }
+      });
+      
       return jsonResponse(200, { message: 'Password reset successfully' });
     }
 

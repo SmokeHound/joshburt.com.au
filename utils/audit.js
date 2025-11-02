@@ -22,6 +22,12 @@ function getIp(event) {
 async function logAudit(event, { action, userId = null, details = {} } = {}) {
   if (!action) {return;}
   try {
+    // Check if database is connected
+    if (!database.pool) {
+      console.warn('⚠️ Audit log skipped: database not connected');
+      return;
+    }
+    
     const method = event && event.httpMethod;
     const path = event && event.path;
     const qs = (event && event.queryStringParameters) || null;
@@ -42,8 +48,9 @@ async function logAudit(event, { action, userId = null, details = {} } = {}) {
     const insert = 'INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)';
     const params = [userId, action, JSON.stringify(enriched), ip, ua];
     await database.run(insert, params);
-  } catch (_) {
+  } catch (err) {
     // Non-fatal: audit logging must not break primary flow
+    console.warn('⚠️ Audit log failed:', err.message);
   }
 }
 
