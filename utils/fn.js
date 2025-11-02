@@ -26,8 +26,10 @@ function notFound(message = 'Not found') { return error(404, message); }
 function methodNotAllowed(message = 'Method not allowed') { return error(405, message); }
 
 function getPagination(qs = {}, defaults = { page: 1, limit: 10 }) {
-  const page = Math.max(1, parseInt(qs.page || defaults.page, 10));
-  const limit = Math.max(1, Math.min(100, parseInt(qs.limit || defaults.limit, 10)));
+  const parsedPage = parseInt(qs.page || defaults.page, 10);
+  const parsedLimit = parseInt(qs.limit || defaults.limit, 10);
+  const page = Math.max(1, isNaN(parsedPage) ? defaults.page : parsedPage);
+  const limit = Math.max(1, Math.min(100, isNaN(parsedLimit) ? defaults.limit : parsedLimit));
   const offset = (page - 1) * limit;
   return { page, limit, offset };
 }

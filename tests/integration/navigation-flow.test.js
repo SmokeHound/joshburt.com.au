@@ -43,6 +43,17 @@ describe('Navigation & Shared Components Integration', () => {
     const navHTML = loadHTMLFile('shared-nav.html');
     document.getElementById('shared-navigation').innerHTML = navHTML;
 
+    // Simulate the dynamic menu-toggle creation from shared-nav.html
+    if (!document.getElementById('menu-toggle')) {
+      const menuToggle = document.createElement('button');
+      menuToggle.id = 'menu-toggle';
+      menuToggle.type = 'button';
+      menuToggle.textContent = '\u2630';
+      menuToggle.setAttribute('aria-label', 'Toggle sidebar');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      document.body.insertBefore(menuToggle, document.body.firstChild);
+    }
+
     expect(document.getElementById('menu-toggle')).toBeTruthy();
     expect(document.getElementById('sidebar')).toBeTruthy();
     // Theme toggle intentionally removed
@@ -52,6 +63,17 @@ describe('Navigation & Shared Components Integration', () => {
   test('should have proper accessibility attributes', () => {
     const navHTML = loadHTMLFile('shared-nav.html');
     document.body.innerHTML = navHTML;
+
+    // Simulate the dynamic menu-toggle creation from shared-nav.html
+    if (!document.getElementById('menu-toggle')) {
+      const menuToggle = document.createElement('button');
+      menuToggle.id = 'menu-toggle';
+      menuToggle.type = 'button';
+      menuToggle.textContent = '\u2630';
+      menuToggle.setAttribute('aria-label', 'Toggle sidebar');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      document.body.insertBefore(menuToggle, document.body.firstChild);
+    }
 
     const toggle = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');

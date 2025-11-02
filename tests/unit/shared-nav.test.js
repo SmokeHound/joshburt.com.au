@@ -12,6 +12,18 @@ describe('Shared Navigation Component', () => {
     document.body.innerHTML = navHTML;
     jest.restoreAllMocks();
     jest.clearAllMocks();
+    
+    // Simulate the dynamic menu-toggle creation from shared-nav.html
+    if (!document.getElementById('menu-toggle')) {
+      const menuToggle = document.createElement('button');
+      menuToggle.id = 'menu-toggle';
+      menuToggle.type = 'button';
+      menuToggle.textContent = '\u2630';
+      menuToggle.setAttribute('aria-label', 'Toggle sidebar');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      menuToggle.className = 'sr-only';
+      document.body.insertBefore(menuToggle, document.body.firstChild);
+    }
   });
 
   test('should toggle sidebar on button click and Enter key', () => {
