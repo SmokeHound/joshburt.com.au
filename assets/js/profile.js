@@ -60,6 +60,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('profile-display-name').textContent = user.name || 'No name set';
   document.getElementById('profile-display-email').textContent = user.email || 'No email';
 
+  // Debug: Log user object to check created_at field
+  console.log('User data:', user);
+  console.log('created_at field:', user.created_at);
+
   // Set role badge with appropriate styling
   const roleBadge = document.getElementById('profile-role-badge');
   const role = (user.role || 'user').toLowerCase();
@@ -85,8 +89,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Set member since date
   const memberSince = document.getElementById('profile-member-since');
   if (user.created_at) {
-    const date = new Date(user.created_at);
-    memberSince.textContent = `Member since: ${date.toLocaleDateString()}`;
+    try {
+      const date = new Date(user.created_at);
+      // Check if date is valid
+      if (!isNaN(date.getTime())) {
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        memberSince.textContent = `Member since: ${date.toLocaleDateString('en-US', options)}`;
+      } else {
+        memberSince.textContent = 'Member since: Unknown';
+      }
+    } catch (err) {
+      console.error('Error parsing created_at date:', err);
+      memberSince.textContent = 'Member since: Unknown';
+    }
   } else {
     memberSince.textContent = 'Member since: Unknown';
   }
