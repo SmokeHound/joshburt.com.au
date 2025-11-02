@@ -1,9 +1,9 @@
 /**
  * Redis Cache Configuration (for production use)
- * 
+ *
  * This file provides a Redis-based cache implementation
  * that can replace the in-memory cache for production deployments.
- * 
+ *
  * To use Redis:
  * 1. Install ioredis: npm install ioredis
  * 2. Set REDIS_URL environment variable
@@ -18,7 +18,7 @@ const REDIS_URL = process.env.REDIS_URL || process.env.REDIS_TLS_URL;
 const USE_REDIS = Boolean(REDIS_URL);
 
 // Initialize Redis client (if configured)
-let redisClient = null;
+const redisClient = null;
 if (USE_REDIS) {
   // Uncomment when ready:
   // redisClient = new Redis(REDIS_URL, {
@@ -127,7 +127,7 @@ async function clearNamespace(namespace) {
   try {
     const pattern = `${namespace}:*`;
     const keys = await redisClient.keys(pattern);
-    if (keys.length === 0) return 0;
+    if (keys.length === 0) {return 0;}
 
     const deleted = await redisClient.del(...keys);
     stats.deletes += deleted;

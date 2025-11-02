@@ -59,36 +59,36 @@ setTimeout(() => {
   const value = cache.get('test', 'expire-fast');
   console.log(`✅ After 1.5 seconds: ${value === null ? 'Expired (correct)' : 'Still cached (incorrect)'}`);
   console.log();
-  
+
   // Test 4: Wrap Function
   console.log('Test 4: Cache Wrap Function');
   console.log('-'.repeat(50));
-  
+
   let callCount = 0;
   const expensiveOperation = async () => {
     callCount++;
     await new Promise(resolve => setTimeout(resolve, 50));
     return { data: 'expensive result' };
   };
-  
+
   const runWrapTest = async () => {
     const start = Date.now();
-    
+
     // First call - should execute function
     await cache.wrap('test', 'expensive', expensiveOperation, 60);
     const firstCallTime = Date.now() - start;
-    
+
     // Second call - should use cache
     const cacheStart = Date.now();
     await cache.wrap('test', 'expensive', expensiveOperation, 60);
     const cachedCallTime = Date.now() - cacheStart;
-    
+
     console.log(`✅ First call: ${firstCallTime}ms (executed function)`);
     console.log(`✅ Cached call: ${cachedCallTime}ms (from cache)`);
     console.log(`✅ Function called ${callCount} time(s) (should be 1)`);
     console.log(`📈 Cache speedup: ${Math.round(firstCallTime / cachedCallTime)}x faster`);
     console.log();
-    
+
     // Final Summary
     console.log('🎉 Performance Test Summary');
     console.log('='.repeat(50));
@@ -126,10 +126,10 @@ setTimeout(() => {
     console.log('   • 50% reduction in database query times');
     console.log('   • Better concurrent request handling');
     console.log();
-    
+
     // Cleanup
     cache.clearAll();
   };
-  
+
   runWrapTest();
 }, 1500);
