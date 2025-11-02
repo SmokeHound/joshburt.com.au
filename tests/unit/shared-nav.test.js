@@ -12,7 +12,7 @@ describe('Shared Navigation Component', () => {
     document.body.innerHTML = navHTML;
     jest.restoreAllMocks();
     jest.clearAllMocks();
-    
+
     // Simulate the dynamic menu-toggle creation from shared-nav.html
     if (!document.getElementById('menu-toggle')) {
       const menuToggle = document.createElement('button');
