@@ -933,6 +933,42 @@
                     <div aria-hidden="true" title="Accent preview" class="w-10 h-8 rounded preview-box-accent border border-gray-600"></div>
                     <input id="accentColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#8b5cf6" title="Accent color hex" placeholder="#8b5cf6" />
                   </div>
+                  
+                  <!-- Button Colors Section -->
+                  <div class="mt-6 pt-6 border-t border-gray-700">
+                    <h4 class="text-sm font-bold text-gray-400 mb-4 flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                      </svg>
+                      Button Colors
+                    </h4>
+                    <div class="space-y-3">
+                      <div class="flex items-center gap-3">
+                        <label for="buttonPrimaryColor" class="w-24 font-semibold text-sm">Primary</label>
+                        <input id="buttonPrimaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#3b82f6" />
+                        <div aria-hidden="true" title="Button Primary preview" class="w-10 h-8 rounded preview-box-btn-primary border border-gray-600"></div>
+                        <input id="buttonPrimaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#3b82f6" title="Button Primary color hex" placeholder="#3b82f6" />
+                      </div>
+                      <div class="flex items-center gap-3">
+                        <label for="buttonSecondaryColor" class="w-24 font-semibold text-sm">Secondary</label>
+                        <input id="buttonSecondaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#6b7280" />
+                        <div aria-hidden="true" title="Button Secondary preview" class="w-10 h-8 rounded preview-box-btn-secondary border border-gray-600"></div>
+                        <input id="buttonSecondaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#6b7280" title="Button Secondary color hex" placeholder="#6b7280" />
+                      </div>
+                      <div class="flex items-center gap-3">
+                        <label for="buttonDangerColor" class="w-24 font-semibold text-sm">Danger</label>
+                        <input id="buttonDangerColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#ef4444" />
+                        <div aria-hidden="true" title="Button Danger preview" class="w-10 h-8 rounded preview-box-btn-danger border border-gray-600"></div>
+                        <input id="buttonDangerColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#ef4444" title="Button Danger color hex" placeholder="#ef4444" />
+                      </div>
+                      <div class="flex items-center gap-3">
+                        <label for="buttonSuccessColor" class="w-24 font-semibold text-sm">Success</label>
+                        <input id="buttonSuccessColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#10b981" />
+                        <div aria-hidden="true" title="Button Success preview" class="w-10 h-8 rounded preview-box-btn-success border border-gray-600"></div>
+                        <input id="buttonSuccessColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#10b981" title="Button Success color hex" placeholder="#10b981" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <button id="apply-theme" class="w-full btn-neon-green px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all mt-6">
@@ -1203,6 +1239,10 @@
         primaryColor: document.getElementById('primaryColor')?.value || '#3b82f6',
         secondaryColor: document.getElementById('secondaryColor')?.value || '#10b981',
         accentColor: document.getElementById('accentColor')?.value || '#8b5cf6',
+        buttonPrimaryColor: document.getElementById('buttonPrimaryColor')?.value || '#3b82f6',
+        buttonSecondaryColor: document.getElementById('buttonSecondaryColor')?.value || '#6b7280',
+        buttonDangerColor: document.getElementById('buttonDangerColor')?.value || '#ef4444',
+        buttonSuccessColor: document.getElementById('buttonSuccessColor')?.value || '#10b981',
         // Theme schedule
         themeSchedule: {
           enabled: document.getElementById('schedule-enabled')?.checked || false,
@@ -1220,7 +1260,7 @@
     // Small helper to pulse preview boxes
     function pulsePreviews(timeout = 900) {
       try {
-        const els = document.querySelectorAll('.preview-box-primary, .preview-box-secondary, .preview-box-accent');
+        const els = document.querySelectorAll('.preview-box-primary, .preview-box-secondary, .preview-box-accent, .preview-box-btn-primary, .preview-box-btn-secondary, .preview-box-btn-danger, .preview-box-btn-success');
         els.forEach(el => el.classList.add('preview-pulse'));
         setTimeout(() => { els.forEach(el => el.classList.remove('preview-pulse')); }, timeout);
       } catch (e) {}
@@ -1274,6 +1314,15 @@
                 if (settings.primaryColor) document.getElementById('primaryColorText').value = settings.primaryColor;
                 if (settings.secondaryColor) document.getElementById('secondaryColorText').value = settings.secondaryColor;
                 if (settings.accentColor) document.getElementById('accentColorText').value = settings.accentColor;
+                // Button colors
+                if (settings.buttonPrimaryColor) document.getElementById('buttonPrimaryColor').value = settings.buttonPrimaryColor;
+                if (settings.buttonSecondaryColor) document.getElementById('buttonSecondaryColor').value = settings.buttonSecondaryColor;
+                if (settings.buttonDangerColor) document.getElementById('buttonDangerColor').value = settings.buttonDangerColor;
+                if (settings.buttonSuccessColor) document.getElementById('buttonSuccessColor').value = settings.buttonSuccessColor;
+                if (settings.buttonPrimaryColor) document.getElementById('buttonPrimaryColorText').value = settings.buttonPrimaryColor;
+                if (settings.buttonSecondaryColor) document.getElementById('buttonSecondaryColorText').value = settings.buttonSecondaryColor;
+                if (settings.buttonDangerColor) document.getElementById('buttonDangerColorText').value = settings.buttonDangerColor;
+                if (settings.buttonSuccessColor) document.getElementById('buttonSuccessColorText').value = settings.buttonSuccessColor;
                 // Theme schedule
                 if (settings.themeSchedule) {
                     document.getElementById('schedule-enabled').checked = settings.themeSchedule.enabled;
@@ -1517,9 +1566,62 @@
         });
       });
       
+      // Button color pickers and text inputs sync
+      const buttonColorInputs = ['buttonPrimaryColor', 'buttonSecondaryColor', 'buttonDangerColor', 'buttonSuccessColor'];
+      const buttonColorTexts = ['buttonPrimaryColorText', 'buttonSecondaryColorText', 'buttonDangerColorText', 'buttonSuccessColorText'];
+      const buttonVarNames = ['--btn-primary-bg', '--btn-secondary-bg', '--btn-danger-bg', '--btn-success-bg'];
+      const buttonPreviewClasses = ['.preview-box-btn-primary', '.preview-box-btn-secondary', '.preview-box-btn-danger', '.preview-box-btn-success'];
+      
+      buttonColorInputs.forEach((inputId, index) => {
+        const colorInput = document.getElementById(inputId);
+        const textInput = document.getElementById(buttonColorTexts[index]);
+        const varName = buttonVarNames[index];
+        const previewBox = document.querySelector(buttonPreviewClasses[index]);
+        
+        if (!colorInput || !textInput) return;
+        
+        // Initialize from existing inputs
+        if (colorInput.value) {
+          document.documentElement.style.setProperty(varName, colorInput.value);
+          if (previewBox) previewBox.style.backgroundColor = colorInput.value;
+        }
+
+        colorInput.addEventListener('change', (e) => {
+          textInput.value = e.target.value;
+          // Set CSS variable on :root for live preview styling
+          document.documentElement.style.setProperty(varName, e.target.value);
+          // Update preview box background
+          if (previewBox) previewBox.style.backgroundColor = e.target.value;
+        });
+
+        textInput.addEventListener('change', (e) => {
+          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            colorInput.value = e.target.value;
+            document.documentElement.style.setProperty(varName, e.target.value);
+            // Update preview box background
+            if (previewBox) previewBox.style.backgroundColor = e.target.value;
+          }
+        });
+      });
+      
       document.getElementById('apply-theme').addEventListener('click', async () => {
         // Immediate pulse for instant feedback
         try { pulsePreviews(700); } catch (e) {}
+        
+        // Apply colors immediately via ThemeManager
+        if (window.Theme) {
+          const colors = {
+            primary: document.getElementById('primaryColor')?.value,
+            secondary: document.getElementById('secondaryColor')?.value,
+            accent: document.getElementById('accentColor')?.value,
+            buttonPrimary: document.getElementById('buttonPrimaryColor')?.value,
+            buttonSecondary: document.getElementById('buttonSecondaryColor')?.value,
+            buttonDanger: document.getElementById('buttonDangerColor')?.value,
+            buttonSuccess: document.getElementById('buttonSuccessColor')?.value
+          };
+          window.Theme.setPalette(colors, true);
+        }
+        
         await saveSettings();
         // Theme will be applied automatically via ThemeManager when siteSettingsUpdated event fires
         const msg = 'Applied custom theme via API';
@@ -1923,6 +2025,28 @@
             document.documentElement.style.setProperty('--preview-primary', active.colors.primary);
             document.documentElement.style.setProperty('--preview-secondary', active.colors.secondary);
             document.documentElement.style.setProperty('--preview-accent', active.colors.accent);
+            // Initialize button color previews
+            if (active.colors.buttonPrimary) document.documentElement.style.setProperty('--btn-primary-bg', active.colors.buttonPrimary);
+            if (active.colors.buttonSecondary) document.documentElement.style.setProperty('--btn-secondary-bg', active.colors.buttonSecondary);
+            if (active.colors.buttonDanger) document.documentElement.style.setProperty('--btn-danger-bg', active.colors.buttonDanger);
+            if (active.colors.buttonSuccess) document.documentElement.style.setProperty('--btn-success-bg', active.colors.buttonSuccess);
+            
+            // Apply preview box backgrounds
+            const previewPrimary = document.querySelector('.preview-box-primary');
+            const previewSecondary = document.querySelector('.preview-box-secondary');
+            const previewAccent = document.querySelector('.preview-box-accent');
+            const previewBtnPrimary = document.querySelector('.preview-box-btn-primary');
+            const previewBtnSecondary = document.querySelector('.preview-box-btn-secondary');
+            const previewBtnDanger = document.querySelector('.preview-box-btn-danger');
+            const previewBtnSuccess = document.querySelector('.preview-box-btn-success');
+            
+            if (previewPrimary) previewPrimary.style.backgroundColor = active.colors.primary;
+            if (previewSecondary) previewSecondary.style.backgroundColor = active.colors.secondary;
+            if (previewAccent) previewAccent.style.backgroundColor = active.colors.accent;
+            if (previewBtnPrimary && active.colors.buttonPrimary) previewBtnPrimary.style.backgroundColor = active.colors.buttonPrimary;
+            if (previewBtnSecondary && active.colors.buttonSecondary) previewBtnSecondary.style.backgroundColor = active.colors.buttonSecondary;
+            if (previewBtnDanger && active.colors.buttonDanger) previewBtnDanger.style.backgroundColor = active.colors.buttonDanger;
+            if (previewBtnSuccess && active.colors.buttonSuccess) previewBtnSuccess.style.backgroundColor = active.colors.buttonSuccess;
           }
         }
       } catch (e) {}
@@ -1935,13 +2059,28 @@
             if (c.primary) document.documentElement.style.setProperty('--preview-primary', c.primary);
             if (c.secondary) document.documentElement.style.setProperty('--preview-secondary', c.secondary);
             if (c.accent) document.documentElement.style.setProperty('--preview-accent', c.accent);
+            if (c.buttonPrimary) document.documentElement.style.setProperty('--btn-primary-bg', c.buttonPrimary);
+            if (c.buttonSecondary) document.documentElement.style.setProperty('--btn-secondary-bg', c.buttonSecondary);
+            if (c.buttonDanger) document.documentElement.style.setProperty('--btn-danger-bg', c.buttonDanger);
+            if (c.buttonSuccess) document.documentElement.style.setProperty('--btn-success-bg', c.buttonSuccess);
+            
+            // Update preview box backgrounds
+            const previewBtnPrimary = document.querySelector('.preview-box-btn-primary');
+            const previewBtnSecondary = document.querySelector('.preview-box-btn-secondary');
+            const previewBtnDanger = document.querySelector('.preview-box-btn-danger');
+            const previewBtnSuccess = document.querySelector('.preview-box-btn-success');
+            
+            if (previewBtnPrimary && c.buttonPrimary) previewBtnPrimary.style.backgroundColor = c.buttonPrimary;
+            if (previewBtnSecondary && c.buttonSecondary) previewBtnSecondary.style.backgroundColor = c.buttonSecondary;
+            if (previewBtnDanger && c.buttonDanger) previewBtnDanger.style.backgroundColor = c.buttonDanger;
+            if (previewBtnSuccess && c.buttonSuccess) previewBtnSuccess.style.backgroundColor = c.buttonSuccess;
           }
         } catch (e) {}
       });
       // Add brief pulse animation to preview boxes when settings are applied
       window.addEventListener('siteSettingsUpdated', () => {
         try {
-          const els = document.querySelectorAll('.preview-box-primary, .preview-box-secondary, .preview-box-accent');
+          const els = document.querySelectorAll('.preview-box-primary, .preview-box-secondary, .preview-box-accent, .preview-box-btn-primary, .preview-box-btn-secondary, .preview-box-btn-danger, .preview-box-btn-success');
           els.forEach(el => el.classList.add('preview-pulse'));
           setTimeout(() => { els.forEach(el => el.classList.remove('preview-pulse')); }, 900);
         } catch (e) {}
