@@ -231,7 +231,7 @@ async function invalidate(namespace, pattern) {
 /**
  * Close Redis connection (for cleanup)
  */
-async function close() {
+async function closeConnection() {
   if (redisClient) {
     await redisClient.quit();
   }
@@ -248,6 +248,6 @@ module.exports = {
   wrap,
   invalidate,
   generateKey,
-  close,
+  close: closeConnection,
   isRedis: USE_REDIS
 };

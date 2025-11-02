@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
+const path = require('path');
 
 // Database configuration - PostgreSQL only
 const DB_TYPE = 'postgres';
@@ -149,7 +150,7 @@ async function applyPostgresSchemaFromFile() {
     if (!fs.existsSync(schemaPath)) {
       return;
     }
-    let sql = await fs.promises.readFile(schemaPath, 'utf8');
+    const sql = await fs.promises.readFile(schemaPath, 'utf8');
 
     const client = await database.pool.connect();
     try {

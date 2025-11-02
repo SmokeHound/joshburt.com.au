@@ -1,14 +1,14 @@
 // assets/js/auth0.js
 // Lightweight wrapper around Auth0 SPA SDK with dynamic loader and safe fallbacks
 (function(){
-  var AUTH0_CDN = 'https://cdn.auth0.com/js/auth0-spa-js/2.5/auth0-spa-js.production.js';
-  var client = null;
-  var sdkReady = null;
+  const AUTH0_CDN = 'https://cdn.auth0.com/js/auth0-spa-js/2.5/auth0-spa-js.production.js';
+  let client = null;
+  let sdkReady = null;
   function loadSdk(){
     if (window.createAuth0Client) return Promise.resolve();
     if (sdkReady) return sdkReady;
     sdkReady = new Promise(function(resolve, reject){
-      var s = document.createElement('script');
+      const s = document.createElement('script');
       s.src = AUTH0_CDN;
       s.async = true;
       s.onload = function(){ resolve(); };
@@ -19,7 +19,7 @@
   }
   function getConfig(){
     // Prefer globals set by a small inline script or separate config file
-    var cfg = {
+    const cfg = {
       domain: window.AUTH0_DOMAIN || '',
       clientId: window.AUTH0_CLIENT_ID || '',
       audience: window.AUTH0_AUDIENCE || '',
@@ -35,12 +35,12 @@
       console.warn('[Auth0] SDK failed to load', e);
       return null;
     }
-    var cfg = getConfig();
+    const cfg = getConfig();
     if (!cfg.domain || !cfg.clientId){
       console.warn('[Auth0] Missing AUTH0_DOMAIN or AUTH0_CLIENT_ID');
       return null;
     }
-    var factory = (window.createAuth0Client || (window.auth0 && window.auth0.createAuth0Client));
+    const factory = (window.createAuth0Client || (window.auth0 && window.auth0.createAuth0Client));
     if (typeof factory !== 'function') {
       console.error('[Auth0] createAuth0Client factory not found on window');
       return null;
@@ -60,7 +60,7 @@
   async function login(connection){
     if (!client) await init();
     if (!client) throw new Error('Auth0 not configured');
-    var params = {};
+    const params = {};
     if (connection) params.connection = connection; // e.g., 'google-oauth2', 'github'
     return client.loginWithRedirect({ authorizationParams: params });
   }
@@ -68,9 +68,9 @@
     if (!client) await init();
     if (!client) throw new Error('Auth0 not configured');
     // Only run if code/state present
-    var qp = new URLSearchParams(window.location.search);
+    const qp = new URLSearchParams(window.location.search);
     if (!(qp.get('code') && qp.get('state'))) return { handled:false };
-    var res = await client.handleRedirectCallback();
+    const res = await client.handleRedirectCallback();
     window.history.replaceState({}, document.title, window.location.pathname);
     return { handled:true, appState: res && res.appState };
   }
@@ -95,7 +95,7 @@
   async function logout(returnTo){
     if (!client) await init();
     if (!client) return;
-    var cfg = getConfig();
+    const cfg = getConfig();
     client.logout({ logoutParams: { returnTo: returnTo || window.location.origin + '/login.html' } });
   }
   window.Auth = {

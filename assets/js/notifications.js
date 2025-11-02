@@ -69,26 +69,26 @@
     ].join('');
     listEl.querySelectorAll('.toggle-read').forEach(btn=>btn.addEventListener('click',function(e){
       e.stopPropagation();
-      var closest = btn.closest('[data-id]');
-      var id = closest ? parseInt(closest.getAttribute('data-id')) : NaN;
+      const closest = btn.closest('[data-id]');
+      const id = closest ? parseInt(closest.getAttribute('data-id')) : NaN;
       if(!isNaN(id)) toggleRead(id);
     }));
     listEl.querySelectorAll('.notification-item').forEach(item=>item.addEventListener('keydown',function(e){
       if(e.key==='Enter'||e.key===' '){
         e.preventDefault();
-        var id=parseInt(item.getAttribute('data-id'));
+        const id=parseInt(item.getAttribute('data-id'));
         if(!isNaN(id)) toggleRead(id);
       } else if(e.key==='Delete'){
-        var delId=parseInt(item.getAttribute('data-id'));
+        const delId=parseInt(item.getAttribute('data-id'));
         notifications=notifications.filter(n=>n.id!==delId);
         unread.delete(delId);
         persist();
         render();
       } else if(e.key==='ArrowDown'||e.key==='ArrowUp'){
         e.preventDefault();
-        var itemsArr=[].slice.call(listEl.querySelectorAll('.notification-item'));
-        var idx=itemsArr.indexOf(item);
-        var next=e.key==='ArrowDown'? (itemsArr[idx+1]||itemsArr[0]) : (itemsArr[idx-1]||itemsArr[itemsArr.length-1]);
+        const itemsArr=[].slice.call(listEl.querySelectorAll('.notification-item'));
+        const idx=itemsArr.indexOf(item);
+        const next=e.key==='ArrowDown'? (itemsArr[idx+1]||itemsArr[0]) : (itemsArr[idx-1]||itemsArr[itemsArr.length-1]);
         if(next) next.focus();
       } else if(e.key==='Escape'){
         closeDropdown();
@@ -99,11 +99,11 @@
     const openSettings=document.getElementById('open-notification-settings'); const panel=document.getElementById('notification-settings-panel');
     if(openSettings && panel){openSettings.addEventListener('click',function(e){
       e.stopPropagation();
-      var exp=openSettings.getAttribute('aria-expanded')==='true';
+      const exp=openSettings.getAttribute('aria-expanded')==='true';
       openSettings.setAttribute('aria-expanded',String(!exp));
       panel.classList.toggle('hidden');
       if(!panel.classList.contains('hidden')){
-        var first=panel.querySelector('input,button,select,textarea');
+        const first=panel.querySelector('input,button,select,textarea');
         if(first) first.focus();
       }
     });}
@@ -131,7 +131,7 @@
         if(!dropdown.classList.contains('hidden')){
           render();
           setTimeout(function(){
-            var firstItem=dropdown.querySelector('.notification-item');
+            const firstItem=dropdown.querySelector('.notification-item');
             if(firstItem) firstItem.focus();
           },30);
         }
@@ -146,9 +146,9 @@
       document.addEventListener('keydown',function(e){
         if(e.key==='Escape') closeDropdown();
         if(!dropdown.classList.contains('hidden') && e.key==='Tab'){
-          var focusables=[].slice.call(dropdown.querySelectorAll('button,[tabindex="0"],input,select'));
+          const focusables=[].slice.call(dropdown.querySelectorAll('button,[tabindex="0"],input,select'));
           if(!focusables.length) return;
-          var idx=focusables.indexOf(document.activeElement);
+          const idx=focusables.indexOf(document.activeElement);
           if(e.shiftKey && (idx===0||document.activeElement===dropdown)){
             e.preventDefault();
             focusables[focusables.length-1].focus();

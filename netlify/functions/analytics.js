@@ -13,15 +13,15 @@ exports.handler = withHandler(async function(event) {
 
   // Only admins and managers can access analytics
   const { user, response: authResponse } = await requirePermission(event, 'orders', 'list');
-  if (authResponse) return authResponse;
+  if (authResponse) {return authResponse;}
 
   try {
     const params = event.queryStringParameters || {};
-    const { 
-      report_type, 
-      date_from, 
-      date_to, 
-      compare_previous = 'false' 
+    const {
+      report_type,
+      date_from,
+      date_to,
+      compare_previous = 'false'
     } = params;
 
     // Default date range: last 30 days
@@ -29,18 +29,18 @@ exports.handler = withHandler(async function(event) {
     const startDate = date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
     switch (report_type) {
-      case 'order_trends':
-        return await getOrderTrends(startDate, endDate, compare_previous === 'true');
-      case 'top_products':
-        return await getTopProducts(startDate, endDate);
-      case 'category_breakdown':
-        return await getCategoryBreakdown(startDate, endDate);
-      case 'order_summary':
-        return await getOrderSummary(startDate, endDate, compare_previous === 'true');
-      case 'user_activity':
-        return await getUserActivity(startDate, endDate);
-      default:
-        return await getOverviewReport(startDate, endDate);
+    case 'order_trends':
+      return await getOrderTrends(startDate, endDate, compare_previous === 'true');
+    case 'top_products':
+      return await getTopProducts(startDate, endDate);
+    case 'category_breakdown':
+      return await getCategoryBreakdown(startDate, endDate);
+    case 'order_summary':
+      return await getOrderSummary(startDate, endDate, compare_previous === 'true');
+    case 'user_activity':
+      return await getUserActivity(startDate, endDate);
+    default:
+      return await getOverviewReport(startDate, endDate);
     }
   } catch (e) {
     console.error('Analytics function error:', e);
@@ -66,7 +66,7 @@ exports.handler = withHandler(async function(event) {
       GROUP BY DATE(created_at)
       ORDER BY date
     `;
-    
+
     const trends = await database.all(query, [startDate, endDate]);
 
     let previousTrends = null;
@@ -77,8 +77,8 @@ exports.handler = withHandler(async function(event) {
       previousTrends = await database.all(query, [prevStart, prevEnd]);
     }
 
-    return ok({ 
-      current: trends, 
+    return ok({
+      current: trends,
       previous: previousTrends,
       date_range: { start: startDate, end: endDate }
     });
@@ -106,7 +106,7 @@ exports.handler = withHandler(async function(event) {
 
     const topProducts = await database.all(query, [startDate, endDate]);
 
-    return ok({ 
+    return ok({
       products: topProducts,
       date_range: { start: startDate, end: endDate }
     });
@@ -138,7 +138,7 @@ exports.handler = withHandler(async function(event) {
       percentage: totalOrders > 0 ? ((cat.order_count / totalOrders) * 100).toFixed(2) : 0
     }));
 
-    return ok({ 
+    return ok({
       categories: withPercentages,
       total_orders: totalOrders,
       date_range: { start: startDate, end: endDate }
@@ -164,14 +164,14 @@ exports.handler = withHandler(async function(event) {
 
     let previousSummary = null;
     let comparison = null;
-    
+
     if (comparePrevious) {
       const daysDiff = Math.floor((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
       const prevStart = new Date(new Date(startDate) - daysDiff * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
       const prevEnd = new Date(new Date(startDate) - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      
+
       previousSummary = await database.get(summaryQuery, [prevStart, prevEnd]);
-      
+
       // Calculate percentage changes
       comparison = {
         total_orders_change: calculatePercentageChange(previousSummary.total_orders, summary.total_orders),
@@ -181,7 +181,7 @@ exports.handler = withHandler(async function(event) {
       };
     }
 
-    return ok({ 
+    return ok({
       current: summary,
       previous: previousSummary,
       comparison,
@@ -206,7 +206,7 @@ exports.handler = withHandler(async function(event) {
 
     const activity = await database.all(query, [startDate, endDate]);
 
-    return ok({ 
+    return ok({
       users: activity,
       date_range: { start: startDate, end: endDate }
     });

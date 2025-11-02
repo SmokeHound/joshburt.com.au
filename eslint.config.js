@@ -17,7 +17,7 @@ const compat = new FlatCompat({
 });
 
 module.exports = defineConfig([
-  { ignores: ['.netlify/**'] },
+  { ignores: ['netlify/**'] },
   {
     languageOptions: {
       globals: {

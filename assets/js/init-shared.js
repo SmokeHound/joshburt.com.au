@@ -2,9 +2,9 @@
 (function initShared(){
   // Compute a functions base that works on Netlify and non-Netlify hosts
   (function computeFnBase(){
-    var defaultBase = '/.netlify/functions';
+    const defaultBase = '/.netlify/functions';
     try {
-      var host = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
+      const host = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
       if (host.endsWith('netlify.app') || host === 'localhost') {
         window.FN_BASE = defaultBase;
       } else {
@@ -188,16 +188,16 @@
   // Auth-aware nav wiring (profile, login/logout)
   document.addEventListener('DOMContentLoaded', function(){
     try {
-      var userProfile = document.getElementById('user-profile');
-      var userInfo = document.getElementById('user-info');
-      var userName = document.getElementById('user-name');
-      var userAvatar = document.getElementById('user-avatar');
-      var loginBtn = document.getElementById('login-btn');
-      var logoutBtn = document.getElementById('logout-btn');
-      var storedUser = null;
+      const userProfile = document.getElementById('user-profile');
+      const userInfo = document.getElementById('user-info');
+      const userName = document.getElementById('user-name');
+      const userAvatar = document.getElementById('user-avatar');
+      const loginBtn = document.getElementById('login-btn');
+      const logoutBtn = document.getElementById('logout-btn');
+      let storedUser = null;
       try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch (e) { /* noop */ }
       if (userProfile) userProfile.classList.remove('hidden');
-      		var isLoggedIn = !!(window.AUTH_DISABLED === true || window.getToken() || (storedUser && storedUser.email));
+      		const isLoggedIn = !!(window.AUTH_DISABLED === true || window.getToken() || (storedUser && storedUser.email));
       if (isLoggedIn) {
         if (userInfo) userInfo.classList.remove('hidden');
         if (loginBtn) loginBtn.classList.add('hidden');
@@ -217,7 +217,7 @@
         logoutBtn.addEventListener('click', async function(){
           try {
             // Best-effort serverless logout (invalidate refresh token)
-            var refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
+            const refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
             if (refreshToken) {
               fetch(FN_BASE + '/auth?action=logout', {
                 method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
@@ -239,7 +239,7 @@
       }
 
       // Also wire sidebar nav logout link if present
-      var navLogout = document.getElementById('nav-logout');
+      const navLogout = document.getElementById('nav-logout');
       if (navLogout) {
         navLogout.addEventListener('click', function(ev){ ev.preventDefault(); if (logoutBtn) { logoutBtn.click(); } else { window.location.href='login.html'; } });
       }
@@ -255,9 +255,9 @@
     }
     
     // Check if this is a fresh login (just completed) - skip aggressive validation to prevent loop
-    var freshLoginTimestamp = localStorage.getItem('freshLogin');
+    const freshLoginTimestamp = localStorage.getItem('freshLogin');
     if (freshLoginTimestamp) {
-      var timeSinceLogin = Date.now() - parseInt(freshLoginTimestamp, 10);
+      const timeSinceLogin = Date.now() - parseInt(freshLoginTimestamp, 10);
       // If login happened within the last 5 seconds, trust the tokens and skip validation
       if (timeSinceLogin < 5000) {
         localStorage.removeItem('freshLogin'); // Clear flag after first page load
@@ -268,39 +268,39 @@
     }
     
     try {
-      		var token = window.getToken();
+      		const token = window.getToken();
       if (!token) return;
       // Ask backend who we are
-      var meRes = await fetch(FN_BASE + '/auth?action=me', {
+      const meRes = await fetch(FN_BASE + '/auth?action=me', {
         headers: { 'Authorization': 'Bearer ' + token }
       });
       if (meRes.ok) {
-        var me = await meRes.json();
+        const me = await meRes.json();
         if (me && me.user) {
           localStorage.setItem('user', JSON.stringify(me.user));
-          var cu = { name: me.user.name || me.user.email || 'User', role: me.user.role || 'user', email: me.user.email };
+          const cu = { name: me.user.name || me.user.email || 'User', role: me.user.role || 'user', email: me.user.email };
           localStorage.setItem('currentUser', JSON.stringify(cu));
         }
         return;
       }
       // Try refresh flow if 401
       if (meRes.status === 401) {
-        var refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
+        const refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
         if (!refreshToken) return;
-        var refRes = await fetch(FN_BASE + '/auth?action=refresh', {
+        const refRes = await fetch(FN_BASE + '/auth?action=refresh', {
           method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
         });
         if (refRes.ok) {
-          var refData = await refRes.json();
+          const refData = await refRes.json();
           if (refData.accessToken) localStorage.setItem('accessToken', refData.accessToken);
           if (refData.refreshToken) localStorage.setItem('refreshToken', refData.refreshToken);
           // Recurse once to update user
-          var meRes2 = await fetch(FN_BASE + '/auth?action=me', { headers: { 'Authorization': 'Bearer ' + (refData.accessToken || token) }});
+          const meRes2 = await fetch(FN_BASE + '/auth?action=me', { headers: { 'Authorization': 'Bearer ' + (refData.accessToken || token) }});
           if (meRes2.ok) {
-            var me2 = await meRes2.json();
+            const me2 = await meRes2.json();
             if (me2 && me2.user) {
               localStorage.setItem('user', JSON.stringify(me2.user));
-              var cu2 = { name: me2.user.name || me2.user.email || 'User', role: me2.user.role || 'user', email: me2.user.email };
+              const cu2 = { name: me2.user.name || me2.user.email || 'User', role: me2.user.role || 'user', email: me2.user.email };
               localStorage.setItem('currentUser', JSON.stringify(cu2));
             }
             return;
@@ -316,18 +316,18 @@
           localStorage.removeItem('currentUser');
         } catch(_){ /* clear session noop */ }
         try {
-          var returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
-          var handled = false;
+          const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+          let handled = false;
           try {
             // Dispatch a cancellable event so pages can handle auth prompts.
-            var ev = new CustomEvent('auth:required', { detail: { returnUrl: returnUrl, reason: 'refresh_failed' }, cancelable: true });
+            const ev = new CustomEvent('auth:required', { detail: { returnUrl: returnUrl, reason: 'refresh_failed' }, cancelable: true });
             // Audit that auth was required for debugging/telemetry (best-effort)
             try {
               if (window.AuditLogger && typeof window.AuditLogger.log === 'function') {
                 // Best-effort current user info from localStorage
-                var currentUserInfo = null;
+                let currentUserInfo = null;
                 try { currentUserInfo = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('user') || 'null'); } catch(_) { currentUserInfo = null; }
-                var auditPayload = { reason: 'refresh_failed', returnUrl: returnUrl };
+                const auditPayload = { reason: 'refresh_failed', returnUrl: returnUrl };
                 try {
                   auditPayload.route = (window.location && (window.location.pathname + window.location.search)) || null;
                 } catch(_) { auditPayload.route = null; }
@@ -363,8 +363,8 @@
       } catch(_) { /* noop */ }
       // Minimal fallback: ephemeral inline banner if notifications system isn't loaded
       try {
-        var el = document.getElementById('toast') || (function(){
-          var d=document.createElement('div'); d.id='toast'; d.className='fixed bottom-4 right-4 p-3 rounded bg-gray-800 text-white hidden'; document.body.appendChild(d); return d;
+        const el = document.getElementById('toast') || (function(){
+          const d=document.createElement('div'); d.id='toast'; d.className='fixed bottom-4 right-4 p-3 rounded bg-gray-800 text-white hidden'; document.body.appendChild(d); return d;
         })();
         el.textContent = String(message || '');
         el.classList.remove('hidden');

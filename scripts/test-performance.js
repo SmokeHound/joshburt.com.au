@@ -34,7 +34,7 @@ const cacheTime = Date.now() - startCache;
 const stats = cache.getStats();
 
 console.log(`✅ Cache operations completed in ${cacheTime}ms`);
-console.log(`📊 Cache Statistics:`, stats);
+console.log('📊 Cache Statistics:', stats);
 console.log(`   - Hit Rate: ${stats.hitRate}`);
 console.log(`   - Total Operations: ${stats.hits + stats.misses + stats.sets}`);
 console.log();
@@ -93,8 +93,8 @@ setTimeout(() => {
     console.log('🎉 Performance Test Summary');
     console.log('='.repeat(50));
     const finalStats = cache.getStats();
-    console.log(`✅ All tests completed successfully!`);
-    console.log(`📊 Final Cache Statistics:`);
+    console.log('✅ All tests completed successfully!');
+    console.log('📊 Final Cache Statistics:');
     console.log(`   - Cache Size: ${finalStats.size} entries`);
     console.log(`   - Hit Rate: ${finalStats.hitRate}`);
     console.log(`   - Total Hits: ${finalStats.hits}`);
