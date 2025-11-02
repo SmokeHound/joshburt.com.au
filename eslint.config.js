@@ -1,13 +1,13 @@
 /* eslint-disable quotes */
 const {
-  defineConfig,
+  defineConfig
 } = require("eslint/config");
 
 const globals = require("globals");
 const js = require("@eslint/js");
 
 const {
-  FlatCompat,
+  FlatCompat
 } = require("@eslint/eslintrc");
 
 const compat = new FlatCompat({
@@ -26,11 +26,11 @@ module.exports = defineConfig([
         ...globals.node,
         'localStorage': 'readonly',
         'fetch': 'readonly',
-        'tailwind': 'readonly',
+        'tailwind': 'readonly'
       },
       ecmaVersion: 12,
       sourceType: 'script',
-      parserOptions: {},
+      parserOptions: {}
     },
     extends: compat.extends('eslint:recommended'),
     rules: {
@@ -38,7 +38,7 @@ module.exports = defineConfig([
       'linebreak-style': ['off', 'unix'],
       'quotes': ['error', 'single'],
       'semi': ['error', 'always'],
-      'no-unused-vars': ['warn', { 
+      'no-unused-vars': ['warn', {
         'argsIgnorePattern': '^_',
         'varsIgnorePattern': '^_',
         'caughtErrors': 'none'
@@ -60,8 +60,8 @@ module.exports = defineConfig([
       'keyword-spacing': 'warn',
       'space-before-blocks': 'warn',
       'object-curly-spacing': ['warn', 'always'],
-      'array-bracket-spacing': ['warn', 'never'],
-    },
+      'array-bracket-spacing': ['warn', 'never']
+    }
   },
   {
     files: ['tests/**/*.js'],
@@ -75,8 +75,8 @@ module.exports = defineConfig([
         'beforeEach': 'readonly',
         'afterAll': 'readonly',
         'afterEach': 'readonly',
-        'jest': 'readonly',
-      },
-    },
+        'jest': 'readonly'
+      }
+    }
   }
 ]);

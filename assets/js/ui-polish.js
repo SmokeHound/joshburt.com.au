@@ -193,18 +193,18 @@
         // Server failed, rollback
         rollback();
         onError(error);
-        
+
         if (window.A11y) {
           window.A11y.announce(errorMessage, 'assertive');
         }
-        
+
         // Show error message
         showToast({
           message: errorMessage,
           type: 'error',
           duration: 5000
         });
-        
+
         throw error;
       });
   }
@@ -363,7 +363,7 @@
     return {
       updateMessage: (newMessage) => {
         const p = overlay.querySelector('p');
-        if (p) p.textContent = newMessage;
+        if (p) {p.textContent = newMessage;}
       },
       remove: () => {
         overlay.style.animation = 'fadeIn 0.2s ease-out reverse';
@@ -438,7 +438,7 @@
         const percentage = Math.min(Math.max((value / total) * 100, 0), 100);
         fill.style.width = `${percentage}%`;
         container.setAttribute('aria-valuenow', value);
-        
+
         if (showPercentage) {
           const percentText = container.querySelector('.progress-percentage');
           if (percentText) {
@@ -449,7 +449,7 @@
       complete: () => {
         fill.style.width = '100%';
         container.setAttribute('aria-valuenow', total);
-        
+
         if (showPercentage) {
           const percentText = container.querySelector('.progress-percentage');
           if (percentText) {
@@ -480,7 +480,7 @@
           message: message || 'Are you sure?',
           type: element.classList.contains('btn-danger') ? 'danger' : 'warning'
         });
-        
+
         if (confirmed) {
           // Proceed with original action
           if (element.tagName === 'FORM') {

@@ -7,7 +7,7 @@ const localStorageMock = {
   getItem: jest.fn((key) => (key in __lsStore ? __lsStore[key] : null)),
   setItem: jest.fn((key, value) => { __lsStore[key] = String(value); }),
   removeItem: jest.fn((key) => { delete __lsStore[key]; }),
-  clear: jest.fn(() => { __lsStore = {}; }),
+  clear: jest.fn(() => { __lsStore = {}; })
 };
 
 Object.defineProperty(global, 'localStorage', { value: localStorageMock, configurable: true });
@@ -26,7 +26,7 @@ beforeEach(() => {
 // Mock fetch
 global.fetch = jest.fn(() =>
   Promise.resolve({
-    text: () => Promise.resolve('<div>mock html</div>'),
+    text: () => Promise.resolve('<div>mock html</div>')
   })
 );
 
@@ -35,25 +35,25 @@ global.console = {
   log: jest.fn(),
   warn: jest.fn(),
   error: jest.fn(),
-  info: jest.fn(),
+  info: jest.fn()
 };
 
 // Add custom matchers
 expect.extend({
   toHaveValidHTML(received) {
-    const pass = received.includes('<!DOCTYPE html>') && 
-                 received.includes('<html') && 
+    const pass = received.includes('<!DOCTYPE html>') &&
+                 received.includes('<html') &&
                  received.includes('</html>');
     if (pass) {
       return {
         message: () => `expected ${received} not to be valid HTML`,
-        pass: true,
+        pass: true
       };
     } else {
       return {
         message: () => `expected ${received} to be valid HTML`,
-        pass: false,
+        pass: false
       };
     }
-  },
+  }
 });

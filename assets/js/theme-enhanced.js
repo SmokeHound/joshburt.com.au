@@ -269,7 +269,7 @@
      * Check current schedule and apply theme
      */
     checkSchedule() {
-      if (!this.schedules.enabled) return;
+      if (!this.schedules.enabled) {return;}
 
       const now = new Date();
       const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -279,7 +279,7 @@
           if (this.currentSchedule !== schedule.name) {
             this.currentSchedule = schedule.name;
             window.Theme.setTheme(schedule.theme, false);
-            
+
             if (window.A11y) {
               window.A11y.announce(`Theme automatically changed to ${schedule.theme} for ${schedule.name}`);
             }

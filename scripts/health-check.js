@@ -13,7 +13,7 @@ function checkEndpoint(path) {
   return new Promise((resolve, reject) => {
     const url = `${NETLIFY_DEV_URL}${path}`;
     console.log(`🔍 Checking ${url}...`);
-    
+
     const req = http.get(url, { timeout: TIMEOUT }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
@@ -27,12 +27,12 @@ function checkEndpoint(path) {
         }
       });
     });
-    
+
     req.on('error', (err) => {
       console.log(`❌ ${path} - ${err.message}`);
       reject({ path, error: err.message });
     });
-    
+
     req.on('timeout', () => {
       req.destroy();
       console.log(`⏱️  ${path} - Timeout`);
@@ -43,14 +43,14 @@ function checkEndpoint(path) {
 
 async function runHealthCheck() {
   console.log('🏥 Running health check for Netlify Functions...\n');
-  
+
   const endpoints = [
     '/.netlify/functions/health',
-    '/.netlify/functions/public-config',
+    '/.netlify/functions/public-config'
   ];
-  
+
   const results = [];
-  
+
   for (const endpoint of endpoints) {
     try {
       const result = await checkEndpoint(endpoint);
@@ -59,12 +59,12 @@ async function runHealthCheck() {
       results.push(error);
     }
   }
-  
+
   console.log('\n📊 Health Check Summary:');
   const healthy = results.filter(r => r.ok).length;
   const total = results.length;
   console.log(`${healthy}/${total} endpoints healthy`);
-  
+
   if (healthy === total) {
     console.log('🎉 All systems operational!\n');
     process.exit(0);

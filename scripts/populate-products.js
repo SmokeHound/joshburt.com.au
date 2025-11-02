@@ -7,23 +7,23 @@ async function populateProducts() {
   try {
     console.log('🔄 Initializing database connection...');
     await initializeDatabase();
-    
+
     // Read products data from JSON
     const productsPath = path.join(__dirname, '..', 'data', 'products.json');
     const productsData = JSON.parse(fs.readFileSync(productsPath, 'utf8'));
-    
+
     console.log(`📦 Found ${productsData.length} products to import`);
-    
+
     // Check if products table already has data
     const existingCount = await database.get('SELECT COUNT(*) as count FROM products');
     console.log(`📊 Current products in database: ${existingCount.count}`);
-    
+
     if (existingCount.count > 0) {
       console.log('⚠️  Products table already has data. Skipping import.');
       console.log('💡 To force reimport, run: DELETE FROM products;');
       return;
     }
-    
+
     // Insert each product
     let imported = 0;
     for (const item of productsData) {
@@ -48,13 +48,13 @@ async function populateProducts() {
         }
       }
     }
-    
+
     console.log(`✅ Successfully imported ${imported} products`);
-    
+
     // Verify import
     const finalCount = await database.get('SELECT COUNT(*) as count FROM products');
     console.log(`📊 Total products in database: ${finalCount.count}`);
-    
+
   } catch (error) {
     console.error('❌ Error populating products:', error);
   } finally {

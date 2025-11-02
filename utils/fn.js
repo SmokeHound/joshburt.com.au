@@ -6,7 +6,7 @@ const { corsHeaders, json, error, parseBody, requireAuth } = require('./http');
 function withHandler(handler) {
   return async (event, context) => {
     try {
-      if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: corsHeaders };
+      if (event.httpMethod === 'OPTIONS') {return { statusCode: 204, headers: corsHeaders };}
       return await handler(event, context);
     } catch (err) {
       console.error('Function error', err);
@@ -33,8 +33,8 @@ function getPagination(qs = {}, defaults = { page: 1, limit: 10 }) {
 }
 
 function parseBool(v, fallback = false) {
-  if (v === undefined || v === null) return fallback;
-  if (typeof v === 'boolean') return v;
+  if (v === undefined || v === null) {return fallback;}
+  if (typeof v === 'boolean') {return v;}
   const s = String(v).toLowerCase();
   return s === '1' || s === 'true' || s === 'yes' || s === 'on';
 }
@@ -54,5 +54,5 @@ module.exports = {
   json,
   error,
   parseBody,
-  requireAuth,
+  requireAuth
 };

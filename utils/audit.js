@@ -20,7 +20,7 @@ function getIp(event) {
 }
 
 async function logAudit(event, { action, userId = null, details = {} } = {}) {
-  if (!action) return;
+  if (!action) {return;}
   try {
     const method = event && event.httpMethod;
     const path = event && event.path;
@@ -37,7 +37,7 @@ async function logAudit(event, { action, userId = null, details = {} } = {}) {
       query: qs,
       referrer,
       origin,
-      requestId,
+      requestId
     };
     const insert = 'INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)';
     const params = [userId, action, JSON.stringify(enriched), ip, ua];

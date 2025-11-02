@@ -83,7 +83,7 @@ let testManager, testUser;
 
     // Test 4: User Management Permissions
     console.log('4️⃣  Testing User Management Permissions...');
-    
+
     // Admin should be able to list users
     let res = await usersFn.handler(makeEvent({
       path: '/.netlify/functions/users',

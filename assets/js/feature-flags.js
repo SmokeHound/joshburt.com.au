@@ -15,7 +15,7 @@
 
   function getCandidateBases() {
     const bases = [];
-    if (window.FN_BASE) bases.push(String(window.FN_BASE));
+    if (window.FN_BASE) {bases.push(String(window.FN_BASE));}
     bases.push('/.netlify/functions');
     const host = (location && location.hostname) || '';
     if (/localhost|127\.0\.0\.1/.test(host)) {
@@ -31,7 +31,7 @@
     try {
       const _fetch = typeof fetchImpl === 'function' ? fetchImpl : fetch;
       const res = await _fetch(url, { ...opts, signal: ctrl.signal });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {throw new Error(`HTTP ${res.status}`);}
       return await res.json();
     } finally {
       clearTimeout(t);
@@ -44,7 +44,7 @@
      */
   async function fetchFeatureFlags() {
     const now = Date.now();
-        
+
     // Return cached flags if still valid
     if (featureFlagsCache && (now - cacheTimestamp) < CACHE_DURATION) {
       return featureFlagsCache;
@@ -59,7 +59,7 @@
           const useAuthFetch = (typeof window !== 'undefined' && typeof window.authFetch === 'function') ? window.authFetch : null;
           // Give a bit more time; this runs in the background and shouldn't spam logs on slow links
           settings = await fetchJsonWithTimeout(`${base}/settings`, { headers: { 'Accept': 'application/json' } }, 10000, useAuthFetch);
-          if (settings) break;
+          if (settings) {break;}
         } catch (e) {
           lastErr = e;
           // try next candidate
@@ -137,7 +137,7 @@
   async function toggleFeatureElements(selector, flagName) {
     const enabled = await isFeatureEnabled(flagName);
     const elements = document.querySelectorAll(selector);
-        
+
     elements.forEach(element => {
       if (enabled) {
         element.classList.remove('hidden');

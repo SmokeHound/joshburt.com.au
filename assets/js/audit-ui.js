@@ -8,9 +8,9 @@
  *  - Export (JSON/CSV) + Clear (all or olderThanDays)
  *  - Graceful fallback if API fails
  */
-(function(){
+(function() {
   const ROOT_ID = 'audit-log-root';
-  if (!document.getElementById(ROOT_ID)) return; // Lazy mount
+  if (!document.getElementById(ROOT_ID)) {return;} // Lazy mount
 
   const state = {
     page: 1,
@@ -32,9 +32,9 @@
   };
 
   // Create base structure if none
-  function ensureStructure(){
+  function ensureStructure() {
     const root = document.getElementById(ROOT_ID);
-    if (root.dataset.initialized) return root;
+    if (root.dataset.initialized) {return root;}
     root.innerHTML = `
       <div class="widget-primary rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-4">
         <div class="flex flex-col md:flex-row gap-2 md:items-end md:justify-between">
@@ -88,28 +88,28 @@
     return root;
   }
 
-  function formatDate(iso){
-    try { return new Date(iso).toLocaleString(); } catch(e){ return iso || ''; }
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleString(); } catch (e) { return iso || ''; }
   }
 
-  async function fetchLogs(){
+  async function fetchLogs() {
     state.loading = true; renderLoading();
     const params = new URLSearchParams();
     params.set('page', state.page);
     params.set('pageSize', state.pageSize);
-    if (state.q) params.set('q', state.q);
-    if (state.action) params.set('action', state.action);
-    if (state.method) params.set('method', state.method);
-    if (state.path) params.set('path', state.path);
-    if (state.requestId) params.set('requestId', state.requestId);
-    if (state.userId) params.set('userId', state.userId);
-    if (state.startDate) params.set('startDate', state.startDate);
-    if (state.endDate) params.set('endDate', state.endDate);
+    if (state.q) {params.set('q', state.q);}
+    if (state.action) {params.set('action', state.action);}
+    if (state.method) {params.set('method', state.method);}
+    if (state.path) {params.set('path', state.path);}
+    if (state.requestId) {params.set('requestId', state.requestId);}
+    if (state.userId) {params.set('userId', state.userId);}
+    if (state.startDate) {params.set('startDate', state.startDate);}
+    if (state.endDate) {params.set('endDate', state.endDate);}
     try {
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
       const url = `${FN_BASE}/audit-logs?` + params.toString();
       const res = await (window.authFetch ? window.authFetch(url) : fetch(url));
-      if (!res.ok) throw new Error('Failed to fetch');
+      if (!res.ok) {throw new Error('Failed to fetch');}
       const json = await res.json();
       // Expect { data, pagination }
       if (Array.isArray(json)) {
@@ -132,14 +132,14 @@
     }
   }
 
-  function renderLoading(){
+  function renderLoading() {
     const tbody = document.getElementById('audit-tbody');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Loading...</td></tr>';
+    if (tbody) {tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Loading...</td></tr>';}
   }
 
-  function renderTable(){
+  function renderTable() {
     const tbody = document.getElementById('audit-tbody');
-    if (!tbody) return;
+    if (!tbody) {return;}
     if (state.error) {
       tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">${state.error}</td></tr>`;
       return;
@@ -175,9 +175,9 @@
         const m = parsed.method ? String(parsed.method).toUpperCase() : '';
         const p = parsed.path || '';
         const rid = parsed.requestId || '';
-        if (m) chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(m)}</span>`;
-        if (p) chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(p.length>40 ? p.slice(0,37)+'…' : p)}</span>`;
-        if (rid) chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(String(rid).slice(0,12))}</span>`;
+        if (m) {chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(m)}</span>`;}
+        if (p) {chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(p.length>40 ? p.slice(0,37)+'…' : p)}</span>`;}
+        if (rid) {chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(String(rid).slice(0,12))}</span>`;}
       }
 
       // Collapsible pretty JSON or raw text
@@ -207,10 +207,10 @@
             valStr = String(val);
           } else if (typeof val === 'object') {
             valStr = JSON.stringify(val);
-            if (valStr.length > MAX_VALUE_LENGTH) valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
+            if (valStr.length > MAX_VALUE_LENGTH) {valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';}
           } else {
             valStr = String(val);
-            if (valStr.length > MAX_VALUE_LENGTH) valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
+            if (valStr.length > MAX_VALUE_LENGTH) {valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';}
           }
           return `${key}: ${valStr}`;
         }).join('\n');
@@ -255,8 +255,7 @@
         const boxId2 = t.getAttribute('data-target');
         const box = document.getElementById(boxId2);
         if (box) {
-          if (box.classList.contains('hidden')) { box.classList.remove('hidden'); t.textContent = 'Hide'; }
-          else { box.classList.add('hidden'); t.textContent = 'View'; }
+          if (box.classList.contains('hidden')) { box.classList.remove('hidden'); t.textContent = 'Hide'; } else { box.classList.add('hidden'); t.textContent = 'View'; }
         }
       } else if (t && t.classList.contains('audit-mode')) {
         const base = t.getAttribute('data-base');
@@ -289,12 +288,12 @@
         }
         if (text) {
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).catch(()=>{});
+            navigator.clipboard.writeText(text).catch(() => {});
           } else {
             // Fallback
             const ta = document.createElement('textarea');
             ta.value = text; document.body.appendChild(ta); ta.select();
-            try { document.execCommand('copy'); } catch(err) { /* no-op */ }
+            try { document.execCommand('copy'); } catch (err) { /* no-op */ }
             document.body.removeChild(ta);
           }
         }
@@ -302,9 +301,9 @@
     };
   }
 
-  function renderPagination(){
+  function renderPagination() {
     const el = document.getElementById('audit-pagination');
-    if (!el) return;
+    if (!el) {return;}
     if (state.totalPages <= 1) { el.innerHTML = `<div class="text-xs text-gray-400">Showing ${state.data.length} of ${state.total}</div>`; return; }
     const prevDisabled = state.page <= 1 ? 'opacity-50 pointer-events-none' : '';
     const nextDisabled = state.page >= state.totalPages ? 'opacity-50 pointer-events-none' : '';
@@ -317,33 +316,33 @@
       <div class="text-xs text-gray-400">Total: ${state.total}</div>`;
     const prevBtn = document.getElementById('audit-prev');
     const nextBtn = document.getElementById('audit-next');
-    if (prevBtn) prevBtn.onclick = ()=>{ if (state.page>1){ state.page--; fetchLogs(); } };
-    if (nextBtn) nextBtn.onclick = ()=>{ if (state.page<state.totalPages){ state.page++; fetchLogs(); } };
+    if (prevBtn) {prevBtn.onclick = () => { if (state.page>1) { state.page--; fetchLogs(); } };}
+    if (nextBtn) {nextBtn.onclick = () => { if (state.page<state.totalPages) { state.page++; fetchLogs(); } };}
   }
 
-  function renderSummary(){
+  function renderSummary() {
     const el = document.getElementById('audit-summary');
-    if (!el) return;
+    if (!el) {return;}
     el.textContent = `Showing ${state.data.length} of ${state.total} total audit events`;
   }
 
-  function exportData(format){
+  function exportData(format) {
     const params = new URLSearchParams();
-    if (format === 'csv') params.set('format', 'csv');
+    if (format === 'csv') {params.set('format', 'csv');}
     // Export large subset (no pagination) - respect search filters
-    if (state.q) params.set('q', state.q);
-    if (state.action) params.set('action', state.action);
-    if (state.method) params.set('method', state.method);
-    if (state.path) params.set('path', state.path);
-    if (state.requestId) params.set('requestId', state.requestId);
-    if (state.userId) params.set('userId', state.userId);
-    if (state.startDate) params.set('startDate', state.startDate);
-    if (state.endDate) params.set('endDate', state.endDate);
+    if (state.q) {params.set('q', state.q);}
+    if (state.action) {params.set('action', state.action);}
+    if (state.method) {params.set('method', state.method);}
+    if (state.path) {params.set('path', state.path);}
+    if (state.requestId) {params.set('requestId', state.requestId);}
+    if (state.userId) {params.set('userId', state.userId);}
+    if (state.startDate) {params.set('startDate', state.startDate);}
+    if (state.endDate) {params.set('endDate', state.endDate);}
     params.set('limit', 1000);
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
     const url = `${FN_BASE}/audit-logs?` + params.toString();
     (window.authFetch ? window.authFetch(url) : fetch(url)).then(async res => {
-      if (!res.ok) throw new Error('Failed export');
+      if (!res.ok) {throw new Error('Failed export');}
       if (format === 'csv') {
         const text = await res.text();
         downloadBlob(new Blob([text], { type: 'text/csv' }), 'audit-log.csv');
@@ -351,49 +350,48 @@
         const json = await res.json();
         downloadBlob(new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' }), 'audit-log.json');
       }
-    }).catch(()=>{/* ignore */});
+    }).catch(() => {/* ignore */});
   }
 
-  function clearLogs(){
-    if (!confirm('Clear all audit logs? This cannot be undone.')) return;
+  function clearLogs() {
+    if (!confirm('Clear all audit logs? This cannot be undone.')) {return;}
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
     const url = `${FN_BASE}/audit-logs`;
     (window.authFetch ? window.authFetch(url, { method: 'DELETE' }) : fetch(url, { method: 'DELETE' }))
-      .then(()=>fetchLogs())
-      .catch(()=>{});
+      .then(() => fetchLogs())
+      .catch(() => {});
   }
 
-  function downloadBlob(blob, filename){
+  function downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
-  function escapeHtml(input){
+  function escapeHtml(input) {
     try {
-      if (input === null || input === undefined) return '';
+      if (input === null || input === undefined) {return '';}
       let str = input;
       // If it's an object, stringify; otherwise coerce to string
       if (typeof str === 'object') {
-        try { str = JSON.stringify(str); }
-        catch (_) { str = String(str); }
+        try { str = JSON.stringify(str); } catch (_) { str = String(str); }
       } else if (typeof str !== 'string') {
         str = String(str);
       }
-      return str.replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]); });
-    } catch(_) {
+      return str.replace(/[&<>"]/g, function(c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]); });
+    } catch (_) {
       // Fallback to empty string on any unexpected error
       return '';
     }
   }
 
-  function debounce(fn, ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); }; }
+  function debounce(fn, ms) { let t; return (...args) => { clearTimeout(t); t=setTimeout(() => fn(...args), ms); }; }
 
-  function formatYMD(d){
-    try { return d.toISOString().slice(0,10); } catch(e){ return ''; }
+  function formatYMD(d) {
+    try { return d.toISOString().slice(0,10); } catch (e) { return ''; }
   }
 
-  async function fetchUsersMap(){
+  async function fetchUsersMap() {
     try {
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
       const url = `${FN_BASE}/users`;
@@ -406,21 +404,21 @@
         const headers = token ? { Authorization: 'Bearer ' + token } : {};
         res = await fetch(url, { headers });
       }
-      if (!res.ok) return;
+      if (!res.ok) {return;}
       const json = await res.json();
       const arr = (json && json.users) || [];
       const map = {};
-      arr.forEach(u=>{
+      arr.forEach(u => {
         const id = String(u.id || u.user_id || u.uid || '');
-        if (!id) return;
+        if (!id) {return;}
         map[id] = u.username || u.name || `User #${id}`;
       });
       state.usersById = map;
       renderTable(); // refresh names in current page
-    } catch(_) { /* ignore */ }
+    } catch (_) { /* ignore */ }
   }
 
-  function wireEvents(){
+  function wireEvents() {
     const search = document.getElementById('audit-search');
     const action = document.getElementById('audit-action');
     const method = document.getElementById('audit-method');
@@ -439,48 +437,48 @@
     const expCsv = document.getElementById('audit-export-csv');
     const clearBtn = document.getElementById('audit-clear');
 
-    if (search) search.addEventListener('input', debounce(e=>{ state.q = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
-    if (action) action.addEventListener('input', debounce(e=>{ state.action = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
-    if (method) method.addEventListener('input', debounce(e=>{ state.method = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
-    if (path) path.addEventListener('input', debounce(e=>{ state.path = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
-    if (requestId) requestId.addEventListener('input', debounce(e=>{ state.requestId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
-    if (userId) userId.addEventListener('input', debounce(e=>{ state.userId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));
+    if (search) {search.addEventListener('input', debounce(e => { state.q = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
+    if (action) {action.addEventListener('input', debounce(e => { state.action = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
+    if (method) {method.addEventListener('input', debounce(e => { state.method = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
+    if (path) {path.addEventListener('input', debounce(e => { state.path = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
+    if (requestId) {requestId.addEventListener('input', debounce(e => { state.requestId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
+    if (userId) {userId.addEventListener('input', debounce(e => { state.userId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
     if (truncate) {
       // Initialize from state/localStorage
       try {
         const saved = localStorage.getItem('audit.truncateLen');
-        if (saved) state.truncateLen = parseInt(saved) || state.truncateLen;
-      } catch(err){ /* no-op */ }
+        if (saved) {state.truncateLen = parseInt(saved) || state.truncateLen;}
+      } catch (err) { /* no-op */ }
       truncate.value = state.truncateLen;
-      truncate.addEventListener('input', debounce(e=>{
+      truncate.addEventListener('input', debounce(e => {
         const v = parseInt(e.target.value);
         if (!isNaN(v)) {
           state.truncateLen = Math.max(40, Math.min(1000, v));
-          try { localStorage.setItem('audit.truncateLen', String(state.truncateLen)); } catch(err){ /* no-op */ }
+          try { localStorage.setItem('audit.truncateLen', String(state.truncateLen)); } catch (err) { /* no-op */ }
           renderTable(); // no refetch needed
         }
       }, 200));
     }
-    if (start) start.addEventListener('change', e=>{ state.startDate = e.target.value; state.page=1; fetchLogs(); });
-    if (end) end.addEventListener('change', e=>{ state.endDate = e.target.value; state.page=1; fetchLogs(); });
-    if (pageSize) pageSize.addEventListener('change', e=>{ state.pageSize = parseInt(e.target.value); state.page=1; fetchLogs(); });
-    function setRangeDays(days){
+    if (start) {start.addEventListener('change', e => { state.startDate = e.target.value; state.page=1; fetchLogs(); });}
+    if (end) {end.addEventListener('change', e => { state.endDate = e.target.value; state.page=1; fetchLogs(); });}
+    if (pageSize) {pageSize.addEventListener('change', e => { state.pageSize = parseInt(e.target.value); state.page=1; fetchLogs(); });}
+    function setRangeDays(days) {
       const endD = new Date();
       const startD = new Date();
       startD.setDate(endD.getDate() - (days - 1));
       state.startDate = formatYMD(startD);
       state.endDate = formatYMD(endD);
-      if (start) start.value = state.startDate;
-      if (end) end.value = state.endDate;
+      if (start) {start.value = state.startDate;}
+      if (end) {end.value = state.endDate;}
       state.page=1; fetchLogs();
     }
-    if (chip24h) chip24h.addEventListener('click', ()=> setRangeDays(1));
-    if (chip7d) chip7d.addEventListener('click', ()=> setRangeDays(7));
-    if (chip30d) chip30d.addEventListener('click', ()=> setRangeDays(30));
-    if (chipClear) chipClear.addEventListener('click', ()=>{ state.startDate=''; state.endDate=''; if (start) start.value=''; if (end) end.value=''; state.page=1; fetchLogs(); });
-    if (expJson) expJson.addEventListener('click', ()=>exportData('json'));
-    if (expCsv) expCsv.addEventListener('click', ()=>exportData('csv'));
-    if (clearBtn) clearBtn.addEventListener('click', clearLogs);
+    if (chip24h) {chip24h.addEventListener('click', () => setRangeDays(1));}
+    if (chip7d) {chip7d.addEventListener('click', () => setRangeDays(7));}
+    if (chip30d) {chip30d.addEventListener('click', () => setRangeDays(30));}
+    if (chipClear) {chipClear.addEventListener('click', () => { state.startDate=''; state.endDate=''; if (start) {start.value='';} if (end) {end.value='';} state.page=1; fetchLogs(); });}
+    if (expJson) {expJson.addEventListener('click', () => exportData('json'));}
+    if (expCsv) {expCsv.addEventListener('click', () => exportData('csv'));}
+    if (clearBtn) {clearBtn.addEventListener('click', clearLogs);}
   }
 
   // Initialize

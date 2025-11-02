@@ -9,5 +9,5 @@ module.exports = {
   moduleFileExtensions: ['js', 'json'],
   verbose: true,
   // Keep Node-only smoke tests outside Jest; they run via npm scripts
-  testPathIgnorePatterns: ['/node_modules/', '/tests/functions/', '/tests/auth.test.js'],
+  testPathIgnorePatterns: ['/node_modules/', '/tests/functions/', '/tests/auth.test.js']
 };

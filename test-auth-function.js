@@ -3,7 +3,7 @@ const { handler } = require('./.netlify/functions/auth');
 
 async function testAuth() {
   console.log('🔧 Using DB_TYPE:', process.env.DB_TYPE);
-  
+
   console.log('🧪 Testing Registration...');
   const registerEvent = {
     httpMethod: 'POST',
@@ -16,11 +16,11 @@ async function testAuth() {
     }),
     headers: {}
   };
-  
+
   try {
     const registerResult = await handler(registerEvent);
     console.log('📝 Register Response:', registerResult.statusCode, JSON.parse(registerResult.body));
-    
+
     if (registerResult.statusCode === 201 || registerResult.statusCode === 409) {
       console.log('✅ Registration test PASSED');
     } else {
@@ -31,7 +31,7 @@ async function testAuth() {
     console.error('❌ Registration test ERROR:', error.message);
     return;
   }
-  
+
   console.log('\n🧪 Testing Login...');
   const loginEvent = {
     httpMethod: 'POST',
@@ -45,11 +45,11 @@ async function testAuth() {
       'x-forwarded-for': '127.0.0.1'
     }
   };
-  
+
   try {
     const loginResult = await handler(loginEvent);
     console.log('📝 Login Response:', loginResult.statusCode, JSON.parse(loginResult.body));
-    
+
     if (loginResult.statusCode === 200) {
       console.log('✅ Login test PASSED');
       const loginData = JSON.parse(loginResult.body);

@@ -38,7 +38,7 @@ describe('Home Page', () => {
       document.body.appendChild(loginBtn);
     }
 
-    if (!loginModal) return; // Skip if modal missing in test HTML
+    if (!loginModal) {return;} // Skip if modal missing in test HTML
 
     loginBtn.addEventListener('click', () => {
       loginModal.classList.remove('hidden');
@@ -52,7 +52,7 @@ describe('Home Page', () => {
     const loginForm = document.getElementById('login-form');
     const loginModal = document.getElementById('login-modal');
 
-    if (!loginForm || !loginModal) return;
+    if (!loginForm || !loginModal) {return;}
 
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
@@ -93,7 +93,7 @@ describe('Home Page', () => {
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
-    if (!loginForm || !loginError) return;
+    if (!loginForm || !loginError) {return;}
 
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');

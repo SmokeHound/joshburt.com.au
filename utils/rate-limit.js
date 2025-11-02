@@ -22,27 +22,27 @@ const RATE_LIMITS = {
  */
 function checkRateLimit(key, limit = 30, windowMs = 60 * 1000) {
   const now = Date.now();
-  
+
   if (!rateBuckets[key]) {
     rateBuckets[key] = [];
   }
-  
+
   // Remove expired entries
   rateBuckets[key] = rateBuckets[key].filter(timestamp => now - timestamp < windowMs);
-  
+
   const allowed = rateBuckets[key].length < limit;
-  
+
   if (allowed) {
     rateBuckets[key].push(now);
   }
-  
+
   const remaining = Math.max(0, limit - rateBuckets[key].length);
-  
+
   // Calculate reset time (when oldest entry expires)
-  const resetAt = rateBuckets[key].length > 0 
-    ? rateBuckets[key][0] + windowMs 
+  const resetAt = rateBuckets[key].length > 0
+    ? rateBuckets[key][0] + windowMs
     : now + windowMs;
-  
+
   return {
     allowed,
     remaining,
@@ -74,14 +74,14 @@ function withRateLimit(handler, options = {}) {
   const preset = options.preset ? RATE_LIMITS[options.preset] : null;
   const limit = options.limit || preset?.limit || 30;
   const windowMs = options.windowMs || preset?.windowMs || 60 * 1000;
-  
+
   return async (event, context) => {
     const ip = getClientIP(event);
     const path = event.path || event.rawUrl || 'unknown';
     const key = `${path}:${ip}`;
-    
+
     const result = checkRateLimit(key, limit, windowMs);
-    
+
     if (!result.allowed) {
       return {
         statusCode: 429,
@@ -99,16 +99,16 @@ function withRateLimit(handler, options = {}) {
         })
       };
     }
-    
+
     // Add rate limit headers to successful response
     const response = await handler(event, context);
-    
+
     if (response && response.headers) {
       response.headers['X-RateLimit-Limit'] = limit.toString();
       response.headers['X-RateLimit-Remaining'] = result.remaining.toString();
       response.headers['X-RateLimit-Reset'] = result.resetAt.toString();
     }
-    
+
     return response;
   };
 }
@@ -120,7 +120,7 @@ function withRateLimit(handler, options = {}) {
 function cleanupRateLimits() {
   const now = Date.now();
   const maxAge = 3600 * 1000; // 1 hour
-  
+
   for (const key in rateBuckets) {
     if (Object.prototype.hasOwnProperty.call(rateBuckets, key)) {
       rateBuckets[key] = rateBuckets[key].filter(timestamp => now - timestamp < maxAge);

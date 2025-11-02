@@ -8,7 +8,7 @@ const { database } = require('../config/database');
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-  'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
 };
 
 function json(statusCode, body, extraHeaders = {}) {
@@ -24,37 +24,37 @@ function error(statusCode, message, extra = {}, extraHeaders = {}) {
 }
 
 function parseBody(event) {
-  if (!event.body) return {};
+  if (!event.body) {return {};}
   try { return JSON.parse(event.body); } catch { return {}; }
 }
 
 // --- Auth helpers ---
-function getBearerToken(event){
+function getBearerToken(event) {
   const auth = event.headers && (event.headers.authorization || event.headers.Authorization);
-  if (!auth || !auth.startsWith('Bearer ')) return null;
+  if (!auth || !auth.startsWith('Bearer ')) {return null;}
   return auth.split(' ')[1];
 }
 
 // Local JWT (HS256) verification (use same default as auth function)
-function verifyLocalToken(token){
+function verifyLocalToken(token) {
   const secret = process.env.JWT_SECRET || 'dev-secret-change-me';
   try { return jwt.verify(token, secret); } catch { return null; }
 }
 
 // Minimal JWKS cache per cold start container
 const jwksCache = { byKid: {}, lastFetch: 0 };
-async function getAuth0PemForKid(kid){
+async function getAuth0PemForKid(kid) {
   const domain = process.env.AUTH0_DOMAIN || '';
-  if (!domain) return null;
-  if (jwksCache.byKid[kid]) return jwksCache.byKid[kid];
+  if (!domain) {return null;}
+  if (jwksCache.byKid[kid]) {return jwksCache.byKid[kid];}
   const jwksUrl = `https://${domain}/.well-known/jwks.json`;
   const res = await fetch(jwksUrl);
-  if (!res.ok) throw new Error('Failed to fetch JWKS');
+  if (!res.ok) {throw new Error('Failed to fetch JWKS');}
   const data = await res.json();
   const key = (data.keys || []).find(k => k.kid === kid);
-  if (!key) throw new Error('JWKS key not found for kid');
+  if (!key) {throw new Error('JWKS key not found for kid');}
   // Prefer x5c certificate chain
-  if (key.x5c && key.x5c.length){
+  if (key.x5c && key.x5c.length) {
     const cert = key.x5c[0];
     const pem = `-----BEGIN CERTIFICATE-----\n${cert}\n-----END CERTIFICATE-----`;
     jwksCache.byKid[kid] = pem;
@@ -64,12 +64,12 @@ async function getAuth0PemForKid(kid){
   throw new Error('Unsupported JWKS key format (no x5c)');
 }
 
-async function verifyAuth0Token(token){
+async function verifyAuth0Token(token) {
   try {
     const decodedHeader = jwt.decode(token, { complete: true });
-    if (!decodedHeader || !decodedHeader.header) return null;
+    if (!decodedHeader || !decodedHeader.header) {return null;}
     const { kid, alg } = decodedHeader.header;
-    if (alg !== 'RS256') return null; // Auth0 tokens are RS256 by default
+    if (alg !== 'RS256') {return null;} // Auth0 tokens are RS256 by default
     const pem = await getAuth0PemForKid(kid);
     const verified = jwt.verify(token, pem, {
       algorithms: ['RS256'],
@@ -77,21 +77,21 @@ async function verifyAuth0Token(token){
       audience: process.env.AUTH0_AUDIENCE || process.env.AUTH0_CLIENT_ID
     });
     return verified; // contains sub, email, name, etc.
-  } catch (e){
+  } catch (e) {
     return null;
   }
 }
 
-async function getOrCreateUserFromClaims(claims){
-  if (!claims) return null;
+async function getOrCreateUserFromClaims(claims) {
+  if (!claims) {return null;}
   const email = claims.email;
-  if (!email) return null; // require email mapping for local account
+  if (!email) {return null;} // require email mapping for local account
   let user = await database.get('SELECT id, email, name, role, is_active, email_verified FROM users WHERE email = ?', [email]);
-  if (user && user.is_active) return user;
+  if (user && user.is_active) {return user;}
   // Default to auto-provision when Auth0 is configured, unless explicitly disabled
   const autoProvisionDefault = process.env.AUTH0_DOMAIN ? 'true' : 'false';
   const autoProvision = (process.env.AUTH0_AUTO_PROVISION || autoProvisionDefault).toLowerCase() === 'true';
-  if (!user && autoProvision){
+  if (!user && autoProvision) {
     const name = (claims.name && String(claims.name).slice(0, 100)) || email.split('@')[0];
     const verified = claims.email_verified ? 1 : 0;
     const result = await database.run('INSERT INTO users (email, name, role, email_verified, is_active) VALUES (?, ?, ?, ?, ?)', [email, name, 'user', verified, 1]);
@@ -103,19 +103,19 @@ async function getOrCreateUserFromClaims(claims){
 
 async function authenticate(event) {
   const token = getBearerToken(event);
-  if (!token) return null;
+  if (!token) {return null;}
   // Try local JWT first
   const decodedLocal = verifyLocalToken(token);
-  if (decodedLocal && decodedLocal.userId){
+  if (decodedLocal && decodedLocal.userId) {
     try {
       const user = await database.get('SELECT id, email, name, role, is_active, email_verified FROM users WHERE id = ?', [decodedLocal.userId]);
-      if (!user || !user.is_active) return null;
+      if (!user || !user.is_active) {return null;}
       return user;
     } catch { return null; }
   }
   // Try Auth0 token
   const verifiedAuth0 = await verifyAuth0Token(token);
-  if (verifiedAuth0){
+  if (verifiedAuth0) {
     return getOrCreateUserFromClaims(verifiedAuth0);
   }
   return null;
@@ -128,8 +128,8 @@ async function requireAuth(event, roles = null) {
     return { user: demoUser, response: null };
   }
   const user = await authenticate(event);
-  if (!user) return { user: null, response: error(401, 'Authentication required') };
-  if (roles && !roles.includes(user.role)) return { user, response: error(403, 'Insufficient permissions') };
+  if (!user) {return { user: null, response: error(401, 'Authentication required') };}
+  if (roles && !roles.includes(user.role)) {return { user, response: error(403, 'Insufficient permissions') };}
   return { user, response: null };
 }
 
@@ -143,16 +143,16 @@ async function requireAuth(event, roles = null) {
  */
 async function requirePermission(event, resource, action) {
   const { hasPermission } = require('./rbac');
-  
+
   // Check authentication first
   const { user, response: authResponse } = await requireAuth(event);
-  if (authResponse) return { user, response: authResponse };
-  
+  if (authResponse) {return { user, response: authResponse };}
+
   // Check permission
   if (!hasPermission(user, resource, action)) {
     return { user, response: error(403, 'Insufficient permissions for this action') };
   }
-  
+
   return { user, response: null };
 }
 

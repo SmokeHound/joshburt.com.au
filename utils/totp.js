@@ -15,7 +15,7 @@ function generateTOTPSecret(email, issuer = 'JoshBurt.com.au') {
     issuer: issuer,
     length: 32
   });
-  
+
   return {
     secret: secret.base32,
     otpauthUrl: secret.otpauth_url
@@ -33,7 +33,7 @@ function verifyTOTPToken(token, secret, options = {}) {
   if (!token || !secret) {
     return false;
   }
-  
+
   try {
     return speakeasy.totp.verify({
       secret: secret,
@@ -71,13 +71,13 @@ async function generateQRCode(otpauthUrl) {
  */
 function generateBackupCodes(count = 10) {
   const codes = [];
-  
+
   for (let i = 0; i < count; i++) {
     // Generate 8-character alphanumeric code
     const code = nodeCrypto.randomBytes(4).toString('hex').toUpperCase();
     codes.push(code);
   }
-  
+
   return codes;
 }
 
@@ -100,18 +100,18 @@ function verifyBackupCode(code, hashedCodes) {
   if (!code || !Array.isArray(hashedCodes)) {
     return { valid: false, remainingCodes: hashedCodes };
   }
-  
+
   const codeHash = hashBackupCode(code);
   const index = hashedCodes.indexOf(codeHash);
-  
+
   if (index === -1) {
     return { valid: false, remainingCodes: hashedCodes };
   }
-  
+
   // Remove used backup code
   const remainingCodes = [...hashedCodes];
   remainingCodes.splice(index, 1);
-  
+
   return {
     valid: true,
     remainingCodes
@@ -137,7 +137,7 @@ function parseStoredBackupCodes(storedCodes) {
   if (!storedCodes) {
     return [];
   }
-  
+
   try {
     const parsed = JSON.parse(storedCodes);
     return Array.isArray(parsed) ? parsed : [];

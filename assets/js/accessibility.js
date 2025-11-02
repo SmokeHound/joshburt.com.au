@@ -44,7 +44,7 @@
    */
   function createAnnouncementRegion() {
     const existing = document.getElementById('a11y-announcer');
-    if (existing) return existing;
+    if (existing) {return existing;}
 
     const announcer = document.createElement('div');
     announcer.id = 'a11y-announcer';
@@ -53,7 +53,7 @@
     announcer.setAttribute('aria-atomic', 'true');
     announcer.className = 'sr-only';
     announcer.style.cssText = 'position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;';
-    
+
     document.body.appendChild(announcer);
     return announcer;
   }
@@ -61,7 +61,7 @@
   function announce(message, priority = 'polite') {
     const announcer = createAnnouncementRegion();
     announcer.setAttribute('aria-live', priority);
-    
+
     // Clear and set new message
     announcer.textContent = '';
     setTimeout(() => {
@@ -77,12 +77,12 @@
     const focusableElements = element.querySelectorAll(
       'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
     );
-    
+
     const firstFocusable = focusableElements[0];
     const lastFocusable = focusableElements[focusableElements.length - 1];
 
     function handleTabKey(e) {
-      if (e.key !== 'Tab') return;
+      if (e.key !== 'Tab') {return;}
 
       if (e.shiftKey) {
         if (document.activeElement === firstFocusable) {
@@ -98,7 +98,7 @@
     }
 
     element.addEventListener('keydown', handleTabKey);
-    
+
     // Return cleanup function
     return () => {
       element.removeEventListener('keydown', handleTabKey);
@@ -124,14 +124,14 @@
    */
   function addSkipLink() {
     // Check if skip link already exists
-    if (document.querySelector('.skip-link')) return;
+    if (document.querySelector('.skip-link')) {return;}
 
     const skipLink = document.createElement('a');
     skipLink.href = '#main-content';
     skipLink.className = 'skip-link';
     skipLink.textContent = 'Skip to main content';
     skipLink.setAttribute('aria-label', 'Skip to main content');
-    
+
     // Insert at the beginning of body
     document.body.insertBefore(skipLink, document.body.firstChild);
 
@@ -153,7 +153,7 @@
       if (!input.id) {
         input.id = `input-${index}-${Date.now()}`;
       }
-      
+
       // Check for placeholder as backup label
       if (input.placeholder && !input.getAttribute('aria-label')) {
         input.setAttribute('aria-label', input.placeholder);
@@ -179,7 +179,7 @@
   function enableHeadingNavigation() {
     let currentHeadingIndex = -1;
     const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'));
-    
+
     headings.forEach(h => {
       if (!h.hasAttribute('tabindex')) {
         h.setAttribute('tabindex', '-1');
@@ -194,7 +194,7 @@
         headings[currentHeadingIndex].focus();
         announce(`Heading level ${headings[currentHeadingIndex].tagName.charAt(1)}: ${headings[currentHeadingIndex].textContent}`);
       }
-      
+
       // Alt + Shift + H: Previous heading
       if (e.altKey && e.shiftKey && e.key === 'H') {
         e.preventDefault();

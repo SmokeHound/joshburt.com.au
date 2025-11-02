@@ -29,7 +29,7 @@ async function callAuth(action, body = {}) {
 }
 
 async function getAuditLogs(token, action = null) {
-  const url = action 
+  const url = action
     ? `${BASE}/.netlify/functions/audit-logs?action=${encodeURIComponent(action)}&limit=10`
     : `${BASE}/.netlify/functions/audit-logs?limit=10`;
   const res = await fetch(url, {
@@ -41,7 +41,7 @@ async function getAuditLogs(token, action = null) {
 
 (async () => {
   console.log('🔍 Starting audit logging smoke test...');
-  
+
   if (!(await isServerAvailable())) {
     console.warn('⚠️ Netlify dev not running at', BASE, '- skipping audit logging test');
     process.exit(0);
@@ -50,11 +50,11 @@ async function getAuditLogs(token, action = null) {
 
   try {
     // 1. Login to get token
-    const login = await callAuth('login', { 
-      email: 'admin@joshburt.com.au', 
-      password: 'admin123!' 
+    const login = await callAuth('login', {
+      email: 'admin@joshburt.com.au',
+      password: 'admin123!'
     });
-    
+
     if (login.status !== 200 || !login.json.accessToken) {
       console.error('❌ Login failed', login);
       process.exitCode = 1;
@@ -75,7 +75,7 @@ async function getAuditLogs(token, action = null) {
 
     const logs = Array.isArray(loginLogs.json) ? loginLogs.json : (loginLogs.json.data || []);
     const loginLog = logs.find(log => log.action === 'auth.login_success');
-    
+
     if (!loginLog) {
       console.error('❌ No auth.login_success audit log found');
       console.error('Available logs:', logs.map(l => l.action));
@@ -93,10 +93,10 @@ async function getAuditLogs(token, action = null) {
     console.log('✅ Audit log has required fields');
 
     // 4. Test logout creates audit log
-    const logout = await callAuth('logout', { 
-      refreshToken: login.json.refreshToken 
+    const logout = await callAuth('logout', {
+      refreshToken: login.json.refreshToken
     });
-    
+
     if (logout.status !== 200) {
       console.error('❌ Logout failed', logout);
       process.exitCode = 1;
@@ -110,7 +110,7 @@ async function getAuditLogs(token, action = null) {
     const logoutLogs = await getAuditLogs(login.json.accessToken, 'auth.logout');
     const logsArray = Array.isArray(logoutLogs.json) ? logoutLogs.json : (logoutLogs.json.data || []);
     const logoutLog = logsArray.find(log => log.action === 'auth.logout');
-    
+
     if (!logoutLog) {
       console.warn('⚠️ No auth.logout audit log found (may not have userId)');
     } else {
@@ -119,7 +119,7 @@ async function getAuditLogs(token, action = null) {
 
     console.log('🎉 Audit logging test PASSED');
     console.log('📊 Tested actions: auth.login_success, auth.logout');
-    
+
   } catch (err) {
     console.error('❌ Audit logging test threw error', err);
     process.exitCode = 1;

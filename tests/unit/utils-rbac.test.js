@@ -1,11 +1,11 @@
 // Unit tests for utils/rbac.js
-const { 
-  ROLES, 
-  PERMISSIONS, 
-  hasPermission, 
-  hasRole, 
-  isValidRole, 
-  getAllRoles 
+const {
+  ROLES,
+  PERMISSIONS,
+  hasPermission,
+  hasRole,
+  isValidRole,
+  getAllRoles
 } = require('../../utils/rbac');
 
 describe('RBAC Utilities', () => {

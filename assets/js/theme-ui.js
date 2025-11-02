@@ -11,23 +11,23 @@
    */
   function initThemePreview() {
     const themeCards = document.querySelectorAll('.theme-card');
-    
+
     themeCards.forEach(card => {
       const themeId = card.getAttribute('data-theme');
-      
+
       // Add preview button
       const previewBtn = document.createElement('button');
       previewBtn.className = 'absolute top-2 right-2 px-3 py-1 text-xs rounded-lg bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 transition-all opacity-0 group-hover:opacity-100';
       previewBtn.textContent = 'Preview';
       previewBtn.setAttribute('aria-label', `Preview ${themeId} theme`);
-      
+
       previewBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (window.ThemeEnhanced) {
           window.ThemeEnhanced.preview(themeId);
         }
       });
-      
+
       card.appendChild(previewBtn);
     });
   }
@@ -37,7 +37,7 @@
    */
   function initThemeScheduler() {
     const schedulerContainer = document.getElementById('theme-scheduler-container');
-    if (!schedulerContainer || !window.ThemeEnhanced) return;
+    if (!schedulerContainer || !window.ThemeEnhanced) {return;}
 
     const scheduler = window.ThemeEnhanced.scheduler;
     const schedules = scheduler.getSchedules();
@@ -172,7 +172,7 @@
     const form = document.getElementById('schedule-form');
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+
       const updatedSchedule = {
         name: schedule.name,
         start: document.getElementById('schedule-start').value,
@@ -207,7 +207,7 @@
    */
   function initCustomThemeBuilder() {
     const builderContainer = document.getElementById('custom-theme-builder');
-    if (!builderContainer || !window.ThemeEnhanced) return;
+    if (!builderContainer || !window.ThemeEnhanced) {return;}
 
     const customTheme = window.ThemeEnhanced.customBuilder.getTheme();
 
@@ -305,7 +305,7 @@
       if (confirm('Reset custom theme to defaults?')) {
         window.ThemeEnhanced.customBuilder.reset();
         initCustomThemeBuilder(); // Refresh UI
-        
+
         if (window.A11y) {
           window.A11y.announce('Custom theme reset to defaults');
         }
@@ -318,7 +318,7 @@
    */
   function initPageThemeOverride() {
     const overrideContainer = document.getElementById('page-theme-override');
-    if (!overrideContainer || !window.ThemeEnhanced) return;
+    if (!overrideContainer || !window.ThemeEnhanced) {return;}
 
     const currentPage = window.ThemeEnhanced.pageOverride.getCurrentPage();
     const currentOverride = window.ThemeEnhanced.pageOverride.getCurrentPageOverride();
@@ -358,7 +358,7 @@
 
     document.getElementById('apply-page-override').addEventListener('click', () => {
       const selectedTheme = document.getElementById('page-override-select').value;
-      
+
       if (selectedTheme) {
         window.ThemeEnhanced.pageOverride.setCurrentPageOverride(selectedTheme);
         if (window.A11y) {
@@ -370,7 +370,7 @@
           window.A11y.announce('Page theme override removed');
         }
       }
-      
+
       initPageThemeOverride(); // Refresh UI
     });
   }

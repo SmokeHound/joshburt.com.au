@@ -17,18 +17,18 @@
         refreshCallback: options.refreshCallback || (() => window.location.reload()),
         ...options
       };
-      
+
       this.startY = 0;
       this.currentY = 0;
       this.isDragging = false;
       this.refreshIndicator = null;
-      
+
       this.init();
     }
 
     init() {
       // Only enable on mobile devices
-      if (!this.isMobileDevice()) return;
+      if (!this.isMobileDevice()) {return;}
 
       this.createRefreshIndicator();
       this.attachListeners();
@@ -59,7 +59,7 @@
         transition: top 0.3s ease-out;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       `;
-      
+
       this.refreshIndicator.innerHTML = `
         <svg class="spinner" width="24" height="24" viewBox="0 0 24 24" style="display: none;">
           <circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="3" fill="none" 
@@ -70,9 +70,9 @@
           <path d="M12 5v14M5 12l7 7 7-7"/>
         </svg>
       `;
-      
+
       document.body.appendChild(this.refreshIndicator);
-      
+
       // Add animation styles
       const style = document.createElement('style');
       style.textContent = `
@@ -100,17 +100,17 @@
     }
 
     handleTouchMove(e) {
-      if (!this.isDragging) return;
+      if (!this.isDragging) {return;}
 
       this.currentY = e.touches[0].clientY;
       const pullDistance = this.currentY - this.startY;
 
       if (pullDistance > 0 && pullDistance <= this.options.maxPullDistance) {
         e.preventDefault();
-        
+
         const top = Math.min(pullDistance - 60, 40);
         this.refreshIndicator.style.top = `${top}px`;
-        
+
         // Rotate arrow based on pull distance
         const rotation = (pullDistance / this.options.threshold) * 180;
         const arrow = this.refreshIndicator.querySelector('.arrow');
@@ -121,28 +121,28 @@
     }
 
     handleTouchEnd() {
-      if (!this.isDragging) return;
+      if (!this.isDragging) {return;}
 
       const pullDistance = this.currentY - this.startY;
-      
+
       if (pullDistance >= this.options.threshold) {
         this.triggerRefresh();
       } else {
         this.resetIndicator();
       }
-      
+
       this.isDragging = false;
     }
 
     triggerRefresh() {
       const arrow = this.refreshIndicator.querySelector('.arrow');
       const spinner = this.refreshIndicator.querySelector('.spinner');
-      
-      if (arrow) arrow.style.display = 'none';
-      if (spinner) spinner.style.display = 'block';
-      
+
+      if (arrow) {arrow.style.display = 'none';}
+      if (spinner) {spinner.style.display = 'block';}
+
       this.refreshIndicator.style.top = '20px';
-      
+
       // Execute refresh callback
       Promise.resolve(this.options.refreshCallback()).finally(() => {
         setTimeout(() => {
@@ -156,16 +156,16 @@
 
     resetIndicator() {
       this.refreshIndicator.style.top = '-60px';
-      
+
       setTimeout(() => {
         const arrow = this.refreshIndicator.querySelector('.arrow');
         const spinner = this.refreshIndicator.querySelector('.spinner');
-        
+
         if (arrow) {
           arrow.style.display = 'block';
           arrow.style.transform = 'rotate(0deg)';
         }
-        if (spinner) spinner.style.display = 'none';
+        if (spinner) {spinner.style.display = 'none';}
       }, 300);
     }
   }
@@ -179,9 +179,9 @@
     const interactiveElements = document.querySelectorAll(
       'button, a, input, select, textarea, [role="button"], [onclick]'
     );
-    
+
     const violations = [];
-    
+
     interactiveElements.forEach(element => {
       const rect = element.getBoundingClientRect();
       const computedStyle = window.getComputedStyle(element);
@@ -191,10 +191,10 @@
         left: parseFloat(computedStyle.paddingLeft),
         right: parseFloat(computedStyle.paddingRight)
       };
-      
+
       const totalWidth = rect.width;
       const totalHeight = rect.height;
-      
+
       if (totalWidth < MIN_SIZE || totalHeight < MIN_SIZE) {
         violations.push({
           element,
@@ -204,11 +204,11 @@
         });
       }
     });
-    
+
     if (violations.length > 0) {
       console.warn(`Found ${violations.length} touch target violations:`, violations);
     }
-    
+
     return violations;
   }
 
@@ -221,7 +221,7 @@
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
     };
-    
+
     setVH();
     window.addEventListener('resize', setVH);
     window.addEventListener('orientationchange', setVH);
@@ -248,7 +248,7 @@
    */
   function preventDoubleTabZoom() {
     let lastTouchEnd = 0;
-    
+
     document.addEventListener('touchend', (event) => {
       const now = Date.now();
       if (now - lastTouchEnd <= 300) {
@@ -262,8 +262,8 @@
    * Mobile-friendly select enhancement
    */
   function enhanceMobileSelects() {
-    if (!isTouchDevice()) return;
-    
+    if (!isTouchDevice()) {return;}
+
     const selects = document.querySelectorAll('select');
     selects.forEach(select => {
       // Make selects larger on mobile
@@ -276,15 +276,15 @@
    * Mobile-friendly input enhancement
    */
   function enhanceMobileInputs() {
-    if (!isTouchDevice()) return;
-    
+    if (!isTouchDevice()) {return;}
+
     const inputs = document.querySelectorAll('input, textarea');
     inputs.forEach(input => {
       // Prevent zoom on focus (iOS)
       if (input.style.fontSize && parseFloat(input.style.fontSize) < 16) {
         input.style.fontSize = '16px';
       }
-      
+
       // Add better touch targets
       if (!input.style.minHeight) {
         input.style.minHeight = '44px';
@@ -327,16 +327,16 @@
 
     fixMobileViewportHeight();
     addSafeAreaSupport();
-    
+
     if (isTouchDevice()) {
       preventDoubleTabZoom();
       enhanceMobileSelects();
       enhanceMobileInputs();
-      
+
       // Initialize pull-to-refresh on data pages
       const dataPages = ['index.html', 'users.html', 'orders-review.html', 'analytics.html'];
       const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-      
+
       if (dataPages.includes(currentPage)) {
         new PullToRefresh({
           refreshCallback: () => {
@@ -347,7 +347,7 @@
           }
         });
       }
-      
+
       // Validate touch targets in development
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         setTimeout(validateTouchTargets, 1000);

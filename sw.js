@@ -10,7 +10,7 @@ const urlsToCache = [
   '/index.html',
   '/administration.html',
   '/analytics.html',
-  '/login.html', 
+  '/login.html',
   '/oil-products.html',
   '/settings.html',
   '/users.html',
@@ -26,7 +26,7 @@ const urlsToCache = [
 // API base patterns (serverless only; legacy /api removed)
 const apiUrls = [
   '/.netlify/functions/',
-  'https://joshburt.netlify.app/.netlify/functions/',
+  'https://joshburt.netlify.app/.netlify/functions/'
 ];
 
 // CDN resources to cache
@@ -77,7 +77,7 @@ self.addEventListener('activate', event => {
 // Enhanced fetch event with intelligent caching strategies
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
-  
+
   // Skip non-GET requests
   if (event.request.method !== 'GET') {
     return;
@@ -131,40 +131,40 @@ async function cacheFirstStrategy(request, cacheName) {
 async function networkFirstStrategy(request, cacheName) {
   try {
     const response = await fetch(request);
-    
+
     if (response.status === 200) {
       const cache = await caches.open(cacheName);
       const responseClone = response.clone();
-      
+
       // Cache with expiration (1 hour for API calls)
       const headers = new Headers(responseClone.headers);
       headers.set('sw-cache-timestamp', Date.now().toString());
-      
+
       const modifiedResponse = new Response(responseClone.body, {
         status: responseClone.status,
         statusText: responseClone.statusText,
         headers: headers
       });
-      
+
       cache.put(request, modifiedResponse);
     }
-    
+
     return response;
   } catch (error) {
     // Network failed, try cache
     const cache = await caches.open(cacheName);
     const cached = await cache.match(request);
-    
+
     if (cached) {
       // Check if cache is expired (1 hour)
       const cacheTimestamp = cached.headers.get('sw-cache-timestamp');
       const isExpired = cacheTimestamp && (Date.now() - parseInt(cacheTimestamp)) > 3600000;
-      
+
       if (!isExpired) {
         return cached;
       }
     }
-    
+
     console.error('Service Worker: Network-first strategy failed', error);
     return new Response('Offline - No cached version available', { status: 503 });
   }

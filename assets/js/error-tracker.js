@@ -11,7 +11,7 @@
     // Store recent errors (limit to prevent memory issues)
     recentErrors: [],
     maxErrors: 50,
-    
+
     // Track if error dialog is already showing
     errorDialogShowing: false,
 
@@ -68,7 +68,7 @@
         const stored = JSON.parse(localStorage.getItem('errorLog') || '[]');
         stored.push(error);
         // Keep only last 100 errors
-        if (stored.length > 100) stored.splice(0, stored.length - 100);
+        if (stored.length > 100) {stored.splice(0, stored.length - 100);}
         localStorage.setItem('errorLog', JSON.stringify(stored));
       } catch (e) {
         // Ignore storage errors
@@ -122,7 +122,7 @@
      * Show error notification to user
      */
     showErrorNotification: function(error) {
-      if (this.errorDialogShowing) return;
+      if (this.errorDialogShowing) {return;}
       this.errorDialogShowing = true;
 
       // Use existing toast if available
@@ -168,7 +168,7 @@
      * Check if in development mode
      */
     isDevelopment: function() {
-      return window.location.hostname === 'localhost' || 
+      return window.location.hostname === 'localhost' ||
              window.location.hostname === '127.0.0.1' ||
              window.location.port === '8000' ||
              window.location.port === '8888';

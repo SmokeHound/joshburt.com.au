@@ -16,7 +16,7 @@ class AdminAuditLogger {
   log(action, details = {}, userId = null) {
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     const user = userId || currentUser.email || 'unknown';
-        
+
     const logEntry = {
       id: Date.now() + Math.random().toString(36).substr(2, 9),
       timestamp: new Date().toISOString(),
@@ -39,13 +39,13 @@ class AdminAuditLogger {
 
     localStorage.setItem(this.logKey, JSON.stringify(logs));
     this.broadcastLogEvent(logEntry);
-        
+
     return logEntry;
   }
 
   getLogs(filters = {}) {
     const logs = JSON.parse(localStorage.getItem(this.logKey) || '[]');
-        
+
     let filteredLogs = logs;
 
     // Apply filters
@@ -60,13 +60,13 @@ class AdminAuditLogger {
     }
 
     if (filters.userId) {
-      filteredLogs = filteredLogs.filter(log => 
+      filteredLogs = filteredLogs.filter(log =>
         log.userId.toLowerCase().includes(filters.userId.toLowerCase())
       );
     }
 
     if (filters.action) {
-      filteredLogs = filteredLogs.filter(log => 
+      filteredLogs = filteredLogs.filter(log =>
         log.action.toLowerCase().includes(filters.action.toLowerCase())
       );
     }
@@ -89,14 +89,14 @@ class AdminAuditLogger {
 
   broadcastLogEvent(logEntry) {
     // Broadcast to other tabs/windows
-    window.dispatchEvent(new CustomEvent('adminAuditLog', { 
-      detail: logEntry 
+    window.dispatchEvent(new CustomEvent('adminAuditLog', {
+      detail: logEntry
     }));
   }
 
   exportLogs(format = 'csv', filters = {}) {
     const logs = this.getLogs(filters);
-        
+
     if (format === 'csv') {
       return this.exportToCSV(logs);
     } else if (format === 'json') {
@@ -106,12 +106,12 @@ class AdminAuditLogger {
 
   exportToCSV(logs) {
     let csv = 'Timestamp,User ID,User Role,Action,Details,IP Address,Session ID\n';
-        
+
     logs.forEach(log => {
       const details = JSON.stringify(log.details).replace(/"/g, '""');
       csv += `"${log.timestamp}","${log.userId}","${log.userRole}","${log.action}","${details}","${log.ipAddress}","${log.sessionId}"\n`;
     });
-        
+
     return csv;
   }
 
@@ -123,18 +123,18 @@ class AdminAuditLogger {
     if (olderThanDays) {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
-            
+
       const logs = this.getLogs();
-      const filteredLogs = logs.filter(log => 
+      const filteredLogs = logs.filter(log =>
         new Date(log.timestamp) > cutoffDate
       );
-            
+
       localStorage.setItem(this.logKey, JSON.stringify(filteredLogs));
-      this.log('audit_logs_cleaned', { 
-        olderThanDays, 
-        removedCount: logs.length - filteredLogs.length 
+      this.log('audit_logs_cleaned', {
+        olderThanDays,
+        removedCount: logs.length - filteredLogs.length
       });
-            
+
       return logs.length - filteredLogs.length;
     } else {
       localStorage.setItem(this.logKey, JSON.stringify([]));
@@ -147,7 +147,7 @@ class AdminAuditLogger {
     const now = new Date();
     const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        
+
     const stats = {
       total: logs.length,
       last24Hours: logs.filter(log => new Date(log.timestamp) > dayAgo).length,

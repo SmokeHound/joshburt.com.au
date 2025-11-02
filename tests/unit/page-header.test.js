@@ -12,7 +12,7 @@ describe('Page header utility presence', () => {
     'profile.html',
     'settings.html',
     'shared-dashboards.html',
-    'users.html',
+    'users.html'
   ];
 
   for (const page of pages) {

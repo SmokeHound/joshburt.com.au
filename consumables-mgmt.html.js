@@ -33,27 +33,27 @@ document.addEventListener('DOMContentLoaded', function() {
   // API Functions
   async function loadProducts() {
     try {
-      (window.showToast || function(){})('Loading consumables...', 'info');
+      (window.showToast || function() {})('Loading consumables...', 'info');
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
       const res = await fetch(`${FN_BASE}/consumables`);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      if (!res.ok) {throw new Error(`HTTP error! status: ${res.status}`);}
       const data = await res.json();
       products = Array.isArray(data) ? data : (data.products || []);
       renderTable();
-      (window.showToast || function(){})(`Loaded ${products.length} consumables from database`, 'success');
+      (window.showToast || function() {})(`Loaded ${products.length} consumables from database`, 'success');
     } catch (e) {
       console.error('Failed to load from API:', e);
-      (window.showToast || function(){})('Database unavailable, loading from local files...', 'error');
+      (window.showToast || function() {})('Database unavailable, loading from local files...', 'error');
       // Fallback to local JSON
       try {
         const res = await fetch('data/consumables.json');
         const data = await res.json();
         products = Array.isArray(data) ? data : (data.products || []);
         renderTable();
-        (window.showToast || function(){})(`Loaded ${products.length} consumables from local files`, 'success');
+        (window.showToast || function() {})(`Loaded ${products.length} consumables from local files`, 'success');
       } catch (localError) {
         console.error('Failed to load from local files:', localError);
-        (window.showToast || function(){})('Failed to load consumables data', 'error');
+        (window.showToast || function() {})('Failed to load consumables data', 'error');
       }
     }
   }
@@ -66,16 +66,16 @@ document.addEventListener('DOMContentLoaded', function() {
       const response = await fetch(url, {
         method: method,
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(productData)
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('API save error:', error);
@@ -89,16 +89,16 @@ document.addEventListener('DOMContentLoaded', function() {
       const response = await fetch(`${FN_BASE}/consumables`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ id: productId })
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('API delete error:', error);
@@ -150,56 +150,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function onEdit(id) {
     const product = products.find(p => String(p.id) === String(id));
-    if (product) showModal(true, product);
+    if (product) {showModal(true, product);}
   }
-  
+
   async function onDelete(id) {
-    if (!confirm('Delete this product?')) return;
-    
+    if (!confirm('Delete this product?')) {return;}
+
     try {
       await deleteProductFromAPI(id);
-      (window.showToast || function(){})('Consumable deleted successfully!', 'success');
+      (window.showToast || function() {})('Consumable deleted successfully!', 'success');
       await loadProducts(); // Reload from API
     } catch (error) {
-      (window.showToast || function(){})(`Error deleting consumable: ${error.message}`, 'error');
+      (window.showToast || function() {})(`Error deleting consumable: ${error.message}`, 'error');
       console.error('Delete error:', error);
     }
   }
-  
+
   function onAdd() {
     showModal(false);
   }
-  
+
   async function onSubmit(e) {
     e.preventDefault();
     const name = document.getElementById('product-name').value.trim();
     const type = document.getElementById('product-type').value.trim();
     const category = document.getElementById('product-category').value.trim();
     const code = document.getElementById('product-code').value.trim();
-    
+
     if (!name || !type || !category) {
-      (window.showToast || function(){})('Please fill in all required fields', 'error');
+      (window.showToast || function() {})('Please fill in all required fields', 'error');
       return;
     }
-    
+
     const productData = { name, type, category, code };
-    
+
     try {
       if (editingId) {
         // Edit
         productData.id = editingId;
         await saveProductToAPI(productData, true);
-        (window.showToast || function(){})('Consumable updated successfully!', 'success');
+        (window.showToast || function() {})('Consumable updated successfully!', 'success');
       } else {
         // Add
         await saveProductToAPI(productData, false);
-        (window.showToast || function(){})('Consumable added successfully!', 'success');
+        (window.showToast || function() {})('Consumable added successfully!', 'success');
       }
-      
+
       hideModal();
       await loadProducts(); // Reload from API
     } catch (error) {
-      (window.showToast || function(){})(`Error: ${error.message}`, 'error');
+      (window.showToast || function() {})(`Error: ${error.message}`, 'error');
       console.error('Save error:', error);
     }
   }
@@ -210,11 +210,11 @@ document.addEventListener('DOMContentLoaded', function() {
   addBtn.addEventListener('click', onAdd);
   cancelModal.addEventListener('click', hideModal);
   form.addEventListener('submit', onSubmit);
-  modal.addEventListener('click', e => { if (e.target === modal) hideModal(); });
+  modal.addEventListener('click', e => { if (e.target === modal) {hideModal();} });
 
   // Escape HTML
   function escapeHtml(text) {
-    if (!text) return '';
+    if (!text) {return '';}
     const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#039;' };
     return text.toString().replace(/[&<>"']/g, m => map[m]);
   }

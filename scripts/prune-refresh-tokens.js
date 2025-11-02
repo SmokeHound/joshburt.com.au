@@ -3,11 +3,11 @@
 
 const { database, initializeDatabase } = require('../config/database');
 
-(async function main(){
+(async function main() {
   try {
     await database.connect();
     // Ensure tables exist in case this is run early
-    try { await initializeDatabase(); } catch(err) { /* tables may already exist */ }
+    try { await initializeDatabase(); } catch (err) { /* tables may already exist */ }
 
     // Use ISO timestamp to compare with PostgreSQL TIMESTAMP columns
     const nowIso = new Date().toISOString();
@@ -16,9 +16,9 @@ const { database, initializeDatabase } = require('../config/database');
     console.log(`Pruned ${deleted} expired refresh token(s).`);
     await database.close();
     process.exit(0);
-  } catch (e){
+  } catch (e) {
     console.error('Prune failed:', e.message);
-    try { await database.close(); } catch(err) { /* ignore close errors */ }
+    try { await database.close(); } catch (err) { /* ignore close errors */ }
     process.exit(1);
   }
 })();

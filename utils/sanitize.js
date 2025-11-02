@@ -11,17 +11,17 @@ function sanitizeString(input, options = {}) {
   if (typeof input !== 'string') {
     return '';
   }
-  
+
   let sanitized = input;
-  
+
   // Trim whitespace
   if (options.trim !== false) {
     sanitized = sanitized.trim();
   }
-  
+
   // Remove null bytes
   sanitized = sanitized.replace(/\0/g, '');
-  
+
   // Remove control characters (except newlines and tabs if allowed)
   if (options.allowNewlines) {
     // eslint-disable-next-line no-control-regex
@@ -30,7 +30,7 @@ function sanitizeString(input, options = {}) {
     // eslint-disable-next-line no-control-regex
     sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
   }
-  
+
   // Remove HTML tags if specified
   if (options.stripHtml) {
     // Use a loop to handle nested or incomplete tags
@@ -40,7 +40,7 @@ function sanitizeString(input, options = {}) {
       sanitized = sanitized.replace(/<[^>]*>/g, '');
     } while (sanitized.length !== prevLength);
   }
-  
+
   // Escape HTML entities if specified
   if (options.escapeHtml) {
     sanitized = sanitized
@@ -51,12 +51,12 @@ function sanitizeString(input, options = {}) {
       .replace(/'/g, '&#x27;')
       .replace(/\//g, '&#x2F;');
   }
-  
+
   // Maximum length
   if (options.maxLength) {
     sanitized = sanitized.substring(0, options.maxLength);
   }
-  
+
   return sanitized;
 }
 
@@ -69,10 +69,10 @@ function isValidEmail(email) {
   if (typeof email !== 'string') {
     return false;
   }
-  
+
   // Basic email regex (RFC 5322 simplified)
   const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-  
+
   return emailRegex.test(email) && email.length <= 254;
 }
 
@@ -86,11 +86,11 @@ function isValidURL(url, options = {}) {
   if (typeof url !== 'string') {
     return false;
   }
-  
+
   try {
     const parsed = new URL(url);
     const allowedProtocols = options.allowedProtocols || ['http:', 'https:'];
-    
+
     return allowedProtocols.includes(parsed.protocol);
   } catch (e) {
     return false;
@@ -105,19 +105,19 @@ function isValidURL(url, options = {}) {
  */
 function isValidInteger(value, options = {}) {
   const num = Number(value);
-  
+
   if (isNaN(num) || !Number.isInteger(num)) {
     return false;
   }
-  
+
   if (options.min !== undefined && num < options.min) {
     return false;
   }
-  
+
   if (options.max !== undefined && num > options.max) {
     return false;
   }
-  
+
   return true;
 }
 
@@ -135,24 +135,24 @@ function validateObject(input, schema) {
       errors: ['Input must be an object']
     };
   }
-  
+
   const result = {};
   const errors = [];
-  
+
   for (const [key, rules] of Object.entries(schema)) {
     const value = input[key];
-    
+
     // Check required
     if (rules.required && (value === undefined || value === null || value === '')) {
       errors.push(`${key} is required`);
       continue;
     }
-    
+
     // Skip if not required and not present
     if (!rules.required && (value === undefined || value === null)) {
       continue;
     }
-    
+
     // Type validation
     switch (rules.type) {
       case 'string':
@@ -161,7 +161,7 @@ function validateObject(input, schema) {
           continue;
         }
         result[key] = sanitizeString(value, rules.sanitize || {});
-        
+
         // Additional string validations
         if (rules.minLength && result[key].length < rules.minLength) {
           errors.push(`${key} must be at least ${rules.minLength} characters`);
@@ -173,7 +173,7 @@ function validateObject(input, schema) {
           errors.push(`${key} has invalid format`);
         }
         break;
-      
+
       case 'email':
         if (!isValidEmail(value)) {
           errors.push(`${key} must be a valid email address`);
@@ -181,7 +181,7 @@ function validateObject(input, schema) {
         }
         result[key] = sanitizeString(value, { trim: true, maxLength: 254 }).toLowerCase();
         break;
-      
+
       case 'integer':
         if (!isValidInteger(value, rules)) {
           errors.push(`${key} must be a valid integer`);
@@ -189,11 +189,11 @@ function validateObject(input, schema) {
         }
         result[key] = parseInt(value, 10);
         break;
-      
+
       case 'boolean':
         result[key] = Boolean(value);
         break;
-      
+
       case 'url':
         if (!isValidURL(value, rules)) {
           errors.push(`${key} must be a valid URL`);
@@ -201,17 +201,17 @@ function validateObject(input, schema) {
         }
         result[key] = sanitizeString(value, { trim: true });
         break;
-      
+
       default:
         result[key] = value;
     }
-    
+
     // Custom validator
     if (rules.validator && !rules.validator(result[key])) {
       errors.push(`${key} failed custom validation`);
     }
   }
-  
+
   return {
     valid: errors.length === 0,
     data: result,
@@ -228,7 +228,7 @@ function isSQLSafe(input) {
   if (typeof input !== 'string') {
     return false;
   }
-  
+
   // Check for common SQL injection patterns
   const sqlInjectionPatterns = [
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE)\b)/i,
@@ -237,7 +237,7 @@ function isSQLSafe(input) {
     /(['"])\s*(OR|AND)\s*\1/i,
     /['"].*['"].*=/i
   ];
-  
+
   return !sqlInjectionPatterns.some(pattern => pattern.test(input));
 }
 
@@ -250,19 +250,19 @@ function sanitizeFilename(filename) {
   if (typeof filename !== 'string') {
     return '';
   }
-  
+
   // Remove directory traversal patterns
   let safe = filename.replace(/\.\./g, '');
-  
+
   // Remove path separators
   safe = safe.replace(/[/\\]/g, '');
-  
+
   // Remove null bytes
   safe = safe.replace(/\0/g, '');
-  
+
   // Allow only alphanumeric, dash, underscore, and dot
   safe = safe.replace(/[^a-zA-Z0-9._-]/g, '');
-  
+
   return safe;
 }
 

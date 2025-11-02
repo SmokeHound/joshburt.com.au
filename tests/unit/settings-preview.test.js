@@ -15,7 +15,7 @@ describe('Settings preview CSS variables', () => {
     const scripts = document.querySelectorAll('script');
     scripts.forEach(script => {
       if (script.textContent) {
-        try { eval(script.textContent); } catch(e) { /* ignore initialization errors */ }
+        try { eval(script.textContent); } catch (e) { /* ignore initialization errors */ }
       }
     });
     // In the test environment DOMContentLoaded may not fire; call initializer manually if present
@@ -31,12 +31,12 @@ describe('Settings preview CSS variables', () => {
       const p = document.getElementById('primaryColor');
       const s = document.getElementById('secondaryColor');
       const a = document.getElementById('accentColor');
-      if (p && p.value) document.documentElement.style.setProperty('--preview-primary', p.value);
-      if (s && s.value) document.documentElement.style.setProperty('--preview-secondary', s.value);
-      if (a && a.value) document.documentElement.style.setProperty('--preview-accent', a.value);
+      if (p && p.value) {document.documentElement.style.setProperty('--preview-primary', p.value);}
+      if (s && s.value) {document.documentElement.style.setProperty('--preview-secondary', s.value);}
+      if (a && a.value) {document.documentElement.style.setProperty('--preview-accent', a.value);}
       const safeBind = (el, name) => {
         try {
-          if (el) el.addEventListener('change', (evt) => document.documentElement.style.setProperty(name, evt.target.value));
+          if (el) {el.addEventListener('change', (evt) => document.documentElement.style.setProperty(name, evt.target.value));}
         } catch (err) {
           // ignore
         }

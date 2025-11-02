@@ -47,10 +47,10 @@ describe('Cache Utility', () => {
     test('should expire entries after TTL', async () => {
       cache.set('test', 'key1', 'value1', 0.1); // 100ms TTL
       expect(cache.get('test', 'key1')).toBe('value1');
-      
+
       // Wait for expiration
       await new Promise(resolve => setTimeout(resolve, 150));
-      
+
       expect(cache.get('test', 'key1')).toBeNull();
     });
 
@@ -66,9 +66,9 @@ describe('Cache Utility', () => {
       cache.set('products', 'key1', 'value1');
       cache.set('products', 'key2', 'value2');
       cache.set('users', 'key1', 'value3');
-      
+
       const cleared = cache.clearNamespace('products');
-      
+
       expect(cleared).toBe(2);
       expect(cache.get('products', 'key1')).toBeNull();
       expect(cache.get('products', 'key2')).toBeNull();
@@ -78,7 +78,7 @@ describe('Cache Utility', () => {
     test('should isolate different namespaces', () => {
       cache.set('ns1', 'key', 'value1');
       cache.set('ns2', 'key', 'value2');
-      
+
       expect(cache.get('ns1', 'key')).toBe('value1');
       expect(cache.get('ns2', 'key')).toBe('value2');
     });
@@ -89,7 +89,7 @@ describe('Cache Utility', () => {
       cache.set('test', 'key1', 'value1');
       cache.get('test', 'key1');
       cache.get('test', 'key1');
-      
+
       const stats = cache.getStats();
       expect(stats.hits).toBe(2);
     });
@@ -97,7 +97,7 @@ describe('Cache Utility', () => {
     test('should track cache misses', () => {
       cache.get('test', 'nonexistent');
       cache.get('test', 'another');
-      
+
       const stats = cache.getStats();
       expect(stats.misses).toBe(2);
     });
@@ -105,7 +105,7 @@ describe('Cache Utility', () => {
     test('should track sets', () => {
       cache.set('test', 'key1', 'value1');
       cache.set('test', 'key2', 'value2');
-      
+
       const stats = cache.getStats();
       expect(stats.sets).toBe(2);
     });
@@ -113,7 +113,7 @@ describe('Cache Utility', () => {
     test('should track deletes', () => {
       cache.set('test', 'key1', 'value1');
       cache.del('test', 'key1');
-      
+
       const stats = cache.getStats();
       expect(stats.deletes).toBe(1);
     });
@@ -123,7 +123,7 @@ describe('Cache Utility', () => {
       cache.get('test', 'key1'); // hit
       cache.get('test', 'key2'); // miss
       cache.get('test', 'key1'); // hit
-      
+
       const stats = cache.getStats();
       expect(stats.hitRate).toBe('66.67%');
     });
@@ -131,7 +131,7 @@ describe('Cache Utility', () => {
     test('should track cache size', () => {
       cache.set('test', 'key1', 'value1');
       cache.set('test', 'key2', 'value2');
-      
+
       const stats = cache.getStats();
       expect(stats.size).toBe(2);
     });
@@ -140,7 +140,7 @@ describe('Cache Utility', () => {
       cache.set('test', 'key1', 'value1');
       cache.get('test', 'key1');
       cache.resetStats();
-      
+
       const stats = cache.getStats();
       expect(stats.hits).toBe(0);
       expect(stats.misses).toBe(0);
@@ -156,10 +156,10 @@ describe('Cache Utility', () => {
         callCount++;
         return 'result';
       };
-      
+
       const result1 = await cache.wrap('test', 'key1', fn, 60);
       const result2 = await cache.wrap('test', 'key1', fn, 60);
-      
+
       expect(result1).toBe('result');
       expect(result2).toBe('result');
       expect(callCount).toBe(1); // Function called only once
@@ -167,18 +167,18 @@ describe('Cache Utility', () => {
 
     test('should call function on cache miss', async () => {
       const fn = jest.fn().mockResolvedValue('result');
-      
+
       await cache.wrap('test', 'key1', fn, 60);
-      
+
       expect(fn).toHaveBeenCalledTimes(1);
     });
 
     test('should not call function on cache hit', async () => {
       const fn = jest.fn().mockResolvedValue('result');
-      
+
       await cache.wrap('test', 'key1', fn, 60);
       await cache.wrap('test', 'key1', fn, 60);
-      
+
       expect(fn).toHaveBeenCalledTimes(1);
     });
   });
@@ -188,9 +188,9 @@ describe('Cache Utility', () => {
       cache.set('products', 'type:oil', 'value1');
       cache.set('products', 'type:filter', 'value2');
       cache.set('products', 'all', 'value3');
-      
+
       const invalidated = cache.invalidate('products', 'type:');
-      
+
       expect(invalidated).toBe(2);
       expect(cache.get('products', 'type:oil')).toBeNull();
       expect(cache.get('products', 'type:filter')).toBeNull();
@@ -201,9 +201,9 @@ describe('Cache Utility', () => {
       cache.set('products', 'item-1', 'value1');
       cache.set('products', 'item-2', 'value2');
       cache.set('products', 'other', 'value3');
-      
+
       const invalidated = cache.invalidate('products', /^item-/);
-      
+
       expect(invalidated).toBe(2);
       expect(cache.get('products', 'item-1')).toBeNull();
       expect(cache.get('products', 'item-2')).toBeNull();
@@ -237,13 +237,13 @@ describe('Cache Utility', () => {
       cache.set('ns1', 'key1', 'value1');
       cache.set('ns2', 'key2', 'value2');
       cache.set('ns3', 'key3', 'value3');
-      
+
       cache.clearAll();
-      
+
       expect(cache.get('ns1', 'key1')).toBeNull();
       expect(cache.get('ns2', 'key2')).toBeNull();
       expect(cache.get('ns3', 'key3')).toBeNull();
-      
+
       const stats = cache.getStats();
       expect(stats.size).toBe(0);
     });
