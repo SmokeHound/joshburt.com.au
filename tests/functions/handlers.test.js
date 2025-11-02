@@ -130,8 +130,9 @@ function makeEvent({ path='/.netlify/functions/auth', httpMethod='POST', query={
     console.log('✅ users list with token ok');
 
     console.log('🎉 Direct handler tests PASSED');
-    process.exitCode = 0;
+    process.exit(0);
   } catch (e) {
-    console.error('❌ Direct handler tests exception', e); process.exitCode=1;
+    console.error('❌ Direct handler tests exception', e);
+    process.exit(1);
   }
 })();
