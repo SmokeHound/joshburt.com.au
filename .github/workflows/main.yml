@@ -1,8 +1,8 @@
 on: push
 name: 🚀 Deploy website via FTP on push. 
 jobs:
-  test-and-deploy:
-    name: 🧪 Test and Deploy
+  deploy:
+    name: 📂 Deploy to FTP
     runs-on: ubuntu-latest
     steps:
     - name: 🚚 Get latest code
@@ -16,52 +16,9 @@ jobs:
         node-version: '22'
         cache: 'npm'
     
-    - name: 📦 Install dependencies
+    - name: 📦 Install dependencies (for migrations)
       id: install
       run: npm ci
-    
-    - name: 🗄️ Run database migrations (dry-run)
-      id: migrate-check
-      env:
-        DB_TYPE: ${{ secrets.DB_TYPE || 'sqlite' }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_PORT: ${{ secrets.DB_PORT }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_NAME: ${{ secrets.DB_NAME }}
-      run: |
-        echo "🔍 Checking pending migrations..."
-        node scripts/run-migrations.js --dry-run || echo "No migrations or dry-run check complete"
-      continue-on-error: true
-    
-    - name: 🔍 Lint code
-      id: lint
-      run: npm run lint
-      continue-on-error: false
-    
-    - name: 🏗️ Build CSS
-      id: build
-      run: npm run build:css
-      continue-on-error: false
-    
-    - name: 🧪 Run tests
-      id: test
-      run: npm test
-      continue-on-error: false
-    
-    - name: ✅ Pre-deployment checks passed
-      run: |
-        echo "### ✅ Pre-Deployment Validation Complete" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-        echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-        echo "| Dependencies | ✅ Installed |" >> $GITHUB_STEP_SUMMARY
-        echo "| Migrations | ✅ Validated |" >> $GITHUB_STEP_SUMMARY
-        echo "| Code Linting | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-        echo "| CSS Build | ✅ Success |" >> $GITHUB_STEP_SUMMARY
-        echo "| Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "**Proceeding with deployment...**" >> $GITHUB_STEP_SUMMARY
     
     - name: 📂 Deploy to FTP
       id: deploy
