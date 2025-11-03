@@ -16,7 +16,7 @@ jobs:
         node-version: '22'
         cache: 'npm'
     
-    - name: 📦 Install dependencies (for migrations)
+    - name: 📦 Install dependencies
       id: install
       run: npm ci
     
