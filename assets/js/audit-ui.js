@@ -2,7 +2,7 @@
  * Modular Audit Log UI
  * Responsibilities:
  *  - Lazy initialization (runs only if #audit-log-root present)
- *  - Fetch audit logs with server pagination (page,pageSize,q,action,startDate,endDate)
+ *  - Fetch audit logs with server pagination (page,pageSize,q,userId,startDate,endDate)
  *  - Client-side debounce for search input
  *  - Render table + pagination controls + summary counts
  *  - Export (JSON/CSV) + Clear (all or olderThanDays)
