@@ -4,6 +4,8 @@ jobs:
   deploy:
     name: 📂 Deploy to FTP
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # Required for checkout action
     steps:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
