@@ -34,7 +34,7 @@ module.exports = defineConfig([
     },
     extends: compat.extends('eslint:recommended'),
     rules: {
-      'indent': ['error', 2],
+      'indent': ['warn', 2],
       'linebreak-style': ['off', 'unix'],
       'quotes': ['error', 'single'],
       'semi': ['error', 'always'],
