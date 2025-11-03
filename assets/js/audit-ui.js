@@ -8,18 +8,16 @@
  *  - Export (JSON/CSV) + Clear (all or olderThanDays)
  *  - Graceful fallback if API fails
  */
-(function() {
+(function () {
   const ROOT_ID = 'audit-log-root';
-  if (!document.getElementById(ROOT_ID)) {return;} // Lazy mount
+  if (!document.getElementById(ROOT_ID)) {
+    return;
+  } // Lazy mount
 
   const state = {
     page: 1,
     pageSize: 25,
     q: '',
-    action: '',
-    method: '',
-    path: '',
-    requestId: '',
     userId: '',
     startDate: '',
     endDate: '',
@@ -34,16 +32,14 @@
   // Create base structure if none
   function ensureStructure() {
     const root = document.getElementById(ROOT_ID);
-    if (root.dataset.initialized) {return root;}
+    if (root.dataset.initialized) {
+      return root;
+    }
     root.innerHTML = `
       <div class="widget-primary rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-4">
         <div class="flex flex-col md:flex-row gap-2 md:items-end md:justify-between">
           <div class="flex flex-wrap gap-2 items-center">
             <input id="audit-search" placeholder="Search..." class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
-            <input id="audit-action" placeholder="Action (e.g. auth.login_success)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
-            <input id="audit-method" placeholder="Method (GET/POST)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-28" />
-            <input id="audit-path" placeholder="Path (/..../orders)" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-48" />
-            <input id="audit-request-id" placeholder="Request ID" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-48" />
             <input id="audit-user-id" placeholder="User ID" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-32" />
             <input type="date" id="audit-start" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
             <input type="date" id="audit-end" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
@@ -89,7 +85,11 @@
   }
 
   function formatDate(iso) {
-    try { return new Date(iso).toLocaleString(); } catch (e) { return iso || ''; }
+    try {
+      return new Date(iso).toLocaleString();
+    } catch (e) {
+      return iso || '';
+    }
   }
 
   async function fetchLogs() {
@@ -99,14 +99,18 @@
     const params = new URLSearchParams();
     params.set('page', state.page);
     params.set('pageSize', state.pageSize);
-    if (state.q) {params.set('q', state.q);}
-    if (state.action) {params.set('action', state.action);}
-    if (state.method) {params.set('method', state.method);}
-    if (state.path) {params.set('path', state.path);}
-    if (state.requestId) {params.set('requestId', state.requestId);}
-    if (state.userId) {params.set('userId', state.userId);}
-    if (state.startDate) {params.set('startDate', state.startDate);}
-    if (state.endDate) {params.set('endDate', state.endDate);}
+    if (state.q) {
+      params.set('q', state.q);
+    }
+    if (state.userId) {
+      params.set('userId', state.userId);
+    }
+    if (state.startDate) {
+      params.set('startDate', state.startDate);
+    }
+    if (state.endDate) {
+      params.set('endDate', state.endDate);
+    }
     try {
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
       const url = `${FN_BASE}/audit-logs?` + params.toString();
@@ -141,105 +145,130 @@
 
   function renderLoading() {
     const tbody = document.getElementById('audit-tbody');
-    if (tbody) {tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Loading...</td></tr>';}
+    if (tbody) {
+      tbody.innerHTML =
+        '<tr><td colspan="5" class="p-4 text-center text-gray-500">Loading...</td></tr>';
+    }
   }
 
   function renderTable() {
     const tbody = document.getElementById('audit-tbody');
-    if (!tbody) {return;}
+    if (!tbody) {
+      return;
+    }
     if (state.error) {
       tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">${escapeHtml(state.error)}</td></tr>`;
       return;
     }
     if (!state.data.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No audit log entries</td></tr>';
+      tbody.innerHTML =
+        '<tr><td colspan="5" class="p-4 text-center text-gray-500">No audit log entries</td></tr>';
       return;
     }
-    tbody.innerHTML = state.data.map((row, idx) => {
-      const created = formatDate(row.created_at || row.timestamp);
-      const uid = row.user_id || row.userId || '';
-      const mapped = (uid && state.usersById[String(uid)]) || null;
-      const disp = mapped ? `${mapped} (${uid})` : (uid || '');
-      const userHtml = uid
-        ? `<a href="profile.html?userId=${encodeURIComponent(String(uid))}" class="text-blue-400 hover:underline">${escapeHtml(disp)}</a>`
-        : '';
-      const action = row.action || '';
-      const ip = row.ip_address || row.ip || '';
+    tbody.innerHTML = state.data
+      .map((row, idx) => {
+        const created = formatDate(row.created_at || row.timestamp);
+        const uid = row.user_id || row.userId || '';
+        const mapped = (uid && state.usersById[String(uid)]) || null;
+        const disp = mapped ? `${mapped} (${uid})` : uid || '';
+        const userHtml = uid
+          ? `<a href="profile.html?userId=${encodeURIComponent(String(uid))}" class="text-blue-400 hover:underline">${escapeHtml(disp)}</a>`
+          : '';
+        const action = row.action || '';
+        const ip = row.ip_address || row.ip || '';
 
-      // Build details view: parse JSON if possible
-      let raw = row.details;
-      let parsed = null;
-      if (raw && typeof raw === 'string') {
-        try { parsed = JSON.parse(raw); } catch (_) { /* not JSON */ }
-      } else if (raw && typeof raw === 'object') {
-        parsed = raw;
-        raw = JSON.stringify(raw);
-      }
-
-      // Summarize chips
-      let chipsHtml = '';
-      if (parsed) {
-        const m = parsed.method ? String(parsed.method).toUpperCase() : '';
-        const p = parsed.path || '';
-        const rid = parsed.requestId || '';
-        if (m) {chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(m)}</span>`;}
-        if (p) {chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(p.length>40 ? p.slice(0,37)+'…' : p)}</span>`;}
-        if (rid) {chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(String(rid).slice(0,12))}</span>`;}
-      }
-
-      // Collapsible pretty JSON or raw text
-      let pretty = '';
-      if (parsed) {
-        pretty = JSON.stringify(parsed, null, 2);
-      } else if (typeof raw === 'string') {
-        pretty = raw;
-      } else {
-        pretty = '';
-      }
-
-      const tlen = Math.max(40, Math.min(1000, parseInt(state.truncateLen) || 120));
-      const truncated = (pretty && pretty.length > tlen) ? (pretty.slice(0, tlen - 3) + '…') : pretty;
-
-      // Create formatted preview with each parameter on a separate line
-      let formattedPreview = '';
-      if (parsed && typeof parsed === 'object') {
-        const MAX_PREVIEW_KEYS = 5; // Show first 5 parameters in preview
-        const MAX_VALUE_LENGTH = 50; // Max length for individual parameter values
-        const keys = Object.keys(parsed);
-        const previewKeys = keys.slice(0, MAX_PREVIEW_KEYS);
-        formattedPreview = previewKeys.map(key => {
-          const val = parsed[key];
-          let valStr = '';
-          if (val === null || val === undefined) {
-            valStr = String(val);
-          } else if (typeof val === 'object') {
-            valStr = JSON.stringify(val);
-            if (valStr.length > MAX_VALUE_LENGTH) {valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';}
-          } else {
-            valStr = String(val);
-            if (valStr.length > MAX_VALUE_LENGTH) {valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';}
+        // Build details view: parse JSON if possible
+        let raw = row.details;
+        let parsed = null;
+        if (raw && typeof raw === 'string') {
+          try {
+            parsed = JSON.parse(raw);
+          } catch (_) {
+            /* not JSON */
           }
-          return `${key}: ${valStr}`;
-        }).join('\n');
-        if (keys.length > MAX_PREVIEW_KEYS) {
-          formattedPreview += `\n... (${keys.length - MAX_PREVIEW_KEYS} more)`;
+        } else if (raw && typeof raw === 'object') {
+          parsed = raw;
+          raw = JSON.stringify(raw);
         }
-      } else {
-        formattedPreview = truncated;
-      }
-      const baseId = `audit-${idx}`;
-      const boxId = `${baseId}-box`;
-      const prePrettyId = `${baseId}-pretty`;
-      const preRawId = `${baseId}-raw`;
 
-      return `<tr>
+        // Summarize chips
+        let chipsHtml = '';
+        if (parsed) {
+          const m = parsed.method ? String(parsed.method).toUpperCase() : '';
+          const p = parsed.path || '';
+          const rid = parsed.requestId || '';
+          if (m) {
+            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(m)}</span>`;
+          }
+          if (p) {
+            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(p.length > 40 ? p.slice(0, 37) + '…' : p)}</span>`;
+          }
+          if (rid) {
+            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(String(rid).slice(0, 12))}</span>`;
+          }
+        }
+
+        // Collapsible pretty JSON or raw text
+        let pretty = '';
+        if (parsed) {
+          pretty = JSON.stringify(parsed, null, 2);
+        } else if (typeof raw === 'string') {
+          pretty = raw;
+        } else {
+          pretty = '';
+        }
+
+        const tlen = Math.max(40, Math.min(1000, parseInt(state.truncateLen) || 120));
+        const truncated = pretty && pretty.length > tlen ? pretty.slice(0, tlen - 3) + '…' : pretty;
+
+        // Create formatted preview with each parameter on a separate line
+        let formattedPreview = '';
+        if (parsed && typeof parsed === 'object') {
+          const MAX_PREVIEW_KEYS = 5; // Show first 5 parameters in preview
+          const MAX_VALUE_LENGTH = 50; // Max length for individual parameter values
+          const keys = Object.keys(parsed);
+          const previewKeys = keys.slice(0, MAX_PREVIEW_KEYS);
+          formattedPreview = previewKeys
+            .map(key => {
+              const val = parsed[key];
+              let valStr = '';
+              if (val === null || val === undefined) {
+                valStr = String(val);
+              } else if (typeof val === 'object') {
+                valStr = JSON.stringify(val);
+                if (valStr.length > MAX_VALUE_LENGTH) {
+                  valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
+                }
+              } else {
+                valStr = String(val);
+                if (valStr.length > MAX_VALUE_LENGTH) {
+                  valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
+                }
+              }
+              return `${key}: ${valStr}`;
+            })
+            .join('\n');
+          if (keys.length > MAX_PREVIEW_KEYS) {
+            formattedPreview += `\n... (${keys.length - MAX_PREVIEW_KEYS} more)`;
+          }
+        } else {
+          formattedPreview = truncated;
+        }
+        const baseId = `audit-${idx}`;
+        const boxId = `${baseId}-box`;
+        const prePrettyId = `${baseId}-pretty`;
+        const preRawId = `${baseId}-raw`;
+
+        return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
   <td class="p-2 align-top">${userHtml}</td>
         <td class="p-2 align-top font-medium">${action}</td>
         <td class="p-2 align-top max-w-sm break-words">
           ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
           <div class="text-xs text-gray-300 dark:text-gray-400 break-words whitespace-pre-wrap">${escapeHtml(formattedPreview || '')}</div>
-          ${(pretty || raw) ? `
+          ${
+            pretty || raw
+              ? `
           <div class="mt-1 flex gap-2">
             <button class="audit-toggle px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${boxId}">View</button>
             ${parsed ? `<button class="audit-mode px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}" data-mode="pretty">Raw</button>` : ''}
@@ -249,20 +278,29 @@
             ${parsed ? `<pre id="${prePrettyId}" class="mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(pretty)}</pre>` : ''}
             <pre id="${preRawId}" class="${parsed ? 'hidden ' : ''}mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(raw || '')}</pre>
           </div>
-          ` : ''}
+          `
+              : ''
+          }
         </td>
         <td class="p-2 align-top whitespace-nowrap text-xs">${ip}</td>
       </tr>`;
-    }).join('');
+      })
+      .join('');
 
     // Row actions: toggle/copy via event delegation
-    tbody.onclick = (e) => {
+    tbody.onclick = e => {
       const t = e.target;
       if (t && t.classList.contains('audit-toggle')) {
         const boxId2 = t.getAttribute('data-target');
         const box = document.getElementById(boxId2);
         if (box) {
-          if (box.classList.contains('hidden')) { box.classList.remove('hidden'); t.textContent = 'Hide'; } else { box.classList.add('hidden'); t.textContent = 'View'; }
+          if (box.classList.contains('hidden')) {
+            box.classList.remove('hidden');
+            t.textContent = 'Hide';
+          } else {
+            box.classList.add('hidden');
+            t.textContent = 'View';
+          }
         }
       } else if (t && t.classList.contains('audit-mode')) {
         const base = t.getAttribute('data-base');
@@ -291,7 +329,7 @@
           const preP = document.getElementById(`${base}-pretty`);
           const preR = document.getElementById(`${base}-raw`);
           const visible = preR && !preR.classList.contains('hidden') ? preR : preP;
-          text = visible ? (visible.textContent || '') : '';
+          text = visible ? visible.textContent || '' : '';
         }
         if (text) {
           if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -299,8 +337,14 @@
           } else {
             // Fallback
             const ta = document.createElement('textarea');
-            ta.value = text; document.body.appendChild(ta); ta.select();
-            try { document.execCommand('copy'); } catch (err) { /* no-op */ }
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              document.execCommand('copy');
+            } catch (err) {
+              /* no-op */
+            }
             document.body.removeChild(ta);
           }
         }
@@ -310,8 +354,13 @@
 
   function renderPagination() {
     const el = document.getElementById('audit-pagination');
-    if (!el) {return;}
-    if (state.totalPages <= 1) { el.innerHTML = `<div class="text-xs text-gray-400">Showing ${state.data.length} of ${state.total}</div>`; return; }
+    if (!el) {
+      return;
+    }
+    if (state.totalPages <= 1) {
+      el.innerHTML = `<div class="text-xs text-gray-400">Showing ${state.data.length} of ${state.total}</div>`;
+      return;
+    }
     const prevDisabled = state.page <= 1 ? 'opacity-50 pointer-events-none' : '';
     const nextDisabled = state.page >= state.totalPages ? 'opacity-50 pointer-events-none' : '';
     el.innerHTML = `
@@ -323,48 +372,84 @@
       <div class="text-xs text-gray-400">Total: ${state.total}</div>`;
     const prevBtn = document.getElementById('audit-prev');
     const nextBtn = document.getElementById('audit-next');
-    if (prevBtn) {prevBtn.onclick = () => { if (state.page>1) { state.page--; fetchLogs(); } };}
-    if (nextBtn) {nextBtn.onclick = () => { if (state.page<state.totalPages) { state.page++; fetchLogs(); } };}
+    if (prevBtn) {
+      prevBtn.onclick = () => {
+        if (state.page > 1) {
+          state.page--;
+          fetchLogs();
+        }
+      };
+    }
+    if (nextBtn) {
+      nextBtn.onclick = () => {
+        if (state.page < state.totalPages) {
+          state.page++;
+          fetchLogs();
+        }
+      };
+    }
   }
 
   function renderSummary() {
     const el = document.getElementById('audit-summary');
-    if (!el) {return;}
+    if (!el) {
+      return;
+    }
     el.textContent = `Showing ${state.data.length} of ${state.total} total audit events`;
   }
 
   function exportData(format) {
     const params = new URLSearchParams();
-    if (format === 'csv') {params.set('format', 'csv');}
+    if (format === 'csv') {
+      params.set('format', 'csv');
+    }
     // Export large subset (no pagination) - respect search filters
-    if (state.q) {params.set('q', state.q);}
-    if (state.action) {params.set('action', state.action);}
-    if (state.method) {params.set('method', state.method);}
-    if (state.path) {params.set('path', state.path);}
-    if (state.requestId) {params.set('requestId', state.requestId);}
-    if (state.userId) {params.set('userId', state.userId);}
-    if (state.startDate) {params.set('startDate', state.startDate);}
-    if (state.endDate) {params.set('endDate', state.endDate);}
+    if (state.q) {
+      params.set('q', state.q);
+    }
+    if (state.userId) {
+      params.set('userId', state.userId);
+    }
+    if (state.startDate) {
+      params.set('startDate', state.startDate);
+    }
+    if (state.endDate) {
+      params.set('endDate', state.endDate);
+    }
     params.set('limit', 1000);
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
     const url = `${FN_BASE}/audit-logs?` + params.toString();
-    (window.authFetch ? window.authFetch(url) : fetch(url)).then(async res => {
-      if (!res.ok) {throw new Error('Failed export');}
-      if (format === 'csv') {
-        const text = await res.text();
-        downloadBlob(new Blob([text], { type: 'text/csv' }), 'audit-log.csv');
-      } else {
-        const json = await res.json();
-        downloadBlob(new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' }), 'audit-log.json');
-      }
-    }).catch(() => {/* ignore */});
+    (window.authFetch ? window.authFetch(url) : fetch(url))
+      .then(async res => {
+        if (!res.ok) {
+          throw new Error('Failed export');
+        }
+        if (format === 'csv') {
+          const text = await res.text();
+          downloadBlob(new Blob([text], { type: 'text/csv' }), 'audit-log.csv');
+        } else {
+          const json = await res.json();
+          downloadBlob(
+            new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' }),
+            'audit-log.json'
+          );
+        }
+      })
+      .catch(() => {
+        /* ignore */
+      });
   }
 
   function clearLogs() {
-    if (!confirm('Clear all audit logs? This cannot be undone.')) {return;}
+    if (!confirm('Clear all audit logs? This cannot be undone.')) {
+      return;
+    }
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
     const url = `${FN_BASE}/audit-logs`;
-    (window.authFetch ? window.authFetch(url, { method: 'DELETE' }) : fetch(url, { method: 'DELETE' }))
+    (window.authFetch
+      ? window.authFetch(url, { method: 'DELETE' })
+      : fetch(url, { method: 'DELETE' })
+    )
       .then(() => fetchLogs())
       .catch(() => {});
   }
@@ -372,30 +457,53 @@
   function downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   function escapeHtml(input) {
     try {
-      if (input === null || input === undefined) {return '';}
+      if (input === null || input === undefined) {
+        return '';
+      }
       let str = input;
       // If it's an object, stringify; otherwise coerce to string
       if (typeof str === 'object') {
-        try { str = JSON.stringify(str); } catch (_) { str = String(str); }
+        try {
+          str = JSON.stringify(str);
+        } catch (_) {
+          str = String(str);
+        }
       } else if (typeof str !== 'string') {
         str = String(str);
       }
-      return str.replace(/[&<>"]/g, function(c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]); });
+      return str.replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
     } catch (_) {
       // Fallback to empty string on any unexpected error
       return '';
     }
   }
 
-  function debounce(fn, ms) { let t; return (...args) => { clearTimeout(t); t=setTimeout(() => fn(...args), ms); }; }
+  function debounce(fn, ms) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), ms);
+    };
+  }
 
   function formatYMD(d) {
-    try { return d.toISOString().slice(0,10); } catch (e) { return ''; }
+    try {
+      return d.toISOString().slice(0, 10);
+    } catch (e) {
+      return '';
+    }
   }
 
   async function fetchUsersMap() {
@@ -411,26 +519,28 @@
         const headers = token ? { Authorization: 'Bearer ' + token } : {};
         res = await fetch(url, { headers });
       }
-      if (!res.ok) {return;}
+      if (!res.ok) {
+        return;
+      }
       const json = await res.json();
       const arr = (json && json.users) || [];
       const map = {};
       arr.forEach(u => {
         const id = String(u.id || u.user_id || u.uid || '');
-        if (!id) {return;}
+        if (!id) {
+          return;
+        }
         map[id] = u.username || u.name || `User #${id}`;
       });
       state.usersById = map;
       renderTable(); // refresh names in current page
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
   }
 
   function wireEvents() {
     const search = document.getElementById('audit-search');
-    const action = document.getElementById('audit-action');
-    const method = document.getElementById('audit-method');
-    const path = document.getElementById('audit-path');
-    const requestId = document.getElementById('audit-request-id');
     const userId = document.getElementById('audit-user-id');
     const truncate = document.getElementById('audit-truncate');
     const start = document.getElementById('audit-start');
@@ -444,48 +554,121 @@
     const expCsv = document.getElementById('audit-export-csv');
     const clearBtn = document.getElementById('audit-clear');
 
-    if (search) {search.addEventListener('input', debounce(e => { state.q = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
-    if (action) {action.addEventListener('input', debounce(e => { state.action = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
-    if (method) {method.addEventListener('input', debounce(e => { state.method = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
-    if (path) {path.addEventListener('input', debounce(e => { state.path = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
-    if (requestId) {requestId.addEventListener('input', debounce(e => { state.requestId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
-    if (userId) {userId.addEventListener('input', debounce(e => { state.userId = e.target.value.trim(); state.page=1; fetchLogs(); }, 300));}
+    if (search) {
+      search.addEventListener(
+        'input',
+        debounce(e => {
+          state.q = e.target.value.trim();
+          state.page = 1;
+          fetchLogs();
+        }, 300)
+      );
+    }
+    if (userId) {
+      userId.addEventListener(
+        'input',
+        debounce(e => {
+          state.userId = e.target.value.trim();
+          state.page = 1;
+          fetchLogs();
+        }, 300)
+      );
+    }
     if (truncate) {
       // Initialize from state/localStorage
       try {
         const saved = localStorage.getItem('audit.truncateLen');
-        if (saved) {state.truncateLen = parseInt(saved) || state.truncateLen;}
-      } catch (err) { /* no-op */ }
-      truncate.value = state.truncateLen;
-      truncate.addEventListener('input', debounce(e => {
-        const v = parseInt(e.target.value);
-        if (!isNaN(v)) {
-          state.truncateLen = Math.max(40, Math.min(1000, v));
-          try { localStorage.setItem('audit.truncateLen', String(state.truncateLen)); } catch (err) { /* no-op */ }
-          renderTable(); // no refetch needed
+        if (saved) {
+          state.truncateLen = parseInt(saved) || state.truncateLen;
         }
-      }, 200));
+      } catch (err) {
+        /* no-op */
+      }
+      truncate.value = state.truncateLen;
+      truncate.addEventListener(
+        'input',
+        debounce(e => {
+          const v = parseInt(e.target.value);
+          if (!isNaN(v)) {
+            state.truncateLen = Math.max(40, Math.min(1000, v));
+            try {
+              localStorage.setItem('audit.truncateLen', String(state.truncateLen));
+            } catch (err) {
+              /* no-op */
+            }
+            renderTable(); // no refetch needed
+          }
+        }, 200)
+      );
     }
-    if (start) {start.addEventListener('change', e => { state.startDate = e.target.value; state.page=1; fetchLogs(); });}
-    if (end) {end.addEventListener('change', e => { state.endDate = e.target.value; state.page=1; fetchLogs(); });}
-    if (pageSize) {pageSize.addEventListener('change', e => { state.pageSize = parseInt(e.target.value); state.page=1; fetchLogs(); });}
+    if (start) {
+      start.addEventListener('change', e => {
+        state.startDate = e.target.value;
+        state.page = 1;
+        fetchLogs();
+      });
+    }
+    if (end) {
+      end.addEventListener('change', e => {
+        state.endDate = e.target.value;
+        state.page = 1;
+        fetchLogs();
+      });
+    }
+    if (pageSize) {
+      pageSize.addEventListener('change', e => {
+        state.pageSize = parseInt(e.target.value);
+        state.page = 1;
+        fetchLogs();
+      });
+    }
     function setRangeDays(days) {
       const endD = new Date();
       const startD = new Date();
       startD.setDate(endD.getDate() - (days - 1));
       state.startDate = formatYMD(startD);
       state.endDate = formatYMD(endD);
-      if (start) {start.value = state.startDate;}
-      if (end) {end.value = state.endDate;}
-      state.page=1; fetchLogs();
+      if (start) {
+        start.value = state.startDate;
+      }
+      if (end) {
+        end.value = state.endDate;
+      }
+      state.page = 1;
+      fetchLogs();
     }
-    if (chip24h) {chip24h.addEventListener('click', () => setRangeDays(1));}
-    if (chip7d) {chip7d.addEventListener('click', () => setRangeDays(7));}
-    if (chip30d) {chip30d.addEventListener('click', () => setRangeDays(30));}
-    if (chipClear) {chipClear.addEventListener('click', () => { state.startDate=''; state.endDate=''; if (start) {start.value='';} if (end) {end.value='';} state.page=1; fetchLogs(); });}
-    if (expJson) {expJson.addEventListener('click', () => exportData('json'));}
-    if (expCsv) {expCsv.addEventListener('click', () => exportData('csv'));}
-    if (clearBtn) {clearBtn.addEventListener('click', clearLogs);}
+    if (chip24h) {
+      chip24h.addEventListener('click', () => setRangeDays(1));
+    }
+    if (chip7d) {
+      chip7d.addEventListener('click', () => setRangeDays(7));
+    }
+    if (chip30d) {
+      chip30d.addEventListener('click', () => setRangeDays(30));
+    }
+    if (chipClear) {
+      chipClear.addEventListener('click', () => {
+        state.startDate = '';
+        state.endDate = '';
+        if (start) {
+          start.value = '';
+        }
+        if (end) {
+          end.value = '';
+        }
+        state.page = 1;
+        fetchLogs();
+      });
+    }
+    if (expJson) {
+      expJson.addEventListener('click', () => exportData('json'));
+    }
+    if (expCsv) {
+      expCsv.addEventListener('click', () => exportData('csv'));
+    }
+    if (clearBtn) {
+      clearBtn.addEventListener('click', clearLogs);
+    }
   }
 
   // Initialize
