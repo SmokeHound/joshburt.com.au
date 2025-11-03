@@ -386,6 +386,7 @@ temp/
 *.swp
 *.swo
 *~
+.vs/
 
 # OS generated files
 .DS_Store
