@@ -191,8 +191,6 @@
           raw = JSON.stringify(raw);
         }
 
-        // Chips removed to declutter interface
-        const chipsHtml = '';
 
         // Collapsible pretty JSON or raw text
         let pretty = '';
@@ -250,7 +248,6 @@
           <td class="p-2 align-top">${userHtml}</td>
           <td class="p-2 align-top font-medium">${action}</td>
           <td class="p-2 align-top max-w-sm break-words">
-            ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
             <div class="text-xs text-gray-300 dark:text-gray-400 break-words whitespace-pre-wrap">${escapeHtml(formattedPreview || '')}</div>
             ${
               pretty || raw
