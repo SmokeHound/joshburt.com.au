@@ -191,22 +191,8 @@
           raw = JSON.stringify(raw);
         }
 
-        // Summarize chips
-        let chipsHtml = '';
-        if (parsed) {
-          const m = parsed.method ? String(parsed.method).toUpperCase() : '';
-          const p = parsed.path || '';
-          const rid = parsed.requestId || '';
-          if (m) {
-            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(m)}</span>`;
-          }
-          if (p) {
-            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(p.length > 40 ? p.slice(0, 37) + '…' : p)}</span>`;
-          }
-          if (rid) {
-            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(String(rid).slice(0, 12))}</span>`;
-          }
-        }
+        // Chips removed to declutter interface
+        const chipsHtml = '';
 
         // Collapsible pretty JSON or raw text
         let pretty = '';
@@ -260,30 +246,30 @@
         const preRawId = `${baseId}-raw`;
 
         return `<tr>
-        <td class="p-2 align-top whitespace-nowrap">${created}</td>
-  <td class="p-2 align-top">${userHtml}</td>
-        <td class="p-2 align-top font-medium">${action}</td>
-        <td class="p-2 align-top max-w-sm break-words">
-          ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
-          <div class="text-xs text-gray-300 dark:text-gray-400 break-words whitespace-pre-wrap">${escapeHtml(formattedPreview || '')}</div>
-          ${
-            pretty || raw
-              ? `
-          <div class="mt-1 flex gap-2">
-            <button class="audit-toggle px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${boxId}">View</button>
-            ${parsed ? `<button class="audit-mode px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}" data-mode="pretty">Raw</button>` : ''}
-            <button class="audit-copy px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}">Copy</button>
-          </div>
-          <div id="${boxId}" class="hidden mt-2">
-            ${parsed ? `<pre id="${prePrettyId}" class="mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(pretty)}</pre>` : ''}
-            <pre id="${preRawId}" class="${parsed ? 'hidden ' : ''}mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(raw || '')}</pre>
-          </div>
-          `
-              : ''
-          }
-        </td>
-        <td class="p-2 align-top whitespace-nowrap text-xs">${ip}</td>
-      </tr>`;
+          <td class="p-2 align-top whitespace-nowrap">${created}</td>
+          <td class="p-2 align-top">${userHtml}</td>
+          <td class="p-2 align-top font-medium">${action}</td>
+          <td class="p-2 align-top max-w-sm break-words">
+            ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
+            <div class="text-xs text-gray-300 dark:text-gray-400 break-words whitespace-pre-wrap">${escapeHtml(formattedPreview || '')}</div>
+            ${
+              pretty || raw
+                ? `
+            <div class="mt-1 flex gap-2">
+              <button class="audit-toggle px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${boxId}">View</button>
+              ${parsed ? `<button class="audit-mode px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}" data-mode="pretty">Raw</button>` : ''}
+              <button class="audit-copy px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}">Copy</button>
+            </div>
+            <div id="${boxId}" class="hidden mt-2">
+              ${parsed ? `<pre id="${prePrettyId}" class="mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(pretty)}</pre>` : ''}
+              <pre id="${preRawId}" class="${parsed ? 'hidden ' : ''}mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(raw || '')}</pre>
+            </div>
+            `
+                : ''
+            }
+          </td>
+          <td class="p-2 align-top whitespace-nowrap text-xs">${ip}</td>
+        </tr>`;
       })
       .join('');
 
