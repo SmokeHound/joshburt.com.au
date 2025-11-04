@@ -1,5 +1,5 @@
 // Unit tests for shared navigation component
-const { loadHTMLFile, simulateClick } = require('../utils/dom-helpers');
+const { loadHTMLFile } = require('../utils/dom-helpers');
 
 describe('Shared Navigation Component', () => {
   let navHTML;
@@ -91,5 +91,12 @@ describe('Shared Navigation Component', () => {
     expect(nav).toBeTruthy();
     // ARIA role or implicit landmark
     expect(nav.getAttribute('role') === 'navigation' || nav.tagName === 'NAV').toBeTruthy();
+  });
+
+  test('should not include skip to content link', () => {
+    const skip = document.querySelector('.skip-link');
+    expect(skip).toBeNull();
+    const anchor = document.querySelector('a[href="#main-content"]');
+    expect(anchor).toBeNull();
   });
 });

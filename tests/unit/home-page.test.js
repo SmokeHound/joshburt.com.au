@@ -202,4 +202,13 @@ describe('Home Page', () => {
     await waitFor(150);
     expect(toast.classList.contains('hidden')).toBe(true);
   });
+
+  test('should not include skip to content link', () => {
+    // Ensure skip link has been removed from markup
+    const skip = document.querySelector('.skip-link');
+    expect(skip).toBeNull();
+    // Also ensure there's no anchor targeting main-content
+    const anchor = document.querySelector('a[href="#main-content"]');
+    expect(anchor).toBeNull();
+  });
 });
