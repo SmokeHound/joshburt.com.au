@@ -271,11 +271,11 @@
       return;
     }
 
-  enhanceFocusManagement();
-  createAnnouncementRegion();
-  // Skip-link removed by request: do not auto-insert the skip-to-content link.
-  // addSkipLink();
-  enhanceFormAccessibility();
+    enhanceFocusManagement();
+    createAnnouncementRegion();
+    // Skip-link removed by request: do not auto-insert the skip-to-content link.
+    // addSkipLink();
+    enhanceFormAccessibility();
     enhanceButtonAccessibility();
     ensureLandmarkRoles();
     enableHeadingNavigation();
