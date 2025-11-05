@@ -92,6 +92,49 @@
     }
   }
 
+  function formatAction(action) {
+    if (!action || typeof action !== 'string') {
+      return '';
+    }
+    
+    // Trim whitespace
+    action = action.trim();
+    if (action.length === 0) {
+      return '';
+    }
+    
+    // Split on dot to get entity and action parts
+    const parts = action.split('.');
+    if (parts.length !== 2) {
+      // If not in expected format, just capitalize first letter
+      return action.charAt(0).toUpperCase() + action.slice(1);
+    }
+    
+    const [entity, verb] = parts;
+    
+    // Ensure both parts have content
+    if (!entity || !verb || entity.length === 0 || verb.length === 0) {
+      return action.charAt(0).toUpperCase() + action.slice(1);
+    }
+    
+    // Format entity name (capitalize first letter)
+    const formattedEntity = entity.charAt(0).toUpperCase() + entity.slice(1);
+    
+    // Format verb (replace underscores with spaces and capitalize)
+    const formattedVerb = verb
+      .split('_')
+      .filter(word => word.length > 0) // Filter out empty strings from double underscores
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+    
+    // If verb formatting resulted in empty string, fall back to original
+    if (formattedVerb.length === 0) {
+      return action.charAt(0).toUpperCase() + action.slice(1);
+    }
+    
+    return `${formattedEntity} ${formattedVerb}`;
+  }
+
   async function fetchLogs() {
     state.loading = true;
     state.error = null; // Clear any previous errors
@@ -175,6 +218,7 @@
           ? `<a href="profile.html?userId=${encodeURIComponent(String(uid))}" class="text-blue-400 hover:underline">${escapeHtml(disp)}</a>`
           : '';
         const action = row.action || '';
+        const formattedAction = formatAction(action);
         const ip = row.ip_address || row.ip || '';
 
         // Build details view: parse JSON if possible
@@ -262,7 +306,7 @@
         return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
   <td class="p-2 align-top">${userHtml}</td>
-        <td class="p-2 align-top font-medium">${action}</td>
+        <td class="p-2 align-top font-medium" title="${escapeHtml(action)}">${escapeHtml(formattedAction)}</td>
         <td class="p-2 align-top max-w-sm break-words">
           ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
           <div class="text-xs text-gray-300 dark:text-gray-400 break-words whitespace-pre-wrap">${escapeHtml(formattedPreview || '')}</div>
