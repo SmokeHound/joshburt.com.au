@@ -1,4 +1,7 @@
 // Admin Audit Logging System
+// See docs/AUDIT_LOGGING.md for conventions: write to `localStorage.auditLogs` and
+// dispatch `auditLogUpdated` for UI consumers. Admin loggers may write to
+// `localStorage.adminAuditLogs` but should mirror key entries into `auditLogs`.
 class AdminAuditLogger {
   constructor() {
     this.logKey = 'adminAuditLogs';
