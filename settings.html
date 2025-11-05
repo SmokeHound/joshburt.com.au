@@ -1355,20 +1355,37 @@
             };
         }
 
+    // Helper function to get authentication token
+    function getAuthToken() {
+      return (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+    }
+
     // Save settings with audit logging (to API)
     async function saveSettings() {
             const settings = getFormSettings();
             try {
                 // Fetch previous settings for audit diff
           const FN_BASE = window.FN_BASE || '/.netlify/functions';
-          const prevRes = await fetch(`${FN_BASE}/settings`);
+          const token = getAuthToken();
+          const prevRes = await fetch(`${FN_BASE}/settings`, {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
                 const previousSettings = prevRes.ok ? await prevRes.json() : {};
           const res = await fetch(`${FN_BASE}/settings`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                      'Content-Type': 'application/json',
+                      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                    },
                     body: JSON.stringify(settings)
                 });
-                if (!res.ok) throw new Error('Failed to save settings');
+                if (!res.ok) {
+                  const errorData = await res.json().catch((e) => {
+                    console.warn('Failed to parse error response:', e);
+                    return {};
+                  });
+                  throw new Error(errorData.error || `Failed to save settings (${res.status})`);
+                }
                 
                 // Clear feature flags cache after settings update
                 if (window.FeatureFlags) {
@@ -1407,7 +1424,8 @@
                   window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: settings }));
                 } catch(e) { /* ignore event dispatch errors */ }
             } catch (e) {
-                showToast('Failed to save settings', 'error');
+                console.error('Settings save error:', e);
+                showToast(`Failed to save settings: ${e.message}`, 'error');
             }
     }
 
