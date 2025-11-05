@@ -318,7 +318,7 @@
         } else {
           formattedPreview = truncated;
         }
-    // baseId removed—modal will source content from state.data by index
+        // baseId removed—modal will source content from state.data by index
 
         return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
