@@ -160,7 +160,7 @@
 
     <script>
         // Serverless auth function base
-        const FN_AUTH = `${(window.FN_BASE || '/.netlify/functions')}/auth`;
+        const FN_AUTH = `${(window.FN_BASE || '/netlify/functions')}/auth`;
 
         // Minimal inline fallback for showToast to prevent ReferenceError before shared notifications load
         if (typeof window.showToast !== 'function') {
@@ -309,7 +309,7 @@
                     try {
                         // If config already present via shared-config, use it; otherwise fetch server config
                         if (!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID)){
-                            const FN_BASE = window.FN_BASE || '/.netlify/functions';
+                            const FN_BASE = window.FN_BASE || '/netlify/functions';
                             const res = await fetch(`${FN_BASE}/public-config`);
                             if (res.ok){
                                 const cfg = await res.json();

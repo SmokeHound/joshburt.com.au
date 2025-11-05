@@ -22,11 +22,11 @@ This document provides comprehensive documentation for all API endpoints in the 
 
 ## Overview
 
-All API endpoints are implemented as Netlify serverless functions located at `/.netlify/functions/`.
+All API endpoints are implemented as Netlify serverless functions located at `/netlify/functions/`.
 
 ### Base URL
-- **Production**: `https://joshburt.com.au/.netlify/functions/`
-- **Development**: `http://localhost:8888/.netlify/functions/`
+- **Production**: `https://joshburt.com.au/netlify/functions/`
+- **Development**: `http://localhost:8888/netlify/functions/`
 
 ### Content Type
 All endpoints accept and return `application/json` unless otherwise specified.

@@ -45,8 +45,8 @@ async function runHealthCheck() {
   console.log('🏥 Running health check for Netlify Functions...\n');
 
   const endpoints = [
-    '/.netlify/functions/health',
-    '/.netlify/functions/public-config'
+    '/netlify/functions/health',
+    '/netlify/functions/public-config'
   ];
 
   const results = [];

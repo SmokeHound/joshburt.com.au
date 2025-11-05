@@ -11,60 +11,60 @@ npm run migrate
 ```bash
 # Check product search
 curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:8888/.netlify/functions/products?search=engine&category_id=1"
+  "http://localhost:8888/netlify/functions/products?search=engine&category_id=1"
 
 # Check notifications
 curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:8888/.netlify/functions/notifications?unread_only=true"
+  "http://localhost:8888/netlify/functions/notifications?unread_only=true"
 
 # Check analytics
 curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:8888/.netlify/functions/analytics?report_type=order_summary"
+  "http://localhost:8888/netlify/functions/analytics?report_type=order_summary"
 ```
 
 ## 📡 New API Endpoints
 
 ### Product Categories
 ```
-GET    /.netlify/functions/product-categories
-POST   /.netlify/functions/product-categories
-PUT    /.netlify/functions/product-categories
-DELETE /.netlify/functions/product-categories
+GET    /netlify/functions/product-categories
+POST   /netlify/functions/product-categories
+PUT    /netlify/functions/product-categories
+DELETE /netlify/functions/product-categories
 ```
 
 ### Enhanced Products (with search & filtering)
 ```
-GET /.netlify/functions/products?search=term&category_id=1&min_price=10&max_price=100
+GET /netlify/functions/products?search=term&category_id=1&min_price=10&max_price=100
 ```
 
 ### Enhanced Orders (with status tracking & export)
 ```
-GET    /.netlify/functions/orders?status=pending&export_format=csv
-PATCH  /.netlify/functions/orders (update status)
-DELETE /.netlify/functions/orders (cancel order)
+GET    /netlify/functions/orders?status=pending&export_format=csv
+PATCH  /netlify/functions/orders (update status)
+DELETE /netlify/functions/orders (cancel order)
 ```
 
 ### Analytics
 ```
-GET /.netlify/functions/analytics?report_type=order_trends
-GET /.netlify/functions/analytics?report_type=top_products
-GET /.netlify/functions/analytics?report_type=category_breakdown
-GET /.netlify/functions/analytics?report_type=order_summary&compare_previous=true
-GET /.netlify/functions/analytics?report_type=user_activity
+GET /netlify/functions/analytics?report_type=order_trends
+GET /netlify/functions/analytics?report_type=top_products
+GET /netlify/functions/analytics?report_type=category_breakdown
+GET /netlify/functions/analytics?report_type=order_summary&compare_previous=true
+GET /netlify/functions/analytics?report_type=user_activity
 ```
 
 ### Notifications
 ```
-GET    /.netlify/functions/notifications?unread_only=true
-POST   /.netlify/functions/notifications (admin only)
-PATCH  /.netlify/functions/notifications (mark as read)
-DELETE /.netlify/functions/notifications
+GET    /netlify/functions/notifications?unread_only=true
+POST   /netlify/functions/notifications (admin only)
+PATCH  /netlify/functions/notifications (mark as read)
+DELETE /netlify/functions/notifications
 ```
 
 ### Notification Preferences
 ```
-GET /.netlify/functions/notification-preferences
-PUT /.netlify/functions/notification-preferences
+GET /netlify/functions/notification-preferences
+PUT /netlify/functions/notification-preferences
 ```
 
 ## 🎨 New UI Pages
@@ -143,7 +143,7 @@ echo $TOKEN
 
 # Test endpoint directly
 curl -H "Authorization: Bearer $TOKEN" \
-  http://localhost:8888/.netlify/functions/notifications
+  http://localhost:8888/netlify/functions/notifications
 ```
 
 ## 📊 Performance Targets

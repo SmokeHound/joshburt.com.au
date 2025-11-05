@@ -10,7 +10,7 @@ async function isServerAvailable() {
   try {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch(`${BASE}/.netlify/functions/health`, { signal: controller.signal });
+    const res = await fetch(`${BASE}/netlify/functions/health`, { signal: controller.signal });
     clearTimeout(t);
     return res.ok;
   } catch {
@@ -19,7 +19,7 @@ async function isServerAvailable() {
 }
 
 async function callAuth(action, body = {}) {
-  const res = await fetch(`${BASE}/.netlify/functions/auth?action=${encodeURIComponent(action)}`, {
+  const res = await fetch(`${BASE}/netlify/functions/auth?action=${encodeURIComponent(action)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...body, action })
@@ -30,8 +30,8 @@ async function callAuth(action, body = {}) {
 
 async function getAuditLogs(token, action = null) {
   const url = action
-    ? `${BASE}/.netlify/functions/audit-logs?action=${encodeURIComponent(action)}&limit=10`
-    : `${BASE}/.netlify/functions/audit-logs?limit=10`;
+    ? `${BASE}/netlify/functions/audit-logs?action=${encodeURIComponent(action)}&limit=10`
+    : `${BASE}/netlify/functions/audit-logs?limit=10`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` }
   });

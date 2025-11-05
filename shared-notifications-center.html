@@ -192,7 +192,7 @@
   // Mark all as read
   markAllReadBtn.addEventListener('click', async () => {
     try {
-      const response = await fetch('/.netlify/functions/notifications', {
+      const response = await fetch('/netlify/functions/notifications', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -212,7 +212,7 @@
   // Clear read notifications
   clearReadBtn.addEventListener('click', async () => {
     try {
-      const response = await fetch('/.netlify/functions/notifications', {
+      const response = await fetch('/netlify/functions/notifications', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -237,7 +237,7 @@
   // Load notifications
   async function loadNotifications() {
     try {
-      const response = await fetch('/.netlify/functions/notifications?limit=20', {
+      const response = await fetch('/netlify/functions/notifications?limit=20', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -306,7 +306,7 @@
 
     // Mark as read
     try {
-      await fetch('/.netlify/functions/notifications', {
+      await fetch('/netlify/functions/notifications', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

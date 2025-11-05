@@ -16,11 +16,11 @@
   function getCandidateBases() {
     const bases = [];
     if (window.FN_BASE) {bases.push(String(window.FN_BASE));}
-    bases.push('/.netlify/functions');
+  bases.push('/netlify/functions');
     const host = (location && location.hostname) || '';
     if (/localhost|127\.0\.0\.1/.test(host)) {
-      bases.push('http://localhost:8888/.netlify/functions');
-      bases.push('http://127.0.0.1:8888/.netlify/functions');
+  bases.push('http://localhost:8888/netlify/functions');
+  bases.push('http://127.0.0.1:8888/netlify/functions');
     }
     return Array.from(new Set(bases));
   }

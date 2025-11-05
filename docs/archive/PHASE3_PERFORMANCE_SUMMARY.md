@@ -121,13 +121,13 @@ cache.getStats()                           // Get cache statistics
 Implemented caching on the following endpoints:
 
 #### 1. Public Config Endpoint
-- **Endpoint**: `/.netlify/functions/public-config`
+- **Endpoint**: `/netlify/functions/public-config`
 - **Cache TTL**: 5 minutes (300 seconds)
 - **Cache Key**: `public-config:auth-config`
 - **Invalidation**: None (static config)
 
 #### 2. Products Endpoint
-- **Endpoint**: `/.netlify/functions/products`
+- **Endpoint**: `/netlify/functions/products`
 - **Cache TTL**: 2 minutes (120 seconds)
 - **Cache Keys**: 
   - `products:all` - All products
@@ -135,13 +135,13 @@ Implemented caching on the following endpoints:
 - **Invalidation**: On create, update, or delete operations
 
 #### 3. Settings Endpoint
-- **Endpoint**: `/.netlify/functions/settings`
+- **Endpoint**: `/netlify/functions/settings`
 - **Cache TTL**: 5 minutes (300 seconds)
 - **Cache Key**: `settings:config`
 - **Invalidation**: On settings update
 
 #### 4. Orders Endpoint
-- **Endpoint**: `/.netlify/functions/orders`
+- **Endpoint**: `/netlify/functions/orders`
 - **Cache TTL**: 1 minute (60 seconds)
 - **Cache Key**: `orders:list`
 - **Invalidation**: On order create or status update
@@ -359,21 +359,21 @@ npm test
 1. **Cache hit verification**:
    ```bash
    # First request (cache miss)
-   curl -H "Authorization: Bearer $TOKEN" https://yoursite.com/.netlify/functions/products
+   curl -H "Authorization: Bearer $TOKEN" https://yoursite.com/netlify/functions/products
    # Check X-Cache: MISS
    
    # Second request (cache hit)
-   curl -H "Authorization: Bearer $TOKEN" https://yoursite.com/.netlify/functions/products
+   curl -H "Authorization: Bearer $TOKEN" https://yoursite.com/netlify/functions/products
    # Check X-Cache: HIT
    ```
 
 2. **Cache invalidation**:
    ```bash
    # Create product (invalidates cache)
-   curl -X POST -H "Authorization: Bearer $TOKEN" https://yoursite.com/.netlify/functions/products -d '{"name":"Test","code":"TEST","type":"oil"}'
+   curl -X POST -H "Authorization: Bearer $TOKEN" https://yoursite.com/netlify/functions/products -d '{"name":"Test","code":"TEST","type":"oil"}'
    
    # Next GET should be cache miss
-   curl -H "Authorization: Bearer $TOKEN" https://yoursite.com/.netlify/functions/products
+   curl -H "Authorization: Bearer $TOKEN" https://yoursite.com/netlify/functions/products
    # Check X-Cache: MISS
    ```
 

@@ -12,7 +12,7 @@ The joshburt.com.au application uses PostgreSQL as its database backend (e.g. Ne
 
 Set the following environment variables based on your deployment:
 
- All dynamic operations are served via Netlify Functions at `/.netlify/functions/users`.
+ All dynamic operations are served via Netlify Functions at `/netlify/functions/users`.
 
 #### PostgreSQL Configuration
 ```env
@@ -40,7 +40,7 @@ DB_SSL=true
 ```
 
 #### Development Environment
- Access audit logs via `/.netlify/functions/audit-logs`.
+ Access audit logs via `/netlify/functions/audit-logs`.
 ```env
 # Database Type (PostgreSQL only)
 DB_TYPE=postgres
@@ -171,36 +171,36 @@ Example:
 
 ## Serverless API Endpoints (Current)
 
-All dynamic operations are served via Netlify Functions under `/.netlify/functions/*`.
+All dynamic operations are served via Netlify Functions under `/netlify/functions/*`.
 
 ### Authentication (Unified Function)
 
-Single function `/.netlify/functions/auth` handles multiple actions via the `action` query parameter (or request body fallback for POST). Each action shares the same base path and differs only by `action` value.
+Single function `/netlify/functions/auth` handles multiple actions via the `action` query parameter (or request body fallback for POST). Each action shares the same base path and differs only by `action` value.
 
 | Action | Method | Endpoint Example | Description | Auth Required |
 |--------|--------|------------------|-------------|---------------|
-| register | POST | `/.netlify/functions/auth?action=register` | Register new user | No |
-| login | POST | `/.netlify/functions/auth?action=login` | User login (issues access + refresh) | No |
-| logout | POST | `/.netlify/functions/auth?action=logout` | Invalidate refresh token | Yes |
-| refresh | POST | `/.netlify/functions/auth?action=refresh` | Exchange refresh for new tokens | No |
-| me | GET | `/.netlify/functions/auth?action=me` | Get current user profile | Yes |
-| forgot-password | POST | `/.netlify/functions/auth?action=forgot-password` | Initiate password reset (always 200) | No |
-| reset-password | POST | `/.netlify/functions/auth?action=reset-password` | Reset password with valid token | No |
-| verify-email | POST | `/.netlify/functions/auth?action=verify-email` | Email verification placeholder | Yes (token) |
+| register | POST | `/netlify/functions/auth?action=register` | Register new user | No |
+| login | POST | `/netlify/functions/auth?action=login` | User login (issues access + refresh) | No |
+| logout | POST | `/netlify/functions/auth?action=logout` | Invalidate refresh token | Yes |
+| refresh | POST | `/netlify/functions/auth?action=refresh` | Exchange refresh for new tokens | No |
+| me | GET | `/netlify/functions/auth?action=me` | Get current user profile | Yes |
+| forgot-password | POST | `/netlify/functions/auth?action=forgot-password` | Initiate password reset (always 200) | No |
+| reset-password | POST | `/netlify/functions/auth?action=reset-password` | Reset password with valid token | No |
+| verify-email | POST | `/netlify/functions/auth?action=verify-email` | Email verification placeholder | Yes (token) |
 
 ### Users
 
-User management is performed through the `users` function. ID-specific operations use a path suffix (e.g. `/.netlify/functions/users/123`) or query parameter fallback depending on implementation.
+User management is performed through the `users` function. ID-specific operations use a path suffix (e.g. `/netlify/functions/users/123`) or query parameter fallback depending on implementation.
 
 | Method | Endpoint | Description | Role Required |
 |--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/users` | List all users | Manager/Admin |
-| GET | `/.netlify/functions/users/:id` | Get user by ID | Manager/Admin |
-| POST | `/.netlify/functions/users` | Create new user | Admin |
-| PUT | `/.netlify/functions/users/:id` | Update user | Admin (or own profile) |
-| DELETE | `/.netlify/functions/users/:id` | Delete user | Admin |
-| PUT | `/.netlify/functions/users/:id/password` | Change password | Admin (or own profile) |
-| GET | `/.netlify/functions/users?stats=overview` | User statistics overview | Manager/Admin |
+| GET | `/netlify/functions/users` | List all users | Manager/Admin |
+| GET | `/netlify/functions/users/:id` | Get user by ID | Manager/Admin |
+| POST | `/netlify/functions/users` | Create new user | Admin |
+| PUT | `/netlify/functions/users/:id` | Update user | Admin (or own profile) |
+| DELETE | `/netlify/functions/users/:id` | Delete user | Admin |
+| PUT | `/netlify/functions/users/:id/password` | Change password | Admin (or own profile) |
+| GET | `/netlify/functions/users?stats=overview` | User statistics overview | Manager/Admin |
 
 ### Products
 
@@ -208,11 +208,11 @@ Product catalog management via `products` function. Supports filtering by query 
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/products` | List products (optional filters) | No |
-| GET | `/.netlify/functions/products/:id` | Get product by ID | No |
-| POST | `/.netlify/functions/products` | Create new product | Admin |
-| PUT | `/.netlify/functions/products/:id` | Update product | Admin |
-| DELETE | `/.netlify/functions/products/:id` | Delete product | Admin |
+| GET | `/netlify/functions/products` | List products (optional filters) | No |
+| GET | `/netlify/functions/products/:id` | Get product by ID | No |
+| POST | `/netlify/functions/products` | Create new product | Admin |
+| PUT | `/netlify/functions/products/:id` | Update product | Admin |
+| DELETE | `/netlify/functions/products/:id` | Delete product | Admin |
 
 ### Inventory
 
@@ -220,8 +220,8 @@ Inventory adjustments and stock queries.
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/inventory` | List inventory records / summary | Manager/Admin |
-| POST | `/.netlify/functions/inventory` | Adjust inventory (delta, reason) | Manager/Admin |
+| GET | `/netlify/functions/inventory` | List inventory records / summary | Manager/Admin |
+| POST | `/netlify/functions/inventory` | Adjust inventory (delta, reason) | Manager/Admin |
 
 ### Consumables
 
@@ -229,28 +229,28 @@ Consumable items tracked separately from products (e.g., shop supplies).
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/consumables` | List consumables | Manager/Admin |
-| GET | `/.netlify/functions/consumables/:id` | Get consumable by ID | Manager/Admin |
-| POST | `/.netlify/functions/consumables` | Create consumable | Manager/Admin |
-| PUT | `/.netlify/functions/consumables/:id` | Update consumable | Manager/Admin |
-| DELETE | `/.netlify/functions/consumables/:id` | Delete consumable | Admin |
+| GET | `/netlify/functions/consumables` | List consumables | Manager/Admin |
+| GET | `/netlify/functions/consumables/:id` | Get consumable by ID | Manager/Admin |
+| POST | `/netlify/functions/consumables` | Create consumable | Manager/Admin |
+| PUT | `/netlify/functions/consumables/:id` | Update consumable | Manager/Admin |
+| DELETE | `/netlify/functions/consumables/:id` | Delete consumable | Admin |
 
 ### Consumable Categories
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/consumable-categories` | List categories | Manager/Admin |
-| POST | `/.netlify/functions/consumable-categories` | Create category | Manager/Admin |
-| PUT | `/.netlify/functions/consumable-categories/:id` | Update category | Manager/Admin |
-| DELETE | `/.netlify/functions/consumable-categories/:id` | Delete category | Admin |
+| GET | `/netlify/functions/consumable-categories` | List categories | Manager/Admin |
+| POST | `/netlify/functions/consumable-categories` | Create category | Manager/Admin |
+| PUT | `/netlify/functions/consumable-categories/:id` | Update category | Manager/Admin |
+| DELETE | `/netlify/functions/consumable-categories/:id` | Delete category | Admin |
 
 ### Audit Logs
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/audit-logs` | List audit events (supports pagination & search) | Admin |
-| POST | `/.netlify/functions/audit-logs` | Create custom audit entry | Admin |
-| DELETE | `/.netlify/functions/audit-logs` | Clear all logs or logs older than N days | Admin |
+| GET | `/netlify/functions/audit-logs` | List audit events (supports pagination & search) | Admin |
+| POST | `/netlify/functions/audit-logs` | Create custom audit entry | Admin |
+| DELETE | `/netlify/functions/audit-logs` | Clear all logs or logs older than N days | Admin |
 
 #### Query Parameters (GET)
 
@@ -292,16 +292,16 @@ Response example:
 ```bash
 # First page, 50 per page, search for "settings"
 curl \
-   '/.netlify/functions/audit-logs?page=1&pageSize=50&q=settings'
+   '/netlify/functions/audit-logs?page=1&pageSize=50&q=settings'
 
 # Export filtered login events to CSV
-curl '/.netlify/functions/audit-logs?action=user_login&format=csv' -o login-events.csv
+curl '/netlify/functions/audit-logs?action=user_login&format=csv' -o login-events.csv
 
 # Delete logs older than 90 days
-curl -X DELETE '/.netlify/functions/audit-logs?olderThanDays=90'
+curl -X DELETE '/netlify/functions/audit-logs?olderThanDays=90'
 
 # Example (array) limited to 25 entries
-curl '/.netlify/functions/audit-logs?limit=25'
+curl '/netlify/functions/audit-logs?limit=25'
 ```
 
 ### Settings
@@ -310,8 +310,8 @@ Settings are a single JSON document in the database; function exposes retrieval 
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/settings` | Retrieve current settings JSON | Admin |
-| PUT | `/.netlify/functions/settings` | Replace/merge settings JSON | Admin |
+| GET | `/netlify/functions/settings` | Retrieve current settings JSON | Admin |
+| PUT | `/netlify/functions/settings` | Replace/merge settings JSON | Admin |
 
 ### Orders
 
@@ -319,11 +319,11 @@ Customer order creation and administrative management.
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/orders` | List orders (may support filters) | Manager/Admin |
-| GET | `/.netlify/functions/orders/:id` | Get order by ID | Manager/Admin (or owner if exposed) |
-| POST | `/.netlify/functions/orders` | Create new order | User |
-| PUT | `/.netlify/functions/orders/:id` | Update order (status, details) | Manager/Admin |
-| DELETE | `/.netlify/functions/orders/:id` | Delete/cancel order | Admin |
+| GET | `/netlify/functions/orders` | List orders (may support filters) | Manager/Admin |
+| GET | `/netlify/functions/orders/:id` | Get order by ID | Manager/Admin (or owner if exposed) |
+| POST | `/netlify/functions/orders` | Create new order | User |
+| PUT | `/netlify/functions/orders/:id` | Update order (status, details) | Manager/Admin |
+| DELETE | `/netlify/functions/orders/:id` | Delete/cancel order | Admin |
 
 ## Security Features
 
@@ -423,7 +423,7 @@ Tests use mocked database connections to avoid requiring a live database. No deb
 ## Monitoring and Maintenance
 
 ### Health Check
-- **Endpoint**: `GET /.netlify/functions/health`
+- **Endpoint**: `GET /netlify/functions/health`
 - **Response**: Server status, timestamp, and environment
 - **No debug or non-production output in health endpoint**
 

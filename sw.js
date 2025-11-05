@@ -25,8 +25,8 @@ const urlsToCache = [
 
 // API base patterns (serverless only; legacy /api removed)
 const apiUrls = [
-  '/.netlify/functions/',
-  'https://joshburt.netlify.app/.netlify/functions/'
+  '/netlify/functions/',
+  'https://joshburt.netlify.app/netlify/functions/'
 ];
 
 // CDN resources to cache

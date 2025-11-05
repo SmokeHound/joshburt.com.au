@@ -95,7 +95,7 @@ Use browser DevTools Network tab to verify authentication headers:
 1. Open DevTools (F12)
 2. Go to Network tab
 3. Perform actions above
-4. Look for API requests to `/.netlify/functions/orders`
+4. Look for API requests to `/netlify/functions/orders`
 5. Check Request Headers for `Authorization: Bearer <token>`
 
 ## Testing with DISABLE_AUTH=true

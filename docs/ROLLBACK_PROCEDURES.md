@@ -247,7 +247,7 @@ After rollback, monitor:
 4. **Database health:**
    ```bash
    # Run health check
-   curl https://joshburt.com.au/.netlify/functions/health
+   curl https://joshburt.com.au/netlify/functions/health
    ```
 
 ## Rollback Testing

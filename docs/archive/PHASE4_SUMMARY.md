@@ -18,9 +18,9 @@ All Phase 4 features from the roadmap have been successfully implemented with pr
 - ⏳ Product variants UI (schema ready, UI pending)
 
 **API Endpoints**:
-- `GET /.netlify/functions/products?search=term&category_id=1&min_price=10&max_price=100`
-- `GET /.netlify/functions/product-categories?is_active=true&include_product_count=true`
-- `POST/PUT/DELETE /.netlify/functions/product-categories`
+- `GET /netlify/functions/products?search=term&category_id=1&min_price=10&max_price=100`
+- `GET /netlify/functions/product-categories?is_active=true&include_product_count=true`
+- `POST/PUT/DELETE /netlify/functions/product-categories`
 
 ### Week 13: Order Management ✅
 **Status**: Complete with Email Integration
@@ -35,9 +35,9 @@ All Phase 4 features from the roadmap have been successfully implemented with pr
 - ⏳ Admin UI for order status updates (backend ready)
 
 **API Endpoints**:
-- `GET /.netlify/functions/orders?status=pending&export_format=csv`
-- `PATCH /.netlify/functions/orders` (status updates)
-- `DELETE /.netlify/functions/orders` (cancellation)
+- `GET /netlify/functions/orders?status=pending&export_format=csv`
+- `PATCH /netlify/functions/orders` (status updates)
+- `DELETE /netlify/functions/orders` (cancellation)
 
 **Email Templates**:
 - Order created confirmation
@@ -57,11 +57,11 @@ All Phase 4 features from the roadmap have been successfully implemented with pr
 - ⏳ Custom date range picker UI
 
 **API Endpoints**:
-- `GET /.netlify/functions/analytics?report_type=order_trends&compare_previous=true`
-- `GET /.netlify/functions/analytics?report_type=top_products`
-- `GET /.netlify/functions/analytics?report_type=category_breakdown`
-- `GET /.netlify/functions/analytics?report_type=order_summary`
-- `GET /.netlify/functions/analytics?report_type=user_activity`
+- `GET /netlify/functions/analytics?report_type=order_trends&compare_previous=true`
+- `GET /netlify/functions/analytics?report_type=top_products`
+- `GET /netlify/functions/analytics?report_type=category_breakdown`
+- `GET /netlify/functions/analytics?report_type=order_summary`
+- `GET /netlify/functions/analytics?report_type=user_activity`
 
 ### Week 16: Notification System ✅
 **Status**: Complete Implementation
@@ -76,11 +76,11 @@ All Phase 4 features from the roadmap have been successfully implemented with pr
 - ⏳ Navigation integration (component ready)
 
 **API Endpoints**:
-- `GET /.netlify/functions/notifications?unread_only=true`
-- `POST /.netlify/functions/notifications` (admin only)
-- `PATCH /.netlify/functions/notifications` (mark as read)
-- `DELETE /.netlify/functions/notifications`
-- `GET/PUT /.netlify/functions/notification-preferences`
+- `GET /netlify/functions/notifications?unread_only=true`
+- `POST /netlify/functions/notifications` (admin only)
+- `PATCH /netlify/functions/notifications` (mark as read)
+- `DELETE /netlify/functions/notifications`
+- `GET/PUT /netlify/functions/notification-preferences`
 
 **UI Components**:
 - `shared-notifications-center.html` - Dropdown notification center
@@ -187,7 +187,7 @@ FRONTEND_URL=https://joshburt.com.au
 ```javascript
 // Search for engine oil in specific price range
 const response = await fetch(
-  '/.netlify/functions/products?search=engine+oil&category_id=1&min_price=20&max_price=100&page=1&limit=20',
+  '/netlify/functions/products?search=engine+oil&category_id=1&min_price=20&max_price=100&page=1&limit=20',
   {
     headers: { 'Authorization': `Bearer ${token}` }
   }
@@ -200,7 +200,7 @@ console.log(data.pagination); // { page: 1, limit: 20, total: 50, totalPages: 3 
 ### Order Management
 ```javascript
 // Update order status and send notification
-await fetch('/.netlify/functions/orders', {
+await fetch('/netlify/functions/orders', {
   method: 'PATCH',
   headers: {
     'Content-Type': 'application/json',
@@ -221,7 +221,7 @@ await fetch('/.netlify/functions/orders', {
 ```javascript
 // Get order trends with previous period comparison
 const response = await fetch(
-  '/.netlify/functions/analytics?report_type=order_trends&date_from=2025-01-01&date_to=2025-01-31&compare_previous=true',
+  '/netlify/functions/analytics?report_type=order_trends&date_from=2025-01-01&date_to=2025-01-31&compare_previous=true',
   {
     headers: { 'Authorization': `Bearer ${token}` }
   }
@@ -236,7 +236,7 @@ console.log(data.comparison); // Percentage changes
 ```javascript
 // Get unread notifications with auto-refresh
 function loadNotifications() {
-  fetch('/.netlify/functions/notifications?unread_only=true&limit=20', {
+  fetch('/netlify/functions/notifications?unread_only=true&limit=20', {
     headers: { 'Authorization': `Bearer ${token}` }
   })
   .then(r => r.json())

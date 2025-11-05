@@ -165,7 +165,7 @@ const categoryList = document.getElementById('categoryList');
 
 async function loadCategories() {
   try {
-    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/consumable-categories`);
+    const res = await fetch(`${window.FN_BASE || '/netlify/functions'}/consumable-categories`);
     if (!res.ok) throw new Error('Failed to load categories');
     categories = await res.json();
   } catch (err) {
@@ -271,7 +271,7 @@ syncInventoryBtn.onclick = async function() {
   syncInventoryBtn.disabled = true;
   syncInventoryBtn.textContent = 'Syncing...';
   try {
-    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/consumables`);
+    const res = await fetch(`${window.FN_BASE || '/netlify/functions'}/consumables`);
     if (!res.ok) throw new Error('API error');
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('Invalid data');
@@ -536,7 +536,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
   try {
     // Try to load from backend first
-    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/consumables`);
+    const res = await fetch(`${window.FN_BASE || '/netlify/functions'}/consumables`);
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -566,7 +566,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function addAuditLog(action, product, details) {
   try {
     // Send audit log to backend API (Netlify function or Express endpoint)
-    await (window.authFetch ? authFetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs`, {
+    await (window.authFetch ? authFetch(`${window.FN_BASE || '/netlify/functions'}/audit-logs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -574,7 +574,7 @@ async function addAuditLog(action, product, details) {
         details: product ? JSON.stringify(product) : details,
         extra: product ? details : undefined
       })
-    }) : fetch(`${window.FN_BASE || '/.netlify/functions'}/audit-logs`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action, details: product ? JSON.stringify(product) : details, extra: product ? details : undefined }) }));
+    }) : fetch(`${window.FN_BASE || '/netlify/functions'}/audit-logs`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action, details: product ? JSON.stringify(product) : details, extra: product ? details : undefined }) }));
   // audit UI removed; no client-side reload
   } catch (err) {
     // Fallback: log to console if API fails

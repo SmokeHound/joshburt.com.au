@@ -1,4 +1,4 @@
-// Netlify Function: GET /.netlify/functions/consumable-categories
+// Netlify Function: GET /netlify/functions/consumable-categories
 const { database } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');

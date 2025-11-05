@@ -36,7 +36,7 @@ npm run test:all
 
 ```bash
 # Check application health
-curl https://joshburt.com.au/.netlify/functions/health
+curl https://joshburt.com.au/netlify/functions/health
 
 # Expected response:
 # {
@@ -51,19 +51,19 @@ curl https://joshburt.com.au/.netlify/functions/health
 
 ```bash
 # Get metrics summary (last hour by default)
-curl https://joshburt.com.au/.netlify/functions/metrics?action=summary
+curl https://joshburt.com.au/netlify/functions/metrics?action=summary
 
 # Get metrics for custom time window (in milliseconds)
-curl "https://joshburt.com.au/.netlify/functions/metrics?action=summary&timeWindow=3600000"
+curl "https://joshburt.com.au/netlify/functions/metrics?action=summary&timeWindow=3600000"
 
 # Check for active alerts
-curl https://joshburt.com.au/.netlify/functions/metrics?action=alerts
+curl https://joshburt.com.au/netlify/functions/metrics?action=alerts
 
 # Get endpoint-specific metrics
-curl "https://joshburt.com.au/.netlify/functions/metrics?action=endpoint&endpoint=/users"
+curl "https://joshburt.com.au/netlify/functions/metrics?action=endpoint&endpoint=/users"
 
 # Check overall health status
-curl https://joshburt.com.au/.netlify/functions/metrics?action=health
+curl https://joshburt.com.au/netlify/functions/metrics?action=health
 ```
 
 ## Reporting
@@ -369,7 +369,7 @@ ls -lh data/metrics.json
 chmod 644 data/metrics.json
 
 # Verify metrics endpoint
-curl https://joshburt.com.au/.netlify/functions/metrics?action=summary
+curl https://joshburt.com.au/netlify/functions/metrics?action=summary
 ```
 
 ### Logs Not Appearing

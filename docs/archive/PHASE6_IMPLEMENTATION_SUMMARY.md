@@ -317,12 +317,12 @@ DEPLOYMENT.md
 
 ### Check Deployment Health
 ```bash
-curl https://joshburt.com.au/.netlify/functions/health
+curl https://joshburt.com.au/netlify/functions/health
 ```
 
 ### View Metrics
 ```bash
-curl https://joshburt.com.au/.netlify/functions/metrics?action=summary
+curl https://joshburt.com.au/netlify/functions/metrics?action=summary
 ```
 
 ### Generate Report

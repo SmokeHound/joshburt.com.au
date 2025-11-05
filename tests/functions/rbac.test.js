@@ -7,8 +7,8 @@
 const path = require('path');
 const authFn = require(path.join('..', '..', 'netlify', 'functions', 'auth.js'));
 const usersFn = require(path.join('..', '..', 'netlify', 'functions', 'users.js'));
-const productsFn = require(path.join('..', '..', '.netlify', 'functions', 'products.js'));
-const ordersFn = require(path.join('..', '..', '.netlify', 'functions', 'orders.js'));
+const productsFn = require(path.join('..', '..', 'netlify', 'functions', 'products.js'));
+const ordersFn = require(path.join('..', '..', 'netlify', 'functions', 'orders.js'));
 
 function makeEvent({ path = '/', httpMethod = 'GET', query = {}, body = {}, headers = {}, authorization } = {}) {
   return {
@@ -22,7 +22,7 @@ function makeEvent({ path = '/', httpMethod = 'GET', query = {}, body = {}, head
 
 async function createTestUser(email, password, name, role = 'user') {
   const response = await usersFn.handler(makeEvent({
-    path: '/.netlify/functions/users',
+    path: '/netlify/functions/users',
     httpMethod: 'POST',
     body: { email, password, name, role },
     authorization: adminToken
@@ -33,7 +33,7 @@ async function createTestUser(email, password, name, role = 'user') {
 
 async function loginAs(email, password) {
   const response = await authFn.handler(makeEvent({
-    path: '/.netlify/functions/auth',
+    path: '/netlify/functions/auth',
     query: { action: 'login' },
     httpMethod: 'POST',
     body: { action: 'login', email, password }
@@ -86,7 +86,7 @@ let testManager, testUser;
 
     // Admin should be able to list users
     let res = await usersFn.handler(makeEvent({
-      path: '/.netlify/functions/users',
+      path: '/netlify/functions/users',
       httpMethod: 'GET',
       authorization: adminToken
     }));
@@ -99,7 +99,7 @@ let testManager, testUser;
 
     // Manager should be able to list users
     res = await usersFn.handler(makeEvent({
-      path: '/.netlify/functions/users',
+      path: '/netlify/functions/users',
       httpMethod: 'GET',
       authorization: managerToken
     }));
@@ -112,7 +112,7 @@ let testManager, testUser;
 
     // Regular user should NOT be able to list users
     res = await usersFn.handler(makeEvent({
-      path: '/.netlify/functions/users',
+      path: '/netlify/functions/users',
       httpMethod: 'GET',
       authorization: userToken
     }));
@@ -125,7 +125,7 @@ let testManager, testUser;
 
     // Only admin can create users
     res = await usersFn.handler(makeEvent({
-      path: '/.netlify/functions/users',
+      path: '/netlify/functions/users',
       httpMethod: 'POST',
       body: { email: 'test@test.com', password: 'Test123!', name: 'Test', role: 'user' },
       authorization: managerToken
@@ -144,7 +144,7 @@ let testManager, testUser;
 
     // All roles can read products
     res = await productsFn.handler(makeEvent({
-      path: '/.netlify/functions/products',
+      path: '/netlify/functions/products',
       httpMethod: 'GET',
       authorization: userToken
     }));
@@ -157,7 +157,7 @@ let testManager, testUser;
 
     // Manager can create products
     res = await productsFn.handler(makeEvent({
-      path: '/.netlify/functions/products',
+      path: '/netlify/functions/products',
       httpMethod: 'POST',
       body: { name: 'Test Product', code: `TEST-${timestamp}`, type: 'Test' },
       authorization: managerToken
@@ -171,7 +171,7 @@ let testManager, testUser;
 
     // Regular user cannot create products
     res = await productsFn.handler(makeEvent({
-      path: '/.netlify/functions/products',
+      path: '/netlify/functions/products',
       httpMethod: 'POST',
       body: { name: 'Test Product 2', code: `TEST2-${timestamp}`, type: 'Test' },
       authorization: userToken
@@ -190,7 +190,7 @@ let testManager, testUser;
 
     // All authenticated users can create orders
     res = await ordersFn.handler(makeEvent({
-      path: '/.netlify/functions/orders',
+      path: '/netlify/functions/orders',
       httpMethod: 'POST',
       body: { items: [{ name: 'Test', code: 'TEST', quantity: 1 }] },
       authorization: userToken
@@ -204,7 +204,7 @@ let testManager, testUser;
 
     // Regular users cannot list all orders
     res = await ordersFn.handler(makeEvent({
-      path: '/.netlify/functions/orders',
+      path: '/netlify/functions/orders',
       httpMethod: 'GET',
       authorization: userToken
     }));
@@ -217,7 +217,7 @@ let testManager, testUser;
 
     // Managers can list orders
     res = await ordersFn.handler(makeEvent({
-      path: '/.netlify/functions/orders',
+      path: '/netlify/functions/orders',
       httpMethod: 'GET',
       authorization: managerToken
     }));
@@ -235,7 +235,7 @@ let testManager, testUser;
 
     // Weak password should be rejected
     res = await authFn.handler(makeEvent({
-      path: '/.netlify/functions/auth',
+      path: '/netlify/functions/auth',
       query: { action: 'register' },
       httpMethod: 'POST',
       body: { action: 'register', email: `weak_${timestamp}@test.com`, password: 'weak', name: 'Weak' }
@@ -250,7 +250,7 @@ let testManager, testUser;
 
     // Strong password should be accepted
     res = await authFn.handler(makeEvent({
-      path: '/.netlify/functions/auth',
+      path: '/netlify/functions/auth',
       query: { action: 'register' },
       httpMethod: 'POST',
       body: { action: 'register', email: `strong_${timestamp}@test.com`, password: 'Strong123!', name: 'Strong' }

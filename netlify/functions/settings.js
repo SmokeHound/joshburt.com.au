@@ -1,4 +1,4 @@
-// Netlify Function: Site Settings CRUD /.netlify/functions/settings
+// Netlify Function: Site Settings CRUD /netlify/functions/settings
 const { database } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');

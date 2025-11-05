@@ -147,7 +147,7 @@ The joshburt.com.au application is a modern, serverless web application built on
 ### Backend Layer
 
 #### Serverless Functions
-Located in `.netlify/functions/`:
+Located in `/netlify/functions/`:
 
 1. **Authentication** (`auth.js`)
    - Register, login, logout, refresh token

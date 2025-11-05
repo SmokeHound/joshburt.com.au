@@ -243,7 +243,7 @@
 
     <script>
     // Serverless base path and auth token helper (computed in init-shared.js)
-    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    const FN_BASE = window.FN_BASE || '/netlify/functions';
     const AUTH_DISABLED = window.AUTH_DISABLED === true;
     const usersState = { list: [], pagination: { page:1, limit:10, total:0, pages:1 }, filters: { search:'', role:'', status:'', sort:'created_at_desc' }, editingId: null, loading: false };
 

@@ -1,4 +1,4 @@
-// Netlify Function: GET /.netlify/functions/inventory
+// Netlify Function: GET /netlify/functions/inventory
 const { database } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');

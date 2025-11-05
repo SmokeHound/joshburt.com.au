@@ -167,8 +167,8 @@ To add audit logging to a new function:
 
 ### Audit Log Retention
 Audit logs can be managed via the API:
-- Clear all logs: `DELETE /.netlify/functions/audit-logs`
-- Clear old logs: `DELETE /.netlify/functions/audit-logs?olderThanDays=90`
+- Clear all logs: `DELETE /netlify/functions/audit-logs`
+- Clear old logs: `DELETE /netlify/functions/audit-logs?olderThanDays=90`
 
 ### Performance Considerations
 - Audit logging is non-fatal (errors are caught and logged)

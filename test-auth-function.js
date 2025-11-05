@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { handler } = require('./.netlify/functions/auth');
+const { handler } = require('./netlify/functions/auth');
 
 async function testAuth() {
   console.log('🔧 Using DB_TYPE:', process.env.DB_TYPE);
@@ -7,7 +7,7 @@ async function testAuth() {
   console.log('🧪 Testing Registration...');
   const registerEvent = {
     httpMethod: 'POST',
-    path: '/.netlify/functions/auth',
+    path: '/netlify/functions/auth',
     queryStringParameters: { action: 'register' },
     body: JSON.stringify({
       email: 'newuser@test.com',
@@ -35,7 +35,7 @@ async function testAuth() {
   console.log('\n🧪 Testing Login...');
   const loginEvent = {
     httpMethod: 'POST',
-    path: '/.netlify/functions/auth',
+    path: '/netlify/functions/auth',
     queryStringParameters: { action: 'login' },
     body: JSON.stringify({
       email: 'admin@joshburt.com.au',

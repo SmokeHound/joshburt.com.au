@@ -17,8 +17,8 @@ Always reference these instructions first. Fallback to search or bash commands o
 - **Static site**: `python3 -m http.server 8000` (HTML/CSS/JS only)
 - **Serverless backend**:
   - Set DB env vars (DB_TYPE, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT as needed)
-  - Use `netlify dev` (optional) to run functions locally (`/.netlify/functions/*`)
-   - Test database connectivity: run `netlify dev` and call `/.netlify/functions/health`
+  - Use `netlify dev` (optional) to run functions locally (`/netlify/functions/*`)
+   - Test database connectivity: run `netlify dev` and call `/netlify/functions/health`
 
 
 ### Build and Deploy Information
@@ -31,14 +31,14 @@ Always reference these instructions first. Fallback to search or bash commands o
 ### Test Website & API Functionality
 - **Static pages**: Load via local server
 - **Serverless endpoints (replace legacy /api)**:
-   - Products: `/.netlify/functions/products`
-   - Orders: `/.netlify/functions/orders`
-   - Users: `/.netlify/functions/users`
-   - Auth (multi-action): `/.netlify/functions/auth?action=login|register|refresh|logout|me|forgot-password|reset-password|verify-email`
-   - Audit Logs: `/.netlify/functions/audit-logs`
-   - Inventory: `/.netlify/functions/inventory`
-   - Consumables: `/.netlify/functions/consumables`
-   - Categories: `/.netlify/functions/consumable-categories`
+   - Products: `/netlify/functions/products`
+   - Orders: `/netlify/functions/orders`
+   - Users: `/netlify/functions/users`
+   - Auth (multi-action): `/netlify/functions/auth?action=login|register|refresh|logout|me|forgot-password|reset-password|verify-email`
+   - Audit Logs: `/netlify/functions/audit-logs`
+   - Inventory: `/netlify/functions/inventory`
+   - Consumables: `/netlify/functions/consumables`
+   - Categories: `/netlify/functions/consumable-categories`
 - **Database**: use the health function locally
 - **Local Functions**: `netlify dev` (optional)
 
@@ -52,18 +52,18 @@ ALWAYS manually validate changes by running through these complete end-to-end sc
    - As before
 
 2. **Oil Ordering System Test** (dynamic):
-   - Navigate to oil-products.html and test product API (`/.netlify/functions/products`)
+   - Navigate to oil-products.html and test product API (`/netlify/functions/products`)
    - Add product, view, and order via serverless endpoints
 
 3. **Admin Dashboard & User Management**:
-   - Test user CRUD via `/.netlify/functions/users`
-   - Test auth actions via `/.netlify/functions/auth?action=...`
+   - Test user CRUD via `/netlify/functions/users`
+   - Test auth actions via `/netlify/functions/auth?action=...`
 
 4. **Orders API Test**:
-   - Submit and list orders via `/.netlify/functions/orders`
+   - Submit and list orders via `/netlify/functions/orders`
 
 5. **Database Test**:
-   - Start local functions with `netlify dev` and call `/.netlify/functions/health` to verify database connectivity and required tables
+   - Start local functions with `netlify dev` and call `/netlify/functions/health` to verify database connectivity and required tables
 
 
 ### Known Limitations
@@ -106,7 +106,7 @@ Two deployment workflows are configured:
 ├── settings.html        # Settings configuration
 ├── users.html           # User management
 ├── login.html           # Login page
-├── .netlify/functions/  # Serverless API endpoints (products.js, orders.js, users.js, auth.js, etc.)
+├── /netlify/functions/  # Serverless API endpoints (products.js, orders.js, users.js, auth.js, etc.)
 ├── config/database.js   # Database abstraction (PostgreSQL)
 ├── migrations/          # Database migration files
 ├── DOCS_INDEX.md        # Documentation index (see this first!)
@@ -117,7 +117,7 @@ Two deployment workflows are configured:
 ### Key Files Reference
 - **index.html**: Main website template
 - **oil-products.html**: Castrol product ordering (uses API)
-- **.netlify/functions/**: Serverless API endpoints (products, orders, users, auth, consumables, categories, audit logs, inventory, settings, health)
+- **/netlify/functions/**: Serverless API endpoints (products, orders, users, auth, consumables, categories, audit logs, inventory, settings, health)
 - **config/database.js**: Database abstraction
 - **docs/**: All technical documentation (see DOCS_INDEX.md)
 - **migrations/**: Database schema migrations
@@ -139,7 +139,7 @@ python3 -m http.server 8000
 # Test database (PostgreSQL)
 # Start Netlify dev then call health
 netlify dev
-curl http://localhost:8888/.netlify/functions/health
+curl http://localhost:8888/netlify/functions/health
 
 # Install backend dependencies
 npm install

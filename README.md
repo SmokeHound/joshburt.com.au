@@ -111,14 +111,14 @@ The audit log system now supports:
 - Free-text search (`q`) across `action`, `details`, and `user_id`
 - Filtering by `action`, `userId`, `startDate`, `endDate`
 - CSV export (`format=csv`) and JSON export (default)
-- Bulk deletion via `DELETE /.netlify/functions/audit-logs` with optional `olderThanDays=N`
+- Bulk deletion via `DELETE /netlify/functions/audit-logs` with optional `olderThanDays=N`
 - Lazy-loaded modular UI (`assets/js/audit-ui.js`) mounted only when `#audit-log-root` exists
 
 Example:
 ```bash
-curl '/.netlify/functions/audit-logs?page=1&pageSize=50&q=settings'
-curl '/.netlify/functions/audit-logs?action=user_login&format=csv' -o login-events.csv
-curl -X DELETE '/.netlify/functions/audit-logs?olderThanDays=90'
+curl '/netlify/functions/audit-logs?page=1&pageSize=50&q=settings'
+curl '/netlify/functions/audit-logs?action=user_login&format=csv' -o login-events.csv
+curl -X DELETE '/netlify/functions/audit-logs?olderThanDays=90'
 ```
 
 UI Features:
@@ -158,18 +158,18 @@ npm run health
 Serverless endpoints are accessible at:
 
 ```
-/.netlify/functions/auth
-/.netlify/functions/users
-/.netlify/functions/orders
-/.netlify/functions/products
-/.netlify/functions/audit-logs
-/.netlify/functions/inventory
-/.netlify/functions/consumables
-/.netlify/functions/consumable-categories
-/.netlify/functions/public-config
+/netlify/functions/auth
+/netlify/functions/users
+/netlify/functions/orders
+/netlify/functions/products
+/netlify/functions/audit-logs
+/netlify/functions/inventory
+/netlify/functions/consumables
+/netlify/functions/consumable-categories
+/netlify/functions/public-config
 ```
 
-Auth actions use a query/body `action` parameter, e.g. `/.netlify/functions/auth?action=login`.
+Auth actions use a query/body `action` parameter, e.g. `/netlify/functions/auth?action=login`.
 When `AUTH0_DOMAIN` is set, Auth0 RS256 JWTs are accepted and users are auto-provisioned by default unless `AUTH0_AUTO_PROVISION=false`.
 - **`consumables.html`**: Consumables order request page (for workshop staff)
 - **`consumables-mgmt.html`**: Consumables product list management (admin/staff CRUD)
@@ -528,7 +528,7 @@ Ensure the following are defined in Netlify (or locally in `.env`) for full func
 - `DB_TYPE` (postgres only)
 - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (PostgreSQL credentials)
 - `JWT_SECRET` (required for auth)
-- `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_AUDIENCE` (optional; enables OAuth; buttons auto-enable via `/.netlify/functions/public-config`)
+- `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_AUDIENCE` (optional; enables OAuth; buttons auto-enable via `/netlify/functions/public-config`)
 - Optional: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` (email flows)
 
 ### Operational Tips

@@ -157,7 +157,7 @@
       // Load notifications
       async function loadNotifications() {
         try {
-          const response = await fetch('/.netlify/functions/notifications?limit=100', {
+          const response = await fetch('/netlify/functions/notifications?limit=100', {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -259,7 +259,7 @@
         if (event) event.stopPropagation();
 
         try {
-          const response = await fetch('/.netlify/functions/notifications', {
+          const response = await fetch('/netlify/functions/notifications', {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -286,7 +286,7 @@
         if (!confirm('Delete this notification?')) return;
 
         try {
-          const response = await fetch('/.netlify/functions/notifications', {
+          const response = await fetch('/netlify/functions/notifications', {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -306,7 +306,7 @@
       // Mark all as read
       markAllReadBtn.addEventListener('click', async () => {
         try {
-          const response = await fetch('/.netlify/functions/notifications', {
+          const response = await fetch('/netlify/functions/notifications', {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -331,7 +331,7 @@
         if (!confirm('Delete all read notifications?')) return;
 
         try {
-          const response = await fetch('/.netlify/functions/notifications', {
+          const response = await fetch('/netlify/functions/notifications', {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',

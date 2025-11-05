@@ -343,9 +343,9 @@ Validates:
 
 **Implementation Plan**:
 ```
-/.netlify/functions/v1/products
-/.netlify/functions/v1/orders
-/.netlify/functions/v2/products  # New version with breaking changes
+/netlify/functions/v1/products
+/netlify/functions/v1/orders
+/netlify/functions/v2/products  # New version with breaking changes
 ```
 
 **Benefits**:

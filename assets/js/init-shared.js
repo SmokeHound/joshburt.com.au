@@ -2,13 +2,13 @@
 (function initShared() {
   // Compute a functions base that works on Netlify and non-Netlify hosts
   (function computeFnBase() {
-    const defaultBase = '/.netlify/functions';
+  const defaultBase = '/netlify/functions';
     try {
       const host = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
       if (host.endsWith('netlify.app') || host === 'localhost') {
         window.FN_BASE = defaultBase;
       } else {
-        window.FN_BASE = 'https://joshburt.netlify.app/.netlify/functions';
+  window.FN_BASE = 'https://joshburt.netlify.app/netlify/functions';
       }
     } catch (e) {
       window.FN_BASE = defaultBase;
@@ -82,7 +82,7 @@
   // Fetch runtime config (auth disable flag) early
   (async function loadRuntimeFlags() {
     try {
-      const base = window.FN_BASE || '/.netlify/functions';
+  const base = window.FN_BASE || '/netlify/functions';
       const res = await fetch(base + '/public-config');
       if (res.ok) {
         const cfg = await res.json();
@@ -108,7 +108,7 @@
   // Exposed globally as window.authFetch
   window.authFetch = async function authFetch(input, init) {
     try {
-      const FN_BASE = window.FN_BASE || '/.netlify/functions';
+  const FN_BASE = window.FN_BASE || '/netlify/functions';
       const toUrl = (typeof input === 'string') ? input : (input && input.url) || '';
       let token = window.getToken();
 

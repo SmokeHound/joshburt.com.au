@@ -121,7 +121,7 @@ Automated performance analysis:
    - Configure build settings:
      - Build command: `npm run build`
      - Publish directory: `/`
-     - Functions directory: `.netlify/functions`
+  - Functions directory: `/netlify/functions`
 
 2. **Environment Variables**
 
@@ -290,7 +290,7 @@ The CI/CD pipeline will automatically apply the migration on deployment.
 
 ```bash
 # Check application health
-curl https://joshburt.com.au/.netlify/functions/health
+curl https://joshburt.com.au/netlify/functions/health
 ```
 
 **Response**:
@@ -314,13 +314,13 @@ curl https://joshburt.com.au/.netlify/functions/health
 
 ```bash
 # Get metrics summary
-curl https://joshburt.com.au/.netlify/functions/metrics?action=summary
+curl https://joshburt.com.au/netlify/functions/metrics?action=summary
 
 # Check for alerts
-curl https://joshburt.com.au/.netlify/functions/metrics?action=alerts
+curl https://joshburt.com.au/netlify/functions/metrics?action=alerts
 
 # Endpoint-specific metrics
-curl https://joshburt.com.au/.netlify/functions/metrics?action=endpoint&endpoint=/users
+curl https://joshburt.com.au/netlify/functions/metrics?action=endpoint&endpoint=/users
 ```
 
 ### Log Aggregation
@@ -464,7 +464,7 @@ On PostgreSQL, the app will best‑effort apply `database-schema.sql` at startup
 2. Rotate tokens by pruning `refresh_tokens` table periodically
 3. Enforce HTTPS (Netlify auto) & set HSTS via Netlify headers if desired
 4. Limit origin access with Netlify site domain (optional future enhancement)
-5. Audit logs available via `/.netlify/functions/audit-logs`
+5. Audit logs available via `/netlify/functions/audit-logs`
 
 ### Security/Ops Checklist (Production)
 - [ ] Rotate `JWT_SECRET` regularly and keep it unique per environment
@@ -493,7 +493,7 @@ manager@example.com / manager123
 ## Manual Verification Checklist
 - [ ] Static pages load (index, analytics, users, oil, settings)
 - [ ] Auth register/login/me flows succeed against serverless function
-- [ ] Users list fetches from `/.netlify/functions/users`
+- [ ] Users list fetches from `/netlify/functions/users`
 - [ ] Orders & products endpoints respond
 - [ ] Analytics dashboard renders charts (Chart.js loaded)
 - [ ] Service worker installs & caches static assets

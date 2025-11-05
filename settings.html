@@ -1155,7 +1155,7 @@
             const token = (window.getToken && window.getToken()) || null;
             let userId = null;
             try { const u = JSON.parse(localStorage.getItem('user')||'null'); if (u && typeof u.id === 'number') userId = u.id; } catch {}
-            const FN_BASE = window.FN_BASE || '/.netlify/functions';
+            const FN_BASE = window.FN_BASE || '/netlify/functions';
             await (window.authFetch ? window.authFetch(`${FN_BASE}/audit-logs`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': 'Bearer ' + token } : {}) },
@@ -1265,7 +1265,7 @@
     // Load settings from API
     async function loadSettings() {
       try {
-        const FN_BASE = window.FN_BASE || '/.netlify/functions';
+        const FN_BASE = window.FN_BASE || '/netlify/functions';
         const res = await fetch(`${FN_BASE}/settings`);
         if (!res.ok) throw new Error('Failed to load settings');
         const settings = await res.json();
@@ -1365,7 +1365,7 @@
             const settings = getFormSettings();
             try {
                 // Fetch previous settings for audit diff
-          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const FN_BASE = window.FN_BASE || '/netlify/functions';
           const token = getAuthToken();
           const prevRes = await fetch(`${FN_BASE}/settings`, {
             headers: token ? { 'Authorization': `Bearer ${token}` } : {}
@@ -1714,7 +1714,7 @@
       async function check2FAStatus() {
         try {
           const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
-          const response = await fetch(`${window.FN_BASE || '/.netlify/functions'}/auth?action=me`, {
+          const response = await fetch(`${window.FN_BASE || '/netlify/functions'}/auth?action=me`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const data = await response.json();
@@ -1749,7 +1749,7 @@
           // Start 2FA setup
           try {
             const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
-            const response = await fetch(`${window.FN_BASE || '/.netlify/functions'}/auth?action=2fa-setup`, {
+            const response = await fetch(`${window.FN_BASE || '/netlify/functions'}/auth?action=2fa-setup`, {
               method: 'POST',
               headers: { 
                 'Authorization': `Bearer ${token}`,
@@ -1788,7 +1788,7 @@
 
         try {
           const authToken = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
-          const response = await fetch(`${window.FN_BASE || '/.netlify/functions'}/auth?action=2fa-enable`, {
+          const response = await fetch(`${window.FN_BASE || '/netlify/functions'}/auth?action=2fa-enable`, {
             method: 'POST',
             headers: { 
               'Authorization': `Bearer ${authToken}`,
@@ -1835,7 +1835,7 @@
 
         try {
           const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
-          const response = await fetch(`${window.FN_BASE || '/.netlify/functions'}/auth?action=2fa-disable`, {
+          const response = await fetch(`${window.FN_BASE || '/netlify/functions'}/auth?action=2fa-disable`, {
             method: 'POST',
             headers: { 
               'Authorization': `Bearer ${token}`,
@@ -1897,7 +1897,7 @@
     if (exportSettingsBtn) {
       exportSettingsBtn.addEventListener('click', async () => {
         try {
-          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const FN_BASE = window.FN_BASE || '/netlify/functions';
           const res = await fetch(`${FN_BASE}/settings`);
           if (!res.ok) throw new Error('Failed to export settings');
           const settings = await res.json();
@@ -1933,7 +1933,7 @@
         if (confirmed) {
           try {
             // Fetch previous settings for audit
-            const FN_BASE = window.FN_BASE || '/.netlify/functions';
+            const FN_BASE = window.FN_BASE || '/netlify/functions';
             const prevRes = await fetch(`${FN_BASE}/settings`);
             const previousSettings = prevRes.ok ? await prevRes.json() : {};
             // Reset to hardcoded defaults (update as needed)

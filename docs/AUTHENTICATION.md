@@ -143,52 +143,52 @@ Authorization: Bearer <access_token>
 
 ### Authentication Endpoints
 
-- `POST /.netlify/functions/auth?action=register` - Register new user
-- `POST /.netlify/functions/auth?action=login` - Login
-- `POST /.netlify/functions/auth?action=refresh` - Refresh tokens
-- `POST /.netlify/functions/auth?action=logout` - Logout
-- `GET /.netlify/functions/auth?action=me` - Get current user
-- `POST /.netlify/functions/auth?action=forgot-password` - Request password reset
-- `POST /.netlify/functions/auth?action=reset-password` - Reset password
-- `GET /.netlify/functions/auth?action=verify-email` - Verify email
+- `POST /netlify/functions/auth?action=register` - Register new user
+- `POST /netlify/functions/auth?action=login` - Login
+- `POST /netlify/functions/auth?action=refresh` - Refresh tokens
+- `POST /netlify/functions/auth?action=logout` - Logout
+- `GET /netlify/functions/auth?action=me` - Get current user
+- `POST /netlify/functions/auth?action=forgot-password` - Request password reset
+- `POST /netlify/functions/auth?action=reset-password` - Reset password
+- `GET /netlify/functions/auth?action=verify-email` - Verify email
 
 ### Protected Endpoints
 
 All of the following require authentication:
 
 #### Users (Admin/Manager)
-- `GET /.netlify/functions/users` - List users (admin, manager)
-- `POST /.netlify/functions/users` - Create user (admin only)
-- `GET /.netlify/functions/users/{id}` - Get user by ID (admin, manager)
-- `PUT /.netlify/functions/users/{id}` - Update user (admin, or self)
-- `DELETE /.netlify/functions/users/{id}` - Delete user (admin only)
-- `GET /.netlify/functions/users/stats/overview` - User statistics (admin, manager)
+- `GET /netlify/functions/users` - List users (admin, manager)
+- `POST /netlify/functions/users` - Create user (admin only)
+- `GET /netlify/functions/users/{id}` - Get user by ID (admin, manager)
+- `PUT /netlify/functions/users/{id}` - Update user (admin, or self)
+- `DELETE /netlify/functions/users/{id}` - Delete user (admin only)
+- `GET /netlify/functions/users/stats/overview` - User statistics (admin, manager)
 
 **Note**: The `{id}` in the path represents the user ID as part of the URL path, parsed by the function handler.
 
 #### Products (All authenticated users can read)
-- `GET /.netlify/functions/products` - List products (all)
-- `POST /.netlify/functions/products` - Create product (admin, manager)
-- `PUT /.netlify/functions/products` - Update product (admin, manager)
-- `DELETE /.netlify/functions/products` - Delete product (admin)
+- `GET /netlify/functions/products` - List products (all)
+- `POST /netlify/functions/products` - Create product (admin, manager)
+- `PUT /netlify/functions/products` - Update product (admin, manager)
+- `DELETE /netlify/functions/products` - Delete product (admin)
 
 #### Orders (All authenticated users can create)
-- `GET /.netlify/functions/orders` - List orders (admin, manager)
-- `POST /.netlify/functions/orders` - Create order (all)
-- `PATCH /.netlify/functions/orders` - Approve/reject order (admin, manager)
+- `GET /netlify/functions/orders` - List orders (admin, manager)
+- `POST /netlify/functions/orders` - Create order (all)
+- `PATCH /netlify/functions/orders` - Approve/reject order (admin, manager)
 
 #### Consumables (All authenticated users can read)
-- `GET /.netlify/functions/consumables` - List consumables (all)
-- `POST /.netlify/functions/consumables` - Create consumable (admin, manager)
-- `PUT /.netlify/functions/consumables` - Update consumable (admin, manager)
-- `DELETE /.netlify/functions/consumables` - Delete consumable (admin)
+- `GET /netlify/functions/consumables` - List consumables (all)
+- `POST /netlify/functions/consumables` - Create consumable (admin, manager)
+- `PUT /netlify/functions/consumables` - Update consumable (admin, manager)
+- `DELETE /netlify/functions/consumables` - Delete consumable (admin)
 
 #### Other Endpoints
-- `GET /.netlify/functions/consumable-categories` - List categories (all)
-- `GET /.netlify/functions/inventory` - View inventory (admin, manager)
-- `GET /.netlify/functions/audit-logs` - View audit logs (admin only)
-- `GET /.netlify/functions/settings` - View settings (admin only)
-- `PUT /.netlify/functions/settings` - Update settings (admin only)
+- `GET /netlify/functions/consumable-categories` - List categories (all)
+- `GET /netlify/functions/inventory` - View inventory (admin, manager)
+- `GET /netlify/functions/audit-logs` - View audit logs (admin only)
+- `GET /netlify/functions/settings` - View settings (admin only)
+- `PUT /netlify/functions/settings` - Update settings (admin only)
 
 ## Security Features
 

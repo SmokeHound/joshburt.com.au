@@ -15,14 +15,14 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 - **Full-Text Search**: PostgreSQL GIN index for fast product search
 
 #### API Endpoints
-- **/.netlify/functions/products** (Enhanced)
+- **/netlify/functions/products** (Enhanced)
   - Search functionality: `?search=term`
   - Category filtering: `?category_id=1`
   - Price range filtering: `?min_price=10&max_price=100`
   - Pagination support: `?page=1&limit=50`
   - Active status filtering: `?is_active=true`
 
-- **/.netlify/functions/product-categories** (New)
+- **/netlify/functions/product-categories** (New)
   - GET: List all categories with optional product counts
   - POST: Create new categories
   - PUT: Update existing categories
@@ -36,7 +36,7 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 - **Cancellation Support**: Track cancelled orders with reasons
 
 #### API Endpoints
-- **/.netlify/functions/orders** (Enhanced)
+- **/netlify/functions/orders** (Enhanced)
   - Status updates with history tracking
   - Order filtering: `?status=pending&created_by=user@example.com`
   - Date range filtering: `?date_from=2025-01-01&date_to=2025-01-31`
@@ -54,7 +54,7 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 ### Week 14-15: Enhanced Analytics
 
 #### API Endpoints
-- **/.netlify/functions/analytics** (New)
+- **/netlify/functions/analytics** (New)
   - Order trends: `?report_type=order_trends&date_from=2025-01-01&date_to=2025-01-31`
   - Top products: `?report_type=top_products`
   - Category breakdown: `?report_type=category_breakdown`
@@ -77,13 +77,13 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 - **Automatic Cleanup**: Expired notifications support
 
 #### API Endpoints
-- **/.netlify/functions/notifications** (New)
+- **/netlify/functions/notifications** (New)
   - GET: List notifications with filtering (unread, by type)
   - POST: Create system notifications (admin only)
   - PATCH: Mark as read (single or all)
   - DELETE: Delete notifications (single or all read)
 
-- **/.netlify/functions/notification-preferences** (New)
+- **/netlify/functions/notification-preferences** (New)
   - GET: Get user's notification preferences
   - PUT: Update notification preferences
 
@@ -125,7 +125,7 @@ Migrations are tracked in the `schema_migrations` table and run in alphanumeric 
 ### Product Search
 ```javascript
 // Search for products
-const response = await fetch('/.netlify/functions/products?search=engine+oil&category_id=1&min_price=20');
+const response = await fetch('/netlify/functions/products?search=engine+oil&category_id=1&min_price=20');
 const data = await response.json();
 console.log(data.products); // Array of matching products
 console.log(data.pagination); // Pagination info
@@ -134,7 +134,7 @@ console.log(data.pagination); // Pagination info
 ### Order Status Update
 ```javascript
 // Update order status
-const response = await fetch('/.netlify/functions/orders', {
+const response = await fetch('/netlify/functions/orders', {
   method: 'PATCH',
   headers: {
     'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ const response = await fetch('/.netlify/functions/orders', {
 ### Analytics Report
 ```javascript
 // Get order trends with comparison
-const response = await fetch('/.netlify/functions/analytics?report_type=order_trends&date_from=2025-01-01&date_to=2025-01-31&compare_previous=true');
+const response = await fetch('/netlify/functions/analytics?report_type=order_trends&date_from=2025-01-01&date_to=2025-01-31&compare_previous=true');
 const data = await response.json();
 console.log(data.current); // Current period data
 console.log(data.previous); // Previous period data
@@ -161,7 +161,7 @@ console.log(data.previous); // Previous period data
 ### Notifications
 ```javascript
 // Get unread notifications
-const response = await fetch('/.netlify/functions/notifications?unread_only=true&limit=20', {
+const response = await fetch('/netlify/functions/notifications?unread_only=true&limit=20', {
   headers: { 'Authorization': `Bearer ${token}` }
 });
 const data = await response.json();
@@ -169,7 +169,7 @@ console.log(data.notifications); // Array of notifications
 console.log(data.unread_count); // Total unread count
 
 // Mark all as read
-await fetch('/.netlify/functions/notifications', {
+await fetch('/netlify/functions/notifications', {
   method: 'PATCH',
   headers: {
     'Content-Type': 'application/json',

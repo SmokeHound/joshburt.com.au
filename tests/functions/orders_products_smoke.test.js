@@ -10,7 +10,7 @@ async function isServerAvailable() {
   try {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch(`${BASE}/.netlify/functions/health`, { signal: controller.signal });
+  const res = await fetch(`${BASE}/netlify/functions/health`, { signal: controller.signal });
     clearTimeout(t);
     return res.ok;
   } catch {
@@ -19,7 +19,7 @@ async function isServerAvailable() {
 }
 
 async function call(endpoint, opts = {}) {
-  const res = await fetch(`${BASE}/.netlify/functions/${endpoint}`, opts);
+  const res = await fetch(`${BASE}/netlify/functions/${endpoint}`, opts);
   const text = await res.text();
   let json;
   try { json = JSON.parse(text); } catch { json = text; }
@@ -27,7 +27,7 @@ async function call(endpoint, opts = {}) {
 }
 
 async function login() {
-  const res = await fetch(`${BASE}/.netlify/functions/auth?action=login`, {
+  const res = await fetch(`${BASE}/netlify/functions/auth?action=login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: 'admin@joshburt.com.au', password: 'admin123!' })

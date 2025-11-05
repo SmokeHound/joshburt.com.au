@@ -1,4 +1,4 @@
-// Netlify Function: CRUD & management /.netlify/functions/users
+// Netlify Function: CRUD & management /netlify/functions/users
 const bcrypt = require('bcryptjs');
 const { database, initializeDatabase } = require('../../config/database');
 const { corsHeaders, parseBody, requireAuth, requirePermission } = require('../../utils/http');

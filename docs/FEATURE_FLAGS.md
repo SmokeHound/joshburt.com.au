@@ -224,7 +224,7 @@ Example settings JSON:
 
 ## API Endpoints
 
-### GET /.netlify/functions/settings
+### GET /netlify/functions/settings
 
 Returns current settings including feature flags.
 
@@ -240,7 +240,7 @@ Returns current settings including feature flags.
 }
 ```
 
-### PUT /.netlify/functions/settings
+### PUT /netlify/functions/settings
 
 Updates settings including feature flags.
 

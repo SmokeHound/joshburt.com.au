@@ -10,7 +10,7 @@ async function isServerAvailable() {
   try {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch(`${BASE}/.netlify/functions/health`, { signal: controller.signal });
+  const res = await fetch(`${BASE}/netlify/functions/health`, { signal: controller.signal });
     clearTimeout(t);
     return res.ok;
   } catch {
@@ -19,7 +19,7 @@ async function isServerAvailable() {
 }
 
 async function callAuth(action, body = {}) {
-  const res = await fetch(`${BASE}/.netlify/functions/auth?action=${encodeURIComponent(action)}`, {
+  const res = await fetch(`${BASE}/netlify/functions/auth?action=${encodeURIComponent(action)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...body, action })
@@ -29,7 +29,7 @@ async function callAuth(action, body = {}) {
 }
 
 async function callUsers(token) {
-  const res = await fetch(`${BASE}/.netlify/functions/users`, {
+  const res = await fetch(`${BASE}/netlify/functions/users`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {}
   });
   const json = await res.json().catch(() => ({}));
@@ -54,7 +54,7 @@ async function callUsers(token) {
     console.log('✅ Login ok');
 
     // 2. Me
-    const meRes = await fetch(`${BASE}/.netlify/functions/auth?action=me`, {
+  const meRes = await fetch(`${BASE}/netlify/functions/auth?action=me`, {
       headers: { Authorization: `Bearer ${login.json.accessToken}` }
     });
     const meJson = await meRes.json().catch(() => ({}));

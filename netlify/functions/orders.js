@@ -1,5 +1,5 @@
 
-// Netlify Function: GET/POST/PATCH/DELETE /.netlify/functions/orders
+// Netlify Function: GET/POST/PATCH/DELETE /netlify/functions/orders
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requirePermission, requireAuth } = require('../../utils/http');

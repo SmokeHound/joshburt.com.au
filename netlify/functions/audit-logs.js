@@ -1,4 +1,4 @@
-// Netlify Function: GET/POST/DELETE /.netlify/functions/audit-logs
+// Netlify Function: GET/POST/DELETE /netlify/functions/audit-logs
 // Enhancements: pagination (page,limit), free-text search (q across action/details/user_id), CSV export, delete with cutoff.
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody, getPagination } = require('../../utils/fn');

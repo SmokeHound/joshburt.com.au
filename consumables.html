@@ -337,7 +337,7 @@
 
       async function loadConsumablesDataSourceSetting() {
         try {
-          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const FN_BASE = window.FN_BASE || '/netlify/functions';
           const res = await window.authFetch(`${FN_BASE}/settings`);
           if (res.ok) {
             const s = await res.json();
@@ -353,7 +353,7 @@
       // Product loading and display
       async function loadProducts() {
         try {
-          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const FN_BASE = window.FN_BASE || '/netlify/functions';
           if (consumablesDataSource === 'local') {
             const resp = await fetch('data/consumables.json');
             if (!resp.ok) throw new Error(`Local JSON error ${resp.status}`);
@@ -611,7 +611,7 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
                   quantity: item.quantity
                 }))
               };
-              const FN_BASE = window.FN_BASE || '/.netlify/functions';
+              const FN_BASE = window.FN_BASE || '/netlify/functions';
               const res = await window.authFetch(`${FN_BASE}/orders`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

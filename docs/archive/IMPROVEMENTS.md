@@ -59,8 +59,8 @@ Added `tests/unit/page-header.test.js` to verify all main pages include the page
 **File**: `scripts/health-check.js`  
 **Purpose**: Validates Netlify Functions are running and database is connected  
 **Checks**:
-- `/.netlify/functions/health` - Database connectivity
-- `/.netlify/functions/public-config` - Basic API availability
+- `/netlify/functions/health` - Database connectivity
+- `/netlify/functions/public-config` - Basic API availability
 
 **Usage**:
 ```bash
@@ -70,10 +70,10 @@ npm run health
 **Output**:
 ```
 🏥 Running health check for Netlify Functions...
-🔍 Checking http://localhost:8888/.netlify/functions/health...
-✅ /.netlify/functions/health - OK (200)
-🔍 Checking http://localhost:8888/.netlify/functions/public-config...
-✅ /.netlify/functions/public-config - OK (200)
+🔍 Checking http://localhost:8888/netlify/functions/health...
+✅ /netlify/functions/health - OK (200)
+🔍 Checking http://localhost:8888/netlify/functions/public-config...
+✅ /netlify/functions/public-config - OK (200)
 📊 Health Check Summary: 2/2 endpoints healthy
 🎉 All systems operational!
 ```

@@ -1,4 +1,4 @@
-// Netlify Function: GET /.netlify/functions/health (service health & DB probe)
+// Netlify Function: GET /netlify/functions/health (service health & DB probe)
 const { database, initializeDatabase } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
 

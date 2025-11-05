@@ -155,7 +155,7 @@
       params.set('endDate', state.endDate);
     }
     try {
-      const FN_BASE = window.FN_BASE || '/.netlify/functions';
+      const FN_BASE = window.FN_BASE || '/netlify/functions';
       const url = `${FN_BASE}/audit-logs?` + params.toString();
       const res = await (window.authFetch ? window.authFetch(url) : fetch(url));
       if (!res.ok) {
@@ -461,7 +461,7 @@
       params.set('endDate', state.endDate);
     }
     params.set('limit', 1000);
-    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    const FN_BASE = window.FN_BASE || '/netlify/functions';
     const url = `${FN_BASE}/audit-logs?` + params.toString();
     (window.authFetch ? window.authFetch(url) : fetch(url))
       .then(async res => {
@@ -488,7 +488,7 @@
     if (!confirm('Clear all audit logs? This cannot be undone.')) {
       return;
     }
-    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    const FN_BASE = window.FN_BASE || '/netlify/functions';
     const url = `${FN_BASE}/audit-logs`;
     (window.authFetch
       ? window.authFetch(url, { method: 'DELETE' })
@@ -552,7 +552,7 @@
 
   async function fetchUsersMap() {
     try {
-      const FN_BASE = window.FN_BASE || '/.netlify/functions';
+      const FN_BASE = window.FN_BASE || '/netlify/functions';
       const url = `${FN_BASE}/users`;
       let res;
       if (window.authFetch) {

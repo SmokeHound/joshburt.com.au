@@ -180,7 +180,7 @@ docs/FEATURE_FLAGS.md → docs/AUDIT_EVENTS.md → docs/ROADMAP.md- **[AUDIT_LOG
 
 |-----------|---------|- **[PHASE4_QUICKSTART.md](PHASE4_QUICKSTART.md)** - Phase 4 quick start
 
-| `.netlify/functions/` | Serverless backend API functions |- **[PHASE5_IMPLEMENTATION_SUMMARY.md](PHASE5_IMPLEMENTATION_SUMMARY.md)** - Phase 5 summary
+| `/netlify/functions/` | Serverless backend API functions |- **[PHASE5_IMPLEMENTATION_SUMMARY.md](PHASE5_IMPLEMENTATION_SUMMARY.md)** - Phase 5 summary
 
 | `docs/` | All technical documentation |
 
@@ -286,7 +286,7 @@ All major documentation follows this structure:
 ### Key Directories
 | Directory | Purpose |
 |-----------|---------|
-| `.netlify/functions/` | Serverless backend functions |
+| `/netlify/functions/` | Serverless backend functions |
 | `utils/` | Shared utility functions |
 | `config/` | Configuration modules |
 | `scripts/` | Maintenance and utility scripts |

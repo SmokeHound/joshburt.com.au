@@ -2,7 +2,7 @@
 // profile.js: User profile view/edit and activity log
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const FN_BASE = window.FN_BASE || '/.netlify/functions';
+  const FN_BASE = window.FN_BASE || '/netlify/functions';
   // Use centralized token accessor
   const token = (window.getToken && window.getToken()) || null;
   if (!token) {

@@ -163,7 +163,7 @@
 
     <script>
         // Serverless auth function base
-        const FN_AUTH = `${(window.FN_BASE || '/.netlify/functions')}/auth`;
+        const FN_AUTH = `${(window.FN_BASE || '/netlify/functions')}/auth`;
 
         // Toast notifications are routed via global showToast (init-shared.js)
 
@@ -383,7 +383,7 @@
             // Try to populate config from server if not set
             try {
                 if (!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID)){
-                    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+                    const FN_BASE = window.FN_BASE || '/netlify/functions';
                     const res = await fetch(`${FN_BASE}/public-config`);
                     if (res.ok){
                         const cfg = await res.json();

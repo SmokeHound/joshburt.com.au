@@ -8,7 +8,7 @@ The application provides health check endpoints that can be monitored by externa
 
 ## Health Check Endpoint
 
-**URL**: `https://joshburt.com.au/.netlify/functions/health`
+**URL**: `https://joshburt.com.au/netlify/functions/health`
 
 **Method**: GET
 
@@ -54,7 +54,7 @@ The application provides health check endpoints that can be monitored by externa
 1. Create account at https://uptimerobot.com
 2. Add new monitor with type "HTTP(s)"
 3. Configure:
-   - URL: `https://joshburt.com.au/.netlify/functions/health`
+   - URL: `https://joshburt.com.au/netlify/functions/health`
    - Monitoring Interval: 5 minutes
    - Monitor Timeout: 30 seconds
    - Monitor Type: HTTP(s)
@@ -71,7 +71,7 @@ The application provides health check endpoints that can be monitored by externa
 1. Create account at https://pingdom.com
 2. Add new uptime check
 3. Configure:
-   - URL: `https://joshburt.com.au/.netlify/functions/health`
+   - URL: `https://joshburt.com.au/netlify/functions/health`
    - Check Interval: 1-5 minutes
    - Response Time Alerting: >5000ms
    - Custom HTTP header: `X-Monitor: Pingdom`
@@ -87,7 +87,7 @@ The application provides health check endpoints that can be monitored by externa
 1. Create account at https://betteruptime.com
 2. Add new monitor
 3. Configure:
-   - URL: `https://joshburt.com.au/.netlify/functions/health`
+   - URL: `https://joshburt.com.au/netlify/functions/health`
    - Check Frequency: Every minute (free tier: every 3 minutes)
    - Timezone: Your preferred timezone
    - Status Page: Create public status page
@@ -117,7 +117,7 @@ docker run -d --restart=always -p 3001:3001 -v uptime-kuma:/app/data --name upti
 
 ### Critical Checks (Every 1-5 minutes)
 
-1. **Health Endpoint**: `/.netlify/functions/health`
+1. **Health Endpoint**: `/netlify/functions/health`
    - Alert on: Status != 200, Response time > 5s
    - Action: Immediate investigation
 
@@ -127,7 +127,7 @@ docker run -d --restart=always -p 3001:3001 -v uptime-kuma:/app/data --name upti
 
 ### Standard Checks (Every 5-15 minutes)
 
-3. **Authentication**: `/.netlify/functions/auth?action=me`
+3. **Authentication**: `/netlify/functions/auth?action=me`
    - Requires valid JWT token
    - Alert on: 5xx errors
    - Action: Check database and auth service
@@ -259,7 +259,7 @@ response.checks.externalService = externalServiceOk;
 
 For issues with monitoring setup:
 - Review logs: Check Netlify function logs
-- Test endpoint: `curl https://joshburt.com.au/.netlify/functions/health`
+- Test endpoint: `curl https://joshburt.com.au/netlify/functions/health`
 - Check DNS: `nslookup joshburt.com.au`
 - Verify SSL: `openssl s_client -connect joshburt.com.au:443`
 
