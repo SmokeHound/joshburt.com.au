@@ -158,7 +158,7 @@
             async function loadOrders() {
                 try {
                     const FN_BASE = window.FN_BASE || '/.netlify/functions';
-                    const res = await fetch(`${FN_BASE}/orders`);
+                    const res = await window.authFetch(`${FN_BASE}/orders`);
                     if (!res.ok) throw new Error('Failed to fetch orders');
                     const orders = await res.json();
                     ordersState = Array.isArray(orders) ? orders : [];
@@ -306,7 +306,7 @@
                     if (!confirmed) return;
                     
                     const FN_BASE = window.FN_BASE || '/.netlify/functions';
-                    const res = await fetch(`${FN_BASE}/orders`, {
+                    const res = await window.authFetch(`${FN_BASE}/orders`, {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ orderId, status })
