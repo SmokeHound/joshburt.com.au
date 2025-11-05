@@ -80,6 +80,26 @@
         </div>
         <div id="audit-pagination" class="flex flex-wrap gap-2 items-center justify-between pt-2 border-t border-gray-800"></div>
       </div>`;
+    // Modal for viewing full details
+    const modalHtml = `
+      <div id="audit-detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+        <div id="audit-modal-overlay" class="absolute inset-0 bg-black/50"></div>
+        <div class="relative bg-white dark:bg-gray-900 rounded-lg shadow-lg w-[90%] max-w-3xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-lg font-semibold">Audit Detail</h3>
+            <div class="flex gap-2">
+              <button id="audit-modal-mode" class="px-2 py-1 text-xs rounded bg-gray-800 text-white">Raw</button>
+              <button id="audit-modal-copy" class="px-2 py-1 text-xs rounded bg-gray-800 text-white">Copy</button>
+              <button id="audit-modal-close" class="px-2 py-1 text-xs rounded bg-red-600 text-white">Close</button>
+            </div>
+          </div>
+          <div class="overflow-auto max-h-[60vh]">
+            <pre id="audit-modal-pretty" class="hidden p-2 bg-gray-900 text-gray-100 rounded text-[12px] whitespace-pre-wrap"></pre>
+            <pre id="audit-modal-raw" class="p-2 bg-gray-900 text-gray-100 rounded text-[12px] whitespace-pre-wrap hidden"></pre>
+          </div>
+        </div>
+      </div>`;
+    root.insertAdjacentHTML('beforeend', modalHtml);
     root.dataset.initialized = 'true';
     return root;
   }
@@ -298,10 +318,7 @@
         } else {
           formattedPreview = truncated;
         }
-        const baseId = `audit-${idx}`;
-        const boxId = `${baseId}-box`;
-        const prePrettyId = `${baseId}-pretty`;
-        const preRawId = `${baseId}-raw`;
+    // baseId removed—modal will source content from state.data by index
 
         return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
@@ -313,14 +330,8 @@
           ${
   pretty || raw
     ? `
-          <div class="mt-1 flex gap-2">
-            <button class="audit-toggle px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${boxId}">View</button>
-            ${parsed ? `<button class="audit-mode px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}" data-mode="pretty">Raw</button>` : ''}
-            <button class="audit-copy px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}">Copy</button>
-          </div>
-          <div id="${boxId}" class="hidden mt-2">
-            ${parsed ? `<pre id="${prePrettyId}" class="mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(pretty)}</pre>` : ''}
-            <pre id="${preRawId}" class="${parsed ? 'hidden ' : ''}mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(raw || '')}</pre>
+          <div class="mt-1">
+            <button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800" data-idx="${idx}">Details</button>
           </div>
           `
     : ''
@@ -331,10 +342,61 @@
       })
       .join('');
 
-    // Row actions: toggle/copy via event delegation
+    // Row actions: modal/mode/copy via event delegation
     tbody.onclick = e => {
       const t = e.target;
-      if (t && t.classList.contains('audit-toggle')) {
+      if (t && t.classList.contains('audit-open-modal')) {
+        const idxAttr = t.getAttribute('data-idx');
+        const idx = parseInt(idxAttr, 10);
+        if (isNaN(idx) || !state.data[idx]) { return; }
+        const row = state.data[idx];
+        // Recreate pretty/raw content from row data
+        let raw = row.details;
+        let parsed = null;
+        if (raw && typeof raw === 'string') {
+          try {
+            parsed = JSON.parse(raw);
+          } catch (_) {
+            /* not JSON */
+          }
+        } else if (raw && typeof raw === 'object') {
+          parsed = raw;
+          raw = JSON.stringify(raw);
+        }
+        const pretty = parsed ? JSON.stringify(parsed, null, 2) : (typeof raw === 'string' ? raw : '');
+        const modal = document.getElementById('audit-detail-modal');
+        if (!modal) { return; }
+        const modalPretty = document.getElementById('audit-modal-pretty');
+        const modalRaw = document.getElementById('audit-modal-raw');
+        const modeBtn = document.getElementById('audit-modal-mode');
+        if (modalPretty) { modalPretty.textContent = pretty; }
+        if (modalRaw) { modalRaw.textContent = raw || ''; }
+        if (pretty && modalPretty) {
+          modalPretty.classList.remove('hidden');
+          modalRaw.classList.add('hidden');
+          if (modeBtn) { modeBtn.textContent = 'Raw'; }
+        } else {
+          modalRaw.classList.remove('hidden');
+          modalPretty.classList.add('hidden');
+          if (modeBtn) { modeBtn.textContent = 'Pretty'; }
+        }
+        // Animate open: scale + fade
+        const modalContent = modal.querySelector('.relative');
+        if (modalContent) {
+          modalContent.style.transition = 'transform 160ms cubic-bezier(.2,.9,.2,1), opacity 160ms ease-out';
+          modalContent.style.transform = 'scale(0.97)';
+          modalContent.style.opacity = '0';
+        }
+        modal.classList.remove('hidden');
+        // trigger animation
+        requestAnimationFrame(() => {
+          if (modalContent) {
+            modalContent.style.transform = 'scale(1)';
+            modalContent.style.opacity = '1';
+          }
+        });
+        return;
+      } else if (t && t.classList.contains('audit-toggle')) {
         const boxId2 = t.getAttribute('data-target');
         const box = document.getElementById(boxId2);
         if (box) {
@@ -712,6 +774,70 @@
     }
     if (clearBtn) {
       clearBtn.addEventListener('click', clearLogs);
+    }
+    // Modal controls (close, overlay, mode toggle, copy, ESC)
+    const modal = document.getElementById('audit-detail-modal');
+    if (modal) {
+      const closeBtn = document.getElementById('audit-modal-close');
+      const overlay = document.getElementById('audit-modal-overlay');
+      const modeBtn = document.getElementById('audit-modal-mode');
+      const copyBtn = document.getElementById('audit-modal-copy');
+      const modalPretty = document.getElementById('audit-modal-pretty');
+      const modalRaw = document.getElementById('audit-modal-raw');
+      function closeModal() {
+        modal.classList.add('hidden');
+        try {
+          if (modalPretty) { modalPretty.textContent = ''; }
+          if (modalRaw) { modalRaw.textContent = ''; }
+        } catch (err) {
+          /* ignore */
+        }
+      }
+      if (closeBtn) { closeBtn.addEventListener('click', closeModal); }
+      if (overlay) { overlay.addEventListener('click', closeModal); }
+      if (modeBtn) {
+        modeBtn.addEventListener('click', () => {
+          if (!modalPretty || !modalRaw) { return; }
+          if (modalPretty.classList.contains('hidden')) {
+            modalPretty.classList.remove('hidden');
+            modalRaw.classList.add('hidden');
+            modeBtn.textContent = 'Raw';
+          } else {
+            modalPretty.classList.add('hidden');
+            modalRaw.classList.remove('hidden');
+            modeBtn.textContent = 'Pretty';
+          }
+        });
+      }
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          try {
+            let text = '';
+            if (modalRaw && !modalRaw.classList.contains('hidden')) {
+              text = modalRaw.textContent || '';
+            } else if (modalPretty) {
+              text = modalPretty.textContent || '';
+            }
+            if (text) {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(() => {});
+              } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (err) { /* no-op */ }
+                document.body.removeChild(ta);
+              }
+            }
+          } catch (err) { /* ignore */ }
+        });
+      }
+      window.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+          closeModal();
+        }
+      });
     }
   }
 
