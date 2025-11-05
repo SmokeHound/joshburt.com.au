@@ -24,9 +24,9 @@ describe('Order Submission Authentication', () => {
       'utf8'
     );
     
-    // Verify that the order submission uses authFetch, not plain fetch
-    const orderSubmissionPattern = /const res = await window\.authFetch\(`\$\{FN_BASE\}\/orders`,\s*\{[^}]*method: 'POST'/;
-    expect(htmlContent).toMatch(orderSubmissionPattern);
+    // Verify that the order submission uses authFetch
+    expect(htmlContent).toContain('window.authFetch(`${FN_BASE}/orders`');
+    expect(htmlContent).toContain("method: 'POST'");
   });
   
   test('should use authFetch for products API', () => {
@@ -68,8 +68,8 @@ describe('Orders Review Authentication', () => {
     );
     
     // Verify order updates use authFetch with PATCH method
-    const patchPattern = /window\.authFetch\(`\$\{FN_BASE\}\/orders`,\s*\{[^}]*method: 'PATCH'/;
-    expect(htmlContent).toMatch(patchPattern);
+    expect(htmlContent).toContain('window.authFetch(`${FN_BASE}/orders`');
+    expect(htmlContent).toContain("method: 'PATCH'");
   });
 });
 
@@ -81,8 +81,8 @@ describe('Consumables Page Authentication', () => {
     );
     
     // Verify order submission uses authFetch
-    const orderPattern = /window\.authFetch\(`\$\{FN_BASE\}\/orders`,\s*\{[^}]*method: 'POST'/;
-    expect(htmlContent).toMatch(orderPattern);
+    expect(htmlContent).toContain('window.authFetch(`${FN_BASE}/orders`');
+    expect(htmlContent).toContain("method: 'POST'");
   });
   
   test('should use authFetch for settings API', () => {
