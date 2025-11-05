@@ -10,7 +10,7 @@ async function isServerAvailable() {
   try {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 2000);
-  const res = await fetch(`${BASE}/netlify/functions/health`, { signal: controller.signal });
+    const res = await fetch(`${BASE}/netlify/functions/health`, { signal: controller.signal });
     clearTimeout(t);
     return res.ok;
   } catch {
@@ -54,7 +54,7 @@ async function callUsers(token) {
     console.log('✅ Login ok');
 
     // 2. Me
-  const meRes = await fetch(`${BASE}/netlify/functions/auth?action=me`, {
+    const meRes = await fetch(`${BASE}/netlify/functions/auth?action=me`, {
       headers: { Authorization: `Bearer ${login.json.accessToken}` }
     });
     const meJson = await meRes.json().catch(() => ({}));

@@ -7,7 +7,7 @@ async function isServerAvailable() {
   try {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 2000);
-  const res = await fetch(`${BASE}/netlify/functions/health`, { signal: controller.signal });
+    const res = await fetch(`${BASE}/netlify/functions/health`, { signal: controller.signal });
     clearTimeout(t);
     return res.ok;
   } catch {
@@ -41,12 +41,12 @@ async function postAuth(action, body) {
     console.log('✅ Invalid password rejected');
 
     // Missing token for me
-  const meNoToken = await fetch(`${BASE}/netlify/functions/auth?action=me`);
+    const meNoToken = await fetch(`${BASE}/netlify/functions/auth?action=me`);
     if (meNoToken.status === 200) { console.error('❌ Expected unauthorized for me without token'); process.exitCode = 1; return; }
     console.log('✅ Unauthorized me without token');
 
     // Fake token
-  const meFake = await fetch(`${BASE}/netlify/functions/auth?action=me`, { headers: { Authorization: 'Bearer faketoken' } });
+    const meFake = await fetch(`${BASE}/netlify/functions/auth?action=me`, { headers: { Authorization: 'Bearer faketoken' } });
     if (meFake.status === 200) { console.error('❌ Expected failure for fake token'); process.exitCode = 1; return; }
     console.log('✅ Fake token rejected');
 

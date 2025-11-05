@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
   async function loadProducts() {
     try {
       (window.showToast || function() {})('Loading consumables...', 'info');
-  const FN_BASE = window.FN_BASE || '/netlify/functions';
+      const FN_BASE = window.FN_BASE || '/netlify/functions';
       const res = await fetch(`${FN_BASE}/consumables`);
       if (!res.ok) {throw new Error(`HTTP error! status: ${res.status}`);}
       const data = await res.json();
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function saveProductToAPI(productData, isUpdate = false) {
     try {
-    const FN_BASE = window.FN_BASE || '/netlify/functions';
+      const FN_BASE = window.FN_BASE || '/netlify/functions';
       const url = `${FN_BASE}/consumables`;
       const method = isUpdate ? 'PUT' : 'POST';
       const response = await fetch(url, {
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function deleteProductFromAPI(productId) {
     try {
-    const FN_BASE = window.FN_BASE || '/netlify/functions';
+      const FN_BASE = window.FN_BASE || '/netlify/functions';
       const response = await fetch(`${FN_BASE}/consumables`, {
         method: 'DELETE',
         headers: {

@@ -118,13 +118,13 @@ function makeEvent({ path='/netlify/functions/auth', httpMethod='POST', query={}
     console.log('✅ login handler ok');
 
     // Users list should fail without token (403/401)
-  const usersNoAuth = await usersFn.handler({ path:'/netlify/functions/users', httpMethod:'GET', headers:{} });
+    const usersNoAuth = await usersFn.handler({ path:'/netlify/functions/users', httpMethod:'GET', headers:{} });
     if (![401,403].includes(usersNoAuth.statusCode)) { console.error('❌ users list should be unauthorized', usersNoAuth); process.exitCode=1; return; }
     console.log('✅ users unauthorized without token');
 
     // Users list with token
     const token = loginBody.accessToken;
-  const usersAuth = await usersFn.handler({ path:'/netlify/functions/users', httpMethod:'GET', headers:{ authorization:`Bearer ${token}` } });
+    const usersAuth = await usersFn.handler({ path:'/netlify/functions/users', httpMethod:'GET', headers:{ authorization:`Bearer ${token}` } });
     const usersAuthBody = JSON.parse(usersAuth.body||'{}');
     if (usersAuth.statusCode!==200 || !Array.isArray(usersAuthBody.users)) { console.error('❌ users list with token failed', usersAuth); process.exitCode=1; return; }
     console.log('✅ users list with token ok');
