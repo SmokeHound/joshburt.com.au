@@ -97,6 +97,12 @@
       return '';
     }
     
+    // Trim whitespace
+    action = action.trim();
+    if (action.length === 0) {
+      return '';
+    }
+    
     // Split on dot to get entity and action parts
     const parts = action.split('.');
     if (parts.length !== 2) {
@@ -106,14 +112,25 @@
     
     const [entity, verb] = parts;
     
+    // Ensure both parts have content
+    if (!entity || !verb || entity.length === 0 || verb.length === 0) {
+      return action.charAt(0).toUpperCase() + action.slice(1);
+    }
+    
     // Format entity name (capitalize first letter)
     const formattedEntity = entity.charAt(0).toUpperCase() + entity.slice(1);
     
     // Format verb (replace underscores with spaces and capitalize)
     const formattedVerb = verb
       .split('_')
+      .filter(word => word.length > 0) // Filter out empty strings from double underscores
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+    
+    // If verb formatting resulted in empty string, fall back to original
+    if (formattedVerb.length === 0) {
+      return action.charAt(0).toUpperCase() + action.slice(1);
+    }
     
     return `${formattedEntity} ${formattedVerb}`;
   }
