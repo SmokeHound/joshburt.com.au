@@ -348,7 +348,7 @@
         try {
           console.log('Attempting to load from API...');
           const FN_BASE = window.FN_BASE || '/.netlify/functions';
-          const response = await fetch(`${FN_BASE}/products`);
+          const response = await window.authFetch(`${FN_BASE}/products`);
           
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -611,7 +611,7 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
       async function loadOilDataSourceSetting() {
         try {
           const FN_BASE = window.FN_BASE || '/.netlify/functions';
-          const res = await fetch(`${FN_BASE}/settings`);
+          const res = await window.authFetch(`${FN_BASE}/settings`);
           if (res.ok) {
             const s = await res.json();
             oilDataSource = (s && s.oilDataSource) ? s.oilDataSource : 'api';
@@ -649,7 +649,7 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
             }))
           };
           const FN_BASE = window.FN_BASE || '/.netlify/functions';
-          const res = await fetch(`${FN_BASE}/orders`, {
+          const res = await window.authFetch(`${FN_BASE}/orders`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
