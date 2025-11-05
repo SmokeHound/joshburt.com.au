@@ -89,9 +89,42 @@ class AdminAuditLogger {
 
   broadcastLogEvent(logEntry) {
     // Broadcast to other tabs/windows
-    window.dispatchEvent(new CustomEvent('adminAuditLog', {
-      detail: logEntry
-    }));
+    try {
+      window.dispatchEvent(new CustomEvent('adminAuditLog', { detail: logEntry }));
+    } catch (e) {
+      // ignore
+    }
+
+    // Also mirror admin audit entries into the shared 'auditLogs' cache
+    // so UI components that read from 'auditLogs' (and listen for
+    // 'auditLogUpdated') will immediately reflect admin actions.
+    try {
+      const sharedKey = 'auditLogs';
+      const existing = JSON.parse(localStorage.getItem(sharedKey) || '[]');
+      // Create a normalized entry similar to other log producers
+      const sharedEntry = {
+        id: logEntry.id || Date.now(),
+        timestamp: logEntry.timestamp || new Date().toISOString(),
+        userId: logEntry.userId || logEntry.user || logEntry.userEmail || null,
+        action: logEntry.action || logEntry.type || 'admin_action',
+        details: logEntry.details || logEntry.data || {},
+        ip: logEntry.ipAddress || logEntry.ip || ''
+      };
+      existing.unshift(sharedEntry);
+      if (existing.length > 1000) {
+        existing.splice(1000);
+      }
+      localStorage.setItem(sharedKey, JSON.stringify(existing));
+
+      // Dispatch the conventional event the dashboard listens for
+      try {
+        window.dispatchEvent(new CustomEvent('auditLogUpdated', { detail: sharedEntry }));
+      } catch (e) {
+        // ignore
+      }
+    } catch (e) {
+      // Fail silently - audit mirroring is best-effort
+    }
   }
 
   exportLogs(format = 'csv', filters = {}) {
