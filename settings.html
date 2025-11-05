@@ -1355,13 +1355,18 @@
             };
         }
 
+    // Helper function to get authentication token
+    function getAuthToken() {
+      return (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+    }
+
     // Save settings with audit logging (to API)
     async function saveSettings() {
             const settings = getFormSettings();
             try {
                 // Fetch previous settings for audit diff
           const FN_BASE = window.FN_BASE || '/.netlify/functions';
-          const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+          const token = getAuthToken();
           const prevRes = await fetch(`${FN_BASE}/settings`, {
             headers: token ? { 'Authorization': `Bearer ${token}` } : {}
           });
@@ -1375,7 +1380,10 @@
                     body: JSON.stringify(settings)
                 });
                 if (!res.ok) {
-                  const errorData = await res.json().catch(() => ({}));
+                  const errorData = await res.json().catch((e) => {
+                    console.warn('Failed to parse error response:', e);
+                    return {};
+                  });
                   throw new Error(errorData.error || `Failed to save settings (${res.status})`);
                 }
                 
