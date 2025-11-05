@@ -96,42 +96,42 @@
     if (!action || typeof action !== 'string') {
       return '';
     }
-    
+
     // Trim whitespace
     action = action.trim();
     if (action.length === 0) {
       return '';
     }
-    
+
     // Split on dot to get entity and action parts
     const parts = action.split('.');
     if (parts.length !== 2) {
       // If not in expected format, just capitalize first letter
       return action.charAt(0).toUpperCase() + action.slice(1);
     }
-    
+
     const [entity, verb] = parts;
-    
+
     // Ensure both parts have content
     if (!entity || !verb || entity.length === 0 || verb.length === 0) {
       return action.charAt(0).toUpperCase() + action.slice(1);
     }
-    
+
     // Format entity name (capitalize first letter)
     const formattedEntity = entity.charAt(0).toUpperCase() + entity.slice(1);
-    
+
     // Format verb (replace underscores with spaces and capitalize)
     const formattedVerb = verb
       .split('_')
       .filter(word => word.length > 0) // Filter out empty strings from double underscores
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
-    
+
     // If verb formatting resulted in empty string, fall back to original
     if (formattedVerb.length === 0) {
       return action.charAt(0).toUpperCase() + action.slice(1);
     }
-    
+
     return `${formattedEntity} ${formattedVerb}`;
   }
 
@@ -311,8 +311,8 @@
           ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
           <div class="text-xs text-gray-300 dark:text-gray-400 break-words whitespace-pre-wrap">${escapeHtml(formattedPreview || '')}</div>
           ${
-            pretty || raw
-              ? `
+  pretty || raw
+    ? `
           <div class="mt-1 flex gap-2">
             <button class="audit-toggle px-2 py-0.5 text-xs rounded bg-gray-800" data-target="${boxId}">View</button>
             ${parsed ? `<button class="audit-mode px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${baseId}" data-mode="pretty">Raw</button>` : ''}
@@ -323,8 +323,8 @@
             <pre id="${preRawId}" class="${parsed ? 'hidden ' : ''}mt-2 p-2 bg-gray-900 text-gray-100 rounded text-[11px] overflow-auto max-h-48">${escapeHtml(raw || '')}</pre>
           </div>
           `
-              : ''
-          }
+    : ''
+  }
         </td>
         <td class="p-2 align-top whitespace-nowrap text-xs">${ip}</td>
       </tr>`;

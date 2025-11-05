@@ -90,9 +90,11 @@ async function set(namespace, key, value, ttl = null) {
       await redisClient.set(cacheKey, serialized);
     }
     stats.sets++;
+    return true;
   } catch (error) {
     console.error('Redis set error:', error);
   }
+  return false;
 }
 
 /**
@@ -148,9 +150,11 @@ async function clearAll() {
 
   try {
     await redisClient.flushdb();
+    return true;
   } catch (error) {
     console.error('Redis clearAll error:', error);
   }
+  return false;
 }
 
 /**

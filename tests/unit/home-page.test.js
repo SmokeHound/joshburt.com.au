@@ -63,7 +63,7 @@ describe('Home Page', () => {
 
       const setItemSpy = jest.spyOn(localStorage, 'setItem');
 
-      loginForm.addEventListener('submit', async (e) => {
+      loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const authenticatedUser = {
           name: 'test',
@@ -102,7 +102,7 @@ describe('Home Page', () => {
       emailInput.value = 'invalid@example.com';
       passwordInput.value = 'wrongpassword';
 
-      loginForm.addEventListener('submit', async (e) => {
+      loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         try {
           throw new Error('Invalid credentials');
@@ -133,7 +133,7 @@ describe('Home Page', () => {
     expect(welcomeMessage.textContent).toBe('Welcome, John Doe!');
   });
 
-  test('should handle logout correctly', async () => {
+  test('should handle logout correctly', () => {
     const logoutBtn = document.getElementById('logout-btn');
     const welcomeMessage = document.getElementById('welcome-message');
 

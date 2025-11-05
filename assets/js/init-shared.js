@@ -119,7 +119,7 @@
         return Object.assign({}, base, { headers });
       };
 
-      async function doFetch(tok) {
+      function doFetch(tok) {
         return fetch(toUrl, makeInit(tok));
       }
 
@@ -214,7 +214,7 @@
         loginBtn.addEventListener('click', function() { window.location.href = 'login.html'; });
       }
       if (logoutBtn) {
-        logoutBtn.addEventListener('click', async function() {
+        logoutBtn.addEventListener('click', function() {
           try {
             // Best-effort serverless logout (invalidate refresh token)
             const refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;

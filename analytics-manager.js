@@ -235,7 +235,7 @@ class AnalyticsDataManager {
   }
 
   // Mock: Browser breakdown (randomized for demo)
-  getBrowserBreakdown(data) {
+  getBrowserBreakdown(_data) {
     // Simulate breakdown for demo
     const chrome = 60 + Math.floor(Math.random() * 10); // 60-70%
     const firefox = 20 + Math.floor(Math.random() * 10); // 20-30%
@@ -249,7 +249,6 @@ class AnalyticsDataManager {
 
   // Mock: Multi-metric comparison (Visitors, Orders, Sessions per day)
   getMultiMetricComparison(data) {
-    const days = (data.visitors || []).length;
     const labels = (data.visitors || []).map(d => d.date);
     const visitors = (data.visitors || []).map(d => d.totalVisitors);
     const orders = (data.oilOrders || []).map(d => d.totalOrders);
@@ -309,9 +308,9 @@ class AnalyticsDataManager {
   }
 
   // Mock: Device/browser breakdown (randomized for demo)
-  getDeviceBreakdown(data) {
+  getDeviceBreakdown(_data) {
     // Simulate breakdown for demo
-    const total = 100;
+    const _total = 100;
     const desktop = 50 + Math.floor(Math.random() * 20); // 50-70%
     const mobile = 100 - desktop - 10;
     const tablet = 10;
@@ -404,6 +403,7 @@ class AnalyticsDataManager {
     } else if (format === 'json') {
       return this.exportToJSON(analyticsData);
     }
+    return null;
   }
 
   exportToCSV(analyticsData) {

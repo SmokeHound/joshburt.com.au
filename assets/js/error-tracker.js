@@ -97,14 +97,14 @@
             });
           }
           return response;
-        } catch (error) {
+        } catch (_error) {
           this.logError({
             type: 'Network Error',
-            message: error.message,
+            message: _error.message,
             url: args[0],
             timestamp: new Date().toISOString()
           });
-          throw error;
+          throw _error;
         }
       };
     },
@@ -121,7 +121,7 @@
     /**
      * Show error notification to user
      */
-    showErrorNotification: function(error) {
+    showErrorNotification: function(_error) {
       if (this.errorDialogShowing) {return;}
       this.errorDialogShowing = true;
 

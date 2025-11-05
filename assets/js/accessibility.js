@@ -122,7 +122,7 @@
    * Add Skip Links Dynamically
    * Adds skip-to-content link if not present
    */
-  function addSkipLink() {
+  function _addSkipLink() {
     // Check if skip link already exists
     if (document.querySelector('.skip-link')) {return;}
 
@@ -274,7 +274,7 @@
     enhanceFocusManagement();
     createAnnouncementRegion();
     // Skip-link removed by request: do not auto-insert the skip-to-content link.
-    // addSkipLink();
+    // _addSkipLink();
     enhanceFormAccessibility();
     enhanceButtonAccessibility();
     ensureLandmarkRoles();

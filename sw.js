@@ -61,12 +61,9 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cache => {
-          // Remove old caches - keep only current versions
-          if (cache !== STATIC_CACHE && cache !== DYNAMIC_CACHE && cache !== API_CACHE && cache !== IMAGE_CACHE) {
-            return caches.delete(cache);
-          }
-        })
+        cacheNames
+          .filter(cache => cache !== STATIC_CACHE && cache !== DYNAMIC_CACHE && cache !== API_CACHE && cache !== IMAGE_CACHE)
+          .map(cache => caches.delete(cache))
       );
     }).then(() => {
       return self.clients.claim();
@@ -76,7 +73,6 @@ self.addEventListener('activate', event => {
 
 // Enhanced fetch event with intelligent caching strategies
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
 
   // Skip non-GET requests
   if (event.request.method !== 'GET') {
@@ -270,6 +266,6 @@ self.addEventListener('notificationclick', event => {
 
 // Performance monitoring
 // Performance monitoring stub
-self.addEventListener('message', event => {
+self.addEventListener('message', _event => {
   // No-op: performance metrics not logged in service worker
 });

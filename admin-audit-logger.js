@@ -102,6 +102,7 @@ class AdminAuditLogger {
     } else if (format === 'json') {
       return this.exportToJSON(logs);
     }
+    return null;
   }
 
   exportToCSV(logs) {
