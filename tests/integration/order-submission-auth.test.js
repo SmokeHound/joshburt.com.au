@@ -72,3 +72,38 @@ describe('Orders Review Authentication', () => {
     expect(htmlContent).toMatch(patchPattern);
   });
 });
+
+describe('Consumables Page Authentication', () => {
+  test('should use authFetch for order submission', () => {
+    const htmlContent = fs.readFileSync(
+      path.join(__dirname, '../../consumables.html'),
+      'utf8'
+    );
+    
+    // Verify order submission uses authFetch
+    const orderPattern = /window\.authFetch\(`\$\{FN_BASE\}\/orders`,\s*\{[^}]*method: 'POST'/;
+    expect(htmlContent).toMatch(orderPattern);
+  });
+  
+  test('should use authFetch for settings API', () => {
+    const htmlContent = fs.readFileSync(
+      path.join(__dirname, '../../consumables.html'),
+      'utf8'
+    );
+    
+    // Verify settings loading uses authFetch
+    expect(htmlContent).toContain('window.authFetch(`${FN_BASE}/settings`)');
+  });
+});
+
+describe('Analytics Page Authentication', () => {
+  test('should use authFetch in fetchJSON helper', () => {
+    const htmlContent = fs.readFileSync(
+      path.join(__dirname, '../../analytics.html'),
+      'utf8'
+    );
+    
+    // Verify fetchJSON uses authFetch
+    expect(htmlContent).toContain('window.authFetch(url)');
+  });
+});
