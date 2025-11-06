@@ -82,20 +82,21 @@
       </div>`;
     // Modal for viewing full details
     const modalHtml = `
-      <div id="audit-detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-        <div id="audit-modal-overlay" class="absolute inset-0 bg-black/50"></div>
-        <div class="relative bg-white dark:bg-gray-900 rounded-lg shadow-lg w-[90%] max-w-3xl p-4">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-lg font-semibold">Audit Detail</h3>
+      <div id="audit-detail-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-3xl">
+          <div class="modal-header">
+            <h3 class="text-lg font-semibold text-gray-100">Audit Detail</h3>
             <div class="flex gap-2">
-              <button id="audit-modal-mode" class="px-2 py-1 text-xs rounded bg-gray-800 text-white">Raw</button>
-              <button id="audit-modal-copy" class="px-2 py-1 text-xs rounded bg-gray-800 text-white">Copy</button>
-              <button id="audit-modal-close" class="px-2 py-1 text-xs rounded bg-red-600 text-white">Close</button>
+              <button id="audit-modal-mode" class="btn-neon-blue px-3 py-1 rounded text-sm">Raw</button>
+              <button id="audit-modal-copy" class="btn-neon-blue px-3 py-1 rounded text-sm">Copy</button>
+              <button id="audit-modal-close" class="btn-neon-pink px-3 py-1 rounded text-sm">Close</button>
             </div>
           </div>
-          <div class="overflow-auto max-h-[60vh]">
-            <pre id="audit-modal-pretty" class="hidden p-2 bg-gray-900 text-gray-100 rounded text-[12px] whitespace-pre-wrap"></pre>
-            <pre id="audit-modal-raw" class="p-2 bg-gray-900 text-gray-100 rounded text-[12px] whitespace-pre-wrap hidden"></pre>
+          <div class="modal-body">
+            <div class="overflow-auto max-h-[60vh]">
+              <pre id="audit-modal-pretty" class="hidden p-2 bg-gray-900 text-gray-100 rounded text-[12px] whitespace-pre-wrap"></pre>
+              <pre id="audit-modal-raw" class="p-2 bg-gray-900 text-gray-100 rounded text-[12px] whitespace-pre-wrap hidden"></pre>
+            </div>
           </div>
         </div>
       </div>`;
@@ -380,21 +381,8 @@
           modalPretty.classList.add('hidden');
           if (modeBtn) { modeBtn.textContent = 'Pretty'; }
         }
-        // Animate open: scale + fade
-        const modalContent = modal.querySelector('.relative');
-        if (modalContent) {
-          modalContent.style.transition = 'transform 160ms cubic-bezier(.2,.9,.2,1), opacity 160ms ease-out';
-          modalContent.style.transform = 'scale(0.97)';
-          modalContent.style.opacity = '0';
-        }
+        // Show modal with animation
         modal.classList.remove('hidden');
-        // trigger animation
-        requestAnimationFrame(() => {
-          if (modalContent) {
-            modalContent.style.transform = 'scale(1)';
-            modalContent.style.opacity = '1';
-          }
-        });
         return;
       } else if (t && t.classList.contains('audit-toggle')) {
         const boxId2 = t.getAttribute('data-target');
@@ -779,7 +767,6 @@
     const modal = document.getElementById('audit-detail-modal');
     if (modal) {
       const closeBtn = document.getElementById('audit-modal-close');
-      const overlay = document.getElementById('audit-modal-overlay');
       const modeBtn = document.getElementById('audit-modal-mode');
       const copyBtn = document.getElementById('audit-modal-copy');
       const modalPretty = document.getElementById('audit-modal-pretty');
@@ -794,7 +781,10 @@
         }
       }
       if (closeBtn) { closeBtn.addEventListener('click', closeModal); }
-      if (overlay) { overlay.addEventListener('click', closeModal); }
+      // Close on overlay click (click on modal-overlay itself, not its children)
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
       if (modeBtn) {
         modeBtn.addEventListener('click', () => {
           if (!modalPretty || !modalRaw) { return; }
