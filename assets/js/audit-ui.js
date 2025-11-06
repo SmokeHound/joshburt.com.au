@@ -783,7 +783,7 @@
       if (closeBtn) { closeBtn.addEventListener('click', closeModal); }
       // Close on overlay click (click on modal-overlay itself, not its children)
       modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
+        if (e.target === modal) {closeModal();}
       });
       if (modeBtn) {
         modeBtn.addEventListener('click', () => {
