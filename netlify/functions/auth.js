@@ -170,7 +170,9 @@ exports.handler = withHandler(async (event) => {
       }
       
       if (user.failed_login_attempts > 0 || user.lockout_expires) {
-        await database.run('UPDATE users SET failed_login_attempts = 0, lockout_expires = NULL WHERE id = ?', [user.id]);
+        await database.run('UPDATE users SET failed_login_attempts = 0, lockout_expires = NULL, last_login = CURRENT_TIMESTAMP WHERE id = ?', [user.id]);
+      } else {
+        await database.run('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?', [user.id]);
       }
       const { accessToken, refreshToken } = generateTokens(user.id, rememberMe);
       await storeRefreshToken(user.id, refreshToken, rememberMe);
@@ -291,7 +293,7 @@ exports.handler = withHandler(async (event) => {
     if (action === 'me') {
       const user = await authenticate(event);
       if (!user) return errorResponse(401, 'User not found');
-      return jsonResponse(200, { user: { id: user.id, email: user.email, name: user.name, role: user.role, emailVerified: user.email_verified, totpEnabled: user.totp_enabled || false } });
+      return jsonResponse(200, { user: { id: user.id, email: user.email, name: user.name, role: user.role, emailVerified: user.email_verified, totpEnabled: user.totp_enabled || false, createdAt: user.created_at, lastLogin: user.last_login, avatarUrl: user.avatar_url } });
     }
 
     // 2FA SETUP - Generate TOTP secret and QR code

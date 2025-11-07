@@ -57,7 +57,7 @@ exports.handler = withHandler(async (event) => {
         const { page, limit, offset } = getPagination(event.queryStringParameters || {}, { page: 1, limit: 10 });
         const search = (event.queryStringParameters && event.queryStringParameters.search) || '';
         const role = (event.queryStringParameters && event.queryStringParameters.role) || '';
-        let query = 'SELECT id, email, name, role, is_active, email_verified, created_at FROM users';
+        let query = 'SELECT id, email, name, role, is_active, email_verified, created_at, last_login FROM users';
         let countQuery = 'SELECT COUNT(*) as total FROM users';
         const params = []; const countParams = [];
         if (search) {
@@ -99,7 +99,7 @@ exports.handler = withHandler(async (event) => {
         const rounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
         const hash = await bcrypt.hash(password, rounds);
         const result = await database.run('INSERT INTO users (email, name, password_hash, role, email_verified) VALUES (?, ?, ?, ?, ?)', [email, name, hash, role, 1]);
-        const newUser = await database.get('SELECT id, email, name, role, is_active, email_verified, created_at FROM users WHERE id = ?', [result.id]);
+        const newUser = await database.get('SELECT id, email, name, role, is_active, email_verified, created_at, last_login FROM users WHERE id = ?', [result.id]);
         await logAudit(event, { action: 'user.create', userId: user.id, details: { targetUserId: result.id, email, name, role } });
         return ok({ message: 'User created successfully', user: newUser }, 201);
       }
@@ -114,7 +114,7 @@ exports.handler = withHandler(async (event) => {
       const { user, response: authResponse } = await requirePermission(event, 'users', 'read');
       if (authResponse) {return authResponse;}
 
-      const u = await database.get('SELECT id, email, name, role, is_active, email_verified, avatar_url, created_at, updated_at FROM users WHERE id = ?', [id]);
+      const u = await database.get('SELECT id, email, name, role, is_active, email_verified, avatar_url, created_at, updated_at, last_login FROM users WHERE id = ?', [id]);
       if (!u) {return error(404, 'User not found');}
       return ok({ user: u });
     }
@@ -152,7 +152,7 @@ exports.handler = withHandler(async (event) => {
       if (!updates.length) {return error(400, 'No valid updates provided');}
       updates.push('updated_at = CURRENT_TIMESTAMP'); values.push(id);
       await database.run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, values);
-      const updated = await database.get('SELECT id, email, name, role, is_active, email_verified, updated_at FROM users WHERE id = ?', [id]);
+      const updated = await database.get('SELECT id, email, name, role, is_active, email_verified, updated_at, last_login FROM users WHERE id = ?', [id]);
       const auditDetails = { targetUserId: id };
       if (name !== undefined) {auditDetails.name = name;}
       if (role !== undefined) {auditDetails.role = role;}

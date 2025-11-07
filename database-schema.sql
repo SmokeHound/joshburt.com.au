@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS users (
     reset_token_expires BIGINT,
     failed_login_attempts INTEGER DEFAULT 0,
     lockout_expires BIGINT,
+    last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

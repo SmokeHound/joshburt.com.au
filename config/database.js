@@ -194,6 +194,7 @@ async function createPostgreSQLTables() {
       reset_token_expires BIGINT,
       failed_login_attempts INTEGER DEFAULT 0,
       lockout_expires BIGINT,
+      last_login TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -259,6 +260,9 @@ async function createPostgreSQLTables() {
   await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_secret VARCHAR(255)');
   await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN DEFAULT false');
   await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS backup_codes TEXT');
+  
+  // Add last_login column to users table
+  await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP');
 
   // Create order_items table for PostgreSQL
   await database.run(`
