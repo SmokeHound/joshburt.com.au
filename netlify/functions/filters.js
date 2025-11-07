@@ -79,7 +79,7 @@ exports.handler = withHandler(async function(event){
       
       const result = await database.run(query, params);
       await logAudit(event, { 
-        action: 'oil_filter.create', 
+        action: 'filter.create', 
         userId: user && user.id, 
         details: { id: result.id, name, code, type } 
       });
@@ -131,7 +131,7 @@ exports.handler = withHandler(async function(event){
       if (result.changes === 0) return error(404, 'Filter not found');
       
       await logAudit(event, { 
-        action: 'oil_filter.update', 
+        action: 'filter.update', 
         userId: user && user.id, 
         details: { id, name, code, type } 
       });
@@ -163,7 +163,7 @@ exports.handler = withHandler(async function(event){
       const result = await database.run('DELETE FROM filters WHERE id = ?', [id]);
       
       await logAudit(event, { 
-        action: 'oil_filter.delete', 
+        action: 'filter.delete', 
         userId: user && user.id, 
         details: { id, name: existing.name, code: existing.code } 
       });
