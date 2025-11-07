@@ -5,7 +5,6 @@
 # Links to site
 - https://joshburt.netlify.app/
 - https://joshburt.com.au/
-- https://joshburt-com-au.onrender.com/
 
 ## Overview
 This is a modern, production-ready website for joshburt.com.au featuring a modular component architecture, comprehensive testing, responsive design with dark/light mode support, admin dashboard functionality, and a dynamic Castrol oil product ordering system. The codebase is now 100% serverless (Netlify Functions) and has been fully audited for dead code, unused variables, and debug logic.
