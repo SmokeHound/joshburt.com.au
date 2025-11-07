@@ -527,6 +527,23 @@ All dynamic capability now relies on Netlify Functions; ensure environment varia
 - `GITHUB_CLIENT_ID`: GitHub OAuth client ID
 - `GITHUB_CLIENT_SECRET`: GitHub OAuth client secret
 
+
+### Avatar selection (predetermined avatars)
+
+The application no longer accepts arbitrary avatar uploads. Instead, users choose from a predefined set of avatars. This simplifies storage and security concerns and ensures avatars are served from trusted, cacheable URLs.
+
+How it works:
+- The client presents a gallery of predetermined avatar URLs (examples use DiceBear-generated avatars).
+- When a user selects an avatar, the client POSTs `{ avatarUrl: '<url>' }` to `/.netlify/functions/users/:id/avatar`.
+- The server validates the `avatarUrl` against the approved preset list and, if valid, stores it in the `avatar_url` column for that user and audit-logs the change.
+
+Operational notes:
+- Predetermined avatar URLs are defined in the serverless function configuration and must be maintained by the development team.
+- This approach avoids storing user-uploaded files and removes the need for external object storage or SFTP credentials.
+
+If you need custom avatars in the future (uploads to your hosting or object storage), open an issue and the team can reintroduce an upload flow using secure storage (S3/Cloudinary) or SFTP.
+
+
 ## Database
 
 ### Settings Persistence

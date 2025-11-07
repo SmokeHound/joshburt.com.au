@@ -329,6 +329,8 @@ await logger.shutdown();
 - [API Documentation](API_DOCUMENTATION.md) - API reference
 - [Database](DATABASE.md) - Database schema and operations
 
+**Note:** The application uses a predefined set of avatars that users select from; arbitrary avatar uploads are not accepted. See [Deployment](DEPLOYMENT.md#avatar-selection-predetermined-avatars) for details and operational notes.
+
 ## Environment Variables
 
 ### Required for Monitoring

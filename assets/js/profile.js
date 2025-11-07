@@ -60,10 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('profile-display-name').textContent = user.name || 'No name set';
   document.getElementById('profile-display-email').textContent = user.email || 'No email';
 
-  // Debug: Log user object to check created_at field
-  console.log('User data:', user);
-  console.log('created_at field:', user.created_at);
-
   // Set role badge with appropriate styling
   const roleBadge = document.getElementById('profile-role-badge');
   const role = (user.role || 'user').toLowerCase();
@@ -121,8 +117,74 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!isSelf) {return;}
     const file = e.target.files[0];
     if (!file) {return;}
-    // TODO: Implement avatar upload API
-    alert('Avatar upload not implemented.');
+    // Client-side validation: size and MIME
+    try {
+      const MAX_BYTES = 1 * 1024 * 1024; // 1 MiB
+      const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+      if (file.size > MAX_BYTES) {
+        if (window.showNotification) { window.showNotification('Avatar is too large (max 1MB)', 'error'); } else { alert('Avatar is too large (max 1MB)'); }
+        return;
+      }
+      if (file.type) {
+        if (!allowed.includes(file.type.toLowerCase())) {
+          if (window.showNotification) { window.showNotification('Unsupported image type', 'error'); } else { alert('Unsupported image type'); }
+          return;
+        }
+      } else {
+        // Fallback: check extension
+        const name = file.name || '';
+        const extMatch = name.match(/\.([a-zA-Z0-9]+)$/);
+        const ext = extMatch ? extMatch[1].toLowerCase() : '';
+        const allowedExts = ['jpg','jpeg','png','gif','webp','svg'];
+        if (!allowedExts.includes(ext)) {
+          if (window.showNotification) { window.showNotification('Unsupported image file extension', 'error'); } else { alert('Unsupported image file extension'); }
+          return;
+        }
+      }
+    } catch (validationErr) {
+      console.warn('Avatar validation failed', validationErr);
+      if (window.showNotification) { window.showNotification('Avatar validation error', 'error'); } else { alert('Avatar validation error'); }
+      return;
+    }
+    try {
+      const reader = new FileReader();
+      const dataUrl = await new Promise((res, rej) => {
+        reader.onload = () => res(reader.result);
+        reader.onerror = () => rej(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+
+      const payload = { avatarBase64: dataUrl, filename: file.name };
+      const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      }) : fetch(`${FN_BASE}/users/${user.id}/avatar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      }));
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Upload failed');
+      }
+      const json = await res.json();
+      const newUrl = json.user && json.user.avatar_url;
+      if (newUrl) {
+        document.getElementById('profile-avatar').src = newUrl + '?t=' + Date.now();
+        // Update stored user
+        try {
+          const stored = JSON.parse(localStorage.getItem('user') || '{}');
+          stored.avatarUrl = newUrl;
+          localStorage.setItem('user', JSON.stringify(stored));
+        } catch (e) { console.warn('Failed to update local user avatar', e); }
+        if (window.showNotification) { window.showNotification('Avatar uploaded', 'success'); }
+      }
+    } catch (err) {
+      console.error('Avatar upload error', err);
+      if (window.showNotification) { window.showNotification('Avatar upload failed: ' + err.message, 'error'); } else { alert('Avatar upload failed: ' + err.message); }
+    }
   };
 
   // Cancel button - reset form
@@ -132,57 +194,82 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   // Save profile changes (only for self)
-  document.getElementById('profile-form').onsubmit = async (e) => {
-    e.preventDefault();
-    if (!isSelf) {return;}
-    const name = document.getElementById('profile-name').value.trim();
-    const password = document.getElementById('profile-password').value;
-    try {
-      const body = { name };
-      if (password) {body.password = password;}
-      const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${user.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(body)
-      }) : fetch(`${FN_BASE}/users/${user.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(body)
-      }));
-      if (!res.ok) {throw new Error('Failed to update profile');}
+  // Avatar selection (pick from predetermined avatars)
+  const PRESET_AVATARS = [
+    'https://avatars.dicebear.com/api/identicon/seed-1.svg',
+    'https://avatars.dicebear.com/api/identicon/seed-2.svg',
+    'https://avatars.dicebear.com/api/identicon/seed-3.svg',
+    'https://avatars.dicebear.com/api/identicon/seed-4.svg',
+    'https://avatars.dicebear.com/api/identicon/seed-5.svg',
+    'https://avatars.dicebear.com/api/identicon/seed-6.svg'
+  ];
 
-      // Update display name
-      user.name = name;
-      document.getElementById('profile-display-name').textContent = name || 'No name set';
+  function openAvatarPicker() {
+    // Build modal
+    const overlay = document.createElement('div');
+    overlay.id = 'avatar-picker-overlay';
+    overlay.className = 'fixed inset-0 bg-black/60 flex items-center justify-center z-50';
 
-      // Update localStorage user
-      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-      storedUser.name = name;
-      localStorage.setItem('user', JSON.stringify(storedUser));
+    const modal = document.createElement('div');
+    modal.className = 'bg-gray-900 p-6 rounded-lg max-w-xl w-full';
+    modal.innerHTML = `
+      <h3 class="text-xl font-semibold mb-4">Choose an avatar</h3>
+      <div id="avatar-options" class="grid grid-cols-3 gap-4"></div>
+      <div class="mt-4 text-right"><button id="avatar-picker-close" class="px-4 py-2 rounded bg-gray-700">Cancel</button></div>
+    `;
 
-      // Show success message
-      if (window.showNotification) {
-        window.showNotification('Profile updated successfully!', 'success');
-      } else {
-        alert('Profile updated!');
-      }
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
 
-      // Clear password field
-      document.getElementById('profile-password').value = '';
-    } catch (err) {
-      if (window.showNotification) {
-        window.showNotification('Error updating profile: ' + err.message, 'error');
-      } else {
-        alert('Error: ' + err.message);
-      }
-    }
-  };
+    const grid = modal.querySelector('#avatar-options');
+    PRESET_AVATARS.forEach(url => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'rounded overflow-hidden border-2 border-transparent hover:border-blue-500';
+      btn.innerHTML = `<img src="${url}" alt="avatar" class="w-full h-24 object-cover">`;
+      btn.onclick = async () => {
+        try {
+          const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ avatarUrl: url })
+          }) : fetch(`${FN_BASE}/users/${user.id}/avatar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ avatarUrl: url })
+          }));
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || 'Selection failed');
+          }
+          const json = await res.json();
+          const newUrl = json.user && json.user.avatar_url;
+          if (newUrl) {
+            document.getElementById('profile-avatar').src = newUrl + '?t=' + Date.now();
+            try {
+              const stored = JSON.parse(localStorage.getItem('user') || '{}');
+              stored.avatarUrl = newUrl;
+              localStorage.setItem('user', JSON.stringify(stored));
+            } catch (e) { console.warn('Failed to update local user avatar', e); }
+            if (window.showNotification) { window.showNotification('Avatar updated', 'success'); }
+          }
+          // Close modal
+          document.body.removeChild(overlay);
+        } catch (err) {
+          console.error('Avatar selection error', err);
+          if (window.showNotification) { window.showNotification('Avatar selection failed: ' + err.message, 'error'); } else { alert('Avatar selection failed: ' + err.message); }
+        }
+      };
+      grid.appendChild(btn);
+    });
+
+    modal.querySelector('#avatar-picker-close').onclick = () => { document.body.removeChild(overlay); };
+    overlay.onclick = (e) => { if (e.target === overlay) { document.body.removeChild(overlay); } };
+  }
+
+  document.getElementById('change-avatar').onclick = () => { if (!isSelf) { return; } openAvatarPicker(); };
+  
 
   // Fetch activity log (admin or self)
   try {

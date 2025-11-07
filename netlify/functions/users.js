@@ -6,6 +6,18 @@ const { getPagination, withHandler, ok, error } = require('../../utils/fn');
 const { validatePassword } = require('../../utils/password');
 const { isValidRole, hasPermission } = require('../../utils/rbac');
 const { logAudit } = require('../../utils/audit');
+const fs = require('fs');
+const path = require('path');
+
+// Predetermined avatar selection (fixed set of allowed URLs)
+const PRESET_AVATARS = [
+  'https://avatars.dicebear.com/api/identicon/seed-1.svg',
+  'https://avatars.dicebear.com/api/identicon/seed-2.svg',
+  'https://avatars.dicebear.com/api/identicon/seed-3.svg',
+  'https://avatars.dicebear.com/api/identicon/seed-4.svg',
+  'https://avatars.dicebear.com/api/identicon/seed-5.svg',
+  'https://avatars.dicebear.com/api/identicon/seed-6.svg'
+];
 
 let dbInitialized = false;
 exports.handler = withHandler(async (event) => {
@@ -31,6 +43,37 @@ exports.handler = withHandler(async (event) => {
   const body = parseBody(event);
 
   try {
+    // Avatar selection endpoint: /users/:id/avatar
+    if (pathParts.length >= 2 && pathParts[pathParts.length - 1] === 'avatar') {
+      const idPart = pathParts[pathParts.length - 2];
+      const uploadId = parseInt(idPart, 10);
+      if (Number.isNaN(uploadId)) { return error(400, 'Invalid user id for avatar selection'); }
+      if (method !== 'POST' && method !== 'PUT') { return error(405, 'Method not allowed'); }
+
+      // Require authentication and permission (self or admin)
+      const { user, response: authResponse } = await requireAuth(event);
+      if (authResponse) { return authResponse; }
+      const isOwn = user.id === uploadId;
+      const canUpdate = isOwn || hasPermission(user, 'users', 'update');
+      if (!canUpdate) { return error(403, 'Insufficient permissions'); }
+
+      // Expect JSON body with avatarUrl (one of predetermined options)
+      const { avatarUrl } = body || {};
+      if (!avatarUrl || typeof avatarUrl !== 'string') {
+        return error(400, 'Missing avatarUrl');
+      }
+
+      // Validate against preset list
+      if (!PRESET_AVATARS.includes(avatarUrl)) {
+        return error(400, 'Invalid avatar selection');
+      }
+
+      // Update DB with avatar URL and audit
+      await database.run('UPDATE users SET avatar_url = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [avatarUrl, uploadId]);
+      const updated = await database.get('SELECT id, email, name, role, is_active, email_verified, avatar_url, updated_at FROM users WHERE id = ?', [uploadId]);
+      await logAudit(event, { action: 'user.avatar.select', userId: user.id, details: { targetUserId: uploadId, avatar: avatarUrl } });
+      return ok({ message: 'Avatar selected', user: updated });
+    }
     // Stats endpoint: /users/stats/overview
     if (isStats) {
       const { user, response: authResponse } = await requirePermission(event, 'users', 'stats');
