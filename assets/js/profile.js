@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Helper function to format action strings for better readability
   function formatAction(action) {
-    if (!action) {return 'Unknown action';}
+    if (!action) { return 'Unknown action'; }
 
     // Replace dots with spaces
     let formatted = action.replace(/\./g, ' ');
@@ -368,9 +368,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     formatted = formatted.replace(/_/g, ' ');
 
     // Capitalize each word
-    formatted = formatted.split(' ').map(word => {
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    }).join(' ');
+    formatted = formatted.split(' ')
+      .filter(word => word.length > 0) // Filter out empty strings
+      .map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }).join(' ');
 
     return formatted;
   }
