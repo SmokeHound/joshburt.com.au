@@ -103,10 +103,10 @@
       </div>
     </section>
 
-    <!-- Oil Selection and Order List -->
+    <!-- Filter Selection and Order List -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Available Filters -->
-      <!-- Neon card for available oils -->
+      <!-- Neon card for available filters -->
   <div class="card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
         <div class="p-6 border-b border-gray-200 dark:border-gray-600">
           <h2 class="text-xl font-semibold text-gray-100">Available Filters</h2>
@@ -120,16 +120,17 @@
             <select id="filterType" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
               <option value="">All Types</option>
               <option value="Engine Filter">Engine Filter</option>
-              <option value="Transmission Filter">Transmission Filter</option>
-              <option value="Fuel Filter">Fuel Filter</option>
               <option value="Air Filter">Air Filter</option>
+              <option value="Cabin Filter">Cabin Filter</option>
+              <option value="Fuel Filter">Fuel Filter</option>
+              <option value="Transmission Filter">Transmission Filter</option>
             </select>
           </div>
         </div>
         
         <!-- Filter List -->
         <div id="filtersList" class="max-h-96 overflow-y-auto">
-          <!-- Oil items will be loaded here -->
+          <!-- Filter items will be loaded here -->
           <div class="p-6 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
             <p class="text-gray-600 dark:text-gray-300">Loading filters...</p>
@@ -522,7 +523,7 @@
           timestamp: new Date().toISOString()
         };
         
-        localStorage.setItem('oilOrderDraft', JSON.stringify(orderData));
+        localStorage.setItem('filterOrderDraft', JSON.stringify(orderData));
         await window.ModalUtils.alert({
           title: 'Order Saved',
           message: 'Order draft saved successfully! You can load it later from the Load Draft button.',
@@ -531,7 +532,7 @@
       }
       
       function loadSavedOrder() {
-        const saved = localStorage.getItem('oilOrderDraft');
+        const saved = localStorage.getItem('filterOrderDraft');
         if (saved) {
           try {
             const orderData = JSON.parse(saved);
@@ -567,7 +568,7 @@
           `${item.name} (${item.type}) - Qty: ${item.quantity} - Current Stock: ${item.currentStock}`
         ).join('\n');
         
-        const emailBody = `Oil Stock Order Request
+        const emailBody = `Filter Stock Order Request
 
 Requested by: ${requestedBy.value}
 Order Date: ${orderDate.value}
@@ -580,7 +581,7 @@ ${orderSummary}
 Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
 `;
         
-        const subject = `Oil Stock Order Request - ${new Date().toLocaleDateString()}`;
+        const subject = `Filter Stock Order Request - ${new Date().toLocaleDateString()}`;
         const mailtoLink = `mailto:purchasing@workshop.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
         
         window.location.href = mailtoLink;
@@ -639,7 +640,7 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
         submitOrderStatus.textContent = 'Submitting order...';
         try {
           const payload = {
-            requestedBy: requestedBy.value || 'mechanic',
+            requestedBy: requestedBy.value || 'Mechanic',
             priority: priority.value || 'normal',
             notes: notes.value || '',
             items: orderItems.map(item => ({
