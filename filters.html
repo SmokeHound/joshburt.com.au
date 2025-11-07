@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Oil Filters Order Request</title>
+  <title>Filters Order Request</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
   <link rel="stylesheet" href="./assets/css/styles.css">
@@ -62,13 +62,13 @@
   <header class="page-header card border" role="banner">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Oil Filters Order Request</h1>
-          <p class="nav-link-muted">Prepare oil filter inventory order list for purchasing department</p>
+          <h1 class="text-3xl font-bold text-white mb-2">Filters Order Request</h1>
+          <p class="nav-link-muted">Prepare filter inventory order list for purchasing department</p>
         </div>
         <div class="flex flex-wrap gap-2 mt-2 md:mt-0 no-print">
           <button id="clearAllBtn" class="btn-neon-pink px-4 py-2 rounded-lg font-semibold">Clear All</button>
           <button id="saveOrderBtn" class="btn-neon-green px-4 py-2 rounded-lg font-semibold">Save Draft</button>
-          <button id="manageProductsBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold" onclick="window.location.href='oil-filters-mgmt.html'">Manage Filters</button>
+          <button id="manageProductsBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold" onclick="window.location.href='filters-mgmt.html'">Manage Filters</button>
           <button id="emailOrderBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Email Order</button>
         </div>
       </div>
@@ -105,11 +105,11 @@
 
     <!-- Oil Selection and Order List -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Available Oils -->
+      <!-- Available Filters -->
       <!-- Neon card for available oils -->
   <div class="card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
         <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-          <h2 class="text-xl font-semibold text-gray-100">Available Oil Filters</h2>
+          <h2 class="text-xl font-semibold text-gray-100">Available Filters</h2>
           <p class="text-sm text-gray-400 mt-1">Click on filters to add to order list</p>
         </div>
 
@@ -119,7 +119,7 @@
             <input type="text" id="searchOils" placeholder="Search filters..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
             <select id="filterType" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
               <option value="">All Types</option>
-              <option value="Engine Oil Filter">Engine Oil Filter</option>
+              <option value="Engine Filter">Engine Filter</option>
               <option value="Transmission Filter">Transmission Filter</option>
               <option value="Fuel Filter">Fuel Filter</option>
               <option value="Air Filter">Air Filter</option>
@@ -132,7 +132,7 @@
           <!-- Oil items will be loaded here -->
           <div class="p-6 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
-            <p class="text-gray-600 dark:text-gray-300">Loading oil products...</p>
+            <p class="text-gray-600 dark:text-gray-300">Loading filters...</p>
           </div>
         </div>
       </div>
@@ -190,7 +190,7 @@
   </script>
 
   <script>
-    // Workshop Oil Filters Stock Order Application
+    // Workshop Filters Stock Order Application
     document.addEventListener('DOMContentLoaded', function() {
       // State management
       const orderItems = [];
@@ -330,7 +330,7 @@
         oilsList.innerHTML = `
           <div class="p-6 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
-            <p class="text-gray-600 dark:text-gray-300">Loading oil products...</p>
+            <p class="text-gray-600 dark:text-gray-300">Loading filters...</p>
           </div>
         `;
 
@@ -348,7 +348,7 @@
         try {
           console.log('Attempting to load from API...');
           const FN_BASE = window.FN_BASE || '/.netlify/functions';
-          const response = await window.authFetch(`${FN_BASE}/oil-filters`);
+          const response = await window.authFetch(`${FN_BASE}/filters`);
           
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -379,7 +379,7 @@
       async function loadFromJSON() {
         try {
           console.log('Attempting to load from JSON file...');
-          const backupResponse = await fetch('data/oil-filters.json');
+          const backupResponse = await fetch('data/filters.json');
 
           if (!backupResponse.ok) {
             throw new Error(`Local backup error! status: ${backupResponse.status}`);
@@ -404,7 +404,7 @@
           console.error('Error loading backup products:', backupError);
           oilsList.innerHTML = `
             <div class="p-6 text-center text-red-600 dark:text-red-400">
-              <p class="mb-2">Unable to load oil products</p>
+              <p class="mb-2">Unable to load filters</p>
               <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Failed to load from ${oilDataSource === 'local' ? 'JSON file' : 'API and local backup'}</p>
               <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
                 Retry Loading
@@ -421,7 +421,7 @@
         if (!filteredProducts || filteredProducts.length === 0) {
           oilsList.innerHTML = `
             <div class="p-6 text-center text-gray-500 dark:text-gray-400">
-              <p>No oil products found</p>
+              <p>No filters found</p>
               <p class="text-sm mt-2">Check console for loading details</p>
             </div>
           `;
@@ -433,7 +433,7 @@
             <div class="flex justify-between items-start">
               <div class="flex-1">
                 <h3 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(product.name)}</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(product.type || 'Oil Product')}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(product.type || 'Filter')}</p>
                 <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   ${product.code ? `Code: ${escapeHtml(product.code)}` : ''}
                   ${product.specs ? ` • ${escapeHtml(product.specs)}` : ''}
@@ -550,7 +550,7 @@
       }
       
       function manageProducts() {
-        window.location.href = 'oil-filters-mgmt.html';
+        window.location.href = 'filters-mgmt.html';
       }
       
       async function emailOrder() {

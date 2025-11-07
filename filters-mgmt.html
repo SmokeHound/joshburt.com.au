@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Oil Filters Management</title>
+  <title>Filters Management</title>
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
@@ -48,7 +48,7 @@
                         <div class="max-w-6xl mx-auto">
                                             <header class="page-header card border mb-6">
                                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                                    <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Oil Filters Management</h2>
+                                    <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Filters Management</h2>
                     <div class="flex flex-wrap gap-2">
                             <button id="addProductBtn" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Filter</button>
                             <button id="export-products" class="btn-neon-green px-4 py-2 rounded font-semibold">Export Filters (CSV)</button>
@@ -105,7 +105,7 @@
                                 <label for="product-type" class="block mb-2 font-medium">Type</label>
                                 <select id="product-type" name="product-type" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
                                     <option value="">Select type</option>
-                                    <option value="Engine Oil Filter">Engine Oil Filter</option>
+                                    <option value="Engine Filter">Engine Filter</option>
                                     <option value="Transmission Filter">Transmission Filter</option>
                                     <option value="Fuel Filter">Fuel Filter</option>
                                     <option value="Air Filter">Air Filter</option>
@@ -156,7 +156,7 @@
         async function loadProducts() {
             try {
                 showToast('Loading products...', 'info');
-                const response = await fetch(`${FN_BASE}/oil-filters`);
+                const response = await fetch(`${FN_BASE}/filters`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -175,7 +175,7 @@
         // Save products to API (no localStorage)
         async function saveProductToAPI(product, isUpdate = false) {
             try {
-                const url = `${FN_BASE}/oil-filters`;
+                const url = `${FN_BASE}/filters`;
                 const method = isUpdate ? 'PUT' : 'POST';
                 const response = await (window.authFetch ? authFetch(url, {
                     method: method,
@@ -199,7 +199,7 @@
         // Delete product from API (no localStorage)
         async function deleteProductFromAPI(productId) {
             try {
-                const url = `${FN_BASE}/oil-filters`;
+                const url = `${FN_BASE}/filters`;
                 const response = await (window.authFetch ? authFetch(url, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
@@ -406,7 +406,7 @@
         // Export products to CSV (API only)
         async function exportProducts() {
             try {
-                const response = await fetch(`${FN_BASE}/oil-filters`);
+                const response = await fetch(`${FN_BASE}/filters`);
                 if (!response.ok) throw new Error('Failed to fetch products for export');
                 const data = await response.json();
                 const headers = ['Code', 'Name', 'Type', 'Current Stock', 'Reorder Point', 'Specs', 'Description', 'Image URL'];
@@ -427,12 +427,12 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'oil_filters.csv';
+                a.download = 'filters.csv';
                 a.click();
                 URL.revokeObjectURL(url);
-                showToast('Products exported successfully!', 'success');
+                showToast('Filters exported successfully!', 'success');
             } catch (error) {
-                showToast('Failed to export products: ' + error.message, 'error');
+                showToast('Failed to export filters: ' + error.message, 'error');
             }
         }
 
@@ -445,10 +445,10 @@
                 try {
                     const csv = e.target.result;
                     // Send CSV to API for bulk import
-                    const url = `${FN_BASE}/oil-filters/import`;
+                    const url = `${FN_BASE}/filters/import`;
                     const response = await (window.authFetch ? authFetch(url, { method: 'POST', headers: { 'Content-Type': 'text/csv' }, body: csv }) : fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/csv' }, body: csv }));
                     if (!response.ok) throw new Error('Bulk import failed');
-                    showToast('Products imported successfully!', 'success');
+                    showToast('Filters imported successfully!', 'success');
                     await loadProducts();
                 } catch (error) {
                     showToast('Error importing CSV file: ' + error.message, 'error');
@@ -538,7 +538,7 @@
                     cta.className = 'mt-6 p-6 border border-gray-700 rounded-lg text-center';
                     const msg = document.createElement('p');
                     msg.className = 'mb-4 text-gray-300';
-                    msg.textContent = 'Please sign in to manage oil products.';
+                    msg.textContent = 'Please sign in to manage filters.';
                     const btn = document.createElement('button');
                     btn.id = 'go-to-login';
                     btn.className = 'btn-neon-blue px-4 py-2 rounded';

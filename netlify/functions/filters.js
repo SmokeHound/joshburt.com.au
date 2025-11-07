@@ -1,4 +1,4 @@
-// Netlify Function: Full CRUD /.netlify/functions/oil-filters
+// Netlify Function: Full CRUD /.netlify/functions/filters
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { logAudit } = require('../../utils/audit');
@@ -15,30 +15,30 @@ exports.handler = withHandler(async function(event){
 
   async function handleGet(event) {
     try {
-      let query = 'SELECT * FROM oil_filters WHERE is_active = true ORDER BY name';
+      let query = 'SELECT * FROM filters WHERE is_active = true ORDER BY name';
       let params = [];
       
       // Optional filters
       const { type, search, include_inactive } = event.queryStringParameters || {};
       
       if (include_inactive === 'true') {
-        query = 'SELECT * FROM oil_filters ORDER BY name';
+        query = 'SELECT * FROM filters ORDER BY name';
       }
       
       if (type && include_inactive === 'true') {
-        query = 'SELECT * FROM oil_filters WHERE type = ? ORDER BY name';
+        query = 'SELECT * FROM filters WHERE type = ? ORDER BY name';
         params = [type];
       } else if (type) {
-        query = 'SELECT * FROM oil_filters WHERE type = ? AND is_active = true ORDER BY name';
+        query = 'SELECT * FROM filters WHERE type = ? AND is_active = true ORDER BY name';
         params = [type];
       }
       
       if (search) {
         if (type) {
-          query = 'SELECT * FROM oil_filters WHERE type = ? AND (name LIKE ? OR code LIKE ? OR description LIKE ?) AND is_active = true ORDER BY name';
+          query = 'SELECT * FROM filters WHERE type = ? AND (name LIKE ? OR code LIKE ? OR description LIKE ?) AND is_active = true ORDER BY name';
           params = [type, `%${search}%`, `%${search}%`, `%${search}%`];
         } else {
-          query = 'SELECT * FROM oil_filters WHERE (name LIKE ? OR code LIKE ? OR description LIKE ?) AND is_active = true ORDER BY name';
+          query = 'SELECT * FROM filters WHERE (name LIKE ? OR code LIKE ? OR description LIKE ?) AND is_active = true ORDER BY name';
           params = [`%${search}%`, `%${search}%`, `%${search}%`];
         }
       }
@@ -46,14 +46,14 @@ exports.handler = withHandler(async function(event){
       const filters = await database.all(query, params);
       return ok(filters);
     } catch (e) {
-      console.error('GET /oil-filters error:', e);
-      return error(500, 'Failed to fetch oil filters');
+      console.error('GET /filters error:', e);
+      return error(500, 'Failed to fetch filters');
     }
   }
 
   async function handlePost(event) {
     try {
-      const { user, response: authResponse } = await requirePermission(event, 'oil_filters', 'create');
+      const { user, response: authResponse } = await requirePermission(event, 'filters', 'create');
       if (authResponse) return authResponse;
       
       const body = parseBody(event);
@@ -64,7 +64,7 @@ exports.handler = withHandler(async function(event){
       }
       
       const query = `
-        INSERT INTO oil_filters (name, code, type, description, model_qty, stock_quantity, reorder_point)
+        INSERT INTO filters (name, code, type, description, model_qty, stock_quantity, reorder_point)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
       const params = [
@@ -86,21 +86,21 @@ exports.handler = withHandler(async function(event){
       
       return ok({
         id: result.id,
-        message: 'Oil filter created successfully',
+        message: 'Filter created successfully',
         filter: { id: result.id, name, code, type, description, model_qty, stock_quantity, reorder_point }
       }, 201);
     } catch (e) {
-      console.error('POST /oil-filters error:', e);
+      console.error('POST /filters error:', e);
       if (e.message && e.message.includes('UNIQUE constraint')) {
-        return error(409, 'Oil filter code already exists');
+        return error(409, 'Filter code already exists');
       }
-      return error(500, 'Failed to create oil filter');
+      return error(500, 'Failed to create filter');
     }
   }
 
   async function handlePut(event) {
     try {
-      const { user, response: authResponse } = await requirePermission(event, 'oil_filters', 'update');
+      const { user, response: authResponse } = await requirePermission(event, 'filters', 'update');
       if (authResponse) return authResponse;
       
       const body = parseBody(event);
@@ -111,7 +111,7 @@ exports.handler = withHandler(async function(event){
       }
       
       const query = `
-        UPDATE oil_filters 
+        UPDATE filters 
         SET name = ?, code = ?, type = ?, description = ?, model_qty = ?, stock_quantity = ?, reorder_point = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `;
@@ -128,7 +128,7 @@ exports.handler = withHandler(async function(event){
       ];
       
       const result = await database.run(query, params);
-      if (result.changes === 0) return error(404, 'Oil filter not found');
+      if (result.changes === 0) return error(404, 'Filter not found');
       
       await logAudit(event, { 
         action: 'oil_filter.update', 
@@ -137,30 +137,30 @@ exports.handler = withHandler(async function(event){
       });
       
       return ok({
-        message: 'Oil filter updated successfully',
+        message: 'Filter updated successfully',
         filter: { id, name, code, type, description, model_qty, stock_quantity, reorder_point, is_active }
       });
     } catch (e) {
-      console.error('PUT /oil-filters error:', e);
+      console.error('PUT /filters error:', e);
       if (e.message && e.message.includes('UNIQUE constraint')) {
-        return error(409, 'Oil filter code already exists');
+        return error(409, 'Filter code already exists');
       }
-      return error(500, 'Failed to update oil filter');
+      return error(500, 'Failed to update filter');
     }
   }
 
   async function handleDelete(event) {
     try {
-      const { user, response: authResponse } = await requirePermission(event, 'oil_filters', 'delete');
+      const { user, response: authResponse } = await requirePermission(event, 'filters', 'delete');
       if (authResponse) return authResponse;
       
       const { id } = parseBody(event);
       if (!id) return error(400, 'Missing required field: id');
       
-      const existing = await database.get('SELECT name, code FROM oil_filters WHERE id = ?', [id]);
-      if (!existing) return error(404, 'Oil filter not found');
+      const existing = await database.get('SELECT name, code FROM filters WHERE id = ?', [id]);
+      if (!existing) return error(404, 'Filter not found');
       
-      const result = await database.run('DELETE FROM oil_filters WHERE id = ?', [id]);
+      const result = await database.run('DELETE FROM filters WHERE id = ?', [id]);
       
       await logAudit(event, { 
         action: 'oil_filter.delete', 
@@ -168,10 +168,10 @@ exports.handler = withHandler(async function(event){
         details: { id, name: existing.name, code: existing.code } 
       });
       
-      return ok({ message: 'Oil filter deleted successfully' });
+      return ok({ message: 'Filter deleted successfully' });
     } catch (e) {
-      console.error('DELETE /oil-filters error:', e);
-      return error(500, 'Failed to delete oil filter');
+      console.error('DELETE /filters error:', e);
+      return error(500, 'Failed to delete filter');
     }
   }
 });
