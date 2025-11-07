@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS filters (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     code VARCHAR(100) UNIQUE NOT NULL,
-    type VARCHAR(100) NOT NULL, -- 'Engine Filter', 'Transmission Filter', 'Fuel Filter', etc.
+    type VARCHAR(100) NOT NULL, -- 'Oil Filter', 'Air Filter', 'Fuel Filter', etc.
     description TEXT,
     model_qty INTEGER DEFAULT 0,
     stock_quantity INTEGER DEFAULT 0,
@@ -33,9 +33,9 @@ EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert sample filters data
 INSERT INTO filters (name, code, type, description, model_qty, stock_quantity, reorder_point) VALUES
-('Standard Oil Filter', 'OF-001', 'Engine Filter', 'Universal oil filter for most passenger vehicles', 0, 50, 20),
-('Heavy Duty Oil Filter', 'OF-002', 'Engine Filter', 'Heavy duty oil filter for trucks and commercial vehicles', 0, 30, 15),
-('Premium Synthetic Filter', 'OF-003', 'Engine Filter', 'Premium oil filter for synthetic oils', 0, 40, 18),
+('Standard Oil Filter', 'OF-001', 'Oil Filter', 'Universal oil filter for most passenger vehicles', 0, 50, 20),
+('Heavy Duty Oil Filter', 'OF-002', 'Oil Filter', 'Heavy duty oil filter for trucks and commercial vehicles', 0, 30, 15),
+('Premium Synthetic Filter', 'OF-003', 'Oil Filter', 'Premium oil filter for synthetic oils', 0, 40, 18),
 ('Transmission Filter Kit', 'TF-001', 'Transmission Filter', 'Complete transmission filter kit with gasket', 0, 25, 10),
 ('Fuel Filter - Diesel', 'FF-001', 'Fuel Filter', 'Diesel fuel filter with water separator', 0, 35, 12),
 ('Fuel Filter - Petrol', 'FF-002', 'Fuel Filter', 'In-line fuel filter for petrol engines', 0, 45, 15),
