@@ -19,8 +19,8 @@
   </script>
   <style>
     /* Page-specific styles only (global theme and neon styles are in assets/css/styles.css) */
-    .oil-item {transition:all .2s ease;background-color:#111;border:1px solid #333}
-    .oil-item:hover {background-color:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
+    .filter-item {transition:all .2s ease;background-color:#111;border:1px solid #333}
+    .filter-item:hover {background-color:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
   </style>
   <link rel="stylesheet" href="./assets/css/accessibility.css" />
   <script src="./assets/js/accessibility.js" defer></script>
@@ -116,7 +116,7 @@
         <!-- Search and Filter -->
         <div class="p-4 border-b border-gray-200 dark:border-gray-600 no-print">
           <div class="flex flex-col sm:flex-row gap-2">
-            <input type="text" id="searchOils" placeholder="Search filters..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+            <input type="text" id="searchFilters" placeholder="Search filters..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
             <select id="filterType" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
               <option value="">All Types</option>
               <option value="Engine Filter">Engine Filter</option>
@@ -127,8 +127,8 @@
           </div>
         </div>
         
-        <!-- Oil List -->
-        <div id="oilsList" class="max-h-96 overflow-y-auto">
+        <!-- Filter List -->
+        <div id="filtersList" class="max-h-96 overflow-y-auto">
           <!-- Oil items will be loaded here -->
           <div class="p-6 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
@@ -199,17 +199,17 @@
 
       
       // DOM elements
-      const oilsList = document.getElementById('oilsList');
+      const filtersList = document.getElementById('filtersList');
       const orderList = document.getElementById('orderList');
       const orderCount = document.getElementById('orderCount');
       const totalOrderItems = document.getElementById('totalOrderItems');
-      const searchOils = document.getElementById('searchOils');
+      const searchFilters = document.getElementById('searchFilters');
       const filterType = document.getElementById('filterType');
       const requestedBy = document.getElementById('requestedBy');
       const orderDate = document.getElementById('orderDate');
       const priority = document.getElementById('priority');
       const notes = document.getElementById('notes');
-  let oilDataSource = 'api'; // default; will be loaded from Settings
+  let filterDataSource = 'api'; // default; will be loaded from Settings
       const submitOrderBtn = document.getElementById('submitOrderBtn');
       const submitOrderStatus = document.getElementById('submitOrderStatus');
       
@@ -327,14 +327,14 @@
       // Product loading and display
       async function loadProducts() {
         // Show loading state
-        oilsList.innerHTML = `
+        filtersList.innerHTML = `
           <div class="p-6 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
             <p class="text-gray-600 dark:text-gray-300">Loading filters...</p>
           </div>
         `;
 
-        const useLocal = oilDataSource === 'local';
+        const useLocal = filterDataSource === 'local';
         if (useLocal) {
           // Load from JSON file directly
           await loadFromJSON();
@@ -402,10 +402,10 @@
 
         } catch (backupError) {
           console.error('Error loading backup products:', backupError);
-          oilsList.innerHTML = `
+          filtersList.innerHTML = `
             <div class="p-6 text-center text-red-600 dark:text-red-400">
               <p class="mb-2">Unable to load filters</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Failed to load from ${oilDataSource === 'local' ? 'JSON file' : 'API and local backup'}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Failed to load from ${filterDataSource === 'local' ? 'JSON file' : 'API and local backup'}</p>
               <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
                 Retry Loading
               </button>
@@ -419,7 +419,7 @@
         console.log('Displaying products:', filteredProducts.length);
         
         if (!filteredProducts || filteredProducts.length === 0) {
-          oilsList.innerHTML = `
+          filtersList.innerHTML = `
             <div class="p-6 text-center text-gray-500 dark:text-gray-400">
               <p>No filters found</p>
               <p class="text-sm mt-2">Check console for loading details</p>
@@ -429,7 +429,7 @@
         }
         
         const productsHTML = filteredProducts.map(product => `
-          <div class="p-4 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors oil-item" onclick="addToOrder(${product.id}, '${escapeHtml(product.name)}', '${escapeHtml(product.type || '')}', '${escapeHtml(product.code || '')}')">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors filter-item" onclick="addToOrder(${product.id}, '${escapeHtml(product.name)}', '${escapeHtml(product.type || '')}', '${escapeHtml(product.code || '')}')">
             <div class="flex justify-between items-start">
               <div class="flex-1">
                 <h3 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(product.name)}</h3>
@@ -448,14 +448,14 @@
           </div>
         `).join('');
         
-        oilsList.innerHTML = productsHTML;
+        filtersList.innerHTML = productsHTML;
         console.log('Products displayed successfully');
       }
 
       
       // Search and filter functionality
       function filterProducts() {
-        const searchTerm = searchOils.value.toLowerCase();
+        const searchTerm = searchFilters.value.toLowerCase();
         const typeFilter = filterType.value;
         
         filteredProducts = products.filter(product => {
@@ -607,19 +607,19 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
       window.updateQuantity = updateQuantity;
       window.loadProducts = loadProducts;
       
-      // Load oil data source preference from Settings API
-      async function loadOilDataSourceSetting() {
+      // Load filter data source preference from Settings API
+      async function loadFilterDataSourceSetting() {
         try {
           const FN_BASE = window.FN_BASE || '/.netlify/functions';
           const res = await window.authFetch(`${FN_BASE}/settings`);
           if (res.ok) {
             const s = await res.json();
-            oilDataSource = (s && s.oilDataSource) ? s.oilDataSource : 'api';
+            filterDataSource = (s && s.filterDataSource) ? s.filterDataSource : 'api';
           } else {
-            oilDataSource = 'api';
+            filterDataSource = 'api';
           }
         } catch (e) {
-          oilDataSource = 'api';
+          filterDataSource = 'api';
         }
       }
 
@@ -668,13 +668,13 @@ Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
         }
       });
       
-      searchOils.addEventListener('input', filterProducts);
+      searchFilters.addEventListener('input', filterProducts);
       filterType.addEventListener('change', filterProducts);
       
       
-      // Initialize: fetch oil data source from Settings then load products
+      // Initialize: fetch filter data source from Settings then load products
       (async () => {
-        await loadOilDataSourceSetting();
+        await loadFilterDataSourceSetting();
         loadProducts();
       })();
       loadSavedOrder();
