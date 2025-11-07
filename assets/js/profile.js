@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-start justify-between gap-2 mb-1">
-                  <span class="font-bold text-white text-sm sm:text-base">${escapeHtml(log.action || 'Unknown action')}</span>
+                  <span class="font-bold text-white text-sm sm:text-base">${escapeHtml(formatAction(log.action))}</span>
                   <span class="flex-shrink-0 text-xs font-medium text-gray-400 bg-gray-800/50 px-2 py-1 rounded">${timeAgo}</span>
                 </div>
                 ${log.details ? `<p class="text-sm text-gray-400 mt-2 leading-relaxed">${escapeHtml(log.details)}</p>` : ''}
@@ -355,5 +355,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // Helper function to format action strings for better readability
+  function formatAction(action) {
+    if (!action) {return 'Unknown action';}
+
+    // Replace dots with spaces
+    let formatted = action.replace(/\./g, ' ');
+
+    // Replace underscores with spaces
+    formatted = formatted.replace(/_/g, ' ');
+
+    // Capitalize each word
+    formatted = formatted.split(' ').map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }).join(' ');
+
+    return formatted;
   }
 });
