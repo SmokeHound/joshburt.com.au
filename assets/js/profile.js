@@ -88,9 +88,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Set member since date
   const memberSince = document.getElementById('profile-member-since');
-  if (user.created_at) {
+  const createdAt = user.createdAt || user.created_at; // Support both camelCase and snake_case
+  if (createdAt) {
     try {
-      const date = new Date(user.created_at);
+      const date = new Date(createdAt);
       // Check if date is valid
       if (!isNaN(date.getTime())) {
         const options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -109,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Populate form
   document.getElementById('profile-name').value = user.name || '';
   document.getElementById('profile-email').value = user.email || '';
-  document.getElementById('profile-avatar').src = user.avatar_url || user.picture || './assets/images/avatar-placeholder.svg';
+  document.getElementById('profile-avatar').src = user.avatarUrl || user.avatar_url || user.picture || './assets/images/avatar-placeholder.svg';
 
   // Avatar upload (only for self)
   document.getElementById('change-avatar').onclick = () => {

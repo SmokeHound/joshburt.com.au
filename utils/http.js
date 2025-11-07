@@ -108,7 +108,7 @@ async function authenticate(event) {
   const decodedLocal = verifyLocalToken(token);
   if (decodedLocal && decodedLocal.userId) {
     try {
-      const user = await database.get('SELECT id, email, name, role, is_active, email_verified FROM users WHERE id = ?', [decodedLocal.userId]);
+      const user = await database.get('SELECT id, email, name, role, is_active, email_verified, created_at, last_login, avatar_url, totp_enabled FROM users WHERE id = ?', [decodedLocal.userId]);
       if (!user || !user.is_active) {return null;}
       return user;
     } catch { return null; }
