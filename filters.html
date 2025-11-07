@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Filters Order Request</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <script src="./assets/js/init-shared.js" defer></script>
+  <script>
+    // Purge legacy role demo key to avoid stale UI state
+    try { localStorage.removeItem('currentUser'); } catch (_) {}
+  </script>
+  <script>
+    fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
+    fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
+    fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>document.head.appendChild(c.cloneNode(true)));});
+  </script>
+  <style>
+    /* Page-specific styles only (global theme and neon styles are in assets/css/styles.css) */
+    .filter-item {transition:all .2s ease;background-color:#111;border:1px solid #333}
+    .filter-item:hover {background-color:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
+  </style>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
+</head>
+<body class="dark">
+  
+
+  <!-- Skip Links -->
+  <div class="sr-only">
+    <a href="#main-content" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to main content</a>
+    <a href="#sidebar" class="absolute top-0 left-0 bg-primary text-white p-2 rounded focus:not-sr-only focus:z-50">Skip to navigation</a>
+  </div>
+
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 no-print" aria-label="Toggle sidebar" aria-expanded="false">
+    <span aria-hidden="true">☰</span>
+    <span class="sr-only">Menu</span>
+  </button>
+
+  <!-- Toast Notification -->
+
+
+  <!-- Shared Navigation Loader -->
+  <div id="main-nav"></div>
+  <script>
+    // Dynamically load shared navigation
+    fetch('shared-nav.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('main-nav').innerHTML = html;
+        // Call the function to highlight the active nav link after insertion
+        if (window.setActiveNavLink) window.setActiveNavLink();
+      });
+  </script>
+
+  <!-- Main Content -->
+  <main id="main-content" class="p-6 bg-black min-h-screen" role="main">
+    <!-- Header Card -->
+  <header class="page-header card border" role="banner">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">Filters Order Request</h1>
+          <p class="nav-link-muted">Prepare filter inventory order list for purchasing department</p>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-2 md:mt-0 no-print">
+          <button id="clearAllBtn" class="btn-neon-pink px-4 py-2 rounded-lg font-semibold">Clear All</button>
+          <button id="saveOrderBtn" class="btn-neon-green px-4 py-2 rounded-lg font-semibold">Save Draft</button>
+          <button id="manageProductsBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold" onclick="window.location.href='filters-mgmt.html'">Manage Filters</button>
+          <button id="emailOrderBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Email Order</button>
+        </div>
+      </div>
+      
+      
+    </header>
+
+  <!-- Order Info Form (standalone card) -->
+  <section class="card rounded-lg shadow p-6 mb-6 bg-gray-900 border border-gray-700">
+      <h2 class="text-lg font-semibold text-gray-100 mb-4">Order Information</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label for="requestedBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requested By</label>
+          <input type="text" id="requestedBy" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white" placeholder="Your name">
+        </div>
+        <div>
+          <label for="orderDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Order Date</label>
+          <input type="date" id="orderDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+        </div>
+        <div>
+          <label for="priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
+          <select id="priority" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+            <option value="normal">Normal</option>
+            <option value="urgent">Urgent</option>
+            <option value="low">Low Priority</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-4">
+        <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+        <textarea id="notes" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white" placeholder="Additional notes or special requirements"></textarea>
+      </div>
+    </section>
+
+    <!-- Filter Selection and Order List -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Available Filters -->
+      <!-- Neon card for available filters -->
+  <div class="card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-600">
+          <h2 class="text-xl font-semibold text-gray-100">Available Filters</h2>
+          <p class="text-sm text-gray-400 mt-1">Click on filters to add to order list</p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="p-4 border-b border-gray-200 dark:border-gray-600 no-print">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="text" id="searchFilters" placeholder="Search filters..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+            <select id="filterType" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+              <option value="">All Types</option>
+              <option value="Engine Filter">Engine Filter</option>
+              <option value="Air Filter">Air Filter</option>
+              <option value="Cabin Filter">Cabin Filter</option>
+              <option value="Fuel Filter">Fuel Filter</option>
+              <option value="Transmission Filter">Transmission Filter</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Filter List -->
+        <div id="filtersList" class="max-h-96 overflow-y-auto">
+          <!-- Filter items will be loaded here -->
+          <div class="p-6 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
+            <p class="text-gray-600 dark:text-gray-300">Loading filters...</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Order List -->
+      <!-- Neon card for order list -->
+  <div class="card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-600">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-100">Order List</h2>
+            <span id="orderCount" class="bg-primary text-white px-3 py-1 rounded-full text-sm">0 items</span>
+          </div>
+          <p class="text-sm text-gray-400 mt-1">Items to be ordered</p>
+        </div>
+        
+        <div id="orderList" class="max-h-96 overflow-y-auto">
+          <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+            <p>No items added to order yet</p>
+            <p class="text-sm mt-1">Click on filters from the left panel to add them</p>
+          </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="p-6 border-t border-gray-200 dark:border-gray-600 bg-gray-900 rounded-b-lg">
+          <div class="flex justify-between items-center text-lg font-semibold text-gray-100">
+            <span>Total Items:</span>
+            <span id="totalOrderItems">0</span>
+          </div>
+          <!-- Add submit order button for consistency with template -->
+          <button id="submitOrderBtn" class="mt-4 w-full btn-neon-green p-3 rounded-lg font-bold">Submit Order</button>
+          <div id="submitOrderStatus" class="mt-2 text-green-400 font-semibold"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+
+  <script>
+
+
+  // Shared navigation functionality
+  (function() {
+    // Mobile menu toggle functionality
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    if (menuToggle && sidebar) {
+      menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        const isOpen = sidebar.classList.contains('open');
+        menuToggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  })();
+  </script>
+
+  <script>
+    // Workshop Filters Stock Order Application
+    document.addEventListener('DOMContentLoaded', function() {
+      // State management
+      const orderItems = [];
+      let products = [];
+      let filteredProducts = [];
+
+      
+      // DOM elements
+      const filtersList = document.getElementById('filtersList');
+      const orderList = document.getElementById('orderList');
+      const orderCount = document.getElementById('orderCount');
+      const totalOrderItems = document.getElementById('totalOrderItems');
+      const searchFilters = document.getElementById('searchFilters');
+      const filterType = document.getElementById('filterType');
+      const requestedBy = document.getElementById('requestedBy');
+      const orderDate = document.getElementById('orderDate');
+      const priority = document.getElementById('priority');
+      const notes = document.getElementById('notes');
+  let filterDataSource = 'api'; // default; will be loaded from Settings
+      const submitOrderBtn = document.getElementById('submitOrderBtn');
+      const submitOrderStatus = document.getElementById('submitOrderStatus');
+      
+      // Set default date to today
+      orderDate.value = new Date().toISOString().split('T')[0];
+
+      
+      // Order management functions
+      function addToOrder(productId, productName, productType, productCode) {
+        const existingItem = orderItems.find(item => item.id === productId);
+        // Find the product in the products array to get model_qty
+        const product = products.find(p => p.id === productId);
+        const modelQty = product && typeof product.model_qty !== 'undefined' ? product.model_qty : '';
+        const currentStock = (product && (product.soh ?? product.currentStock)) ?? Math.floor(Math.random() * 50);
+        if (existingItem) {
+          existingItem.quantity++;
+        } else {
+          orderItems.push({
+            id: productId,
+            name: productName,
+            type: productType || 'Unknown',
+            code: productCode || 'N/A',
+            quantity: 1,
+            currentStock: currentStock,
+              modelStock: modelQty // Use model_qty from DB as model stock
+          });
+        }
+        
+        updateOrderDisplay();
+      }
+      
+      function removeFromOrder(productId) {
+        const index = orderItems.findIndex(item => item.id === productId);
+        if (index > -1) {
+          orderItems.splice(index, 1);
+          updateOrderDisplay();
+        }
+      }
+      
+      function updateQuantity(productId, newQuantity) {
+        const item = orderItems.find(item => item.id === productId);
+        if (item) {
+          if (newQuantity <= 0) {
+            removeFromOrder(productId);
+          } else {
+            item.quantity = newQuantity;
+            updateOrderDisplay();
+          }
+        }
+      }
+      
+      function updateOrderDisplay() {
+        const itemCount = orderItems.length;
+        const totalQty = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+        
+        orderCount.textContent = `${itemCount} items`;
+        totalOrderItems.textContent = totalQty;
+        
+        if (itemCount === 0) {
+          orderList.innerHTML = `
+            <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+              <p>No items added to order yet</p>
+              <p class="text-sm mt-1">Click on filters from the left panel to add them</p>
+            </div>
+          `;
+          return;
+        }
+        
+        const orderHTML = orderItems.map(item => `
+          <div class="p-4 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
+            <div class="flex justify-between items-start mb-3">
+              <div class="flex-1 min-w-0">
+                <h4 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(item.name)}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(item.type)} • Code: ${escapeHtml(item.code)}</p>
+              </div>
+              <button onclick="removeFromOrder(${item.id})" class="text-red-500 hover:text-red-700 p-1 no-print" title="Remove item">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-4 text-sm mb-3">
+              <div>
+                <span class="text-gray-500 dark:text-gray-400 block">Current Stock</span>
+                <span class="font-medium ${item.currentStock <= item.modelStock ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${item.currentStock}</span>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400 block">Model Stock</span>
+                  <span class="font-medium text-gray-900 dark:text-gray-100">${item.modelStock}</span>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400 block">Status</span>
+                  <span class="inline-block px-2 py-1 rounded-full text-xs ${item.currentStock <= item.modelStock ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}">
+                    ${item.currentStock <= item.modelStock ? 'Low Stock' : 'In Stock'}
+                </span>
+              </div>
+            </div>
+            
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-300">Order Quantity:</span>
+              <div class="flex items-center space-x-2 no-print">
+                <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" class="w-8 h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500">−</button>
+                <span class="font-medium text-gray-900 dark:text-gray-100 min-w-12 text-center">${item.quantity}</span>
+                <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})" class="w-8 h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500">+</button>
+              </div>
+              <span class="print-only font-medium text-gray-900 dark:text-gray-100">${item.quantity}</span>
+            </div>
+          </div>
+        `).join('');
+        
+        orderList.innerHTML = orderHTML;
+      }
+      
+      // Product loading and display
+      async function loadProducts() {
+        // Show loading state
+        filtersList.innerHTML = `
+          <div class="p-6 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
+            <p class="text-gray-600 dark:text-gray-300">Loading filters...</p>
+          </div>
+        `;
+
+        const useLocal = filterDataSource === 'local';
+        if (useLocal) {
+          // Load from JSON file directly
+          await loadFromJSON();
+        } else {
+          // Try API first, fallback to JSON
+          await loadFromAPI();
+        }
+      }
+
+      async function loadFromAPI() {
+        try {
+          console.log('Attempting to load from API...');
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const response = await window.authFetch(`${FN_BASE}/filters`);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log('API response:', data);
+          
+          // Handle both array and object responses
+          products = Array.isArray(data) ? data : (data.products || []);
+          
+          if (products.length === 0) {
+            throw new Error('No products returned from API');
+          }
+          
+          filteredProducts = [...products];
+          displayProducts();
+          console.log('Products loaded from API:', products.length);
+          showToast('Products loaded from API successfully', 'success');
+          
+        } catch (error) {
+          console.warn('API unavailable, loading local backup:', error.message);
+          showToast('API unavailable, switching to local data', 'warning');
+          await loadFromJSON();
+        }
+      }
+
+      async function loadFromJSON() {
+        try {
+          console.log('Attempting to load from JSON file...');
+          const backupResponse = await fetch('data/filters.json');
+
+          if (!backupResponse.ok) {
+            throw new Error(`Local backup error! status: ${backupResponse.status}`);
+          }
+
+          const backupData = await backupResponse.json();
+          console.log('JSON response:', backupData);
+
+          // Handle both array and object responses
+          products = Array.isArray(backupData) ? backupData : (backupData.products || []);
+
+          if (products.length === 0) {
+            throw new Error('No products found in backup data');
+          }
+
+          filteredProducts = [...products];
+          displayProducts();
+          console.log('Products loaded from JSON backup:', products.length);
+          showToast('Products loaded from local JSON file', 'info');
+
+        } catch (backupError) {
+          console.error('Error loading backup products:', backupError);
+          filtersList.innerHTML = `
+            <div class="p-6 text-center text-red-600 dark:text-red-400">
+              <p class="mb-2">Unable to load filters</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Failed to load from ${filterDataSource === 'local' ? 'JSON file' : 'API and local backup'}</p>
+              <button onclick="loadProducts()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+                Retry Loading
+              </button>
+            </div>
+          `;
+          showToast('Failed to load product data. Please check your files.', 'error');
+        }
+      }
+      
+      function displayProducts() {
+        console.log('Displaying products:', filteredProducts.length);
+        
+        if (!filteredProducts || filteredProducts.length === 0) {
+          filtersList.innerHTML = `
+            <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+              <p>No filters found</p>
+              <p class="text-sm mt-2">Check console for loading details</p>
+            </div>
+          `;
+          return;
+        }
+        
+        const productsHTML = filteredProducts.map(product => `
+          <div class="p-4 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors filter-item" onclick="addToOrder(${product.id}, '${escapeHtml(product.name)}', '${escapeHtml(product.type || '')}', '${escapeHtml(product.code || '')}')">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <h3 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(product.name)}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(product.type || 'Filter')}</p>
+                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  ${product.code ? `Code: ${escapeHtml(product.code)}` : ''}
+                  ${product.specs ? ` • ${escapeHtml(product.specs)}` : ''}
+                </div>
+              </div>
+              <div class="text-primary hover:text-blue-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        
+        filtersList.innerHTML = productsHTML;
+        console.log('Products displayed successfully');
+      }
+
+      
+      // Search and filter functionality
+      function filterProducts() {
+        const searchTerm = searchFilters.value.toLowerCase();
+        const typeFilter = filterType.value;
+        
+        filteredProducts = products.filter(product => {
+          const matchesSearch = !searchTerm || 
+            product.name.toLowerCase().includes(searchTerm) ||
+            (product.type && product.type.toLowerCase().includes(searchTerm)) ||
+            (product.code && product.code.toLowerCase().includes(searchTerm)) ||
+            (product.specs && product.specs.toLowerCase().includes(searchTerm));
+          
+          const matchesType = !typeFilter || product.type === typeFilter;
+          
+          return matchesSearch && matchesType;
+        });
+        
+        displayProducts();
+      }
+
+
+  console.log('Products loaded from API:', products.length);
+
+
+
+
+
+      // Workshop functions continue from here...
+
+      
+      // Action handlers
+      async function clearAll() {
+        if (orderItems.length === 0) return;
+        
+        const confirmed = await window.ModalUtils.confirm({
+          title: 'Clear Order',
+          message: `Are you sure you want to clear all ${orderItems.length} item(s) from the order?`,
+          confirmText: 'Clear All',
+          cancelText: 'Cancel',
+          type: 'warning'
+        });
+        
+        if (confirmed) {
+          orderItems.length = 0;
+          updateOrderDisplay();
+          showToast('Order cleared', 'info');
+        }
+      }
+      
+      async function saveOrder() {
+        if (orderItems.length === 0) {
+          await window.ModalUtils.alert({
+            title: 'No Items',
+            message: 'Please add items to your order before saving.',
+            type: 'warning'
+          });
+          return;
+        }
+        
+        const orderData = {
+          requestedBy: requestedBy.value,
+          orderDate: orderDate.value,
+          priority: priority.value,
+          notes: notes.value,
+          items: orderItems,
+          totalItems: orderItems.reduce((sum, item) => sum + item.quantity, 0),
+          timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem('filterOrderDraft', JSON.stringify(orderData));
+        await window.ModalUtils.alert({
+          title: 'Order Saved',
+          message: 'Order draft saved successfully! You can load it later from the Load Draft button.',
+          type: 'success'
+        });
+      }
+      
+      function loadSavedOrder() {
+        const saved = localStorage.getItem('filterOrderDraft');
+        if (saved) {
+          try {
+            const orderData = JSON.parse(saved);
+            requestedBy.value = orderData.requestedBy || '';
+            orderDate.value = orderData.orderDate || '';
+            priority.value = orderData.priority || 'normal';
+            notes.value = orderData.notes || '';
+            
+            orderItems.length = 0;
+            orderItems.push(...(orderData.items || []));
+            updateOrderDisplay();
+          } catch (error) {
+            console.error('Error loading saved order:', error);
+          }
+        }
+      }
+      
+      function manageProducts() {
+        window.location.href = 'filters-mgmt.html';
+      }
+      
+      async function emailOrder() {
+        if (orderItems.length === 0) {
+          await window.ModalUtils.alert({
+            title: 'No Items',
+            message: 'Please add items to your order before emailing.',
+            type: 'warning'
+          });
+          return;
+        }
+        
+        const orderSummary = orderItems.map(item => 
+          `${item.name} (${item.type}) - Qty: ${item.quantity} - Current Stock: ${item.currentStock}`
+        ).join('\n');
+        
+        const emailBody = `Filter Stock Order Request
+
+Requested by: ${requestedBy.value}
+Order Date: ${orderDate.value}
+Priority: ${priority.value}
+Notes: ${notes.value}
+
+Items to Order:
+${orderSummary}
+
+Total Items: ${orderItems.reduce((sum, item) => sum + item.quantity, 0)}
+`;
+        
+        const subject = `Filter Stock Order Request - ${new Date().toLocaleDateString()}`;
+        const mailtoLink = `mailto:purchasing@workshop.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+        
+        window.location.href = mailtoLink;
+      }
+      
+      // Utility functions
+      function escapeHtml(text) {
+        if (!text) return '';
+        const map = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        };
+        return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
+      }
+      
+      // Toast notifications are routed via global showToast adapter (init-shared.js)
+      
+      // Make functions globally available
+      window.addToOrder = addToOrder;
+      window.removeFromOrder = removeFromOrder;
+      window.updateQuantity = updateQuantity;
+      window.loadProducts = loadProducts;
+      
+      // Load filter data source preference from Settings API
+      async function loadFilterDataSourceSetting() {
+        try {
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const res = await window.authFetch(`${FN_BASE}/settings`);
+          if (res.ok) {
+            const s = await res.json();
+            filterDataSource = (s && s.filterDataSource) ? s.filterDataSource : 'api';
+          } else {
+            filterDataSource = 'api';
+          }
+        } catch (e) {
+          filterDataSource = 'api';
+        }
+      }
+
+  // Event listeners
+      document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+      document.getElementById('saveOrderBtn').addEventListener('click', saveOrder);
+      document.getElementById('manageProductsBtn').addEventListener('click', manageProducts);
+      document.getElementById('emailOrderBtn').addEventListener('click', emailOrder);
+      
+  // Submit order to API
+      submitOrderBtn.addEventListener('click', async function() {
+        if (orderItems.length === 0) {
+          showToast('No items to submit', 'warning');
+          return;
+        }
+        submitOrderBtn.disabled = true;
+        submitOrderStatus.textContent = 'Submitting order...';
+        try {
+          const payload = {
+            requestedBy: requestedBy.value || 'Mechanic',
+            priority: priority.value || 'normal',
+            notes: notes.value || '',
+            items: orderItems.map(item => ({
+              name: item.name,
+              code: item.code,
+              quantity: item.quantity
+            }))
+          };
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const res = await window.authFetch(`${FN_BASE}/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('Failed to submit order');
+          submitOrderStatus.textContent = 'Order submitted!';
+          showToast('Order submitted successfully!', 'success');
+          orderItems.length = 0;
+          updateOrderDisplay();
+        } catch (err) {
+          submitOrderStatus.textContent = 'Error submitting order.';
+          showToast('Error submitting order', 'error');
+        } finally {
+          submitOrderBtn.disabled = false;
+          setTimeout(() => { submitOrderStatus.textContent = ''; }, 3000);
+        }
+      });
+      
+      searchFilters.addEventListener('input', filterProducts);
+      filterType.addEventListener('change', filterProducts);
+      
+      
+      // Initialize: fetch filter data source from Settings then load products
+      (async () => {
+        await loadFilterDataSourceSetting();
+        loadProducts();
+      })();
+      loadSavedOrder();
+    });
+  </script>
+</body>
+</html>
