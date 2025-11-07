@@ -378,7 +378,7 @@
         // Delete product
         async function deleteProduct(productId) {
             // Find product details for confirmation
-            const product = productsData.find(p => p.id === productId);
+            const product = products.find(p => p.id === productId);
             const productName = product ? `${product.name} (${product.code})` : 'this product';
             
             const confirmed = await window.ModalUtils.confirm({
@@ -427,7 +427,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'oil_products.csv';
+                a.download = 'oil_filters.csv';
                 a.click();
                 URL.revokeObjectURL(url);
                 showToast('Products exported successfully!', 'success');
