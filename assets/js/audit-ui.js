@@ -273,7 +273,7 @@
           }
         }
 
-        // Collapsible pretty JSON or raw text
+        // Build pretty and raw content for hidden elements
         let pretty = '';
         if (parsed) {
           pretty = JSON.stringify(parsed, null, 2);
@@ -283,58 +283,28 @@
           pretty = '';
         }
 
-        const tlen = Math.max(40, Math.min(1000, parseInt(state.truncateLen) || 120));
-        const truncated = pretty && pretty.length > tlen ? pretty.slice(0, tlen - 3) + '…' : pretty;
+        // Base ID for this row's hidden elements
+        const baseId = `audit-${idx}`;
 
-        // Create formatted preview with each parameter on a separate line
-        let formattedPreview = '';
-        if (parsed && typeof parsed === 'object') {
-          const MAX_PREVIEW_KEYS = 5; // Show first 5 parameters in preview
-          const MAX_VALUE_LENGTH = 50; // Max length for individual parameter values
-          const keys = Object.keys(parsed);
-          const previewKeys = keys.slice(0, MAX_PREVIEW_KEYS);
-          formattedPreview = previewKeys
-            .map(key => {
-              const val = parsed[key];
-              let valStr = '';
-              if (val === null || val === undefined) {
-                valStr = String(val);
-              } else if (typeof val === 'object') {
-                valStr = JSON.stringify(val);
-                if (valStr.length > MAX_VALUE_LENGTH) {
-                  valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
-                }
-              } else {
-                valStr = String(val);
-                if (valStr.length > MAX_VALUE_LENGTH) {
-                  valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
-                }
-              }
-              return `${key}: ${valStr}`;
-            })
-            .join('\n');
-          if (keys.length > MAX_PREVIEW_KEYS) {
-            formattedPreview += `\n... (${keys.length - MAX_PREVIEW_KEYS} more)`;
-          }
-        } else {
-          formattedPreview = truncated;
+        // Create hidden DOM elements for pretty and raw content
+        let hiddenElementsHtml = '';
+        if (pretty || raw) {
+          hiddenElementsHtml = `
+            <div id="${baseId}-pretty" class="hidden">${escapeHtml(pretty)}</div>
+            <div id="${baseId}-raw" class="hidden">${escapeHtml(raw || '')}</div>
+          `;
         }
-        // baseId removed—modal will source content from state.data by index
 
         return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
-  <td class="p-2 align-top">${userHtml}</td>
+        <td class="p-2 align-top">${userHtml}</td>
         <td class="p-2 align-top font-medium" title="${escapeHtml(action)}">${escapeHtml(formattedAction)}</td>
         <td class="p-2 align-top max-w-sm break-words">
           ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
-          <div class="text-xs text-gray-300 dark:text-gray-400 break-words whitespace-pre-wrap">${escapeHtml(formattedPreview || '')}</div>
+          ${hiddenElementsHtml}
           ${
   pretty || raw
-    ? `
-          <div class="mt-1">
-            <button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800" data-idx="${idx}">Details</button>
-          </div>
-          `
+    ? `<button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800 hover:bg-gray-700" data-base="${baseId}">Details</button>`
     : ''
   }
         </td>
@@ -347,31 +317,26 @@
     tbody.onclick = e => {
       const t = e.target;
       if (t && t.classList.contains('audit-open-modal')) {
-        const idxAttr = t.getAttribute('data-idx');
-        const idx = parseInt(idxAttr, 10);
-        if (isNaN(idx) || !state.data[idx]) { return; }
-        const row = state.data[idx];
-        // Recreate pretty/raw content from row data
-        let raw = row.details;
-        let parsed = null;
-        if (raw && typeof raw === 'string') {
-          try {
-            parsed = JSON.parse(raw);
-          } catch (_) {
-            /* not JSON */
-          }
-        } else if (raw && typeof raw === 'object') {
-          parsed = raw;
-          raw = JSON.stringify(raw);
-        }
-        const pretty = parsed ? JSON.stringify(parsed, null, 2) : (typeof raw === 'string' ? raw : '');
+        const base = t.getAttribute('data-base');
+        if (!base) { return; }
+
+        // Read content from hidden DOM elements
+        const prettyEl = document.getElementById(`${base}-pretty`);
+        const rawEl = document.getElementById(`${base}-raw`);
+        if (!prettyEl || !rawEl) { return; }
+
+        const pretty = prettyEl.textContent || '';
+        const raw = rawEl.textContent || '';
+
         const modal = document.getElementById('audit-detail-modal');
         if (!modal) { return; }
         const modalPretty = document.getElementById('audit-modal-pretty');
         const modalRaw = document.getElementById('audit-modal-raw');
         const modeBtn = document.getElementById('audit-modal-mode');
+
         if (modalPretty) { modalPretty.textContent = pretty; }
         if (modalRaw) { modalRaw.textContent = raw || ''; }
+
         if (pretty && modalPretty) {
           modalPretty.classList.remove('hidden');
           modalRaw.classList.add('hidden');
