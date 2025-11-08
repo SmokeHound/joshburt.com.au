@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   document.getElementById('change-avatar').onclick = () => { if (!isSelf) { return; } openAvatarPicker(); };
-  
+
 
   // Fetch activity log (admin or self)
   try {
