@@ -273,68 +273,54 @@
           }
         }
 
-        // Collapsible pretty JSON or raw text
-        let pretty = '';
-        if (parsed) {
-          pretty = JSON.stringify(parsed, null, 2);
-        } else if (typeof raw === 'string') {
-          pretty = raw;
-        } else {
-          pretty = '';
-        }
+        // Create hidden DOM nodes for pretty and raw JSON
+        const base = `audit-${idx}`;
+        let hiddenPretty = '';
+        let hiddenRaw = '';
 
-        const tlen = Math.max(40, Math.min(1000, parseInt(state.truncateLen) || 120));
-        const truncated = pretty && pretty.length > tlen ? pretty.slice(0, tlen - 3) + '…' : pretty;
-
-        // Create formatted preview with each parameter on a separate line
-        let formattedPreview = '';
         if (parsed && typeof parsed === 'object') {
-          const MAX_PREVIEW_KEYS = 5; // Show first 5 parameters in preview
-          const MAX_VALUE_LENGTH = 50; // Max length for individual parameter values
+          // Build pretty summary with key: value lines (truncate long values to ~240 chars)
           const keys = Object.keys(parsed);
-          const previewKeys = keys.slice(0, MAX_PREVIEW_KEYS);
-          formattedPreview = previewKeys
-            .map(key => {
-              const val = parsed[key];
-              let valStr = '';
-              if (val === null || val === undefined) {
-                valStr = String(val);
-              } else if (typeof val === 'object') {
-                valStr = JSON.stringify(val);
-                if (valStr.length > MAX_VALUE_LENGTH) {
-                  valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
-                }
-              } else {
-                valStr = String(val);
-                if (valStr.length > MAX_VALUE_LENGTH) {
-                  valStr = valStr.slice(0, MAX_VALUE_LENGTH - 3) + '...';
-                }
-              }
-              return `${key}: ${valStr}`;
-            })
-            .join('\n');
-          if (keys.length > MAX_PREVIEW_KEYS) {
-            formattedPreview += `\n... (${keys.length - MAX_PREVIEW_KEYS} more)`;
-          }
-        } else {
-          formattedPreview = truncated;
+          const prettyLines = keys.map(key => {
+            const val = parsed[key];
+            let valStr = '';
+            if (val === null || val === undefined) {
+              valStr = String(val);
+            } else if (typeof val === 'object') {
+              valStr = JSON.stringify(val);
+            } else {
+              valStr = String(val);
+            }
+            // Truncate long values to ~240 chars
+            if (valStr.length > 240) {
+              valStr = valStr.slice(0, 237) + '...';
+            }
+            return `${key}: ${valStr}`;
+          }).join('\n');
+          hiddenPretty = `<pre id="${base}-pretty" class="hidden" data-content="pretty">${escapeHtml(prettyLines)}</pre>`;
+
+          // Raw JSON block
+          const rawJson = JSON.stringify(parsed, null, 2);
+          hiddenRaw = `<pre id="${base}-raw" class="hidden" data-content="raw">${escapeHtml(rawJson)}</pre>`;
+        } else if (typeof raw === 'string' && raw) {
+          // If not parsed, use raw string for both
+          hiddenPretty = `<pre id="${base}-pretty" class="hidden" data-content="pretty">${escapeHtml(raw)}</pre>`;
+          hiddenRaw = `<pre id="${base}-raw" class="hidden" data-content="raw">${escapeHtml(raw)}</pre>`;
         }
-        // baseId removed—modal will source content from state.data by index
 
         return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
-  <td class="p-2 align-top">${userHtml}</td>
+        <td class="p-2 align-top">${userHtml}</td>
         <td class="p-2 align-top font-medium" title="${escapeHtml(action)}">${escapeHtml(formattedAction)}</td>
         <td class="p-2 align-top max-w-sm break-words">
           ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
-          <div class="text-xs text-gray-300 dark:text-gray-400 break-words whitespace-pre-wrap">${escapeHtml(formattedPreview || '')}</div>
+          ${hiddenPretty}
+          ${hiddenRaw}
           ${
-  pretty || raw
-    ? `
-          <div class="mt-1">
-            <button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800" data-idx="${idx}">Details</button>
-          </div>
-          `
+  hiddenPretty || hiddenRaw
+    ? `<div class="mt-1">
+            <button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${base}">Details</button>
+          </div>`
     : ''
   }
         </td>
@@ -347,40 +333,41 @@
     tbody.onclick = e => {
       const t = e.target;
       if (t && t.classList.contains('audit-open-modal')) {
-        const idxAttr = t.getAttribute('data-idx');
-        const idx = parseInt(idxAttr, 10);
-        if (isNaN(idx) || !state.data[idx]) { return; }
-        const row = state.data[idx];
-        // Recreate pretty/raw content from row data
-        let raw = row.details;
-        let parsed = null;
-        if (raw && typeof raw === 'string') {
-          try {
-            parsed = JSON.parse(raw);
-          } catch (_) {
-            /* not JSON */
-          }
-        } else if (raw && typeof raw === 'object') {
-          parsed = raw;
-          raw = JSON.stringify(raw);
-        }
-        const pretty = parsed ? JSON.stringify(parsed, null, 2) : (typeof raw === 'string' ? raw : '');
+        const base = t.getAttribute('data-base');
+        if (!base) { return; }
+
+        // Find hidden content nodes by base ID
+        const prettyNode = document.getElementById(`${base}-pretty`);
+        const rawNode = document.getElementById(`${base}-raw`);
+
+        if (!prettyNode && !rawNode) { return; }
+
         const modal = document.getElementById('audit-detail-modal');
         if (!modal) { return; }
+
         const modalPretty = document.getElementById('audit-modal-pretty');
         const modalRaw = document.getElementById('audit-modal-raw');
         const modeBtn = document.getElementById('audit-modal-mode');
-        if (modalPretty) { modalPretty.textContent = pretty; }
-        if (modalRaw) { modalRaw.textContent = raw || ''; }
-        if (pretty && modalPretty) {
+
+        // Copy content from hidden nodes to modal
+        if (modalPretty && prettyNode) {
+          modalPretty.textContent = prettyNode.textContent || '';
+        }
+        if (modalRaw && rawNode) {
+          modalRaw.textContent = rawNode.textContent || '';
+        }
+
+        // Show pretty by default if available
+        if (prettyNode && modalPretty) {
           modalPretty.classList.remove('hidden');
           modalRaw.classList.add('hidden');
           if (modeBtn) { modeBtn.textContent = 'Raw'; }
-        } else {
+        } else if (rawNode && modalRaw) {
           modalRaw.classList.remove('hidden');
           modalPretty.classList.add('hidden');
           if (modeBtn) { modeBtn.textContent = 'Pretty'; }
         }
+
         // Show modal with animation
         modal.classList.remove('hidden');
         return;
