@@ -176,15 +176,17 @@
                                 </div>
                                 <span class="px-2 py-0.5 rounded-full text-xs ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : order.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${order.status}</span>
                             </div>
-                            <div class="flex flex-wrap gap-2 text-xs mb-1">
-                                <div class="text-gray-700 dark:text-gray-200">Requested by: <span class="font-medium">${order.created_by || 'mechanic'}</span></div>
-                                <div class="text-gray-600 dark:text-gray-300">Total Items: <span class="font-medium">${order.total_items || '?'}</span></div>
-                                <div class="text-gray-600 dark:text-gray-300">Priority: <span class="font-medium">${order.priority || 'normal'}</span></div>
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <div class="flex flex-wrap gap-2 text-xs">
+                                    <div class="text-gray-700 dark:text-gray-200">Requested by: <span class="font-medium">${order.created_by || 'mechanic'}</span></div>
+                                    <div class="text-gray-600 dark:text-gray-300">Total Items: <span class="font-medium">${order.total_items || '?'}</span></div>
+                                    <div class="text-gray-600 dark:text-gray-300">Priority: <span class="font-medium">${order.priority || 'normal'}</span></div>
+                                </div>
+                                <button class="ml-auto px-3 py-1.5 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary text-xs" onclick="showOrderDetailsModal(${order.id})">
+                                    <span>View Details</span>
+                                </button>
                             </div>
                             <div class="text-gray-600 dark:text-gray-300 mb-1 text-xs">Notes: <span class="font-medium">${order.notes || ''}</span></div>
-                            <button class="mt-1 px-3 py-1.5 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary text-xs" onclick="showOrderDetailsModal(${order.id})">
-                                <span>View Details</span>
-                            </button>
                         </div>
                     `).join('');
                 } catch (err) {
