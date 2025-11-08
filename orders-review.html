@@ -23,14 +23,14 @@
       .modal-content.modal-sm { max-width: 400px; }
       .modal-content.modal-lg { max-width: 800px; }
       .modal-content.modal-xl { max-width: 1200px; }
-      .modal-header { padding: 1.5rem; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
-      .modal-body { padding: 1.5rem; }
-      .modal-footer { padding: 1.5rem; border-top: 1px solid #333; display: flex; gap: 0.75rem; justify-content: flex-end; }
+    .modal-header { padding: 1rem; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
+    .modal-body { padding: 1rem; }
+    .modal-footer { padding: 1rem; border-top: 1px solid #333; display: flex; gap: 0.5rem; justify-content: flex-end; }
       .modal-close { background: transparent; border: none; color: #999; font-size: 1.5rem; cursor: pointer; padding: 0; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem; transition: all 0.2s; }
       .modal-close:hover { background: #333; color: #fff; }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-      .modal-icon { width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; }
+    .modal-icon { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-size: 1rem; }
       .modal-icon-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
       .modal-icon-warning { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
       .modal-icon-info { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
@@ -137,9 +137,9 @@
             </script>
             <!-- Main Content -->
             <main id="main-content" class="flex-1 p-4 md:p-6 ml-64 md:ml-0" role="main">
-                <section class="mb-6">
-                    <h2 class="text-3xl font-bold mb-2 text-gray-100">Workshop Orders Review</h2>
-                    <p class="text-gray-400 text-sm">Review, filter and manage submitted workshop stock orders.</p>
+                <section class="mb-4">
+                    <h2 class="text-2xl font-bold mb-1 text-gray-100">Workshop Orders Review</h2>
+                    <p class="text-gray-400 text-xs">Review, filter and manage submitted workshop stock orders.</p>
                 </section>
                 <section>
                     <div class="card widget-primary rounded-lg shadow-md p-6" id="orders-container">
@@ -168,21 +168,21 @@
                         return;
                     }
                     ordersList.innerHTML = ordersState.map((order, idx) => `
-                        <div class="mb-6 p-4 border-b border-gray-200 dark:border-gray-600">
-                            <div class="flex justify-between items-center mb-2">
+                        <div class="mb-3 p-3 border-b border-gray-200 dark:border-gray-600">
+                            <div class="flex justify-between items-center mb-1">
                                 <div>
                                     <span class="font-semibold text-gray-900 dark:text-white">Order #${order.id}</span>
                                     <span class="ml-2 text-xs text-gray-500">${new Date(order.created_at).toLocaleString()}</span>
                                 </div>
-                                <span class="px-2 py-1 rounded-full text-xs ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : order.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${order.status}</span>
+                                <span class="px-2 py-0.5 rounded-full text-xs ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : order.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${order.status}</span>
                             </div>
-                            <div class="flex flex-wrap gap-4 text-sm mb-2">
+                            <div class="flex flex-wrap gap-2 text-xs mb-1">
                                 <div class="text-gray-700 dark:text-gray-200">Requested by: <span class="font-medium">${order.created_by || 'mechanic'}</span></div>
                                 <div class="text-gray-600 dark:text-gray-300">Total Items: <span class="font-medium">${order.total_items || '?'}</span></div>
                                 <div class="text-gray-600 dark:text-gray-300">Priority: <span class="font-medium">${order.priority || 'normal'}</span></div>
                             </div>
-                            <div class="text-gray-600 dark:text-gray-300 mb-2">Notes: <span class="font-medium">${order.notes || ''}</span></div>
-                            <button class="mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary" onclick="showOrderDetailsModal(${order.id})">
+                            <div class="text-gray-600 dark:text-gray-300 mb-1 text-xs">Notes: <span class="font-medium">${order.notes || ''}</span></div>
+                            <button class="mt-1 px-3 py-1.5 bg-primary text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary text-xs" onclick="showOrderDetailsModal(${order.id})">
                                 <span>View Details</span>
                             </button>
                         </div>
@@ -201,53 +201,53 @@
                 }
 
                 const statusBadge = order.status === 'pending' 
-                    ? '<span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Pending</span>'
+                    ? '<span class="px-2 py-0.5 rounded-full text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Pending</span>'
                     : order.status === 'approved'
-                    ? '<span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Approved</span>'
-                    : '<span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">Rejected</span>';
+                    ? '<span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Approved</span>'
+                    : '<span class="px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">Rejected</span>';
 
                 const itemsHtml = (order.items || []).map(item => `
                     <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <td class="py-2 px-3 text-gray-900 dark:text-white">${item.name}</td>
-                        <td class="py-2 px-3 text-gray-600 dark:text-gray-400 text-sm">${item.code}</td>
-                        <td class="py-2 px-3 text-gray-900 dark:text-white text-right font-medium">${item.quantity}</td>
+                        <td class="py-1 px-2 text-gray-900 dark:text-white text-xs">${item.name}</td>
+                        <td class="py-1 px-2 text-gray-600 dark:text-gray-400 text-xs">${item.code}</td>
+                        <td class="py-1 px-2 text-gray-900 dark:text-white text-right font-medium text-xs">${item.quantity}</td>
                     </tr>
                 `).join('');
 
                 const content = `
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-start border-b border-gray-200 dark:border-gray-700 pb-3">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start border-b border-gray-200 dark:border-gray-700 pb-2">
                             <div>
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Order #${order.id}</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${new Date(order.created_at).toLocaleString()}</p>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Order #${order.id}</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${new Date(order.created_at).toLocaleString()}</p>
                             </div>
                             ${statusBadge}
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                        <div class="grid grid-cols-2 gap-3 bg-gray-50 dark:bg-gray-800 p-2 rounded">
                             <div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Requested By</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">Requested By</p>
                                 <p class="font-medium text-gray-900 dark:text-white">${order.created_by || 'mechanic'}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Priority</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">Priority</p>
                                 <p class="font-medium text-gray-900 dark:text-white">${order.priority || 'normal'}</p>
                             </div>
                             <div class="col-span-2">
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Notes</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">Notes</p>
                                 <p class="font-medium text-gray-900 dark:text-white">${order.notes || 'No notes provided'}</p>
                             </div>
                         </div>
 
                         <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Order Items (${order.total_items || order.items?.length || 0})</h4>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-2 text-sm">Order Items (${order.total_items || order.items?.length || 0})</h4>
                             <div class="overflow-x-auto">
                                 <table class="w-full">
                                     <thead class="bg-gray-100 dark:bg-gray-700">
                                         <tr>
-                                            <th class="py-2 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Product</th>
-                                            <th class="py-2 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Code</th>
-                                            <th class="py-2 px-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Quantity</th>
+                                            <th class="py-1 px-2 text-left text-xs font-semibold text-gray-900 dark:text-white">Product</th>
+                                            <th class="py-1 px-2 text-left text-xs font-semibold text-gray-900 dark:text-white">Code</th>
+                                            <th class="py-1 px-2 text-right text-xs font-semibold text-gray-900 dark:text-white">Quantity</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -257,14 +257,14 @@
                             </div>
                         </div>
 
-                        <div class="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-                            <button class="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors" onclick="updateOrderStatus(${order.id}, 'approved')">
+                        <div class="flex gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <button class="flex-1 px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors text-sm" onclick="updateOrderStatus(${order.id}, 'approved')">
                                 Approve Order
                             </button>
-                            <button class="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors" onclick="updateOrderStatus(${order.id}, 'rejected')">
+                            <button class="flex-1 px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-sm" onclick="updateOrderStatus(${order.id}, 'rejected')">
                                 Reject Order
                             </button>
-                            <button class="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors" onclick="emailOrder(${order.id})">
+                            <button class="flex-1 px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors text-sm" onclick="emailOrder(${order.id})">
                                 Email Order
                             </button>
                         </div>
