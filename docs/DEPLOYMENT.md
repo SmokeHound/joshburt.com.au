@@ -539,9 +539,9 @@ How it works:
 
 Operational notes:
 - Predetermined avatar URLs are defined in the serverless function configuration and must be maintained by the development team.
-- This approach avoids storing user-uploaded files and removes the need for external object storage or SFTP credentials.
+- This approach avoids storing user-uploaded files and removes the need for external object storage credentials.
 
-If you need custom avatars in the future (uploads to your hosting or object storage), open an issue and the team can reintroduce an upload flow using secure storage (S3/Cloudinary) or SFTP.
+If you need custom avatars in the future (uploads to your hosting or object storage), open an issue and the team can reintroduce an upload flow using secure storage (S3/Cloudinary). Legacy SFTP-based uploads are considered historical and would require extra operational support; contact the dev team if you need that specifically.
 
 
 ## Database
