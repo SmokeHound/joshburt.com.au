@@ -204,7 +204,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const i = initialsInput.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
       const t = themeSelect.value;
       const s = styleSelect.value;
+      		// Declare these here so both try and catch blocks can access them for revert logic
+      		const avatarEl = document.getElementById('profile-avatar');
+      		const prevAvatarSrc = avatarEl && avatarEl.src ? avatarEl.src : '';
       try {
+        // Optimistic local-only preview for initials avatar
+        const previewUrl = `/.netlify/functions/avatar-initials?i=${encodeURIComponent(i)}&t=${t}&s=${s}` + '&preview=1&ts=' + Date.now();
+        try { if (avatarEl) { avatarEl.src = previewUrl; } } catch (e) { console.warn('Failed to set initials preview', e); }
         const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -225,6 +231,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         safeClose();
       } catch (err) {
         console.error(err);
+        // Revert optimistic preview on failure
+        try { if (avatarEl && prevAvatarSrc) { avatarEl.src = prevAvatarSrc; } } catch (revertErr) { console.warn('Failed to revert initials preview', revertErr); }
         if (window.showNotification) { window.showNotification('Avatar save failed: ' + err.message, 'error'); } else { alert('Avatar save failed: ' + err.message); }
       }
     };
@@ -312,6 +320,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.classList.add('ring-4', 'ring-blue-500', 'border-blue-500', 'scale-105');
         btn.setAttribute('aria-current', 'true');
 
+        // Optimistic local-only avatar preview: remember previous src and set immediately
+        const avatarEl = document.getElementById('profile-avatar');
+        const prevAvatarSrc = avatarEl && avatarEl.src ? avatarEl.src : '';
+        try {
+          // Use a local preview (append a local cache-bust token to avoid stale caching)
+          avatarEl.src = url + (url.includes('?') ? '&' : '?') + 'preview=1&ts=' + Date.now();
+        } catch (e) {
+          // ignore preview failure
+          console.warn('Failed to apply local avatar preview', e);
+        }
+
         // Disable all buttons to avoid rapid repeat actions
         const allBtns = Array.from(grid.querySelectorAll('button'));
         allBtns.forEach(b => { b.disabled = true; });
@@ -353,6 +372,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               prevSelected.classList.add('ring-4', 'ring-blue-500', 'border-blue-500', 'scale-105');
               prevSelected.setAttribute('aria-current', 'true');
             }
+            // Revert avatar preview to previous src
+            try { if (avatarEl && prevAvatarSrc) { avatarEl.src = prevAvatarSrc; } } catch (revertAvatarErr) { console.warn('Failed to revert avatar preview', revertAvatarErr); }
           } catch (revertErr) {
             console.warn('Failed to revert selection highlight', revertErr);
           }
