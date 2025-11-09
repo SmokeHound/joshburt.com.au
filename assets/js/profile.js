@@ -119,13 +119,144 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Save profile changes (only for self)
   // Avatar selection (pick from predetermined avatars)
   const PRESET_AVATARS = [
-    'https://avatars.dicebear.com/api/identicon/seed-1.svg',
-    'https://avatars.dicebear.com/api/identicon/seed-2.svg',
-    'https://avatars.dicebear.com/api/identicon/seed-3.svg',
-    'https://avatars.dicebear.com/api/identicon/seed-4.svg',
-    'https://avatars.dicebear.com/api/identicon/seed-5.svg',
-    'https://avatars.dicebear.com/api/identicon/seed-6.svg'
+    '/assets/images/avatars/avatar-1.svg',
+    '/assets/images/avatars/avatar-2.svg',
+    '/assets/images/avatars/avatar-3.svg',
+    '/assets/images/avatars/avatar-4.svg',
+    '/assets/images/avatars/avatar-5.svg',
+    '/assets/images/avatars/avatar-6.svg',
+    '/assets/images/avatars/avatar-7.svg',
+    '/assets/images/avatars/avatar-8.svg',
+    '/assets/images/avatars/avatar-9.svg',
+    '/assets/images/avatars/avatar-10.svg',
+    '/assets/images/avatars/avatar-11.svg',
+    '/assets/images/avatars/avatar-12.svg'
   ];
+
+  // Build initials from user name (first letters of up to 3 words)
+  function deriveInitials(name) {
+    if (!name) { return 'U'; }
+    const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 3);
+    const initials = parts.map((p) => p[0].toUpperCase().replace(/[^A-Z]/g, '')).join('');
+    return initials || 'U';
+  }
+
+  function openInitialsAvatarPicker() {
+    const overlay = document.createElement('div');
+    overlay.id = 'avatar-picker-overlay';
+    overlay.className = 'fixed inset-0 bg-black/60 flex items-center justify-center z-50';
+    const modal = document.createElement('div');
+    modal.className = 'bg-gray-900 p-6 rounded-lg max-w-md w-full space-y-4';
+    const initials = deriveInitials(user.name || user.email || 'User');
+    modal.innerHTML = `
+      <h3 class="text-lg font-semibold">Generate Initials Avatar</h3>
+      <div class="flex flex-col gap-4">
+        <div class="flex gap-2 items-center">
+          <label class="text-sm font-medium w-24">Initials</label>
+          <input id="init-initials" type="text" maxlength="3" value="${initials}" class="flex-1 p-2 rounded bg-gray-800 border border-gray-700 text-white" />
+        </div>
+        <div class="flex gap-2 items-center">
+          <label class="text-sm font-medium w-24">Theme</label>
+          <select id="init-theme" class="flex-1 p-2 rounded bg-gray-800 border border-gray-700 text-white">
+            <option value="dark" selected>Dark</option>
+            <option value="light">Light</option>
+          </select>
+        </div>
+        <div class="flex gap-2 items-center">
+          <label class="text-sm font-medium w-24">Style</label>
+          <select id="init-style" class="flex-1 p-2 rounded bg-gray-800 border border-gray-700 text-white">
+            <option value="solid" selected>Solid</option>
+            <option value="outline">Outline</option>
+          </select>
+        </div>
+        <div id="init-preview" class="flex items-center justify-center h-40 border border-dashed border-gray-700 rounded"></div>
+      </div>
+      <div class="flex justify-between pt-2">
+        <button id="init-cancel" class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600">Cancel</button>
+        <button id="init-save" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 font-semibold">Save Avatar</button>
+      </div>
+    `;
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    function safeClose() { const ex = document.getElementById('avatar-picker-overlay'); if (ex && ex.parentNode) { ex.parentNode.removeChild(ex); } }
+    overlay.onclick = (e) => { if (e.target === overlay) { safeClose(); } };
+    modal.querySelector('#init-cancel').onclick = () => safeClose();
+
+    const initialsInput = modal.querySelector('#init-initials');
+    const themeSelect = modal.querySelector('#init-theme');
+    const styleSelect = modal.querySelector('#init-style');
+    const preview = modal.querySelector('#init-preview');
+
+    function updatePreview() {
+      const i = initialsInput.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
+      const t = themeSelect.value;
+      const s = styleSelect.value;
+      const url = `/.netlify/functions/avatar-initials?i=${encodeURIComponent(i)}&t=${t}&s=${s}`;
+      preview.innerHTML = `<img src="${url}" alt="Initials Avatar" class="h-36 w-36 rounded-full" />`;
+    }
+    initialsInput.oninput = updatePreview;
+    themeSelect.onchange = updatePreview;
+    styleSelect.onchange = updatePreview;
+    updatePreview();
+
+    modal.querySelector('#init-save').onclick = async () => {
+      const i = initialsInput.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
+      const t = themeSelect.value;
+      const s = styleSelect.value;
+      try {
+        const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
+        }) : fetch(`${FN_BASE}/users/${user.id}/avatar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
+        }));
+        if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || 'Save failed'); }
+        const json = await res.json();
+        const newUrl = json.user && json.user.avatar_url;
+        if (newUrl) {
+          document.getElementById('profile-avatar').src = newUrl + '&cb=' + Date.now();
+          try { const stored = JSON.parse(localStorage.getItem('user') || '{}'); stored.avatarUrl = newUrl; localStorage.setItem('user', JSON.stringify(stored)); } catch (e) { console.warn('Failed to persist avatar locally', e); }
+          if (window.showNotification) { window.showNotification('Avatar updated', 'success'); }
+        }
+        safeClose();
+      } catch (err) {
+        console.error(err);
+        if (window.showNotification) { window.showNotification('Avatar save failed: ' + err.message, 'error'); } else { alert('Avatar save failed: ' + err.message); }
+      }
+    };
+  }
+
+  // Augment existing picker button: offer choice between presets and initials
+  const changeBtn = document.getElementById('change-avatar');
+  if (changeBtn) {
+    changeBtn.onclick = () => {
+      if (!isSelf) { return; }
+      // Simple chooser overlay with two options
+      const overlay = document.createElement('div');
+      overlay.id = 'avatar-picker-overlay';
+      overlay.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
+      const modal = document.createElement('div');
+      modal.className = 'bg-gray-900 p-6 rounded-lg w-full max-w-sm space-y-4';
+      modal.innerHTML = `
+        <h3 class="text-lg font-semibold">Change Avatar</h3>
+        <div class="grid gap-3">
+          <button id="choose-preset" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 font-medium">Choose Preset</button>
+          <button id="choose-initials" class="px-4 py-2 rounded bg-purple-600 hover:bg-purple-500 font-medium">Generate Initials</button>
+          <button id="cancel-avatar" class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600">Cancel</button>
+        </div>
+      `;
+      overlay.appendChild(modal); document.body.appendChild(overlay);
+      function safeClose() { const ex = document.getElementById('avatar-picker-overlay'); if (ex && ex.parentNode) { ex.parentNode.removeChild(ex); } }
+      overlay.onclick = (e) => { if (e.target === overlay) { safeClose(); } };
+      modal.querySelector('#cancel-avatar').onclick = () => safeClose();
+      modal.querySelector('#choose-preset').onclick = () => { safeClose(); openAvatarPicker(); };
+      modal.querySelector('#choose-initials').onclick = () => { safeClose(); openInitialsAvatarPicker(); };
+    };
+  }
 
   function openAvatarPicker() {
     // Build modal
@@ -145,12 +276,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.body.appendChild(overlay);
 
     const grid = modal.querySelector('#avatar-options');
+    // Determine currently-selected avatar (normalize to pathname)
+    const currentAvatarSrc = (user.avatarUrl || user.avatar_url || document.getElementById('profile-avatar').src || '').toString();
+    let currentAvatarPath = '';
+    try { currentAvatarPath = new URL(currentAvatarSrc, window.location.href).pathname; } catch (e) { currentAvatarPath = currentAvatarSrc.split('?')[0]; }
+
     PRESET_AVATARS.forEach(url => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'rounded overflow-hidden border-2 border-transparent hover:border-blue-500';
       btn.innerHTML = `<img src="${url}" alt="avatar" class="w-full h-24 object-cover">`;
+      // Highlight if this preset matches the current avatar
+      let btnPath = '';
+      try { btnPath = new URL(url, window.location.href).pathname; } catch (e) { btnPath = url.split('?')[0]; }
+      if (btnPath === currentAvatarPath) {
+        // selected visual styles (Tailwind utility classes)
+        btn.className += ' ring-4 ring-blue-500 border-blue-500 scale-105';
+        btn.setAttribute('aria-current', 'true');
+      } else {
+        btn.setAttribute('aria-current', 'false');
+      }
+
       btn.onclick = async () => {
+        // Prevent double clicks while a request is in-flight
+        if (btn.disabled) { return; }
+
+        // Remember previous selection so we can revert on failure
+        const prevSelected = grid.querySelector('[aria-current="true"]');
+
+        // Optimistically highlight this button
+        if (prevSelected) {
+          prevSelected.classList.remove('ring-4', 'ring-blue-500', 'border-blue-500', 'scale-105');
+          prevSelected.setAttribute('aria-current', 'false');
+        }
+        btn.classList.add('ring-4', 'ring-blue-500', 'border-blue-500', 'scale-105');
+        btn.setAttribute('aria-current', 'true');
+
+        // Disable all buttons to avoid rapid repeat actions
+        const allBtns = Array.from(grid.querySelectorAll('button'));
+        allBtns.forEach(b => { b.disabled = true; });
+
         try {
           const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
             method: 'POST',
@@ -177,18 +342,37 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch (e) { console.warn('Failed to update local user avatar', e); }
             if (window.showNotification) { window.showNotification('Avatar updated', 'success'); }
           }
-          // Close modal
-          document.body.removeChild(overlay);
+          // Close modal (idempotent)
+          safeClose();
         } catch (err) {
+          // Revert optimistic highlight on failure
+          try {
+            btn.classList.remove('ring-4', 'ring-blue-500', 'border-blue-500', 'scale-105');
+            btn.setAttribute('aria-current', 'false');
+            if (prevSelected) {
+              prevSelected.classList.add('ring-4', 'ring-blue-500', 'border-blue-500', 'scale-105');
+              prevSelected.setAttribute('aria-current', 'true');
+            }
+          } catch (revertErr) {
+            console.warn('Failed to revert selection highlight', revertErr);
+          }
+          // Re-enable buttons so user can try again
+          allBtns.forEach(b => { b.disabled = false; });
           console.error('Avatar selection error', err);
           if (window.showNotification) { window.showNotification('Avatar selection failed: ' + err.message, 'error'); } else { alert('Avatar selection failed: ' + err.message); }
         }
       };
       grid.appendChild(btn);
     });
-
-    modal.querySelector('#avatar-picker-close').onclick = () => { document.body.removeChild(overlay); };
-    overlay.onclick = (e) => { if (e.target === overlay) { document.body.removeChild(overlay); } };
+    // Safe close helper prevents DOMException if already removed
+    function safeClose() {
+      const existing = document.getElementById('avatar-picker-overlay');
+      if (existing && existing.parentNode) {
+        existing.parentNode.removeChild(existing);
+      }
+    }
+    modal.querySelector('#avatar-picker-close').onclick = () => { safeClose(); };
+    overlay.onclick = (e) => { if (e.target === overlay) { safeClose(); } };
   }
 
   document.getElementById('change-avatar').onclick = () => { if (!isSelf) { return; } openAvatarPicker(); };

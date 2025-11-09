@@ -9,14 +9,20 @@ const { logAudit } = require('../../utils/audit');
 const fs = require('fs');
 const path = require('path');
 
-// Predetermined avatar selection (fixed set of allowed URLs)
+// Predetermined avatar selection (fixed set of allowed URLs) - local assets
 const PRESET_AVATARS = [
-  'https://avatars.dicebear.com/api/identicon/seed-1.svg',
-  'https://avatars.dicebear.com/api/identicon/seed-2.svg',
-  'https://avatars.dicebear.com/api/identicon/seed-3.svg',
-  'https://avatars.dicebear.com/api/identicon/seed-4.svg',
-  'https://avatars.dicebear.com/api/identicon/seed-5.svg',
-  'https://avatars.dicebear.com/api/identicon/seed-6.svg'
+  '/assets/images/avatars/avatar-1.svg',
+  '/assets/images/avatars/avatar-2.svg',
+  '/assets/images/avatars/avatar-3.svg',
+  '/assets/images/avatars/avatar-4.svg',
+  '/assets/images/avatars/avatar-5.svg',
+  '/assets/images/avatars/avatar-6.svg',
+  '/assets/images/avatars/avatar-7.svg',
+  '/assets/images/avatars/avatar-8.svg',
+  '/assets/images/avatars/avatar-9.svg',
+  '/assets/images/avatars/avatar-10.svg',
+  '/assets/images/avatars/avatar-11.svg',
+  '/assets/images/avatars/avatar-12.svg'
 ];
 
 let dbInitialized = false;
@@ -57,21 +63,45 @@ exports.handler = withHandler(async (event) => {
       const canUpdate = isOwn || hasPermission(user, 'users', 'update');
       if (!canUpdate) { return error(403, 'Insufficient permissions'); }
 
-      // Expect JSON body with avatarUrl (one of predetermined options)
-      const { avatarUrl } = body || {};
-      if (!avatarUrl || typeof avatarUrl !== 'string') {
-        return error(400, 'Missing avatarUrl');
-      }
+      // Support two modes: preset url OR dynamic initials
+      const { avatarUrl, avatarType, initials, theme, style } = body || {};
 
-      // Validate against preset list
-      if (!PRESET_AVATARS.includes(avatarUrl)) {
-        return error(400, 'Invalid avatar selection');
+      let storedUrl = null;
+
+      if (avatarType === 'initials') {
+        // Validate initials and options
+        const safeInitials = String(initials || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+        if (!safeInitials) { return error(400, 'Missing or invalid initials'); }
+        const safeTheme = (theme === 'light' || theme === 'dark') ? theme : 'dark';
+        const safeStyle = (style === 'outline' || style === 'solid') ? style : 'solid';
+        storedUrl = `/.netlify/functions/avatar-initials?i=${encodeURIComponent(safeInitials)}&t=${safeTheme}&s=${safeStyle}`;
+      } else {
+        // Expect JSON body with avatarUrl (one of predetermined options)
+        if (!avatarUrl || typeof avatarUrl !== 'string') {
+          return error(400, 'Missing avatarUrl');
+        }
+        // Strip query if present
+        const base = avatarUrl.split('?')[0];
+        if (!PRESET_AVATARS.includes(base)) {
+          return error(400, 'Invalid avatar selection');
+        }
+        // Append cache-busting based on file mtime
+        try {
+          const filename = path.basename(base);
+          const filePath = path.join(__dirname, '../../assets/images/avatars', filename);
+          const stat = fs.statSync(filePath);
+          const v = Math.floor(stat.mtimeMs);
+          storedUrl = `${base}?v=${v}`;
+        } catch (fsErr) {
+          // Fallback to base if fs lookup fails
+          storedUrl = base;
+        }
       }
 
       // Update DB with avatar URL and audit
-      await database.run('UPDATE users SET avatar_url = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [avatarUrl, uploadId]);
+      await database.run('UPDATE users SET avatar_url = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [storedUrl, uploadId]);
       const updated = await database.get('SELECT id, email, name, role, is_active, email_verified, avatar_url, updated_at FROM users WHERE id = ?', [uploadId]);
-      await logAudit(event, { action: 'user.avatar.select', userId: user.id, details: { targetUserId: uploadId, avatar: avatarUrl } });
+      await logAudit(event, { action: 'user.avatar.select', userId: user.id, details: { targetUserId: uploadId, avatar: storedUrl } });
       return ok({ message: 'Avatar selected', user: updated });
     }
     // Stats endpoint: /users/stats/overview
