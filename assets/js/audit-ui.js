@@ -312,9 +312,15 @@
         let detailsPart = '';
         if (hiddenPretty || hiddenRaw) {
           if (chipsHtml) {
-            detailsPart = '<div class="mb-1 flex items-center gap-2">' + chipsHtml + '<button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800" data-base="' + base + '">Details</button></div>';
+            // Smaller button and tighter gap when chips are present
+            detailsPart = '<div class="mb-1 flex items-center gap-1">' +
+              chipsHtml +
+              '<button class="audit-open-modal px-2 py-0.5 text-[11px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400 ml-1" data-base="' +
+              base +
+              '">Details</button></div>';
           } else {
-            detailsPart = '<div class="mb-1"><button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800" data-base="' + base + '">Details</button></div>';
+            // Smaller standalone Details button
+            detailsPart = '<div class="mb-1"><button class="audit-open-modal px-2 py-0.5 text-[11px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400" data-base="' + base + '">Details</button></div>';
           }
         } else {
           detailsPart = chipsHtml ? ('<div class="mb-1">' + chipsHtml + '</div>') : '';
