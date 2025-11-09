@@ -308,21 +308,26 @@
           hiddenRaw = `<pre id="${base}-raw" class="hidden" data-content="raw">${escapeHtml(raw)}</pre>`;
         }
 
+        // Build details / chips section: put Details button inline next to chips when chips exist
+        let detailsPart = '';
+        if (hiddenPretty || hiddenRaw) {
+          if (chipsHtml) {
+            detailsPart = '<div class="mb-1 flex items-center gap-2">' + chipsHtml + '<button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800" data-base="' + base + '">Details</button></div>';
+          } else {
+            detailsPart = '<div class="mb-1"><button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800" data-base="' + base + '">Details</button></div>';
+          }
+        } else {
+          detailsPart = chipsHtml ? ('<div class="mb-1">' + chipsHtml + '</div>') : '';
+        }
+
         return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
         <td class="p-2 align-top">${userHtml}</td>
         <td class="p-2 align-top font-medium" title="${escapeHtml(action)}">${escapeHtml(formattedAction)}</td>
         <td class="p-2 align-top max-w-sm break-words">
-          ${chipsHtml ? `<div class="mb-1">${chipsHtml}</div>` : ''}
+          ${detailsPart}
           ${hiddenPretty}
           ${hiddenRaw}
-          ${
-  hiddenPretty || hiddenRaw
-    ? `<div class="mt-1">
-            <button class="audit-open-modal px-2 py-0.5 text-xs rounded bg-gray-800" data-base="${base}">Details</button>
-          </div>`
-    : ''
-  }
         </td>
         <td class="p-2 align-top whitespace-nowrap text-xs">${ip}</td>
       </tr>`;
