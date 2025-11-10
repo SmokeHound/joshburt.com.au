@@ -20,9 +20,52 @@ CREATE TABLE IF NOT EXISTS products (
     description TEXT,
     image TEXT,
     model_qty INTEGER DEFAULT 0,
+    soh INTEGER DEFAULT 0,
+    -- product category/stock flags (added by migrations/001)
+    category_id INTEGER,
+    stock_quantity INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Product categories, variants and images (from migrations/001_add_product_categories.sql)
+CREATE TABLE IF NOT EXISTS product_categories (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    description TEXT,
+    parent_id INTEGER REFERENCES product_categories(id) ON DELETE SET NULL,
+    display_order INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS product_variants (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+    variant_type VARCHAR(50) NOT NULL,
+    variant_value VARCHAR(100) NOT NULL,
+    stock_quantity INTEGER DEFAULT 0,
+    sku VARCHAR(100) UNIQUE,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(product_id, variant_type, variant_value)
+);
+
+CREATE TABLE IF NOT EXISTS product_images (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+    image_url TEXT NOT NULL,
+    alt_text VARCHAR(255),
+    display_order INTEGER DEFAULT 0,
+    is_primary BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Full-text search index for products (PostgreSQL specific)
+CREATE INDEX IF NOT EXISTS idx_products_search ON products USING GIN (to_tsvector('english', name || ' ' || COALESCE(description, '') || ' ' || COALESCE(specs, '')));
 
 -- Consumables table for workshop consumables
 CREATE TABLE IF NOT EXISTS consumables (
@@ -33,6 +76,7 @@ CREATE TABLE IF NOT EXISTS consumables (
     category VARCHAR(100),
     description TEXT,
     model_qty INTEGER DEFAULT 0,
+    soh INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -43,6 +87,11 @@ CREATE TABLE IF NOT EXISTS orders (
     total_items INTEGER NOT NULL DEFAULT 0,
     status VARCHAR(50) DEFAULT 'pending',
     priority VARCHAR(50) DEFAULT 'normal',
+    tracking_number VARCHAR(100) UNIQUE,
+    status_updated_at TIMESTAMP,
+    cancelled_at TIMESTAMP,
+    cancellation_reason TEXT,
+    estimated_delivery TIMESTAMP,
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -56,6 +105,67 @@ CREATE TABLE IF NOT EXISTS order_items (
     quantity INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Order status history (migrations/002_add_order_status_tracking.sql)
+CREATE TABLE IF NOT EXISTS order_status_history (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+    old_status VARCHAR(50),
+    new_status VARCHAR(50) NOT NULL,
+    changed_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_order_status_history_order_id ON order_status_history(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_status_history_created_at ON order_status_history(created_at);
+
+-- Notifications system (migrations/003_add_notification_system.sql)
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    related_entity_type VARCHAR(50),
+    related_entity_id INTEGER,
+    action_url TEXT,
+    is_read BOOLEAN DEFAULT false,
+    read_at TIMESTAMP,
+    priority VARCHAR(20) DEFAULT 'normal',
+    expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS notification_preferences (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+    email_order_status BOOLEAN DEFAULT true,
+    email_system_announcements BOOLEAN DEFAULT true,
+    email_product_updates BOOLEAN DEFAULT false,
+    in_app_order_status BOOLEAN DEFAULT true,
+    in_app_system_announcements BOOLEAN DEFAULT true,
+    in_app_product_updates BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_type ON notifications(type);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, is_read) WHERE is_read = false;
+
+-- Trigger for preferences
+CREATE TRIGGER update_notification_preferences_updated_at 
+BEFORE UPDATE ON notification_preferences 
+FOR EACH ROW 
+EXECUTE FUNCTION update_updated_at_column();
+
+-- Create default notification preferences for existing users (idempotent)
+INSERT INTO notification_preferences (user_id)
+SELECT id FROM users 
+WHERE id NOT IN (SELECT user_id FROM notification_preferences);
 
 -- Inventory table to track stock for products and consumables
 CREATE TABLE IF NOT EXISTS inventory (
@@ -73,6 +183,7 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255),
     role VARCHAR(50) DEFAULT 'user',
+    -- role constraint kept in runtime schema migrations/DB code; ensure application enforces valid roles
     is_active BOOLEAN DEFAULT true,
     email_verified BOOLEAN DEFAULT false,
     email_verification_token VARCHAR(255),
@@ -84,10 +195,78 @@ CREATE TABLE IF NOT EXISTS users (
     reset_token_expires BIGINT,
     failed_login_attempts INTEGER DEFAULT 0,
     lockout_expires BIGINT,
+    totp_secret VARCHAR(255),
+    totp_enabled BOOLEAN DEFAULT false,
+    backup_codes TEXT,
     last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Refresh tokens table (for JWT/session refresh)
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Login attempts table (for rate limiting / security)
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id SERIAL PRIMARY KEY,
+    ip_address VARCHAR(45) NOT NULL,
+    email VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Settings table (store JSON/text config)
+CREATE TABLE IF NOT EXISTS settings (
+    id INTEGER PRIMARY KEY,
+    data TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Filters table (product/filter catalog) added in migrations/004_add_filters.sql
+CREATE TABLE IF NOT EXISTS filters (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(100) UNIQUE NOT NULL,
+    type VARCHAR(100) NOT NULL, -- 'Oil Filter', 'Air Filter', 'Fuel Filter', etc.
+    description TEXT,
+    model_qty INTEGER DEFAULT 0,
+    stock_quantity INTEGER DEFAULT 0,
+    reorder_point INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_filters_type ON filters(type);
+CREATE INDEX IF NOT EXISTS idx_filters_is_active ON filters(is_active);
+CREATE INDEX IF NOT EXISTS idx_filters_code ON filters(code);
+
+-- Full-text search for filters (PostgreSQL specific)
+CREATE INDEX IF NOT EXISTS idx_filters_search ON filters USING GIN (to_tsvector('english', name || ' ' || COALESCE(description, '') || ' ' || code));
+
+-- Add update trigger for filters
+DROP TRIGGER IF EXISTS update_filters_updated_at ON filters;
+CREATE TRIGGER update_filters_updated_at
+BEFORE UPDATE ON filters
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- Seed sample filters (will not duplicate due to ON CONFLICT)
+INSERT INTO filters (name, code, type, description, model_qty, stock_quantity, reorder_point) VALUES
+('Standard Oil Filter', 'OF-001', 'Oil Filter', 'Universal oil filter for most passenger vehicles', 0, 50, 20),
+('Heavy Duty Oil Filter', 'OF-002', 'Oil Filter', 'Heavy duty oil filter for trucks and commercial vehicles', 0, 30, 15),
+('Premium Synthetic Filter', 'OF-003', 'Oil Filter', 'Premium oil filter for synthetic oils', 0, 40, 18),
+('Transmission Filter Kit', 'TF-001', 'Transmission Filter', 'Complete transmission filter kit with gasket', 0, 25, 10),
+('Fuel Filter - Diesel', 'FF-001', 'Fuel Filter', 'Diesel fuel filter with water separator', 0, 35, 12),
+('Fuel Filter - Petrol', 'FF-002', 'Fuel Filter', 'In-line fuel filter for petrol engines', 0, 45, 15),
+('Cabin Air Filter', 'CF-001', 'Air Filter', 'Cabin air filter for passenger compartment', 0, 60, 25),
+('Engine Air Filter', 'AF-001', 'Air Filter', 'High-flow engine air filter', 0, 55, 20)
+ON CONFLICT (code) DO NOTHING;
 
 -- Insert sample Castrol products (with ON CONFLICT inside INSERT for PostgreSQL)
 INSERT INTO products (name, code, type, specs, description, image) VALUES
@@ -167,6 +346,26 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user_action ON audit_logs(user_id, action);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_created_user ON audit_logs(created_at DESC, user_id);
 
+-- Additional indexes used by runtime schema/queries
+CREATE INDEX IF NOT EXISTS idx_users_oauth ON users(oauth_provider, oauth_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at);
+CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip_address, created_at);
+
+-- Expression/indexes for audit_logs JSON details (PostgreSQL only)
+-- These are guarded to avoid errors on non-JSON text rows
+DO $$ BEGIN
+    BEGIN
+        CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs ((details::json->>'path')) WHERE substring(details from 1 for 1) IN ('{','[');
+    EXCEPTION WHEN others THEN NULL; END;
+    BEGIN
+        CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs ((details::json->>'method')) WHERE substring(details from 1 for 1) IN ('{','[');
+    EXCEPTION WHEN others THEN NULL; END;
+    BEGIN
+        CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs ((details::json->>'requestId')) WHERE substring(details from 1 for 1) IN ('{','[');
+    EXCEPTION WHEN others THEN NULL; END;
+END $$;
+
 -- Update timestamp trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -180,3 +379,24 @@ $$ language 'plpgsql';
 CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Additional indexes and triggers added by migrations/001
+CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active);
+CREATE INDEX IF NOT EXISTS idx_product_categories_name ON product_categories(name);
+CREATE INDEX IF NOT EXISTS idx_product_categories_parent_id ON product_categories(parent_id);
+CREATE INDEX IF NOT EXISTS idx_product_variants_product_id ON product_variants(product_id);
+CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON product_images(product_id);
+
+-- Add update triggers for product_categories and product_variants
+DROP TRIGGER IF EXISTS update_product_categories_updated_at ON product_categories;
+CREATE TRIGGER update_product_categories_updated_at
+BEFORE UPDATE ON product_categories
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_product_variants_updated_at ON product_variants;
+CREATE TRIGGER update_product_variants_updated_at
+BEFORE UPDATE ON product_variants
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();

@@ -320,7 +320,6 @@ Defined in: `shared-config.html`
 
 ### Accessibility Features
 
-- **Skip to Content Link**: Global skip link injected on every page (keyboard accessible, auto-positions on focus)
 - **Main Landmark**: Auto-assigns `id="main"` to the first `<main>` element if missing
 - **ARIA Attributes**: Proper labeling on interactive elements
 - **Keyboard Navigation**: Full keyboard support for navigation and modals
@@ -524,16 +523,11 @@ Extending CI:
 
 ### Environment Variables Checklist
 Ensure the following are defined in Netlify (or locally in `.env`) for full functionality:
-- `DB_TYPE` (postgres only)
 - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (PostgreSQL credentials)
 - `JWT_SECRET` (required for auth)
 - `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_AUDIENCE` (optional; enables OAuth; buttons auto-enable via `/.netlify/functions/public-config`)
 - Optional: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` (email flows)
 
-### Operational Tips
-- If switching database engines, clear or migrate the existing schema before first request so automatic table creation runs cleanly.
-- Confirm database connectivity against PostgreSQL in CI or a staging branch before deploying.
-- Re-run the prune script after bulk auth / load testing to keep token tables lean.
 
 ## 🐛 Known Limitations
 
