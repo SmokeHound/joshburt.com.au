@@ -1,175 +1,481 @@
 
-# joshburt.com.au - Dynamic Website & API
+# joshburt.com.au - Copilot Development Guide
 
-This site includes static HTML pages plus a serverless backend (Netlify Functions) only:
-- Responsive design with dark/light mode support
-- Admin dashboard and user management
-- Castrol oil product ordering system
- - **Dynamic backend**: Netlify serverless functions with PostgreSQL database integration 
-**Codebase is fully audited and production-ready (no dead code, debug logic, or unused variables)**
+**Production-ready serverless web application** with PostgreSQL database, JWT authentication, and comprehensive admin features.
 
-Always reference these instructions first. Fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
+## 🎯 Quick Reference
 
+### Technology Stack
+- **Frontend**: Static HTML, TailwindCSS v4, Vanilla JavaScript
+- **Backend**: Netlify Functions (Node.js serverless)
+- **Database**: PostgreSQL (Neon or compatible)
+- **Auth**: JWT tokens + optional Auth0 OAuth
+- **Deployment**: Netlify (primary) + FTP mirror (optional)
 
-## Working Effectively
+### Project Status
+✅ **Production-ready** - No dead code, debug logic, or unused variables  
+✅ **Fully serverless** - All APIs migrated from legacy `/api` to Netlify Functions  
+✅ **Database-driven** - All settings, users, products, orders in PostgreSQL
 
-### Bootstrap and Run the Website
-- **Static site**: `python3 -m http.server 8000` (HTML/CSS/JS only)
-- **Serverless backend**:
-  - Set DB env vars (DB_TYPE, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT as needed)
-  - Use `netlify dev` (optional) to run functions locally (`/.netlify/functions/*`)
-   - Test database connectivity: run `netlify dev` and call `/.netlify/functions/health`
+---
 
+## 🚀 Development Workflow
 
-### Build and Deploy Information
-- **Static files**: No build required
-- **Backend/API**: Requires Node.js dependencies (run `npm install`)
-- **Database**: PostgreSQL (e.g. Neon), (see config/database.js for credentials)
-- **Deployment**: GitHub Actions for FTP and Netlify; API/serverless functions deploy automatically
+### Local Development Setup
 
+```bash
+# Install dependencies
+npm install
 
-### Test Website & API Functionality
-- **Static pages**: Load via local server
-- **Serverless endpoints (replace legacy /api)**:
-   - Products: `/.netlify/functions/products`
-   - Orders: `/.netlify/functions/orders`
-   - Users: `/.netlify/functions/users`
-   - Auth (multi-action): `/.netlify/functions/auth?action=login|register|refresh|logout|me|forgot-password|reset-password|verify-email`
-   - Audit Logs: `/.netlify/functions/audit-logs`
-   - Inventory: `/.netlify/functions/inventory`
-   - Consumables: `/.netlify/functions/consumables`
-   - Categories: `/.netlify/functions/consumable-categories`
-- **Database**: use the health function locally
-- **Local Functions**: `netlify dev` (optional)
+# Option 1: Static development only (no backend)
+npm run dev
+# Serves on http://localhost:8000
 
+# Option 2: Full-stack development (static + serverless)
+npm run dev:functions
+# Serves on http://localhost:8888 with functions at /.netlify/functions/*
 
-## Validation
-
-### Manual Testing Requirements
-ALWAYS manually validate changes by running through these complete end-to-end scenarios:
-
-1. **Homepage Functionality Test** (static):
-   - As before
-
-2. **Oil Ordering System Test** (dynamic):
-   - Navigate to oil-products.html and test product API (`/.netlify/functions/products`)
-   - Add product, view, and order via serverless endpoints
-
-3. **Admin Dashboard & User Management**:
-   - Test user CRUD via `/.netlify/functions/users`
-   - Test auth actions via `/.netlify/functions/auth?action=...`
-
-4. **Orders API Test**:
-   - Submit and list orders via `/.netlify/functions/orders`
-
-5. **Database Test**:
-   - Start local functions with `netlify dev` and call `/.netlify/functions/health` to verify database connectivity and required tables
-
-
-### Known Limitations
-- **CDN resources blocked**: Styling may be limited in restricted environments
-- **Image loading blocked**: Placeholder images may not display
-- **Database connection**: Requires valid credentials and network access
-- **API/serverless**: Only works in supported environments (Netlify, Node.js)
-
-
-## Deployment
-
-### GitHub Actions Workflows
-Two deployment workflows are configured:
-1. **FTP Deployment** (`.github/workflows/main.yml`): Deploys static and backend files to joshburt.com.au via FTP on any push
-2. **Netlify Functions**: Deploys serverless API endpoints automatically
-
-**Build steps:**
-- Static: No build required
-- Backend/API: Run `npm install` before deploy
-
-
-## Common Tasks
-
-### Repository Structure
+# Option 3: Both (recommended for full testing)
+# Terminal 1: npm run dev
+# Terminal 2: npm run dev:functions
 ```
-/home/runner/work/joshburt.com.au/joshburt.com.au/
-├── .github/
-│   └── workflows/
-│       └── main.yml      # FTP deployment
-├── docs/                 # All technical documentation
-│   ├── archive/         # Historical phase documentation
+
+### Environment Variables Required
+
+Create `.env` file in project root:
+
+```env
+# Database (required for all functions)
+DB_HOST=your-db-host.neon.tech
+DB_PORT=5432
+DB_USER=your-username
+DB_PASSWORD=your-password
+DB_NAME=your-database
+
+# Auth (required)
+JWT_SECRET=your-secret-key-min-32-chars
+
+# Auth0 OAuth (optional - enables social login)
+AUTH0_DOMAIN=your-tenant.auth0.com
+AUTH0_CLIENT_ID=your-client-id
+AUTH0_AUDIENCE=https://your-api-identifier
+
+# Email (optional - for password reset)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=your-email@example.com
+SMTP_PASSWORD=your-smtp-password
+
+# Schema management (optional)
+APPLY_SCHEMA_ON_START=0  # Set to 1 to auto-apply database-schema.sql on startup
+```
+
+### Testing & Validation
+
+```bash
+# Run all tests (Jest + smoke tests)
+npm run test:all
+
+# Run only Jest tests
+npm test
+
+# Run function smoke tests
+npm run test:functions
+
+# Lint code
+npm run lint
+
+# Complete validation (lint + build + test)
+npm run validate
+
+# Database health check
+npm run health
+```
+
+---
+
+## 📁 Repository Structure
+
+```
+joshburt.com.au/
+├── index.html                      # Landing page
+├── login.html, register.html       # Authentication
+├── administration.html             # Admin dashboard
+├── users.html                      # User management
+├── settings.html                   # Site settings
+├── analytics.html                  # Analytics dashboard
+├── audit-logs.html                 # Audit log viewer
+├── oil-products.html               # Product catalog
+├── oil-products-mgmt.html          # Product admin
+├── consumables.html                # Consumables catalog
+├── consumables-mgmt.html           # Consumables admin
+├── filters.html                    # Filters catalog
+├── filters-mgmt.html               # Filters admin
+├── orders-review.html              # Order management
+├── notifications.html              # User notifications
+├── profile.html                    # User profile
+│
+├── assets/
+│   ├── css/styles.css              # Compiled TailwindCSS
+│   ├── js/
+│   │   ├── init-shared.js          # App initialization
+│   │   ├── auth.js                 # Auth utilities
+│   │   ├── audit-ui.js             # Audit log UI
+│   │   ├── profile.js              # Profile page logic
+│   │   └── ...
+│   └── images/
+│       └── avatars/                # User avatar presets
+│
+├── netlify/functions/              # Serverless API
+│   ├── auth.js                     # Multi-action auth endpoint
+│   ├── users.js                    # User CRUD + avatar upload
+│   ├── products.js                 # Product catalog
+│   ├── orders.js                   # Order management
+│   ├── consumables.js              # Consumables catalog
+│   ├── filters.js                  # Filters catalog
+│   ├── audit-logs.js               # Audit logging
+│   ├── inventory.js                # Stock management
+│   ├── settings.js                 # Site settings API
+│   ├── notifications.js            # User notifications
+│   ├── notification-preferences.js # Notification settings
+│   ├── avatar-initials.js          # Dynamic avatar generation
+│   ├── health.js                   # Database health check
+│   ├── public-config.js            # Public config (Auth0 status)
+│   └── public-stats.js             # Public statistics
+│
+├── config/
+│   └── database.js                 # PostgreSQL connection pool
+│
+├── utils/
+│   ├── fn.js                       # Function helpers (withHandler, error)
+│   ├── http.js                     # Auth middleware (requirePermission)
+│   ├── audit.js                    # Audit logging helper
+│   ├── password.js                 # Password hashing/validation
+│   ├── rbac.js                     # Role-based access control
+│   └── email.js                    # Email utilities
+│
+├── migrations/                     # Database migrations
+│   ├── 001_add_product_categories.sql
+│   ├── 002_add_order_status_tracking.sql
+│   ├── 003_add_notification_system.sql
+│   └── 004_add_filters.sql
+│
+├── scripts/
+│   ├── run-migrations.js           # Migration runner
+│   ├── health-check.js             # Function health test
+│   └── prune-refresh-tokens.js     # Token cleanup
+│
+├── tests/
+│   ├── functions/                  # Function smoke tests
+│   ├── unit/                       # Jest unit tests
+│   └── integration/                # Jest integration tests
+│
+├── docs/                           # Comprehensive documentation
 │   ├── ARCHITECTURE.md
 │   ├── API_DOCUMENTATION.md
 │   ├── DATABASE.md
-│   └── ...              # See DOCS_INDEX.md for complete list
-├── index.html           # Main homepage
-├── oil-products.html    # Castrol oil ordering system
-├── administration.html  # Administration dashboard
-├── analytics.html       # Analytics page
-├── settings.html        # Settings configuration
-├── users.html           # User management
-├── login.html           # Login page
-├── .netlify/functions/  # Serverless API endpoints (products.js, orders.js, users.js, auth.js, etc.)
-├── config/database.js   # Database abstraction (PostgreSQL)
-├── migrations/          # Database migration files
-├── DOCS_INDEX.md        # Documentation index (see this first!)
-└── README.md            # Basic project info
+│   ├── DEPLOYMENT.md
+│   └── ...
+│
+├── database-schema.sql             # Master schema file
+├── netlify.toml                    # Netlify config
+├── package.json                    # Dependencies + scripts
+└── tailwind.config.js              # TailwindCSS v4 config
 ```
 
+---
 
-### Key Files Reference
-- **index.html**: Main website template
-- **oil-products.html**: Castrol product ordering (uses API)
-- **.netlify/functions/**: Serverless API endpoints (products, orders, users, auth, consumables, categories, audit logs, inventory, settings, health)
-- **config/database.js**: Database abstraction
-- **docs/**: All technical documentation (see DOCS_INDEX.md)
-- **migrations/**: Database schema migrations
+## 🔌 API Endpoints
 
+All serverless functions are available at `/.netlify/functions/<name>`.
 
-### Development Notes
-- Static pages use TailwindCSS v4.1 and unified navigation
-- Backend/API uses Netlify Functions only (Node.js runtime)
-- Database: PostgreSQL (e.g. Neon)
-- Run `npm install` for backend dependencies
-- FTP credentials stored in GitHub Secrets for deployment
+### Authentication (`/auth`)
+Multi-action endpoint using `?action=<action>` or `{ action: "..." }` in body:
 
+- **login** - Email/password or Auth0 OAuth login
+- **register** - Create new user account
+- **refresh** - Refresh JWT access token
+- **logout** - Invalidate refresh token
+- **me** - Get current user info
+- **forgot-password** - Send password reset email
+- **reset-password** - Reset password with token
+- **verify-email** - Verify email with token
+- **2fa-setup** - Generate TOTP secret + QR code
+- **2fa-enable** - Enable 2FA with TOTP code
+- **2fa-disable** - Disable 2FA
 
-### Quick Commands Reference
+### Resource Endpoints
+
+| Endpoint | Methods | Description |
+|----------|---------|-------------|
+| `/users` | GET, POST, PUT, DELETE | User management |
+| `/users/:id/avatar` | PUT | Upload/update avatar |
+| `/products` | GET, POST, PUT, DELETE | Oil products catalog |
+| `/orders` | GET, POST, PUT, DELETE | Order management |
+| `/consumables` | GET, POST, PUT, DELETE | Consumables catalog |
+| `/filters` | GET, POST, PUT, DELETE | Filters/parts catalog |
+| `/audit-logs` | GET, POST, DELETE | Audit log management |
+| `/inventory` | GET, PUT | Stock level management |
+| `/settings` | GET, PUT | Site-wide settings |
+| `/notifications` | GET, POST, PUT, DELETE | User notifications |
+| `/notification-preferences` | GET, PUT | Notification settings |
+| `/avatar-initials` | GET | Generate initials avatar |
+| `/health` | GET | Database health check |
+| `/public-config` | GET | Public config (no auth) |
+| `/public-stats` | GET | Public stats (no auth) |
+
+### Permission Matrix
+
+| Role | Read | Create | Update | Delete |
+|------|------|--------|--------|--------|
+| **mechanic** | ✅ Products, Orders | ✅ Orders | ❌ | ❌ |
+| **manager** | ✅ All | ✅ Products, Users | ✅ Products, Orders | ❌ |
+| **admin** | ✅ All | ✅ All | ✅ All | ✅ All |
+
+Permissions enforced via `requirePermission(event, resource, action)` in `utils/http.js`.
+
+---
+
+## 💾 Database Schema
+
+### Core Tables
+
+- **users** - User accounts (email, password_hash, role, avatar_url, totp_secret, etc.)
+- **products** - Oil products (name, code, type, specs, category_id, stock_quantity)
+- **product_categories** - Product categories (hierarchical with parent_id)
+- **product_variants** - Product variants (size, color, SKU)
+- **product_images** - Product images (multiple per product)
+- **consumables** - Workshop consumables (name, code, type, category, soh)
+- **filters** - Filter/parts catalog (name, code, type, stock_quantity)
+- **orders** - Order headers (status, priority, tracking_number)
+- **order_items** - Order line items
+- **order_status_history** - Order status audit trail
+- **inventory** - Stock tracking (item_type, item_id, stock_count)
+- **audit_logs** - System audit trail (user_id, action, details, ip_address)
+- **refresh_tokens** - JWT refresh tokens (hashed)
+- **login_attempts** - Rate limiting tracker
+- **settings** - Site-wide settings (JSON in `data` field)
+- **notifications** - User notifications
+- **notification_preferences** - User notification settings
+
+### Migrations
+
+Managed via `scripts/run-migrations.js`:
+
 ```bash
-# Start static development server
-python3 -m http.server 8000
+# Dry run (show pending migrations)
+node scripts/run-migrations.js --dry-run
 
-# Test database (PostgreSQL)
-# Start Netlify dev then call health
+# Apply all pending migrations
+node scripts/run-migrations.js
+```
+
+Migration tracking in `schema_migrations` table ensures idempotency.
+
+---
+
+## 🎨 Frontend Patterns
+
+### Shared Components
+
+Include these HTML fragments in your pages:
+
+```html
+<!-- Navigation sidebar -->
+<div id="shared-nav-container"></div>
+<script src="/shared-nav.html"></script>
+
+<!-- Theme manager (dark/light/system/neon/ocean/high-contrast) -->
+<script src="/shared-theme.html"></script>
+
+<!-- TailwindCSS config + common utilities -->
+<script src="/shared-config.html"></script>
+
+<!-- Modals (confirmation, info, error) -->
+<script src="/shared-modals.html"></script>
+
+<!-- Notifications toast -->
+<script src="/shared-notifications.html"></script>
+```
+
+### Theme System
+
+Global `window.Theme` API:
+
+```javascript
+// Apply saved theme on page load (called automatically)
+window.Theme.applyFromStorage();
+
+// Set theme preset
+window.Theme.setTheme('dark');     // dark, light, system, neon, ocean, high-contrast
+
+// Custom colors
+window.Theme.setPalette({
+  primary: '#3b82f6',
+  secondary: '#10b981',
+  accent: '#8b5cf6'
+});
+
+// Get active theme
+const { id, mode, colors } = window.Theme.getActiveTheme();
+```
+
+### API Calls
+
+All pages use `window.FN_BASE` (defaults to `/.netlify/functions`):
+
+```javascript
+const FN_BASE = window.FN_BASE || '/.netlify/functions';
+
+// Authenticated request
+const response = await fetch(`${FN_BASE}/products`, {
+  headers: {
+    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+  }
+});
+
+// Multi-action auth call
+await fetch(`${FN_BASE}/auth?action=login`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, password })
+});
+```
+
+---
+
+## 🧪 Testing
+
+### Function Tests (Node.js smoke tests)
+
+```bash
+# Run all function tests
+npm run test:functions
+
+# Individual tests
+node tests/functions/auth_me_smoke.test.js
+node tests/functions/orders_products_smoke.test.js
+node tests/functions/auth_errors.test.js
+node tests/functions/handlers.test.js
+```
+
+### Jest Tests
+
+```bash
+# All Jest tests
+npm test
+
+# Unit tests only
+npm run test:unit
+
+# Integration tests only
+npm run test:integration
+
+# With coverage
+npm run test:coverage
+```
+
+---
+
+## 🚢 Deployment
+
+### Netlify (Primary)
+
+Auto-deploys on push to `main`:
+- Static files → Netlify CDN
+- Functions → Netlify serverless runtime
+- Environment variables configured in Netlify dashboard
+
+### FTP Mirror (Optional)
+
+GitHub Actions workflow (`.github/workflows/main.yml`) deploys to FTP server on push.  
+Credentials stored in GitHub Secrets: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`.
+
+---
+
+## 📋 Common Tasks
+
+### Add New Page
+
+1. Create HTML file in root (e.g., `my-page.html`)
+2. Include shared components (nav, theme, config)
+3. Add navigation link in `shared-nav.html`
+4. Test locally with `npm run dev`
+
+### Add New Function
+
+1. Create file in `netlify/functions/` (e.g., `my-function.js`)
+2. Use `withHandler` wrapper from `utils/fn.js`
+3. Add permission checks with `requirePermission` from `utils/http.js`
+4. Test with `netlify dev` then call `/.netlify/functions/my-function`
+
+### Database Changes
+
+1. Create migration in `migrations/` (e.g., `005_add_my_table.sql`)
+2. Update `database-schema.sql` to match
+3. Run migration: `node scripts/run-migrations.js`
+4. Test with `npm run health`
+
+---
+
+## 🔍 Debugging
+
+### Check Function Logs
+
+```bash
+# Netlify CLI
 netlify dev
-curl http://localhost:8888/.netlify/functions/health
+# Then call functions and view console output
 
-# Install backend dependencies
-npm install
-
-# Check website responds
-curl -s -o /dev/null -w "HTTP response: %{time_total}s\n" http://localhost:8000/
-
-# Count total HTML pages
-ls -1 *.html | wc -l  # Returns: 7
-
-# Stop server (if running in background)
-pkill -f "python3 -m http.server"
+# Production logs (Netlify dashboard)
+# Navigate to: Netlify Dashboard > Functions > Select function > Logs
 ```
 
+### Database Connectivity
 
-### File Contents Reference
 ```bash
-# README.md contents
-cat README.md
-# Returns basic project info with website status badge
+# Health check
+npm run health
 
-# Main navigation structure (from index.html)
-grep -A10 "<nav>" index.html
-# Shows sidebar navigation with Home, Administration, Consumables Orders, Analytics, Settings, Oil Orders, Logout
+# Or manually
+curl http://localhost:8888/.netlify/functions/health
 ```
 
+### Frontend Errors
 
-## Error Handling
-- If CDN resources fail to load, website remains functional but may have styling issues
-- If database connection fails, check credentials and network access
-- API/serverless errors: check logs and endpoint responses
-- No debug logic or dead code in production
-- Static files: no runtime errors beyond JavaScript console warnings for blocked CDNs
+Global error tracker captures all errors:
+
+```javascript
+// View errors in browser console
+ErrorTracker.getErrorLog()
+
+// Export errors
+ErrorTracker.exportErrorLog()
+
+// Clear errors
+ErrorTracker.clearErrorLog()
+```
+
+---
+
+## ⚠️ Important Notes
+
+1. **Always validate changes** with `npm run validate` before committing
+2. **Never commit** `.env` files or database credentials
+3. **Test locally** with `netlify dev` before deploying
+4. **Review audit logs** in `audit-logs.html` after admin actions
+5. **Run migrations** on staging before production
+6. **Use feature flags** in `settings.html` to toggle experimental features
+
+---
+
+## 📚 Documentation
+
+See `/docs` directory for comprehensive guides:
+- **ARCHITECTURE.md** - System design and patterns
+- **API_DOCUMENTATION.md** - Complete API reference
+- **DATABASE.md** - Schema details and queries
+- **DEPLOYMENT.md** - Deployment procedures
+- **AUTHENTICATION.md** - Auth flows and security
+
+Full documentation index: `DOCS_INDEX.md`

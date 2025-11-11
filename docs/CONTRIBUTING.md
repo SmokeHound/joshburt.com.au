@@ -1,256 +1,361 @@
-# Contributing to joshburt.com.au
+# Contributing Guide
 
-Welcome to the joshburt.com.au project! This is a dynamic website and API with a modular component structure, comprehensive testing, and a fully audited, production-ready codebase (no dead code, debug logic, or unused variables).
+Guidelines for contributing to joshburt.com.au.
 
-## Development Setup
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Code Standards](#code-standards)
+- [Testing Requirements](#testing-requirements)
+- [Pull Request Process](#pull-request-process)
+- [Issue Reporting](#issue-reporting)
+
+---
+
+## Getting Started
 
 ### Prerequisites
-- Node.js 18 or higher
-- Python 3 (for local development server)
+
+- Node.js 18+
 - Git
+- PostgreSQL access (or use Neon free tier)
+- Code editor (VS Code recommended)
 
-### Getting Started
+### Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/SmokeHound/joshburt.com.au.git
-   cd joshburt.com.au
-   ```
+```bash
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/joshburt.com.au.git
+cd joshburt.com.au
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+# Install dependencies
+npm install
 
-3. **Start development server**
-   ```bash
-   npm run serve
-   ```
-   This starts a Python HTTP server on port 8000. Visit http://localhost:8000
+# Copy environment file
+cp .env.example .env
+# Edit .env with your credentials
 
-## Project Structure
+# Run migrations
+npm run migrate
 
+# Start development server
+npm run dev:functions
 ```
-├── index.html              # Main homepage
-├── administration.html     # Administration dashboard
-├── users.html              # User management
-├── analytics.html          # Analytics page
-├── settings.html           # Settings configuration
-├── oil-products.html       # Oil ordering system
-├── consumables.html        # Consumables order request (for staff)
-├── consumables-mgmt.html   # Consumables product list management (admin/staff CRUD)
-├── login.html              # Login page
-├── shared-nav.html         # Shared navigation component
-├── shared-theme.html       # Centralized ThemeManager (multi-theme support)
-├── shared-config.html      # Shared configuration
-├── tests/                  # Test directory
-│   ├── unit/              # Unit tests
-│   ├── integration/       # Integration tests
-│   └── utils/             # Test utilities
-├── package.json           # Node.js dependencies and scripts
-└── .github/workflows/     # CI/CD configuration
-```
+
+---
 
 ## Development Workflow
 
-## Theme System
+### Branch Strategy
 
-The site uses a centralized ThemeManager (in `shared-theme.html`) that provides:
+- `main`: Production branch (protected)
+- `feature/*`: New features
+- `fix/*`: Bug fixes
+- `docs/*`: Documentation updates
 
-- **Multiple Theme Presets**: dark, light, system (auto-detect), neon, ocean, high-contrast
-- **Custom Color Palettes**: Users can override primary/secondary/accent colors
-- **System Theme Detection**: Automatically follows OS dark/light preference when set to 'system'
-- **Cross-Tab Synchronization**: Theme changes sync across browser tabs
-- **Event-Driven Updates**: Responds to settings changes via custom events
-
-When working with themes:
-1. **Use the ThemeManager API**: Access via `window.Theme` for programmatic theme changes
-2. **Don't add inline color scripts**: ThemeManager handles this centrally and idempotently
-3. **Test all theme presets**: Ensure your UI works with dark, light, and high-contrast themes
-4. **Update theme tests**: If adding new theme features, add corresponding tests in `tests/unit/shared-theme.test.js`
-
-See README.md for complete ThemeManager API documentation.
-
-## Settings System
-
-- All site settings are now stored in the database (see `DATABASE.md` for schema).
-- The settings UI (`settings.html`) must be updated for any new or changed settings fields.
-- All changes to settings are audit-logged automatically via the frontend.
-- When adding new settings fields:
-   1. Update the settings form in `settings.html`.
-   2. Update the JS logic to load/save the new field.
-   3. Document the new field in `README.md` and `DATABASE.md`.
-   4. Ensure audit logging covers the new field.
-   5. If theme-related, dispatch `siteSettingsUpdated` event so ThemeManager can respond
-
-### 1. Code Style and Standards
-- Uses TailwindCSS for styling
-- Follows semantic HTML structure
-- JavaScript uses ES6+ features
-- All code must pass linting checks
-- No dead code, unused variables, or debug logic (e.g. `console.log`) allowed in PRs
-
-### 2. Testing Requirements
-Before submitting any changes:
+### Workflow
 
 ```bash
-# Run all tests
-npm test
+# Create feature branch
+git checkout -b feature/my-feature
 
-# Run unit tests only
-npm run test:unit
+# Make changes
+# ... code changes ...
 
-# Run integration tests only
-npm run test:integration
-
-# Run linting
-npm run lint
-
-# Run complete validation
+# Run validation
 npm run validate
+
+# Commit with descriptive message
+git commit -m "feat: Add product filtering by category"
+
+# Push to your fork
+git push origin feature/my-feature
+
+# Open Pull Request
 ```
-All tests and linting must pass. Test files must not contain dead code or debug logic.
-
-### 3. Component Structure
-The website uses a modular component approach:
-- **shared-nav.html**: Navigation sidebar with menu toggle, user profile, and theme toggle
-- **shared-theme.html**: Theme switching functionality (dark/light mode)
-- **shared-config.html**: TailwindCSS configuration and common styles
-
-### 4. Adding New Features
-
-#### Adding a New Page
-1. Create the HTML file in the root directory
-2. Include shared components:
-   ```html
-   <!-- Load shared navigation component -->
-   <div id="shared-navigation"></div>
-   <script>
-       fetch('shared-nav.html')
-           .then(response => response.text())
-           .then(html => {
-               document.getElementById('shared-navigation').innerHTML = html;
-           });
-   </script>
-   ```
-3. Add the new page link to `shared-nav.html`
-4. Write tests for the new functionality
-
-#### Adding New Components
-1. Create the component HTML file (e.g., `shared-component.html`)
-2. Write unit tests in `tests/unit/`
-3. Add integration tests if needed
-4. Update documentation
-
-### 5. Testing Guidelines
-
-#### Unit Tests
-Located in `tests/unit/`, test individual components:
-- Navigation functionality
-- Theme switching
-- Form interactions
-- User authentication flows
-
-#### Integration Tests
-Located in `tests/integration/`, test cross-component functionality:
-- Navigation between pages
-- Component loading and interaction
-- HTML validation
-- Accessibility compliance
-
-#### Test Utilities
-Use the helper functions in `tests/utils/dom-helpers.js`:
-```javascript
-const { loadHTMLFile, simulateClick, waitFor } = require('../utils/dom-helpers');
-```
-
-### 6. Code Quality Checks
-
-#### HTML Linting
-Uses HTMLHint with TailwindCSS-friendly configuration:
-```bash
-npm run lint
-```
-
-#### JavaScript Linting
-Uses ESLint for JavaScript code quality:
-```bash
-eslint --ext .js *.html
-```
-
-#### Codebase Audit
-All code (including tests) is regularly audited for dead code, unused variables, and debug logic. PRs introducing such code will not be accepted.
-
-## Submitting Changes
-
-### Pull Request Process
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Make your changes following the guidelines above
-4. Run tests and linting: `npm run validate`
-5. Commit with clear messages: `git commit -m "Add: new feature description"`
-6. Push to your fork: `git push origin feature/your-feature-name`
-7. Create a Pull Request
 
 ### Commit Message Format
-Use clear, descriptive commit messages:
-- `Add: new feature or functionality`
-- `Fix: bug fix or correction`
-- `Update: improvements to existing features`
-- `Test: add or modify tests`
-- `Docs: documentation changes`
 
-### Code Review Checklist
-- [ ] All tests pass
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types**:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Formatting (no code change)
+- `refactor`: Code restructuring
+- `test`: Adding tests
+- `chore`: Maintenance
+
+**Examples**:
+```
+feat(products): Add full-text search with PostgreSQL
+fix(auth): Resolve JWT expiration edge case
+docs(api): Update authentication endpoint examples
+```
+
+---
+
+## Code Standards
+
+### JavaScript
+
+**Style Guide**: ESLint configuration in `eslint.config.js`
+
+**Key Rules**:
+- Use `const`/`let`, never `var`
+- Arrow functions preferred
+- Async/await over callbacks
+- Descriptive variable names
+- JSDoc comments for functions
+
+**Example**:
+```javascript
+/**
+ * Fetch products with optional filters
+ * @param {Object} filters - Filter criteria
+ * @param {number} filters.page - Page number
+ * @param {number} filters.limit - Items per page
+ * @returns {Promise<Object>} Products and pagination
+ */
+const getProducts = async (filters = {}) => {
+  const { page = 1, limit = 20 } = filters;
+  
+  const result = await pool.query(
+    'SELECT * FROM products LIMIT $1 OFFSET $2',
+    [limit, (page - 1) * limit]
+  );
+  
+  return {
+    data: result.rows,
+    pagination: { page, limit, total: result.rowCount }
+  };
+};
+```
+
+### HTML
+
+**Standards**:
+- Semantic HTML5 elements
+- Accessibility attributes (ARIA)
+- No inline styles (use TailwindCSS classes)
+- Include shared components
+
+### CSS
+
+**Framework**: TailwindCSS v4
+
+**Custom Styles**: Add to `src/styles.css` only when Tailwind classes insufficient
+
+**Build**: `npm run build:css`
+
+### Database
+
+**Queries**:
+- Always use parameterized queries (`$1`, `$2`)
+- Create indexes for frequent lookups
+- Use transactions for multi-step operations
+
+**Migrations**:
+- Sequential numbering (`005_add_feature.sql`)
+- Idempotent (`CREATE TABLE IF NOT EXISTS`)
+- Update `database-schema.sql` to match
+
+---
+
+## Testing Requirements
+
+### Before Submitting PR
+
+```bash
+# Run full validation suite
+npm run validate
+```
+
+This runs:
+1. **Linting**: `npm run lint`
+2. **Tests**: `npm run test:all`
+3. **Build**: `npm run build:css`
+
+### Writing Tests
+
+**Unit Tests** (`tests/unit/`):
+```javascript
+// tests/unit/my-feature.test.js
+const { myFunction } = require('../../utils/my-feature');
+
+describe('myFunction', () => {
+  it('should return expected result', () => {
+    const result = myFunction('input');
+    expect(result).toBe('expected');
+  });
+});
+```
+
+**Function Tests** (`tests/functions/`):
+```javascript
+// tests/functions/my-function.test.js
+const handler = require('../../netlify/functions/my-function').handler;
+
+describe('my-function', () => {
+  it('should return 200 OK', async () => {
+    const event = {
+      httpMethod: 'GET',
+      headers: { authorization: 'Bearer token' }
+    };
+    
+    const response = await handler(event);
+    expect(response.statusCode).toBe(200);
+  });
+});
+```
+
+### Test Coverage
+
+**Minimum**: 70% code coverage for new functions
+
+**Check**: `npm run test:coverage`
+
+---
+
+## Pull Request Process
+
+### Before Submitting
+
+1. ✅ Tests pass (`npm run test:all`)
+2. ✅ Linting clean (`npm run lint`)
+3. ✅ No console.log or debug code
+4. ✅ Documentation updated (if API changes)
+5. ✅ Migration created (if schema changes)
+
+### PR Template
+
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Documentation update
+- [ ] Performance improvement
+
+## Testing
+- [ ] Unit tests added/updated
+- [ ] Manual testing completed
+- [ ] No regressions introduced
+
+## Screenshots (if UI changes)
+[Add screenshots]
+
+## Checklist
 - [ ] Code follows style guidelines
-- [ ] HTML is valid and semantic
-- [ ] Accessibility attributes are present
-- [ ] Components are properly modularized
-- [ ] No dead code, unused variables, or debug logic present
-- [ ] Documentation is updated if needed
+- [ ] Self-review completed
+- [ ] Comments added for complex logic
+- [ ] Documentation updated
+- [ ] Tests pass locally
+```
 
-## Continuous Integration
+### Review Process
 
-The project uses GitHub Actions for:
-- **Automated Testing**: Runs on every push and PR
-- **Code Quality**: Linting and validation
-- **Deployment**: Automatic deployment to production on main branch
+1. Automated checks run (GitHub Actions)
+2. Code review by maintainer
+3. Address feedback
+4. Approval → Merge to `main`
+5. Auto-deploy to production (Netlify)
 
-### CI Pipeline
-1. Install dependencies
-2. Run linting checks
-3. Execute test suite
-4. Deploy to FTP server (on success)
+---
 
-## Browser Support
+## Issue Reporting
 
-The website supports:
-- Chrome/Chromium 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+### Bug Reports
 
-## Accessibility
+**Template**:
+```markdown
+## Bug Description
+Clear description of the bug
 
-We strive for WCAG 2.1 AA compliance:
-- Semantic HTML structure
-- Proper ARIA attributes
-- Keyboard navigation support
-- Color contrast compliance
-- Screen reader compatibility
+## Steps to Reproduce
+1. Go to '...'
+2. Click on '...'
+3. See error
 
-## Performance Guidelines
+## Expected Behavior
+What should happen
 
-- Minimize HTTP requests
-- Use CDN resources efficiently
-- Optimize images and assets
-- Maintain fast load times (< 2 seconds)
+## Actual Behavior
+What actually happens
 
-## Questions and Support
+## Environment
+- Browser: Chrome 120
+- OS: Windows 11
+- Node.js: 18.17.0
 
-For questions about contributing:
-1. Check existing issues and documentation
-2. Create a GitHub issue for bugs or feature requests
-3. Join discussions in pull requests
+## Screenshots
+[If applicable]
 
-Thank you for contributing to joshburt.com.au! Help us keep the codebase clean, maintainable, and production-ready.
+## Additional Context
+Any other relevant info
+```
+
+### Feature Requests
+
+**Template**:
+```markdown
+## Feature Description
+Clear description of proposed feature
+
+## Use Case
+Why is this feature needed?
+
+## Proposed Implementation
+How might this be implemented?
+
+## Alternatives Considered
+Other approaches you've thought about
+```
+
+---
+
+## Code of Conduct
+
+### Our Standards
+
+- **Be respectful**: Treat everyone with respect
+- **Be constructive**: Provide helpful feedback
+- **Be inclusive**: Welcome contributors of all backgrounds
+- **Be professional**: Maintain professional communication
+
+### Unacceptable Behavior
+
+- Harassment, discrimination, or offensive language
+- Personal attacks or trolling
+- Publishing private information
+- Spam or off-topic content
+
+### Enforcement
+
+Issues violating code of conduct will be addressed by project maintainers.
+
+---
+
+## Questions?
+
+- **GitHub Discussions**: https://github.com/SmokeHound/joshburt.com.au/discussions
+- **Issues**: https://github.com/SmokeHound/joshburt.com.au/issues
+
+---
+
+**Thank you for contributing!**
+
+**Last Updated**: 2025-11-11  
+**Maintained By**: Development Team

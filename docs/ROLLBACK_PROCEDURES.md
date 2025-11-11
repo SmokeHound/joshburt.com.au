@@ -1,269 +1,216 @@
-# Deployment Rollback Procedures
+# Rollback Procedures
 
-This document provides detailed procedures for rolling back failed deployments.
+Emergency rollback procedures for joshburt.com.au.
 
-## Quick Reference
+## Table of Contents
 
-### Emergency Rollback Commands
-```bash
-# Option 1: Revert the last commit
-git revert HEAD
-git push origin main
-
-# Option 2: Reset to specific commit (force push - use with caution)
-git reset --hard <previous-commit-sha>
-git push --force origin main
-
-# Option 3: Deploy from a specific tag/commit via GitHub Actions
-# Trigger workflow dispatch with specific commit
-```
-
-## Rollback Scenarios
-
-### 1. Failed Deployment Detection
-
-A deployment is considered failed when:
-- Build steps fail (lint, test, build)
-- FTP deployment fails
-- Database migrations fail
-- Post-deployment health checks fail
-
-GitHub Actions will automatically:
-1. Stop the deployment process
-2. Display rollback instructions in the summary
-3. Send failure notifications
-4. Log the failed commit for tracking
-
-### 2. Application Code Rollback
-
-#### Automatic Rollback (Git Revert)
-The safest approach - creates a new commit that undoes changes:
-
-```bash
-# Step 1: Identify the problematic commit
-git log --oneline -10
-
-# Step 2: Revert the commit (this creates a new commit)
-git revert <bad-commit-sha>
-
-# Step 3: Push to trigger automatic re-deployment
-git push origin main
-```
-
-**Advantages:**
-- Preserves git history
-- Safe for shared branches
-- Triggers CI/CD automatically
-- Can be reverted if mistake was made
-
-#### Manual Rollback (Git Reset)
-Use only when revert is not possible:
-
-```bash
-# WARNING: This rewrites history - coordinate with team first
-
-# Step 1: Identify the last good commit
-git log --oneline -10
-
-# Step 2: Reset to that commit
-git reset --hard <good-commit-sha>
-
-# Step 3: Force push (requires force-push permissions)
-git push --force origin main
-```
-
-**⚠️ WARNING:** Force pushing:
-- Rewrites git history
-- Can cause issues for team members
-- Requires coordination
-- Use only as last resort
-
-### 3. Database Rollback
-
-#### Migration Rollback Strategy
-
-**Prevention First:**
-- Migrations are checked in dry-run mode before deployment
-- Failed migrations stop the deployment automatically
-- No automatic database rollback (by design - data safety)
-
-**Manual Migration Rollback:**
-
-1. **Identify the problematic migration:**
-```bash
-# Connect to database and check applied migrations
-SELECT * FROM schema_migrations ORDER BY applied_at DESC LIMIT 10;
-```
-
-2. **Create a rollback migration:**
-```bash
-# Create a new migration file that reverses the changes
-# Example: migrations/004_rollback_notification_system.sql
-```
-
-3. **Apply the rollback migration:**
-```bash
-# Add the rollback SQL file to migrations/
-node scripts/run-migrations.js
-```
-
-**Important Database Notes:**
-- Never manually delete entries from `schema_migrations` table
-- Always create forward-fixing migrations, not manual rollbacks
-- Database changes should be backwards compatible when possible
-- Test migrations thoroughly in staging environment first
-
-#### Database Backup & Restore
-
-**Before risky migrations:**
-```bash
-# PostgreSQL backup
-pg_dump -h $DB_HOST -U $DB_USER -d $DB_NAME > backup_$(date +%Y%m%d_%H%M%S).sql
-```
-
-**Restore from backup:**
-```bash
-# PostgreSQL restore
-psql -h $DB_HOST -U $DB_USER -d $DB_NAME < backup_file.sql
-```
-
-### 4. Static File Rollback (FTP)
-
-If static files were deployed but need rollback:
-
-**Option 1: Re-deploy from previous commit**
-```bash
-# Checkout the last good commit
-git checkout <good-commit-sha>
-
-# Manually trigger deployment workflow
-# Or create a temporary branch and push
-git checkout -b rollback-temp
-git push origin rollback-temp
-```
-
-**Option 2: Manual FTP rollback**
-1. Access FTP server with credentials
-2. Restore files from backup (if available)
-3. Or manually upload files from previous commit
-
-### 5. Netlify Functions Rollback
-
-Netlify deployments can be rolled back through:
-
-**Via Netlify Dashboard:**
-1. Log into Netlify dashboard
-2. Go to Deploys section
-3. Find the last successful deployment
-4. Click "Publish deploy" to rollback
-
-**Via Netlify CLI:**
-```bash
-# List recent deployments
-netlify deploy:list
-
-# Restore a specific deployment
-netlify api restoreDeploy --deploy_id=<deploy-id>
-```
-
-## Post-Rollback Checklist
-
-After completing a rollback:
-
-- [ ] Verify application is functioning correctly
-- [ ] Check database integrity
-- [ ] Verify all critical endpoints are working
-- [ ] Run smoke tests: `npm run test:functions`
-- [ ] Monitor error logs for 15-30 minutes
-- [ ] Document the incident in a post-mortem
-- [ ] Update the team via communication channels
-- [ ] Plan forward fix for the issue that caused rollback
-
-## Rollback Decision Matrix
-
-| Failure Type | Recommended Action | Urgency | Data Risk |
-|--------------|-------------------|---------|-----------|
-| Lint/Test Failure | Fix forward + push | Low | None |
-| Build Failure | Fix forward + push | Low | None |
-| FTP Deploy Failure | Retry or fix forward | Medium | None |
-| Migration Failure | Stop, assess, manual fix | High | High |
-| Runtime Errors | Git revert + redeploy | High | Low |
-| Data Corruption | Database restore + revert | Critical | Critical |
-
-## Prevention Best Practices
-
-To minimize the need for rollbacks:
-
-1. **Always run locally first:**
-   ```bash
-   npm run validate  # Runs lint + build + tests
-   ```
-
-2. **Use feature flags for risky changes:**
-   - Deploy code disabled by default
-   - Enable gradually after monitoring
-
-3. **Test migrations thoroughly:**
-   ```bash
-   # Always test in development first
-   DB_TYPE=postgres node scripts/run-migrations.js
-   ```
-
-4. **Use staging environment:**
-   - Deploy to staging first
-   - Verify functionality
-   - Then deploy to production
-
-5. **Small, incremental changes:**
-   - Easier to identify issues
-   - Faster to rollback if needed
-   - Less risky overall
-
-## Emergency Contacts
-
-In case of critical deployment issues:
-
-- **Primary:** Check GitHub Actions logs and GITHUB_STEP_SUMMARY
-- **Database Issues:** Access via connection details in secrets
-- **FTP Issues:** Verify credentials in GitHub Secrets
-- **Netlify Issues:** Check Netlify dashboard and function logs
-
-## Monitoring After Rollback
-
-After rollback, monitor:
-
-1. **Error rates:**
-   - Check function logs in Netlify
-   - Monitor application logs
-
-2. **Performance metrics:**
-   - Response times via health endpoint
-   - Database query performance
-
-3. **User experience:**
-   - Test critical user flows
-   - Check for error reports
-
-4. **Database health:**
-   ```bash
-   # Run health check
-   curl https://joshburt.com.au/.netlify/functions/health
-   ```
-
-## Rollback Testing
-
-Periodically test rollback procedures:
-
-1. **Simulate a failed deployment** in staging
-2. **Execute rollback procedures**
-3. **Document any issues** or improvements needed
-4. **Update this document** based on lessons learned
-
-## Version History
-
-- **2025-10-31:** Initial rollback procedures documentation
-- Document version: 1.0.0
+- [Netlify Rollback](#netlify-rollback)
+- [Database Rollback](#database-rollback)
+- [Emergency Procedures](#emergency-procedures)
+- [Post-Rollback](#post-rollback)
 
 ---
 
-**Remember:** The best rollback is the one you never have to perform. Focus on testing, validation, and gradual deployments to minimize risk.
+## Netlify Rollback
+
+### Via Dashboard
+
+**Steps**:
+1. Go to **Deploys** tab
+2. Find previous successful deploy
+3. Click **"Publish deploy"**
+4. Confirm rollback
+
+**Downtime**: ~30 seconds
+
+### Via CLI
+
+```bash
+# List recent deploys
+netlify deploy:list
+
+# Rollback to specific deploy ID
+netlify deploy:publish <deploy-id>
+```
+
+**Example**:
+```bash
+netlify deploy:publish 5f8a1b2c3d4e5f6g7h8i9j0k
+```
+
+---
+
+## Database Rollback
+
+### Point-in-Time Recovery (Neon)
+
+**Neon Dashboard**:
+1. Project → **Restore**
+2. Select timestamp (last 7 days)
+3. Create new branch or restore to main
+4. Update connection strings if branch created
+
+**Downtime**: ~5 minutes
+
+### Manual Rollback
+
+#### From Backup Dump
+
+```bash
+# Restore full database
+pg_restore -h your-host.neon.tech \
+  -U your-user \
+  -d your-db \
+  -v backup-20251110.dump
+
+# Or restore specific tables
+pg_restore -h your-host.neon.tech \
+  -U your-user \
+  -d your-db \
+  -t products -t orders \
+  backup-20251110.dump
+```
+
+#### Schema Rollback
+
+To rollback schema changes, restore from a backup dump:
+
+```bash
+# Restore from backup
+pg_restore -h your-host.neon.tech \
+  -U your-user \
+  -d your-db \
+  -v backup-20251110.dump
+```
+
+---
+
+## Emergency Procedures
+
+### Enable Maintenance Mode
+
+**Fastest Method** (direct database):
+
+```sql
+-- Enable maintenance mode
+UPDATE settings SET data = jsonb_set(data, '{maintenanceMode}', 'true');
+```
+
+**Via API**:
+
+```bash
+curl -X PUT https://joshburt.netlify.app/.netlify/functions/settings \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"maintenanceMode":true}'
+```
+
+**Effect**: All pages show maintenance message to users.
+
+### Disable Feature Flag
+
+```sql
+-- Disable specific feature
+UPDATE settings SET data = jsonb_set(
+  data,
+  '{featureFlags,problematicFeature}',
+  'false'
+);
+```
+
+### Clear User Sessions
+
+```sql
+-- Invalidate all refresh tokens (forces re-login)
+DELETE FROM refresh_tokens;
+```
+
+---
+
+## Post-Rollback
+
+### Verification Checklist
+
+```bash
+# 1. Health check
+curl https://joshburt.netlify.app/.netlify/functions/health
+
+# 2. Test login
+curl -X POST https://joshburt.netlify.app/.netlify/functions/auth?action=login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"testpass"}'
+
+# 3. Test key endpoints
+curl https://joshburt.netlify.app/.netlify/functions/products \
+  -H "Authorization: Bearer TOKEN"
+
+# 4. Check database
+psql -h your-host.neon.tech -U your-user -d your-db -c "SELECT COUNT(*) FROM users;"
+```
+
+### Disable Maintenance Mode
+
+```sql
+UPDATE settings SET data = jsonb_set(data, '{maintenanceMode}', 'false');
+```
+
+### Notify Users
+
+If issue affected users:
+1. Post incident report
+2. Email affected users (if applicable)
+3. Update status page
+
+---
+
+## Incident Response
+
+### 1. Assess Impact
+
+- How many users affected?
+- What functionality broken?
+- Data loss risk?
+
+### 2. Communicate
+
+- Enable maintenance mode if critical
+- Post status update (GitHub issues/discussions)
+- Notify team
+
+### 3. Rollback Decision
+
+**Rollback if**:
+- Critical functionality broken
+- Data corruption risk
+- Security vulnerability
+- >50% users affected
+
+**Don't rollback if**:
+- Minor UI issue
+- Affects <10% users
+- Quick hotfix available
+
+### 4. Execute Rollback
+
+Follow procedures above (Netlify and/or database).
+
+### 5. Root Cause Analysis
+
+After rollback:
+- Identify cause
+- Document lessons learned
+- Update tests to prevent recurrence
+- Plan fix for redeployment
+
+---
+
+## Contact
+
+**Emergency Contact**: [Your email/phone for critical issues]
+
+**GitHub Issues**: https://github.com/SmokeHound/joshburt.com.au/issues
+
+---
+
+**Last Updated**: 2025-11-11  
+**Maintained By**: Development Team

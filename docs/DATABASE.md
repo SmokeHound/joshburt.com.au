@@ -1,458 +1,744 @@
+# Database Documentation
 
-# Database Implementation Guide (Production-Ready, Audited)
+Complete guide to the PostgreSQL database schema and operations for joshburt.com.au.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Configuration](#configuration)
+- [Schema](#schema)
+- [Common Queries](#common-queries)
+- [Maintenance](#maintenance)
+- [Backup & Recovery](#backup--recovery)
+
+---
 
 ## Overview
 
+### Database Platform
 
-The joshburt.com.au application uses PostgreSQL as its database backend (e.g. Neon).
+- **Type**: PostgreSQL 14+
+- **Provider**: Neon (serverless PostgreSQL)
+- **Connection**: Connection pooling via `config/database.js`
+- **Schema Management**: Single master schema file (`database-schema.sql`)
 
-## Database Configuration
+### Key Features
+
+- **Connection Pooling**: Automatic connection management
+- **Full-Text Search**: PostgreSQL GIN indexes for products and filters
+- **Audit Trail**: Comprehensive logging in `audit_logs` table
+- **JSONB Storage**: Flexible settings and metadata storage
+
+---
+
+## Configuration
 
 ### Environment Variables
 
-Set the following environment variables based on your deployment:
-
- All dynamic operations are served via Netlify Functions at `/.netlify/functions/users`.
-
-#### PostgreSQL Configuration
 ```env
-# Database Type
-DB_TYPE=postgres
-
-# PostgreSQL Configuration
-
-DB_HOST='ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech'
-DB_DATABASE='neondb'
-DB_USER='neondb_owner'
-DB_PASSWORD='*************'
-DB_SSLMODE='require'
-DB_CHANNELBINDING='require'
-
-# JWT Configuration (required)
-JWT_SECRET=your-super-secure-jwt-secret-key
-JWT_EXPIRES_IN=7d
-JWT_REFRESH_EXPIRES_IN=30d
-
-# Security
-BCRYPT_ROUNDS=12
-DB_PASSWORD=your-secure-password
+# PostgreSQL Connection (required)
+DB_HOST=your-db-host.neon.tech
+DB_PORT=5432
+DB_USER=your-username
+DB_PASSWORD=your-password
+DB_NAME=your-database
 DB_SSL=true
+
+# Optional: Full connection string (alternative to individual vars)
+DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require
 ```
 
-#### Development Environment
- Access audit logs via `/.netlify/functions/audit-logs`.
-```env
-# Database Type (PostgreSQL only)
-DB_TYPE=postgres
+### Connection Pool
 
-# PostgreSQL Configuration (required)
-DATABASE_URL=postgres://user:password@host/database
-# Or use individual credentials:
-# DB_HOST=localhost
-# DB_PORT=5432
-# DB_USER=joshburt_user
-# DB_PASSWORD=secure_password
-# DB_NAME=joshburt_website
-
-# JWT Configuration (required)
-JWT_SECRET=development-jwt-secret
-JWT_EXPIRES_IN=7d
-JWT_REFRESH_EXPIRES_IN=30d
-
-# Security
-BCRYPT_ROUNDS=10
-```
-
-## Database Schema
-
-### Settings Table
-
-All site settings are stored as a single JSON blob in the `settings` table. This enables flexible, versioned, and auditable configuration management.
-
-```sql
-CREATE TABLE IF NOT EXISTS settings (
-   id INTEGER PRIMARY KEY,
-   data TEXT NOT NULL
-);
-INSERT OR IGNORE INTO settings (id, data) VALUES (1, '{}');
-```
-
-#### Settings JSON Fields
-
-The following fields are supported (see `settings.html` for UI):
-
-- siteTitle, siteDescription, logoUrl, faviconUrl, contactEmail, 
-- theme, primaryColor, secondaryColor, accentColor, themeSchedule
-- maintenanceMode, enableRegistration, enableGuestCheckout
-- googleAnalyticsId, facebookPixelId, smtpHost, smtpPort, smtpUser, smtpPassword
-- customCss, customJs
-- featureFlags (betaFeatures, newDashboard, advancedReports)
-- sessionTimeout, maxLoginAttempts, enable2FA, auditAllActions
-
-All changes to settings are audit-logged for compliance and traceability.
-
-### Users Table
-```sql
--- PostgreSQL
-CREATE TABLE IF NOT EXISTS users (
-   id SERIAL PRIMARY KEY,
-   email VARCHAR(255) UNIQUE NOT NULL,
-   name VARCHAR(255) NOT NULL,
-   password_hash VARCHAR(255),
-   role VARCHAR(50) DEFAULT 'user',
-   is_active BOOLEAN DEFAULT true,
-   email_verified BOOLEAN DEFAULT false,
-   oauth_provider VARCHAR(50),
-   oauth_id VARCHAR(255),
-   avatar_url TEXT,
-   reset_token VARCHAR(255),
-   reset_token_expires BIGINT,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### Refresh Tokens Table
-```sql
-CREATE TABLE refresh_tokens (
-   id INTEGER PRIMARY KEY AUTO_INCREMENT,
-   user_id INTEGER NOT NULL,
-   token_hash VARCHAR(255) NOT NULL,
-   expires_at TIMESTAMP NOT NULL,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-```
-
-### Audit Logs Table
-```sql
-   details TEXT,
-   ip_address VARCHAR(45),
-```
-
-
-| Role | Email | Password | Purpose |
-
-> **Security Note**: Change default passwords immediately in production!
-
-## Database Operations
-
-### Connection Management
-
-
-The database abstraction in `config/database.js` automatically handles connections and query parameter conversion for PostgreSQL:
+Configured in `config/database.js`:
 
 ```javascript
-const { database } = require('./config/database');
-
-// Automatically connects based on DB_TYPE environment variable
-await database.connect();
-
-// Execute queries
-const user = await database.get('SELECT * FROM users WHERE email = ?', ['user@example.com']);
-const users = await database.all('SELECT * FROM users WHERE is_active = ?', [true]);
-await database.run('INSERT INTO users (email, name) VALUES (?, ?)', ['new@user.com', 'New User']);
-
-// Close connection
-await database.close();
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 5432,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  max: 20,              // Max connections in pool
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000
+});
 ```
 
-### Query Parameter Conversion
+---
 
+## Schema
 
-The database class automatically converts query parameters to PostgreSQL format:
-- **PostgreSQL**: Uses `$1, $2, $3...` placeholders
+### Core Tables
 
-Example:
-```javascript
-// Query: SELECT * FROM users WHERE email = ? AND is_active = ?
-// PostgreSQL: SELECT * FROM users WHERE email = $1 AND is_active = $2
+#### users
+
+User accounts with authentication and role-based access.
+
+```sql
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255),
+  role VARCHAR(50) DEFAULT 'mechanic',
+  avatar_url VARCHAR(500),
+  totp_secret VARCHAR(255),
+  totp_enabled BOOLEAN DEFAULT FALSE,
+  last_login TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role ON users(role);
 ```
 
-## Serverless API Endpoints (Current)
+**Roles**: `mechanic`, `manager`, `admin`
 
-All dynamic operations are served via Netlify Functions under `/.netlify/functions/*`.
+---
 
-### Authentication (Unified Function)
+#### products
 
-Single function `/.netlify/functions/auth` handles multiple actions via the `action` query parameter (or request body fallback for POST). Each action shares the same base path and differs only by `action` value.
+Oil products catalog with categories and variants.
 
-| Action | Method | Endpoint Example | Description | Auth Required |
-|--------|--------|------------------|-------------|---------------|
-| register | POST | `/.netlify/functions/auth?action=register` | Register new user | No |
-| login | POST | `/.netlify/functions/auth?action=login` | User login (issues access + refresh) | No |
-| logout | POST | `/.netlify/functions/auth?action=logout` | Invalidate refresh token | Yes |
-| refresh | POST | `/.netlify/functions/auth?action=refresh` | Exchange refresh for new tokens | No |
-| me | GET | `/.netlify/functions/auth?action=me` | Get current user profile | Yes |
-| forgot-password | POST | `/.netlify/functions/auth?action=forgot-password` | Initiate password reset (always 200) | No |
-| reset-password | POST | `/.netlify/functions/auth?action=reset-password` | Reset password with valid token | No |
-| verify-email | POST | `/.netlify/functions/auth?action=verify-email` | Email verification placeholder | Yes (token) |
+```sql
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  code VARCHAR(100) UNIQUE NOT NULL,
+  type VARCHAR(50),
+  viscosity VARCHAR(50),
+  specification VARCHAR(100),
+  category_id INTEGER REFERENCES product_categories(id),
+  stock_quantity INTEGER DEFAULT 0,
+  reorder_point INTEGER DEFAULT 50,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-### Users
+-- Full-text search index
+CREATE INDEX idx_products_search ON products 
+  USING GIN(to_tsvector('english', name || ' ' || code));
 
-User management is performed through the `users` function. ID-specific operations use a path suffix (e.g. `/.netlify/functions/users/123`) or query parameter fallback depending on implementation.
+CREATE INDEX idx_products_category ON products(category_id);
+CREATE INDEX idx_products_type ON products(type);
+```
 
-| Method | Endpoint | Description | Role Required |
-|--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/users` | List all users | Manager/Admin |
-| GET | `/.netlify/functions/users/:id` | Get user by ID | Manager/Admin |
-| POST | `/.netlify/functions/users` | Create new user | Admin |
-| PUT | `/.netlify/functions/users/:id` | Update user | Admin (or own profile) |
-| DELETE | `/.netlify/functions/users/:id` | Delete user | Admin |
-| PUT | `/.netlify/functions/users/:id/password` | Change password | Admin (or own profile) |
-| GET | `/.netlify/functions/users?stats=overview` | User statistics overview | Manager/Admin |
+---
 
-### Products
+#### product_categories
 
-Product catalog management via `products` function. Supports filtering by query parameters (e.g. `type`, `category`).
+Hierarchical product categories (supports parent/child relationships).
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/products` | List products (optional filters) | No |
-| GET | `/.netlify/functions/products/:id` | Get product by ID | No |
-| POST | `/.netlify/functions/products` | Create new product | Admin |
-| PUT | `/.netlify/functions/products/:id` | Update product | Admin |
-| DELETE | `/.netlify/functions/products/:id` | Delete product | Admin |
+```sql
+CREATE TABLE product_categories (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  parent_id INTEGER REFERENCES product_categories(id) ON DELETE SET NULL,
+  description TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-### Inventory
+CREATE INDEX idx_product_categories_parent ON product_categories(parent_id);
+```
 
-Inventory adjustments and stock queries.
+---
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/inventory` | List inventory records / summary | Manager/Admin |
-| POST | `/.netlify/functions/inventory` | Adjust inventory (delta, reason) | Manager/Admin |
+#### product_variants
 
-### Consumables
+Product variants (size, color, SKU variations).
 
-Consumable items tracked separately from products (e.g., shop supplies).
+```sql
+CREATE TABLE product_variants (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+  sku VARCHAR(100) UNIQUE NOT NULL,
+  size VARCHAR(50),
+  color VARCHAR(50),
+  stock_quantity INTEGER DEFAULT 0,
+  price DECIMAL(10, 2),
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/consumables` | List consumables | Manager/Admin |
-| GET | `/.netlify/functions/consumables/:id` | Get consumable by ID | Manager/Admin |
-| POST | `/.netlify/functions/consumables` | Create consumable | Manager/Admin |
-| PUT | `/.netlify/functions/consumables/:id` | Update consumable | Manager/Admin |
-| DELETE | `/.netlify/functions/consumables/:id` | Delete consumable | Admin |
+CREATE INDEX idx_product_variants_product ON product_variants(product_id);
+CREATE INDEX idx_product_variants_sku ON product_variants(sku);
+```
 
-### Consumable Categories
+---
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/consumable-categories` | List categories | Manager/Admin |
-| POST | `/.netlify/functions/consumable-categories` | Create category | Manager/Admin |
-| PUT | `/.netlify/functions/consumable-categories/:id` | Update category | Manager/Admin |
-| DELETE | `/.netlify/functions/consumable-categories/:id` | Delete category | Admin |
+#### product_images
 
-### Audit Logs
+Multiple images per product (URLs, captions, display order).
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/audit-logs` | List audit events (supports pagination & search) | Admin |
-| POST | `/.netlify/functions/audit-logs` | Create custom audit entry | Admin |
-| DELETE | `/.netlify/functions/audit-logs` | Clear all logs or logs older than N days | Admin |
+```sql
+CREATE TABLE product_images (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+  image_url VARCHAR(500) NOT NULL,
+  alt_text VARCHAR(255),
+  caption TEXT,
+  display_order INTEGER DEFAULT 0,
+  is_primary BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-#### Query Parameters (GET)
+CREATE INDEX idx_product_images_product ON product_images(product_id);
+```
 
-| Param | Type | Default | Description |
-|-------|------|---------|-------------|
-| `page` | number | 1 | Page number (enables paginated response structure) |
-| `pageSize` | number | 25 | Page size (1–200) |
-| `limit` | number | 100 | Backward-compatible single array limit (used only if `page`/`pageSize` omitted) |
-| `q` | string | — | Free-text search across `action`, `details`, `user_id` (SQL LIKE) |
-| `action` | string | — | Filter by exact action value |
-| `userId` | string | — | Filter by exact user ID/email stored with entry |
-| `startDate` | ISO date/time | — | Only include events with `created_at >= startDate` |
-| `endDate` | ISO date/time | — | Only include events with `created_at <= endDate` |
-| `format` | `csv` | — | If `csv`, returns CSV export instead of JSON |
+---
 
-When `page` or `pageSize` is provided the JSON response is:
+#### consumables
+
+Workshop consumables (rags, gloves, cleaners, etc.).
+
+```sql
+CREATE TABLE consumables (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  code VARCHAR(100) UNIQUE NOT NULL,
+  type VARCHAR(50),
+  category VARCHAR(50),
+  soh INTEGER DEFAULT 0,           -- Stock on hand
+  reorder_point INTEGER DEFAULT 10,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_consumables_category ON consumables(category);
+```
+
+---
+
+#### filters
+
+Filter/parts catalog (oil filters, air filters, etc.).
+
+```sql
+CREATE TABLE filters (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  code VARCHAR(100) UNIQUE NOT NULL,
+  type VARCHAR(50),
+  stock_quantity INTEGER DEFAULT 0,
+  reorder_point INTEGER DEFAULT 20,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Full-text search index
+CREATE INDEX idx_filters_search ON filters 
+  USING GIN(to_tsvector('english', name || ' ' || code));
+```
+
+---
+
+#### orders
+
+Order headers with status tracking.
+
+```sql
+CREATE TABLE orders (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  status VARCHAR(50) DEFAULT 'pending',
+  priority VARCHAR(50) DEFAULT 'normal',
+  tracking_number VARCHAR(100),
+  estimated_delivery DATE,
+  status_updated_at TIMESTAMP,
+  cancelled_at TIMESTAMP,
+  cancellation_reason TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_orders_user ON orders(user_id);
+CREATE INDEX idx_orders_status ON orders(status);
+CREATE INDEX idx_orders_created ON orders(created_at DESC);
+```
+
+**Status values**: `pending`, `confirmed`, `shipped`, `delivered`, `cancelled`
+
+---
+
+#### order_items
+
+Order line items (products/consumables/filters).
+
+```sql
+CREATE TABLE order_items (
+  id SERIAL PRIMARY KEY,
+  order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+  product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+  product_name VARCHAR(255),
+  quantity INTEGER NOT NULL,
+  price_per_unit DECIMAL(10, 2),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_order_items_order ON order_items(order_id);
+CREATE INDEX idx_order_items_product ON order_items(product_id);
+```
+
+---
+
+#### order_status_history
+
+Audit trail for order status changes.
+
+```sql
+CREATE TABLE order_status_history (
+  id SERIAL PRIMARY KEY,
+  order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+  old_status VARCHAR(50),
+  new_status VARCHAR(50) NOT NULL,
+  changed_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_order_status_history_order ON order_status_history(order_id);
+CREATE INDEX idx_order_status_history_created ON order_status_history(created_at DESC);
+```
+
+---
+
+#### inventory
+
+Stock tracking across all item types.
+
+```sql
+CREATE TABLE inventory (
+  id SERIAL PRIMARY KEY,
+  item_type VARCHAR(50) NOT NULL,  -- 'product', 'consumable', 'filter'
+  item_id INTEGER NOT NULL,
+  stock_count INTEGER DEFAULT 0,
+  last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(item_type, item_id)
+);
+
+CREATE INDEX idx_inventory_item ON inventory(item_type, item_id);
+```
+
+---
+
+#### settings
+
+Site-wide settings stored as JSONB.
+
+```sql
+CREATE TABLE settings (
+  id INTEGER PRIMARY KEY DEFAULT 1,
+  data JSONB NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT single_row CHECK (id = 1)
+);
+
+INSERT INTO settings (id, data) VALUES (1, '{}') ON CONFLICT DO NOTHING;
+```
+
+**Example settings data**:
 ```json
 {
-   "data": [ { /* log */ }, ... ],
-   "pagination": { "page": 1, "pageSize": 25, "total": 1234, "totalPages": 50 }
+  "siteTitle": "Josh Burt Workshop",
+  "theme": "dark",
+  "primaryColor": "#3b82f6",
+  "maintenanceMode": false,
+  "enableRegistration": true,
+  "featureFlags": {
+    "betaFeatures": false
+  }
 }
 ```
-If neither is supplied the response is a simple JSON array of logs (respecting `limit`).
 
-#### DELETE Semantics
+---
 
-| Query | Behavior |
-|-------|----------|
-| (none) | Deletes ALL audit log rows |
-| `olderThanDays=30` | Deletes only rows with `created_at` earlier than now minus N days |
+#### audit_logs
 
-Response example:
-```json
-{ "message": "Old audit logs cleared", "olderThanDays": 30 }
-```
+System audit trail for compliance.
 
-#### Example Requests
-
-```bash
-# First page, 50 per page, search for "settings"
-curl \
-   '/.netlify/functions/audit-logs?page=1&pageSize=50&q=settings'
-
-# Export filtered login events to CSV
-curl '/.netlify/functions/audit-logs?action=user_login&format=csv' -o login-events.csv
-
-# Delete logs older than 90 days
-curl -X DELETE '/.netlify/functions/audit-logs?olderThanDays=90'
-
-# Example (array) limited to 25 entries
-curl '/.netlify/functions/audit-logs?limit=25'
-```
-
-### Settings
-
-Settings are a single JSON document in the database; function exposes retrieval and update.
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/settings` | Retrieve current settings JSON | Admin |
-| PUT | `/.netlify/functions/settings` | Replace/merge settings JSON | Admin |
-
-### Orders
-
-Customer order creation and administrative management.
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/.netlify/functions/orders` | List orders (may support filters) | Manager/Admin |
-| GET | `/.netlify/functions/orders/:id` | Get order by ID | Manager/Admin (or owner if exposed) |
-| POST | `/.netlify/functions/orders` | Create new order | User |
-| PUT | `/.netlify/functions/orders/:id` | Update order (status, details) | Manager/Admin |
-| DELETE | `/.netlify/functions/orders/:id` | Delete/cancel order | Admin |
-
-## Security Features
-
-### Password Security
-- **bcrypt hashing** with configurable rounds (default: 12 for production, 10 for development)
-- **Password strength validation** with regex requirements
-- **Salt rounds** configurable via `BCRYPT_ROUNDS` environment variable
-- **No plaintext passwords or debug logic in production**
-
-### JWT Token Management
-- **Access tokens** with configurable expiration (default: 7 days)
-- **Refresh tokens** with longer expiration (default: 30 days)  
-- **Token hashing** in database for security
-- **Automatic cleanup** of expired refresh tokens
-
-### Rate Limiting
-- **Authentication endpoints** limited to 5 attempts per 15 minutes
-- **General API endpoints** limited to 100 requests per 15 minutes
-- **Configurable limits** via environment variables
-
-### Audit Logging
-- **User actions** automatically logged with IP address and user agent
-- **Timestamps** for all critical operations
-- **Detailed audit trail** for compliance and security monitoring
-- **No debug or non-production logging in codebase**
-
-## Database Migration
-
-
-### Setting up PostgreSQL
-
-1. **Set up PostgreSQL database**:
 ```sql
-CREATE DATABASE joshburt_website;
-CREATE USER joshburt_user WITH PASSWORD 'secure_password';
-GRANT ALL PRIVILEGES ON DATABASE joshburt_website TO joshburt_user;
+CREATE TABLE audit_logs (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  action VARCHAR(100) NOT NULL,
+  details TEXT,
+  ip_address VARCHAR(45),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_audit_logs_user ON audit_logs(user_id);
+CREATE INDEX idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX idx_audit_logs_created ON audit_logs(created_at DESC);
 ```
 
-2. **Update environment variables**:
-```env
-DB_TYPE=postgres
-DB_HOST=your-postgres-host
-DB_NAME=joshburt_website
-DB_USER=joshburt_user
-DB_PASSWORD=secure_password
-DB_SSL=true
+**Common actions**: `user:create`, `user:update`, `user:delete`, `product:create`, `order:create`, `settings:update`
+
+---
+
+#### notifications
+
+User notifications system.
+
+```sql
+CREATE TABLE notifications (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  type VARCHAR(50) DEFAULT 'general',
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_notifications_user ON notifications(user_id);
+CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = FALSE;
 ```
 
-3. **Run database initialization**: application functions auto-create tables on first use.
+---
 
-4. **Migrate existing data** (if needed): Manual PostgreSQL import scripts may be required.
+#### notification_preferences
+
+User notification preferences.
+
+```sql
+CREATE TABLE notification_preferences (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+  email_enabled BOOLEAN DEFAULT TRUE,
+  push_enabled BOOLEAN DEFAULT FALSE,
+  order_updates BOOLEAN DEFAULT TRUE,
+  system_updates BOOLEAN DEFAULT TRUE,
+  marketing BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Default preferences on user creation
+INSERT INTO notification_preferences (user_id, email_enabled, order_updates)
+SELECT id, TRUE, TRUE FROM users WHERE id NOT IN (SELECT user_id FROM notification_preferences);
 ```
 
-## Troubleshooting
+---
 
-### Common Issues
+#### refresh_tokens
 
-1. **"secretOrPrivateKey must have a value"**
-   - Ensure `JWT_SECRET` is set in environment variables
+JWT refresh token storage (hashed).
 
-2. **Database connection failed**
-   - Check PostgreSQL server is running
-   - Verify connection parameters
-   - Check firewall/network connectivity
+```sql
+CREATE TABLE refresh_tokens (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  token_hash VARCHAR(255) UNIQUE NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-3. **Permission denied for relation**
-   - Ensure database user has proper permissions
-   - Run `GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO username;`
+CREATE INDEX idx_refresh_tokens_user ON refresh_tokens(user_id);
+CREATE INDEX idx_refresh_tokens_expires ON refresh_tokens(expires_at);
+```
 
-### Performance Optimization
+**Cleanup**: Expired tokens pruned via `scripts/prune-refresh-tokens.js`
 
-1. **Database Indexes**: Already created for frequently queried columns
-2. **Connection Pooling**: Enabled for PostgreSQL (max 20 connections)
-3. **Query Optimization**: Use parameterized queries for better performance
-4. **Connection Timeouts**: Configured for optimal performance
+---
 
-## Testing
+#### login_attempts
 
-### Running Tests
+Rate limiting for failed logins.
+
+```sql
+CREATE TABLE login_attempts (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  ip_address VARCHAR(45),
+  attempt_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_login_attempts_email ON login_attempts(email, attempt_time);
+```
+
+---
+
+```
+
+---
+
+## Common Queries
+
+---
+
+## Migrations
+
+### Running Migrations
 
 ```bash
-# Run all tests
-npm test
+# Dry run (show pending migrations)
+node scripts/run-migrations.js --dry-run
 
+# Apply all pending migrations
+node scripts/run-migrations.js
 
-# Run authentication tests only
-npm test tests/auth.test.js
-
-# Run with PostgreSQL database (required)
-DB_TYPE=postgres npm test  # Requires PostgreSQL server
+# Manual migration
+npm run migrate
 ```
 
-### Test Database
+### Migration Files
 
-Tests use mocked database connections to avoid requiring a live database. No debug logic or dead code is present in test files.
+Located in `migrations/` directory:
 
-## Monitoring and Maintenance
+| File | Description |
+|------|-------------|
+| `001_add_product_categories.sql` | Product categories, variants, images |
+| `002_add_order_status_tracking.sql` | Order tracking columns and history table |
+| `003_add_notification_system.sql` | Notifications and preferences |
+| `004_add_filters.sql` | Filters/parts catalog table |
+| `004_add_last_login.sql` | Last login tracking for users |
+
+### Creating New Migration
+
+1. Create file: `migrations/005_add_my_feature.sql`
+2. Write SQL (idempotent CREATE IF NOT EXISTS recommended)
+3. Run migration: `npm run migrate`
+4. Update `database-schema.sql` to match
+
+---
+
+## Common Queries
+
+### User Management
+
+```sql
+-- Get all users with role counts
+SELECT role, COUNT(*) as count 
+FROM users 
+GROUP BY role;
+
+-- Find users who haven't logged in for 30 days
+SELECT id, email, name, last_login
+FROM users
+WHERE last_login < NOW() - INTERVAL '30 days'
+OR last_login IS NULL;
+```
+
+### Product Queries
+
+```sql
+-- Low stock products
+SELECT name, code, stock_quantity, reorder_point
+FROM products
+WHERE stock_quantity < reorder_point
+AND is_active = TRUE
+ORDER BY stock_quantity ASC;
+
+-- Full-text search
+SELECT name, code, type
+FROM products
+WHERE to_tsvector('english', name || ' ' || code) @@ to_tsquery('synthetic & oil')
+LIMIT 20;
+
+-- Products by category with hierarchy
+SELECT 
+  p.name as product_name,
+  c1.name as category,
+  c2.name as parent_category
+FROM products p
+LEFT JOIN product_categories c1 ON p.category_id = c1.id
+LEFT JOIN product_categories c2 ON c1.parent_id = c2.id
+WHERE p.is_active = TRUE;
+```
+
+### Order Analytics
+
+```sql
+-- Orders by status
+SELECT status, COUNT(*) as count, SUM(oi.quantity * oi.price_per_unit) as total_value
+FROM orders o
+JOIN order_items oi ON o.id = oi.order_id
+GROUP BY status;
+
+-- Top products by order volume
+SELECT 
+  p.name,
+  COUNT(DISTINCT oi.order_id) as order_count,
+  SUM(oi.quantity) as total_quantity
+FROM order_items oi
+JOIN products p ON oi.product_id = p.id
+WHERE oi.created_at > NOW() - INTERVAL '30 days'
+GROUP BY p.id, p.name
+ORDER BY total_quantity DESC
+LIMIT 10;
+
+-- Order status history for order
+SELECT 
+  old_status,
+  new_status,
+  u.name as changed_by,
+  notes,
+  osh.created_at
+FROM order_status_history osh
+LEFT JOIN users u ON osh.changed_by = u.id
+WHERE order_id = 123
+ORDER BY osh.created_at DESC;
+```
+
+### Audit Trail
+
+```sql
+-- Recent admin actions
+SELECT 
+  u.name as user,
+  al.action,
+  al.details,
+  al.created_at
+FROM audit_logs al
+JOIN users u ON al.user_id = u.id
+WHERE u.role = 'admin'
+AND al.created_at > NOW() - INTERVAL '7 days'
+ORDER BY al.created_at DESC;
+
+-- Actions by user
+SELECT action, COUNT(*) as count
+FROM audit_logs
+WHERE user_id = 1
+GROUP BY action
+ORDER BY count DESC;
+```
+
+---
+
+## Maintenance
+
+### Index Maintenance
+
+```sql
+-- Rebuild all indexes
+REINDEX DATABASE joshburt_website;
+
+-- Vacuum tables (reclaim space)
+VACUUM ANALYZE users;
+VACUUM ANALYZE products;
+VACUUM ANALYZE orders;
+```
+
+### Cleanup Tasks
+
+```bash
+# Prune expired refresh tokens
+node scripts/prune-refresh-tokens.js
+
+# Clean up old login attempts (30+ days)
+DELETE FROM login_attempts WHERE attempt_time < NOW() - INTERVAL '30 days';
+
+# Archive old audit logs (1+ year)
+INSERT INTO audit_logs_archive SELECT * FROM audit_logs WHERE created_at < NOW() - INTERVAL '1 year';
+DELETE FROM audit_logs WHERE created_at < NOW() - INTERVAL '1 year';
+```
+
+---
+
+## Backup & Recovery
+
+### Automatic Backups
+
+Neon provides automatic daily backups with point-in-time recovery (last 7 days).
+
+### Manual Backup
+
+```bash
+# Full database dump
+pg_dump -h your-db-host.neon.tech \
+  -U your-username \
+  -d your-database \
+  -F c \
+  -f backup-$(date +%Y%m%d).dump
+
+# Schema only
+pg_dump --schema-only -h your-db-host.neon.tech -U your-username -d your-database -f schema.sql
+```
+
+### Restore
+
+```bash
+# Restore from dump
+pg_restore -h your-db-host.neon.tech \
+  -U your-username \
+  -d your-database \
+  -v backup-20251111.dump
+
+# Restore schema only
+psql -h your-db-host.neon.tech -U your-username -d your-database -f database-schema.sql
+```
+
+---
+
+## Database Health
 
 ### Health Check
-- **Endpoint**: `GET /.netlify/functions/health`
-- **Response**: Server status, timestamp, and environment
-- **No debug or non-production output in health endpoint**
 
-### Database Maintenance
-- **Cleanup expired tokens**: Automatic during logout operations
-- **Audit log rotation**: Implement based on retention requirements
-- **Backup procedures**: Set up regular database backups for production
+```bash
+# Via function endpoint
+npm run health
 
-### Monitoring Queries
-```sql
--- Check active users
-SELECT COUNT(*) FROM users WHERE is_active = true;
-
--- Check recent registrations
-SELECT COUNT(*) FROM users WHERE created_at >= NOW() - INTERVAL '30 days';
-
--- Check token usage
-SELECT COUNT(*) FROM refresh_tokens WHERE expires_at > NOW();
+# Or manually
+curl http://localhost:8888/.netlify/functions/health
 ```
 
-## Production Deployment Checklist
+### Performance Monitoring
 
-- [ ] PostgreSQL database set up and accessible
-- [ ] Environment variables configured correctly
-- [ ] JWT_SECRET set to secure random value
-- [ ] Default passwords changed
-- [ ] SSL/TLS enabled for database connection
-- [ ] Rate limiting configured appropriately
-- [ ] Backup procedures in place
-- [ ] Monitoring and alerting configured
-- [ ] Audit log retention policy defined
-- [ ] Security headers configured in production
+```sql
+-- Active connections
+SELECT COUNT(*) FROM pg_stat_activity;
+
+-- Slow queries (>1 second)
+SELECT query, mean_exec_time, calls
+FROM pg_stat_statements
+WHERE mean_exec_time > 1000
+ORDER BY mean_exec_time DESC
+LIMIT 10;
+
+-- Table sizes
+SELECT 
+  table_name,
+  pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size
+FROM information_schema.tables
+WHERE table_schema = 'public'
+ORDER BY pg_total_relation_size(quote_ident(table_name)) DESC;
+```
+
+---
+
+## Indexes
+
+### Current Indexes
+
+| Table | Index Name | Columns | Type |
+|-------|------------|---------|------|
+| users | idx_users_email | email | B-tree |
+| users | idx_users_role | role | B-tree |
+| products | idx_products_search | name, code | GIN (full-text) |
+| products | idx_products_category | category_id | B-tree |
+| orders | idx_orders_status | status | B-tree |
+| orders | idx_orders_created | created_at DESC | B-tree |
+| audit_logs | idx_audit_logs_created | created_at DESC | B-tree |
+| notifications | idx_notifications_unread | user_id, is_read | Partial (WHERE is_read = FALSE) |
+
+---
+
+## Support
+
+- **Schema File**: `database-schema.sql` (master schema)
+- **Migration Runner**: `scripts/run-migrations.js`
+- **Health Check**: `scripts/health-check.js`
+
+---
+
+**Last Updated**: 2025-11-11  
+**Maintained By**: Development Team
