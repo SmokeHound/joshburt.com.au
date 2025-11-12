@@ -43,6 +43,13 @@ const PERMISSIONS = {
     delete: ['admin'],
     list: ['admin', 'manager', 'user']
   },
+  filters: {
+    create: ['admin', 'manager'],
+    read: ['admin', 'manager', 'user'],
+    update: ['admin', 'manager'],
+    delete: ['admin'],
+    list: ['admin', 'manager', 'user']
+  },
   orders: {
     create: ['admin', 'manager', 'user'],
     read: ['admin', 'manager'],
