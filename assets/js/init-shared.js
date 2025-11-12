@@ -193,7 +193,6 @@
       const userName = document.getElementById('user-name');
       const userAvatar = document.getElementById('user-avatar');
       const loginBtn = document.getElementById('login-btn');
-      const logoutBtn = document.getElementById('logout-btn');
       let storedUser = null;
       try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch (e) { /* noop */ }
       if (userProfile) {userProfile.classList.remove('hidden');}
@@ -201,20 +200,26 @@
       if (isLoggedIn) {
         if (userInfo) {userInfo.classList.remove('hidden');}
         if (loginBtn) {loginBtn.classList.add('hidden');}
-        if (logoutBtn) {logoutBtn.classList.remove('hidden');}
         if (userName) {userName.textContent = (storedUser && (storedUser.name || storedUser.email)) || 'User';}
-        if (userAvatar && storedUser && storedUser.picture) {userAvatar.src = storedUser.picture;}
+        // Set avatar: try avatarUrl (snake_case from DB), then picture (Auth0), then placeholder
+        if (userAvatar && storedUser) {
+          const avatarSrc = storedUser.avatarUrl || storedUser.avatar_url || storedUser.picture || './assets/images/avatar-placeholder.svg';
+          userAvatar.src = avatarSrc;
+        }
       } else {
         if (userInfo) {userInfo.classList.add('hidden');}
         if (loginBtn) {loginBtn.classList.remove('hidden');}
-        if (logoutBtn) {logoutBtn.classList.add('hidden');}
       }
 
       if (loginBtn) {
         loginBtn.addEventListener('click', function() { window.location.href = 'login.html'; });
       }
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
+
+      // Wire the main nav logout link (at bottom of menu)
+      const navLogout = document.getElementById('nav-logout');
+      if (navLogout) {
+        navLogout.addEventListener('click', function(ev) {
+          ev.preventDefault();
           try {
             // Best-effort serverless logout (invalidate refresh token)
             const refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
@@ -236,12 +241,6 @@
           // Fallback: navigate to login
           window.location.href = 'login.html';
         });
-      }
-
-      // Also wire sidebar nav logout link if present
-      const navLogout = document.getElementById('nav-logout');
-      if (navLogout) {
-        navLogout.addEventListener('click', function(ev) { ev.preventDefault(); if (logoutBtn) { logoutBtn.click(); } else { window.location.href='login.html'; } });
       }
     } catch (e) { /* non-fatal nav wiring */ }
   });
