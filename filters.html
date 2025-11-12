@@ -436,8 +436,7 @@
                 <h3 class="font-medium text-gray-900 dark:text-gray-100">${product.code ? escapeHtml(product.code) : 'N/A'}</h3>
                 <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(product.type || 'Filter')}</p>
                 <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  ${product.name ? `${escapeHtml(product.name)}` : ''}
-                  ${product.specs ? ` • ${escapeHtml(product.specs)}` : ''}
+                  ${product.specs ? `${escapeHtml(product.specs)}` : ''}
                 </div>
               </div>
               <div class="text-primary hover:text-blue-600">
