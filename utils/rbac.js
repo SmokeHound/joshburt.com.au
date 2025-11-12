@@ -50,6 +50,13 @@ const PERMISSIONS = {
     delete: ['admin'],
     list: ['admin', 'manager', 'user']
   },
+  returns: {
+    create: ['admin', 'manager', 'user'],
+    read: ['admin', 'manager', 'user'],
+    update: ['admin', 'manager'],
+    delete: ['admin'],
+    list: ['admin', 'manager', 'user']
+  },
   orders: {
     create: ['admin', 'manager', 'user'],
     read: ['admin', 'manager'],

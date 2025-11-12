@@ -256,6 +256,49 @@ BEFORE UPDATE ON filters
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
+-- Supplier Returns table for tracking parts returned to suppliers for credit
+CREATE TABLE IF NOT EXISTS supplier_returns (
+    id SERIAL PRIMARY KEY,
+    return_date DATE NOT NULL,
+    inv_number VARCHAR(100),
+    supplier VARCHAR(255) NOT NULL,
+    part_code VARCHAR(100) NOT NULL,
+    part_name VARCHAR(255) NOT NULL,
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price DECIMAL(10, 2) NOT NULL CHECK (unit_price >= 0),
+    total_value DECIMAL(10, 2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
+    return_reason VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending_shipment',
+    tracking_number VARCHAR(100),
+    notes TEXT,
+    credit_date DATE,
+    credit_number VARCHAR(100),
+    credit_amount DECIMAL(10, 2),
+    created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT valid_status CHECK (status IN ('pending_shipment', 'in_transit', 'received_by_supplier', 'under_review', 'approved', 'credited', 'rejected')),
+    CONSTRAINT valid_reason CHECK (return_reason IN ('defective', 'wrong_part', 'warranty', 'excess_stock', 'customer_return', 'other')),
+    CONSTRAINT credit_required_when_credited CHECK (
+        (status = 'credited' AND credit_date IS NOT NULL AND credit_amount IS NOT NULL) OR
+        (status != 'credited')
+    )
+);
+
+-- Indexes for supplier_returns
+CREATE INDEX IF NOT EXISTS idx_supplier_returns_status ON supplier_returns(status);
+CREATE INDEX IF NOT EXISTS idx_supplier_returns_supplier ON supplier_returns(supplier);
+CREATE INDEX IF NOT EXISTS idx_supplier_returns_return_date ON supplier_returns(return_date);
+CREATE INDEX IF NOT EXISTS idx_supplier_returns_part_code ON supplier_returns(part_code);
+CREATE INDEX IF NOT EXISTS idx_supplier_returns_created_by ON supplier_returns(created_by);
+
+-- Add update trigger for supplier_returns
+DROP TRIGGER IF EXISTS update_supplier_returns_updated_at ON supplier_returns;
+CREATE TRIGGER update_supplier_returns_updated_at
+BEFORE UPDATE ON supplier_returns
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
 -- Seed sample filters (will not duplicate due to ON CONFLICT)
 INSERT INTO filters (name, code, type, description, model_qty, stock_quantity, reorder_point) VALUES
 ('Standard Oil Filter', 'OF-001', 'Oil Filter', 'Universal oil filter for most passenger vehicles', 0, 50, 20),

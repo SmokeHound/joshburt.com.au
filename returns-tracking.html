@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Returns & Credits Tracking</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
+  <script>
+    try { localStorage.removeItem('currentUser'); } catch (_) {}
+  </script>
+  <script>
+    fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
+    fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
+    fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>document.head.appendChild(c.cloneNode(true)));});
+  </script>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
+</head>
+<body class="dark">
+  
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+
+  <!-- Shared Navigation -->
+  <div id="main-nav"></div>
+  <script>
+    fetch('shared-nav.html').then(r => r.text()).then(html => {
+      document.getElementById('main-nav').innerHTML = html;
+      if (window.setActiveNavLink) window.setActiveNavLink();
+    });
+  </script>
+
+  <!-- Main Content -->
+  <main id="main-content" class="p-6 bg-black min-h-screen" role="main">
+    <!-- Header -->
+    <header class="page-header card border mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">Returns & Credits Tracking</h1>
+          <p class="nav-link-muted">Track parts returned to suppliers and monitor credit status</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="addReturnBtn" class="btn-neon-green px-4 py-2 rounded-lg font-semibold">+ New Return</button>
+          <button id="exportReturnsBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Export CSV</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-400 text-sm">Pending Returns</p>
+            <p class="text-2xl font-bold text-yellow-400" id="pendingCount">0</p>
+          </div>
+          <div class="text-yellow-400">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-400 text-sm">Credited</p>
+            <p class="text-2xl font-bold text-green-400" id="creditedCount">0</p>
+          </div>
+          <div class="text-green-400">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-400 text-sm">Total Value Pending</p>
+            <p class="text-2xl font-bold text-white" id="totalPendingValue">$0.00</p>
+          </div>
+          <div class="text-blue-400">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-400 text-sm">Avg. Processing Time</p>
+            <p class="text-2xl font-bold text-white" id="avgProcessingTime">0 days</p>
+          </div>
+          <div class="text-purple-400">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card rounded-lg shadow p-4 mb-6 bg-gray-900 border border-gray-700">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label for="filterStatus" class="block text-sm font-medium text-gray-300 mb-1">Status</label>
+          <select id="filterStatus" class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+            <option value="">All Statuses</option>
+            <option value="pending_shipment">Pending Shipment</option>
+            <option value="in_transit">In Transit</option>
+            <option value="received_by_supplier">Received by Supplier</option>
+            <option value="under_review">Under Review</option>
+            <option value="approved">Approved</option>
+            <option value="credited">Credited</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="filterSupplier" class="block text-sm font-medium text-gray-300 mb-1">Supplier</label>
+          <select id="filterSupplier" class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+            <option value="">All Suppliers</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="filterDateFrom" class="block text-sm font-medium text-gray-300 mb-1">From Date</label>
+          <input type="date" id="filterDateFrom" class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+
+        <div>
+          <label for="filterDateTo" class="block text-sm font-medium text-gray-300 mb-1">To Date</label>
+          <input type="date" id="filterDateTo" class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <input type="text" id="searchReturns" placeholder="Search by part code, supplier, or RMA number..." class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+      </div>
+    </div>
+
+    <!-- Returns Table -->
+    <div class="card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left" role="table" aria-label="Returns tracking table">
+          <thead>
+            <tr class="border-b-2 border-gray-600">
+              <th class="py-2 px-4 text-gray-100 font-semibold">Return Date</th>
+              <th class="py-2 px-3 text-gray-100 font-semibold">Part Code</th>
+              <th class="py-2 px-3 text-gray-100 font-semibold">Part Name</th>
+              <th class="py-2 px-3 text-gray-100 font-semibold">Supplier</th>
+              <th class="py-2 px-3 text-gray-100 font-semibold">RMA #</th>
+              <th class="py-2 px-3 text-gray-100 font-semibold">Qty</th>
+              <th class="py-2 px-3 text-gray-100 font-semibold">Value</th>
+              <th class="py-2 px-3 text-gray-100 font-semibold">Status</th>
+              <th class="py-2 px-3 text-gray-100 font-semibold">Days Pending</th>
+              <th class="py-2 px-3 text-gray-100 font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="returnsTableBody">
+            <tr>
+              <td colspan="10" class="py-8 text-center text-gray-400">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
+                <p>Loading returns...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Add/Edit Return Modal -->
+  <div id="returnModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop p-4">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 relative border-2 border-accent modal-panel">
+      <button id="closeReturnModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold" aria-label="Close">&times;</button>
+      <h3 class="text-xl font-bold text-accent mb-4" id="modal-title">New Return</h3>
+      
+      <form id="return-form" class="space-y-4">
+        <!-- Return Information -->
+        <div class="border-b border-gray-700 pb-4">
+          <h4 class="text-lg font-semibold text-white mb-3">Return Information</h4>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="return-date" class="block mb-2 font-medium">Return Date *</label>
+              <input type="date" id="return-date" name="return-date" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            
+            <div>
+              <label for="rma-number" class="block mb-2 font-medium">RMA Number</label>
+              <input type="text" id="rma-number" name="rma-number" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Supplier's RMA number">
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label for="supplier" class="block mb-2 font-medium">Supplier *</label>
+            <input type="text" id="supplier" name="supplier" required list="suppliers-list" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter or select supplier">
+            <datalist id="suppliers-list">
+              <option value="Repco">
+              <option value="Supercheap Auto">
+              <option value="Burson Auto Parts">
+              <option value="AutoPro">
+              <option value="BNT Automotive">
+            </datalist>
+          </div>
+        </div>
+
+        <!-- Part Information -->
+        <div class="border-b border-gray-700 pb-4">
+          <h4 class="text-lg font-semibold text-white mb-3">Part Information</h4>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="part-code" class="block mb-2 font-medium">Part Code *</label>
+              <input type="text" id="part-code" name="part-code" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. WZ79">
+            </div>
+            
+            <div>
+              <label for="part-name" class="block mb-2 font-medium">Part Name *</label>
+              <input type="text" id="part-name" name="part-name" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. Oil Filter Toyota">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label for="quantity" class="block mb-2 font-medium">Quantity *</label>
+              <input type="number" min="1" id="quantity" name="quantity" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="1">
+            </div>
+            
+            <div>
+              <label for="unit-price" class="block mb-2 font-medium">Unit Price *</label>
+              <input type="number" step="0.01" min="0" id="unit-price" name="unit-price" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00">
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label for="total-value" class="block mb-2 font-medium">Total Value</label>
+            <input type="text" id="total-value" name="total-value" readonly class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-gray-300" placeholder="$0.00">
+          </div>
+        </div>
+
+        <!-- Return Details -->
+        <div class="border-b border-gray-700 pb-4">
+          <h4 class="text-lg font-semibold text-white mb-3">Return Details</h4>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="return-reason" class="block mb-2 font-medium">Return Reason *</label>
+              <select id="return-reason" name="return-reason" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="">Select reason</option>
+                <option value="defective">Defective/Faulty</option>
+                <option value="wrong_part">Wrong Part Ordered</option>
+                <option value="warranty">Warranty Claim</option>
+                <option value="excess_stock">Excess Stock</option>
+                <option value="customer_return">Customer Return</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="status" class="block mb-2 font-medium">Status *</label>
+              <select id="status" name="status" required class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="pending_shipment">Pending Shipment</option>
+                <option value="in_transit">In Transit</option>
+                <option value="received_by_supplier">Received by Supplier</option>
+                <option value="under_review">Under Review</option>
+                <option value="approved">Approved</option>
+                <option value="credited">Credited</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label for="tracking-number" class="block mb-2 font-medium">Tracking Number</label>
+            <input type="text" id="tracking-number" name="tracking-number" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Courier tracking number">
+          </div>
+
+          <div class="mt-4">
+            <label for="notes" class="block mb-2 font-medium">Notes</label>
+            <textarea id="notes" name="notes" rows="3" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Additional notes or comments"></textarea>
+          </div>
+        </div>
+
+        <!-- Credit Information (shown when status is credited) -->
+        <div id="creditInfoSection" class="border-b border-gray-700 pb-4 hidden">
+          <h4 class="text-lg font-semibold text-white mb-3">Credit Information</h4>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="credit-date" class="block mb-2 font-medium">Credit Date</label>
+              <input type="date" id="credit-date" name="credit-date" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            
+            <div>
+              <label for="credit-number" class="block mb-2 font-medium">Credit Note Number</label>
+              <input type="text" id="credit-number" name="credit-number" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Credit note reference">
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label for="credit-amount" class="block mb-2 font-medium">Credit Amount</label>
+            <input type="number" step="0.01" min="0" id="credit-amount" name="credit-amount" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-6">
+          <button type="button" id="cancelReturnBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold">Cancel</button>
+          <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Save Return</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    let returns = [];
+    let filteredReturns = [];
+    let editingReturnId = null;
+    let returnModalEl, closeReturnModalBtn, addReturnBtn, cancelReturnBtn;
+
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    if (menuToggle && sidebar) {
+      menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        const isOpen = sidebar.classList.contains('open');
+        menuToggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      returnModalEl = document.getElementById('returnModal');
+      closeReturnModalBtn = document.getElementById('closeReturnModal');
+      addReturnBtn = document.getElementById('addReturnBtn');
+      cancelReturnBtn = document.getElementById('cancelReturnBtn');
+
+      loadReturns();
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      // Modal controls
+      if (addReturnBtn) addReturnBtn.addEventListener('click', () => {
+        editingReturnId = null;
+        document.getElementById('modal-title').textContent = 'New Return';
+        document.getElementById('return-form').reset();
+        document.getElementById('return-date').value = new Date().toISOString().split('T')[0];
+        openReturnModal();
+      });
+      if (closeReturnModalBtn) closeReturnModalBtn.addEventListener('click', closeReturnModal);
+      if (cancelReturnBtn) cancelReturnBtn.addEventListener('click', closeReturnModal);
+      if (returnModalEl) {
+        returnModalEl.addEventListener('click', (e) => {
+          if (e.target === returnModalEl) closeReturnModal();
+        });
+      }
+
+      // Form submission
+      document.getElementById('return-form').addEventListener('submit', handleSubmit);
+
+      // Auto-calculate total value
+      document.getElementById('quantity').addEventListener('input', calculateTotal);
+      document.getElementById('unit-price').addEventListener('input', calculateTotal);
+
+      // Show/hide credit info based on status
+      document.getElementById('status').addEventListener('change', (e) => {
+        const creditSection = document.getElementById('creditInfoSection');
+        if (e.target.value === 'credited') {
+          creditSection.classList.remove('hidden');
+        } else {
+          creditSection.classList.add('hidden');
+        }
+      });
+
+      // Filters
+      document.getElementById('filterStatus').addEventListener('change', applyFilters);
+      document.getElementById('filterSupplier').addEventListener('change', applyFilters);
+      document.getElementById('filterDateFrom').addEventListener('change', applyFilters);
+      document.getElementById('filterDateTo').addEventListener('change', applyFilters);
+      document.getElementById('searchReturns').addEventListener('input', applyFilters);
+
+      // Export
+      document.getElementById('exportReturnsBtn').addEventListener('click', exportReturns);
+
+      // Table actions
+      document.getElementById('returnsTableBody').addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-return')) {
+          editReturn(parseInt(e.target.dataset.id));
+        } else if (e.target.classList.contains('delete-return')) {
+          deleteReturn(parseInt(e.target.dataset.id));
+        }
+      });
+    }
+
+    function calculateTotal() {
+      const qty = parseFloat(document.getElementById('quantity').value) || 0;
+      const price = parseFloat(document.getElementById('unit-price').value) || 0;
+      const total = qty * price;
+      document.getElementById('total-value').value = '$' + total.toFixed(2);
+    }
+
+    async function loadReturns() {
+      try {
+        showToast('Loading returns...', 'info');
+        const response = await window.authFetch(`${FN_BASE}/supplier-returns`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        returns = Array.isArray(data) ? data : [];
+        filteredReturns = [...returns];
+        
+        // Populate supplier filter
+        const suppliers = [...new Set(returns.map(r => r.supplier))];
+        const supplierSelect = document.getElementById('filterSupplier');
+        // Clear existing options except "All Suppliers"
+        supplierSelect.innerHTML = '<option value="">All Suppliers</option>';
+        suppliers.forEach(s => {
+          const option = document.createElement('option');
+          option.value = s;
+          option.textContent = s;
+          supplierSelect.appendChild(option);
+        });
+
+        renderReturns();
+        updateSummary();
+        showToast(`Loaded ${returns.length} returns from database`, 'success');
+      } catch (error) {
+        console.error('Failed to load returns:', error);
+        showToast('Failed to load returns from database', 'error');
+        returns = [];
+        filteredReturns = [];
+        renderReturns();
+      }
+    }
+
+    function renderReturns() {
+      const tbody = document.getElementById('returnsTableBody');
+      tbody.innerHTML = '';
+
+      if (filteredReturns.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="py-8 text-center text-gray-400">
+              <p>No returns found</p>
+              <p class="text-sm mt-2">Click "New Return" to add one</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      filteredReturns.forEach(ret => {
+        const row = document.createElement('tr');
+        row.className = 'border-b border-gray-700 hover:bg-gray-800';
+        
+        const daysPending = calculateDaysPending(ret);
+        const statusClass = getStatusClass(ret.status);
+        
+        row.innerHTML = `
+          <td class="py-1 px-4">${formatDate(ret.return_date)}</td>
+          <td class="py-1 px-3 font-mono text-sm">${escapeHtml(ret.part_code)}</td>
+          <td class="py-1 px-3">${escapeHtml(ret.part_name)}</td>
+          <td class="py-1 px-3">${escapeHtml(ret.supplier)}</td>
+          <td class="py-1 px-3 font-mono text-sm">${escapeHtml(ret.inv_number || '-')}</td>
+          <td class="py-1 px-3">${ret.quantity}</td>
+          <td class="py-1 px-3">$${parseFloat(ret.total_value || 0).toFixed(2)}</td>
+          <td class="py-1 px-3"><span class="px-2 py-1 rounded text-xs ${statusClass}">${formatStatus(ret.status)}</span></td>
+          <td class="py-1 px-3 ${daysPending > 30 ? 'text-red-400 font-semibold' : ''}">${ret.status === 'credited' ? '-' : daysPending + ' days'}</td>
+          <td class="py-1 px-3">
+            <button class="edit-return text-primary hover:text-secondary mr-2" data-id="${ret.id}">Edit</button>
+            <button class="delete-return text-red-500 hover:text-red-400" data-id="${ret.id}">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updateSummary() {
+      const pending = returns.filter(r => r.status !== 'credited' && r.status !== 'rejected');
+      const credited = returns.filter(r => r.status === 'credited');
+      const totalPendingValue = pending.reduce((sum, r) => sum + parseFloat(r.total_value || 0), 0);
+      
+      const creditedWithDates = credited.filter(r => r.return_date && r.credit_date);
+      const avgDays = creditedWithDates.length > 0
+        ? Math.round(creditedWithDates.reduce((sum, r) => {
+            const days = Math.floor((new Date(r.credit_date) - new Date(r.return_date)) / (1000 * 60 * 60 * 24));
+            return sum + days;
+          }, 0) / creditedWithDates.length)
+        : 0;
+
+      document.getElementById('pendingCount').textContent = pending.length;
+      document.getElementById('creditedCount').textContent = credited.length;
+      document.getElementById('totalPendingValue').textContent = '$' + totalPendingValue.toFixed(2);
+      document.getElementById('avgProcessingTime').textContent = avgDays + ' days';
+    }
+
+    function applyFilters() {
+      const status = document.getElementById('filterStatus').value;
+      const supplier = document.getElementById('filterSupplier').value;
+      const dateFrom = document.getElementById('filterDateFrom').value;
+      const dateTo = document.getElementById('filterDateTo').value;
+      const search = document.getElementById('searchReturns').value.toLowerCase();
+
+      filteredReturns = returns.filter(ret => {
+        if (status && ret.status !== status) return false;
+        if (supplier && ret.supplier !== supplier) return false;
+        if (dateFrom && ret.returnDate < dateFrom) return false;
+        if (dateTo && ret.returnDate > dateTo) return false;
+        if (search) {
+          const searchStr = `${ret.partCode} ${ret.partName} ${ret.supplier} ${ret.rmaNumber || ''}`.toLowerCase();
+          if (!searchStr.includes(search)) return false;
+        }
+        return true;
+      });
+
+      renderReturns();
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      
+      const form = document.getElementById('return-form');
+      const formData = new FormData(form);
+      
+      const returnData = {
+        return_date: formData.get('return-date'),
+        inv_number: formData.get('rma-number') || null,
+        supplier: formData.get('supplier'),
+        part_code: formData.get('part-code'),
+        part_name: formData.get('part-name'),
+        quantity: parseInt(formData.get('quantity')),
+        unit_price: parseFloat(formData.get('unit-price')),
+        return_reason: formData.get('return-reason'),
+        status: formData.get('status'),
+        tracking_number: formData.get('tracking-number') || null,
+        notes: formData.get('notes') || null,
+        credit_date: formData.get('credit-date') || null,
+        credit_number: formData.get('credit-number') || null,
+        credit_amount: formData.get('credit-amount') ? parseFloat(formData.get('credit-amount')) : null
+      };
+
+      try {
+        if (editingReturnId) {
+          returnData.id = editingReturnId;
+          const response = await window.authFetch(`${FN_BASE}/supplier-returns`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(returnData)
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update return');
+          }
+          
+          showToast('Return updated successfully', 'success');
+        } else {
+          const response = await window.authFetch(`${FN_BASE}/supplier-returns`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(returnData)
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to create return');
+          }
+          
+          showToast('Return added successfully', 'success');
+        }
+        
+        closeReturnModal();
+        await loadReturns();
+      } catch (error) {
+        console.error('Error saving return:', error);
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    }
+
+    function editReturn(id) {
+      const ret = returns.find(r => r.id === id);
+      if (!ret) return;
+
+      editingReturnId = id;
+      document.getElementById('modal-title').textContent = 'Edit Return';
+
+      document.getElementById('return-date').value = ret.return_date;
+      document.getElementById('rma-number').value = ret.inv_number || '';
+      document.getElementById('supplier').value = ret.supplier;
+      document.getElementById('part-code').value = ret.part_code;
+      document.getElementById('part-name').value = ret.part_name;
+      document.getElementById('quantity').value = ret.quantity;
+      document.getElementById('unit-price').value = ret.unit_price;
+      document.getElementById('return-reason').value = ret.return_reason;
+      document.getElementById('status').value = ret.status;
+      document.getElementById('tracking-number').value = ret.tracking_number || '';
+      document.getElementById('notes').value = ret.notes || '';
+      document.getElementById('credit-date').value = ret.credit_date || '';
+      document.getElementById('credit-number').value = ret.credit_number || '';
+      document.getElementById('credit-amount').value = ret.credit_amount || '';
+
+      calculateTotal();
+      
+      if (ret.status === 'credited') {
+        document.getElementById('creditInfoSection').classList.remove('hidden');
+      }
+
+      openReturnModal();
+    }
+
+    async function deleteReturn(id) {
+      const ret = returns.find(r => r.id === id);
+      const confirmed = confirm(`Are you sure you want to delete the return for ${ret.part_code}?`);
+      
+      if (!confirmed) return;
+
+      try {
+        const response = await window.authFetch(`${FN_BASE}/supplier-returns`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to delete return');
+        }
+        
+        showToast('Return deleted successfully', 'success');
+        await loadReturns();
+      } catch (error) {
+        console.error('Error deleting return:', error);
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    }
+
+    function exportReturns() {
+      const headers = ['Return Date', 'Part Code', 'Part Name', 'Supplier', 'RMA Number', 'Quantity', 'Unit Price', 'Total Value', 'Reason', 'Status', 'Tracking', 'Days Pending', 'Credit Date', 'Credit Number', 'Notes'];
+      const csvContent = [
+        headers.join(','),
+        ...filteredReturns.map(ret => [
+          ret.return_date,
+          `"${ret.part_code}"`,
+          `"${ret.part_name}"`,
+          `"${ret.supplier}"`,
+          `"${ret.inv_number || ''}"`,
+          ret.quantity,
+          ret.unit_price,
+          ret.total_value,
+          `"${ret.return_reason}"`,
+          `"${ret.status}"`,
+          `"${ret.tracking_number || ''}"`,
+          calculateDaysPending(ret),
+          ret.credit_date || '',
+          `"${ret.credit_number || ''}"`,
+          `"${ret.notes || ''}"`
+        ].join(','))
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `returns-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Returns exported successfully', 'success');
+    }
+
+    function openReturnModal() {
+      if (!returnModalEl) return;
+      returnModalEl.classList.remove('hidden');
+    }
+
+    function closeReturnModal() {
+      if (!returnModalEl) return;
+      returnModalEl.classList.add('hidden');
+      document.getElementById('return-form').reset();
+      editingReturnId = null;
+    }
+
+    function calculateDaysPending(ret) {
+      if (ret.status === 'credited' || ret.status === 'rejected') return 0;
+      const start = new Date(ret.return_date);
+      const end = new Date();
+      return Math.floor((end - start) / (1000 * 60 * 60 * 24));
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-AU', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function formatStatus(status) {
+      return status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function getStatusClass(status) {
+      const classes = {
+        'pending_shipment': 'bg-gray-600 text-white',
+        'in_transit': 'bg-blue-600 text-white',
+        'received_by_supplier': 'bg-indigo-600 text-white',
+        'under_review': 'bg-yellow-600 text-white',
+        'approved': 'bg-green-600 text-white',
+        'credited': 'bg-green-700 text-white',
+        'rejected': 'bg-red-600 text-white'
+      };
+      return classes[status] || 'bg-gray-600 text-white';
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.toString().replace(/[&<>"']/g, m => map[m]);
+    }
+  </script>
+</body>
+</html>
