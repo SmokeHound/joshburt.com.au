@@ -92,7 +92,7 @@ exports.handler = withHandler(async function(event){
         params.push(`%"requestId":"${escapedRequestId}"%`); 
       }
       if (q) {
-        whereParts.push('(action LIKE ? OR details LIKE ? OR user_id LIKE ?)');
+        whereParts.push('(action LIKE ? OR details LIKE ? OR CAST(user_id AS TEXT) LIKE ?)');
         const like = `%${q}%`;
         params.push(like, like, like);
       }
