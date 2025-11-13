@@ -183,53 +183,7 @@
                 </div>
             </div>
             </div>
-      <!-- Recent Activity -->
-      <div class="mt-8">
-        <div class="card widget-secondary p-6 rounded-lg shadow-md border border-gray-700 hover:border-gray-600 transition-all duration-300">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <h3 class="text-lg font-semibold text-white">Recent Activity</h3>
-              <span id="activity-count-badge" class="hidden px-2 py-0.5 text-xs bg-cyan-500/20 text-cyan-300 rounded-full"></span>
-            </div>
-            <div class="flex items-center gap-2">
-              <button id="filter-activity" class="text-xs text-gray-400 hover:text-cyan-300 px-2 py-1 rounded hover:bg-gray-800 transition-colors" title="Filter activity">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-                Filter
-              </button>
-              <a id="view-all-activity" href="audit-logs.html" class="text-cyan-400 hover:text-cyan-300 text-xs hover:underline transition-colors">View all →</a>
-            </div>
-          </div>
-          <ul id="recent-audit-log" class="space-y-2 text-sm text-gray-300 min-h-[100px]" aria-live="polite" aria-busy="true">
-            <li class="flex items-center gap-3 p-3 rounded bg-gray-800/50 animate-pulse">
-              <div class="w-6 h-6 bg-gray-700 rounded"></div>
-              <div class="flex-1 space-y-2">
-                <div class="h-4 bg-gray-700 rounded w-3/4"></div>
-                <div class="h-3 bg-gray-700 rounded w-1/2"></div>
-              </div>
-            </li>
-            <li class="flex items-center gap-3 p-3 rounded bg-gray-800/50 animate-pulse">
-              <div class="w-6 h-6 bg-gray-700 rounded"></div>
-              <div class="flex-1 space-y-2">
-                <div class="h-4 bg-gray-700 rounded w-2/3"></div>
-                <div class="h-3 bg-gray-700 rounded w-1/3"></div>
-              </div>
-            </li>
-            <li class="flex items-center gap-3 p-3 rounded bg-gray-800/50 animate-pulse">
-              <div class="w-6 h-6 bg-gray-700 rounded"></div>
-              <div class="flex-1 space-y-2">
-                <div class="h-4 bg-gray-700 rounded w-3/5"></div>
-                <div class="h-3 bg-gray-700 rounded w-2/5"></div>
-              </div>
-            </li>
-          </ul>
-          <div id="recent-activity-actions" class="mt-4 pt-3 border-t border-gray-700 hidden">
-            <button id="recent-activity-toggle" class="text-xs text-cyan-300 hover:text-cyan-200 underline">Show more</button>
-          </div>
-        </div>
-      </div>
-
+      
       <!-- Additional Insights Section -->
       <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Quick Stats -->
@@ -287,6 +241,53 @@
               <span class="text-gray-400">Uptime</span>
               <span id="system-uptime" class="text-gray-200">99.9%</span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="mt-8">
+        <div class="card widget-secondary p-6 rounded-lg shadow-md border border-gray-700 hover:border-gray-600 transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <h3 class="text-lg font-semibold text-white">Recent Activity</h3>
+              <span id="activity-count-badge" class="hidden px-2 py-0.5 text-xs bg-cyan-500/20 text-cyan-300 rounded-full"></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="filter-activity" class="text-xs text-gray-400 hover:text-cyan-300 px-2 py-1 rounded hover:bg-gray-800 transition-colors" title="Filter activity">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filter
+              </button>
+              <a id="view-all-activity" href="audit-logs.html" class="text-cyan-400 hover:text-cyan-300 text-xs hover:underline transition-colors">View all →</a>
+            </div>
+          </div>
+          <ul id="recent-audit-log" class="space-y-2 text-sm text-gray-300 min-h-[100px]" aria-live="polite" aria-busy="true">
+            <li class="flex items-center gap-3 p-3 rounded bg-gray-800/50 animate-pulse">
+              <div class="w-6 h-6 bg-gray-700 rounded"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+                <div class="h-3 bg-gray-700 rounded w-1/2"></div>
+              </div>
+            </li>
+            <li class="flex items-center gap-3 p-3 rounded bg-gray-800/50 animate-pulse">
+              <div class="w-6 h-6 bg-gray-700 rounded"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-700 rounded w-2/3"></div>
+                <div class="h-3 bg-gray-700 rounded w-1/3"></div>
+              </div>
+            </li>
+            <li class="flex items-center gap-3 p-3 rounded bg-gray-800/50 animate-pulse">
+              <div class="w-6 h-6 bg-gray-700 rounded"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-700 rounded w-3/5"></div>
+                <div class="h-3 bg-gray-700 rounded w-2/5"></div>
+              </div>
+            </li>
+          </ul>
+          <div id="recent-activity-actions" class="mt-4 pt-3 border-t border-gray-700 hidden">
+            <button id="recent-activity-toggle" class="text-xs text-cyan-300 hover:text-cyan-200 underline">Show more</button>
           </div>
         </div>
       </div>
