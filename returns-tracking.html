@@ -181,12 +181,15 @@
   </main>
 
   <!-- Add/Edit Return Modal -->
-  <div id="returnModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop p-4">
-    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 relative border-2 border-accent modal-panel">
-      <button id="closeReturnModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold" aria-label="Close">&times;</button>
-      <h3 class="text-xl font-bold text-accent mb-4" id="modal-title">New Return</h3>
+  <div id="returnModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop p-4 overflow-y-auto">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-3xl my-8 relative border-2 border-accent modal-panel" style="max-height: calc(100vh - 4rem); display: flex; flex-direction: column;">
+      <button id="closeReturnModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold z-10" aria-label="Close">&times;</button>
+      <div class="p-6 pb-2">
+        <h3 class="text-xl font-bold text-accent mb-4" id="modal-title">New Return</h3>
+      </div>
       
-      <form id="return-form" class="space-y-4">
+      <div class="overflow-y-auto px-6 flex-1">
+        <form id="return-form" class="space-y-4">
         <!-- Return Information -->
         <div class="border-b border-gray-700 pb-4">
           <h4 class="text-lg font-semibold text-white mb-3">Return Information</h4>
@@ -314,12 +317,15 @@
             <input type="number" step="0.01" min="0" id="credit-amount" name="credit-amount" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00">
           </div>
         </div>
-
-        <div class="flex justify-end gap-2 mt-6">
-          <button type="button" id="cancelReturnBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold">Cancel</button>
-          <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Save Return</button>
-        </div>
       </form>
+      </div>
+
+      <div class="p-6 pt-2 border-t border-gray-700 mt-4">
+        <div class="flex justify-end gap-2">
+          <button type="button" id="cancelReturnBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold">Cancel</button>
+          <button type="submit" form="return-form" class="btn-neon-green px-4 py-2 rounded font-semibold">Save Return</button>
+        </div>
+      </div>
     </div>
   </div>
 
