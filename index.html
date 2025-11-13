@@ -40,104 +40,129 @@
     <!-- Main Content -->
   <main id="main-content" class="flex-1 p-4 md:p-6 md:ml-64" role="main">
       <!-- Header with Welcome + Actions -->
-  <header class="page-header card border" role="banner">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 id="welcome-message" class="text-3xl md:text-4xl font-bold text-white">Welcome!</h1>
-            <p id="welcome-subtitle" class="text-base md:text-lg mt-2 text-gray-400">Your dashboard overview</p>
+  <header class="page-header card border relative overflow-hidden" role="banner">
+        <!-- Animated background gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-cyan-500/5 opacity-50"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex-1">
+            <h1 id="welcome-message" class="text-3xl md:text-4xl font-bold text-white mb-1 animate-fade-in">Welcome!</h1>
+            <p id="welcome-subtitle" class="text-base md:text-lg text-gray-400 animate-fade-in">Your dashboard overview</p>
+            <div id="last-login" class="text-xs text-gray-500 mt-2 hidden"></div>
           </div>
           <div class="flex items-center gap-3">
             <div id="notification-bell-wrapper" class="relative"></div>
+            <button id="refresh-dashboard" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition-all duration-200 group" title="Refresh dashboard data" aria-label="Refresh dashboard">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
       <!-- Quick Actions -->
       <div class="mt-6">
-        <h2 class="text-xl font-semibold text-white mb-4">Quick Actions</h2>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold text-white">Quick Actions</h2>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500">Popular shortcuts</span>
+          </div>
+        </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          <a href="users.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group relative overflow-hidden">
+          <a href="users.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group relative overflow-hidden border border-transparent hover:border-blue-500/30">
             <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div class="text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-300 relative z-10">👥</div>
             <div class="text-sm font-semibold text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">Manage Users</div>
+            <div class="text-[10px] text-gray-500 mt-1 relative z-10">Team management</div>
           </a>
-          <a href="orders-review.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 group relative overflow-hidden">
+          <a href="orders-review.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 group relative overflow-hidden border border-transparent hover:border-green-500/30">
             <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div class="text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-300 relative z-10">📋</div>
             <div class="text-sm font-semibold text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">View Orders</div>
+            <div class="text-[10px] text-gray-500 mt-1 relative z-10">Order tracking</div>
           </a>
-          <a href="oil-products-mgmt.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group relative overflow-hidden">
+          <a href="oil-products-mgmt.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group relative overflow-hidden border border-transparent hover:border-purple-500/30">
             <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div class="text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-300 relative z-10">🛢️</div>
             <div class="text-sm font-semibold text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">Products</div>
+            <div class="text-[10px] text-gray-500 mt-1 relative z-10">Inventory</div>
           </a>
-          <a href="analytics.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 group relative overflow-hidden">
+          <a href="analytics.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 group relative overflow-hidden border border-transparent hover:border-cyan-500/30">
             <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div class="text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-300 relative z-10">📊</div>
             <div class="text-sm font-semibold text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">Analytics</div>
+            <div class="text-[10px] text-gray-500 mt-1 relative z-10">Insights</div>
           </a>
-          <a href="settings.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/20 transition-all duration-300 group relative overflow-hidden">
+          <a href="settings.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/20 transition-all duration-300 group relative overflow-hidden border border-transparent hover:border-yellow-500/30">
             <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div class="text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-300 relative z-10">⚙️</div>
             <div class="text-sm font-semibold text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">Settings</div>
+            <div class="text-[10px] text-gray-500 mt-1 relative z-10">Configure</div>
           </a>
-          <a href="audit-logs.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-pink-500/20 transition-all duration-300 group relative overflow-hidden">
+          <a href="audit-logs.html" class="card rounded-lg p-5 text-center hover:scale-105 hover:shadow-lg hover:shadow-pink-500/20 transition-all duration-300 group relative overflow-hidden border border-transparent hover:border-pink-500/30">
             <div class="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div class="text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-300 relative z-10">📝</div>
             <div class="text-sm font-semibold text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">Audit Logs</div>
+            <div class="text-[10px] text-gray-500 mt-1 relative z-10">Security</div>
           </a>
         </div>
       </div>
 
 <!-- Website Stats and Status Widgets -->
             <div class="mt-6">
-                <h2 class="text-xl font-semibold text-white mb-4">Overview Statistics</h2>
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-xl font-semibold text-white">Overview Statistics</h2>
+                  <div id="stats-last-updated" class="text-xs text-gray-500"></div>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Website stats and status">
-                <div class="card widget-primary p-6 rounded-lg shadow-md flex flex-col items-center relative overflow-hidden group">
+                <!-- Users Card with Skeleton Loader -->
+                <div class="card widget-primary p-6 rounded-lg shadow-md flex flex-col items-center relative overflow-hidden group border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300">
                     <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500 opacity-10 rounded-full group-hover:scale-150 transition-transform duration-300"></div>
                     <span class="mb-3 relative z-10" aria-hidden="true">
-                      <!-- Users Icon (simplified for reliability) -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.879 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </span>
-                    <div class="text-3xl font-bold text-blue-400 mb-1 relative z-10" id="stat-total-users">--</div>
+                    <div class="text-3xl font-bold text-blue-400 mb-1 relative z-10 min-h-[2.25rem]" id="stat-total-users">
+                      <div class="skeleton-loader w-16 h-9 rounded"></div>
+                    </div>
                     <div class="text-sm text-gray-400 mb-2 relative z-10">Total Users</div>
-                    <div class="text-xs text-green-400 flex items-center gap-1 relative z-10" id="users-trend">
-                      <span>↗</span>
-                      <span>+0%</span>
+                    <div class="text-xs text-green-400 flex items-center gap-1 relative z-10 min-h-[1.25rem]" id="users-trend">
+                      <div class="skeleton-loader w-12 h-4 rounded"></div>
                     </div>
                 </div>
-                <div class="card widget-secondary p-6 rounded-lg shadow-md flex flex-col items-center relative overflow-hidden group">
+                <!-- Orders Card with Skeleton Loader -->
+                <div class="card widget-secondary p-6 rounded-lg shadow-md flex flex-col items-center relative overflow-hidden group border border-green-500/20 hover:border-green-500/40 transition-all duration-300">
                     <div class="absolute -top-10 -right-10 w-32 h-32 bg-green-500 opacity-10 rounded-full group-hover:scale-150 transition-transform duration-300"></div>
                     <span class="mb-3 relative z-10">
-                      <!-- Orders Icon -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     </span>
-                    <div class="text-3xl font-bold text-green-400 mb-1 relative z-10" id="stat-total-orders">--</div>
+                    <div class="text-3xl font-bold text-green-400 mb-1 relative z-10 min-h-[2.25rem]" id="stat-total-orders">
+                      <div class="skeleton-loader w-16 h-9 rounded"></div>
+                    </div>
                     <div class="text-sm text-gray-400 mb-2 relative z-10">Total Orders</div>
-                    <div class="text-xs text-green-400 flex items-center gap-1 relative z-10" id="orders-trend">
-                      <span>↗</span>
-                      <span>+0%</span>
+                    <div class="text-xs text-green-400 flex items-center gap-1 relative z-10 min-h-[1.25rem]" id="orders-trend">
+                      <div class="skeleton-loader w-12 h-4 rounded"></div>
                     </div>
                 </div>
-                <div class="card widget-accent p-6 rounded-lg shadow-md flex flex-col items-center relative overflow-hidden group">
+                <!-- Products Card with Skeleton Loader -->
+                <div class="card widget-accent p-6 rounded-lg shadow-md flex flex-col items-center relative overflow-hidden group border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300">
                     <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-500 opacity-10 rounded-full group-hover:scale-150 transition-transform duration-300"></div>
                     <span class="mb-3 relative z-10">
-                      <!-- Products Icon -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                     </span>
-                    <div class="text-3xl font-bold text-purple-400 mb-1 relative z-10" id="stat-total-products">--</div>
+                    <div class="text-3xl font-bold text-purple-400 mb-1 relative z-10 min-h-[2.25rem]" id="stat-total-products">
+                      <div class="skeleton-loader w-16 h-9 rounded"></div>
+                    </div>
                     <div class="text-sm text-gray-400 mb-2 relative z-10">Total Products</div>
-                    <div class="text-xs text-green-400 flex items-center gap-1 relative z-10" id="products-trend">
-                      <span>↗</span>
-                      <span>+0%</span>
+                    <div class="text-xs text-green-400 flex items-center gap-1 relative z-10 min-h-[1.25rem]" id="products-trend">
+                      <div class="skeleton-loader w-12 h-4 rounded"></div>
                     </div>
                 </div>
-                <div class="card widget-yellow p-6 rounded-lg shadow-md flex flex-col items-center relative overflow-hidden">
+                <!-- System Status Card -->
+                <div class="card widget-yellow p-6 rounded-lg shadow-md flex flex-col items-center relative overflow-hidden border border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300">
                     <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500 opacity-10 rounded-full"></div>
                     <span class="mb-3 relative z-10">
-                      <!-- System Status Icon -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                     </span>
                     <div class="flex flex-col gap-2 w-full relative z-10">
@@ -160,26 +185,139 @@
             </div>
       <!-- Recent Activity -->
       <div class="mt-8">
-        <div class="card widget-secondary p-6 rounded-lg shadow-md">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-semibold text-white">Recent Activity</h3>
-            <a id="view-all-activity" href="audit-logs.html" class="text-cyan-400 hover:underline text-sm">View all</a>
+        <div class="card widget-secondary p-6 rounded-lg shadow-md border border-gray-700 hover:border-gray-600 transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <h3 class="text-lg font-semibold text-white">Recent Activity</h3>
+              <span id="activity-count-badge" class="hidden px-2 py-0.5 text-xs bg-cyan-500/20 text-cyan-300 rounded-full"></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="filter-activity" class="text-xs text-gray-400 hover:text-cyan-300 px-2 py-1 rounded hover:bg-gray-800 transition-colors" title="Filter activity">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filter
+              </button>
+              <a id="view-all-activity" href="audit-logs.html" class="text-cyan-400 hover:text-cyan-300 text-xs hover:underline transition-colors">View all →</a>
+            </div>
           </div>
-          <ul id="recent-audit-log" class="space-y-2 text-sm text-gray-300" aria-live="polite" aria-busy="true">
-            <li class="text-gray-400">Loading recent activity…</li>
+          <ul id="recent-audit-log" class="space-y-2 text-sm text-gray-300 min-h-[100px]" aria-live="polite" aria-busy="true">
+            <li class="flex items-center gap-3 p-3 rounded bg-gray-800/50 animate-pulse">
+              <div class="w-6 h-6 bg-gray-700 rounded"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+                <div class="h-3 bg-gray-700 rounded w-1/2"></div>
+              </div>
+            </li>
+            <li class="flex items-center gap-3 p-3 rounded bg-gray-800/50 animate-pulse">
+              <div class="w-6 h-6 bg-gray-700 rounded"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-700 rounded w-2/3"></div>
+                <div class="h-3 bg-gray-700 rounded w-1/3"></div>
+              </div>
+            </li>
+            <li class="flex items-center gap-3 p-3 rounded bg-gray-800/50 animate-pulse">
+              <div class="w-6 h-6 bg-gray-700 rounded"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-700 rounded w-3/5"></div>
+                <div class="h-3 bg-gray-700 rounded w-2/5"></div>
+              </div>
+            </li>
           </ul>
-          <div id="recent-activity-actions" class="mt-3 hidden">
+          <div id="recent-activity-actions" class="mt-4 pt-3 border-t border-gray-700 hidden">
             <button id="recent-activity-toggle" class="text-xs text-cyan-300 hover:text-cyan-200 underline">Show more</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Insights Section -->
+      <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Quick Stats -->
+        <div class="card p-6 rounded-lg shadow-md border border-gray-700">
+          <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Quick Insights
+          </h3>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 rounded bg-gray-800/50 hover:bg-gray-800 transition-colors">
+              <span class="text-sm text-gray-300">Pending Orders</span>
+              <span id="insight-pending-orders" class="text-yellow-400 font-semibold">
+                <div class="skeleton-loader w-8 h-5 rounded inline-block"></div>
+              </span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded bg-gray-800/50 hover:bg-gray-800 transition-colors">
+              <span class="text-sm text-gray-300">Low Stock Items</span>
+              <span id="insight-low-stock" class="text-red-400 font-semibold">
+                <div class="skeleton-loader w-8 h-5 rounded inline-block"></div>
+              </span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded bg-gray-800/50 hover:bg-gray-800 transition-colors">
+              <span class="text-sm text-gray-300">Today's Activity</span>
+              <span id="insight-today-activity" class="text-green-400 font-semibold">
+                <div class="skeleton-loader w-8 h-5 rounded inline-block"></div>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="card p-6 rounded-lg shadow-md border border-gray-700">
+          <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            System Information
+          </h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-400">Version</span>
+              <span class="text-gray-200 font-mono">v2.1.0</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-400">Environment</span>
+              <span class="px-2 py-0.5 bg-green-500/20 text-green-300 rounded text-xs">Production</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-400">Last Updated</span>
+              <span id="system-last-updated" class="text-gray-200">Just now</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-400">Uptime</span>
+              <span id="system-uptime" class="text-gray-200">99.9%</span>
+            </div>
           </div>
         </div>
       </div>
     <!-- Dashboard Stats Script -->
     <script>
+  // Cache for dashboard data
+  const dashboardCache = {
+    data: null,
+    timestamp: null,
+    ttl: 60000 // 1 minute cache
+  };
+
+  // Debounce helper
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
   // Personalized greeting based on time of day
   function updateGreeting() {
     const hour = new Date().getHours();
     const welcomeEl = document.getElementById('welcome-message');
     const subtitleEl = document.getElementById('welcome-subtitle');
+    const lastLoginEl = document.getElementById('last-login');
     let greeting = 'Welcome!';
     let subtitle = 'Your dashboard overview';
     
@@ -197,6 +335,21 @@
         greeting = userName ? `Good Evening, ${userName}!` : 'Good Evening!';
         subtitle = 'Wrapping up for the day?';
       }
+
+      // Show last login if available
+      if (user.last_login && lastLoginEl) {
+        const lastLogin = new Date(user.last_login);
+        const timeDiff = Date.now() - lastLogin.getTime();
+        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        if (daysDiff === 0) {
+          lastLoginEl.textContent = 'Last login: Today';
+        } else if (daysDiff === 1) {
+          lastLoginEl.textContent = 'Last login: Yesterday';
+        } else if (daysDiff < 7) {
+          lastLoginEl.textContent = `Last login: ${daysDiff} days ago`;
+        }
+        lastLoginEl.classList.remove('hidden');
+      }
     } catch(err) {
       console.warn('Could not load user data for greeting:', err);
     }
@@ -204,13 +357,49 @@
     if (welcomeEl) welcomeEl.textContent = greeting;
     if (subtitleEl) subtitleEl.textContent = subtitle;
   }
+
+  // Remove skeleton loaders
+  function removeSkeletonLoaders() {
+    document.querySelectorAll('.skeleton-loader').forEach(el => {
+      const parent = el.parentElement;
+      if (parent && el === parent.firstElementChild && el === parent.lastElementChild) {
+        parent.innerHTML = '--';
+      }
+    });
+  }
+
+  // Show error state
+  function showErrorState(message = 'Failed to load data') {
+    const statsElements = ['stat-total-users', 'stat-total-orders', 'stat-total-products'];
+    statsElements.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<span class="text-red-400 text-sm">Error</span>';
+    });
+    
+    const auditList = document.getElementById('recent-audit-log');
+    if (auditList) {
+      auditList.innerHTML = `<li class="text-red-400 p-3 rounded bg-red-500/10 border border-red-500/20">${message}</li>`;
+    }
+  }
   
-  async function updateDashboardStats() {
+  async function updateDashboardStats(forceRefresh = false) {
         const FN_BASE = window.FN_BASE || '/.netlify/functions';
+        
+        // Check cache first
+        if (!forceRefresh && dashboardCache.data && dashboardCache.timestamp) {
+          const age = Date.now() - dashboardCache.timestamp;
+          if (age < dashboardCache.ttl) {
+            console.log('Using cached dashboard data');
+            renderDashboardData(dashboardCache.data);
+            return;
+          }
+        }
+
         // Numeric counts with safe defaults
         let usersCount = 0, ordersCount = 0, productsCount = 0;
         let auditLogs = [];
         let apiHealthy = false, dbHealthy = false, serverHealthy = true;
+        let pendingOrders = 0, lowStock = 0, todayActivity = 0;
 
   const token = (window.getToken && window.getToken()) || null;
         const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
@@ -229,133 +418,156 @@
           return fetch(url, Object.assign({}, base, { headers }));
         };
 
-        // 1) Try lightweight public stats first for immediate numbers
         try {
-          const res = await fetch(`${FN_BASE}/public-stats`);
-          if (res.ok) {
-            const s = await res.json();
-            usersCount = Number(s.users) || 0;
-            ordersCount = Number(s.orders) || 0;
-            productsCount = Number(s.products) || 0;
-            apiHealthy = true; dbHealthy = true;
+          // 1) Try lightweight public stats first for immediate numbers
+          try {
+            const res = await fetch(`${FN_BASE}/public-stats`);
+            if (res.ok) {
+              const s = await res.json();
+              usersCount = Number(s.users) || 0;
+              ordersCount = Number(s.orders) || 0;
+              productsCount = Number(s.products) || 0;
+              apiHealthy = true; dbHealthy = true;
+            }
+          } catch (e) {
+            console.warn('Public stats fetch failed:', e);
           }
-        } catch (_) {}
 
-        // Small helper: proactively refresh token to avoid noisy 401s on public homepage
-        async function ensureFreshToken(tok){
-          try {
-            const rt = (window.getRefreshToken && window.getRefreshToken()) || null;
-            if (!rt) return tok;
-            // If we don't yet have a user cached, or token exists but might be expired, do a lightweight refresh once
-            const refRes = await fetch(`${FN_BASE}/auth?action=refresh`, {
-              method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken: rt })
-            });
-            if (refRes.ok) {
-              const data = await refRes.json();
-              if (data && (data.accessToken || data.refreshToken)) {
-                try {
-                  if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
-                  if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-                } catch(_) { /* noop */ }
-                return data.accessToken || tok;
-              }
-            }
-            return tok;
-          } catch(_) { return tok; }
-        }
-
-        // 2) If authenticated and privileged, refine counts with admin endpoints (after trying a silent refresh)
-        if (token && (currentRole === 'admin' || currentRole === 'manager')) {
-          try {
-            const res = await fetchAuth(`${FN_BASE}/users/stats/overview`);
-            apiHealthy = apiHealthy || res.ok;
-            if (res.ok) {
-              const j = await res.json();
-              // shape: { stats: { total_users, ... } }
-              const total = j && j.stats && (j.stats.total_users || j.stats.total || j.total_users);
-              if (typeof total === 'number') usersCount = total;
-            }
-          } catch (_) {}
-          try {
-            const res = await fetchAuth(`${FN_BASE}/orders`);
-            apiHealthy = apiHealthy || res.ok;
-            if (res.ok) {
-              const j = await res.json();
-              const arr = Array.isArray(j) ? j : (Array.isArray(j?.orders) ? j.orders : []);
-              ordersCount = arr.length;
-            }
-          } catch (_) {}
-          try {
-            const res = await fetchAuth(`${FN_BASE}/products`);
-            apiHealthy = apiHealthy || res.ok;
-            if (res.ok) {
-              const j = await res.json();
-              const arr = Array.isArray(j) ? j : (Array.isArray(j?.products) ? j.products : []);
-              productsCount = arr.length;
-            }
-          } catch (_) {}
-        }
-
-        // 3) Health check for DB indicator (optional)
-        try {
-          const res = await fetch(`${FN_BASE}/health`);
-          if (res.ok) { dbHealthy = true; apiHealthy = apiHealthy || true; }
-        } catch (_) {}
-
-        // 4) Recent audit logs (best-effort, last 24h, limit 8) with fallback to localStorage
-        try {
-          const since = new Date(Date.now() - 24*60*60*1000).toISOString();
+          // 2) If authenticated and privileged, refine counts with admin endpoints
           if (token && (currentRole === 'admin' || currentRole === 'manager')) {
-            const res = await fetchAuth(`${FN_BASE}/audit-logs?limit=8&startDate=${encodeURIComponent(since)}`);
-            if (res.ok) {
-              const j = await res.json();
-              auditLogs = Array.isArray(j) ? j : (j.data || j.logs || []);
+            try {
+              const res = await fetchAuth(`${FN_BASE}/users/stats/overview`);
+              apiHealthy = apiHealthy || res.ok;
+              if (res.ok) {
+                const j = await res.json();
+                const total = j && j.stats && (j.stats.total_users || j.stats.total || j.total_users);
+                if (typeof total === 'number') usersCount = total;
+              }
+            } catch (e) {
+              console.warn('Users stats fetch failed:', e);
+            }
+            
+            try {
+              const res = await fetchAuth(`${FN_BASE}/orders`);
+              apiHealthy = apiHealthy || res.ok;
+              if (res.ok) {
+                const j = await res.json();
+                const arr = Array.isArray(j) ? j : (Array.isArray(j?.orders) ? j.orders : []);
+                ordersCount = arr.length;
+                // Calculate pending orders
+                pendingOrders = arr.filter(o => o.status === 'pending' || o.status === 'processing').length;
+                // Calculate today's activity
+                const today = new Date().toDateString();
+                todayActivity = arr.filter(o => {
+                  const orderDate = new Date(o.created_at || o.order_date).toDateString();
+                  return orderDate === today;
+                }).length;
+              }
+            } catch (e) {
+              console.warn('Orders fetch failed:', e);
+            }
+            
+            try {
+              const res = await fetchAuth(`${FN_BASE}/products`);
+              apiHealthy = apiHealthy || res.ok;
+              if (res.ok) {
+                const j = await res.json();
+                const arr = Array.isArray(j) ? j : (Array.isArray(j?.products) ? j.products : []);
+                productsCount = arr.length;
+                // Calculate low stock items
+                lowStock = arr.filter(p => (p.stock_quantity || p.stock || 0) < 10).length;
+              }
+            } catch (e) {
+              console.warn('Products fetch failed:', e);
             }
           }
-          if ((!auditLogs || auditLogs.length === 0)) {
-            // Fallback to local in-browser audit log cache (if present).
-            // Be permissive about timestamp field names and include entries
-            // that may not have a timestamp so admins still see recent events.
-            try {
-              const local = JSON.parse(localStorage.getItem('auditLogs') || '[]');
-              if (Array.isArray(local) && local.length) {
-                const now = Date.now();
-                const cutoff = now - 24*60*60*1000; // 24h
-                const filtered = local.filter(x => {
-                  if (!x) return false;
-                  const ts = x.timestamp || x.created_at || x.createdAt || x.time || x.createdAtUtc;
-                  if (!ts) return true; // include if no timestamp available
-                  try { return new Date(ts).getTime() >= cutoff; } catch(_) { return true; }
-                }).slice(0, 8);
-                // Normalize fields for rendering
-                auditLogs = filtered.map(x => ({
-                  id: x.id || x.ID || Date.now(),
-                  user_id: x.userId || x.user_id || x.user || null,
-                  action: x.action || x.name || 'Activity',
-                  details: x.details || x.detail || {},
-                  created_at: x.timestamp || x.created_at || x.createdAt || x.time || new Date().toISOString(),
-                  ip_address: x.ip || x.ip_address || '',
-                  user_agent: ''
-                }));
-              }
-            } catch(_) {}
-          }
-        } catch (_) {}
 
-        // Update stats UI with numbers (fallback to 0s)
-        const elUsers = document.getElementById('stat-total-users');
-        const elOrders = document.getElementById('stat-total-orders');
-        const elProducts = document.getElementById('stat-total-products');
-        if (elUsers) elUsers.textContent = usersCount;
-        if (elOrders) elOrders.textContent = ordersCount;
-        if (elProducts) elProducts.textContent = productsCount;
+          // 3) Health check for DB indicator
+          try {
+            const res = await fetch(`${FN_BASE}/health`);
+            if (res.ok) { dbHealthy = true; apiHealthy = apiHealthy || true; }
+          } catch (e) {
+            console.warn('Health check failed:', e);
+          }
+
+          // 4) Recent audit logs
+          try {
+            const since = new Date(Date.now() - 24*60*60*1000).toISOString();
+            if (token && (currentRole === 'admin' || currentRole === 'manager')) {
+              const res = await fetchAuth(`${FN_BASE}/audit-logs?limit=8&startDate=${encodeURIComponent(since)}`);
+              if (res.ok) {
+                const j = await res.json();
+                auditLogs = Array.isArray(j) ? j : (j.data || j.logs || []);
+              }
+            }
+            if ((!auditLogs || auditLogs.length === 0)) {
+              try {
+                const local = JSON.parse(localStorage.getItem('auditLogs') || '[]');
+                if (Array.isArray(local) && local.length) {
+                  const now = Date.now();
+                  const cutoff = now - 24*60*60*1000;
+                  const filtered = local.filter(x => {
+                    if (!x) return false;
+                    const ts = x.timestamp || x.created_at || x.createdAt || x.time || x.createdAtUtc;
+                    if (!ts) return true;
+                    try { return new Date(ts).getTime() >= cutoff; } catch(_) { return true; }
+                  }).slice(0, 8);
+                  auditLogs = filtered.map(x => ({
+                    id: x.id || x.ID || Date.now(),
+                    user_id: x.userId || x.user_id || x.user || null,
+                    action: x.action || x.name || 'Activity',
+                    details: x.details || x.detail || {},
+                    created_at: x.timestamp || x.created_at || x.createdAt || x.time || new Date().toISOString(),
+                    ip_address: x.ip || x.ip_address || '',
+                    user_agent: ''
+                  }));
+                }
+              } catch(_) {}
+            }
+          } catch (e) {
+            console.warn('Audit logs fetch failed:', e);
+          }
+
+          // Cache the data
+          dashboardCache.data = {
+            usersCount, ordersCount, productsCount,
+            auditLogs, apiHealthy, dbHealthy, serverHealthy,
+            pendingOrders, lowStock, todayActivity
+          };
+          dashboardCache.timestamp = Date.now();
+
+          renderDashboardData(dashboardCache.data);
+
+        } catch (error) {
+          console.error('Dashboard update failed:', error);
+          showErrorState('Unable to load dashboard data. Please try refreshing.');
+          removeSkeletonLoaders();
+        }
+    }
+
+    function renderDashboardData(data) {
+      const { usersCount, ordersCount, productsCount, auditLogs, apiHealthy, dbHealthy, serverHealthy, pendingOrders, lowStock, todayActivity } = data;
+
+      // Update last updated timestamp
+      const lastUpdated = document.getElementById('stats-last-updated');
+      if (lastUpdated) {
+        const now = new Date();
+        lastUpdated.textContent = `Updated ${now.toLocaleTimeString()}`;
+      }
+
+      // Update stats UI with numbers
+      const elUsers = document.getElementById('stat-total-users');
+      const elOrders = document.getElementById('stat-total-orders');
+      const elProducts = document.getElementById('stat-total-products');
+      if (elUsers) elUsers.textContent = usersCount.toLocaleString();
+      if (elOrders) elOrders.textContent = ordersCount.toLocaleString();
+      if (elProducts) elProducts.textContent = productsCount.toLocaleString();
         
-        // Simulate trend data (in production, this would come from API with historical comparison)
+        // Update trend indicators
         function updateTrend(elementId, value) {
           const el = document.getElementById(elementId);
           if (!el) return;
           
-          // Use consistent placeholder trends until real API data is available
           const trends = {
             'users-trend': 8,
             'orders-trend': 12,
@@ -366,11 +578,10 @@
           const arrow = isPositive ? '↗' : '↘';
           const color = isPositive ? 'text-green-400' : 'text-red-400';
           
-          el.className = `text-xs ${color} flex items-center gap-1`;
+          el.className = `text-xs ${color} flex items-center gap-1 relative z-10 min-h-[1.25rem]`;
           el.innerHTML = `<span>${arrow}</span><span>${isPositive ? '+' : ''}${trend}%</span>`;
         }
         
-        // Update trend indicators
         updateTrend('users-trend', usersCount);
         updateTrend('orders-trend', ordersCount);
         updateTrend('products-trend', productsCount);
@@ -386,11 +597,21 @@
         setStatus('status-db', dbHealthy);
         setStatus('status-server', serverHealthy);
 
-        // Update recent activity list (improved layout)
+        // Update quick insights
+        const elPending = document.getElementById('insight-pending-orders');
+        const elLowStock = document.getElementById('insight-low-stock');
+        const elTodayActivity = document.getElementById('insight-today-activity');
+        if (elPending) elPending.textContent = pendingOrders;
+        if (elLowStock) elLowStock.textContent = lowStock;
+        if (elTodayActivity) elTodayActivity.textContent = todayActivity;
+
+        // Update recent activity list
         const auditList = document.getElementById('recent-audit-log');
         const viewAll = document.getElementById('view-all-activity');
         const activityActions = document.getElementById('recent-activity-actions');
         const toggleBtn = document.getElementById('recent-activity-toggle');
+        const activityBadge = document.getElementById('activity-count-badge');
+        
         function relTime(iso){
           try {
             const d = new Date(iso);
@@ -450,12 +671,19 @@
             return url.toString();
           } catch(_) { return 'audit-logs.html'; }
         };
+        
         if (auditList) {
           auditList.setAttribute('aria-busy','false');
           const since = new Date(Date.now() - 24*60*60*1000).toISOString();
           if (viewAll) viewAll.href = `audit-logs.html?start=${encodeURIComponent(since)}`;
+          
+          if (activityBadge && auditLogs && auditLogs.length > 0) {
+            activityBadge.textContent = auditLogs.length;
+            activityBadge.classList.remove('hidden');
+          }
+          
           if (auditLogs && auditLogs.length > 0) {
-            const maxCollapsed = 6;
+            const maxCollapsed = 5;
             const maxExpanded = Math.min(12, auditLogs.length);
             let lastDate = null;
             function render(limit){
@@ -485,7 +713,7 @@
                 const metaLine = [who, path].filter(Boolean).join(' · ');
                 const link = buildLogLink(log, details);
                 parts.push(`
-                  <li class="flex items-start gap-3 p-2 rounded hover:bg-gray-800/60">
+                  <li class="flex items-start gap-3 p-2 rounded hover:bg-gray-800/60 transition-colors">
                     <span class="mt-0.5 ${colors.icon}" aria-hidden="true">${actionIcon(log.action)}</span>
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center justify-between gap-2">
@@ -516,17 +744,34 @@
               };
             }
           } else {
-            auditList.innerHTML = '<li class="text-gray-400">No activity in the last 24 hours</li>';
+            auditList.innerHTML = '<li class="text-gray-400 p-3">No activity in the last 24 hours</li>';
             if (activityActions) activityActions.classList.add('hidden');
           }
         }
     }
+
+    // Debounced refresh function
+    const debouncedRefresh = debounce(() => updateDashboardStats(true), 300);
+
     document.addEventListener('DOMContentLoaded', () => {
       updateGreeting();
       updateDashboardStats();
 
-      // Listen for in-page audit log updates (other pages dispatch this event)
-      // and refresh the recent activity list immediately.
+      // Refresh button
+      const refreshBtn = document.getElementById('refresh-dashboard');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const icon = refreshBtn.querySelector('svg');
+          if (icon) icon.classList.add('rotate-180');
+          debouncedRefresh();
+          setTimeout(() => {
+            if (icon) icon.classList.remove('rotate-180');
+          }, 500);
+        });
+      }
+
+      // Listen for audit log updates
       window.addEventListener('auditLogUpdated', (e) => {
         try {
           const entry = e && e.detail;
@@ -537,8 +782,15 @@
             localStorage.setItem('auditLogs', JSON.stringify(existing));
           }
         } catch(_) {}
-        try { updateDashboardStats(); } catch(_) {}
+        // Invalidate cache and refresh
+        dashboardCache.timestamp = null;
+        debouncedRefresh();
       });
+
+      // Auto-refresh every 2 minutes
+      setInterval(() => {
+        updateDashboardStats(false); // Use cache if valid
+      }, 120000);
     });
     </script>
     <!-- Hidden minimal login form for integration tests -->

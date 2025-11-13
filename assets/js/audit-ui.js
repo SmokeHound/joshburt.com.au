@@ -2,7 +2,7 @@
  * Modular Audit Log UI
  * Responsibilities:
  *  - Lazy initialization (runs only if #audit-log-root present)
- *  - Fetch audit logs with server pagination (page,pageSize,q,userId,startDate,endDate)
+ *  - Fetch audit logs with server pagination (page,pageSize,q,startDate,endDate)
  *  - Client-side debounce for search input
  *  - Render table + pagination controls + summary counts
  *  - Export (JSON/CSV) + Clear (all or olderThanDays)
@@ -18,7 +18,6 @@
     page: 1,
     pageSize: 25,
     q: '',
-    userId: '',
     startDate: '',
     endDate: '',
     truncateLen: 120,
@@ -40,7 +39,6 @@
         <div class="flex flex-col md:flex-row gap-2 md:items-end md:justify-between">
           <div class="flex flex-wrap gap-2 items-center">
             <input id="audit-search" placeholder="Search..." class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
-            <input id="audit-user-id" placeholder="User ID" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm w-32" />
             <input type="date" id="audit-start" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
             <input type="date" id="audit-end" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" />
             <select id="audit-page-size" class="p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm">
@@ -165,9 +163,6 @@
     params.set('pageSize', state.pageSize);
     if (state.q) {
       params.set('q', state.q);
-    }
-    if (state.userId) {
-      params.set('userId', state.userId);
     }
     if (state.startDate) {
       params.set('startDate', state.startDate);
@@ -499,9 +494,6 @@
     if (state.q) {
       params.set('q', state.q);
     }
-    if (state.userId) {
-      params.set('userId', state.userId);
-    }
     if (state.startDate) {
       params.set('startDate', state.startDate);
     }
@@ -633,7 +625,6 @@
 
   function wireEvents() {
     const search = document.getElementById('audit-search');
-    const userId = document.getElementById('audit-user-id');
     const truncate = document.getElementById('audit-truncate');
     const start = document.getElementById('audit-start');
     const end = document.getElementById('audit-end');
@@ -651,16 +642,6 @@
         'input',
         debounce(e => {
           state.q = e.target.value.trim();
-          state.page = 1;
-          fetchLogs();
-        }, 300)
-      );
-    }
-    if (userId) {
-      userId.addEventListener(
-        'input',
-        debounce(e => {
-          state.userId = e.target.value.trim();
           state.page = 1;
           fetchLogs();
         }, 300)
