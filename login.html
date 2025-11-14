@@ -32,12 +32,6 @@
 
         <!-- Login Card: neon/dark theme -->
         <section class="card widget-primary p-8 rounded-lg shadow-2xl border border-gray-700" role="region" aria-label="Login form">
-                        <!-- Config debug info (unobtrusive) -->
-                        <div id="config-debug" class="hidden mb-4 text-xs text-gray-400" aria-live="polite">
-                            <span id="cfg-auth"></span>
-                            <span class="mx-1">•</span>
-                            <span id="cfg-oauth"></span>
-                        </div>
             <form id="login-form" role="form" aria-labelledby="login-heading">
 
                 <h2 id="login-heading" class="sr-only">Login credentials</h2>
@@ -132,6 +126,13 @@
         <!-- Footer Info -->
         <div class="text-center mt-6 text-sm text-gray-400">
             <p>&copy; 2025 Josh Burt. All rights reserved.</p>
+        </div>
+        
+        <!-- Config debug info (unobtrusive) -->
+        <div id="config-debug" class="hidden mt-4 text-center text-xs text-gray-400" aria-live="polite">
+            <span id="cfg-auth"></span>
+            <span class="mx-1">•</span>
+            <span id="cfg-oauth"></span>
         </div>
     </main>
 
