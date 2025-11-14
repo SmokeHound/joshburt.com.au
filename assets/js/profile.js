@@ -189,15 +189,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const preview = modal.querySelector('#init-preview');
 
     function updatePreview() {
+      if (!initialsInput || !themeSelect || !styleSelect || !preview) return;
       const i = initialsInput.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
       const t = themeSelect.value;
       const s = styleSelect.value;
       const url = `/.netlify/functions/avatar-initials?i=${encodeURIComponent(i)}&t=${t}&s=${s}`;
       preview.innerHTML = `<img src="${url}" alt="Initials Avatar" class="h-36 w-36 rounded-full" />`;
     }
-    initialsInput.oninput = updatePreview;
-    themeSelect.onchange = updatePreview;
-    styleSelect.onchange = updatePreview;
+    
+    if (initialsInput) initialsInput.oninput = updatePreview;
+    if (themeSelect) themeSelect.onchange = updatePreview;
+    if (styleSelect) styleSelect.onchange = updatePreview;
     updatePreview();
 
     modal.querySelector('#init-save').onclick = async () => {

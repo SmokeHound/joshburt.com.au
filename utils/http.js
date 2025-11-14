@@ -83,42 +83,60 @@ async function verifyAuth0Token(token) {
 }
 
 async function getOrCreateUserFromClaims(claims) {
-  if (!claims) {return null;}
-  const email = claims.email;
-  if (!email) {return null;} // require email mapping for local account
-  let user = await database.get('SELECT id, email, name, role, is_active, email_verified FROM users WHERE email = ?', [email]);
-  if (user && user.is_active) {return user;}
-  // Default to auto-provision when Auth0 is configured, unless explicitly disabled
-  const autoProvisionDefault = process.env.AUTH0_DOMAIN ? 'true' : 'false';
-  const autoProvision = (process.env.AUTH0_AUTO_PROVISION || autoProvisionDefault).toLowerCase() === 'true';
-  if (!user && autoProvision) {
-    const name = (claims.name && String(claims.name).slice(0, 100)) || email.split('@')[0];
-    const verified = claims.email_verified ? 1 : 0;
-    const result = await database.run('INSERT INTO users (email, name, role, email_verified, is_active) VALUES (?, ?, ?, ?, ?)', [email, name, 'user', verified, 1]);
-    user = await database.get('SELECT id, email, name, role, is_active, email_verified FROM users WHERE id = ?', [result.id]);
-    return user;
+  try {
+    if (!claims) {return null;}
+    const email = claims.email;
+    if (!email) {return null;} // require email mapping for local account
+    
+    let user = await database.get('SELECT id, email, name, role, is_active, email_verified FROM users WHERE email = ?', [email]);
+    if (user && user.is_active) {return user;}
+    
+    // Default to auto-provision when Auth0 is configured, unless explicitly disabled
+    const autoProvisionDefault = process.env.AUTH0_DOMAIN ? 'true' : 'false';
+    const autoProvision = (process.env.AUTH0_AUTO_PROVISION || autoProvisionDefault).toLowerCase() === 'true';
+    if (!user && autoProvision) {
+      const name = (claims.name && String(claims.name).slice(0, 100)) || email.split('@')[0];
+      const verified = claims.email_verified ? 1 : 0;
+      const result = await database.run('INSERT INTO users (email, name, role, email_verified, is_active) VALUES (?, ?, ?, ?, ?)', [email, name, 'user', verified, 1]);
+      user = await database.get('SELECT id, email, name, role, is_active, email_verified FROM users WHERE id = ?', [result.id]);
+      return user;
+    }
+    return null;
+  } catch (err) {
+    console.error('Error in getOrCreateUserFromClaims:', err);
+    return null;
   }
-  return null;
 }
 
 async function authenticate(event) {
-  const token = getBearerToken(event);
-  if (!token) {return null;}
-  // Try local JWT first
-  const decodedLocal = verifyLocalToken(token);
-  if (decodedLocal && decodedLocal.userId) {
-    try {
-      const user = await database.get('SELECT id, email, name, role, is_active, email_verified, created_at, last_login, avatar_url, totp_enabled FROM users WHERE id = ?', [decodedLocal.userId]);
-      if (!user || !user.is_active) {return null;}
-      return user;
-    } catch { return null; }
+  try {
+    const token = getBearerToken(event);
+    if (!token) {return null;}
+    
+    // Try local JWT first
+    const decodedLocal = verifyLocalToken(token);
+    if (decodedLocal && decodedLocal.userId) {
+      try {
+        const user = await database.get('SELECT id, email, name, role, is_active, email_verified, created_at, last_login, avatar_url, totp_enabled FROM users WHERE id = ?', [decodedLocal.userId]);
+        if (!user || !user.is_active) {return null;}
+        return user;
+      } catch (err) {
+        console.error('Database error in authenticate:', err);
+        return null;
+      }
+    }
+    
+    // Try Auth0 token
+    const verifiedAuth0 = await verifyAuth0Token(token);
+    if (verifiedAuth0) {
+      return getOrCreateUserFromClaims(verifiedAuth0);
+    }
+    
+    return null;
+  } catch (err) {
+    console.error('Error in authenticate function:', err);
+    return null;
   }
-  // Try Auth0 token
-  const verifiedAuth0 = await verifyAuth0Token(token);
-  if (verifiedAuth0) {
-    return getOrCreateUserFromClaims(verifiedAuth0);
-  }
-  return null;
 }
 
 async function requireAuth(event, roles = null) {
