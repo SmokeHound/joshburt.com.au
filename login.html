@@ -32,16 +32,6 @@
 
         <!-- Login Card: neon/dark theme -->
         <section class="card widget-primary p-8 rounded-lg shadow-2xl border border-gray-700" role="region" aria-label="Login form">
-                        <!-- Runtime config banner (only shows if Auth0 not configured) -->
-                        <div id="auth0-banner" class="hidden mb-4 p-3 rounded bg-yellow-100 text-yellow-900 text-sm">
-                            OAuth is not configured. Set AUTH0_DOMAIN and AUTH0_CLIENT_ID in Netlify to enable Google/GitHub sign in.
-                        </div>
-                        <!-- Config debug info (unobtrusive) -->
-                        <div id="config-debug" class="hidden mb-4 text-xs text-gray-400" aria-live="polite">
-                            <span id="cfg-auth"></span>
-                            <span class="mx-1">•</span>
-                            <span id="cfg-oauth"></span>
-                        </div>
             <form id="login-form" role="form" aria-labelledby="login-heading">
 
                 <h2 id="login-heading" class="sr-only">Login credentials</h2>
@@ -136,6 +126,13 @@
         <!-- Footer Info -->
         <div class="text-center mt-6 text-sm text-gray-400">
             <p>&copy; 2025 Josh Burt. All rights reserved.</p>
+        </div>
+        
+        <!-- Config debug info (unobtrusive) -->
+        <div id="config-debug" class="hidden mt-4 text-center text-xs text-gray-400" aria-live="polite">
+            <span id="cfg-auth"></span>
+            <span class="mx-1">•</span>
+            <span id="cfg-oauth"></span>
         </div>
     </main>
 
@@ -323,7 +320,12 @@
                         }
                     } catch(_){}
                     const ready = !!(window.AUTH0_DOMAIN && window.AUTH0_CLIENT_ID);
-                            try { const b = document.getElementById('auth0-banner'); if (b) b.classList.toggle('hidden', ready); } catch(_){}
+                            // Log OAuth configuration status to console
+                            if (!ready) {
+                                console.warn('OAuth is not configured. Set AUTH0_DOMAIN and AUTH0_CLIENT_ID in Netlify to enable Google/GitHub sign in.');
+                            } else {
+                                console.info('OAuth is configured and ready.');
+                            }
                             // Populate config debug banner (only show when OAuth not ready)
                             try {
                                 const cfgWrap = document.getElementById('config-debug');
