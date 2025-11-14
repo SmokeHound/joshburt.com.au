@@ -196,7 +196,7 @@
       let storedUser = null;
       try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch (e) { /* noop */ }
       if (userProfile) {userProfile.classList.remove('hidden');}
-      		const isLoggedIn = !!(window.AUTH_DISABLED === true || window.getToken() || (storedUser && storedUser.email));
+      const isLoggedIn = !!(window.AUTH_DISABLED === true || window.getToken() || (storedUser && storedUser.email));
       if (isLoggedIn) {
         if (userInfo) {userInfo.classList.remove('hidden');}
         if (loginBtn) {loginBtn.classList.add('hidden');}

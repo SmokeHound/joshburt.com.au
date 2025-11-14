@@ -655,6 +655,25 @@
           try { return JSON.parse(val); } catch(_) { return val; }
         }
         function isSameDay(a,b){ try{ const da=new Date(a), db=new Date(b); return da.getFullYear()===db.getFullYear() && da.getMonth()===db.getMonth() && da.getDate()===db.getDate(); } catch(_) { return false; } }
+        
+        // Prettify action names: convert snake_case/camelCase to readable text
+        const prettifyAction = (action) => {
+          if (!action) return 'Activity';
+          // Convert snake_case and camelCase to spaces
+          let pretty = String(action)
+            .replace(/([a-z])([A-Z])/g, '$1 $2')  // camelCase to space
+            .replace(/_/g, ' ')                     // snake_case to space
+            .replace(/-/g, ' ')                     // kebab-case to space
+            .toLowerCase();
+          
+          // Capitalize first letter of each word
+          pretty = pretty.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+          
+          return pretty;
+        };
+        
         const actionIcon = (action) => {
           const a = String(action || '').toLowerCase();
           if (a.includes('login')) return '🔐';
@@ -667,8 +686,14 @@
         };
         const methodBadge = (method) => {
           if (!method) return '';
-          const color = method === 'GET' ? 'bg-gray-700' : method === 'POST' ? 'bg-blue-700' : method === 'PUT' ? 'bg-yellow-700' : method === 'DELETE' ? 'bg-red-700' : 'bg-gray-700';
-          return `<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] ${color}">${method}</span>`;
+          const m = String(method).toUpperCase();
+          let color = 'bg-gray-700';
+          if (m === 'GET') color = 'bg-green-700';
+          else if (m === 'POST') color = 'bg-blue-700';
+          else if (m === 'PUT') color = 'bg-yellow-700';
+          else if (m === 'PATCH') color = 'bg-orange-700';
+          else if (m === 'DELETE') color = 'bg-red-700';
+          return `<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] text-white ${color}">${m}</span>`;
         };
         const severityOf = (action, details) => {
           const a = String(action||'').toLowerCase();
@@ -744,7 +769,7 @@
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center flex-wrap gap-1 min-w-0">
-                          <span class="font-semibold text-white truncate">${log.action || 'Activity'}</span>
+                          <span class="font-semibold text-white truncate">${prettifyAction(log.action)}</span>
                           ${methodBadge(method)}
                         </div>
                         <span class="text-xs text-gray-500 whitespace-nowrap ml-2">${created ? relTime(created) : ''}</span>

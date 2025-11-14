@@ -122,36 +122,21 @@
       return '';
     }
 
-    // Split on dot to get entity and action parts
-    const parts = action.split('.');
-    if (parts.length !== 2) {
-      // If not in expected format, just capitalize first letter
-      return action.charAt(0).toUpperCase() + action.slice(1);
-    }
-
-    const [entity, verb] = parts;
-
-    // Ensure both parts have content
-    if (!entity || !verb || entity.length === 0 || verb.length === 0) {
-      return action.charAt(0).toUpperCase() + action.slice(1);
-    }
-
-    // Format entity name (capitalize first letter)
-    const formattedEntity = entity.charAt(0).toUpperCase() + entity.slice(1);
-
-    // Format verb (replace underscores with spaces and capitalize)
-    const formattedVerb = verb
-      .split('_')
-      .filter(word => word.length > 0) // Filter out empty strings from double underscores
+    // Convert snake_case, camelCase, and kebab-case to readable text
+    let pretty = action
+      .replace(/([a-z])([A-Z])/g, '$1 $2')  // camelCase to space
+      .replace(/_/g, ' ')                     // snake_case to space
+      .replace(/-/g, ' ')                     // kebab-case to space
+      .replace(/\./g, ' ')                    // dot notation to space
+      .toLowerCase();
+    
+    // Capitalize first letter of each word
+    pretty = pretty.split(' ')
+      .filter(word => word.length > 0)
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
-
-    // If verb formatting resulted in empty string, fall back to original
-    if (formattedVerb.length === 0) {
-      return action.charAt(0).toUpperCase() + action.slice(1);
-    }
-
-    return `${formattedEntity} ${formattedVerb}`;
+    
+    return pretty || action;
   }
 
   async function fetchLogs() {
@@ -258,7 +243,13 @@
           const p = parsed.path || '';
           const rid = parsed.requestId || '';
           if (m) {
-            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(m)}</span>`;
+            let methodColor = 'bg-gray-700';
+            if (m === 'GET') methodColor = 'bg-green-700';
+            else if (m === 'POST') methodColor = 'bg-blue-700';
+            else if (m === 'PUT') methodColor = 'bg-yellow-700';
+            else if (m === 'PATCH') methodColor = 'bg-orange-700';
+            else if (m === 'DELETE') methodColor = 'bg-red-700';
+            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded text-white ${methodColor} mr-1">${escapeHtml(m)}</span>`;
           }
           if (p) {
             chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(p.length > 40 ? p.slice(0, 37) + '…' : p)}</span>`;
