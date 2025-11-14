@@ -1,5 +1,5 @@
 on: push
-name: 🚀 Deploy website via FTP on push. 
+name: 🚀 Deploy via FTP. 
 jobs:
   deploy:
     name: 📂 Deploy to FTP
