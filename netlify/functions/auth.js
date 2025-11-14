@@ -414,6 +414,59 @@ exports.handler = withHandler(async (event) => {
       return jsonResponse(200, { csrfToken });
     }
 
+    // CHANGE PASSWORD - Change password for authenticated user
+    if (action === 'change-password') {
+      const user = await authenticate(event);
+      if (!user) return errorResponse(401, 'Authentication required');
+      
+      const { currentPassword, newPassword } = payload;
+      if (!currentPassword || !newPassword) {
+        return errorResponse(400, 'Current password and new password are required');
+      }
+      
+      // Verify current password
+      const userData = await database.get('SELECT password_hash FROM users WHERE id = ?', [user.id]);
+      const valid = await bcrypt.compare(currentPassword, userData.password_hash);
+      
+      if (!valid) {
+        await logAudit(event, { 
+          action: 'auth.password_change_failed', 
+          userId: user.id, 
+          details: { reason: 'invalid_current_password' }
+        });
+        return errorResponse(401, 'Current password is incorrect');
+      }
+      
+      // Validate new password strength
+      const passwordValidation = validatePassword(newPassword);
+      if (!passwordValidation.valid) {
+        return errorResponse(400, 'New password does not meet requirements', { errors: passwordValidation.errors });
+      }
+      
+      // Check that new password is different from current
+      const samePassword = await bcrypt.compare(newPassword, userData.password_hash);
+      if (samePassword) {
+        return errorResponse(400, 'New password must be different from current password');
+      }
+      
+      // Hash and update password
+      const rounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
+      const hash = await bcrypt.hash(newPassword, rounds);
+      await database.run('UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [hash, user.id]);
+      
+      // Invalidate all existing refresh tokens for security
+      await database.run('DELETE FROM refresh_tokens WHERE user_id = ?', [user.id]);
+      
+      // Log successful password change
+      await logAudit(event, { 
+        action: 'auth.password_changed', 
+        userId: user.id, 
+        details: { allSessionsInvalidated: true }
+      });
+      
+      return jsonResponse(200, { message: 'Password changed successfully. Please log in again with your new password.' });
+    }
+
     return errorResponse(400, 'Unknown auth action');
   } catch (error) {
     console.error('Auth function error', error);

@@ -4,7 +4,8 @@
   (function computeFnBase() {
     const defaultBase = '/.netlify/functions';
     try {
-      const host = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
+      const host =
+        (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
       if (host.endsWith('netlify.app') || host === 'localhost') {
         window.FN_BASE = defaultBase;
       } else {
@@ -17,47 +18,64 @@
   const FN_BASE = window.FN_BASE; // Set the function base URL
   // Inject shared-config and shared-theme fragments
   function injectFragment(url, filterTagNames) {
-    return fetch(url).then(r => r.text()).then(html => {
-      const t=document.createElement('div');
-      t.innerHTML=html;
-      Array.from(t.children).forEach(c => {
-        if (!filterTagNames || filterTagNames.includes(c.tagName)) {
-          document.head.appendChild(c.cloneNode(true));
-        }
-      });
-    }).catch(() => {});
+    return fetch(url)
+      .then(r => r.text())
+      .then(html => {
+        const t = document.createElement('div');
+        t.innerHTML = html;
+        Array.from(t.children).forEach(c => {
+          if (!filterTagNames || filterTagNames.includes(c.tagName)) {
+            document.head.appendChild(c.cloneNode(true));
+          }
+        });
+      })
+      .catch(() => {});
   }
   function applyColors() {
     // Defer to ThemeManager if available (loaded from shared-theme.html)
-    if (typeof window !== 'undefined' && window.Theme && typeof window.Theme.applyFromStorage === 'function') {
+    if (
+      typeof window !== 'undefined' &&
+      window.Theme &&
+      typeof window.Theme.applyFromStorage === 'function'
+    ) {
       try {
         window.Theme.applyFromStorage();
-      } catch (e) { /* no-op: ThemeManager failed */ }
+      } catch (e) {
+        /* no-op: ThemeManager failed */
+      }
     } else {
       // Fallback: apply colors directly (if ThemeManager not loaded yet)
       try {
-        const s=JSON.parse(localStorage.getItem('siteSettings')||'{}');
-        document.documentElement.style.setProperty('--tw-color-primary', s.primaryColor || '#3b82f6');
-        document.documentElement.style.setProperty('--tw-color-secondary', s.secondaryColor || '#10b981');
+        const s = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+        document.documentElement.style.setProperty(
+          '--tw-color-primary',
+          s.primaryColor || '#3b82f6'
+        );
+        document.documentElement.style.setProperty(
+          '--tw-color-secondary',
+          s.secondaryColor || '#10b981'
+        );
         document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
-        const theme=s.theme || localStorage.getItem('theme') || 'dark';
+        const theme = s.theme || localStorage.getItem('theme') || 'dark';
         document.documentElement.classList.toggle('dark', theme === 'dark');
         document.documentElement.classList.toggle('light', theme === 'light');
-      } catch (e) { /* no-op: invalid or missing settings */ }
+      } catch (e) {
+        /* no-op: invalid or missing settings */
+      }
     }
   }
   function registerSW() {
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load',() => {
+      window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
   }
   // Start
-  injectFragment('shared-config.html', ['LINK','STYLE','SCRIPT']).then(applyColors);
+  injectFragment('shared-config.html', ['LINK', 'STYLE', 'SCRIPT']).then(applyColors);
   injectFragment('shared-theme.html', ['SCRIPT']);
   // Load shared notifications (styles + logic) to centralize all notification UI/styling
-  injectFragment('shared-notifications.html', ['STYLE','SCRIPT']);
+  injectFragment('shared-notifications.html', ['STYLE', 'SCRIPT']);
   applyColors();
   registerSW();
 
@@ -90,17 +108,21 @@
           window.AUTH_DISABLED = cfg.auth.disabled === true;
         }
       }
-    } catch (_) { /* ignore config fetch failure */ }
+    } catch (_) {
+      /* ignore config fetch failure */
+    }
     if (window.AUTH_DISABLED === true) {
       // Ensure a demo user exists for UI that expects a user
       try {
-        const existing = JSON.parse(localStorage.getItem('user')||'null');
+        const existing = JSON.parse(localStorage.getItem('user') || 'null');
         if (!existing) {
           const demo = { id: 0, email: 'demo@local', name: 'Demo Admin', role: 'admin' };
           localStorage.setItem('user', JSON.stringify(demo));
           localStorage.setItem('currentUser', JSON.stringify(demo));
         }
-      } catch (_) { /* ignore localStorage parse/set errors */ }
+      } catch (_) {
+        /* ignore localStorage parse/set errors */
+      }
     }
   })();
 
@@ -109,13 +131,15 @@
   window.authFetch = async function authFetch(input, init) {
     try {
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
-      const toUrl = (typeof input === 'string') ? input : (input && input.url) || '';
+      const toUrl = typeof input === 'string' ? input : (input && input.url) || '';
       let token = window.getToken();
 
-      const makeInit = (tok) => {
+      const makeInit = tok => {
         const base = init || {};
         const headers = Object.assign({}, base.headers || {});
-        if (tok && !headers.Authorization) {headers.Authorization = 'Bearer ' + tok;}
+        if (tok && !headers.Authorization) {
+          headers.Authorization = 'Bearer ' + tok;
+        }
         return Object.assign({}, base, { headers });
       };
 
@@ -124,8 +148,12 @@
       }
 
       let res = await doFetch(token);
-      if (res.status !== 401 && res.status !== 403) {return res;}
-      if (window.AUTH_DISABLED === true) {return res;}
+      if (res.status !== 401 && res.status !== 403) {
+        return res;
+      }
+      if (window.AUTH_DISABLED === true) {
+        return res;
+      }
 
       // If forbidden (insufficient role), don't redirect here; let caller decide
       if (res.status === 403) {
@@ -135,7 +163,7 @@
       // Fresh login loop guard: if login just happened, do not redirect yet
       try {
         const fl = localStorage.getItem('freshLogin');
-        if (fl && (Date.now() - parseInt(fl,10) < 10000)) {
+        if (fl && Date.now() - parseInt(fl, 10) < 10000) {
           return res;
         }
       } catch (_) {
@@ -147,33 +175,49 @@
         const rt = (window.getRefreshToken && window.getRefreshToken()) || null;
         if (rt) {
           const refRes = await fetch(FN_BASE + '/auth?action=refresh', {
-            method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken: rt })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken: rt })
           });
           if (refRes.ok) {
             const data = await refRes.json();
             if (data && (data.accessToken || data.refreshToken)) {
               try {
-                if (data.accessToken) {localStorage.setItem('accessToken', data.accessToken);}
-                if (data.refreshToken) {localStorage.setItem('refreshToken', data.refreshToken);}
-              } catch (_) { void 0; }
+                if (data.accessToken) {
+                  localStorage.setItem('accessToken', data.accessToken);
+                }
+                if (data.refreshToken) {
+                  localStorage.setItem('refreshToken', data.refreshToken);
+                }
+              } catch (_) {
+                void 0;
+              }
               token = data.accessToken || token;
               res = await doFetch(token);
-              if (res.status !== 401) {return res;}
+              if (res.status !== 401) {
+                return res;
+              }
             }
           }
         }
-      } catch (_) { /* ignore refresh errors */ }
+      } catch (_) {
+        /* ignore refresh errors */
+      }
 
       // Throttle redirects to avoid loops
       try {
-        const last = parseInt(localStorage.getItem('lastAuthRedirect')||'0',10);
-        if (Date.now() - last < 15000) {return res;}
+        const last = parseInt(localStorage.getItem('lastAuthRedirect') || '0', 10);
+        if (Date.now() - last < 15000) {
+          return res;
+        }
         localStorage.setItem('lastAuthRedirect', String(Date.now()));
       } catch (_) {
         void 0;
       }
       try {
-        const ru = encodeURIComponent((window.location && (window.location.pathname + window.location.search)) || '/');
+        const ru = encodeURIComponent(
+          (window.location && window.location.pathname + window.location.search) || '/'
+        );
         window.location.href = 'login.html?message=login-required&returnUrl=' + ru;
       } catch (_) {
         void 0;
@@ -186,7 +230,7 @@
   };
 
   // Auth-aware nav wiring (profile, login/logout)
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     try {
       const userProfile = document.getElementById('user-profile');
       const userInfo = document.getElementById('user-info');
@@ -194,62 +238,109 @@
       const userAvatar = document.getElementById('user-avatar');
       const loginBtn = document.getElementById('login-btn');
       let storedUser = null;
-      try { storedUser = JSON.parse(localStorage.getItem('user')||'null'); } catch (e) { /* noop */ }
-      if (userProfile) {userProfile.classList.remove('hidden');}
-      const isLoggedIn = !!(window.AUTH_DISABLED === true || window.getToken() || (storedUser && storedUser.email));
+      try {
+        storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+      } catch (e) {
+        /* noop */
+      }
+      if (userProfile) {
+        userProfile.classList.remove('hidden');
+      }
+      const isLoggedIn = !!(
+        window.AUTH_DISABLED === true ||
+        window.getToken() ||
+        (storedUser && storedUser.email)
+      );
       if (isLoggedIn) {
-        if (userInfo) {userInfo.classList.remove('hidden');}
-        if (loginBtn) {loginBtn.classList.add('hidden');}
-        if (userName) {userName.textContent = (storedUser && (storedUser.name || storedUser.email)) || 'User';}
+        if (userInfo) {
+          userInfo.classList.remove('hidden');
+        }
+        if (loginBtn) {
+          loginBtn.classList.add('hidden');
+        }
+        if (userName) {
+          userName.textContent = (storedUser && (storedUser.name || storedUser.email)) || 'User';
+        }
         // Set avatar: try avatarUrl (snake_case from DB), then picture (Auth0), then placeholder
         if (userAvatar && storedUser) {
-          const avatarSrc = storedUser.avatarUrl || storedUser.avatar_url || storedUser.picture || './assets/images/avatar-placeholder.svg';
+          const avatarSrc =
+            storedUser.avatarUrl ||
+            storedUser.avatar_url ||
+            storedUser.picture ||
+            './assets/images/avatar-placeholder.svg';
           userAvatar.src = avatarSrc;
         }
       } else {
-        if (userInfo) {userInfo.classList.add('hidden');}
-        if (loginBtn) {loginBtn.classList.remove('hidden');}
+        if (userInfo) {
+          userInfo.classList.add('hidden');
+        }
+        if (loginBtn) {
+          loginBtn.classList.remove('hidden');
+        }
       }
 
       if (loginBtn) {
-        loginBtn.addEventListener('click', function() { window.location.href = 'login.html'; });
+        loginBtn.addEventListener('click', function () {
+          window.location.href = 'login.html';
+        });
       }
 
       // Wire the main nav logout link (at bottom of menu)
       const navLogout = document.getElementById('nav-logout');
       if (navLogout) {
-        navLogout.addEventListener('click', function(ev) {
+        navLogout.addEventListener('click', function (ev) {
           ev.preventDefault();
           try {
             // Best-effort serverless logout (invalidate refresh token)
             const refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
             if (refreshToken) {
               fetch(FN_BASE + '/auth?action=logout', {
-                method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken })
               }).catch(() => {});
             }
-          } catch (e) { /* noop */ }
+          } catch (e) {
+            /* noop */
+          }
           // Clear local session
           try {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('user');
             localStorage.removeItem('currentUser');
-          } catch (e) { /* noop */ }
+          } catch (e) {
+            /* noop */
+          }
           // Auth0 global logout if available
-          try { if (window.Auth && typeof window.Auth.logout === 'function') { window.Auth.logout(); return; } } catch (e) { /* noop */ }
+          try {
+            if (window.Auth && typeof window.Auth.logout === 'function') {
+              window.Auth.logout();
+              return;
+            }
+          } catch (e) {
+            /* noop */
+          }
           // Fallback: navigate to login
           window.location.href = 'login.html';
         });
       }
-    } catch (e) { /* non-fatal nav wiring */ }
+    } catch (e) {
+      /* non-fatal nav wiring */
+    }
   });
 
   // Session bootstrap: verify current user and refresh if possible
-  (async function() {
+  (async function () {
     // Skip when auth is globally disabled or on login page
-    if (window.AUTH_DISABLED === true) {return;}
-    if (typeof window !== 'undefined' && window.location && /login\.html$/i.test(window.location.pathname)) {
+    if (window.AUTH_DISABLED === true) {
+      return;
+    }
+    if (
+      typeof window !== 'undefined' &&
+      window.location &&
+      /login\.html$/i.test(window.location.pathname)
+    ) {
       return;
     }
 
@@ -267,17 +358,23 @@
     }
 
     try {
-      		const token = window.getToken();
-      if (!token) {return;}
+      const token = window.getToken();
+      if (!token) {
+        return;
+      }
       // Ask backend who we are
       const meRes = await fetch(FN_BASE + '/auth?action=me', {
-        headers: { 'Authorization': 'Bearer ' + token }
+        headers: { Authorization: 'Bearer ' + token }
       });
       if (meRes.ok) {
         const me = await meRes.json();
         if (me && me.user) {
           localStorage.setItem('user', JSON.stringify(me.user));
-          const cu = { name: me.user.name || me.user.email || 'User', role: me.user.role || 'user', email: me.user.email };
+          const cu = {
+            name: me.user.name || me.user.email || 'User',
+            role: me.user.role || 'user',
+            email: me.user.email
+          };
           localStorage.setItem('currentUser', JSON.stringify(cu));
         }
         return;
@@ -285,21 +382,35 @@
       // Try refresh flow if 401
       if (meRes.status === 401) {
         const refreshToken = (window.getRefreshToken && window.getRefreshToken()) || null;
-        if (!refreshToken) {return;}
+        if (!refreshToken) {
+          return;
+        }
         const refRes = await fetch(FN_BASE + '/auth?action=refresh', {
-          method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ refreshToken })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken })
         });
         if (refRes.ok) {
           const refData = await refRes.json();
-          if (refData.accessToken) {localStorage.setItem('accessToken', refData.accessToken);}
-          if (refData.refreshToken) {localStorage.setItem('refreshToken', refData.refreshToken);}
+          if (refData.accessToken) {
+            localStorage.setItem('accessToken', refData.accessToken);
+          }
+          if (refData.refreshToken) {
+            localStorage.setItem('refreshToken', refData.refreshToken);
+          }
           // Recurse once to update user
-          const meRes2 = await fetch(FN_BASE + '/auth?action=me', { headers: { 'Authorization': 'Bearer ' + (refData.accessToken || token) } });
+          const meRes2 = await fetch(FN_BASE + '/auth?action=me', {
+            headers: { Authorization: 'Bearer ' + (refData.accessToken || token) }
+          });
           if (meRes2.ok) {
             const me2 = await meRes2.json();
             if (me2 && me2.user) {
               localStorage.setItem('user', JSON.stringify(me2.user));
-              const cu2 = { name: me2.user.name || me2.user.email || 'User', role: me2.user.role || 'user', email: me2.user.email };
+              const cu2 = {
+                name: me2.user.name || me2.user.email || 'User',
+                role: me2.user.role || 'user',
+                email: me2.user.email
+              };
               localStorage.setItem('currentUser', JSON.stringify(cu2));
             }
             return;
@@ -313,62 +424,119 @@
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
           localStorage.removeItem('currentUser');
-        } catch (_) { /* clear session noop */ }
+        } catch (_) {
+          /* clear session noop */
+        }
         try {
           const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
           let handled = false;
           try {
             // Dispatch a cancellable event so pages can handle auth prompts.
-            const ev = new CustomEvent('auth:required', { detail: { returnUrl: returnUrl, reason: 'refresh_failed' }, cancelable: true });
+            const ev = new CustomEvent('auth:required', {
+              detail: { returnUrl: returnUrl, reason: 'refresh_failed' },
+              cancelable: true
+            });
             // Audit that auth was required for debugging/telemetry (best-effort)
             try {
               if (window.AuditLogger && typeof window.AuditLogger.log === 'function') {
                 // Best-effort current user info from localStorage
                 let currentUserInfo = null;
-                try { currentUserInfo = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('user') || 'null'); } catch (_) { currentUserInfo = null; }
+                try {
+                  currentUserInfo = JSON.parse(
+                    localStorage.getItem('currentUser') || localStorage.getItem('user') || 'null'
+                  );
+                } catch (_) {
+                  currentUserInfo = null;
+                }
                 const auditPayload = { reason: 'refresh_failed', returnUrl: returnUrl };
                 try {
-                  auditPayload.route = (window.location && (window.location.pathname + window.location.search)) || null;
-                } catch (_) { auditPayload.route = null; }
-                try { auditPayload.pageTitle = document.title || null; } catch (_) { auditPayload.pageTitle = null; }
-                try { auditPayload.userAgent = navigator.userAgent || null; } catch (_) { auditPayload.userAgent = null; }
-                try { auditPayload.hasRefreshToken = !!localStorage.getItem('refreshToken'); } catch (_) { auditPayload.hasRefreshToken = null; }
-                try { auditPayload.timestamp = new Date().toISOString(); } catch (_) { auditPayload.timestamp = null; }
-                if (currentUserInfo) {auditPayload.user = { id: currentUserInfo.id || currentUserInfo.email || null, email: currentUserInfo.email || null, name: currentUserInfo.name || null, role: currentUserInfo.role || null };}
+                  auditPayload.route =
+                    (window.location && window.location.pathname + window.location.search) || null;
+                } catch (_) {
+                  auditPayload.route = null;
+                }
+                try {
+                  auditPayload.pageTitle = document.title || null;
+                } catch (_) {
+                  auditPayload.pageTitle = null;
+                }
+                try {
+                  auditPayload.userAgent = navigator.userAgent || null;
+                } catch (_) {
+                  auditPayload.userAgent = null;
+                }
+                try {
+                  auditPayload.hasRefreshToken = !!localStorage.getItem('refreshToken');
+                } catch (_) {
+                  auditPayload.hasRefreshToken = null;
+                }
+                try {
+                  auditPayload.timestamp = new Date().toISOString();
+                } catch (_) {
+                  auditPayload.timestamp = null;
+                }
+                if (currentUserInfo) {
+                  auditPayload.user = {
+                    id: currentUserInfo.id || currentUserInfo.email || null,
+                    email: currentUserInfo.email || null,
+                    name: currentUserInfo.name || null,
+                    role: currentUserInfo.role || null
+                  };
+                }
                 window.AuditLogger.log('auth_required', auditPayload);
               }
-            } catch (err) { console.debug('AuditLogger.log failed', err); }
+            } catch (err) {
+              console.debug('AuditLogger.log failed', err);
+            }
             handled = window.dispatchEvent(ev);
-          } catch (e) { handled = false; }
+          } catch (e) {
+            handled = false;
+          }
           if (!handled) {
             // No handler consumed the event; fall back to previous redirect behavior.
             if (!/login\.html$/i.test(window.location.pathname)) {
               window.location.href = 'login.html?message=login-required&returnUrl=' + returnUrl;
             }
           }
-        } catch (e) { /* navigation noop */ }
+        } catch (e) {
+          /* navigation noop */
+        }
       }
-    } catch (e) { /* silent session bootstrap */ }
+    } catch (e) {
+      /* silent session bootstrap */
+    }
   })();
 
   // Back-compat toast adapter: route legacy showToast calls to unified notifications
   // Usage: showToast(message, type='info') -> showNotification(message, type)
   if (typeof window.showToast !== 'function') {
-    window.showToast = function(message, type) {
+    window.showToast = function (message, type) {
       try {
         if (typeof window.showNotification === 'function') {
           return window.showNotification(String(message || ''), String(type || 'info'));
         }
-      } catch (_) { /* noop */ }
+      } catch (_) {
+        /* noop */
+      }
       // Minimal fallback: ephemeral inline banner if notifications system isn't loaded
       try {
-        const el = document.getElementById('toast') || (function() {
-          const d=document.createElement('div'); d.id='toast'; d.className='fixed bottom-4 right-4 p-3 rounded bg-gray-800 text-white hidden'; document.body.appendChild(d); return d;
-        })();
+        const el =
+          document.getElementById('toast') ||
+          (function () {
+            const d = document.createElement('div');
+            d.id = 'toast';
+            d.className = 'fixed bottom-4 right-4 p-3 rounded bg-gray-800 text-white hidden';
+            document.body.appendChild(d);
+            return d;
+          })();
         el.textContent = String(message || '');
         el.classList.remove('hidden');
-        setTimeout(function() { el.classList.add('hidden'); }, 3000);
-      } catch (_) { /* noop */ }
+        setTimeout(function () {
+          el.classList.add('hidden');
+        }, 3000);
+      } catch (_) {
+        /* noop */
+      }
       return null;
     };
   }

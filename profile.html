@@ -61,11 +61,34 @@
                     <input type="email" id="profile-email" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-gray-500 cursor-not-allowed" disabled />
                 </label>
             </div>
-            <label class="flex flex-col gap-2">
-                <span class="text-sm font-semibold text-gray-300">Change Password</span>
-                <input type="password" id="profile-password" autocomplete="new-password" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Leave blank to keep current password" />
-                <span class="text-xs text-gray-400">Leave this field empty if you don't want to change your password</span>
-            </label>
+            <div class="border-t border-gray-700 pt-4 mt-4">
+                <h4 class="text-lg font-semibold mb-4 text-gray-200">Change Password</h4>
+                <div class="space-y-4">
+                    <label class="flex flex-col gap-2">
+                        <span class="text-sm font-semibold text-gray-300">Current Password</span>
+                        <input type="password" id="profile-current-password" autocomplete="current-password" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter current password to change" />
+                    </label>
+                    <label class="flex flex-col gap-2">
+                        <span class="text-sm font-semibold text-gray-300">New Password</span>
+                        <input type="password" id="profile-new-password" autocomplete="new-password" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter new password" />
+                        <span class="text-xs text-gray-400">Must be at least 8 characters with uppercase, lowercase, number, and special character</span>
+                    </label>
+                    <label class="flex flex-col gap-2">
+                        <span class="text-sm font-semibold text-gray-300">Confirm New Password</span>
+                        <input type="password" id="profile-confirm-password" autocomplete="new-password" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Confirm new password" />
+                    </label>
+                    <div class="text-xs text-gray-400">
+                        <p class="font-semibold mb-1">Password Requirements:</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500">
+                            <li>At least 8 characters long</li>
+                            <li>At least one uppercase letter</li>
+                            <li>At least one lowercase letter</li>
+                            <li>At least one number</li>
+                            <li>At least one special character (!@#$%^&*(),.?":{}|&lt;&gt;)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <div class="flex gap-3">
                 <button type="submit" class="btn-neon-green px-6 py-3 rounded font-semibold flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

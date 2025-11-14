@@ -1,4 +1,3 @@
-
 # joshburt.com.au - Copilot Development Guide
 
 **Production-ready serverless web application** with PostgreSQL database, JWT authentication, and comprehensive admin features.
@@ -6,6 +5,7 @@
 ## 🎯 Quick Reference
 
 ### Technology Stack
+
 - **Frontend**: Static HTML, TailwindCSS v4, Vanilla JavaScript
 - **Backend**: Netlify Functions (Node.js serverless)
 - **Database**: PostgreSQL (Neon or compatible)
@@ -13,6 +13,7 @@
 - **Deployment**: Netlify (primary) + FTP mirror (optional)
 
 ### Project Status
+
 ✅ **Production-ready** - No dead code, debug logic, or unused variables  
 ✅ **Fully serverless** - All APIs migrated from legacy `/api` to Netlify Functions  
 ✅ **Database-driven** - All settings, users, products, orders in PostgreSQL
@@ -190,6 +191,7 @@ joshburt.com.au/
 All serverless functions are available at `/.netlify/functions/<name>`.
 
 ### Authentication (`/auth`)
+
 Multi-action endpoint using `?action=<action>` or `{ action: "..." }` in body:
 
 - **login** - Email/password or Auth0 OAuth login
@@ -206,31 +208,31 @@ Multi-action endpoint using `?action=<action>` or `{ action: "..." }` in body:
 
 ### Resource Endpoints
 
-| Endpoint | Methods | Description |
-|----------|---------|-------------|
-| `/users` | GET, POST, PUT, DELETE | User management |
-| `/users/:id/avatar` | PUT | Upload/update avatar |
-| `/products` | GET, POST, PUT, DELETE | Oil products catalog |
-| `/orders` | GET, POST, PUT, DELETE | Order management |
-| `/consumables` | GET, POST, PUT, DELETE | Consumables catalog |
-| `/filters` | GET, POST, PUT, DELETE | Filters/parts catalog |
-| `/audit-logs` | GET, POST, DELETE | Audit log management |
-| `/inventory` | GET, PUT | Stock level management |
-| `/settings` | GET, PUT | Site-wide settings |
-| `/notifications` | GET, POST, PUT, DELETE | User notifications |
-| `/notification-preferences` | GET, PUT | Notification settings |
-| `/avatar-initials` | GET | Generate initials avatar |
-| `/health` | GET | Database health check |
-| `/public-config` | GET | Public config (no auth) |
-| `/public-stats` | GET | Public stats (no auth) |
+| Endpoint                    | Methods                | Description              |
+| --------------------------- | ---------------------- | ------------------------ |
+| `/users`                    | GET, POST, PUT, DELETE | User management          |
+| `/users/:id/avatar`         | PUT                    | Upload/update avatar     |
+| `/products`                 | GET, POST, PUT, DELETE | Oil products catalog     |
+| `/orders`                   | GET, POST, PUT, DELETE | Order management         |
+| `/consumables`              | GET, POST, PUT, DELETE | Consumables catalog      |
+| `/filters`                  | GET, POST, PUT, DELETE | Filters/parts catalog    |
+| `/audit-logs`               | GET, POST, DELETE      | Audit log management     |
+| `/inventory`                | GET, PUT               | Stock level management   |
+| `/settings`                 | GET, PUT               | Site-wide settings       |
+| `/notifications`            | GET, POST, PUT, DELETE | User notifications       |
+| `/notification-preferences` | GET, PUT               | Notification settings    |
+| `/avatar-initials`          | GET                    | Generate initials avatar |
+| `/health`                   | GET                    | Database health check    |
+| `/public-config`            | GET                    | Public config (no auth)  |
+| `/public-stats`             | GET                    | Public stats (no auth)   |
 
 ### Permission Matrix
 
-| Role | Read | Create | Update | Delete |
-|------|------|--------|--------|--------|
-| **mechanic** | ✅ Products, Orders | ✅ Orders | ❌ | ❌ |
-| **manager** | ✅ All | ✅ Products, Users | ✅ Products, Orders | ❌ |
-| **admin** | ✅ All | ✅ All | ✅ All | ✅ All |
+| Role         | Read                | Create             | Update              | Delete |
+| ------------ | ------------------- | ------------------ | ------------------- | ------ |
+| **mechanic** | ✅ Products, Orders | ✅ Orders          | ❌                  | ❌     |
+| **manager**  | ✅ All              | ✅ Products, Users | ✅ Products, Orders | ❌     |
+| **admin**    | ✅ All              | ✅ All             | ✅ All              | ✅ All |
 
 Permissions enforced via `requirePermission(event, resource, action)` in `utils/http.js`.
 
@@ -307,7 +309,7 @@ Global `window.Theme` API:
 window.Theme.applyFromStorage();
 
 // Set theme preset
-window.Theme.setTheme('dark');     // dark, light, system, neon, ocean, high-contrast
+window.Theme.setTheme('dark'); // dark, light, system, neon, ocean, high-contrast
 
 // Custom colors
 window.Theme.setPalette({
@@ -330,7 +332,7 @@ const FN_BASE = window.FN_BASE || '/.netlify/functions';
 // Authenticated request
 const response = await fetch(`${FN_BASE}/products`, {
   headers: {
-    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+    Authorization: `Bearer ${localStorage.getItem('accessToken')}`
   }
 });
 
@@ -382,6 +384,7 @@ npm run test:coverage
 ### Netlify (Primary)
 
 Auto-deploys on push to `main`:
+
 - Static files → Netlify CDN
 - Functions → Netlify serverless runtime
 - Environment variables configured in Netlify dashboard
@@ -447,13 +450,13 @@ Global error tracker captures all errors:
 
 ```javascript
 // View errors in browser console
-ErrorTracker.getErrorLog()
+ErrorTracker.getErrorLog();
 
 // Export errors
-ErrorTracker.exportErrorLog()
+ErrorTracker.exportErrorLog();
 
 // Clear errors
-ErrorTracker.clearErrorLog()
+ErrorTracker.clearErrorLog();
 ```
 
 ---
@@ -472,6 +475,7 @@ ErrorTracker.clearErrorLog()
 ## 📚 Documentation
 
 See `/docs` directory for comprehensive guides:
+
 - **ARCHITECTURE.md** - System design and patterns
 - **API_DOCUMENTATION.md** - Complete API reference
 - **DATABASE.md** - Schema details and queries

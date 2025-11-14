@@ -3,7 +3,7 @@
  * Checks feature flag status from settings API
  */
 
-(function() {
+(function () {
   'use strict';
 
   // Cache for feature flags
@@ -15,7 +15,9 @@
 
   function getCandidateBases() {
     const bases = [];
-    if (window.FN_BASE) {bases.push(String(window.FN_BASE));}
+    if (window.FN_BASE) {
+      bases.push(String(window.FN_BASE));
+    }
     bases.push('/.netlify/functions');
     const host = (location && location.hostname) || '';
     if (/localhost|127\.0\.0\.1/.test(host)) {
@@ -31,7 +33,9 @@
     try {
       const _fetch = typeof fetchImpl === 'function' ? fetchImpl : fetch;
       const res = await _fetch(url, { ...opts, signal: ctrl.signal });
-      if (!res.ok) {throw new Error(`HTTP ${res.status}`);}
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
       return await res.json();
     } finally {
       clearTimeout(t);
@@ -39,14 +43,14 @@
   }
 
   /**
-     * Fetch feature flags from settings API
-     * @returns {Promise<Object>} Feature flags object
-     */
+   * Fetch feature flags from settings API
+   * @returns {Promise<Object>} Feature flags object
+   */
   async function fetchFeatureFlags() {
     const now = Date.now();
 
     // Return cached flags if still valid
-    if (featureFlagsCache && (now - cacheTimestamp) < CACHE_DURATION) {
+    if (featureFlagsCache && now - cacheTimestamp < CACHE_DURATION) {
       return featureFlagsCache;
     }
 
@@ -56,10 +60,20 @@
       let lastErr = null;
       for (const base of bases) {
         try {
-          const useAuthFetch = (typeof window !== 'undefined' && typeof window.authFetch === 'function') ? window.authFetch : null;
+          const useAuthFetch =
+            typeof window !== 'undefined' && typeof window.authFetch === 'function'
+              ? window.authFetch
+              : null;
           // Give a bit more time; this runs in the background and shouldn't spam logs on slow links
-          settings = await fetchJsonWithTimeout(`${base}/settings`, { headers: { 'Accept': 'application/json' } }, 10000, useAuthFetch);
-          if (settings) {break;}
+          settings = await fetchJsonWithTimeout(
+            `${base}/settings`,
+            { headers: { Accept: 'application/json' } },
+            10000,
+            useAuthFetch
+          );
+          if (settings) {
+            break;
+          }
         } catch (e) {
           lastErr = e;
           // try next candidate
@@ -69,8 +83,14 @@
         // Attempt to use localStorage cached flags if available
         const lsTs = parseInt(localStorage.getItem(LS_TS_KEY) || '0', 10);
         const lsRaw = localStorage.getItem(LS_KEY);
-        if (lsRaw && (now - lsTs) < 5 * CACHE_DURATION) {
-          try { featureFlagsCache = JSON.parse(lsRaw); cacheTimestamp = lsTs; return featureFlagsCache; } catch (_) { /* ignore */ }
+        if (lsRaw && now - lsTs < 5 * CACHE_DURATION) {
+          try {
+            featureFlagsCache = JSON.parse(lsRaw);
+            cacheTimestamp = lsTs;
+            return featureFlagsCache;
+          } catch (_) {
+            /* ignore */
+          }
         }
         // Downgrade AbortError noise to debug and fail closed to defaults
         if (lastErr && lastErr.name === 'AbortError') {
@@ -86,15 +106,23 @@
         betaFeatures: !!nestedFlags.betaFeatures,
         newDashboard: !!nestedFlags.newDashboard,
         advancedReports: !!nestedFlags.advancedReports,
-        enableRegistration: nestedFlags.enableRegistration !== undefined ? !!nestedFlags.enableRegistration : !!settings.enableRegistration,
-        enableGuestCheckout: nestedFlags.enableGuestCheckout !== undefined ? !!nestedFlags.enableGuestCheckout : !!settings.enableGuestCheckout
+        enableRegistration:
+          nestedFlags.enableRegistration !== undefined
+            ? !!nestedFlags.enableRegistration
+            : !!settings.enableRegistration,
+        enableGuestCheckout:
+          nestedFlags.enableGuestCheckout !== undefined
+            ? !!nestedFlags.enableGuestCheckout
+            : !!settings.enableGuestCheckout
       };
       featureFlagsCache = merged;
       cacheTimestamp = now;
       try {
         localStorage.setItem(LS_KEY, JSON.stringify(merged));
         localStorage.setItem(LS_TS_KEY, String(now));
-      } catch (_) { /* no-op */ }
+      } catch (_) {
+        /* no-op */
+      }
 
       return featureFlagsCache;
     } catch (error) {
@@ -102,38 +130,41 @@
       try {
         const lsTs = parseInt(localStorage.getItem(LS_TS_KEY) || '0', 10);
         const lsRaw = localStorage.getItem(LS_KEY);
-        if (lsRaw && (Date.now() - lsTs) < 24 * 60 * 60 * 1000) { // accept up to 24h-old cache on failure
+        if (lsRaw && Date.now() - lsTs < 24 * 60 * 60 * 1000) {
+          // accept up to 24h-old cache on failure
           return JSON.parse(lsRaw);
         }
-      } catch (_) { /* ignore */ }
+      } catch (_) {
+        /* ignore */
+      }
       console.error('Error fetching feature flags:', error);
       return { betaFeatures: false, newDashboard: false, advancedReports: false };
     }
   }
 
   /**
-     * Check if a specific feature flag is enabled
-     * @param {string} flagName - Name of the feature flag
-     * @returns {Promise<boolean>} True if enabled, false otherwise
-     */
+   * Check if a specific feature flag is enabled
+   * @param {string} flagName - Name of the feature flag
+   * @returns {Promise<boolean>} True if enabled, false otherwise
+   */
   async function isFeatureEnabled(flagName) {
     const flags = await fetchFeatureFlags();
     return flags[flagName] === true;
   }
 
   /**
-     * Clear the feature flags cache (useful after settings update)
-     */
+   * Clear the feature flags cache (useful after settings update)
+   */
   function clearCache() {
     featureFlagsCache = null;
     cacheTimestamp = 0;
   }
 
   /**
-     * Show/hide elements based on feature flag
-     * @param {string} selector - CSS selector for elements
-     * @param {string} flagName - Name of the feature flag
-     */
+   * Show/hide elements based on feature flag
+   * @param {string} selector - CSS selector for elements
+   * @param {string} flagName - Name of the feature flag
+   */
   async function toggleFeatureElements(selector, flagName) {
     const enabled = await isFeatureEnabled(flagName);
     const elements = document.querySelectorAll(selector);

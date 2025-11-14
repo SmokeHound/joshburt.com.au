@@ -49,10 +49,12 @@ class AnalyticsDataManager {
       const dayOfWeek = date.getDay();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       const weekendMultiplier = isWeekend ? 0.6 : 1;
-      const trendMultiplier = 1 + (days - i) / days * 0.4; // Growing trend
+      const trendMultiplier = 1 + ((days - i) / days) * 0.4; // Growing trend
       const randomVariation = 0.7 + Math.random() * 0.6;
 
-      const visitors = Math.floor(baseVisitors * weekendMultiplier * trendMultiplier * randomVariation);
+      const visitors = Math.floor(
+        baseVisitors * weekendMultiplier * trendMultiplier * randomVariation
+      );
       const uniqueVisitors = Math.floor(visitors * (0.7 + Math.random() * 0.2));
       const returningVisitors = Math.floor(uniqueVisitors * (0.3 + Math.random() * 0.3));
 
@@ -85,11 +87,11 @@ class AnalyticsDataManager {
       date.setDate(date.getDate() - i);
       const dayData = { date: date.toISOString().split('T')[0], pages: {} };
 
-      const totalViews = Math.floor((200 + Math.random() * 150) * (1 + (days - i) / days * 0.3));
+      const totalViews = Math.floor((200 + Math.random() * 150) * (1 + ((days - i) / days) * 0.3));
 
       pages.forEach(page => {
         const views = Math.floor(totalViews * page.weight * (0.8 + Math.random() * 0.4));
-        const avgTime = Math.floor((120 + Math.random() * 300)); // 2-7 minutes
+        const avgTime = Math.floor(120 + Math.random() * 300); // 2-7 minutes
         const bounceRate = 0.2 + Math.random() * 0.4; // 20-60%
 
         dayData.pages[page.path] = {
@@ -131,8 +133,11 @@ class AnalyticsDataManager {
 
   generateOrderData(days) {
     const products = [
-      'Castrol GTX', 'Castrol Magnatec', 'Castrol EDGE',
-      'Castrol GTX Diesel', 'Castrol Actevo'
+      'Castrol GTX',
+      'Castrol Magnatec',
+      'Castrol EDGE',
+      'Castrol GTX Diesel',
+      'Castrol Actevo'
     ];
 
     const data = [];
@@ -191,7 +196,9 @@ class AnalyticsDataManager {
     const data = JSON.parse(localStorage.getItem(this.storageKey));
     const settings = JSON.parse(localStorage.getItem(this.settingsKey));
 
-    if (!data) {return null;}
+    if (!data) {
+      return null;
+    }
 
     // Apply filters
     const filteredData = { ...data };
@@ -203,9 +210,7 @@ class AnalyticsDataManager {
 
       ['visitors', 'pageViews', 'userSessions', 'oilOrders', 'performance'].forEach(key => {
         if (filteredData[key]) {
-          filteredData[key] = filteredData[key].filter(item =>
-            new Date(item.date) >= cutoffDate
-          );
+          filteredData[key] = filteredData[key].filter(item => new Date(item.date) >= cutoffDate);
         }
       });
     }
@@ -263,7 +268,7 @@ class AnalyticsDataManager {
 
   // Mock: Sparkline data for quick stats (last 14 days)
   getSparklineData(data) {
-    const last14 = (arr) => arr.slice(-14);
+    const last14 = arr => arr.slice(-14);
     return {
       visitors: last14((data.visitors || []).map(d => d.totalVisitors)),
       orders: last14((data.oilOrders || []).map(d => d.totalOrders)),
@@ -274,8 +279,13 @@ class AnalyticsDataManager {
   // Mock: Conversion rate = orders / unique visitors
   getConversionRate(data) {
     const totalOrders = (data.oilOrders || []).reduce((sum, d) => sum + (d.totalOrders || 0), 0);
-    const totalUniqueVisitors = (data.visitors || []).reduce((sum, d) => sum + (d.uniqueVisitors || 0), 0);
-    if (totalUniqueVisitors === 0) {return 0;}
+    const totalUniqueVisitors = (data.visitors || []).reduce(
+      (sum, d) => sum + (d.uniqueVisitors || 0),
+      0
+    );
+    if (totalUniqueVisitors === 0) {
+      return 0;
+    }
     return ((totalOrders / totalUniqueVisitors) * 100).toFixed(1);
   }
 
@@ -291,7 +301,9 @@ class AnalyticsDataManager {
     });
     const totalUsers = Object.keys(userVisits).length;
     const retained = Object.values(userVisits).filter(v => v > 1).length;
-    if (totalUsers === 0) {return 0;}
+    if (totalUsers === 0) {
+      return 0;
+    }
     return ((retained / totalUsers) * 100).toFixed(1);
   }
 
@@ -344,8 +356,14 @@ class AnalyticsDataManager {
 
     // Update visitor counts based on event
     todayData.totalVisitors++;
-    if (event.isUnique) {todayData.uniqueVisitors++;}
-    if (event.isReturning) {todayData.returningVisitors++;} else {todayData.newVisitors++;}
+    if (event.isUnique) {
+      todayData.uniqueVisitors++;
+    }
+    if (event.isReturning) {
+      todayData.returningVisitors++;
+    } else {
+      todayData.newVisitors++;
+    }
 
     data.lastUpdated = new Date().toISOString();
     localStorage.setItem(this.storageKey, JSON.stringify(data));
@@ -407,7 +425,8 @@ class AnalyticsDataManager {
   }
 
   exportToCSV(analyticsData) {
-    let csv = 'Date,Total Visitors,Unique Visitors,Returning Visitors,New Visitors,Total Sessions,Avg Session Duration,Pages Per Session,Bounce Rate\n';
+    let csv =
+      'Date,Total Visitors,Unique Visitors,Returning Visitors,New Visitors,Total Sessions,Avg Session Duration,Pages Per Session,Bounce Rate\n';
 
     analyticsData.data.visitors.forEach((visitor, index) => {
       const session = analyticsData.data.userSessions[index] || {};

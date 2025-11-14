@@ -3,7 +3,7 @@
  * Provides helper functions for improving accessibility across the application
  */
 
-(function() {
+(function () {
   'use strict';
 
   /**
@@ -14,7 +14,7 @@
     // Track if user is using keyboard for navigation
     let usingKeyboard = false;
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
       if (e.key === 'Tab') {
         usingKeyboard = true;
         document.body.classList.add('keyboard-navigation');
@@ -27,13 +27,13 @@
     });
 
     // Enhance focus visibility
-    document.addEventListener('focusin', (e) => {
+    document.addEventListener('focusin', e => {
       if (usingKeyboard) {
         e.target.classList.add('keyboard-focused');
       }
     });
 
-    document.addEventListener('focusout', (e) => {
+    document.addEventListener('focusout', e => {
       e.target.classList.remove('keyboard-focused');
     });
   }
@@ -44,7 +44,9 @@
    */
   function createAnnouncementRegion() {
     const existing = document.getElementById('a11y-announcer');
-    if (existing) {return existing;}
+    if (existing) {
+      return existing;
+    }
 
     const announcer = document.createElement('div');
     announcer.id = 'a11y-announcer';
@@ -52,7 +54,8 @@
     announcer.setAttribute('aria-live', 'polite');
     announcer.setAttribute('aria-atomic', 'true');
     announcer.className = 'sr-only';
-    announcer.style.cssText = 'position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;';
+    announcer.style.cssText =
+      'position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;';
 
     document.body.appendChild(announcer);
     return announcer;
@@ -82,7 +85,9 @@
     const lastFocusable = focusableElements[focusableElements.length - 1];
 
     function handleTabKey(e) {
-      if (e.key !== 'Tab') {return;}
+      if (e.key !== 'Tab') {
+        return;
+      }
 
       if (e.shiftKey) {
         if (document.activeElement === firstFocusable) {
@@ -124,7 +129,9 @@
    */
   function _addSkipLink() {
     // Check if skip link already exists
-    if (document.querySelector('.skip-link')) {return;}
+    if (document.querySelector('.skip-link')) {
+      return;
+    }
 
     const skipLink = document.createElement('a');
     skipLink.href = '#main-content';
@@ -162,7 +169,7 @@
 
     // Enhance error messages
     const errorMessages = document.querySelectorAll('.error-message, [role="alert"]');
-    errorMessages.forEach((error) => {
+    errorMessages.forEach(error => {
       if (!error.getAttribute('role')) {
         error.setAttribute('role', 'alert');
       }
@@ -186,21 +193,26 @@
       }
     });
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
       // Alt + H: Next heading
       if (e.altKey && e.key === 'h') {
         e.preventDefault();
         currentHeadingIndex = (currentHeadingIndex + 1) % headings.length;
         headings[currentHeadingIndex].focus();
-        announce(`Heading level ${headings[currentHeadingIndex].tagName.charAt(1)}: ${headings[currentHeadingIndex].textContent}`);
+        announce(
+          `Heading level ${headings[currentHeadingIndex].tagName.charAt(1)}: ${headings[currentHeadingIndex].textContent}`
+        );
       }
 
       // Alt + Shift + H: Previous heading
       if (e.altKey && e.shiftKey && e.key === 'H') {
         e.preventDefault();
-        currentHeadingIndex = currentHeadingIndex <= 0 ? headings.length - 1 : currentHeadingIndex - 1;
+        currentHeadingIndex =
+          currentHeadingIndex <= 0 ? headings.length - 1 : currentHeadingIndex - 1;
         headings[currentHeadingIndex].focus();
-        announce(`Heading level ${headings[currentHeadingIndex].tagName.charAt(1)}: ${headings[currentHeadingIndex].textContent}`);
+        announce(
+          `Heading level ${headings[currentHeadingIndex].tagName.charAt(1)}: ${headings[currentHeadingIndex].textContent}`
+        );
       }
     });
   }

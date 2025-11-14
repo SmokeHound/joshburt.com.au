@@ -1,18 +1,26 @@
 // assets/js/auth0.js
 // Lightweight wrapper around Auth0 SPA SDK with dynamic loader and safe fallbacks
-(function() {
+(function () {
   const AUTH0_CDN = 'https://cdn.auth0.com/js/auth0-spa-js/2.5/auth0-spa-js.production.js';
   let client = null;
   let sdkReady = null;
   function loadSdk() {
-    if (window.createAuth0Client) {return Promise.resolve();}
-    if (sdkReady) {return sdkReady;}
-    sdkReady = new Promise(function(resolve, reject) {
+    if (window.createAuth0Client) {
+      return Promise.resolve();
+    }
+    if (sdkReady) {
+      return sdkReady;
+    }
+    sdkReady = new Promise(function (resolve, reject) {
       const s = document.createElement('script');
       s.src = AUTH0_CDN;
       s.async = true;
-      s.onload = function() { resolve(); };
-      s.onerror = function() { reject(new Error('Failed to load Auth0 SDK')); };
+      s.onload = function () {
+        resolve();
+      };
+      s.onerror = function () {
+        reject(new Error('Failed to load Auth0 SDK'));
+      };
       document.head.appendChild(s);
     });
     return sdkReady;
@@ -23,7 +31,7 @@
       domain: window.AUTH0_DOMAIN || '',
       clientId: window.AUTH0_CLIENT_ID || '',
       audience: window.AUTH0_AUDIENCE || '',
-      redirect_uri: window.AUTH0_REDIRECT_URI || (window.location.origin + '/oauth-success.html'),
+      redirect_uri: window.AUTH0_REDIRECT_URI || window.location.origin + '/oauth-success.html',
       scope: window.AUTH0_SCOPE || 'openid profile email'
     };
     return cfg;
@@ -40,7 +48,7 @@
       console.warn('[Auth0] Missing AUTH0_DOMAIN or AUTH0_CLIENT_ID');
       return null;
     }
-    const factory = (window.createAuth0Client || (window.auth0 && window.auth0.createAuth0Client));
+    const factory = window.createAuth0Client || (window.auth0 && window.auth0.createAuth0Client);
     if (typeof factory !== 'function') {
       console.error('[Auth0] createAuth0Client factory not found on window');
       return null;
@@ -58,42 +66,86 @@
     return client;
   }
   async function login(connection) {
-    if (!client) {await init();}
-    if (!client) {throw new Error('Auth0 not configured');}
+    if (!client) {
+      await init();
+    }
+    if (!client) {
+      throw new Error('Auth0 not configured');
+    }
     const params = {};
-    if (connection) {params.connection = connection;} // e.g., 'google-oauth2', 'github'
+    if (connection) {
+      params.connection = connection;
+    } // e.g., 'google-oauth2', 'github'
     return client.loginWithRedirect({ authorizationParams: params });
   }
   async function handleRedirectCallback() {
-    if (!client) {await init();}
-    if (!client) {throw new Error('Auth0 not configured');}
+    if (!client) {
+      await init();
+    }
+    if (!client) {
+      throw new Error('Auth0 not configured');
+    }
     // Only run if code/state present
     const qp = new URLSearchParams(window.location.search);
-    if (!(qp.get('code') && qp.get('state'))) {return { handled:false };}
+    if (!(qp.get('code') && qp.get('state'))) {
+      return { handled: false };
+    }
     const res = await client.handleRedirectCallback();
     window.history.replaceState({}, document.title, window.location.pathname);
-    return { handled:true, appState: res && res.appState };
+    return { handled: true, appState: res && res.appState };
   }
   async function getToken() {
-    if (!client) {await init();}
-    if (!client) {throw new Error('Auth0 not configured');}
-    try { return await client.getTokenSilently(); } catch (e) { console.warn('[Auth0] getTokenSilently failed', e); return null; }
+    if (!client) {
+      await init();
+    }
+    if (!client) {
+      throw new Error('Auth0 not configured');
+    }
+    try {
+      return await client.getTokenSilently();
+    } catch (e) {
+      console.warn('[Auth0] getTokenSilently failed', e);
+      return null;
+    }
   }
   async function getUser() {
-    if (!client) {await init();}
-    if (!client) {throw new Error('Auth0 not configured');}
-    try { return await client.getUser(); } catch (e) { console.warn('[Auth0] getUser failed', e); return null; }
+    if (!client) {
+      await init();
+    }
+    if (!client) {
+      throw new Error('Auth0 not configured');
+    }
+    try {
+      return await client.getUser();
+    } catch (e) {
+      console.warn('[Auth0] getUser failed', e);
+      return null;
+    }
   }
   async function isAuthenticated() {
-    if (!client) {await init();}
-    if (!client) {return false;}
-    try { return await client.isAuthenticated(); } catch (e) { return false; }
+    if (!client) {
+      await init();
+    }
+    if (!client) {
+      return false;
+    }
+    try {
+      return await client.isAuthenticated();
+    } catch (e) {
+      return false;
+    }
   }
   async function logout(returnTo) {
-    if (!client) {await init();}
-    if (!client) {return;}
+    if (!client) {
+      await init();
+    }
+    if (!client) {
+      return;
+    }
     const cfg = getConfig();
-    client.logout({ logoutParams: { returnTo: returnTo || window.location.origin + '/login.html' } });
+    client.logout({
+      logoutParams: { returnTo: returnTo || window.location.origin + '/login.html' }
+    });
   }
   window.Auth = {
     init: init,
