@@ -13,22 +13,9 @@
     <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
     
     <link rel="stylesheet" href="./assets/css/styles.css">
+    <script src="./assets/js/init-shared.js" defer></script>
     <script src="./assets/js/auth0.js" defer></script>
     <script>
-        // Load centralized theme manager
-        fetch('shared-theme.html')
-            .then(r => r.text())
-            .then(html => {
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                const scripts = temp.getElementsByTagName('script');
-                for (let script of scripts) {
-                    const newScript = document.createElement('script');
-                    newScript.textContent = script.textContent;
-                    document.head.appendChild(newScript);
-                }
-            })
-            .catch(err => console.warn('Failed to load shared-theme.html:', err));
         // Service Worker Registration for PWA
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
