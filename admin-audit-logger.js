@@ -162,9 +162,7 @@ class AdminAuditLogger {
       cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
 
       const logs = this.getLogs();
-      const filteredLogs = logs.filter(log =>
-        new Date(log.timestamp) > cutoffDate
-      );
+      const filteredLogs = logs.filter(log => new Date(log.timestamp) > cutoffDate);
 
       localStorage.setItem(this.logKey, JSON.stringify(filteredLogs));
       this.log('audit_logs_cleaned', {
@@ -240,7 +238,7 @@ window.addEventListener('load', () => {
 });
 
 // Track settings changes
-window.addEventListener('storage', (e) => {
+window.addEventListener('storage', e => {
   if (e.key === 'siteSettings') {
     window.adminAuditLogger.log(AdminAuditLogger.ACTIONS.SETTINGS_CHANGE, {
       key: e.key,
@@ -251,7 +249,7 @@ window.addEventListener('storage', (e) => {
 });
 
 // Track unhandled errors
-window.addEventListener('error', (e) => {
+window.addEventListener('error', e => {
   window.adminAuditLogger.log(AdminAuditLogger.ACTIONS.ERROR_OCCURRED, {
     message: e.message,
     filename: e.filename,

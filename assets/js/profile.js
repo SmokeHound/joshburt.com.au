@@ -1,4 +1,3 @@
-
 // profile.js: User profile view/edit and activity log
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -21,12 +20,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentUser = null;
   try {
     // Serverless auth "me" action
-    const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/auth?action=me`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    }) : fetch(`${FN_BASE}/auth?action=me`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    }));
-    if (!res.ok) {throw new Error('Failed to load current user');}
+    const res = await (window.authFetch
+      ? window.authFetch(`${FN_BASE}/auth?action=me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      : fetch(`${FN_BASE}/auth?action=me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }));
+    if (!res.ok) {
+      throw new Error('Failed to load current user');
+    }
     currentUser = (await res.json()).user;
   } catch (e) {
     alert('Error loading current user: ' + e.message);
@@ -39,12 +42,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (profileUserId && currentUser.role === 'admin') {
     // Admin viewing another user
     try {
-      const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${profileUserId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      }) : fetch(`${FN_BASE}/users/${profileUserId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      }));
-      if (!res.ok) {throw new Error('Failed to load user profile');}
+      const res = await (window.authFetch
+        ? window.authFetch(`${FN_BASE}/users/${profileUserId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        : fetch(`${FN_BASE}/users/${profileUserId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }));
+      if (!res.ok) {
+        throw new Error('Failed to load user profile');
+      }
       user = (await res.json()).user;
     } catch (e) {
       alert('Error loading user profile: ' + e.message);
@@ -106,15 +113,241 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Populate form
   document.getElementById('profile-name').value = user.name || '';
   document.getElementById('profile-email').value = user.email || '';
-  document.getElementById('profile-avatar').src = user.avatarUrl || user.avatar_url || user.picture || './assets/images/avatar-placeholder.svg';
+  document.getElementById('profile-avatar').src =
+    user.avatarUrl || user.avatar_url || user.picture || './assets/images/avatar-placeholder.svg';
 
   // Removed legacy upload flow; avatar changes are done via the preset picker below.
 
   // Cancel button - reset form
   document.getElementById('cancel-edit').onclick = () => {
     document.getElementById('profile-name').value = user.name || '';
-    document.getElementById('profile-password').value = '';
+    const currentPwdField = document.getElementById('profile-current-password');
+    const newPwdField = document.getElementById('profile-new-password');
+    const confirmPwdField = document.getElementById('profile-confirm-password');
+    if (currentPwdField) currentPwdField.value = '';
+    if (newPwdField) newPwdField.value = '';
+    if (confirmPwdField) confirmPwdField.value = '';
   };
+
+  // Password section toggle functionality
+  const togglePasswordBtn = document.getElementById('toggle-password-section');
+  const passwordContent = document.getElementById('password-change-content');
+  const passwordToggleIcon = document.getElementById('password-toggle-icon');
+
+  if (togglePasswordBtn && passwordContent && passwordToggleIcon) {
+    togglePasswordBtn.onclick = () => {
+      const isExpanded = togglePasswordBtn.getAttribute('aria-expanded') === 'true';
+
+      if (isExpanded) {
+        // Collapse
+        passwordContent.classList.add('hidden');
+        togglePasswordBtn.setAttribute('aria-expanded', 'false');
+        passwordToggleIcon.style.transform = 'rotate(0deg)';
+      } else {
+        // Expand
+        passwordContent.classList.remove('hidden');
+        togglePasswordBtn.setAttribute('aria-expanded', 'true');
+        passwordToggleIcon.style.transform = 'rotate(180deg)';
+      }
+    };
+  }
+
+  // Profile form submission handler
+  const profileForm = document.getElementById('profile-form');
+  if (profileForm) {
+    profileForm.onsubmit = async e => {
+      e.preventDefault();
+
+      if (!isSelf) {
+        if (window.showNotification) {
+          window.showNotification('Only the user can edit their own profile', 'error');
+        } else {
+          alert('Only the user can edit their own profile');
+        }
+        return;
+      }
+
+      const name = document.getElementById('profile-name').value.trim();
+      const currentPassword = document.getElementById('profile-current-password')?.value || '';
+      const newPassword = document.getElementById('profile-new-password')?.value || '';
+      const confirmPassword = document.getElementById('profile-confirm-password')?.value || '';
+
+      // Track what needs updating
+      const needsNameUpdate = name && name !== user.name;
+      const needsPasswordUpdate = currentPassword || newPassword || confirmPassword;
+
+      if (!needsNameUpdate && !needsPasswordUpdate) {
+        if (window.showNotification) {
+          window.showNotification('No changes to save', 'info');
+        } else {
+          alert('No changes to save');
+        }
+        return;
+      }
+
+      // Validate password change if attempting
+      if (needsPasswordUpdate) {
+        if (!currentPassword) {
+          if (window.showNotification) {
+            window.showNotification('Current password is required to change password', 'error');
+          } else {
+            alert('Current password is required to change password');
+          }
+          return;
+        }
+        if (!newPassword) {
+          if (window.showNotification) {
+            window.showNotification('New password is required', 'error');
+          } else {
+            alert('New password is required');
+          }
+          return;
+        }
+        if (!confirmPassword) {
+          if (window.showNotification) {
+            window.showNotification('Please confirm your new password', 'error');
+          } else {
+            alert('Please confirm your new password');
+          }
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          if (window.showNotification) {
+            window.showNotification('New passwords do not match', 'error');
+          } else {
+            alert('New passwords do not match');
+          }
+          return;
+        }
+        if (newPassword.length < 8) {
+          if (window.showNotification) {
+            window.showNotification('Password must be at least 8 characters long', 'error');
+          } else {
+            alert('Password must be at least 8 characters long');
+          }
+          return;
+        }
+        const hasUppercase = /[A-Z]/.test(newPassword);
+        const hasLowercase = /[a-z]/.test(newPassword);
+        const hasNumber = /[0-9]/.test(newPassword);
+        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+        if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+          if (window.showNotification) {
+            window.showNotification(
+              'Password must contain uppercase, lowercase, number, and special character',
+              'error'
+            );
+          } else {
+            alert('Password must contain uppercase, lowercase, number, and special character');
+          }
+          return;
+        }
+      }
+
+      const submitBtn = profileForm.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML =
+          '<svg class="animate-spin h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...';
+      }
+
+      try {
+        if (needsNameUpdate) {
+          const res = await (window.authFetch
+            ? window.authFetch(`${FN_BASE}/users/${user.id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ name })
+              })
+            : fetch(`${FN_BASE}/users/${user.id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ name })
+              }));
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || 'Failed to update name');
+          }
+          user.name = name;
+          document.getElementById('profile-display-name').textContent = name;
+          try {
+            const stored = JSON.parse(localStorage.getItem('user') || '{}');
+            stored.name = name;
+            localStorage.setItem('user', JSON.stringify(stored));
+          } catch (e) {
+            console.warn('Failed to update local storage', e);
+          }
+        }
+
+        if (needsPasswordUpdate) {
+          const res = await (window.authFetch
+            ? window.authFetch(`${FN_BASE}/auth?action=change-password`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ currentPassword, newPassword })
+              })
+            : fetch(`${FN_BASE}/auth?action=change-password`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ currentPassword, newPassword })
+              }));
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || 'Failed to change password');
+          }
+          document.getElementById('profile-current-password').value = '';
+          document.getElementById('profile-new-password').value = '';
+          document.getElementById('profile-confirm-password').value = '';
+          if (window.showNotification) {
+            window.showNotification(
+              'Password changed successfully! Redirecting to login...',
+              'success'
+            );
+          } else {
+            alert('Password changed successfully! Please log in again with your new password.');
+          }
+          setTimeout(() => {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+          }, 2000);
+          return;
+        }
+
+        if (window.showNotification) {
+          window.showNotification('Profile updated successfully', 'success');
+        } else {
+          alert('Profile updated successfully');
+        }
+      } catch (err) {
+        console.error('Profile update error:', err);
+        if (window.showNotification) {
+          window.showNotification('Error: ' + err.message, 'error');
+        } else {
+          alert('Error: ' + err.message);
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+        }
+      }
+    };
+  }
 
   // Save profile changes (only for self)
   // Avatar selection (pick from predetermined avatars)
@@ -135,9 +368,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Build initials from user name (first letters of up to 3 words)
   function deriveInitials(name) {
-    if (!name) { return 'U'; }
+    if (!name) {
+      return 'U';
+    }
     const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 3);
-    const initials = parts.map((p) => p[0].toUpperCase().replace(/[^A-Z]/g, '')).join('');
+    const initials = parts.map(p => p[0].toUpperCase().replace(/[^A-Z]/g, '')).join('');
     return initials || 'U';
   }
 
@@ -179,9 +414,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
-    function safeClose() { const ex = document.getElementById('avatar-picker-overlay'); if (ex && ex.parentNode) { ex.parentNode.removeChild(ex); } }
-    overlay.onclick = (e) => { if (e.target === overlay) { safeClose(); } };
-    
+    function safeClose() {
+      const ex = document.getElementById('avatar-picker-overlay');
+      if (ex && ex.parentNode) {
+        ex.parentNode.removeChild(ex);
+      }
+    }
+    overlay.onclick = e => {
+      if (e.target === overlay) {
+        safeClose();
+      }
+    };
+
     const cancelBtn = modal.querySelector('#init-cancel');
     if (cancelBtn) cancelBtn.onclick = () => safeClose();
 
@@ -192,13 +436,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updatePreview() {
       if (!initialsInput || !themeSelect || !styleSelect || !preview) return;
-      const i = (initialsInput.value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
+      const i =
+        (initialsInput.value || '')
+          .toUpperCase()
+          .replace(/[^A-Z]/g, '')
+          .slice(0, 3) || 'U';
       const t = themeSelect.value || 'dark';
       const s = styleSelect.value || 'solid';
       const url = `/.netlify/functions/avatar-initials?i=${encodeURIComponent(i)}&t=${t}&s=${s}`;
       preview.innerHTML = `<img src="${url}" alt="Initials Avatar" class="h-36 w-36 rounded-full" />`;
     }
-    
+
     if (initialsInput) initialsInput.oninput = updatePreview;
     if (themeSelect) themeSelect.onchange = updatePreview;
     if (styleSelect) styleSelect.onchange = updatePreview;
@@ -208,40 +456,76 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (saveBtn) {
       saveBtn.onclick = async () => {
         if (!initialsInput || !themeSelect || !styleSelect) return;
-        const i = (initialsInput.value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
+        const i =
+          (initialsInput.value || '')
+            .toUpperCase()
+            .replace(/[^A-Z]/g, '')
+            .slice(0, 3) || 'U';
         const t = themeSelect.value || 'dark';
         const s = styleSelect.value || 'solid';
         // Declare these here so both try and catch blocks can access them for revert logic
         const avatarEl = document.getElementById('profile-avatar');
         const prevAvatarSrc = avatarEl && avatarEl.src ? avatarEl.src : '';
         try {
-        // Optimistic local-only preview for initials avatar
-        const previewUrl = `/.netlify/functions/avatar-initials?i=${encodeURIComponent(i)}&t=${t}&s=${s}` + '&preview=1&ts=' + Date.now();
-        try { if (avatarEl) { avatarEl.src = previewUrl; } } catch (e) { console.warn('Failed to set initials preview', e); }
-        const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
-        }) : fetch(`${FN_BASE}/users/${user.id}/avatar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
-        }));
-        if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || 'Save failed'); }
-        const json = await res.json();
-        const newUrl = json.user && json.user.avatar_url;
-        if (newUrl) {
-          document.getElementById('profile-avatar').src = newUrl + '&cb=' + Date.now();
-          try { const stored = JSON.parse(localStorage.getItem('user') || '{}'); stored.avatarUrl = newUrl; localStorage.setItem('user', JSON.stringify(stored)); } catch (e) { console.warn('Failed to persist avatar locally', e); }
-          if (window.showNotification) { window.showNotification('Avatar updated', 'success'); }
+          // Optimistic local-only preview for initials avatar
+          const previewUrl =
+            `/.netlify/functions/avatar-initials?i=${encodeURIComponent(i)}&t=${t}&s=${s}` +
+            '&preview=1&ts=' +
+            Date.now();
+          try {
+            if (avatarEl) {
+              avatarEl.src = previewUrl;
+            }
+          } catch (e) {
+            console.warn('Failed to set initials preview', e);
+          }
+          const res = await (window.authFetch
+            ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
+              })
+            : fetch(`${FN_BASE}/users/${user.id}/avatar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
+              }));
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || 'Save failed');
+          }
+          const json = await res.json();
+          const newUrl = json.user && json.user.avatar_url;
+          if (newUrl) {
+            document.getElementById('profile-avatar').src = newUrl + '&cb=' + Date.now();
+            try {
+              const stored = JSON.parse(localStorage.getItem('user') || '{}');
+              stored.avatarUrl = newUrl;
+              localStorage.setItem('user', JSON.stringify(stored));
+            } catch (e) {
+              console.warn('Failed to persist avatar locally', e);
+            }
+            if (window.showNotification) {
+              window.showNotification('Avatar updated', 'success');
+            }
+          }
+          safeClose();
+        } catch (err) {
+          console.error(err);
+          // Revert optimistic preview on failure
+          try {
+            if (avatarEl && prevAvatarSrc) {
+              avatarEl.src = prevAvatarSrc;
+            }
+          } catch (revertErr) {
+            console.warn('Failed to revert initials preview', revertErr);
+          }
+          if (window.showNotification) {
+            window.showNotification('Avatar save failed: ' + err.message, 'error');
+          } else {
+            alert('Avatar save failed: ' + err.message);
+          }
         }
-        safeClose();
-      } catch (err) {
-        console.error(err);
-        // Revert optimistic preview on failure
-        try { if (avatarEl && prevAvatarSrc) { avatarEl.src = prevAvatarSrc; } } catch (revertErr) { console.warn('Failed to revert initials preview', revertErr); }
-        if (window.showNotification) { window.showNotification('Avatar save failed: ' + err.message, 'error'); } else { alert('Avatar save failed: ' + err.message); }
-      }
       };
     }
   }
@@ -250,7 +534,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const changeBtn = document.getElementById('change-avatar');
   if (changeBtn) {
     changeBtn.onclick = () => {
-      if (!isSelf) { return; }
+      if (!isSelf) {
+        return;
+      }
       // Simple chooser overlay with two options
       const overlay = document.createElement('div');
       overlay.id = 'avatar-picker-overlay';
@@ -265,12 +551,28 @@ document.addEventListener('DOMContentLoaded', async () => {
           <button id="cancel-avatar" class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600">Cancel</button>
         </div>
       `;
-      overlay.appendChild(modal); document.body.appendChild(overlay);
-      function safeClose() { const ex = document.getElementById('avatar-picker-overlay'); if (ex && ex.parentNode) { ex.parentNode.removeChild(ex); } }
-      overlay.onclick = (e) => { if (e.target === overlay) { safeClose(); } };
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      function safeClose() {
+        const ex = document.getElementById('avatar-picker-overlay');
+        if (ex && ex.parentNode) {
+          ex.parentNode.removeChild(ex);
+        }
+      }
+      overlay.onclick = e => {
+        if (e.target === overlay) {
+          safeClose();
+        }
+      };
       modal.querySelector('#cancel-avatar').onclick = () => safeClose();
-      modal.querySelector('#choose-preset').onclick = () => { safeClose(); openAvatarPicker(); };
-      modal.querySelector('#choose-initials').onclick = () => { safeClose(); openInitialsAvatarPicker(); };
+      modal.querySelector('#choose-preset').onclick = () => {
+        safeClose();
+        openAvatarPicker();
+      };
+      modal.querySelector('#choose-initials').onclick = () => {
+        safeClose();
+        openInitialsAvatarPicker();
+      };
     };
   }
 
@@ -293,9 +595,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const grid = modal.querySelector('#avatar-options');
     // Determine currently-selected avatar (normalize to pathname)
-    const currentAvatarSrc = (user.avatarUrl || user.avatar_url || document.getElementById('profile-avatar').src || '').toString();
+    const currentAvatarSrc = (
+      user.avatarUrl ||
+      user.avatar_url ||
+      document.getElementById('profile-avatar').src ||
+      ''
+    ).toString();
     let currentAvatarPath = '';
-    try { currentAvatarPath = new URL(currentAvatarSrc, window.location.href).pathname; } catch (e) { currentAvatarPath = currentAvatarSrc.split('?')[0]; }
+    try {
+      currentAvatarPath = new URL(currentAvatarSrc, window.location.href).pathname;
+    } catch (e) {
+      currentAvatarPath = currentAvatarSrc.split('?')[0];
+    }
 
     PRESET_AVATARS.forEach(url => {
       const btn = document.createElement('button');
@@ -304,7 +615,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.innerHTML = `<img src="${url}" alt="avatar" class="w-full h-24 object-cover">`;
       // Highlight if this preset matches the current avatar
       let btnPath = '';
-      try { btnPath = new URL(url, window.location.href).pathname; } catch (e) { btnPath = url.split('?')[0]; }
+      try {
+        btnPath = new URL(url, window.location.href).pathname;
+      } catch (e) {
+        btnPath = url.split('?')[0];
+      }
       if (btnPath === currentAvatarPath) {
         // selected visual styles (Tailwind utility classes)
         btn.className += ' ring-4 ring-blue-500 border-blue-500 scale-105';
@@ -315,7 +630,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       btn.onclick = async () => {
         // Prevent double clicks while a request is in-flight
-        if (btn.disabled) { return; }
+        if (btn.disabled) {
+          return;
+        }
 
         // Remember previous selection so we can revert on failure
         const prevSelected = grid.querySelector('[aria-current="true"]');
@@ -341,18 +658,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Disable all buttons to avoid rapid repeat actions
         const allBtns = Array.from(grid.querySelectorAll('button'));
-        allBtns.forEach(b => { b.disabled = true; });
+        allBtns.forEach(b => {
+          b.disabled = true;
+        });
 
         try {
-          const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ avatarUrl: url })
-          }) : fetch(`${FN_BASE}/users/${user.id}/avatar`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ avatarUrl: url })
-          }));
+          const res = await (window.authFetch
+            ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ avatarUrl: url })
+              })
+            : fetch(`${FN_BASE}/users/${user.id}/avatar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ avatarUrl: url })
+              }));
 
           if (!res.ok) {
             const err = await res.json().catch(() => ({}));
@@ -366,8 +687,12 @@ document.addEventListener('DOMContentLoaded', async () => {
               const stored = JSON.parse(localStorage.getItem('user') || '{}');
               stored.avatarUrl = newUrl;
               localStorage.setItem('user', JSON.stringify(stored));
-            } catch (e) { console.warn('Failed to update local user avatar', e); }
-            if (window.showNotification) { window.showNotification('Avatar updated', 'success'); }
+            } catch (e) {
+              console.warn('Failed to update local user avatar', e);
+            }
+            if (window.showNotification) {
+              window.showNotification('Avatar updated', 'success');
+            }
           }
           // Close modal (idempotent)
           safeClose();
@@ -381,14 +706,26 @@ document.addEventListener('DOMContentLoaded', async () => {
               prevSelected.setAttribute('aria-current', 'true');
             }
             // Revert avatar preview to previous src
-            try { if (avatarEl && prevAvatarSrc) { avatarEl.src = prevAvatarSrc; } } catch (revertAvatarErr) { console.warn('Failed to revert avatar preview', revertAvatarErr); }
+            try {
+              if (avatarEl && prevAvatarSrc) {
+                avatarEl.src = prevAvatarSrc;
+              }
+            } catch (revertAvatarErr) {
+              console.warn('Failed to revert avatar preview', revertAvatarErr);
+            }
           } catch (revertErr) {
             console.warn('Failed to revert selection highlight', revertErr);
           }
           // Re-enable buttons so user can try again
-          allBtns.forEach(b => { b.disabled = false; });
+          allBtns.forEach(b => {
+            b.disabled = false;
+          });
           console.error('Avatar selection error', err);
-          if (window.showNotification) { window.showNotification('Avatar selection failed: ' + err.message, 'error'); } else { alert('Avatar selection failed: ' + err.message); }
+          if (window.showNotification) {
+            window.showNotification('Avatar selection failed: ' + err.message, 'error');
+          } else {
+            alert('Avatar selection failed: ' + err.message);
+          }
         }
       };
       grid.appendChild(btn);
@@ -400,20 +737,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         existing.parentNode.removeChild(existing);
       }
     }
-    modal.querySelector('#avatar-picker-close').onclick = () => { safeClose(); };
-    overlay.onclick = (e) => { if (e.target === overlay) { safeClose(); } };
+    modal.querySelector('#avatar-picker-close').onclick = () => {
+      safeClose();
+    };
+    overlay.onclick = e => {
+      if (e.target === overlay) {
+        safeClose();
+      }
+    };
   }
 
-  document.getElementById('change-avatar').onclick = () => { if (!isSelf) { return; } openAvatarPicker(); };
-
+  document.getElementById('change-avatar').onclick = () => {
+    if (!isSelf) {
+      return;
+    }
+    openAvatarPicker();
+  };
 
   // Fetch activity log (admin or self)
   try {
-    const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    }) : fetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    }));
+    const res = await (window.authFetch
+      ? window.authFetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      : fetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }));
     if (res.ok) {
       const logs = await res.json();
       const logList = document.getElementById('activity-log');
@@ -429,19 +778,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         let loginCount = 0;
 
         logs.forEach(log => {
-          if (log.action && log.action.toLowerCase().includes('order')) {orderCount++;}
-          if (log.action && log.action.toLowerCase().includes('login')) {loginCount++;}
+          if (log.action && log.action.toLowerCase().includes('order')) {
+            orderCount++;
+          }
+          if (log.action && log.action.toLowerCase().includes('login')) {
+            loginCount++;
+          }
         });
 
         document.getElementById('stats-orders').textContent = orderCount;
         document.getElementById('stats-logins').textContent = loginCount;
 
-        logList.innerHTML = logs.map(log => {
-          const date = new Date(log.created_at || log.timestamp);
-          const timeAgo = getTimeAgo(date);
-          const actionInfo = getActionInfo(log.action);
+        logList.innerHTML = logs
+          .map(log => {
+            const date = new Date(log.created_at || log.timestamp);
+            const timeAgo = getTimeAgo(date);
+            const actionInfo = getActionInfo(log.action);
 
-          return `
+            return `
             <div class="group flex items-start gap-4 p-4 rounded-lg bg-gradient-to-r from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-${actionInfo.color}-500/50 hover:shadow-lg hover:shadow-${actionInfo.color}-500/10 transition-all duration-200">
               <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br ${actionInfo.bgGradient} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                 ${actionInfo.icon}
@@ -456,14 +810,16 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
             </div>
           `;
-        }).join('');
+          })
+          .join('');
       } else {
         logList.innerHTML = '<div class="text-center text-gray-400 py-8">No activity found.</div>';
       }
     }
   } catch (e) {
     // If audit logs fail, show message
-    document.getElementById('activity-log').innerHTML = '<div class="text-center text-gray-400 py-8">Activity log unavailable.</div>';
+    document.getElementById('activity-log').innerHTML =
+      '<div class="text-center text-gray-400 py-8">Activity log unavailable.</div>';
   }
 
   // Helper function to get action styling and icon
@@ -505,7 +861,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Create/Add actions
-    if (actionLower.includes('create') || actionLower.includes('add') || actionLower.includes('new')) {
+    if (
+      actionLower.includes('create') ||
+      actionLower.includes('add') ||
+      actionLower.includes('new')
+    ) {
       return {
         color: 'blue',
         bgGradient: 'from-blue-500 to-blue-600',
@@ -514,7 +874,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Update/Edit actions
-    if (actionLower.includes('update') || actionLower.includes('edit') || actionLower.includes('modify')) {
+    if (
+      actionLower.includes('update') ||
+      actionLower.includes('edit') ||
+      actionLower.includes('modify')
+    ) {
       return {
         color: 'yellow',
         bgGradient: 'from-yellow-500 to-yellow-600',
@@ -560,15 +924,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Helper function to get time ago string
   function getTimeAgo(date) {
     const seconds = Math.floor((new Date() - date) / 1000);
-    if (seconds < 60) {return `${seconds}s ago`;}
+    if (seconds < 60) {
+      return `${seconds}s ago`;
+    }
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) {return `${minutes}m ago`;}
+    if (minutes < 60) {
+      return `${minutes}m ago`;
+    }
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) {return `${hours}h ago`;}
+    if (hours < 24) {
+      return `${hours}h ago`;
+    }
     const days = Math.floor(hours / 24);
-    if (days < 30) {return `${days}d ago`;}
+    if (days < 30) {
+      return `${days}d ago`;
+    }
     const months = Math.floor(days / 30);
-    if (months < 12) {return `${months}mo ago`;}
+    if (months < 12) {
+      return `${months}mo ago`;
+    }
     const years = Math.floor(months / 12);
     return `${years}y ago`;
   }
@@ -582,7 +956,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Helper function to format action strings for better readability
   function formatAction(action) {
-    if (!action) { return 'Unknown action'; }
+    if (!action) {
+      return 'Unknown action';
+    }
 
     // Replace dots with spaces
     let formatted = action.replace(/\./g, ' ');
@@ -591,11 +967,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     formatted = formatted.replace(/_/g, ' ');
 
     // Capitalize each word
-    formatted = formatted.split(' ')
+    formatted = formatted
+      .split(' ')
       .filter(word => word.length > 0) // Filter out empty strings
       .map(word => {
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      }).join(' ');
+      })
+      .join(' ');
 
     return formatted;
   }

@@ -3,7 +3,7 @@
  * Enhances mobile user experience with touch gestures and responsive features
  */
 
-(function() {
+(function () {
   'use strict';
 
   /**
@@ -28,15 +28,21 @@
 
     init() {
       // Only enable on mobile devices
-      if (!this.isMobileDevice()) {return;}
+      if (!this.isMobileDevice()) {
+        return;
+      }
 
       this.createRefreshIndicator();
       this.attachListeners();
     }
 
     isMobileDevice() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-             (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+      return (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        ) ||
+        (window.matchMedia && window.matchMedia('(max-width: 768px)').matches)
+      );
     }
 
     createRefreshIndicator() {
@@ -100,7 +106,9 @@
     }
 
     handleTouchMove(e) {
-      if (!this.isDragging) {return;}
+      if (!this.isDragging) {
+        return;
+      }
 
       this.currentY = e.touches[0].clientY;
       const pullDistance = this.currentY - this.startY;
@@ -121,7 +129,9 @@
     }
 
     handleTouchEnd() {
-      if (!this.isDragging) {return;}
+      if (!this.isDragging) {
+        return;
+      }
 
       const pullDistance = this.currentY - this.startY;
 
@@ -138,8 +148,12 @@
       const arrow = this.refreshIndicator.querySelector('.arrow');
       const spinner = this.refreshIndicator.querySelector('.spinner');
 
-      if (arrow) {arrow.style.display = 'none';}
-      if (spinner) {spinner.style.display = 'block';}
+      if (arrow) {
+        arrow.style.display = 'none';
+      }
+      if (spinner) {
+        spinner.style.display = 'block';
+      }
 
       this.refreshIndicator.style.top = '20px';
 
@@ -165,7 +179,9 @@
           arrow.style.display = 'block';
           arrow.style.transform = 'rotate(0deg)';
         }
-        if (spinner) {spinner.style.display = 'none';}
+        if (spinner) {
+          spinner.style.display = 'none';
+        }
       }, 300);
     }
   }
@@ -231,9 +247,9 @@
    * Detect Touch Device
    */
   function isTouchDevice() {
-    return ('ontouchstart' in window) ||
-           (navigator.maxTouchPoints > 0) ||
-           (navigator.msMaxTouchPoints > 0);
+    return (
+      'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
+    );
   }
 
   /**
@@ -249,20 +265,26 @@
   function preventDoubleTabZoom() {
     let lastTouchEnd = 0;
 
-    document.addEventListener('touchend', (event) => {
-      const now = Date.now();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
+    document.addEventListener(
+      'touchend',
+      event => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      },
+      false
+    );
   }
 
   /**
    * Mobile-friendly select enhancement
    */
   function enhanceMobileSelects() {
-    if (!isTouchDevice()) {return;}
+    if (!isTouchDevice()) {
+      return;
+    }
 
     const selects = document.querySelectorAll('select');
     selects.forEach(select => {
@@ -276,7 +298,9 @@
    * Mobile-friendly input enhancement
    */
   function enhanceMobileInputs() {
-    if (!isTouchDevice()) {return;}
+    if (!isTouchDevice()) {
+      return;
+    }
 
     const inputs = document.querySelectorAll('input, textarea');
     inputs.forEach(input => {

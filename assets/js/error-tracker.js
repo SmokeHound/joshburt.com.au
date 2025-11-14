@@ -3,7 +3,7 @@
  * Provides basic error tracking and logging for production
  */
 
-(function() {
+(function () {
   'use strict';
 
   // Error tracking configuration
@@ -18,9 +18,9 @@
     /**
      * Initialize error tracking
      */
-    init: function() {
+    init: function () {
       // Global error handler
-      window.addEventListener('error', (event) => {
+      window.addEventListener('error', event => {
         this.logError({
           type: 'JavaScript Error',
           message: event.message,
@@ -33,7 +33,7 @@
       });
 
       // Promise rejection handler
-      window.addEventListener('unhandledrejection', (event) => {
+      window.addEventListener('unhandledrejection', event => {
         this.logError({
           type: 'Unhandled Promise Rejection',
           message: event.reason?.message || event.reason,
@@ -51,7 +51,7 @@
     /**
      * Log an error
      */
-    logError: function(error) {
+    logError: function (error) {
       // Add to recent errors
       this.recentErrors.push(error);
       if (this.recentErrors.length > this.maxErrors) {
@@ -68,7 +68,9 @@
         const stored = JSON.parse(localStorage.getItem('errorLog') || '[]');
         stored.push(error);
         // Keep only last 100 errors
-        if (stored.length > 100) {stored.splice(0, stored.length - 100);}
+        if (stored.length > 100) {
+          stored.splice(0, stored.length - 100);
+        }
         localStorage.setItem('errorLog', JSON.stringify(stored));
       } catch (e) {
         // Ignore storage errors
@@ -83,7 +85,7 @@
     /**
      * Track network errors
      */
-    trackNetworkErrors: function() {
+    trackNetworkErrors: function () {
       const originalFetch = window.fetch;
       window.fetch = async (...args) => {
         try {
@@ -112,7 +114,7 @@
     /**
      * Check if error is critical
      */
-    isCriticalError: function(error) {
+    isCriticalError: function (error) {
       const criticalKeywords = ['auth', 'database', 'fatal', 'critical'];
       const errorText = (error.message || '').toLowerCase();
       return criticalKeywords.some(keyword => errorText.includes(keyword));
@@ -121,14 +123,18 @@
     /**
      * Show error notification to user
      */
-    showErrorNotification: function(_error) {
-      if (this.errorDialogShowing) {return;}
+    showErrorNotification: function (_error) {
+      if (this.errorDialogShowing) {
+        return;
+      }
       this.errorDialogShowing = true;
 
       // Use existing toast if available
       if (typeof window.showToast === 'function') {
         window.showToast('An error occurred. Please refresh the page.', 'error');
-        setTimeout(() => { this.errorDialogShowing = false; }, 5000);
+        setTimeout(() => {
+          this.errorDialogShowing = false;
+        }, 5000);
         return;
       }
 
@@ -167,17 +173,19 @@
     /**
      * Check if in development mode
      */
-    isDevelopment: function() {
-      return window.location.hostname === 'localhost' ||
-             window.location.hostname === '127.0.0.1' ||
-             window.location.port === '8000' ||
-             window.location.port === '8888';
+    isDevelopment: function () {
+      return (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.port === '8000' ||
+        window.location.port === '8888'
+      );
     },
 
     /**
      * Get error log for debugging
      */
-    getErrorLog: function() {
+    getErrorLog: function () {
       try {
         return JSON.parse(localStorage.getItem('errorLog') || '[]');
       } catch {
@@ -188,7 +196,7 @@
     /**
      * Clear error log
      */
-    clearErrorLog: function() {
+    clearErrorLog: function () {
       this.recentErrors = [];
       try {
         localStorage.removeItem('errorLog');
@@ -201,7 +209,7 @@
     /**
      * Export error log as JSON
      */
-    exportErrorLog: function() {
+    exportErrorLog: function () {
       const errors = this.getErrorLog();
       const blob = new Blob([JSON.stringify(errors, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);

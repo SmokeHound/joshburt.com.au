@@ -124,18 +124,19 @@
 
     // Convert snake_case, camelCase, and kebab-case to readable text
     let pretty = action
-      .replace(/([a-z])([A-Z])/g, '$1 $2')  // camelCase to space
-      .replace(/_/g, ' ')                     // snake_case to space
-      .replace(/-/g, ' ')                     // kebab-case to space
-      .replace(/\./g, ' ')                    // dot notation to space
+      .replace(/([a-z])([A-Z])/g, '$1 $2') // camelCase to space
+      .replace(/_/g, ' ') // snake_case to space
+      .replace(/-/g, ' ') // kebab-case to space
+      .replace(/\./g, ' ') // dot notation to space
       .toLowerCase();
-    
+
     // Capitalize first letter of each word
-    pretty = pretty.split(' ')
+    pretty = pretty
+      .split(' ')
       .filter(word => word.length > 0)
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
-    
+
     return pretty || action;
   }
 
@@ -267,22 +268,24 @@
         if (parsed && typeof parsed === 'object') {
           // Build pretty summary with key: value lines (truncate long values to ~240 chars)
           const keys = Object.keys(parsed);
-          const prettyLines = keys.map(key => {
-            const val = parsed[key];
-            let valStr = '';
-            if (val === null || val === undefined) {
-              valStr = String(val);
-            } else if (typeof val === 'object') {
-              valStr = JSON.stringify(val);
-            } else {
-              valStr = String(val);
-            }
-            // Truncate long values to ~240 chars
-            if (valStr.length > 240) {
-              valStr = valStr.slice(0, 237) + '...';
-            }
-            return `${key}: ${valStr}`;
-          }).join('\n');
+          const prettyLines = keys
+            .map(key => {
+              const val = parsed[key];
+              let valStr = '';
+              if (val === null || val === undefined) {
+                valStr = String(val);
+              } else if (typeof val === 'object') {
+                valStr = JSON.stringify(val);
+              } else {
+                valStr = String(val);
+              }
+              // Truncate long values to ~240 chars
+              if (valStr.length > 240) {
+                valStr = valStr.slice(0, 237) + '...';
+              }
+              return `${key}: ${valStr}`;
+            })
+            .join('\n');
           hiddenPretty = `<pre id="${base}-pretty" class="hidden" data-content="pretty">${escapeHtml(prettyLines)}</pre>`;
 
           // Raw JSON block
@@ -299,17 +302,21 @@
         if (hiddenPretty || hiddenRaw) {
           if (chipsHtml) {
             // Smaller button and tighter gap when chips are present
-            detailsPart = '<div class="mb-1 flex items-center gap-1">' +
+            detailsPart =
+              '<div class="mb-1 flex items-center gap-1">' +
               chipsHtml +
               '<button class="audit-open-modal px-2 py-0.5 text-[11px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400 ml-1" data-base="' +
               base +
               '">Details</button></div>';
           } else {
             // Smaller standalone Details button
-            detailsPart = '<div class="mb-1"><button class="audit-open-modal px-2 py-0.5 text-[11px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400" data-base="' + base + '">Details</button></div>';
+            detailsPart =
+              '<div class="mb-1"><button class="audit-open-modal px-2 py-0.5 text-[11px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400" data-base="' +
+              base +
+              '">Details</button></div>';
           }
         } else {
-          detailsPart = chipsHtml ? ('<div class="mb-1">' + chipsHtml + '</div>') : '';
+          detailsPart = chipsHtml ? '<div class="mb-1">' + chipsHtml + '</div>' : '';
         }
 
         return `<tr>
@@ -331,16 +338,22 @@
       const t = e.target;
       if (t && t.classList.contains('audit-open-modal')) {
         const base = t.getAttribute('data-base');
-        if (!base) { return; }
+        if (!base) {
+          return;
+        }
 
         // Find hidden content nodes by base ID
         const prettyNode = document.getElementById(`${base}-pretty`);
         const rawNode = document.getElementById(`${base}-raw`);
 
-        if (!prettyNode && !rawNode) { return; }
+        if (!prettyNode && !rawNode) {
+          return;
+        }
 
         const modal = document.getElementById('audit-detail-modal');
-        if (!modal) { return; }
+        if (!modal) {
+          return;
+        }
 
         const modalPretty = document.getElementById('audit-modal-pretty');
         const modalRaw = document.getElementById('audit-modal-raw');
@@ -358,11 +371,15 @@
         if (prettyNode && modalPretty) {
           modalPretty.classList.remove('hidden');
           modalRaw.classList.add('hidden');
-          if (modeBtn) { modeBtn.textContent = 'Raw'; }
+          if (modeBtn) {
+            modeBtn.textContent = 'Raw';
+          }
         } else if (rawNode && modalRaw) {
           modalRaw.classList.remove('hidden');
           modalPretty.classList.add('hidden');
-          if (modeBtn) { modeBtn.textContent = 'Pretty'; }
+          if (modeBtn) {
+            modeBtn.textContent = 'Pretty';
+          }
         }
 
         // Show modal with animation
@@ -744,20 +761,30 @@
       function closeModal() {
         modal.classList.add('hidden');
         try {
-          if (modalPretty) { modalPretty.textContent = ''; }
-          if (modalRaw) { modalRaw.textContent = ''; }
+          if (modalPretty) {
+            modalPretty.textContent = '';
+          }
+          if (modalRaw) {
+            modalRaw.textContent = '';
+          }
         } catch (err) {
           /* ignore */
         }
       }
-      if (closeBtn) { closeBtn.addEventListener('click', closeModal); }
+      if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+      }
       // Close on overlay click (click on modal-overlay itself, not its children)
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {closeModal();}
+      modal.addEventListener('click', e => {
+        if (e.target === modal) {
+          closeModal();
+        }
       });
       if (modeBtn) {
         modeBtn.addEventListener('click', () => {
-          if (!modalPretty || !modalRaw) { return; }
+          if (!modalPretty || !modalRaw) {
+            return;
+          }
           if (modalPretty.classList.contains('hidden')) {
             modalPretty.classList.remove('hidden');
             modalRaw.classList.add('hidden');
@@ -786,11 +813,17 @@
                 ta.value = text;
                 document.body.appendChild(ta);
                 ta.select();
-                try { document.execCommand('copy'); } catch (err) { /* no-op */ }
+                try {
+                  document.execCommand('copy');
+                } catch (err) {
+                  /* no-op */
+                }
                 document.body.removeChild(ta);
               }
             }
-          } catch (err) { /* ignore */ }
+          } catch (err) {
+            /* ignore */
+          }
         });
       }
       window.addEventListener('keydown', e => {
