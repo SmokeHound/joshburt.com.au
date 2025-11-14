@@ -181,7 +181,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function safeClose() { const ex = document.getElementById('avatar-picker-overlay'); if (ex && ex.parentNode) { ex.parentNode.removeChild(ex); } }
     overlay.onclick = (e) => { if (e.target === overlay) { safeClose(); } };
-    modal.querySelector('#init-cancel').onclick = () => safeClose();
+    
+    const cancelBtn = modal.querySelector('#init-cancel');
+    if (cancelBtn) cancelBtn.onclick = () => safeClose();
 
     const initialsInput = modal.querySelector('#init-initials');
     const themeSelect = modal.querySelector('#init-theme');
@@ -190,9 +192,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updatePreview() {
       if (!initialsInput || !themeSelect || !styleSelect || !preview) return;
-      const i = initialsInput.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
-      const t = themeSelect.value;
-      const s = styleSelect.value;
+      const i = (initialsInput.value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
+      const t = themeSelect.value || 'dark';
+      const s = styleSelect.value || 'solid';
       const url = `/.netlify/functions/avatar-initials?i=${encodeURIComponent(i)}&t=${t}&s=${s}`;
       preview.innerHTML = `<img src="${url}" alt="Initials Avatar" class="h-36 w-36 rounded-full" />`;
     }
@@ -202,14 +204,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (styleSelect) styleSelect.onchange = updatePreview;
     updatePreview();
 
-    modal.querySelector('#init-save').onclick = async () => {
-      const i = initialsInput.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
-      const t = themeSelect.value;
-      const s = styleSelect.value;
-      		// Declare these here so both try and catch blocks can access them for revert logic
-      		const avatarEl = document.getElementById('profile-avatar');
-      		const prevAvatarSrc = avatarEl && avatarEl.src ? avatarEl.src : '';
-      try {
+    const saveBtn = modal.querySelector('#init-save');
+    if (saveBtn) {
+      saveBtn.onclick = async () => {
+        if (!initialsInput || !themeSelect || !styleSelect) return;
+        const i = (initialsInput.value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'U';
+        const t = themeSelect.value || 'dark';
+        const s = styleSelect.value || 'solid';
+        // Declare these here so both try and catch blocks can access them for revert logic
+        const avatarEl = document.getElementById('profile-avatar');
+        const prevAvatarSrc = avatarEl && avatarEl.src ? avatarEl.src : '';
+        try {
         // Optimistic local-only preview for initials avatar
         const previewUrl = `/.netlify/functions/avatar-initials?i=${encodeURIComponent(i)}&t=${t}&s=${s}` + '&preview=1&ts=' + Date.now();
         try { if (avatarEl) { avatarEl.src = previewUrl; } } catch (e) { console.warn('Failed to set initials preview', e); }
@@ -237,7 +242,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try { if (avatarEl && prevAvatarSrc) { avatarEl.src = prevAvatarSrc; } } catch (revertErr) { console.warn('Failed to revert initials preview', revertErr); }
         if (window.showNotification) { window.showNotification('Avatar save failed: ' + err.message, 'error'); } else { alert('Avatar save failed: ' + err.message); }
       }
-    };
+      };
+    }
   }
 
   // Augment existing picker button: offer choice between presets and initials

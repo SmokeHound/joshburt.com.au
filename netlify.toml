@@ -65,6 +65,6 @@
     # Conservative permissions policy (expand as needed)
     Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"
     # Content Security Policy - Allow self, CDNs, Auth0, and inline scripts (adjust as needed)
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdn.auth0.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.netlify.app https://joshburt.com.au https://*.auth0.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.auth0.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.netlify.app https://joshburt.com.au https://*.auth0.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
     # XSS Protection (legacy, but still useful for older browsers)
     X-XSS-Protection = "1; mode=block"

@@ -504,13 +504,18 @@ async function loadUsers(page = 1) {
     async function deleteUser(id){ 
         const user = usersState.list.find(u => u.id == id);
         const userName = user ? (user.name || user.email) : 'this user';
-        const confirmed = await window.ModalUtils.confirm({
-            title: 'Delete User',
-            message: `Are you sure you want to delete ${userName}? This action cannot be undone.`,
-            confirmText: 'Delete',
-            cancelText: 'Cancel',
-            type: 'danger'
-        });
+        let confirmed = false;
+        if (window.ModalUtils && window.ModalUtils.confirm) {
+            confirmed = await window.ModalUtils.confirm({
+                title: 'Delete User',
+                message: `Are you sure you want to delete ${userName}? This action cannot be undone.`,
+                confirmText: 'Delete',
+                cancelText: 'Cancel',
+                type: 'danger'
+            });
+        } else {
+            confirmed = confirm(`Are you sure you want to delete ${userName}? This action cannot be undone.`);
+        }
         if(!confirmed) return; 
         const token=(window.getToken && window.getToken()) || null; 
         try { 
@@ -637,23 +642,32 @@ async function loadUsers(page = 1) {
                 if(e.target.classList.contains('reset-password-user')){ 
                     const user = usersState.list.find(u => u.id == id);
                     const userName = user ? (user.name || user.email) : 'this user';
-                    const confirmed = await window.ModalUtils.confirm({
-                        title: 'Reset Password',
-                        message: `Reset password for ${userName}? A temporary password will be generated.`,
-                        confirmText: 'Reset',
-                        cancelText: 'Cancel',
-                        type: 'warning'
-                    });
+                    let confirmed = false;
+                    if (window.ModalUtils && window.ModalUtils.confirm) {
+                        confirmed = await window.ModalUtils.confirm({
+                            title: 'Reset Password',
+                            message: `Reset password for ${userName}? A temporary password will be generated.`,
+                            confirmText: 'Reset',
+                            cancelText: 'Cancel',
+                            type: 'warning'
+                        });
+                    } else {
+                        confirmed = confirm(`Reset password for ${userName}? A temporary password will be generated.`);
+                    }
                     if(!confirmed) return;
                     try { 
                         const newPassword=Math.random().toString(36).slice(-10)+'A1!'; 
                         const res=await fetch(`${FN_BASE}/users/${id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ newPassword }) }); 
                         if(!res.ok) throw new Error('Failed to reset'); 
-                        await window.ModalUtils.alert({
-                            title: 'Password Reset',
-                            message: `Temporary password for ${userName}:\n\n${newPassword}\n\nPlease save this password and share it securely with the user.`,
-                            type: 'success'
-                        });
+                        if (window.ModalUtils && window.ModalUtils.alert) {
+                            await window.ModalUtils.alert({
+                                title: 'Password Reset',
+                                message: `Temporary password for ${userName}:\n\n${newPassword}\n\nPlease save this password and share it securely with the user.`,
+                                type: 'success'
+                            });
+                        } else {
+                            alert(`Temporary password for ${userName}:\n\n${newPassword}\n\nPlease save this password and share it securely with the user.`);
+                        }
                     } catch(err){ 
                         showToast('Error: '+err.message,'error'); 
                     } 

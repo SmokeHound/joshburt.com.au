@@ -144,7 +144,7 @@
       </div>
 
       <div class="mt-4">
-        <input type="text" id="searchReturns" placeholder="Search by part code, supplier, or RMA number..." class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+        <input type="text" id="searchReturns" placeholder="Search by part code, supplier, or Inv number..." class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
       </div>
     </div>
 
@@ -201,8 +201,8 @@
             </div>
             
             <div>
-              <label for="rma-number" class="block mb-2 font-medium">RMA Number</label>
-              <input type="text" id="rma-number" name="rma-number" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Supplier's RMA number">
+              <label for="inv-number" class="block mb-2 font-medium">RMA Number</label>
+              <input type="text" id="inv-number" name="inv-number" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Supplier's RMA number">
             </div>
           </div>
 
@@ -547,7 +547,7 @@
       
       const returnData = {
         return_date: formData.get('return-date'),
-        inv_number: formData.get('rma-number') || null,
+        inv_number: formData.get('inv-number') || null,
         supplier: formData.get('supplier'),
         part_code: formData.get('part-code'),
         part_name: formData.get('part-name'),
@@ -608,7 +608,7 @@
       document.getElementById('modal-title').textContent = 'Edit Return';
 
       document.getElementById('return-date').value = ret.return_date;
-      document.getElementById('rma-number').value = ret.inv_number || '';
+      document.getElementById('inv-number').value = ret.inv_number || '';
       document.getElementById('supplier').value = ret.supplier;
       document.getElementById('part-code').value = ret.part_code;
       document.getElementById('part-name').value = ret.part_name;

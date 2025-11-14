@@ -506,6 +506,34 @@
             } catch (e) {
               console.warn('Products fetch failed:', e);
             }
+            
+            // Fetch consumables and add to total products count
+            try {
+              const res = await fetchAuth(`${FN_BASE}/consumables`);
+              if (res.ok) {
+                const j = await res.json();
+                const arr = Array.isArray(j) ? j : (Array.isArray(j?.consumables) ? j.consumables : []);
+                productsCount += arr.length;
+                // Add consumables low stock to count
+                lowStock += arr.filter(c => (c.stock_quantity || c.soh || c.stock || 0) < 10).length;
+              }
+            } catch (e) {
+              console.warn('Consumables fetch failed:', e);
+            }
+            
+            // Fetch filters and add to total products count
+            try {
+              const res = await fetchAuth(`${FN_BASE}/filters`);
+              if (res.ok) {
+                const j = await res.json();
+                const arr = Array.isArray(j) ? j : (Array.isArray(j?.filters) ? j.filters : []);
+                productsCount += arr.length;
+                // Add filters low stock to count
+                lowStock += arr.filter(f => (f.stock_quantity || f.stock || 0) < 10).length;
+              }
+            } catch (e) {
+              console.warn('Filters fetch failed:', e);
+            }
           }
 
           // 3) Health check for DB indicator
