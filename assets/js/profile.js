@@ -129,6 +129,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (confirmPwdField) confirmPwdField.value = '';
   };
 
+  // Password section toggle functionality
+  const togglePasswordBtn = document.getElementById('toggle-password-section');
+  const passwordContent = document.getElementById('password-change-content');
+  const passwordToggleIcon = document.getElementById('password-toggle-icon');
+
+  if (togglePasswordBtn && passwordContent && passwordToggleIcon) {
+    togglePasswordBtn.onclick = () => {
+      const isExpanded = togglePasswordBtn.getAttribute('aria-expanded') === 'true';
+
+      if (isExpanded) {
+        // Collapse
+        passwordContent.classList.add('hidden');
+        togglePasswordBtn.setAttribute('aria-expanded', 'false');
+        passwordToggleIcon.style.transform = 'rotate(0deg)';
+      } else {
+        // Expand
+        passwordContent.classList.remove('hidden');
+        togglePasswordBtn.setAttribute('aria-expanded', 'true');
+        passwordToggleIcon.style.transform = 'rotate(180deg)';
+      }
+    };
+  }
+
   // Profile form submission handler
   const profileForm = document.getElementById('profile-form');
   if (profileForm) {

@@ -1,161 +1,316 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Profile</title>
     <link rel="manifest" href="./manifest.json" />
     <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
-    <link rel="stylesheet" href="./assets/css/styles.css">
+    <link rel="stylesheet" href="./assets/css/styles.css" />
     <script src="./assets/js/init-shared.js" defer></script>
     <link rel="stylesheet" href="./assets/css/accessibility.css" />
-  <script src="./assets/js/accessibility.js" defer></script>
-</head>
-<body class="dark min-h-screen">
-  
-
+    <script src="./assets/js/accessibility.js" defer></script>
+  </head>
+  <body class="dark min-h-screen">
     <!-- Mobile Menu Toggle -->
-    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+    <button
+      id="menu-toggle"
+      class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+      aria-label="Toggle sidebar"
+      aria-expanded="false"
+    >
+      ☰
+    </button>
     <div id="main-nav"></div>
-    <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
+    <script>
+      fetch('shared-nav.html')
+        .then(r => r.text())
+        .then(h => {
+          document.getElementById('main-nav').innerHTML = h;
+          if (window.setActiveNavLink) window.setActiveNavLink();
+        });
+    </script>
     <main id="main-content" class="max-w-4xl mx-auto p-6 md:ml-64" role="main">
-        <header class="page-header card border mb-6">
-          <h1 class="text-3xl font-bold flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <circle cx="12" cy="8" r="4" stroke-width="1.5"></circle>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 21c0-3.3 2.7-6 6-6s6 2.7 6 6"></path>
+      <header class="page-header card border mb-6">
+        <h1 class="text-3xl font-bold flex items-center gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-blue-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <circle cx="12" cy="8" r="4" stroke-width="1.5"></circle>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M6 21c0-3.3 2.7-6 6-6s6 2.7 6 6"
+            ></path>
+          </svg>
+          My Profile
+        </h1>
+      </header>
+
+      <!-- Profile Overview Card -->
+      <div class="card widget-primary rounded-lg shadow-md p-6 mb-6">
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+          <div class="flex flex-col items-center gap-3">
+            <img
+              id="profile-avatar"
+              src="./assets/images/avatar-placeholder.svg"
+              alt="Avatar"
+              class="w-32 h-32 rounded-full border-4 border-blue-500 shadow-lg"
+            />
+            <button
+              type="button"
+              id="change-avatar"
+              class="btn-neon-blue px-4 py-2 rounded text-sm"
+            >
+              Change Avatar
+            </button>
+          </div>
+          <div class="flex-1 text-center md:text-left">
+            <h2 id="profile-display-name" class="text-2xl font-bold mb-2">Loading...</h2>
+            <p id="profile-display-email" class="text-gray-400 mb-3">Loading...</p>
+            <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+              <span
+                id="profile-role-badge"
+                class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-600 text-white"
+                >User</span
+              >
+              <span
+                id="profile-status-badge"
+                class="px-3 py-1 rounded-full text-sm font-semibold bg-green-600 text-white"
+                >Active</span
+              >
+              <span
+                id="profile-member-since"
+                class="px-3 py-1 rounded-full text-sm bg-gray-700 text-gray-300"
+                >Member since: Loading...</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Edit Form -->
+      <form
+        id="profile-form"
+        class="card widget-primary rounded-lg shadow-md p-6 flex flex-col gap-6 mb-6"
+      >
+        <h3 class="text-xl font-semibold border-b border-gray-700 pb-2">
+          Edit Profile Information
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-gray-300">Name</span>
+            <input
+              type="text"
+              id="profile-name"
+              class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              placeholder="Enter your name"
+            />
+          </label>
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-gray-300">Email</span>
+            <input
+              type="email"
+              id="profile-email"
+              class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-gray-500 cursor-not-allowed"
+              disabled
+            />
+          </label>
+        </div>
+        <div class="border-t border-gray-700 pt-4 mt-4">
+          <button
+            type="button"
+            id="toggle-password-section"
+            class="w-full flex items-center justify-between text-lg font-semibold mb-4 text-gray-200 hover:text-blue-400 transition-colors cursor-pointer"
+            aria-expanded="false"
+            aria-controls="password-change-content"
+          >
+            <span>Change Password</span>
+            <svg
+              id="password-toggle-icon"
+              class="w-5 h-5 transform transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
             </svg>
-            My Profile
-          </h1>
-        </header>
-        
-        <!-- Profile Overview Card -->
-        <div class="card widget-primary rounded-lg shadow-md p-6 mb-6">
-            <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
-                <div class="flex flex-col items-center gap-3">
-                    <img id="profile-avatar" src="./assets/images/avatar-placeholder.svg" alt="Avatar" class="w-32 h-32 rounded-full border-4 border-blue-500 shadow-lg">
-                    <button type="button" id="change-avatar" class="btn-neon-blue px-4 py-2 rounded text-sm">Change Avatar</button>
-                </div>
-                <div class="flex-1 text-center md:text-left">
-                    <h2 id="profile-display-name" class="text-2xl font-bold mb-2">Loading...</h2>
-                    <p id="profile-display-email" class="text-gray-400 mb-3">Loading...</p>
-                    <div class="flex flex-wrap gap-2 justify-center md:justify-start">
-                        <span id="profile-role-badge" class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-600 text-white">User</span>
-                        <span id="profile-status-badge" class="px-3 py-1 rounded-full text-sm font-semibold bg-green-600 text-white">Active</span>
-                        <span id="profile-member-since" class="px-3 py-1 rounded-full text-sm bg-gray-700 text-gray-300">Member since: Loading...</span>
-                    </div>
-                </div>
+          </button>
+          <div id="password-change-content" class="space-y-4 hidden">
+            <label class="flex flex-col gap-2">
+              <span class="text-sm font-semibold text-gray-300">Current Password</span>
+              <input
+                type="password"
+                id="profile-current-password"
+                autocomplete="current-password"
+                class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                placeholder="Enter current password to change"
+              />
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="text-sm font-semibold text-gray-300">New Password</span>
+              <input
+                type="password"
+                id="profile-new-password"
+                autocomplete="new-password"
+                class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                placeholder="Enter new password"
+              />
+              <span class="text-xs text-gray-400"
+                >Must be at least 8 characters with uppercase, lowercase, number, and special
+                character</span
+              >
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="text-sm font-semibold text-gray-300">Confirm New Password</span>
+              <input
+                type="password"
+                id="profile-confirm-password"
+                autocomplete="new-password"
+                class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                placeholder="Confirm new password"
+              />
+            </label>
+            <div class="text-xs text-gray-400">
+              <p class="font-semibold mb-1">Password Requirements:</p>
+              <ul class="list-disc list-inside space-y-1 text-gray-500">
+                <li>At least 8 characters long</li>
+                <li>At least one uppercase letter</li>
+                <li>At least one lowercase letter</li>
+                <li>At least one number</li>
+                <li>At least one special character (!@#$%^&*(),.?":{}|&lt;&gt;)</li>
+              </ul>
             </div>
+          </div>
         </div>
-
-        <!-- Profile Edit Form -->
-        <form id="profile-form" class="card widget-primary rounded-lg shadow-md p-6 flex flex-col gap-6 mb-6">
-            <h3 class="text-xl font-semibold border-b border-gray-700 pb-2">Edit Profile Information</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <label class="flex flex-col gap-2">
-                    <span class="text-sm font-semibold text-gray-300">Name</span>
-                    <input type="text" id="profile-name" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter your name" />
-                </label>
-                <label class="flex flex-col gap-2">
-                    <span class="text-sm font-semibold text-gray-300">Email</span>
-                    <input type="email" id="profile-email" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-gray-500 cursor-not-allowed" disabled />
-                </label>
-            </div>
-            <div class="border-t border-gray-700 pt-4 mt-4">
-                <h4 class="text-lg font-semibold mb-4 text-gray-200">Change Password</h4>
-                <div class="space-y-4">
-                    <label class="flex flex-col gap-2">
-                        <span class="text-sm font-semibold text-gray-300">Current Password</span>
-                        <input type="password" id="profile-current-password" autocomplete="current-password" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter current password to change" />
-                    </label>
-                    <label class="flex flex-col gap-2">
-                        <span class="text-sm font-semibold text-gray-300">New Password</span>
-                        <input type="password" id="profile-new-password" autocomplete="new-password" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter new password" />
-                        <span class="text-xs text-gray-400">Must be at least 8 characters with uppercase, lowercase, number, and special character</span>
-                    </label>
-                    <label class="flex flex-col gap-2">
-                        <span class="text-sm font-semibold text-gray-300">Confirm New Password</span>
-                        <input type="password" id="profile-confirm-password" autocomplete="new-password" class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Confirm new password" />
-                    </label>
-                    <div class="text-xs text-gray-400">
-                        <p class="font-semibold mb-1">Password Requirements:</p>
-                        <ul class="list-disc list-inside space-y-1 text-gray-500">
-                            <li>At least 8 characters long</li>
-                            <li>At least one uppercase letter</li>
-                            <li>At least one lowercase letter</li>
-                            <li>At least one number</li>
-                            <li>At least one special character (!@#$%^&*(),.?":{}|&lt;&gt;)</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="flex gap-3">
-                <button type="submit" class="btn-neon-green px-6 py-3 rounded font-semibold flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Save Changes
-                </button>
-                <button type="button" id="cancel-edit" class="px-6 py-3 rounded font-semibold bg-gray-700 hover:bg-gray-600 text-white transition">Cancel</button>
-            </div>
-        </form>
-
-        <!-- Account Statistics -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="card rounded-lg shadow-md p-4 text-center">
-                <div class="text-3xl font-bold text-blue-500" id="stats-orders">0</div>
-                <div class="text-sm text-gray-400">Total Orders</div>
-            </div>
-            <div class="card rounded-lg shadow-md p-4 text-center">
-                <div class="text-3xl font-bold text-green-500" id="stats-logins">0</div>
-                <div class="text-sm text-gray-400">Login Count</div>
-            </div>
-            <div class="card rounded-lg shadow-md p-4 text-center">
-                <div class="text-3xl font-bold text-purple-500" id="stats-activities">0</div>
-                <div class="text-sm text-gray-400">Activities</div>
-            </div>
+        <div class="flex gap-3">
+          <button
+            type="submit"
+            class="btn-neon-green px-6 py-3 rounded font-semibold flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Save Changes
+          </button>
+          <button
+            type="button"
+            id="cancel-edit"
+            class="px-6 py-3 rounded font-semibold bg-gray-700 hover:bg-gray-600 text-white transition"
+          >
+            Cancel
+          </button>
         </div>
+      </form>
 
-        <!-- Activity Log Section -->
-        <section class="card widget-secondary rounded-xl shadow-xl p-6 border-2 border-gray-700/50">
-            <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-gray-700/50">
-                <h2 class="text-2xl font-bold flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <span class="text-white">Recent Activity</span>
-                </h2>
-                <span id="activity-count" class="px-4 py-2 rounded-lg bg-gray-800/50 text-sm font-semibold text-gray-300 border border-gray-700">0 activities</span>
+      <!-- Account Statistics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card rounded-lg shadow-md p-4 text-center">
+          <div class="text-3xl font-bold text-blue-500" id="stats-orders">0</div>
+          <div class="text-sm text-gray-400">Total Orders</div>
+        </div>
+        <div class="card rounded-lg shadow-md p-4 text-center">
+          <div class="text-3xl font-bold text-green-500" id="stats-logins">0</div>
+          <div class="text-sm text-gray-400">Login Count</div>
+        </div>
+        <div class="card rounded-lg shadow-md p-4 text-center">
+          <div class="text-3xl font-bold text-purple-500" id="stats-activities">0</div>
+          <div class="text-sm text-gray-400">Activities</div>
+        </div>
+      </div>
+
+      <!-- Activity Log Section -->
+      <section class="card widget-secondary rounded-xl shadow-xl p-6 border-2 border-gray-700/50">
+        <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-gray-700/50">
+          <h2 class="text-2xl font-bold flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
             </div>
-            <div id="activity-log" class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                <div class="text-center text-gray-400 py-12 flex flex-col items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span class="text-lg">Loading activity log...</span>
-                </div>
-            </div>
-        </section>
+            <span class="text-white">Recent Activity</span>
+          </h2>
+          <span
+            id="activity-count"
+            class="px-4 py-2 rounded-lg bg-gray-800/50 text-sm font-semibold text-gray-300 border border-gray-700"
+            >0 activities</span
+          >
+        </div>
+        <div
+          id="activity-log"
+          class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar"
+        >
+          <div class="text-center text-gray-400 py-12 flex flex-col items-center gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-16 w-16 text-gray-600 animate-pulse"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span class="text-lg">Loading activity log...</span>
+          </div>
+        </div>
+      </section>
     </main>
     <style>
-        /* Custom scrollbar for activity log */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(31, 41, 55, 0.5);
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(59, 130, 246, 0.5);
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(59, 130, 246, 0.8);
-        }
+      /* Custom scrollbar for activity log */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(31, 41, 55, 0.5);
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(59, 130, 246, 0.5);
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(59, 130, 246, 0.8);
+      }
     </style>
     <script src="./assets/js/profile.js"></script>
-</body>
+  </body>
 </html>
