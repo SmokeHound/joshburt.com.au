@@ -1,12 +1,10 @@
 # joshburt.com.au
 
-[![Deploy via FTP](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml)
-
 **Production-ready serverless web application** for workshop management and product ordering.
 
 ## 🔗 Live Sites
 - **Primary**: https://joshburt.netlify.app/ [![Netlify Status](https://api.netlify.com/api/v1/badges/6390337a-60f4-4d6e-8078-0fdbd19ae28b/deploy-status)](https://app.netlify.com/projects/joshburt/deploys)(Netlify + Functions)
-- **Mirror**: https://joshburt.com.au/ (FTP static mirror)
+- **Mirror**: https://joshburt.com.au/ [![Deploy via FTP](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml) (FTP static mirror)
 
 ---
 
