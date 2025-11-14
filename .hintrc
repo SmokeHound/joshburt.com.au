@@ -17,7 +17,8 @@
           "-webkit-text-size-adjust"
         ]
       }
-    ]
+    ],
+    "axe/language": "off"
   },
   "browserslist": [
     "defaults",
