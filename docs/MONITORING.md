@@ -9,6 +9,7 @@ System monitoring, health checks, and observability for joshburt.com.au.
 **Endpoint**: `GET /.netlify/functions/health`
 
 **Response**:
+
 ```json
 {
   "status": "healthy",

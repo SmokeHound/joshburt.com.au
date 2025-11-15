@@ -16,6 +16,7 @@ Emergency rollback procedures for joshburt.com.au.
 ### Via Dashboard
 
 **Steps**:
+
 1. Go to **Deploys** tab
 2. Find previous successful deploy
 3. Click **"Publish deploy"**
@@ -34,6 +35,7 @@ netlify deploy:publish <deploy-id>
 ```
 
 **Example**:
+
 ```bash
 netlify deploy:publish 5f8a1b2c3d4e5f6g7h8i9j0k
 ```
@@ -45,6 +47,7 @@ netlify deploy:publish 5f8a1b2c3d4e5f6g7h8i9j0k
 ### Point-in-Time Recovery (Neon)
 
 **Neon Dashboard**:
+
 1. Project → **Restore**
 2. Select timestamp (last 7 days)
 3. Create new branch or restore to main
@@ -157,6 +160,7 @@ UPDATE settings SET data = jsonb_set(data, '{maintenanceMode}', 'false');
 ### Notify Users
 
 If issue affected users:
+
 1. Post incident report
 2. Email affected users (if applicable)
 3. Update status page
@@ -180,12 +184,14 @@ If issue affected users:
 ### 3. Rollback Decision
 
 **Rollback if**:
+
 - Critical functionality broken
 - Data corruption risk
 - Security vulnerability
-- >50% users affected
+- > 50% users affected
 
 **Don't rollback if**:
+
 - Minor UI issue
 - Affects <10% users
 - Quick hotfix available
@@ -197,6 +203,7 @@ Follow procedures above (Netlify and/or database).
 ### 5. Root Cause Analysis
 
 After rollback:
+
 - Identify cause
 - Document lessons learned
 - Update tests to prevent recurrence

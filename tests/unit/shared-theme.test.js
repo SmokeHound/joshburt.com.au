@@ -38,16 +38,25 @@ describe('Theme System (Preset / Persistence)', () => {
   });
 
   test('applies custom color variables from siteSettings', () => {
-    localStorage.setItem('siteSettings', JSON.stringify({
-      primaryColor: '#123456',
-      secondaryColor: '#abcdef',
-      accentColor: '#ff00aa',
-      theme: 'dark'
-    }));
+    localStorage.setItem(
+      'siteSettings',
+      JSON.stringify({
+        primaryColor: '#123456',
+        secondaryColor: '#abcdef',
+        accentColor: '#ff00aa',
+        theme: 'dark'
+      })
+    );
     window.Theme.applyFromStorage();
-    expect(getComputedStyle(document.documentElement).getPropertyValue('--tw-color-primary').trim()).toBe('#123456');
-    expect(getComputedStyle(document.documentElement).getPropertyValue('--tw-color-secondary').trim()).toBe('#abcdef');
-    expect(getComputedStyle(document.documentElement).getPropertyValue('--tw-color-accent').trim()).toBe('#ff00aa');
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--tw-color-primary').trim()
+    ).toBe('#123456');
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--tw-color-secondary').trim()
+    ).toBe('#abcdef');
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--tw-color-accent').trim()
+    ).toBe('#ff00aa');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 
@@ -111,8 +120,14 @@ describe('Theme System (Preset / Persistence)', () => {
       accent: '#0000ff'
     };
     window.Theme.setPalette(customColors, false);
-    expect(getComputedStyle(document.documentElement).getPropertyValue('--tw-color-primary').trim()).toBe('#ff0000');
-    expect(getComputedStyle(document.documentElement).getPropertyValue('--tw-color-secondary').trim()).toBe('#00ff00');
-    expect(getComputedStyle(document.documentElement).getPropertyValue('--tw-color-accent').trim()).toBe('#0000ff');
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--tw-color-primary').trim()
+    ).toBe('#ff0000');
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--tw-color-secondary').trim()
+    ).toBe('#00ff00');
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--tw-color-accent').trim()
+    ).toBe('#0000ff');
   });
 });

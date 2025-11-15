@@ -4,7 +4,7 @@ const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requireAuth } = require('../../utils/http');
 const { hasPermission } = require('../../utils/rbac');
 
-exports.handler = withHandler(async function(event) {
+exports.handler = withHandler(async function (event) {
   await database.connect();
 
   const method = event.httpMethod;
@@ -67,13 +67,13 @@ exports.handler = withHandler(async function(event) {
 
     try {
       const body = parseBody(event);
-      const { 
-        user_id, 
-        type, 
-        title, 
-        message, 
-        related_entity_type, 
-        related_entity_id, 
+      const {
+        user_id,
+        type,
+        title,
+        message,
+        related_entity_type,
+        related_entity_id,
         action_url,
         priority,
         expires_at
@@ -101,10 +101,13 @@ exports.handler = withHandler(async function(event) {
 
       const result = await database.run(query, params);
 
-      return ok({
-        id: result.id,
-        message: 'Notification created successfully'
-      }, 201);
+      return ok(
+        {
+          id: result.id,
+          message: 'Notification created successfully'
+        },
+        201
+      );
     } catch (e) {
       console.error('POST /notifications error:', e);
       return error(500, 'Failed to create notification');
@@ -161,10 +164,9 @@ exports.handler = withHandler(async function(event) {
 
       if (delete_all_read) {
         // Delete all read notifications for this user
-        await database.run(
-          'DELETE FROM notifications WHERE user_id = ? AND is_read = true',
-          [user.id]
-        );
+        await database.run('DELETE FROM notifications WHERE user_id = ? AND is_read = true', [
+          user.id
+        ]);
         return ok({ message: 'All read notifications deleted' });
       }
 
@@ -173,10 +175,10 @@ exports.handler = withHandler(async function(event) {
       }
 
       // Delete specific notification (must belong to user)
-      const result = await database.run(
-        'DELETE FROM notifications WHERE id = ? AND user_id = ?',
-        [notification_id, user.id]
-      );
+      const result = await database.run('DELETE FROM notifications WHERE id = ? AND user_id = ?', [
+        notification_id,
+        user.id
+      ]);
 
       if (result.changes === 0) {
         return error(404, 'Notification not found or does not belong to you');

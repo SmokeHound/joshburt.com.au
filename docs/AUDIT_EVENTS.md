@@ -17,9 +17,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ## Authentication Events
 
 ### user:login
+
 **Description**: Successful user login
 
 **Logged Details**:
+
 ```json
 {
   "email": "user@example.com",
@@ -34,9 +36,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### user:login-failed
+
 **Description**: Failed login attempt
 
 **Logged Details**:
+
 ```json
 {
   "email": "user@example.com",
@@ -50,9 +54,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### user:logout
+
 **Description**: User logout
 
 **Logged Details**:
+
 ```json
 {
   "email": "user@example.com"
@@ -64,9 +70,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### user:register
+
 **Description**: New user registration
 
 **Logged Details**:
+
 ```json
 {
   "email": "newuser@example.com",
@@ -79,9 +87,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### user:password-reset
+
 **Description**: Password reset completed
 
 **Logged Details**:
+
 ```json
 {
   "email": "user@example.com",
@@ -94,9 +104,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### user:2fa-enable
+
 **Description**: 2FA enabled for user
 
 **Logged Details**:
+
 ```json
 {
   "userId": 123,
@@ -109,9 +121,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### user:2fa-disable
+
 **Description**: 2FA disabled for user
 
 **Logged Details**:
+
 ```json
 {
   "userId": 123,
@@ -126,9 +140,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ## User Management
 
 ### user:create
+
 **Description**: Admin creates new user
 
 **Logged Details**:
+
 ```json
 {
   "createdUserId": 456,
@@ -145,15 +161,17 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### user:update
+
 **Description**: User profile updated
 
 **Logged Details**:
+
 ```json
 {
   "userId": 123,
   "changedFields": ["name", "role"],
-  "oldValues": {"name": "Old Name", "role": "mechanic"},
-  "newValues": {"name": "New Name", "role": "manager"}
+  "oldValues": { "name": "Old Name", "role": "mechanic" },
+  "newValues": { "name": "New Name", "role": "manager" }
 }
 ```
 
@@ -164,9 +182,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### user:delete
+
 **Description**: User deleted
 
 **Logged Details**:
+
 ```json
 {
   "deletedUserId": 123,
@@ -182,9 +202,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### user:avatar-update
+
 **Description**: User avatar updated
 
 **Logged Details**:
+
 ```json
 {
   "userId": 123,
@@ -200,9 +222,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ## Product Management
 
 ### product:create
+
 **Description**: New product created
 
 **Logged Details**:
+
 ```json
 {
   "productId": 789,
@@ -220,15 +244,17 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### product:update
+
 **Description**: Product updated
 
 **Logged Details**:
+
 ```json
 {
   "productId": 789,
   "changedFields": ["price", "stock_quantity"],
-  "oldValues": {"price": 49.99, "stock_quantity": 10},
-  "newValues": {"price": 54.99, "stock_quantity": 15}
+  "oldValues": { "price": 49.99, "stock_quantity": 10 },
+  "newValues": { "price": 54.99, "stock_quantity": 15 }
 }
 ```
 
@@ -239,9 +265,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### product:delete
+
 **Description**: Product deleted
 
 **Logged Details**:
+
 ```json
 {
   "productId": 789,
@@ -259,9 +287,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ## Order Management
 
 ### order:create
+
 **Description**: New order created
 
 **Logged Details**:
+
 ```json
 {
   "orderId": 101,
@@ -276,9 +306,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### order:update
+
 **Description**: Order updated
 
 **Logged Details**:
+
 ```json
 {
   "orderId": 101,
@@ -295,9 +327,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### order:status-change
+
 **Description**: Order status changed (with history)
 
 **Logged Details**:
+
 ```json
 {
   "orderId": 101,
@@ -314,9 +348,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### order:delete
+
 **Description**: Order cancelled/deleted
 
 **Logged Details**:
+
 ```json
 {
   "orderId": 101,
@@ -334,9 +370,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ## Inventory Management
 
 ### inventory:update
+
 **Description**: Stock level changed
 
 **Logged Details**:
+
 ```json
 {
   "itemType": "product",
@@ -354,9 +392,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### inventory:reorder
+
 **Description**: Reorder point triggered
 
 **Logged Details**:
+
 ```json
 {
   "itemType": "product",
@@ -374,14 +414,16 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ## Settings Management
 
 ### settings:update
+
 **Description**: Site settings changed
 
 **Logged Details**:
+
 ```json
 {
   "changedSettings": ["maintenanceMode", "featureFlags.auth0Enabled"],
-  "oldValues": {"maintenanceMode": false, "featureFlags.auth0Enabled": true},
-  "newValues": {"maintenanceMode": true, "featureFlags.auth0Enabled": false}
+  "oldValues": { "maintenanceMode": false, "featureFlags.auth0Enabled": true },
+  "newValues": { "maintenanceMode": true, "featureFlags.auth0Enabled": false }
 }
 ```
 
@@ -394,9 +436,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ## System Events
 
 ### system:migration
+
 **Description**: Database migration executed
 
 **Logged Details**:
+
 ```json
 {
   "migrationName": "002_add_order_status_tracking.sql",
@@ -410,9 +454,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### system:backup
+
 **Description**: Database backup completed
 
 **Logged Details**:
+
 ```json
 {
   "backupFile": "backup-20251111.dump",
@@ -426,9 +472,11 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ---
 
 ### system:error
+
 **Description**: Critical system error
 
 **Logged Details**:
+
 ```json
 {
   "error": "Database connection failed",
@@ -443,12 +491,12 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 
 ## Event Severity Levels
 
-| Severity | Events | Action Required |
-|----------|--------|-----------------|
-| **INFO** | login, logout, create, update | None |
-| **WARNING** | failed login (3+ attempts), reorder triggered | Monitor |
-| **ERROR** | delete, system error | Review |
-| **CRITICAL** | settings changed, migration, backup failed | Immediate review |
+| Severity     | Events                                        | Action Required  |
+| ------------ | --------------------------------------------- | ---------------- |
+| **INFO**     | login, logout, create, update                 | None             |
+| **WARNING**  | failed login (3+ attempts), reorder triggered | Monitor          |
+| **ERROR**    | delete, system error                          | Review           |
+| **CRITICAL** | settings changed, migration, backup failed    | Immediate review |
 
 ---
 
@@ -457,7 +505,7 @@ Comprehensive list of all audit events tracked in joshburt.com.au.
 ### Failed Logins (Last 24h)
 
 ```sql
-SELECT 
+SELECT
   details->>'email' as email,
   COUNT(*) as attempts,
   MAX(created_at) as last_attempt
@@ -472,7 +520,7 @@ ORDER BY attempts DESC;
 ### User Activity Summary
 
 ```sql
-SELECT 
+SELECT
   u.name,
   COUNT(*) FILTER (WHERE al.action LIKE 'product:%') as product_actions,
   COUNT(*) FILTER (WHERE al.action LIKE 'order:%') as order_actions,
@@ -487,7 +535,7 @@ ORDER BY product_actions + order_actions + user_actions DESC;
 ### Recent Admin Changes
 
 ```sql
-SELECT 
+SELECT
   u.name as admin,
   al.action,
   al.details,

@@ -28,17 +28,20 @@ async function populateProducts() {
     let imported = 0;
     for (const item of productsData) {
       try {
-        await database.run(`
+        await database.run(
+          `
           INSERT INTO products (name, code, type, specs, description, image)
           VALUES (?, ?, ?, ?, ?, ?)
-        `, [
-          item.name,
-          item.code,
-          item.type,
-          item.specs || '',
-          item.description || '',
-          item.image || ''
-        ]);
+        `,
+          [
+            item.name,
+            item.code,
+            item.type,
+            item.specs || '',
+            item.description || '',
+            item.image || ''
+          ]
+        );
         imported++;
       } catch (error) {
         if (error.message.includes('UNIQUE constraint')) {
@@ -54,7 +57,6 @@ async function populateProducts() {
     // Verify import
     const finalCount = await database.get('SELECT COUNT(*) as count FROM products');
     console.log(`📊 Total products in database: ${finalCount.count}`);
-
   } catch (error) {
     console.error('❌ Error populating products:', error);
   } finally {

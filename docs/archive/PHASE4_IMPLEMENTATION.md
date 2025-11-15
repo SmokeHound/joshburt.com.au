@@ -1,6 +1,7 @@
 # Phase 4: Feature Expansion - Implementation Summary
 
 ## Overview
+
 This document summarizes the implementation of Phase 4 features for the Josh Burt website, focusing on enhanced functionality for products, orders, analytics, and notifications.
 
 ## Completed Features
@@ -8,6 +9,7 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 ### Week 11-12: Product Enhancements
 
 #### Database Schema (migrations/001_add_product_categories.sql)
+
 - **Product Categories Table**: Full category management with parent-child relationships
 - **Product Enhancements**: Added `category_id`, `price`, `stock_quantity`, and `is_active` columns
 - **Product Variants**: Support for size, color, and other variant types
@@ -15,6 +17,7 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 - **Full-Text Search**: PostgreSQL GIN index for fast product search
 
 #### API Endpoints
+
 - **/.netlify/functions/products** (Enhanced)
   - Search functionality: `?search=term`
   - Category filtering: `?category_id=1`
@@ -31,11 +34,13 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 ### Week 13: Order Management
 
 #### Database Schema (migrations/002_add_order_status_tracking.sql)
+
 - **Order Status Tracking**: Extended status fields (tracking_number, status_updated_at, etc.)
 - **Order Status History**: Complete audit trail of all status changes
 - **Cancellation Support**: Track cancelled orders with reasons
 
 #### API Endpoints
+
 - **/.netlify/functions/orders** (Enhanced)
   - Status updates with history tracking
   - Order filtering: `?status=pending&created_by=user@example.com`
@@ -45,6 +50,7 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
   - Automatic notifications on status changes
 
 #### Email Notifications
+
 - **utils/email.js** (Enhanced)
   - `sendOrderStatusEmail()`: Notify users of order status changes
   - `sendOrderCreatedEmail()`: Confirm order creation
@@ -54,6 +60,7 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 ### Week 14-15: Enhanced Analytics
 
 #### API Endpoints
+
 - **/.netlify/functions/analytics** (New)
   - Order trends: `?report_type=order_trends&date_from=2025-01-01&date_to=2025-01-31`
   - Top products: `?report_type=top_products`
@@ -63,6 +70,7 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
   - Overview report: No report_type specified
 
 #### Features
+
 - Date range filtering
 - Period-over-period comparison
 - Category segmentation
@@ -72,11 +80,13 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 ### Week 16: Notification System
 
 #### Database Schema (migrations/003_add_notification_system.sql)
+
 - **Notifications Table**: Store in-app notifications with priority levels
 - **Notification Preferences**: Per-user notification preferences (email/in-app)
 - **Automatic Cleanup**: Expired notifications support
 
 #### API Endpoints
+
 - **/.netlify/functions/notifications** (New)
   - GET: List notifications with filtering (unread, by type)
   - POST: Create system notifications (admin only)
@@ -88,6 +98,7 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
   - PUT: Update notification preferences
 
 #### UI Components
+
 - **shared-notifications-center.html**: Drop-down notification center for navigation
   - Real-time notification badge
   - Unread count
@@ -109,6 +120,7 @@ This document summarizes the implementation of Phase 4 features for the Josh Bur
 ## Database Migration
 
 ### Running Migrations
+
 ```bash
 # Run all pending migrations
 npm run migrate
@@ -118,27 +130,32 @@ node scripts/run-migrations.js
 ```
 
 ### Migration Tracking
+
 Migrations are tracked in the `schema_migrations` table and run in alphanumeric order. Each migration is executed only once.
 
 ## API Usage Examples
 
 ### Product Search
+
 ```javascript
 // Search for products
-const response = await fetch('/.netlify/functions/products?search=engine+oil&category_id=1&min_price=20');
+const response = await fetch(
+  '/.netlify/functions/products?search=engine+oil&category_id=1&min_price=20'
+);
 const data = await response.json();
 console.log(data.products); // Array of matching products
 console.log(data.pagination); // Pagination info
 ```
 
 ### Order Status Update
+
 ```javascript
 // Update order status
 const response = await fetch('/.netlify/functions/orders', {
   method: 'PATCH',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    Authorization: `Bearer ${token}`
   },
   body: JSON.stringify({
     orderId: 123,
@@ -150,19 +167,23 @@ const response = await fetch('/.netlify/functions/orders', {
 ```
 
 ### Analytics Report
+
 ```javascript
 // Get order trends with comparison
-const response = await fetch('/.netlify/functions/analytics?report_type=order_trends&date_from=2025-01-01&date_to=2025-01-31&compare_previous=true');
+const response = await fetch(
+  '/.netlify/functions/analytics?report_type=order_trends&date_from=2025-01-01&date_to=2025-01-31&compare_previous=true'
+);
 const data = await response.json();
 console.log(data.current); // Current period data
 console.log(data.previous); // Previous period data
 ```
 
 ### Notifications
+
 ```javascript
 // Get unread notifications
 const response = await fetch('/.netlify/functions/notifications?unread_only=true&limit=20', {
-  headers: { 'Authorization': `Bearer ${token}` }
+  headers: { Authorization: `Bearer ${token}` }
 });
 const data = await response.json();
 console.log(data.notifications); // Array of notifications
@@ -173,7 +194,7 @@ await fetch('/.netlify/functions/notifications', {
   method: 'PATCH',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    Authorization: `Bearer ${token}`
   },
   body: JSON.stringify({ mark_all_read: true })
 });
@@ -182,6 +203,7 @@ await fetch('/.netlify/functions/notifications', {
 ## Configuration
 
 ### Environment Variables
+
 ```bash
 # Email Configuration (for notifications)
 SMTP_HOST=smtp.example.com
@@ -196,6 +218,7 @@ NODE_ENV=development
 ```
 
 ### Database Configuration
+
 The application uses PostgreSQL exclusively through `config/database.js`. Database connection is configured via environment variables:
 
 ```bash
@@ -212,6 +235,7 @@ DB_PORT=5432
 ### Manual Testing Checklist
 
 #### Products
+
 - [ ] Search products by name, description, specs
 - [ ] Filter by category
 - [ ] Filter by price range
@@ -221,6 +245,7 @@ DB_PORT=5432
 - [ ] Categories can be created/updated/deleted
 
 #### Orders
+
 - [ ] Create new order
 - [ ] Update order status
 - [ ] View order status history
@@ -230,6 +255,7 @@ DB_PORT=5432
 - [ ] Filter orders by status/date/user
 
 #### Analytics
+
 - [ ] Generate order trends report
 - [ ] View top products
 - [ ] See category breakdown
@@ -238,6 +264,7 @@ DB_PORT=5432
 - [ ] Date range filtering works
 
 #### Notifications
+
 - [ ] In-app notifications appear
 - [ ] Notification badge shows count
 - [ ] Mark single notification as read
@@ -247,6 +274,7 @@ DB_PORT=5432
 - [ ] Email notifications respect preferences
 
 ### Automated Tests
+
 ```bash
 # Run all tests
 npm test
@@ -269,16 +297,19 @@ npm run lint
 ## Future Enhancements
 
 ### Week 11-12 Remaining
+
 - [ ] Product image upload system (with cloud storage integration)
 - [ ] Product variants UI in oil-products.html
 - [ ] Enhanced product filtering UI
 
 ### Week 13 Remaining
+
 - [ ] Order status update UI in orders-review.html
 - [ ] Bulk order status updates
 - [ ] Order timeline visualization
 
 ### Week 14-15 Remaining
+
 - [ ] Custom date range picker in analytics.html
 - [ ] Interactive charts for order trends
 - [ ] Top products visualization
@@ -286,6 +317,7 @@ npm run lint
 - [ ] Export analytics reports to PDF
 
 ### Week 16 Remaining
+
 - [ ] Integrate notification center into shared-nav.html
 - [ ] Push notifications (browser API)
 - [ ] Notification sound preferences
@@ -311,6 +343,7 @@ npm run lint
 ## Deployment
 
 ### Pre-Deployment Checklist
+
 - [ ] Run database migrations on production database
 - [ ] Set all environment variables
 - [ ] Test email sending with production SMTP
@@ -319,6 +352,7 @@ npm run lint
 - [ ] Lint all code
 
 ### Deployment Steps
+
 ```bash
 # 1. Run migrations
 npm run migrate
@@ -334,7 +368,9 @@ git push origin main
 ```
 
 ### Rollback Plan
+
 If issues arise after deployment:
+
 1. Revert to previous Git commit
 2. Database migrations cannot be automatically rolled back
 3. Manual SQL scripts may be needed for schema rollback
@@ -345,21 +381,25 @@ If issues arise after deployment:
 ### Common Issues
 
 **Migrations fail**
+
 - Check database connection credentials
 - Ensure user has CREATE TABLE permissions
 - Review migration logs for specific errors
 
 **Emails not sending**
+
 - Verify SMTP credentials
 - Check NODE_ENV is not set to 'development' in production
 - Review email.js logs
 
 **Notifications not appearing**
+
 - Check user is authenticated (valid token)
 - Verify notification preferences allow the notification type
 - Check browser console for errors
 
 **Search not working**
+
 - Ensure PostgreSQL full-text search index created
 - For SQLite, search uses LIKE (slower but functional)
 

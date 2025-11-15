@@ -3,11 +3,13 @@
 ## 🚀 Getting Started
 
 ### Run Migrations
+
 ```bash
 npm run migrate
 ```
 
 ### Test New Features
+
 ```bash
 # Check product search
 curl -H "Authorization: Bearer $TOKEN" \
@@ -25,6 +27,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 ## 📡 New API Endpoints
 
 ### Product Categories
+
 ```
 GET    /.netlify/functions/product-categories
 POST   /.netlify/functions/product-categories
@@ -33,11 +36,13 @@ DELETE /.netlify/functions/product-categories
 ```
 
 ### Enhanced Products (with search & filtering)
+
 ```
 GET /.netlify/functions/products?search=term&category_id=1&min_price=10&max_price=100
 ```
 
 ### Enhanced Orders (with status tracking & export)
+
 ```
 GET    /.netlify/functions/orders?status=pending&export_format=csv
 PATCH  /.netlify/functions/orders (update status)
@@ -45,6 +50,7 @@ DELETE /.netlify/functions/orders (cancel order)
 ```
 
 ### Analytics
+
 ```
 GET /.netlify/functions/analytics?report_type=order_trends
 GET /.netlify/functions/analytics?report_type=top_products
@@ -54,6 +60,7 @@ GET /.netlify/functions/analytics?report_type=user_activity
 ```
 
 ### Notifications
+
 ```
 GET    /.netlify/functions/notifications?unread_only=true
 POST   /.netlify/functions/notifications (admin only)
@@ -62,6 +69,7 @@ DELETE /.netlify/functions/notifications
 ```
 
 ### Notification Preferences
+
 ```
 GET /.netlify/functions/notification-preferences
 PUT /.netlify/functions/notification-preferences
@@ -76,6 +84,7 @@ PUT /.netlify/functions/notification-preferences
 ## 🔧 Configuration
 
 ### Required Environment Variables
+
 ```bash
 # Email notifications
 SMTP_HOST=smtp.example.com
@@ -89,6 +98,7 @@ FRONTEND_URL=https://joshburt.com.au
 ## 🧪 Testing Checklist
 
 ### Products
+
 - [ ] Search products: `?search=engine+oil`
 - [ ] Filter by category: `?category_id=1`
 - [ ] Filter by price: `?min_price=20&max_price=100`
@@ -96,6 +106,7 @@ FRONTEND_URL=https://joshburt.com.au
 - [ ] Create/update/delete categories
 
 ### Orders
+
 - [ ] Update order status
 - [ ] View status history
 - [ ] Export to CSV: `?export_format=csv`
@@ -103,12 +114,14 @@ FRONTEND_URL=https://joshburt.com.au
 - [ ] Verify email sent
 
 ### Analytics
+
 - [ ] Get order trends
 - [ ] View top products
 - [ ] Category breakdown
 - [ ] Period comparison: `?compare_previous=true`
 
 ### Notifications
+
 - [ ] Receive in-app notification
 - [ ] Unread count correct
 - [ ] Mark as read works
@@ -118,6 +131,7 @@ FRONTEND_URL=https://joshburt.com.au
 ## 🐛 Troubleshooting
 
 ### Migrations fail
+
 ```bash
 # Check connection
 node scripts/health-check.js
@@ -127,6 +141,7 @@ node scripts/run-migrations.js
 ```
 
 ### Emails not sending
+
 ```bash
 # Check environment
 echo $SMTP_HOST
@@ -137,6 +152,7 @@ node -e "console.log(process.env.SMTP_HOST)"
 ```
 
 ### Notifications not appearing
+
 ```bash
 # Check token
 echo $TOKEN

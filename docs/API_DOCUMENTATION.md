@@ -1,14 +1,8 @@
 # API Documentation# API Documentation
 
-
-
 Complete reference for all Netlify Function endpoints in joshburt.com.au.This document provides comprehensive documentation for all API endpoints in the joshburt.com.au application.
 
-
-
 ## Table of Contents## Table of Contents
-
-
 
 - [Overview](#overview)- [Overview](#overview)
 
@@ -19,36 +13,27 @@ Complete reference for all Netlify Function endpoints in joshburt.com.au.This do
 - [Error Codes](#error-codes)- [Error Handling](#error-handling)
 
 - [Endpoints](#endpoints)- [Endpoints](#endpoints)
+  - [Public Endpoints](#public-endpoints) - [Health & Status](#health--status)
 
-  - [Public Endpoints](#public-endpoints)  - [Health & Status](#health--status)
+  - [Authentication](#authentication-endpoints) - [Authentication & Users](#authentication--users)
 
-  - [Authentication](#authentication-endpoints)  - [Authentication & Users](#authentication--users)
+  - [Users](#users) - [Products](#products)
 
-  - [Users](#users)  - [Products](#products)
+  - [Products](#products) - [Orders](#orders)
 
-  - [Products](#products)  - [Orders](#orders)
+  - [Orders](#orders) - [Consumables](#consumables)
 
-  - [Orders](#orders)  - [Consumables](#consumables)
+  - [Settings](#settings) - [Inventory](#inventory)
 
-  - [Settings](#settings)  - [Inventory](#inventory)
+  - [Audit Logs](#audit-logs) - [Settings](#settings)
 
-  - [Audit Logs](#audit-logs)  - [Settings](#settings)
+  - [Notifications](#notifications) - [Audit Logs](#audit-logs)
 
-  - [Notifications](#notifications)  - [Audit Logs](#audit-logs)
-
-
-
-------
-
-
+---
 
 ## Overview## Overview
 
-
-
 ### Base URLAll API endpoints are implemented as Netlify serverless functions located at `/.netlify/functions/`.
-
-
 
 | Environment | URL |### Base URL
 
@@ -62,8 +47,6 @@ Complete reference for all Netlify Function endpoints in joshburt.com.au.This do
 
 ### Request FormatAll endpoints accept and return `application/json` unless otherwise specified.
 
-
-
 - **Content-Type**: `application/json`### CORS
 
 - **Authorization**: `Bearer <access_token>` (most endpoints)All endpoints support CORS with appropriate headers. OPTIONS requests return 204 status.
@@ -76,7 +59,7 @@ Complete reference for all Netlify Function endpoints in joshburt.com.au.This do
 
 ## Authentication
 
-```javascript
+````javascript
 
 const FN_BASE = window.FN_BASE || '/.netlify/functions';Most endpoints require authentication via JWT (JSON Web Token) passed in the `Authorization` header:
 
@@ -100,7 +83,7 @@ const response = await fetch(`${FN_BASE}/products`, {Authorization: Bearer <your
 
 const data = await response.json();### Role-Based Access Control (RBAC)
 
-```
+````
 
 The system supports three roles with hierarchical permissions:
 
@@ -132,15 +115,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...## Common Response 
 
 {
 
-| Token Type | Lifetime | Storage | Purpose |  "data": { ... },
+| Token Type | Lifetime | Storage | Purpose | "data": { ... },
 
-|------------|----------|---------|---------|  "message": "Success message"
+|------------|----------|---------|---------| "message": "Success message"
 
 | **Access Token** | 7 days | `localStorage.accessToken` | API authentication |}
 
 | **Refresh Token** | 30 days | HTTP-only cookie or DB | Renew access tokens |```
-
-
 
 ### Role-Based Access Control (RBAC)### Paginated Response
 
@@ -174,11 +155,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...## Common Response 
 
 {
 
-**Status**: `200 OK`  "error": "Error message",
+**Status**: `200 OK` "error": "Error message",
 
-  "details": { ... }
+"details": { ... }
 
-```json}
+````json}
 
 {```
 
@@ -220,7 +201,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...## Common Response 
 
 }| 500 | Internal Server Error |
 
-```
+````
 
 ---
 
@@ -250,27 +231,27 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...## Common Response 
 
 {
 
-## Error Codes  "status": "healthy",
+## Error Codes "status": "healthy",
 
-  "time": "2024-01-01T00:00:00.000Z",
+"time": "2024-01-01T00:00:00.000Z",
 
-| Status | Meaning | Common Causes |  "uptimeSeconds": 12345,
+| Status | Meaning | Common Causes | "uptimeSeconds": 12345,
 
-|--------|---------|---------------|  "db": {
+|--------|---------|---------------| "db": {
 
-| `400` | Bad Request | Invalid input, missing required fields |    "ok": true,
+| `400` | Bad Request | Invalid input, missing required fields | "ok": true,
 
-| `401` | Unauthorized | Missing/invalid/expired token |    "driver": "postgresql"
+| `401` | Unauthorized | Missing/invalid/expired token | "driver": "postgresql"
 
-| `403` | Forbidden | Insufficient permissions for action |  },
+| `403` | Forbidden | Insufficient permissions for action | },
 
-| `404` | Not Found | Resource doesn't exist |  "version": "1.0.0",
+| `404` | Not Found | Resource doesn't exist | "version": "1.0.0",
 
-| `409` | Conflict | Duplicate resource (e.g., email already exists) |  "latencyMs": 5
+| `409` | Conflict | Duplicate resource (e.g., email already exists) | "latencyMs": 5
 
 | `500` | Internal Server Error | Database error, unexpected exception |}
 
-```
+````
 
 ---
 
@@ -298,7 +279,7 @@ Check database connectivity and system health.  "orders": 250,
 
 **Auth**: None required}
 
-```
+````
 
 **Response**: `200 OK`
 
@@ -326,21 +307,19 @@ Check database connectivity and system health.  "orders": 250,
 
 {
 
-**GET** `/.netlify/functions/public-config`  "email": "user@example.com",
+**GET** `/.netlify/functions/public-config` "email": "user@example.com",
 
-  "password": "SecurePass123!",
+"password": "SecurePass123!",
 
-Get public configuration (e.g., Auth0 status, feature flags).  "name": "John Doe"
+Get public configuration (e.g., Auth0 status, feature flags). "name": "John Doe"
 
 }
 
 **Auth**: None required```
 
-
-
 **Response**: `200 OK`**Password Requirements**:
 
-```json- Minimum 8 characters
+`````json- Minimum 8 characters
 
 {- At least one uppercase letter
 
@@ -442,11 +421,11 @@ Authenticate user with email/password or Auth0 OAuth.Authenticate user and recei
 
 ```}
 
-```
+`````
 
 **Response**: `200 OK`
 
-```json**Response**: 200 OK
+````json**Response**: 200 OK
 
 {```json
 
@@ -470,9 +449,7 @@ Authenticate user with email/password or Auth0 OAuth.Authenticate user and recei
 
 }}
 
-``````
-
-
+````
 
 **Errors**:**Rate Limiting**: 5 attempts per 5 minutes per IP
 
@@ -498,11 +475,9 @@ Authenticate user with email/password or Auth0 OAuth.Authenticate user and recei
 
 Create new user account.Refresh access token using refresh token.
 
-
-
 **Request Body**:**Authentication**: Refresh token required
 
-```json
+````json
 
 {**Request Body**:
 
@@ -514,21 +489,19 @@ Create new user account.Refresh access token using refresh token.
 
 }}
 
-``````
-
-
+````
 
 **Response**: `201 Created`**Response**: 200 OK
 
-```json```json
+`json`json
 
 {{
 
-  "accessToken": "eyJhbG...",  "accessToken": "eyJhbGc...",
+"accessToken": "eyJhbG...", "accessToken": "eyJhbGc...",
 
-  "refreshToken": "dGVz...",  "refreshToken": "eyJhbGc..."
+"refreshToken": "dGVz...", "refreshToken": "eyJhbGc..."
 
-  "user": {}
+"user": {}
 
     "id": 2,```
 
@@ -538,11 +511,11 @@ Create new user account.Refresh access token using refresh token.
 
     "role": "mechanic"
 
-  }---
+}---
 
 }
 
-```#### POST /auth?action=logout
+`````#### POST /auth?action=logout
 
 Invalidate refresh token.
 
@@ -632,7 +605,7 @@ Get authenticated user's profile.  "email": "user@example.com",
 
 }**Authentication**: None required
 
-```
+`````
 
 **Request Body**:
 
@@ -640,13 +613,11 @@ Get authenticated user's profile.  "email": "user@example.com",
 
 {
 
-### Users  "email": "user@example.com"
+### Users "email": "user@example.com"
 
 }
 
 **Endpoint**: `/.netlify/functions/users````
-
-
 
 ---**Response**: 200 OK
 
@@ -680,7 +651,7 @@ Get all users (paginated).
 
 **Response**: `200 OK````json
 
-```json{
+````json{
 
 {  "token": "reset-token-here",
 
@@ -718,7 +689,7 @@ Get all users (paginated).
 
 }**Authentication**: Required (admin or manager role)
 
-```
+````
 
 **Query Parameters**:
 
@@ -738,13 +709,13 @@ Create new user (admin only).```json
 
 {
 
-**Auth**: Required (admin)  "users": [
+**Auth**: Required (admin) "users": [
 
     {
 
-**Request Body**:      "id": 123,
+**Request Body**: "id": 123,
 
-```json      "email": "user@example.com",
+`````json "email": "user@example.com",
 
 {      "name": "John Doe",
 
@@ -832,7 +803,7 @@ Update user details.  "email": "newuser@example.com",
 
 }Get specific user by ID.
 
-```
+`````
 
 **Authentication**: Required (admin/manager for any user, users can view their own profile)
 
@@ -844,29 +815,25 @@ Update user details.  "email": "newuser@example.com",
 
 {
 
-**Endpoint**: `/.netlify/functions/products`  "id": 123,
+**Endpoint**: `/.netlify/functions/products` "id": 123,
 
-  "email": "user@example.com",
+"email": "user@example.com",
 
-Similar structure for `/consumables` and `/filters` endpoints.  "name": "John Doe",
+Similar structure for `/consumables` and `/filters` endpoints. "name": "John Doe",
 
-  "role": "user",
+"role": "user",
 
----  "is_active": true,
+--- "is_active": true,
 
-  "email_verified": true,
+"email_verified": true,
 
-#### List Products  "created_at": "2024-01-01T00:00:00.000Z"
+#### List Products "created_at": "2024-01-01T00:00:00.000Z"
 
 }
 
 **GET** `/.netlify/functions/products````
 
-
-
 Get all products (paginated).---
-
-
 
 **Auth**: Required#### PUT /users/:id
 
@@ -884,9 +851,9 @@ Update user information.
 
 {
 
-**Response**: `200 OK`  "name": "John Updated",
+**Response**: `200 OK` "name": "John Updated",
 
-```json  "email": "newemail@example.com",
+`````json "email": "newemail@example.com",
 
 {  "role": "manager",
 
@@ -1152,7 +1119,7 @@ Update an existing product.
 
 Update site settings (admin only).}
 
-```
+`````
 
 **Auth**: Required (admin)
 
@@ -1160,7 +1127,7 @@ Update site settings (admin only).}
 
 **Request Body**:
 
-```json#### DELETE /products
+````json#### DELETE /products
 
 {Delete a product.
 
@@ -1194,7 +1161,7 @@ Update site settings (admin only).}
 
 ### Audit Logs}
 
-```
+````
 
 **Endpoint**: `/.netlify/functions/audit-logs`
 
@@ -1210,11 +1177,7 @@ Update site settings (admin only).}
 
 **GET** `/.netlify/functions/audit-logs`List orders with pagination.
 
-
-
 Get audit trail (admin only).**Authentication**: Required (admin or manager role)
-
-
 
 **Auth**: Required (admin)**Query Parameters**:
 
@@ -1230,9 +1193,9 @@ Get audit trail (admin only).**Authentication**: Required (admin or manager role
 
 {
 
-**Response**: `200 OK`  "orders": [
+**Response**: `200 OK` "orders": [
 
-```json    {
+````json {
 
 {      "id": 1,
 
@@ -1262,7 +1225,7 @@ Get audit trail (admin only).**Authentication**: Required (admin or manager role
 
 ```}
 
-```
+````
 
 ---
 
@@ -1274,15 +1237,11 @@ Get audit trail (admin only).**Authentication**: Required (admin or manager role
 
 **Endpoint**: `/.netlify/functions/notifications`Create a new order.
 
-
-
 ---**Authentication**: Required
-
-
 
 #### List Notifications**Request Body**:
 
-```json
+````json
 
 **GET** `/.netlify/functions/notifications`{
 
@@ -1372,7 +1331,7 @@ curl https://joshburt.netlify.app/.netlify/functions/products \
 
   -H "Authorization: Bearer YOUR_TOKEN"---
 
-```
+````
 
 ### Consumables
 
@@ -1380,7 +1339,7 @@ curl https://joshburt.netlify.app/.netlify/functions/products \
 
 #### GET /consumables
 
-```javascriptList consumables with optional filtering.
+````javascriptList consumables with optional filtering.
 
 // Login and store token
 
@@ -1426,7 +1385,7 @@ const getProducts = async () => {      "code": "OF-123",
 
   });```
 
-  
+
 
   return await response.json();---
 
@@ -1460,20 +1419,21 @@ Create a new consumable.
 
 - **Documentation**: https://github.com/SmokeHound/joshburt.com.au/tree/main/docs}
 
-```
+````
 
 ---
 
 **Response**: 201 Created
 
-**Last Updated**: 2025-11-11  ```json
+**Last Updated**: 2025-11-11 ```json
 
 **Maintained By**: Development Team{
 
-  "message": "Consumable created",
-  "consumableId": 1
+"message": "Consumable created",
+"consumableId": 1
 }
-```
+
+````
 
 ---
 
@@ -1492,9 +1452,10 @@ Update a consumable.
   "code": "OF-123",
   "description": "Updated description"
 }
-```
+````
 
 **Response**: 200 OK
+
 ```json
 {
   "message": "Consumable updated"
@@ -1504,11 +1465,13 @@ Update a consumable.
 ---
 
 #### DELETE /consumables
+
 Delete a consumable.
 
 **Authentication**: Required (admin role only)
 
 **Request Body**:
+
 ```json
 {
   "id": 1
@@ -1516,6 +1479,7 @@ Delete a consumable.
 ```
 
 **Response**: 200 OK
+
 ```json
 {
   "message": "Consumable deleted"
@@ -1525,11 +1489,13 @@ Delete a consumable.
 ---
 
 #### GET /consumable-categories
+
 Get distinct categories from consumables.
 
 **Authentication**: Required
 
 **Response**: 200 OK
+
 ```json
 {
   "categories": ["engine", "transmission", "brake", "suspension"]
@@ -1541,11 +1507,13 @@ Get distinct categories from consumables.
 ### Inventory
 
 #### GET /inventory
+
 Get inventory items (PostgreSQL only).
 
 **Authentication**: Required (admin or manager role)
 
 **Response**: 200 OK
+
 ```json
 {
   "inventory": [
@@ -1564,11 +1532,13 @@ Get inventory items (PostgreSQL only).
 ### Settings
 
 #### GET /settings
+
 Get application settings.
 
 **Authentication**: Required (admin role only)
 
 **Response**: 200 OK
+
 ```json
 {
   "theme": "dark",
@@ -1580,11 +1550,13 @@ Get application settings.
 ---
 
 #### PUT /settings
+
 Update application settings.
 
 **Authentication**: Required (admin role only)
 
 **Request Body**:
+
 ```json
 {
   "theme": "light",
@@ -1594,6 +1566,7 @@ Update application settings.
 ```
 
 **Response**: 200 OK
+
 ```json
 {
   "message": "Settings updated"
@@ -1605,11 +1578,13 @@ Update application settings.
 ### Audit Logs
 
 #### GET /audit-logs
+
 Query audit logs with filtering.
 
 **Authentication**: Required (admin role only)
 
 **Query Parameters**:
+
 - `userId` (optional): Filter by user ID
 - `action` (optional): Filter by action type
 - `startDate` (optional): Filter by start date (ISO 8601)
@@ -1620,6 +1595,7 @@ Query audit logs with filtering.
 - `format` (optional): Response format (json or csv)
 
 **Response**: 200 OK (JSON)
+
 ```json
 {
   "data": [
@@ -1642,6 +1618,7 @@ Query audit logs with filtering.
 ```
 
 **Response**: 200 OK (CSV)
+
 ```
 id,user_id,action,details,ip_address,user_agent,timestamp
 1,123,user.login,Login successful,192.168.1.1,Mozilla/5.0...,2024-01-01T00:00:00.000Z
@@ -1650,11 +1627,13 @@ id,user_id,action,details,ip_address,user_agent,timestamp
 ---
 
 #### POST /audit-logs
+
 Create an audit log entry.
 
 **Authentication**: Required
 
 **Request Body**:
+
 ```json
 {
   "action": "user.login",
@@ -1666,6 +1645,7 @@ Create an audit log entry.
 ```
 
 **Response**: 201 Created
+
 ```json
 {
   "message": "Audit log created"
@@ -1675,14 +1655,17 @@ Create an audit log entry.
 ---
 
 #### DELETE /audit-logs
+
 Delete old audit logs.
 
 **Authentication**: Required (admin role only)
 
 **Query Parameters**:
+
 - `olderThanDays` (optional): Delete logs older than N days
 
 **Response**: 200 OK
+
 ```json
 {
   "message": "Audit logs deleted",
@@ -1709,6 +1692,7 @@ Most list endpoints support pagination with these query parameters:
 - `limit`: Results per page (minimum: 1, maximum: 100, default: varies by endpoint)
 
 Response includes pagination metadata:
+
 ```json
 {
   "pagination": {
@@ -1740,11 +1724,13 @@ Response includes pagination metadata:
 ### Environment Variables
 
 Required:
+
 - `JWT_SECRET`: Secret key for JWT token signing
 - `DB_TYPE`: Database type (postgresql only)
 - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`: PostgreSQL connection details
 
 Optional:
+
 - `BCRYPT_ROUNDS`: BCrypt hashing rounds (default: 12)
 - `JWT_EXPIRES_IN`: Access token expiration (default: 7d)
 - `JWT_REFRESH_EXPIRES_IN`: Refresh token expiration (default: 30d)
@@ -1754,6 +1740,7 @@ Optional:
 ### Testing
 
 Run tests:
+
 ```bash
 npm test                # Run all Jest tests
 npm run test:coverage   # Run tests with coverage
@@ -1778,6 +1765,7 @@ npm run health
 ## Changelog
 
 ### Version 1.0.0 (2024-01-01)
+
 - Initial API documentation
 - All endpoints documented with request/response examples
 - Authentication and RBAC documented
@@ -1788,6 +1776,6 @@ npm run health
 ## Support
 
 For issues or questions:
+
 - GitHub: https://github.com/SmokeHound/joshburt.com.au
 - Email: Contact repository owner
-

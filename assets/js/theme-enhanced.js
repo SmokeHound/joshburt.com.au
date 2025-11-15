@@ -3,7 +3,7 @@
  * Extends the base theme manager with advanced features
  */
 
-(function() {
+(function () {
   'use strict';
 
   // Wait for base ThemeManager to be available
@@ -131,7 +131,7 @@
       });
 
       // Close on overlay click
-      overlay.addEventListener('click', (e) => {
+      overlay.addEventListener('click', e => {
         if (e.target === overlay) {
           this.destroy();
           window.Theme.applyFromStorage();
@@ -139,7 +139,7 @@
       });
 
       // Close on Escape key
-      const escapeHandler = (e) => {
+      const escapeHandler = e => {
         if (e.key === 'Escape') {
           this.destroy();
           window.Theme.applyFromStorage();
@@ -269,7 +269,9 @@
      * Check current schedule and apply theme
      */
     checkSchedule() {
-      if (!this.schedules.enabled) {return;}
+      if (!this.schedules.enabled) {
+        return;
+      }
 
       const now = new Date();
       const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -281,7 +283,9 @@
             window.Theme.setTheme(schedule.theme, false);
 
             if (window.A11y) {
-              window.A11y.announce(`Theme automatically changed to ${schedule.theme} for ${schedule.name}`);
+              window.A11y.announce(
+                `Theme automatically changed to ${schedule.theme} for ${schedule.name}`
+              );
             }
           }
           break;
@@ -517,7 +521,7 @@
 
   // Expose enhanced API
   window.ThemeEnhanced = {
-    preview: (themeId) => themePreview.createPreviewModal(themeId),
+    preview: themeId => themePreview.createPreviewModal(themeId),
     scheduler: themeScheduler,
     customBuilder: customThemeBuilder,
     pageOverride: pageThemeOverride

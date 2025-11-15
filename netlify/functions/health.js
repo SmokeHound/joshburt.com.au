@@ -5,7 +5,7 @@ const { withHandler, ok, error } = require('../../utils/fn');
 let dbInitialized = false;
 let startupTime = Date.now();
 
-exports.handler = withHandler(async (event) => {
+exports.handler = withHandler(async event => {
   const start = Date.now();
   try {
     // Connect and initialize database (once per cold start)
@@ -101,4 +101,3 @@ exports.handler = withHandler(async (event) => {
     });
   }
 });
-

@@ -62,7 +62,7 @@ function set(namespace, key, value, ttl = null) {
   const cacheKey = generateKey(namespace, key);
   const entry = {
     value,
-    expiresAt: ttl ? Date.now() + (ttl * 1000) : null,
+    expiresAt: ttl ? Date.now() + ttl * 1000 : null,
     createdAt: Date.now()
   };
 
@@ -119,9 +119,10 @@ function clearAll() {
  * @returns {object} - Cache statistics
  */
 function getStats() {
-  const hitRate = stats.hits + stats.misses > 0
-    ? (stats.hits / (stats.hits + stats.misses) * 100).toFixed(2)
-    : 0;
+  const hitRate =
+    stats.hits + stats.misses > 0
+      ? ((stats.hits / (stats.hits + stats.misses)) * 100).toFixed(2)
+      : 0;
 
   return {
     ...stats,

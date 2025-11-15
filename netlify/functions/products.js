@@ -4,7 +4,7 @@ const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
 const { logAudit } = require('../../utils/audit');
 
-exports.handler = withHandler(async function(event) {
+exports.handler = withHandler(async function (event) {
   // Initialize database connection (idempotent)
   await database.connect();
 
@@ -19,20 +19,14 @@ exports.handler = withHandler(async function(event) {
     // Products can be read by all authenticated users
     const { user, response: authResponse } = await requirePermission(event, 'products', 'read');
     if (authResponse) return authResponse;
-    
+
     try {
       const params = event.queryStringParameters || {};
-      const {
-        search,
-        category_id,
-        type,
-        is_active,
-        page = 1,
-        limit = 50
-      } = params;
+      const { search, category_id, type, is_active, page = 1, limit = 50 } = params;
 
       // Build query with filters
-      let query = 'SELECT p.*, pc.name as category_name FROM products p LEFT JOIN product_categories pc ON p.category_id = pc.id WHERE 1=1';
+      let query =
+        'SELECT p.*, pc.name as category_name FROM products p LEFT JOIN product_categories pc ON p.category_id = pc.id WHERE 1=1';
       const queryParams = [];
 
       // Search functionality (full-text search on name, description, specs)
@@ -73,9 +67,10 @@ exports.handler = withHandler(async function(event) {
       // Get total count for pagination
       let countQuery = 'SELECT COUNT(*) as total FROM products p WHERE 1=1';
       const countParams = [];
-      
+
       if (search) {
-        countQuery += ' AND (p.name LIKE ? OR p.description LIKE ? OR p.specs LIKE ? OR p.code LIKE ?)';
+        countQuery +=
+          ' AND (p.name LIKE ? OR p.description LIKE ? OR p.specs LIKE ? OR p.code LIKE ?)';
         const searchPattern = `%${search}%`;
         countParams.push(searchPattern, searchPattern, searchPattern, searchPattern);
       }
@@ -114,10 +109,20 @@ exports.handler = withHandler(async function(event) {
     // Only admins and managers can create products
     const { user, response: authResponse } = await requirePermission(event, 'products', 'create');
     if (authResponse) return authResponse;
-    
+
     try {
       const body = parseBody(event);
-      const { name, code, type, specs, description, image, category_id, stock_quantity, is_active } = body;
+      const {
+        name,
+        code,
+        type,
+        specs,
+        description,
+        image,
+        category_id,
+        stock_quantity,
+        is_active
+      } = body;
       if (!name || !code || !type) {
         return error(400, 'Missing required fields: name, code, type');
       }
@@ -126,18 +131,18 @@ exports.handler = withHandler(async function(event) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
       const params = [
-        name, 
-        code, 
-        type, 
-        specs || '', 
-        description || '', 
+        name,
+        code,
+        type,
+        specs || '',
+        description || '',
         image || '',
         category_id || null,
         stock_quantity || 0,
         is_active !== undefined ? is_active : true
       ];
       const result = await database.run(query, params);
-      
+
       // Log product creation
       await logAudit(event, {
         action: 'product.create',
@@ -150,12 +155,26 @@ exports.handler = withHandler(async function(event) {
           categoryId: category_id
         }
       });
-      
-      return ok({ 
-        id: result.id,
-        message: 'Product created successfully',
-        product: { id: result.id, name, code, type, specs, description, image, category_id, stock_quantity, is_active }
-      }, 201);
+
+      return ok(
+        {
+          id: result.id,
+          message: 'Product created successfully',
+          product: {
+            id: result.id,
+            name,
+            code,
+            type,
+            specs,
+            description,
+            image,
+            category_id,
+            stock_quantity,
+            is_active
+          }
+        },
+        201
+      );
     } catch (e) {
       console.error('POST /products error:', e);
       if (e.message && e.message.includes('UNIQUE constraint')) {
@@ -169,10 +188,21 @@ exports.handler = withHandler(async function(event) {
     // Only admins and managers can update products
     const { user, response: authResponse } = await requirePermission(event, 'products', 'update');
     if (authResponse) return authResponse;
-    
+
     try {
       const body = parseBody(event);
-      const { id, name, code, type, specs, description, image, category_id, stock_quantity, is_active } = body;
+      const {
+        id,
+        name,
+        code,
+        type,
+        specs,
+        description,
+        image,
+        category_id,
+        stock_quantity,
+        is_active
+      } = body;
       if (!id || !name || !code || !type) {
         return error(400, 'Missing required fields: id, name, code, type');
       }
@@ -183,12 +213,12 @@ exports.handler = withHandler(async function(event) {
         WHERE id = ?
       `;
       const params = [
-        name, 
-        code, 
-        type, 
-        specs || '', 
-        description || '', 
-        image || '', 
+        name,
+        code,
+        type,
+        specs || '',
+        description || '',
+        image || '',
         category_id || null,
         stock_quantity !== undefined ? stock_quantity : 0,
         is_active !== undefined ? is_active : true,
@@ -198,10 +228,21 @@ exports.handler = withHandler(async function(event) {
       if (result.changes === 0) {
         return error(404, 'Product not found');
       }
-      
+
       return ok({
         message: 'Product updated successfully',
-        product: { id, name, code, type, specs, description, image, category_id, stock_quantity, is_active }
+        product: {
+          id,
+          name,
+          code,
+          type,
+          specs,
+          description,
+          image,
+          category_id,
+          stock_quantity,
+          is_active
+        }
       });
     } catch (e) {
       console.error('PUT /products error:', e);
@@ -216,13 +257,13 @@ exports.handler = withHandler(async function(event) {
     // Only admins can delete products
     const { user, response: authResponse } = await requirePermission(event, 'products', 'delete');
     if (authResponse) return authResponse;
-    
+
     try {
       const { id } = parseBody(event);
       if (!id) return error(400, 'Missing required field: id');
       const result = await database.run('DELETE FROM products WHERE id = ?', [id]);
       if (result.changes === 0) return error(404, 'Product not found');
-      
+
       return ok({ message: 'Product deleted successfully' });
     } catch (e) {
       console.error('DELETE /products error:', e);

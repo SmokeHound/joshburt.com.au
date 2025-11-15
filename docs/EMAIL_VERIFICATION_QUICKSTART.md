@@ -17,6 +17,7 @@ node scripts/run-migrations.js
 ```
 
 **Or manually:**
+
 ```bash
 psql $DATABASE_URL -f migrations/005_add_email_verification_tracking.sql
 ```
@@ -28,6 +29,7 @@ npm run test:email-verification
 ```
 
 Should output:
+
 ```
 ✅ email_verification_attempts table exists
 ✅ All required columns present
@@ -39,6 +41,7 @@ Should output:
 ### 3. Configure SMTP (if not already done)
 
 Add to `.env`:
+
 ```env
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
@@ -48,6 +51,7 @@ SMTP_FROM_EMAIL=noreply@joshburt.com.au
 ```
 
 Test SMTP:
+
 ```bash
 npm run test:smtp
 ```
@@ -57,24 +61,28 @@ npm run test:smtp
 ## 📋 User Flows
 
 ### New User Registration
+
 1. User fills out registration form
 2. Account created with `email_verified = false`
 3. Verification email sent with 24-hour token
 4. **Tracking**: `initial` attempt logged with IP/user agent
 
 ### Email Verification
+
 1. User clicks link in email
 2. Token validated (checks expiration)
 3. User email marked as verified
 4. **Tracking**: `verify` attempt logged (success or failure reason)
 
 ### Resend Verification
+
 1. User visits `/resend-verification.html`
 2. Enters email address
 3. Old tokens invalidated, new email sent
 4. **Tracking**: `resend` attempt logged
 
 ### Admin Manual Verification
+
 1. Admin opens Users Management page
 2. Finds user with ⚠ Unverified badge
 3. Clicks "Verify Email" button
@@ -87,18 +95,23 @@ npm run test:smtp
 ## 🔧 Admin Features
 
 ### View Email Status
+
 Navigate to **Users Management** (`/users.html`):
+
 - ✅ **Green badge**: Email verified
 - ⚠️ **Yellow badge**: Email unverified
 
 ### Manually Verify Email
+
 **When to use:**
+
 - User never received email
 - Email ended up in spam
 - Token expired
 - User cannot access email temporarily
 
 **Steps:**
+
 1. Find user in list
 2. Click **"Verify Email"** button
 3. Confirm in dialog
@@ -106,7 +119,9 @@ Navigate to **Users Management** (`/users.html`):
 5. Audit logged automatically
 
 ### View Verification History
+
 **What you'll see:**
+
 - All verification attempts (initial, resend, verify, admin)
 - Success/failure status (color-coded)
 - IP addresses for each attempt
@@ -114,6 +129,7 @@ Navigate to **Users Management** (`/users.html`):
 - Error messages (for failures)
 
 **Steps:**
+
 1. Click **"Verify Attempts"** for any user
 2. Review modal showing all attempts:
    - 🟢 Green = Success
@@ -127,9 +143,10 @@ Navigate to **Users Management** (`/users.html`):
 ### Check Verification Attempts
 
 **SQL Query:**
+
 ```sql
-SELECT 
-  u.name, 
+SELECT
+  u.name,
   u.email,
   eva.attempt_type,
   eva.success,
@@ -144,8 +161,9 @@ ORDER BY eva.created_at DESC;
 ### Common Issues to Watch For
 
 **High failure rates:**
+
 ```sql
-SELECT 
+SELECT
   attempt_type,
   COUNT(*) as total,
   SUM(CASE WHEN success THEN 1 ELSE 0 END) as successful,
@@ -156,14 +174,15 @@ GROUP BY attempt_type;
 ```
 
 **Multiple failed attempts from same IP:**
+
 ```sql
-SELECT 
+SELECT
   ip_address,
   COUNT(*) as attempts,
   COUNT(DISTINCT user_id) as users
 FROM email_verification_attempts
-WHERE 
-  success = false 
+WHERE
+  success = false
   AND created_at > NOW() - INTERVAL '24 hours'
 GROUP BY ip_address
 HAVING COUNT(*) > 5
@@ -181,6 +200,7 @@ ORDER BY attempts DESC;
 **Permissions:** Admin only
 
 **Request:**
+
 ```javascript
 fetch(`${FN_BASE}/users/123/verify-email`, {
   method: 'POST',
@@ -191,6 +211,7 @@ fetch(`${FN_BASE}/users/123/verify-email`, {
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "Email verified successfully",
@@ -204,6 +225,7 @@ fetch(`${FN_BASE}/users/123/verify-email`, {
 ```
 
 **Errors:**
+
 - `400`: Email already verified
 - `401`: Unauthorized (not logged in)
 - `403`: Forbidden (not admin)
@@ -216,6 +238,7 @@ fetch(`${FN_BASE}/users/123/verify-email`, {
 **Permissions:** Admin only
 
 **Request:**
+
 ```javascript
 fetch(`${FN_BASE}/users/123/verification-attempts`, {
   headers: {
@@ -225,6 +248,7 @@ fetch(`${FN_BASE}/users/123/verification-attempts`, {
 ```
 
 **Response (200):**
+
 ```json
 {
   "attempts": [
@@ -286,31 +310,35 @@ CREATE INDEX idx_verification_attempts_success ON email_verification_attempts(su
 
 ### Attempt Types
 
-| Type | Description | Triggered By |
-|------|-------------|--------------|
-| `initial` | First verification email sent on registration | User registration |
-| `resend` | User requested new verification email | Resend button/page |
-| `verify` | User clicked verification link | Email link click |
-| `admin_manual` | Admin manually verified email | Admin action |
+| Type           | Description                                   | Triggered By       |
+| -------------- | --------------------------------------------- | ------------------ |
+| `initial`      | First verification email sent on registration | User registration  |
+| `resend`       | User requested new verification email         | Resend button/page |
+| `verify`       | User clicked verification link                | Email link click   |
+| `admin_manual` | Admin manually verified email                 | Admin action       |
 
 ---
 
 ## 🎯 Best Practices
 
 ### When to Manually Verify
+
 ✅ **DO manually verify when:**
+
 - User's email provider is blocking verification emails
 - User has verified their identity through other means
 - Token expired and user needs immediate access
 - Corporate email system requires admin approval
 
 ❌ **DON'T manually verify when:**
+
 - User hasn't checked spam folder
 - User might be attempting to bypass security
 - Email address appears suspicious
 - Multiple failed attempts from same IP (possible attack)
 
 ### Security Considerations
+
 1. **Always check user identity** before manual verification
 2. **Review verification history** for suspicious patterns
 3. **Monitor failure rates** across all attempt types
@@ -318,7 +346,9 @@ CREATE INDEX idx_verification_attempts_success ON email_verification_attempts(su
 5. **Document reason** for manual verifications (in audit logs)
 
 ### Email Deliverability
+
 If you see high initial/resend failure rates:
+
 - Check SMTP configuration
 - Verify SPF/DKIM/DMARC records
 - Review email content for spam triggers
@@ -331,18 +361,21 @@ If you see high initial/resend failure rates:
 ### Users not receiving emails
 
 **Check SMTP:**
+
 ```bash
 npm run test:smtp
 ```
 
 **Check tracking table:**
+
 ```sql
-SELECT * FROM email_verification_attempts 
-WHERE email = 'user@example.com' 
+SELECT * FROM email_verification_attempts
+WHERE email = 'user@example.com'
 ORDER BY created_at DESC;
 ```
 
 **Common causes:**
+
 - SMTP credentials incorrect
 - Email in spam folder
 - Corporate firewall blocking
@@ -353,6 +386,7 @@ ORDER BY created_at DESC;
 **Current token lifetime:** 24 hours
 
 **Extend in `auth.js`:**
+
 ```javascript
 // Change from 24 hours to 72 hours
 const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
@@ -361,11 +395,13 @@ const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
 ### Database errors
 
 **Test schema:**
+
 ```bash
 npm run test:email-verification
 ```
 
 **Check migration:**
+
 ```bash
 node scripts/run-migrations.js --dry-run
 ```

@@ -3,7 +3,7 @@
  * Provides UI for theme preview, scheduling, and custom builder
  */
 
-(function() {
+(function () {
   'use strict';
 
   /**
@@ -17,11 +17,12 @@
 
       // Add preview button
       const previewBtn = document.createElement('button');
-      previewBtn.className = 'absolute top-2 right-2 px-3 py-1 text-xs rounded-lg bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 transition-all opacity-0 group-hover:opacity-100';
+      previewBtn.className =
+        'absolute top-2 right-2 px-3 py-1 text-xs rounded-lg bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 transition-all opacity-0 group-hover:opacity-100';
       previewBtn.textContent = 'Preview';
       previewBtn.setAttribute('aria-label', `Preview ${themeId} theme`);
 
-      previewBtn.addEventListener('click', (e) => {
+      previewBtn.addEventListener('click', e => {
         e.stopPropagation();
         if (window.ThemeEnhanced) {
           window.ThemeEnhanced.preview(themeId);
@@ -37,7 +38,9 @@
    */
   function initThemeScheduler() {
     const schedulerContainer = document.getElementById('theme-scheduler-container');
-    if (!schedulerContainer || !window.ThemeEnhanced) {return;}
+    if (!schedulerContainer || !window.ThemeEnhanced) {
+      return;
+    }
 
     const scheduler = window.ThemeEnhanced.scheduler;
     const schedules = scheduler.getSchedules();
@@ -56,7 +59,9 @@
     `;
 
     // Create schedule editor
-    const schedulesHtml = schedules.schedules.map((schedule, index) => `
+    const schedulesHtml = schedules.schedules
+      .map(
+        (schedule, index) => `
       <div class="card p-4 border border-gray-700" data-schedule-index="${index}">
         <div class="flex items-center justify-between mb-3">
           <h4 class="font-bold text-white">${schedule.name}</h4>
@@ -79,9 +84,13 @@
           </div>
         </div>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
-    schedulerContainer.innerHTML = toggleHtml + `
+    schedulerContainer.innerHTML =
+      toggleHtml +
+      `
       <div id="schedules-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         ${schedulesHtml}
       </div>
@@ -89,7 +98,7 @@
 
     // Event listeners
     const enabledToggle = document.getElementById('scheduler-enabled');
-    enabledToggle.addEventListener('change', (e) => {
+    enabledToggle.addEventListener('change', e => {
       if (e.target.checked) {
         scheduler.enable();
         if (window.A11y) {
@@ -105,7 +114,7 @@
 
     // Edit schedule buttons
     document.querySelectorAll('.edit-schedule').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', e => {
         const index = parseInt(e.target.getAttribute('data-index'));
         showScheduleEditor(index, schedules.schedules[index]);
       });
@@ -170,7 +179,7 @@
 
     // Event listeners
     const form = document.getElementById('schedule-form');
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', e => {
       e.preventDefault();
 
       const updatedSchedule = {
@@ -195,7 +204,7 @@
       modal.remove();
     });
 
-    modal.addEventListener('click', (e) => {
+    modal.addEventListener('click', e => {
       if (e.target === modal) {
         modal.remove();
       }
@@ -207,7 +216,9 @@
    */
   function initCustomThemeBuilder() {
     const builderContainer = document.getElementById('custom-theme-builder');
-    if (!builderContainer || !window.ThemeEnhanced) {return;}
+    if (!builderContainer || !window.ThemeEnhanced) {
+      return;
+    }
 
     const customTheme = window.ThemeEnhanced.customBuilder.getTheme();
 
@@ -273,11 +284,11 @@
       const colorInput = document.getElementById(`custom-${colorType}`);
       const textInput = document.getElementById(`custom-${colorType}-text`);
 
-      colorInput.addEventListener('input', (e) => {
+      colorInput.addEventListener('input', e => {
         textInput.value = e.target.value;
       });
 
-      textInput.addEventListener('input', (e) => {
+      textInput.addEventListener('input', e => {
         if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
           colorInput.value = e.target.value;
         }
@@ -318,7 +329,9 @@
    */
   function initPageThemeOverride() {
     const overrideContainer = document.getElementById('page-theme-override');
-    if (!overrideContainer || !window.ThemeEnhanced) {return;}
+    if (!overrideContainer || !window.ThemeEnhanced) {
+      return;
+    }
 
     const currentPage = window.ThemeEnhanced.pageOverride.getCurrentPage();
     const currentOverride = window.ThemeEnhanced.pageOverride.getCurrentPageOverride();
@@ -328,13 +341,17 @@
         <h3 class="text-lg font-bold text-white mb-4">Page Theme Override</h3>
         <p class="text-sm text-gray-400 mb-4">Set a specific theme for this page: <code class="text-blue-400">${currentPage}</code></p>
         
-        ${currentOverride ? `
+        ${
+  currentOverride
+    ? `
           <div class="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
             <p class="text-sm text-blue-400">
               Current override: <strong class="capitalize">${currentOverride}</strong>
             </p>
           </div>
-        ` : ''}
+        `
+    : ''
+  }
         
         <div class="space-y-3">
           <select id="page-override-select" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700">

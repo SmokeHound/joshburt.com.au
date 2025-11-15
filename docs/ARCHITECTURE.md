@@ -1,10 +1,6 @@
 # System Architecture# System Architecture
 
-
-
 Comprehensive overview of the joshburt.com.au serverless application architecture.This document provides a comprehensive overview of the joshburt.com.au application architecture.
-
-
 
 ## Table of Contents## Table of Contents
 
@@ -38,8 +34,6 @@ The joshburt.com.au application is a modern, serverless web application built on
 
 ### System Type- **CI/CD**: GitHub Actions
 
-
-
 **Serverless full-stack web application** with static frontend and serverless backend.### Key Characteristics
 
 - **Serverless Architecture**: No dedicated server, scales automatically
@@ -60,37 +54,37 @@ The joshburt.com.au application is a modern, serverless web application built on
 
 | **Hosting** | Netlify CDN (primary), FTP mirror (optional) |┌─────────────────────────────────────────────────────────────────────┐
 
-| **CI/CD** | GitHub Actions |│                           USER BROWSER                               │
+| **CI/CD** | GitHub Actions |│ USER BROWSER │
 
-| **Auth** | JWT + optional Auth0 OAuth |│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐  │
+| **Auth** | JWT + optional Auth0 OAuth |│ ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐ │
 
-│  │  Static HTML │  │  JavaScript  │  │  Service Worker (PWA)    │  │
+│ │ Static HTML │ │ JavaScript │ │ Service Worker (PWA) │ │
 
-### Key Characteristics│  │  + CSS       │  │  (ES6+)      │  │  (Offline Caching)       │  │
+### Key Characteristics│ │ + CSS │ │ (ES6+) │ │ (Offline Caching) │ │
 
-│  └──────┬───────┘  └──────┬───────┘  └───────────┬──────────────┘  │
+│ └──────┬───────┘ └──────┬───────┘ └───────────┬──────────────┘ │
 
-- **Zero Server Management**: Fully serverless, auto-scaling│         │                 │                       │                  │
+- **Zero Server Management**: Fully serverless, auto-scaling│ │ │ │ │
 
 - **Progressive Enhancement**: Works without JavaScript, enhanced with it└─────────┼─────────────────┼───────────────────────┼──────────────────┘
 
-- **Mobile-First**: Responsive design, all screen sizes          │                 │                       │
+- **Mobile-First**: Responsive design, all screen sizes │ │ │
 
-- **Production-Ready**: No debug code, comprehensive error handling          │                 │                       │
+- **Production-Ready**: No debug code, comprehensive error handling │ │ │
 
-- **Audit Trail**: Complete action logging for compliance          ▼                 ▼                       ▼
+- **Audit Trail**: Complete action logging for compliance ▼ ▼ ▼
 
 ┌─────────────────────────────────────────────────────────────────────┐
 
----│                         NETLIFY CDN                                  │
+---│ NETLIFY CDN │
 
-│  ┌─────────────────────────────────────────────────────────────┐   │
+│ ┌─────────────────────────────────────────────────────────────┐ │
 
-## Architecture Diagram│  │  Edge Caching (Static Assets)                               │   │
+## Architecture Diagram│ │ Edge Caching (Static Assets) │ │
 
-│  │  - HTML, CSS, JavaScript, Images                            │   │
+│ │ - HTML, CSS, JavaScript, Images │ │
 
-```│  │  - Cache-Control: max-age=31536000 (1 year)                │   │
+````│ │  - Cache-Control: max-age=31536000 (1 year)                │   │
 
 ┌─────────────────────────────────────────────────────────────────────┐│  └─────────────────────────────────────────────────────────────┘   │
 
@@ -448,7 +442,7 @@ exports.handler = withHandler(async (event) => {- Weekly performance reports
 
   const user = await requirePermission(event, 'resource', 'read');- Recommendations based on metrics
 
-  
+
 
   // Business logic## Data Flow
 
@@ -560,9 +554,9 @@ const error = (statusCode, message, details) => ({     │                   │
 
 Authentication and authorization middleware:     │                   │                    │                     │
 
-```
+````
 
-```javascript
+````javascript
 
 const requirePermission = async (event, resource, action) => {### Database Migration Flow
 
@@ -634,17 +628,17 @@ const permissions = {      │                    ├─────────
 
 };
 
-```
+````
 
 const hasPermission = (role, resource, action) => {┌────────────────────────────────────────────────────────────┐
 
-  // Check if role has permission│                    Security Layers                         │
+// Check if role has permission│ Security Layers │
 
-  // Supports wildcard and hierarchical roles│                                                            │
+// Supports wildcard and hierarchical roles│ │
 
-};│  Layer 1: HTTPS (Netlify CDN)                             │
+};│ Layer 1: HTTPS (Netlify CDN) │
 
-```│  ├─ TLS 1.3                                               │
+`````│ ├─ TLS 1.3                                               │
 
 │  └─ Automatic certificate management                      │
 
@@ -924,16 +918,16 @@ WHERE email = $1 AND attempt_time > NOW() - INTERVAL '15 minutes';### Incident R
 
 
 
-```javascript**Document Version**: 1.0.0  
+```javascript**Document Version**: 1.0.0
 
-// ✅ Safe**Last Updated**: 2025-10-31  
+// ✅ Safe**Last Updated**: 2025-10-31
 
 await pool.query('SELECT * FROM users WHERE email = $1', [email]);**Maintained By**: Development Team
 
 
 // ❌ Never do this
 await pool.query(`SELECT * FROM users WHERE email = '${email}'`);
-```
+`````
 
 ---
 
@@ -944,6 +938,7 @@ await pool.query(`SELECT * FROM users WHERE email = '${email}'`);
 **Trigger**: Push to `main` branch
 
 **Build Process**:
+
 1. Install dependencies: `npm install`
 2. Build CSS: `npm run build:css`
 3. Run tests: `npm run test`
@@ -1000,10 +995,12 @@ jobs:
 **Netlify Dashboard**: Settings → Environment Variables
 
 **Required**:
+
 - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
 - `JWT_SECRET`
 
 **Optional**:
+
 - `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_AUDIENCE`
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`
 
@@ -1078,6 +1075,7 @@ jobs:
 - **Partitioning**: Order tables partitioned by date (future optimization)
 
 **Metrics**:
+
 - Page load: <2s (was 3.5s)
 - API response: <100ms p95 (was 500ms)
 - Lighthouse score: 95/100
@@ -1091,6 +1089,7 @@ jobs:
 **Endpoint**: `/.netlify/functions/health`
 
 **Checks**:
+
 - Database connectivity
 - Connection pool status
 - System timestamp
@@ -1114,7 +1113,7 @@ jobs:
 ```javascript
 window.ErrorTracker = {
   log: [],
-  capture: (error) => {
+  capture: error => {
     // Store error details
     // Send to backend (future: external service)
   }

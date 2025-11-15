@@ -3,7 +3,7 @@
  * Provides optimistic UI updates, confirmation dialogs, and improved UX
  */
 
-(function() {
+(function () {
   'use strict';
 
   /**
@@ -21,7 +21,7 @@
       onCancel = () => {}
     } = options;
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const modal = document.createElement('div');
       modal.className = 'modal-overlay confirmation-dialog-overlay';
       modal.setAttribute('role', 'alertdialog');
@@ -134,7 +134,7 @@
       });
 
       // Close on overlay click
-      modal.addEventListener('click', (e) => {
+      modal.addEventListener('click', e => {
         if (e.target === modal) {
           cleanup();
           onCancel();
@@ -143,7 +143,7 @@
       });
 
       // Close on Escape
-      const escHandler = (e) => {
+      const escHandler = e => {
         if (e.key === 'Escape') {
           cleanup();
           onCancel();
@@ -182,14 +182,14 @@
 
     // Sync with server
     return action()
-      .then((result) => {
+      .then(result => {
         // Server confirmed, show success
         if (window.A11y) {
           window.A11y.announce(successMessage);
         }
         return result;
       })
-      .catch((error) => {
+      .catch(error => {
         // Server failed, rollback
         rollback();
         onError(error);
@@ -361,9 +361,11 @@
     document.body.appendChild(overlay);
 
     return {
-      updateMessage: (newMessage) => {
+      updateMessage: newMessage => {
         const p = overlay.querySelector('p');
-        if (p) {p.textContent = newMessage;}
+        if (p) {
+          p.textContent = newMessage;
+        }
       },
       remove: () => {
         overlay.style.animation = 'fadeIn 0.2s ease-out reverse';
@@ -380,11 +382,7 @@
    * Shows progress for long-running operations
    */
   function createProgressBar(options = {}) {
-    const {
-      label = 'Progress',
-      total = 100,
-      showPercentage = true
-    } = options;
+    const { label = 'Progress', total = 100, showPercentage = true } = options;
 
     const container = document.createElement('div');
     container.className = 'progress-bar-container';
@@ -434,7 +432,7 @@
 
     return {
       element: container,
-      setProgress: (value) => {
+      setProgress: value => {
         const percentage = Math.min(Math.max((value / total) * 100, 0), 100);
         fill.style.width = `${percentage}%`;
         container.setAttribute('aria-valuenow', value);
@@ -472,7 +470,7 @@
   // Auto-attach to delete buttons
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-confirm]').forEach(element => {
-      element.addEventListener('click', async (e) => {
+      element.addEventListener('click', async e => {
         e.preventDefault();
         const message = element.getAttribute('data-confirm');
         const confirmed = await showConfirmationDialog({

@@ -11,16 +11,13 @@ function getHeader(event, key) {
 
 function getIp(event) {
   const h = event && event.headers ? event.headers : {};
-  return (
-    h['x-forwarded-for'] ||
-    h['client-ip'] ||
-    h['x-real-ip'] ||
-    ''
-  );
+  return h['x-forwarded-for'] || h['client-ip'] || h['x-real-ip'] || '';
 }
 
 async function logAudit(event, { action, userId = null, details = {} } = {}) {
-  if (!action) {return;}
+  if (!action) {
+    return;
+  }
   try {
     // Check if database is connected
     if (!database.pool) {
@@ -45,7 +42,8 @@ async function logAudit(event, { action, userId = null, details = {} } = {}) {
       origin,
       requestId
     };
-    const insert = 'INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)';
+    const insert =
+      'INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)';
     const params = [userId, action, JSON.stringify(enriched), ip, ua];
     await database.run(insert, params);
   } catch (err) {

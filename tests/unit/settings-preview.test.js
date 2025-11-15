@@ -15,7 +15,11 @@ describe('Settings preview CSS variables', () => {
     const scripts = document.querySelectorAll('script');
     scripts.forEach(script => {
       if (script.textContent) {
-        try { eval(script.textContent); } catch (e) { /* ignore initialization errors */ }
+        try {
+          eval(script.textContent);
+        } catch (e) {
+          /* ignore initialization errors */
+        }
       }
     });
     // In the test environment DOMContentLoaded may not fire; call initializer manually if present
@@ -31,12 +35,22 @@ describe('Settings preview CSS variables', () => {
       const p = document.getElementById('primaryColor');
       const s = document.getElementById('secondaryColor');
       const a = document.getElementById('accentColor');
-      if (p && p.value) {document.documentElement.style.setProperty('--preview-primary', p.value);}
-      if (s && s.value) {document.documentElement.style.setProperty('--preview-secondary', s.value);}
-      if (a && a.value) {document.documentElement.style.setProperty('--preview-accent', a.value);}
+      if (p && p.value) {
+        document.documentElement.style.setProperty('--preview-primary', p.value);
+      }
+      if (s && s.value) {
+        document.documentElement.style.setProperty('--preview-secondary', s.value);
+      }
+      if (a && a.value) {
+        document.documentElement.style.setProperty('--preview-accent', a.value);
+      }
       const safeBind = (el, name) => {
         try {
-          if (el) {el.addEventListener('change', (evt) => document.documentElement.style.setProperty(name, evt.target.value));}
+          if (el) {
+            el.addEventListener('change', evt =>
+              document.documentElement.style.setProperty(name, evt.target.value)
+            );
+          }
         } catch (err) {
           // ignore
         }
@@ -54,9 +68,18 @@ describe('Settings preview CSS variables', () => {
     const secondary = document.getElementById('secondaryColor').value;
     const accent = document.getElementById('accentColor').value;
     const rootStyle = document.documentElement.style;
-    const primaryVar = (rootStyle.getPropertyValue('--preview-primary') || getComputedStyle(document.documentElement).getPropertyValue('--preview-primary')).trim();
-    const secondaryVar = (rootStyle.getPropertyValue('--preview-secondary') || getComputedStyle(document.documentElement).getPropertyValue('--preview-secondary')).trim();
-    const accentVar = (rootStyle.getPropertyValue('--preview-accent') || getComputedStyle(document.documentElement).getPropertyValue('--preview-accent')).trim();
+    const primaryVar = (
+      rootStyle.getPropertyValue('--preview-primary') ||
+      getComputedStyle(document.documentElement).getPropertyValue('--preview-primary')
+    ).trim();
+    const secondaryVar = (
+      rootStyle.getPropertyValue('--preview-secondary') ||
+      getComputedStyle(document.documentElement).getPropertyValue('--preview-secondary')
+    ).trim();
+    const accentVar = (
+      rootStyle.getPropertyValue('--preview-accent') ||
+      getComputedStyle(document.documentElement).getPropertyValue('--preview-accent')
+    ).trim();
     expect(primaryVar).toBe(primary);
     expect(secondaryVar).toBe(secondary);
     expect(accentVar).toBe(accent);
@@ -74,9 +97,18 @@ describe('Settings preview CSS variables', () => {
     s.dispatchEvent(new Event('change', { bubbles: true }));
     a.dispatchEvent(new Event('change', { bubbles: true }));
 
-    const primaryVar2 = (document.documentElement.style.getPropertyValue('--preview-primary') || getComputedStyle(document.documentElement).getPropertyValue('--preview-primary')).trim();
-    const secondaryVar2 = (document.documentElement.style.getPropertyValue('--preview-secondary') || getComputedStyle(document.documentElement).getPropertyValue('--preview-secondary')).trim();
-    const accentVar2 = (document.documentElement.style.getPropertyValue('--preview-accent') || getComputedStyle(document.documentElement).getPropertyValue('--preview-accent')).trim();
+    const primaryVar2 = (
+      document.documentElement.style.getPropertyValue('--preview-primary') ||
+      getComputedStyle(document.documentElement).getPropertyValue('--preview-primary')
+    ).trim();
+    const secondaryVar2 = (
+      document.documentElement.style.getPropertyValue('--preview-secondary') ||
+      getComputedStyle(document.documentElement).getPropertyValue('--preview-secondary')
+    ).trim();
+    const accentVar2 = (
+      document.documentElement.style.getPropertyValue('--preview-accent') ||
+      getComputedStyle(document.documentElement).getPropertyValue('--preview-accent')
+    ).trim();
     expect(primaryVar2).toBe('#112233');
     expect(secondaryVar2).toBe('#445566');
     expect(accentVar2).toBe('#778899');

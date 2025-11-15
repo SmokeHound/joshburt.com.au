@@ -245,11 +245,7 @@
           const rid = parsed.requestId || '';
           if (m) {
             let methodColor = 'bg-gray-700';
-            if (m === 'GET') methodColor = 'bg-green-700';
-            else if (m === 'POST') methodColor = 'bg-blue-700';
-            else if (m === 'PUT') methodColor = 'bg-yellow-700';
-            else if (m === 'PATCH') methodColor = 'bg-orange-700';
-            else if (m === 'DELETE') methodColor = 'bg-red-700';
+            if (m === 'GET') {methodColor = 'bg-green-700';} else if (m === 'POST') {methodColor = 'bg-blue-700';} else if (m === 'PUT') {methodColor = 'bg-yellow-700';} else if (m === 'PATCH') {methodColor = 'bg-orange-700';} else if (m === 'DELETE') {methodColor = 'bg-red-700';}
             chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded text-white ${methodColor} mr-1">${escapeHtml(m)}</span>`;
           }
           if (p) {

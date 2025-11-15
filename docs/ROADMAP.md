@@ -5,6 +5,7 @@ Planned features and improvements for joshburt.com.au.
 ## Completed ✅
 
 ### Phase 1: Foundation (Q1 2025)
+
 - PostgreSQL database setup
 - Netlify Functions backend
 - JWT authentication
@@ -12,6 +13,7 @@ Planned features and improvements for joshburt.com.au.
 - Product/order management
 
 ### Phase 2: Features (Q2 2025)
+
 - User roles (mechanic, manager, admin)
 - Audit logging
 - Notification system
@@ -19,6 +21,7 @@ Planned features and improvements for joshburt.com.au.
 - Theme system
 
 ### Phase 3: Optimization (Q3 2025)
+
 - Performance improvements (80% smaller CSS)
 - Database indexing (20+ indexes)
 - Connection pooling
@@ -31,12 +34,14 @@ Planned features and improvements for joshburt.com.au.
 ### Q4 2025
 
 #### Enhanced Reporting
+
 - Advanced analytics dashboard
 - Product sales reports
 - Inventory forecasting
 - Automated weekly reports
 
 #### User Experience
+
 - Product image galleries
 - Advanced search filters
 - Bulk product upload
@@ -49,12 +54,14 @@ Planned features and improvements for joshburt.com.au.
 ### Q1 2026
 
 #### Integrations
+
 - External tracking API (Australia Post, etc.)
 - Accounting software integration (Xero, MYOB)
 - Email notifications (order confirmations)
 - SMS alerts (low stock)
 
 #### Features
+
 - Product reviews/ratings
 - Customer portal
 - Invoice generation
@@ -63,12 +70,14 @@ Planned features and improvements for joshburt.com.au.
 ### Q2 2026
 
 #### Advanced Features
+
 - Multi-warehouse support
 - Supplier management
 - Purchase orders
 - Barcode scanning
 
 #### DevOps
+
 - Automated testing expansion
 - Performance monitoring (external service)
 - Database read replicas
@@ -79,6 +88,7 @@ Planned features and improvements for joshburt.com.au.
 ## Future Considerations 💭
 
 ### Nice to Have
+
 - Mobile app (React Native)
 - AI-powered inventory predictions
 - Advanced analytics (ML insights)

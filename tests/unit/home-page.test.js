@@ -38,7 +38,9 @@ describe('Home Page', () => {
       document.body.appendChild(loginBtn);
     }
 
-    if (!loginModal) {return;} // Skip if modal missing in test HTML
+    if (!loginModal) {
+      return;
+    } // Skip if modal missing in test HTML
 
     loginBtn.addEventListener('click', () => {
       loginModal.classList.remove('hidden');
@@ -52,7 +54,9 @@ describe('Home Page', () => {
     const loginForm = document.getElementById('login-form');
     const loginModal = document.getElementById('login-modal');
 
-    if (!loginForm || !loginModal) {return;}
+    if (!loginForm || !loginModal) {
+      return;
+    }
 
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
@@ -63,7 +67,7 @@ describe('Home Page', () => {
 
       const setItemSpy = jest.spyOn(localStorage, 'setItem');
 
-      loginForm.addEventListener('submit', (e) => {
+      loginForm.addEventListener('submit', e => {
         e.preventDefault();
         const authenticatedUser = {
           name: 'test',
@@ -93,7 +97,9 @@ describe('Home Page', () => {
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
-    if (!loginForm || !loginError) {return;}
+    if (!loginForm || !loginError) {
+      return;
+    }
 
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
@@ -102,7 +108,7 @@ describe('Home Page', () => {
       emailInput.value = 'invalid@example.com';
       passwordInput.value = 'wrongpassword';
 
-      loginForm.addEventListener('submit', (e) => {
+      loginForm.addEventListener('submit', e => {
         e.preventDefault();
         try {
           throw new Error('Invalid credentials');
@@ -121,10 +127,12 @@ describe('Home Page', () => {
 
   test('should update welcome message when user is logged in', () => {
     const welcomeMessage = document.getElementById('welcome-message');
-    localStorage.getItem.mockReturnValue(JSON.stringify({
-      name: 'John Doe',
-      email: 'john@example.com'
-    }));
+    localStorage.getItem.mockReturnValue(
+      JSON.stringify({
+        name: 'John Doe',
+        email: 'john@example.com'
+      })
+    );
 
     const user = JSON.parse(localStorage.getItem('user'));
     if (user && welcomeMessage) {
@@ -160,7 +168,7 @@ describe('Home Page', () => {
   test('should apply site settings correctly', () => {
     const welcomeMessage = document.getElementById('welcome-message');
 
-    localStorage.getItem.mockImplementation((key) => {
+    localStorage.getItem.mockImplementation(key => {
       if (key === 'siteSettings') {
         return JSON.stringify({
           'homepage-message': 'Custom Welcome Message',
@@ -186,7 +194,7 @@ describe('Home Page', () => {
       document.body.appendChild(toast);
     }
 
-    const showToast = jest.fn((message) => {
+    const showToast = jest.fn(message => {
       toast.textContent = message;
       toast.classList.remove('hidden');
       setTimeout(() => toast.classList.add('hidden'), 100);

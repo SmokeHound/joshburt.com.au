@@ -60,7 +60,7 @@ const createTransporter = () => {
   if (process.env.NODE_ENV === 'development') {
     // For development, do not send emails (no-op)
     return {
-      sendMail: async (mailOptions) => {
+      sendMail: async mailOptions => {
         return { messageId: 'dev-mode-' + Date.now() };
       }
     };

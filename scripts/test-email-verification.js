@@ -42,8 +42,16 @@ async function testEmailVerification() {
     `);
 
     const expectedColumns = [
-      'id', 'user_id', 'email', 'attempt_type', 'token_used',
-      'success', 'ip_address', 'user_agent', 'error_message', 'created_at'
+      'id',
+      'user_id',
+      'email',
+      'attempt_type',
+      'token_used',
+      'success',
+      'ip_address',
+      'user_agent',
+      'error_message',
+      'created_at'
     ];
 
     const actualColumns = columns.map(c => c.column_name);
@@ -79,18 +87,14 @@ async function testEmailVerification() {
     const sampleUser = await database.get('SELECT id, email FROM users LIMIT 1');
 
     if (sampleUser) {
-      await database.run(`
+      await database.run(
+        `
         INSERT INTO email_verification_attempts 
         (user_id, email, attempt_type, success, ip_address, user_agent)
         VALUES (?, ?, ?, ?, ?, ?)
-      `, [
-        sampleUser.id,
-        sampleUser.email,
-        'test',
-        true,
-        '127.0.0.1',
-        'test-script'
-      ]);
+      `,
+        [sampleUser.id, sampleUser.email, 'test', true, '127.0.0.1', 'test-script']
+      );
 
       const inserted = await database.get(
         `SELECT * FROM email_verification_attempts 
@@ -108,10 +112,13 @@ async function testEmailVerification() {
         console.log(`   Created: ${inserted.created_at}`);
 
         // Clean up test data
-        await database.run(`
+        await database.run(
+          `
           DELETE FROM email_verification_attempts 
           WHERE id = ?
-        `, [inserted.id]);
+        `,
+          [inserted.id]
+        );
         console.log('   (Test record cleaned up)');
       }
     } else {
@@ -128,7 +135,11 @@ async function testEmailVerification() {
       AND column_name IN ('email_verified', 'email_verification_token', 'email_verification_expires')
     `);
 
-    const requiredUserColumns = ['email_verified', 'email_verification_token', 'email_verification_expires'];
+    const requiredUserColumns = [
+      'email_verified',
+      'email_verification_token',
+      'email_verification_expires'
+    ];
     const foundUserColumns = userColumns.map(c => c.column_name);
     const missingUserCols = requiredUserColumns.filter(col => !foundUserColumns.includes(col));
 
@@ -156,7 +167,6 @@ async function testEmailVerification() {
     console.log('\n🎉 Email verification system is ready to use!\n');
 
     process.exit(0);
-
   } catch (error) {
     console.error('\n❌ Test failed:', error.message);
     console.error('\nFull error:', error);

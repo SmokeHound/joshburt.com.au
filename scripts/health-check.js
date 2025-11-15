@@ -14,9 +14,9 @@ function checkEndpoint(path) {
     const url = `${NETLIFY_DEV_URL}${path}`;
     console.log(`🔍 Checking ${url}...`);
 
-    const req = http.get(url, { timeout: TIMEOUT }, (res) => {
+    const req = http.get(url, { timeout: TIMEOUT }, res => {
       let data = '';
-      res.on('data', chunk => data += chunk);
+      res.on('data', chunk => (data += chunk));
       res.on('end', () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           console.log(`✅ ${path} - OK (${res.statusCode})`);
@@ -28,7 +28,7 @@ function checkEndpoint(path) {
       });
     });
 
-    req.on('error', (err) => {
+    req.on('error', err => {
       console.log(`❌ ${path} - ${err.message}`);
       reject({ path, error: err.message });
     });
@@ -44,10 +44,7 @@ function checkEndpoint(path) {
 async function runHealthCheck() {
   console.log('🏥 Running health check for Netlify Functions...\n');
 
-  const endpoints = [
-    '/.netlify/functions/health',
-    '/.netlify/functions/public-config'
-  ];
+  const endpoints = ['/.netlify/functions/health', '/.netlify/functions/public-config'];
 
   const results = [];
 

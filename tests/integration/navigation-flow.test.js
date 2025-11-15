@@ -98,8 +98,7 @@ describe('Navigation & Shared Components Integration', () => {
     expect(email).toBeTruthy();
     expect(password).toBeTruthy();
     expect(
-      email.hasAttribute('required') ||
-      email.getAttribute('aria-required') === 'true'
+      email.hasAttribute('required') || email.getAttribute('aria-required') === 'true'
     ).toBeTruthy();
   });
 });

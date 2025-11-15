@@ -88,6 +88,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 **Types**:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -97,6 +98,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore`: Maintenance
 
 **Examples**:
+
 ```
 feat(products): Add full-text search with PostgreSQL
 fix(auth): Resolve JWT expiration edge case
@@ -112,6 +114,7 @@ docs(api): Update authentication endpoint examples
 **Style Guide**: ESLint configuration in `eslint.config.js`
 
 **Key Rules**:
+
 - Use `const`/`let`, never `var`
 - Arrow functions preferred
 - Async/await over callbacks
@@ -119,6 +122,7 @@ docs(api): Update authentication endpoint examples
 - JSDoc comments for functions
 
 **Example**:
+
 ```javascript
 /**
  * Fetch products with optional filters
@@ -129,12 +133,12 @@ docs(api): Update authentication endpoint examples
  */
 const getProducts = async (filters = {}) => {
   const { page = 1, limit = 20 } = filters;
-  
-  const result = await pool.query(
-    'SELECT * FROM products LIMIT $1 OFFSET $2',
-    [limit, (page - 1) * limit]
-  );
-  
+
+  const result = await pool.query('SELECT * FROM products LIMIT $1 OFFSET $2', [
+    limit,
+    (page - 1) * limit
+  ]);
+
   return {
     data: result.rows,
     pagination: { page, limit, total: result.rowCount }
@@ -145,6 +149,7 @@ const getProducts = async (filters = {}) => {
 ### HTML
 
 **Standards**:
+
 - Semantic HTML5 elements
 - Accessibility attributes (ARIA)
 - No inline styles (use TailwindCSS classes)
@@ -161,11 +166,13 @@ const getProducts = async (filters = {}) => {
 ### Database
 
 **Queries**:
+
 - Always use parameterized queries (`$1`, `$2`)
 - Create indexes for frequent lookups
 - Use transactions for multi-step operations
 
 **Migrations**:
+
 - Sequential numbering (`005_add_feature.sql`)
 - Idempotent (`CREATE TABLE IF NOT EXISTS`)
 - Update `database-schema.sql` to match
@@ -182,6 +189,7 @@ npm run validate
 ```
 
 This runs:
+
 1. **Linting**: `npm run lint`
 2. **Tests**: `npm run test:all`
 3. **Build**: `npm run build:css`
@@ -189,6 +197,7 @@ This runs:
 ### Writing Tests
 
 **Unit Tests** (`tests/unit/`):
+
 ```javascript
 // tests/unit/my-feature.test.js
 const { myFunction } = require('../../utils/my-feature');
@@ -202,6 +211,7 @@ describe('myFunction', () => {
 ```
 
 **Function Tests** (`tests/functions/`):
+
 ```javascript
 // tests/functions/my-function.test.js
 const handler = require('../../netlify/functions/my-function').handler;
@@ -212,7 +222,7 @@ describe('my-function', () => {
       httpMethod: 'GET',
       headers: { authorization: 'Bearer token' }
     };
-    
+
     const response = await handler(event);
     expect(response.statusCode).toBe(200);
   });
@@ -241,23 +251,28 @@ describe('my-function', () => {
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Documentation update
 - [ ] Performance improvement
 
 ## Testing
+
 - [ ] Unit tests added/updated
 - [ ] Manual testing completed
 - [ ] No regressions introduced
 
 ## Screenshots (if UI changes)
+
 [Add screenshots]
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Comments added for complex logic
@@ -280,47 +295,60 @@ Brief description of changes
 ### Bug Reports
 
 **Template**:
+
 ```markdown
 ## Bug Description
+
 Clear description of the bug
 
 ## Steps to Reproduce
+
 1. Go to '...'
 2. Click on '...'
 3. See error
 
 ## Expected Behavior
+
 What should happen
 
 ## Actual Behavior
+
 What actually happens
 
 ## Environment
+
 - Browser: Chrome 120
 - OS: Windows 11
 - Node.js: 18.17.0
 
 ## Screenshots
+
 [If applicable]
 
 ## Additional Context
+
 Any other relevant info
 ```
 
 ### Feature Requests
 
 **Template**:
+
 ```markdown
 ## Feature Description
+
 Clear description of proposed feature
 
 ## Use Case
+
 Why is this feature needed?
 
 ## Proposed Implementation
+
 How might this be implemented?
 
 ## Alternatives Considered
+
 Other approaches you've thought about
 ```
 

@@ -1,5 +1,13 @@
 // Unit tests for TOTP 2FA utilities
-const { generateTOTPSecret, verifyTOTPToken, generateBackupCodes, hashBackupCode, verifyBackupCode, prepareBackupCodesForStorage, parseStoredBackupCodes } = require('../../utils/totp');
+const {
+  generateTOTPSecret,
+  verifyTOTPToken,
+  generateBackupCodes,
+  hashBackupCode,
+  verifyBackupCode,
+  prepareBackupCodesForStorage,
+  parseStoredBackupCodes
+} = require('../../utils/totp');
 
 describe('TOTP 2FA Utilities', () => {
   describe('generateTOTPSecret', () => {

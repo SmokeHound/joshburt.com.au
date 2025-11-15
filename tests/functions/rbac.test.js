@@ -10,7 +10,14 @@ const usersFn = require(path.join('..', '..', 'netlify', 'functions', 'users.js'
 const productsFn = require(path.join('..', '..', '.netlify', 'functions', 'products.js'));
 const ordersFn = require(path.join('..', '..', '.netlify', 'functions', 'orders.js'));
 
-function makeEvent({ path = '/', httpMethod = 'GET', query = {}, body = {}, headers = {}, authorization } = {}) {
+function makeEvent({
+  path = '/',
+  httpMethod = 'GET',
+  query = {},
+  body = {},
+  headers = {},
+  authorization
+} = {}) {
   return {
     path,
     httpMethod,
@@ -21,23 +28,27 @@ function makeEvent({ path = '/', httpMethod = 'GET', query = {}, body = {}, head
 }
 
 async function createTestUser(email, password, name, role = 'user') {
-  const response = await usersFn.handler(makeEvent({
-    path: '/.netlify/functions/users',
-    httpMethod: 'POST',
-    body: { email, password, name, role },
-    authorization: adminToken
-  }));
+  const response = await usersFn.handler(
+    makeEvent({
+      path: '/.netlify/functions/users',
+      httpMethod: 'POST',
+      body: { email, password, name, role },
+      authorization: adminToken
+    })
+  );
   const result = JSON.parse(response.body || '{}');
   return result.user;
 }
 
 async function loginAs(email, password) {
-  const response = await authFn.handler(makeEvent({
-    path: '/.netlify/functions/auth',
-    query: { action: 'login' },
-    httpMethod: 'POST',
-    body: { action: 'login', email, password }
-  }));
+  const response = await authFn.handler(
+    makeEvent({
+      path: '/.netlify/functions/auth',
+      query: { action: 'login' },
+      httpMethod: 'POST',
+      body: { action: 'login', email, password }
+    })
+  );
   const result = JSON.parse(response.body || '{}');
   if (response.statusCode !== 200 || !result.accessToken) {
     throw new Error(`Login failed for ${email}: ${result.error || 'unknown'}`);
@@ -85,11 +96,13 @@ let testManager, testUser;
     console.log('4️⃣  Testing User Management Permissions...');
 
     // Admin should be able to list users
-    let res = await usersFn.handler(makeEvent({
-      path: '/.netlify/functions/users',
-      httpMethod: 'GET',
-      authorization: adminToken
-    }));
+    let res = await usersFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/users',
+        httpMethod: 'GET',
+        authorization: adminToken
+      })
+    );
     if (res.statusCode !== 200) {
       console.log('   ❌ Admin cannot list users');
       failures++;
@@ -98,11 +111,13 @@ let testManager, testUser;
     }
 
     // Manager should be able to list users
-    res = await usersFn.handler(makeEvent({
-      path: '/.netlify/functions/users',
-      httpMethod: 'GET',
-      authorization: managerToken
-    }));
+    res = await usersFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/users',
+        httpMethod: 'GET',
+        authorization: managerToken
+      })
+    );
     if (res.statusCode !== 200) {
       console.log('   ❌ Manager cannot list users');
       failures++;
@@ -111,11 +126,13 @@ let testManager, testUser;
     }
 
     // Regular user should NOT be able to list users
-    res = await usersFn.handler(makeEvent({
-      path: '/.netlify/functions/users',
-      httpMethod: 'GET',
-      authorization: userToken
-    }));
+    res = await usersFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/users',
+        httpMethod: 'GET',
+        authorization: userToken
+      })
+    );
     if (res.statusCode !== 403) {
       console.log('   ❌ Regular user can list users (should be denied)');
       failures++;
@@ -124,12 +141,14 @@ let testManager, testUser;
     }
 
     // Only admin can create users
-    res = await usersFn.handler(makeEvent({
-      path: '/.netlify/functions/users',
-      httpMethod: 'POST',
-      body: { email: 'test@test.com', password: 'Test123!', name: 'Test', role: 'user' },
-      authorization: managerToken
-    }));
+    res = await usersFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/users',
+        httpMethod: 'POST',
+        body: { email: 'test@test.com', password: 'Test123!', name: 'Test', role: 'user' },
+        authorization: managerToken
+      })
+    );
     if (res.statusCode !== 403) {
       console.log('   ❌ Manager can create users (should be denied)');
       failures++;
@@ -143,11 +162,13 @@ let testManager, testUser;
     console.log('5️⃣  Testing Products Permissions...');
 
     // All roles can read products
-    res = await productsFn.handler(makeEvent({
-      path: '/.netlify/functions/products',
-      httpMethod: 'GET',
-      authorization: userToken
-    }));
+    res = await productsFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/products',
+        httpMethod: 'GET',
+        authorization: userToken
+      })
+    );
     if (res.statusCode !== 200) {
       console.log('   ❌ User cannot read products');
       failures++;
@@ -156,12 +177,14 @@ let testManager, testUser;
     }
 
     // Manager can create products
-    res = await productsFn.handler(makeEvent({
-      path: '/.netlify/functions/products',
-      httpMethod: 'POST',
-      body: { name: 'Test Product', code: `TEST-${timestamp}`, type: 'Test' },
-      authorization: managerToken
-    }));
+    res = await productsFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/products',
+        httpMethod: 'POST',
+        body: { name: 'Test Product', code: `TEST-${timestamp}`, type: 'Test' },
+        authorization: managerToken
+      })
+    );
     if (res.statusCode !== 201) {
       console.log('   ❌ Manager cannot create products');
       failures++;
@@ -170,12 +193,14 @@ let testManager, testUser;
     }
 
     // Regular user cannot create products
-    res = await productsFn.handler(makeEvent({
-      path: '/.netlify/functions/products',
-      httpMethod: 'POST',
-      body: { name: 'Test Product 2', code: `TEST2-${timestamp}`, type: 'Test' },
-      authorization: userToken
-    }));
+    res = await productsFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/products',
+        httpMethod: 'POST',
+        body: { name: 'Test Product 2', code: `TEST2-${timestamp}`, type: 'Test' },
+        authorization: userToken
+      })
+    );
     if (res.statusCode !== 403) {
       console.log('   ❌ User can create products (should be denied)');
       failures++;
@@ -189,12 +214,14 @@ let testManager, testUser;
     console.log('6️⃣  Testing Orders Permissions...');
 
     // All authenticated users can create orders
-    res = await ordersFn.handler(makeEvent({
-      path: '/.netlify/functions/orders',
-      httpMethod: 'POST',
-      body: { items: [{ name: 'Test', code: 'TEST', quantity: 1 }] },
-      authorization: userToken
-    }));
+    res = await ordersFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/orders',
+        httpMethod: 'POST',
+        body: { items: [{ name: 'Test', code: 'TEST', quantity: 1 }] },
+        authorization: userToken
+      })
+    );
     if (res.statusCode !== 201) {
       console.log('   ❌ User cannot create orders');
       failures++;
@@ -203,11 +230,13 @@ let testManager, testUser;
     }
 
     // Regular users cannot list all orders
-    res = await ordersFn.handler(makeEvent({
-      path: '/.netlify/functions/orders',
-      httpMethod: 'GET',
-      authorization: userToken
-    }));
+    res = await ordersFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/orders',
+        httpMethod: 'GET',
+        authorization: userToken
+      })
+    );
     if (res.statusCode !== 403) {
       console.log('   ❌ User can list orders (should be denied)');
       failures++;
@@ -216,11 +245,13 @@ let testManager, testUser;
     }
 
     // Managers can list orders
-    res = await ordersFn.handler(makeEvent({
-      path: '/.netlify/functions/orders',
-      httpMethod: 'GET',
-      authorization: managerToken
-    }));
+    res = await ordersFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/orders',
+        httpMethod: 'GET',
+        authorization: managerToken
+      })
+    );
     if (res.statusCode !== 200) {
       console.log('   ❌ Manager cannot list orders');
       failures++;
@@ -234,12 +265,19 @@ let testManager, testUser;
     console.log('7️⃣  Testing Password Validation...');
 
     // Weak password should be rejected
-    res = await authFn.handler(makeEvent({
-      path: '/.netlify/functions/auth',
-      query: { action: 'register' },
-      httpMethod: 'POST',
-      body: { action: 'register', email: `weak_${timestamp}@test.com`, password: 'weak', name: 'Weak' }
-    }));
+    res = await authFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/auth',
+        query: { action: 'register' },
+        httpMethod: 'POST',
+        body: {
+          action: 'register',
+          email: `weak_${timestamp}@test.com`,
+          password: 'weak',
+          name: 'Weak'
+        }
+      })
+    );
     if (res.statusCode !== 400) {
       console.log(`   ❌ Weak password was accepted (got status ${res.statusCode}, expected 400)`);
       console.log(`      Response: ${res.body}`);
@@ -249,12 +287,19 @@ let testManager, testUser;
     }
 
     // Strong password should be accepted
-    res = await authFn.handler(makeEvent({
-      path: '/.netlify/functions/auth',
-      query: { action: 'register' },
-      httpMethod: 'POST',
-      body: { action: 'register', email: `strong_${timestamp}@test.com`, password: 'Strong123!', name: 'Strong' }
-    }));
+    res = await authFn.handler(
+      makeEvent({
+        path: '/.netlify/functions/auth',
+        query: { action: 'register' },
+        httpMethod: 'POST',
+        body: {
+          action: 'register',
+          email: `strong_${timestamp}@test.com`,
+          password: 'Strong123!',
+          name: 'Strong'
+        }
+      })
+    );
     if (![200, 201].includes(res.statusCode)) {
       console.log(`   ❌ Strong password was rejected (got status ${res.statusCode})`);
       console.log(`      Response: ${res.body}`);
@@ -275,7 +320,6 @@ let testManager, testUser;
       process.exitCode = 1;
     }
     console.log('════════════════════════════════════\n');
-
   } catch (error) {
     console.error('💥 Test execution failed:', error);
     process.exitCode = 1;

@@ -19,9 +19,9 @@ module.exports = {
         'neon-cyan': '#00ffff',
 
         // Updated primary colors to use neon
-        primary: '#00d4ff',      // neon blue
-        secondary: '#00ff88',    // neon green
-        accent: '#8000ff',       // neon purple
+        primary: '#00d4ff', // neon blue
+        secondary: '#00ff88', // neon green
+        accent: '#8000ff', // neon purple
         'primary-green': '#00ff88',
         'accent-red': '#ff0080',
 

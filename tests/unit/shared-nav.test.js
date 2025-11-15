@@ -46,10 +46,7 @@ describe('Shared Navigation Component', () => {
     menuToggle.dispatchEvent(enterEvent);
 
     // We only assert presence of class toggling logic executed at least once
-    expect(
-      sidebar.classList.contains('open') ||
-      sidebar.classList.contains('closed')
-    ).toBeTruthy();
+    expect(sidebar.classList.contains('open') || sidebar.classList.contains('closed')).toBeTruthy();
   });
 
   test('should highlight current page link', () => {

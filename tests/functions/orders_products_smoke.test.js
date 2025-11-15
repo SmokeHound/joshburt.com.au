@@ -22,7 +22,11 @@ async function call(endpoint, opts = {}) {
   const res = await fetch(`${BASE}/.netlify/functions/${endpoint}`, opts);
   const text = await res.text();
   let json;
-  try { json = JSON.parse(text); } catch { json = text; }
+  try {
+    json = JSON.parse(text);
+  } catch {
+    json = text;
+  }
   return { status: res.status, json };
 }
 
@@ -46,24 +50,39 @@ async function login() {
     const auth = await login();
     if (!auth.accessToken) {
       console.error('❌ Login failed for orders/products test');
-      process.exitCode = 1; return;
+      process.exitCode = 1;
+      return;
     }
-    const headers = { Authorization: `Bearer ${auth.accessToken}`, 'Content-Type': 'application/json' };
+    const headers = {
+      Authorization: `Bearer ${auth.accessToken}`,
+      'Content-Type': 'application/json'
+    };
 
     // Products list
     const products = await call('products');
     if (products.status !== 200 || !Array.isArray(products.json)) {
-      console.error('❌ Products list failed', products); process.exitCode = 1; return;
+      console.error('❌ Products list failed', products);
+      process.exitCode = 1;
+      return;
     }
     console.log(`✅ Products list ok (${products.json.length} items)`);
 
     // Create order (fake order with first product)
     if (products.json.length) {
       const first = products.json[0];
-      const orderBody = { requestedBy: 'smoke-test-user', items: [{ name: first.name || first.product_name || 'Test Product', quantity: 1 }] };
-      const create = await call('orders', { method: 'POST', headers, body: JSON.stringify(orderBody) });
+      const orderBody = {
+        requestedBy: 'smoke-test-user',
+        items: [{ name: first.name || first.product_name || 'Test Product', quantity: 1 }]
+      };
+      const create = await call('orders', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(orderBody)
+      });
       if (!(create.status === 200 || create.status === 201)) {
-        console.error('❌ Order create failed', create); process.exitCode = 1; return;
+        console.error('❌ Order create failed', create);
+        process.exitCode = 1;
+        return;
       }
       console.log('✅ Order create ok');
     } else {
@@ -73,11 +92,14 @@ async function login() {
     // List orders
     const orders = await call('orders');
     if (orders.status !== 200 || !Array.isArray(orders.json)) {
-      console.error('❌ Orders list failed', orders); process.exitCode = 1; return;
+      console.error('❌ Orders list failed', orders);
+      process.exitCode = 1;
+      return;
     }
     console.log(`✅ Orders list ok (${orders.json.length} total)`);
     console.log('🎉 Products/Orders smoke test PASSED');
   } catch (e) {
-    console.error('❌ Products/Orders smoke test error', e); process.exitCode = 1;
+    console.error('❌ Products/Orders smoke test error', e);
+    process.exitCode = 1;
   }
 })();

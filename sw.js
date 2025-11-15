@@ -24,10 +24,7 @@ const urlsToCache = [
 ];
 
 // API base patterns (serverless only; legacy /api removed)
-const apiUrls = [
-  '/.netlify/functions/',
-  'https://joshburt.netlify.app/.netlify/functions/'
-];
+const apiUrls = ['/.netlify/functions/', 'https://joshburt.netlify.app/.netlify/functions/'];
 
 // CDN resources to cache
 const cdnUrls = [
@@ -59,21 +56,29 @@ self.addEventListener('install', event => {
 // Activate event - clean up old caches with improved performance
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames
-          .filter(cache => cache !== STATIC_CACHE && cache !== DYNAMIC_CACHE && cache !== API_CACHE && cache !== IMAGE_CACHE)
-          .map(cache => caches.delete(cache))
-      );
-    }).then(() => {
-      return self.clients.claim();
-    })
+    caches
+      .keys()
+      .then(cacheNames => {
+        return Promise.all(
+          cacheNames
+            .filter(
+              cache =>
+                cache !== STATIC_CACHE &&
+                cache !== DYNAMIC_CACHE &&
+                cache !== API_CACHE &&
+                cache !== IMAGE_CACHE
+            )
+            .map(cache => caches.delete(cache))
+        );
+      })
+      .then(() => {
+        return self.clients.claim();
+      })
   );
 });
 
 // Enhanced fetch event with intelligent caching strategies
 self.addEventListener('fetch', event => {
-
   // Skip non-GET requests
   if (event.request.method !== 'GET') {
     return;
@@ -114,10 +119,15 @@ async function cacheFirstStrategy(request, cacheName) {
     console.error('Service Worker: Cache-first strategy failed', error);
     // Fallback for CSS/HTML
     if (request.url.endsWith('.css')) {
-      return new Response('body { font-family: sans-serif; background: #fff; color: #222; }', { headers: { 'Content-Type': 'text/css' } });
+      return new Response('body { font-family: sans-serif; background: #fff; color: #222; }', {
+        headers: { 'Content-Type': 'text/css' }
+      });
     }
     if (request.headers.get('accept')?.includes('text/html')) {
-      return new Response('<!DOCTYPE html><html><head><title>Offline</title></head><body><h1>Offline</h1><p>Unable to load page. Please check your connection and refresh.</p></body></html>', { headers: { 'Content-Type': 'text/html' } });
+      return new Response(
+        '<!DOCTYPE html><html><head><title>Offline</title></head><body><h1>Offline</h1><p>Unable to load page. Please check your connection and refresh.</p></body></html>',
+        { headers: { 'Content-Type': 'text/html' } }
+      );
     }
     return new Response('Offline', { status: 503 });
   }
@@ -154,7 +164,7 @@ async function networkFirstStrategy(request, cacheName) {
     if (cached) {
       // Check if cache is expired (1 hour)
       const cacheTimestamp = cached.headers.get('sw-cache-timestamp');
-      const isExpired = cacheTimestamp && (Date.now() - parseInt(cacheTimestamp)) > 3600000;
+      const isExpired = cacheTimestamp && Date.now() - parseInt(cacheTimestamp) > 3600000;
 
       if (!isExpired) {
         return cached;
@@ -171,8 +181,11 @@ async function staleWhileRevalidateStrategy(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
   // Serve from cache immediately if available
-  const response = cached || fetch(request).catch(() => {
-    return new Response(`
+  const response =
+    cached ||
+    fetch(request).catch(() => {
+      return new Response(
+        `
       <!DOCTYPE html>
       <html>
         <head><title>Offline</title></head>
@@ -182,16 +195,20 @@ async function staleWhileRevalidateStrategy(request, cacheName) {
           <button onclick="window.location.reload()">Retry</button>
         </body>
       </html>
-    `, { headers: { 'Content-Type': 'text/html' } });
-  });
+    `,
+        { headers: { 'Content-Type': 'text/html' } }
+      );
+    });
   // Update cache in background
-  fetch(request).then(fetchResponse => {
-    if (fetchResponse.status === 200) {
-      cache.put(request, fetchResponse.clone());
-    }
-  }).catch(() => {
-    // Network failed, cache update skipped
-  });
+  fetch(request)
+    .then(fetchResponse => {
+      if (fetchResponse.status === 200) {
+        cache.put(request, fetchResponse.clone());
+      }
+    })
+    .catch(() => {
+      // Network failed, cache update skipped
+    });
   return response;
 }
 
@@ -242,9 +259,7 @@ self.addEventListener('push', event => {
       console.error('Failed to parse notification data:', err);
     }
   }
-  event.waitUntil(
-    self.registration.showNotification('Josh\'s App', options)
-  );
+  event.waitUntil(self.registration.showNotification('Josh\'s App', options));
 });
 
 // Handle notification clicks

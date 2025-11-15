@@ -2,9 +2,7 @@
 module.exports = {
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/tests'],
-  testMatch: [
-    '**/tests/**/*.test.js'
-  ],
+  testMatch: ['**/tests/**/*.test.js'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   moduleFileExtensions: ['js', 'json'],
   verbose: true,

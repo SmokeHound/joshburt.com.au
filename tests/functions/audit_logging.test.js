@@ -73,12 +73,15 @@ async function getAuditLogs(token, action = null) {
       return;
     }
 
-    const logs = Array.isArray(loginLogs.json) ? loginLogs.json : (loginLogs.json.data || []);
+    const logs = Array.isArray(loginLogs.json) ? loginLogs.json : loginLogs.json.data || [];
     const loginLog = logs.find(log => log.action === 'auth.login_success');
 
     if (!loginLog) {
       console.error('❌ No auth.login_success audit log found');
-      console.error('Available logs:', logs.map(l => l.action));
+      console.error(
+        'Available logs:',
+        logs.map(l => l.action)
+      );
       process.exitCode = 1;
       return;
     }
@@ -108,7 +111,7 @@ async function getAuditLogs(token, action = null) {
 
     // 5. Check logout audit log
     const logoutLogs = await getAuditLogs(login.json.accessToken, 'auth.logout');
-    const logsArray = Array.isArray(logoutLogs.json) ? logoutLogs.json : (logoutLogs.json.data || []);
+    const logsArray = Array.isArray(logoutLogs.json) ? logoutLogs.json : logoutLogs.json.data || [];
     const logoutLog = logsArray.find(log => log.action === 'auth.logout');
 
     if (!logoutLog) {
@@ -119,7 +122,6 @@ async function getAuditLogs(token, action = null) {
 
     console.log('🎉 Audit logging test PASSED');
     console.log('📊 Tested actions: auth.login_success, auth.logout');
-
   } catch (err) {
     console.error('❌ Audit logging test threw error', err);
     process.exitCode = 1;

@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <!-- Shared Tailwind CSS Configuration and Common Styles -->
 <link rel="stylesheet" href="./assets/css/styles.css">
 <!-- Preload critical resources for performance -->
@@ -406,43 +410,10 @@
         }
 </style>
 <script>
-    // Accessibility: inject Skip to main content link and ensure main has an id
+    // Global handler: show a sign-in CTA when authentication is required.
     (function(){
         try {
-            // Insert skip link at top of body as early as possible
-            const makeSkip = () => {
-                if (document.getElementById('skip-to-content')) return;
-                const a = document.createElement('a');
-                a.id = 'skip-to-content';
-                a.href = '#main';
-                a.textContent = 'Skip to main content';
-                a.style.position = 'absolute';
-                a.style.left = '-999px';
-                a.style.top = '0';
-                a.style.background = '#111827';
-                a.style.color = '#fff';
-                a.style.padding = '8px 12px';
-                a.style.borderRadius = '6px';
-                a.style.zIndex = '10000';
-                a.style.boxShadow = '0 2px 8px rgba(0,0,0,0.4)';
-                a.addEventListener('focus', () => { a.style.left = '8px'; a.style.top = '8px'; });
-                a.addEventListener('blur', () => { a.style.left = '-999px'; a.style.top = '0'; });
-                document.body.prepend(a);
-            };
-            const ensureMainId = () => {
-                const main = document.querySelector('main');
-                if (main && !main.id) main.id = 'main';
-            };
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => { ensureMainId(); makeSkip(); });
-            } else {
-                ensureMainId(); makeSkip();
-            }
-        } catch (e) {}
-
-                // Global handler: show a sign-in CTA when authentication is required.
-                try {
-                    window.addEventListener('auth:required', (ev) => {
+            window.addEventListener('auth:required', (ev) => {
                         try {
                             // If a page implements a showSignInCTA function, call it
                             if (typeof window.showSignInCTA === 'function') {
@@ -483,4 +454,6 @@
                     });
                 } catch (e) { /* noop if events unsupported */ }
     })();
-    </script>
+</script>
+</head>
+</html>

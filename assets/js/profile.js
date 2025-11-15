@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Serverless auth "me" action
     const res = await (window.authFetch
       ? window.authFetch(`${FN_BASE}/auth?action=me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        headers: { Authorization: `Bearer ${token}` }
+      })
       : fetch(`${FN_BASE}/auth?action=me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }));
+        headers: { Authorization: `Bearer ${token}` }
+      }));
     if (!res.ok) {
       throw new Error('Failed to load current user');
     }
@@ -44,11 +44,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const res = await (window.authFetch
         ? window.authFetch(`${FN_BASE}/users/${profileUserId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+          headers: { Authorization: `Bearer ${token}` }
+        })
         : fetch(`${FN_BASE}/users/${profileUserId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }));
+          headers: { Authorization: `Bearer ${token}` }
+        }));
       if (!res.ok) {
         throw new Error('Failed to load user profile');
       }
@@ -124,9 +124,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentPwdField = document.getElementById('profile-current-password');
     const newPwdField = document.getElementById('profile-new-password');
     const confirmPwdField = document.getElementById('profile-confirm-password');
-    if (currentPwdField) currentPwdField.value = '';
-    if (newPwdField) newPwdField.value = '';
-    if (confirmPwdField) confirmPwdField.value = '';
+    if (currentPwdField) {currentPwdField.value = '';}
+    if (newPwdField) {newPwdField.value = '';}
+    if (confirmPwdField) {confirmPwdField.value = '';}
   };
 
   // Password section toggle functionality
@@ -256,21 +256,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (needsNameUpdate) {
           const res = await (window.authFetch
             ? window.authFetch(`${FN_BASE}/users/${user.id}`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ name })
-              })
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({ name })
+            })
             : fetch(`${FN_BASE}/users/${user.id}`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ name })
-              }));
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({ name })
+            }));
           if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             throw new Error(err.error || 'Failed to update name');
@@ -289,21 +289,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (needsPasswordUpdate) {
           const res = await (window.authFetch
             ? window.authFetch(`${FN_BASE}/auth?action=change-password`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ currentPassword, newPassword })
-              })
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({ currentPassword, newPassword })
+            })
             : fetch(`${FN_BASE}/auth?action=change-password`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ currentPassword, newPassword })
-              }));
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({ currentPassword, newPassword })
+            }));
           if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             throw new Error(err.error || 'Failed to change password');
@@ -427,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const cancelBtn = modal.querySelector('#init-cancel');
-    if (cancelBtn) cancelBtn.onclick = () => safeClose();
+    if (cancelBtn) {cancelBtn.onclick = () => safeClose();}
 
     const initialsInput = modal.querySelector('#init-initials');
     const themeSelect = modal.querySelector('#init-theme');
@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const preview = modal.querySelector('#init-preview');
 
     function updatePreview() {
-      if (!initialsInput || !themeSelect || !styleSelect || !preview) return;
+      if (!initialsInput || !themeSelect || !styleSelect || !preview) {return;}
       const i =
         (initialsInput.value || '')
           .toUpperCase()
@@ -447,15 +447,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       preview.innerHTML = `<img src="${url}" alt="Initials Avatar" class="h-36 w-36 rounded-full" />`;
     }
 
-    if (initialsInput) initialsInput.oninput = updatePreview;
-    if (themeSelect) themeSelect.onchange = updatePreview;
-    if (styleSelect) styleSelect.onchange = updatePreview;
+    if (initialsInput) {initialsInput.oninput = updatePreview;}
+    if (themeSelect) {themeSelect.onchange = updatePreview;}
+    if (styleSelect) {styleSelect.onchange = updatePreview;}
     updatePreview();
 
     const saveBtn = modal.querySelector('#init-save');
     if (saveBtn) {
       saveBtn.onclick = async () => {
-        if (!initialsInput || !themeSelect || !styleSelect) return;
+        if (!initialsInput || !themeSelect || !styleSelect) {return;}
         const i =
           (initialsInput.value || '')
             .toUpperCase()
@@ -481,15 +481,15 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
           const res = await (window.authFetch
             ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
-              })
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
+            })
             : fetch(`${FN_BASE}/users/${user.id}/avatar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
-              }));
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ avatarType: 'initials', initials: i, theme: t, style: s })
+            }));
           if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             throw new Error(err.error || 'Save failed');
@@ -665,15 +665,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           const res = await (window.authFetch
             ? window.authFetch(`${FN_BASE}/users/${user.id}/avatar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ avatarUrl: url })
-              })
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ avatarUrl: url })
+            })
             : fetch(`${FN_BASE}/users/${user.id}/avatar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ avatarUrl: url })
-              }));
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ avatarUrl: url })
+            }));
 
           if (!res.ok) {
             const err = await res.json().catch(() => ({}));
@@ -758,11 +758,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const res = await (window.authFetch
       ? window.authFetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        headers: { Authorization: `Bearer ${token}` }
+      })
       : fetch(`${FN_BASE}/audit-logs?userId=${user.id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }));
+        headers: { Authorization: `Bearer ${token}` }
+      }));
     if (res.ok) {
       const logs = await res.json();
       const logList = document.getElementById('activity-log');

@@ -12,8 +12,8 @@ const pgConfig = DATABASE_URL
   ? {
     connectionString: DATABASE_URL,
     ssl: true,
-    max: parseInt(process.env.DB_POOL_MAX) || 20,  // Increased for better concurrency
-    min: parseInt(process.env.DB_POOL_MIN) || 2,   // Maintain minimum connections
+    max: parseInt(process.env.DB_POOL_MAX) || 20, // Increased for better concurrency
+    min: parseInt(process.env.DB_POOL_MIN) || 2, // Maintain minimum connections
     idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
     connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
     // Query timeout to prevent long-running queries
@@ -124,7 +124,6 @@ class Database {
   }
 }
 
-
 const database = new Database();
 
 async function initializeDatabase() {
@@ -160,7 +159,10 @@ async function applyPostgresSchemaFromFile() {
       console.log('🛠 Applied database-schema.sql to PostgreSQL');
     } catch (err) {
       await client.query('ROLLBACK');
-      console.warn('⚠️ Applying database-schema.sql encountered an error; continuing with built-in schema:', err.message);
+      console.warn(
+        '⚠️ Applying database-schema.sql encountered an error; continuing with built-in schema:',
+        err.message
+      );
     } finally {
       client.release();
     }
@@ -170,7 +172,9 @@ async function applyPostgresSchemaFromFile() {
 }
 
 function shouldApplySchemaOnStart() {
-  const val = String(process.env.APPLY_SCHEMA_ON_START || '').toLowerCase().trim();
+  const val = String(process.env.APPLY_SCHEMA_ON_START || '')
+    .toLowerCase()
+    .trim();
   return val === '1' || val === 'true' || val === 'yes';
 }
 
@@ -248,19 +252,33 @@ async function createPostgreSQLTables() {
   `);
 
   // Backfill missing columns for legacy deployments (safe no-ops with IF NOT EXISTS)
-  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_by VARCHAR(255) DEFAULT \'mechanic\'');
-  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_items INTEGER NOT NULL DEFAULT 0');
-  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT \'pending\'');
-  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT \'normal\'');
+  await database.run(
+    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_by VARCHAR(255) DEFAULT \'mechanic\''
+  );
+  await database.run(
+    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_items INTEGER NOT NULL DEFAULT 0'
+  );
+  await database.run(
+    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT \'pending\''
+  );
+  await database.run(
+    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT \'normal\''
+  );
   await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS notes TEXT');
-  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-  await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  await database.run(
+    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  );
+  await database.run(
+    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  );
 
   // Add 2FA columns to users table for PostgreSQL
   await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_secret VARCHAR(255)');
-  await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN DEFAULT false');
+  await database.run(
+    'ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN DEFAULT false'
+  );
   await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS backup_codes TEXT');
-  
+
   // Add last_login column to users table
   await database.run('ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP');
 
@@ -279,8 +297,12 @@ async function createPostgreSQLTables() {
   // Ensure legacy order_items have expected columns
   await database.run('ALTER TABLE order_items ADD COLUMN IF NOT EXISTS product_name VARCHAR(255)');
   await database.run('ALTER TABLE order_items ADD COLUMN IF NOT EXISTS product_code VARCHAR(100)');
-  await database.run('ALTER TABLE order_items ADD COLUMN IF NOT EXISTS quantity INTEGER NOT NULL DEFAULT 1');
-  await database.run('ALTER TABLE order_items ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  await database.run(
+    'ALTER TABLE order_items ADD COLUMN IF NOT EXISTS quantity INTEGER NOT NULL DEFAULT 1'
+  );
+  await database.run(
+    'ALTER TABLE order_items ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  );
 
   // Inventory table to track stock for products and consumables (PostgreSQL)
   await database.run(`
@@ -336,13 +358,23 @@ async function createPostgreSQLTables() {
     )
   `);
   // Backfill legacy settings tables missing updated_at
-  await database.run('ALTER TABLE settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  await database.run(
+    'ALTER TABLE settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  );
 
   // Ensure all timestamp columns exist before creating indexes (for legacy databases)
-  await database.run('ALTER TABLE products ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-  await database.run('ALTER TABLE products ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-  await database.run('ALTER TABLE consumables ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-  await database.run('ALTER TABLE consumables ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  await database.run(
+    'ALTER TABLE products ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  );
+  await database.run(
+    'ALTER TABLE products ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  );
+  await database.run(
+    'ALTER TABLE consumables ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  );
+  await database.run(
+    'ALTER TABLE consumables ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  );
 
   // Create indexes for better performance
   await database.run('CREATE INDEX IF NOT EXISTS idx_products_type ON products(type)');
@@ -351,41 +383,68 @@ async function createPostgreSQLTables() {
   await database.run('CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_orders_created_by ON orders(created_by)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status)');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id)');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_order_items_product_code ON order_items(product_code)');
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id)'
+  );
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_order_items_product_code ON order_items(product_code)'
+  );
   await database.run('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_users_is_active ON users(is_active)');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_users_oauth ON users(oauth_provider, oauth_id)');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at)');
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_users_oauth ON users(oauth_provider, oauth_id)'
+  );
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)'
+  );
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at)'
+  );
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at)');
   await database.run('CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action)');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_consumables_category ON consumables(category)');
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_consumables_category ON consumables(category)'
+  );
   await database.run('CREATE INDEX IF NOT EXISTS idx_consumables_code ON consumables(code)');
   // Composite indexes for common query patterns
-  await database.run('CREATE INDEX IF NOT EXISTS idx_orders_status_created ON orders(status, created_at DESC)');
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_orders_status_created ON orders(status, created_at DESC)'
+  );
   await database.run('CREATE INDEX IF NOT EXISTS idx_users_active_role ON users(is_active, role)');
   // Expression indexes on common JSON fields in details for faster filtering (PostgreSQL)
   // Use partial indexes guarded to rows where details appears to be JSON to avoid cast errors on legacy text rows
-  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs ((details::json->>\'path\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs ((details::json->>\'method\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs ((details::json->>\'requestId\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')');
-  await database.run('CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip_address, created_at)');
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs ((details::json->>\'path\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')'
+  );
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs ((details::json->>\'method\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')'
+  );
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs ((details::json->>\'requestId\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')'
+  );
+  await database.run(
+    'CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip_address, created_at)'
+  );
 }
 
 async function createDefaultUsers() {
   // Create default admin user if it doesn't exist
-  const existingAdmin = await database.get('SELECT id FROM users WHERE email = ?', ['admin@joshburt.com.au']);
+  const existingAdmin = await database.get('SELECT id FROM users WHERE email = ?', [
+    'admin@joshburt.com.au'
+  ]);
 
   if (!existingAdmin) {
     const adminPassword = await bcrypt.hash('Admin123!', parseInt(process.env.BCRYPT_ROUNDS) || 12);
 
-    await database.run(`
+    await database.run(
+      `
       INSERT INTO users (email, name, password_hash, role, email_verified)
       VALUES (?, ?, ?, ?, ?)
-    `, ['admin@joshburt.com.au', 'Admin User', adminPassword, 'admin', true]);
+    `,
+      ['admin@joshburt.com.au', 'Admin User', adminPassword, 'admin', true]
+    );
 
     console.log('👑 Default admin user created: admin@joshburt.com.au / Admin123!');
   }
@@ -393,24 +452,38 @@ async function createDefaultUsers() {
   // Create test users
   const testUser = await database.get('SELECT id FROM users WHERE email = ?', ['test@example.com']);
   if (!testUser) {
-    const testPassword = await bcrypt.hash('Password123!', parseInt(process.env.BCRYPT_ROUNDS) || 12);
+    const testPassword = await bcrypt.hash(
+      'Password123!',
+      parseInt(process.env.BCRYPT_ROUNDS) || 12
+    );
 
-    await database.run(`
+    await database.run(
+      `
       INSERT INTO users (email, name, password_hash, role, email_verified)
       VALUES (?, ?, ?, ?, ?)
-    `, ['test@example.com', 'Test User', testPassword, 'user', true]);
+    `,
+      ['test@example.com', 'Test User', testPassword, 'user', true]
+    );
 
     console.log('👤 Test user created: test@example.com / Password123!');
   }
 
-  const managerUser = await database.get('SELECT id FROM users WHERE email = ?', ['manager@example.com']);
+  const managerUser = await database.get('SELECT id FROM users WHERE email = ?', [
+    'manager@example.com'
+  ]);
   if (!managerUser) {
-    const managerPassword = await bcrypt.hash('Manager123!', parseInt(process.env.BCRYPT_ROUNDS) || 12);
+    const managerPassword = await bcrypt.hash(
+      'Manager123!',
+      parseInt(process.env.BCRYPT_ROUNDS) || 12
+    );
 
-    await database.run(`
+    await database.run(
+      `
       INSERT INTO users (email, name, password_hash, role, email_verified)
       VALUES (?, ?, ?, ?, ?)
-    `, ['manager@example.com', 'Manager User', managerPassword, 'manager', true]);
+    `,
+      ['manager@example.com', 'Manager User', managerPassword, 'manager', true]
+    );
 
     console.log('👔 Manager user created: manager@example.com / Manager123!');
   }

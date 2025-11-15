@@ -57,7 +57,9 @@ console.log('✅ Set value with 1 second TTL');
 
 setTimeout(() => {
   const value = cache.get('test', 'expire-fast');
-  console.log(`✅ After 1.5 seconds: ${value === null ? 'Expired (correct)' : 'Still cached (incorrect)'}`);
+  console.log(
+    `✅ After 1.5 seconds: ${value === null ? 'Expired (correct)' : 'Still cached (incorrect)'}`
+  );
   console.log();
 
   // Test 4: Wrap Function

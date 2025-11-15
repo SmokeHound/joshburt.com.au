@@ -96,7 +96,8 @@ class MetricsCollector {
   /**
    * Get metrics summary
    */
-  getSummary(timeWindow = 3600000) { // Default: last hour
+  getSummary(timeWindow = 3600000) {
+    // Default: last hour
     const now = Date.now();
     const cutoff = now - timeWindow;
 
@@ -104,9 +105,7 @@ class MetricsCollector {
       m => new Date(m.timestamp).getTime() > cutoff
     );
 
-    const recentErrors = this.metrics.errors.filter(
-      m => new Date(m.timestamp).getTime() > cutoff
-    );
+    const recentErrors = this.metrics.errors.filter(m => new Date(m.timestamp).getTime() > cutoff);
 
     const recentPerformance = this.metrics.performance.filter(
       m => new Date(m.timestamp).getTime() > cutoff
@@ -116,12 +115,13 @@ class MetricsCollector {
     const requestRate = recentRequests.length / (timeWindow / 1000 / 60); // per minute
 
     // Calculate error rate
-    const errorRate = recentErrors.length / Math.max(recentRequests.length, 1) * 100;
+    const errorRate = (recentErrors.length / Math.max(recentRequests.length, 1)) * 100;
 
     // Calculate average response time
-    const avgResponseTime = recentRequests.length > 0
-      ? recentRequests.reduce((sum, r) => sum + r.responseTime, 0) / recentRequests.length
-      : 0;
+    const avgResponseTime =
+      recentRequests.length > 0
+        ? recentRequests.reduce((sum, r) => sum + r.responseTime, 0) / recentRequests.length
+        : 0;
 
     // Status code distribution
     const statusCodes = {};
@@ -156,9 +156,12 @@ class MetricsCollector {
       },
       performance: {
         operations: recentPerformance.length,
-        avgDuration: recentPerformance.length > 0
-          ? Math.round(recentPerformance.reduce((sum, p) => sum + p.duration, 0) / recentPerformance.length)
-          : 0
+        avgDuration:
+          recentPerformance.length > 0
+            ? Math.round(
+              recentPerformance.reduce((sum, p) => sum + p.duration, 0) / recentPerformance.length
+            )
+            : 0
       }
     };
   }
@@ -254,10 +257,7 @@ class MetricsCollector {
   async save() {
     try {
       await fs.mkdir(path.dirname(this.metricsFile), { recursive: true });
-      await fs.writeFile(
-        this.metricsFile,
-        JSON.stringify(this.metrics, null, 2)
-      );
+      await fs.writeFile(this.metricsFile, JSON.stringify(this.metrics, null, 2));
     } catch (error) {
       console.error('Failed to save metrics:', error);
     }

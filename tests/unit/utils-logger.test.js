@@ -119,36 +119,24 @@ describe('Logger Utilities', () => {
       const logger = new Logger('test-id');
       logger.error('Test error', { detail: 'error detail' });
 
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('error')
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Test error')
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('error'));
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Test error'));
     });
 
     test('should log warning messages', () => {
       const logger = new Logger('test-id');
       logger.warn('Test warning');
 
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('warn')
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Test warning')
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('warn'));
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Test warning'));
     });
 
     test('should log info messages', () => {
       const logger = new Logger('test-id');
       logger.info('Test info');
 
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('info')
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Test info')
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('info'));
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Test info'));
     });
 
     test('should include correlation ID in logs', () => {
@@ -156,9 +144,7 @@ describe('Logger Utilities', () => {
       const logger = new Logger(correlationId);
       logger.info('Test message');
 
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining(correlationId)
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining(correlationId));
     });
 
     test('should include context in logs', () => {
@@ -166,12 +152,8 @@ describe('Logger Utilities', () => {
       const logger = new Logger('test-id', context);
       logger.info('Test message');
 
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('userId')
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('123')
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('userId'));
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('123'));
     });
 
     test('should create child logger with additional context', () => {
@@ -190,12 +172,8 @@ describe('Logger Utilities', () => {
       const startTime = Date.now() - 100; // 100ms ago
       logger.logTiming('testFunction', startTime);
 
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('testFunction')
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('durationMs')
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('testFunction'));
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('durationMs'));
     });
 
     test('should sanitize authorization headers', () => {
@@ -235,21 +213,15 @@ describe('Logger Utilities', () => {
 
       logger.logRequest(event);
 
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('POST')
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('/api/test')
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('POST'));
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('/api/test'));
     });
 
     test('should log HTTP response', () => {
       const logger = new Logger('test-id');
       logger.logResponse(200, { duration: 50 });
 
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('200')
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('200'));
     });
 
     test('should only log debug messages when DEBUG is set', () => {

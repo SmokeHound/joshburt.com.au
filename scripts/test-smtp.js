@@ -65,7 +65,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS
   },
   debug: true, // Show debug output
-  logger: true  // Log to console
+  logger: true // Log to console
 });
 
 // Test email content

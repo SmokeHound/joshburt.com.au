@@ -4,8 +4,12 @@ const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody, getPagination } = require('../../utils/fn');
 const { corsHeaders, requirePermission } = require('../../utils/http');
 
-exports.handler = withHandler(async function(event){
-  try { await database.connect(); } catch (e) { return error(500, 'DB connection failed', { message: e.message }); }
+exports.handler = withHandler(async function (event) {
+  try {
+    await database.connect();
+  } catch (e) {
+    return error(500, 'DB connection failed', { message: e.message });
+  }
 
   const method = event.httpMethod;
   if (method === 'POST') return handlePost(event);
@@ -13,21 +17,32 @@ exports.handler = withHandler(async function(event){
   if (method !== 'GET') return error(405, 'Method Not Allowed');
   return handleGet(event);
 
-  async function handlePost(event){
+  async function handlePost(event) {
     // Only admins can create audit logs manually (normally auto-created)
     const { user, response: authResponse } = await requirePermission(event, 'auditLogs', 'read');
     if (authResponse) return authResponse;
-    
+
     try {
       const body = parseBody(event);
       const action = body.action || '';
       if (!action) return error(400, 'Missing action');
       const user_id = body.userId || null;
       const details = body.details || '';
-      const ip_address = body.ip_address || (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'] || '')) || '';
-      const user_agent = body.user_agent || (event.headers && (event.headers['user-agent'] || '')) || '';
-      const insert = 'INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)';
-      const params = [user_id, action, typeof details === 'string' ? details : JSON.stringify(details), ip_address, user_agent];
+      const ip_address =
+        body.ip_address ||
+        (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'] || '')) ||
+        '';
+      const user_agent =
+        body.user_agent || (event.headers && (event.headers['user-agent'] || '')) || '';
+      const insert =
+        'INSERT INTO audit_logs (user_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)';
+      const params = [
+        user_id,
+        action,
+        typeof details === 'string' ? details : JSON.stringify(details),
+        ip_address,
+        user_agent
+      ];
       await database.run(insert, params);
       return ok({ message: 'Audit log entry created' }, 201);
     } catch (e) {
@@ -36,11 +51,11 @@ exports.handler = withHandler(async function(event){
     }
   }
 
-  async function handleDelete(event){
+  async function handleDelete(event) {
     // Only admins can delete audit logs
     const { user, response: authResponse } = await requirePermission(event, 'auditLogs', 'read');
     if (authResponse) return authResponse;
-    
+
     try {
       const { olderThanDays } = event.queryStringParameters || {};
       if (olderThanDays) {
@@ -58,38 +73,58 @@ exports.handler = withHandler(async function(event){
     }
   }
 
-  async function handleGet(event){
+  async function handleGet(event) {
     // Only admins can view audit logs
     const { user, response: authResponse } = await requirePermission(event, 'auditLogs', 'read');
     if (authResponse) return authResponse;
-    
+
     try {
-      const { userId, action, startDate, endDate, limit, format, q, method, path, requestId } = event.queryStringParameters || {};
-      const { page, limit: pageLimit, offset } = getPagination(event.queryStringParameters || {}, { page: 1, limit: 25 });
-      const hasPagination = !!(event.queryStringParameters && (event.queryStringParameters.page || event.queryStringParameters.limit));
+      const { userId, action, startDate, endDate, limit, format, q, method, path, requestId } =
+        event.queryStringParameters || {};
+      const {
+        page,
+        limit: pageLimit,
+        offset
+      } = getPagination(event.queryStringParameters || {}, { page: 1, limit: 25 });
+      const hasPagination = !!(
+        event.queryStringParameters &&
+        (event.queryStringParameters.page || event.queryStringParameters.limit)
+      );
 
       const whereParts = ['1=1'];
       const params = [];
-      if (userId) { whereParts.push('user_id = ?'); params.push(userId); }
-      if (action) { whereParts.push('action = ?'); params.push(action); }
-      if (startDate) { whereParts.push('created_at >= ?'); params.push(startDate); }
-      if (endDate) { whereParts.push('created_at <= ?'); params.push(endDate); }
+      if (userId) {
+        whereParts.push('user_id = ?');
+        params.push(userId);
+      }
+      if (action) {
+        whereParts.push('action = ?');
+        params.push(action);
+      }
+      if (startDate) {
+        whereParts.push('created_at >= ?');
+        params.push(startDate);
+      }
+      if (endDate) {
+        whereParts.push('created_at <= ?');
+        params.push(endDate);
+      }
       // JSON field searches - use LIKE with escaped parameters for cross-database compatibility
-      if (method) { 
-        whereParts.push('details LIKE ?'); 
+      if (method) {
+        whereParts.push('details LIKE ?');
         // Escape special characters for LIKE pattern matching
         const escapedMethod = method.replace(/[%_\\]/g, '\\$&');
-        params.push(`%"method":"${escapedMethod}"%`); 
+        params.push(`%"method":"${escapedMethod}"%`);
       }
-      if (path) { 
-        whereParts.push('details LIKE ?'); 
+      if (path) {
+        whereParts.push('details LIKE ?');
         const escapedPath = path.replace(/[%_\\]/g, '\\$&');
-        params.push(`%"path":"${escapedPath}"%`); 
+        params.push(`%"path":"${escapedPath}"%`);
       }
-      if (requestId) { 
-        whereParts.push('details LIKE ?'); 
+      if (requestId) {
+        whereParts.push('details LIKE ?');
         const escapedRequestId = requestId.replace(/[%_\\]/g, '\\$&');
-        params.push(`%"requestId":"${escapedRequestId}"%`); 
+        params.push(`%"requestId":"${escapedRequestId}"%`);
       }
       if (q) {
         whereParts.push('(action LIKE ? OR details LIKE ? OR CAST(user_id AS TEXT) LIKE ?)');
@@ -117,24 +152,46 @@ exports.handler = withHandler(async function(event){
       const logs = await database.all(dataQuery, params);
 
       if (format === 'csv') {
-        const csvHeaders = ['id','user_id','action','details','ip_address','user_agent','created_at'];
+        const csvHeaders = [
+          'id',
+          'user_id',
+          'action',
+          'details',
+          'ip_address',
+          'user_agent',
+          'created_at'
+        ];
         const csvRows = [csvHeaders.join(',')];
         for (const log of logs) {
-          csvRows.push([
-            log.id,
-            log.user_id,
-            log.action,
-            '"' + (log.details ? String(log.details).replace(/"/g, '""') : '') + '"',
-            log.ip_address,
-            '"' + (log.user_agent ? String(log.user_agent).replace(/"/g, '""') : '') + '"',
-            log.created_at
-          ].join(','));
+          csvRows.push(
+            [
+              log.id,
+              log.user_id,
+              log.action,
+              '"' + (log.details ? String(log.details).replace(/"/g, '""') : '') + '"',
+              log.ip_address,
+              '"' + (log.user_agent ? String(log.user_agent).replace(/"/g, '""') : '') + '"',
+              log.created_at
+            ].join(',')
+          );
         }
-        return { statusCode: 200, headers: { 'Content-Type': 'text/csv', ...corsHeaders }, body: csvRows.join('\n') };
+        return {
+          statusCode: 200,
+          headers: { 'Content-Type': 'text/csv', ...corsHeaders },
+          body: csvRows.join('\n')
+        };
       }
 
       if (hasPagination) {
-        return ok({ data: logs, pagination: { page, pageSize: pageLimit, total, totalPages: Math.ceil(total / pageLimit) || 0 } });
+        return ok({
+          data: logs,
+          pagination: {
+            page,
+            pageSize: pageLimit,
+            total,
+            totalPages: Math.ceil(total / pageLimit) || 0
+          }
+        });
       }
       return ok(logs);
     } catch (e) {

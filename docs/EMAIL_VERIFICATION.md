@@ -1,21 +1,25 @@
 # Email Verification System
 
 ## Overview
+
 The application includes a complete email verification system for user registration.
 
 ## Features
 
 ### 1. Registration with Email Verification
+
 - New users receive a verification email upon registration
 - Email contains a unique token valid for 24 hours
 - Registration is complete but email must be verified for full access
 
 ### 2. Resend Verification Email
+
 - Users can request a new verification email if needed
 - Old tokens are invalidated when new ones are generated
 - Security: Doesn't reveal if email exists in system
 
 ### 3. Email Verification
+
 - Click link in email to verify
 - Token-based verification with expiration
 - Automatic cleanup of used tokens
@@ -23,9 +27,11 @@ The application includes a complete email verification system for user registrat
 ## API Endpoints
 
 ### POST `/auth?action=resend-verification`
+
 Resend verification email to a user.
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com"
@@ -33,6 +39,7 @@ Resend verification email to a user.
 ```
 
 **Response (Success):**
+
 ```json
 {
   "message": "Verification email sent."
@@ -40,6 +47,7 @@ Resend verification email to a user.
 ```
 
 **Response (Already Verified):**
+
 ```json
 {
   "error": "Email already verified"
@@ -47,12 +55,15 @@ Resend verification email to a user.
 ```
 
 ### GET `/auth?action=verify-email&token=<token>`
+
 Verify user's email address.
 
 **Query Parameters:**
+
 - `token` (required): Verification token from email
 
 **Response (Success):**
+
 ```json
 {
   "message": "Email verified"
@@ -60,6 +71,7 @@ Verify user's email address.
 ```
 
 **Response (Invalid/Expired):**
+
 ```json
 {
   "error": "Invalid or expired verification token"
@@ -69,12 +81,14 @@ Verify user's email address.
 ## Pages
 
 ### `/resend-verification.html`
+
 - Simple form to request new verification email
 - Enter email address
 - Redirects to login after success
 - Link available on login page
 
 ### `/verify-email.html`
+
 - Automatically processes verification token from URL
 - Shows loading/success/error states
 - Links to resend verification if failed
@@ -83,6 +97,7 @@ Verify user's email address.
 ## Email Template
 
 The verification email includes:
+
 - Personalized greeting with user's name
 - Click button to verify
 - Plain text link as fallback
@@ -92,6 +107,7 @@ The verification email includes:
 ## User Flow
 
 ### New Registration
+
 1. User fills out registration form
 2. Account created with `email_verified = 0`
 3. Verification email sent automatically
@@ -101,6 +117,7 @@ The verification email includes:
 7. Can now log in
 
 ### Resend Verification
+
 1. User goes to login page
 2. Clicks "Resend Verification Email"
 3. Enters email address
@@ -119,11 +136,13 @@ The verification email includes:
 ## Testing
 
 ### Test Email Sending
+
 ```bash
 npm run test:smtp your-email@example.com
 ```
 
 ### Test Flow
+
 1. Register new account
 2. Check email for verification link
 3. Click link or manually go to verify-email.html with token
@@ -134,6 +153,7 @@ npm run test:smtp your-email@example.com
 ## Environment Variables
 
 Required for email functionality:
+
 ```env
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
@@ -146,6 +166,7 @@ FRONTEND_URL=https://joshburt.com.au
 ## Database Schema
 
 Relevant `users` table columns:
+
 ```sql
 email_verified INTEGER DEFAULT 0,
 email_verification_token TEXT,
@@ -155,6 +176,7 @@ email_verification_expires INTEGER
 ## Audit Logging
 
 Actions logged:
+
 - `auth.register` - User registration
 - `auth.verification_resent` - Verification email resent
 - `auth.verify_email` - Email verified (if implemented)
@@ -184,12 +206,14 @@ Admins can manually verify user emails from the user management page:
 **Endpoint**: `POST /users/:id/verify-email`
 
 **UI Features**:
+
 - "Verify Email" button appears for unverified users
 - Email verification status badge (✓ Verified / ⚠ Unverified)
 - One-click verification with confirmation
 - Automatic page refresh after verification
 
 **Audit Trail**:
+
 - Logs admin who performed manual verification
 - Tracks in audit_logs table
 - Records in email_verification_attempts table with type `admin_manual`
@@ -197,6 +221,7 @@ Admins can manually verify user emails from the user management page:
 ### Verification Attempts Tracking
 
 All email verification attempts are logged with:
+
 - User ID and email
 - Attempt type (initial, resend, verify, admin_manual)
 - Success/failure status
@@ -205,6 +230,7 @@ All email verification attempts are logged with:
 - Timestamp
 
 **View Attempts**:
+
 - "Verify Attempts" button in user management
 - Shows chronological list of all attempts
 - Color-coded by success/failure

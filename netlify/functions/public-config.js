@@ -4,7 +4,7 @@
 
 const cache = require('../../utils/cache');
 
-exports.handler = async (event) => {
+exports.handler = async event => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 204,
@@ -30,7 +30,7 @@ exports.handler = async (event) => {
         'Access-Control-Max-Age': '86400',
         'X-Cache': 'HIT'
       },
-      body: JSON.stringify(cached),
+      body: JSON.stringify(cached)
     };
   }
 
@@ -38,16 +38,19 @@ exports.handler = async (event) => {
     AUTH0_DOMAIN = null,
     AUTH0_CLIENT_ID = null,
     AUTH0_AUDIENCE = null,
-    DISABLE_AUTH = 'false',
+    DISABLE_AUTH = 'false'
   } = process.env;
 
   const body = {
     auth: { disabled: String(DISABLE_AUTH).toLowerCase() === 'true' },
-    auth0: AUTH0_DOMAIN && AUTH0_CLIENT_ID ? {
-      domain: AUTH0_DOMAIN,
-      clientId: AUTH0_CLIENT_ID,
-      audience: AUTH0_AUDIENCE || null,
-    } : null,
+    auth0:
+      AUTH0_DOMAIN && AUTH0_CLIENT_ID
+        ? {
+            domain: AUTH0_DOMAIN,
+            clientId: AUTH0_CLIENT_ID,
+            audience: AUTH0_AUDIENCE || null
+          }
+        : null
   };
 
   // Cache for 5 minutes (300 seconds)
@@ -63,6 +66,6 @@ exports.handler = async (event) => {
       'Access-Control-Max-Age': '86400',
       'X-Cache': 'MISS'
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body)
   };
 };

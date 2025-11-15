@@ -7,16 +7,16 @@ const bcrypt = require('bcryptjs');
 
 // Color output helpers
 const colors = {
-  green: (text) => `\x1b[32m${text}\x1b[0m`,
-  red: (text) => `\x1b[31m${text}\x1b[0m`,
-  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
-  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  green: text => `\x1b[32m${text}\x1b[0m`,
+  red: text => `\x1b[31m${text}\x1b[0m`,
+  yellow: text => `\x1b[33m${text}\x1b[0m`,
+  blue: text => `\x1b[34m${text}\x1b[0m`
 };
 
 let passed = 0;
 let failed = 0;
 
-function test(description, fn) {
+function runTest(description, fn) {
   try {
     fn();
     console.log(colors.green('✓'), description);
@@ -39,59 +39,59 @@ console.log(colors.blue('\n=== Password Change Functionality Tests ===\n'));
 // Test 1: Password validation utility
 const { validatePassword } = require('../../utils/password');
 
-test('validatePassword rejects passwords shorter than 8 characters', () => {
+runTest('validatePassword rejects passwords shorter than 8 characters', () => {
   const result = validatePassword('Short1!');
   assert(!result.valid, 'Should reject short password');
   assert(
-    result.errors.some((e) => e.includes('8 characters')),
+    result.errors.some(e => e.includes('8 characters')),
     'Should mention length requirement'
   );
 });
 
-test('validatePassword rejects passwords without uppercase', () => {
+runTest('validatePassword rejects passwords without uppercase', () => {
   const result = validatePassword('lowercase123!');
   assert(!result.valid, 'Should reject password without uppercase');
   assert(
-    result.errors.some((e) => e.includes('uppercase')),
+    result.errors.some(e => e.includes('uppercase')),
     'Should mention uppercase requirement'
   );
 });
 
-test('validatePassword rejects passwords without lowercase', () => {
+runTest('validatePassword rejects passwords without lowercase', () => {
   const result = validatePassword('UPPERCASE123!');
   assert(!result.valid, 'Should reject password without lowercase');
   assert(
-    result.errors.some((e) => e.includes('lowercase')),
+    result.errors.some(e => e.includes('lowercase')),
     'Should mention lowercase requirement'
   );
 });
 
-test('validatePassword rejects passwords without number', () => {
+runTest('validatePassword rejects passwords without number', () => {
   const result = validatePassword('NoNumbers!');
   assert(!result.valid, 'Should reject password without number');
   assert(
-    result.errors.some((e) => e.includes('number')),
+    result.errors.some(e => e.includes('number')),
     'Should mention number requirement'
   );
 });
 
-test('validatePassword rejects passwords without special character', () => {
+runTest('validatePassword rejects passwords without special character', () => {
   const result = validatePassword('NoSpecial123');
   assert(!result.valid, 'Should reject password without special char');
   assert(
-    result.errors.some((e) => e.includes('special')),
+    result.errors.some(e => e.includes('special')),
     'Should mention special char requirement'
   );
 });
 
-test('validatePassword accepts valid passwords', () => {
+runTest('validatePassword accepts valid passwords', () => {
   const result = validatePassword('ValidPass123!');
   assert(result.valid, 'Should accept valid password');
   assert(result.errors.length === 0, 'Should have no errors');
 });
 
 // Test 2: Backend logic (simulated)
-test('Password change requires current password verification', async () => {
+runTest('Password change requires current password verification', async () => {
   const currentPassword = 'OldPass123!';
   const hashedPassword = await bcrypt.hash(currentPassword, 12);
 
@@ -103,7 +103,7 @@ test('Password change requires current password verification', async () => {
   assert(!wrongCheck, 'Wrong password should not verify');
 });
 
-test('New password must be different from current', async () => {
+runTest('New password must be different from current', async () => {
   const password = 'SamePass123!';
   const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -112,7 +112,7 @@ test('New password must be different from current', async () => {
   assert(sameCheck, 'Same password check should work');
 });
 
-test('New password is properly hashed before storage', async () => {
+runTest('New password is properly hashed before storage', async () => {
   const newPassword = 'NewSecurePass456!';
   const rounds = 12;
   const hash = await bcrypt.hash(newPassword, rounds);
@@ -130,7 +130,7 @@ test('New password is properly hashed before storage', async () => {
 });
 
 // Test 3: Client-side validation patterns
-test('Client-side regex patterns match requirements', () => {
+runTest('Client-side regex patterns match requirements', () => {
   const hasUppercase = /[A-Z]/.test('TestPass123!');
   assert(hasUppercase, 'Should detect uppercase');
 
@@ -144,7 +144,7 @@ test('Client-side regex patterns match requirements', () => {
   assert(hasSpecial, 'Should detect special char');
 });
 
-test('Client-side validation can detect all required patterns', () => {
+runTest('Client-side validation can detect all required patterns', () => {
   const validPassword = 'SecurePass123!';
 
   const checks = {
@@ -152,7 +152,7 @@ test('Client-side validation can detect all required patterns', () => {
     uppercase: /[A-Z]/.test(validPassword),
     lowercase: /[a-z]/.test(validPassword),
     number: /[0-9]/.test(validPassword),
-    special: /[!@#$%^&*(),.?":{}|<>]/.test(validPassword),
+    special: /[!@#$%^&*(),.?":{}|<>]/.test(validPassword)
   };
 
   assert(checks.length, 'Should meet length requirement');
@@ -161,7 +161,7 @@ test('Client-side validation can detect all required patterns', () => {
   assert(checks.number, 'Should have number');
   assert(checks.special, 'Should have special character');
 
-  const allValid = Object.values(checks).every((v) => v === true);
+  const allValid = Object.values(checks).every(v => v === true);
   assert(allValid, 'All checks should pass');
 });
 

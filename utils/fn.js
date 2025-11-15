@@ -6,7 +6,9 @@ const { corsHeaders, json, error, parseBody, requireAuth } = require('./http');
 function withHandler(handler) {
   return async (event, context) => {
     try {
-      if (event.httpMethod === 'OPTIONS') {return { statusCode: 204, headers: corsHeaders };}
+      if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 204, headers: corsHeaders };
+      }
       return await handler(event, context);
     } catch (err) {
       console.error('Function error', err);
@@ -19,11 +21,21 @@ function ok(data, status = 200, headers = {}) {
   return json(status, data, headers);
 }
 
-function badRequest(message = 'Bad request') { return error(400, message); }
-function unauthorized(message = 'Authentication required') { return error(401, message); }
-function forbidden(message = 'Insufficient permissions') { return error(403, message); }
-function notFound(message = 'Not found') { return error(404, message); }
-function methodNotAllowed(message = 'Method not allowed') { return error(405, message); }
+function badRequest(message = 'Bad request') {
+  return error(400, message);
+}
+function unauthorized(message = 'Authentication required') {
+  return error(401, message);
+}
+function forbidden(message = 'Insufficient permissions') {
+  return error(403, message);
+}
+function notFound(message = 'Not found') {
+  return error(404, message);
+}
+function methodNotAllowed(message = 'Method not allowed') {
+  return error(405, message);
+}
 
 function getPagination(qs = {}, defaults = { page: 1, limit: 10 }) {
   const parsedPage = parseInt(qs.page || defaults.page, 10);
@@ -35,8 +47,12 @@ function getPagination(qs = {}, defaults = { page: 1, limit: 10 }) {
 }
 
 function parseBool(v, fallback = false) {
-  if (v === undefined || v === null) {return fallback;}
-  if (typeof v === 'boolean') {return v;}
+  if (v === undefined || v === null) {
+    return fallback;
+  }
+  if (typeof v === 'boolean') {
+    return v;
+  }
   const s = String(v).toLowerCase();
   return s === '1' || s === 'true' || s === 'yes' || s === 'on';
 }

@@ -1,5 +1,13 @@
 // Unit tests for input sanitization utilities
-const { sanitizeString, isValidEmail, isValidURL, isValidInteger, validateObject, isSQLSafe, sanitizeFilename } = require('../../utils/sanitize');
+const {
+  sanitizeString,
+  isValidEmail,
+  isValidURL,
+  isValidInteger,
+  validateObject,
+  isSQLSafe,
+  sanitizeFilename
+} = require('../../utils/sanitize');
 
 describe('Input Sanitization Utilities', () => {
   describe('sanitizeString', () => {

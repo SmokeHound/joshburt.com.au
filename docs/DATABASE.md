@@ -60,7 +60,7 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-  max: 20,              // Max connections in pool
+  max: 20, // Max connections in pool
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000
 });
@@ -120,7 +120,7 @@ CREATE TABLE products (
 );
 
 -- Full-text search index
-CREATE INDEX idx_products_search ON products 
+CREATE INDEX idx_products_search ON products
   USING GIN(to_tsvector('english', name || ' ' || code));
 
 CREATE INDEX idx_products_category ON products(category_id);
@@ -235,7 +235,7 @@ CREATE TABLE filters (
 );
 
 -- Full-text search index
-CREATE INDEX idx_filters_search ON filters 
+CREATE INDEX idx_filters_search ON filters
   USING GIN(to_tsvector('english', name || ' ' || code));
 ```
 
@@ -346,6 +346,7 @@ INSERT INTO settings (id, data) VALUES (1, '{}') ON CONFLICT DO NOTHING;
 ```
 
 **Example settings data**:
+
 ```json
 {
   "siteTitle": "Josh Burt Workshop",
@@ -467,7 +468,7 @@ CREATE INDEX idx_login_attempts_email ON login_attempts(email, attempt_time);
 
 ---
 
-```
+````
 
 ---
 
@@ -488,19 +489,19 @@ node scripts/run-migrations.js
 
 # Manual migration
 npm run migrate
-```
+````
 
 ### Migration Files
 
 Located in `migrations/` directory:
 
-| File | Description |
-|------|-------------|
-| `001_add_product_categories.sql` | Product categories, variants, images |
+| File                                | Description                              |
+| ----------------------------------- | ---------------------------------------- |
+| `001_add_product_categories.sql`    | Product categories, variants, images     |
 | `002_add_order_status_tracking.sql` | Order tracking columns and history table |
-| `003_add_notification_system.sql` | Notifications and preferences |
-| `004_add_filters.sql` | Filters/parts catalog table |
-| `004_add_last_login.sql` | Last login tracking for users |
+| `003_add_notification_system.sql`   | Notifications and preferences            |
+| `004_add_filters.sql`               | Filters/parts catalog table              |
+| `004_add_last_login.sql`            | Last login tracking for users            |
 
 ### Creating New Migration
 
@@ -517,8 +518,8 @@ Located in `migrations/` directory:
 
 ```sql
 -- Get all users with role counts
-SELECT role, COUNT(*) as count 
-FROM users 
+SELECT role, COUNT(*) as count
+FROM users
 GROUP BY role;
 
 -- Find users who haven't logged in for 30 days
@@ -545,7 +546,7 @@ WHERE to_tsvector('english', name || ' ' || code) @@ to_tsquery('synthetic & oil
 LIMIT 20;
 
 -- Products by category with hierarchy
-SELECT 
+SELECT
   p.name as product_name,
   c1.name as category,
   c2.name as parent_category
@@ -565,7 +566,7 @@ JOIN order_items oi ON o.id = oi.order_id
 GROUP BY status;
 
 -- Top products by order volume
-SELECT 
+SELECT
   p.name,
   COUNT(DISTINCT oi.order_id) as order_count,
   SUM(oi.quantity) as total_quantity
@@ -577,7 +578,7 @@ ORDER BY total_quantity DESC
 LIMIT 10;
 
 -- Order status history for order
-SELECT 
+SELECT
   old_status,
   new_status,
   u.name as changed_by,
@@ -593,7 +594,7 @@ ORDER BY osh.created_at DESC;
 
 ```sql
 -- Recent admin actions
-SELECT 
+SELECT
   u.name as user,
   al.action,
   al.details,
@@ -705,7 +706,7 @@ ORDER BY mean_exec_time DESC
 LIMIT 10;
 
 -- Table sizes
-SELECT 
+SELECT
   table_name,
   pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size
 FROM information_schema.tables
@@ -719,15 +720,15 @@ ORDER BY pg_total_relation_size(quote_ident(table_name)) DESC;
 
 ### Current Indexes
 
-| Table | Index Name | Columns | Type |
-|-------|------------|---------|------|
-| users | idx_users_email | email | B-tree |
-| users | idx_users_role | role | B-tree |
-| products | idx_products_search | name, code | GIN (full-text) |
-| products | idx_products_category | category_id | B-tree |
-| orders | idx_orders_status | status | B-tree |
-| orders | idx_orders_created | created_at DESC | B-tree |
-| audit_logs | idx_audit_logs_created | created_at DESC | B-tree |
+| Table         | Index Name               | Columns          | Type                            |
+| ------------- | ------------------------ | ---------------- | ------------------------------- |
+| users         | idx_users_email          | email            | B-tree                          |
+| users         | idx_users_role           | role             | B-tree                          |
+| products      | idx_products_search      | name, code       | GIN (full-text)                 |
+| products      | idx_products_category    | category_id      | B-tree                          |
+| orders        | idx_orders_status        | status           | B-tree                          |
+| orders        | idx_orders_created       | created_at DESC  | B-tree                          |
+| audit_logs    | idx_audit_logs_created   | created_at DESC  | B-tree                          |
 | notifications | idx_notifications_unread | user_id, is_read | Partial (WHERE is_read = FALSE) |
 
 ---

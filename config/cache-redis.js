@@ -129,7 +129,9 @@ async function clearNamespace(namespace) {
   try {
     const pattern = `${namespace}:*`;
     const keys = await redisClient.keys(pattern);
-    if (keys.length === 0) {return 0;}
+    if (keys.length === 0) {
+      return 0;
+    }
 
     const deleted = await redisClient.del(...keys);
     stats.deletes += deleted;
@@ -165,9 +167,10 @@ function getStats() {
     return require('../utils/cache').getStats();
   }
 
-  const hitRate = stats.hits + stats.misses > 0
-    ? (stats.hits / (stats.hits + stats.misses) * 100).toFixed(2)
-    : 0;
+  const hitRate =
+    stats.hits + stats.misses > 0
+      ? ((stats.hits / (stats.hits + stats.misses)) * 100).toFixed(2)
+      : 0;
 
   return {
     ...stats,

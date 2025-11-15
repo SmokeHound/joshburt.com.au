@@ -1,10 +1,14 @@
 // Netlify Function: dynamic initials-based avatar SVG
 const crypto = require('crypto');
 
-exports.handler = async (event) => {
+exports.handler = async event => {
   try {
     const params = event.queryStringParameters || {};
-    const i = (params.i || '').toString().toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+    const i = (params.i || '')
+      .toString()
+      .toUpperCase()
+      .replace(/[^A-Z]/g, '')
+      .slice(0, 3);
     if (!i) {
       return {
         statusCode: 400,
@@ -12,8 +16,8 @@ exports.handler = async (event) => {
         body: JSON.stringify({ error: 'Missing initials' })
       };
     }
-    const theme = (params.t === 'light' || params.t === 'dark') ? params.t : 'dark';
-    const style = (params.s === 'outline' || params.s === 'solid') ? params.s : 'solid';
+    const theme = params.t === 'light' || params.t === 'dark' ? params.t : 'dark';
+    const style = params.s === 'outline' || params.s === 'solid' ? params.s : 'solid';
 
     // Derive colors from initials
     const seed = crypto.createHash('md5').update(i).digest('hex');
@@ -47,7 +51,7 @@ exports.handler = async (event) => {
       return {
         statusCode: 304,
         headers: {
-          'ETag': etag,
+          ETag: etag,
           'Cache-Control': 'public, max-age=31536000, immutable',
           'Access-Control-Allow-Origin': '*'
         },
@@ -60,13 +64,17 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'image/svg+xml',
         'Cache-Control': 'public, max-age=31536000, immutable',
-        'ETag': etag,
+        ETag: etag,
         'Access-Control-Allow-Origin': '*'
       },
       body: svg
     };
   } catch (err) {
     console.error('avatar-initials error', err);
-    return { statusCode: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'Internal server error' }) };
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ error: 'Internal server error' })
+    };
   }
 };

@@ -1,4 +1,3 @@
-
 // Netlify Function: GET/POST/PATCH/DELETE /.netlify/functions/orders
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
@@ -7,19 +6,19 @@ const { hasPermission } = require('../../utils/rbac');
 const { sendOrderStatusEmail } = require('../../utils/email');
 const { logAudit } = require('../../utils/audit');
 
-exports.handler = withHandler(async function(event){
+exports.handler = withHandler(async function (event) {
   await database.connect();
   const method = event.httpMethod;
-  
+
   try {
     if (method === 'GET') {
       return handleGet(event);
     }
-    
+
     if (method === 'PATCH') {
       return handlePatch(event);
     }
-    
+
     if (method === 'POST') {
       return handlePost(event);
     }
@@ -27,7 +26,7 @@ exports.handler = withHandler(async function(event){
     if (method === 'DELETE') {
       return handleDelete(event);
     }
-    
+
     return error(405, 'Method Not Allowed');
   } catch (e) {
     console.error('Orders function error:', e);
@@ -38,7 +37,7 @@ exports.handler = withHandler(async function(event){
     // Only admins and managers can list all orders
     const { user, response: authResponse } = await requirePermission(event, 'orders', 'list');
     if (authResponse) return authResponse;
-    
+
     const params = event.queryStringParameters || {};
     const { status, created_by, export_format, date_from, date_to } = params;
 
@@ -73,7 +72,7 @@ exports.handler = withHandler(async function(event){
     query += ' ORDER BY created_at DESC LIMIT 100';
 
     const orders = await database.all(query, queryParams);
-    
+
     for (const order of orders) {
       const items = await database.all(
         'SELECT product_name AS name, product_code AS code, quantity FROM order_items WHERE order_id = ?',
@@ -88,7 +87,7 @@ exports.handler = withHandler(async function(event){
       );
       order.status_history = history;
     }
-    
+
     return ok(orders);
   }
 
@@ -96,13 +95,21 @@ exports.handler = withHandler(async function(event){
     // Only admins and managers can update orders
     const { user, response: authResponse } = await requirePermission(event, 'orders', 'approve');
     if (authResponse) return authResponse;
-    
+
     const body = parseBody(event);
     const { orderId, status, notes, tracking_number, estimated_delivery } = body;
-    
+
     // Valid statuses: pending, processing, requested, received, approved, rejected, cancelled
-    const validStatuses = ['pending', 'processing', 'requested', 'received', 'approved', 'rejected', 'cancelled'];
-    
+    const validStatuses = [
+      'pending',
+      'processing',
+      'requested',
+      'received',
+      'approved',
+      'rejected',
+      'cancelled'
+    ];
+
     if (!orderId) {
       return error(400, 'Missing orderId');
     }
@@ -174,7 +181,12 @@ exports.handler = withHandler(async function(event){
       });
 
       // Send email notification (async, don't wait)
-      sendOrderStatusNotification(orderId, currentOrder.created_by, status, currentOrder.status).catch(err => {
+      sendOrderStatusNotification(
+        orderId,
+        currentOrder.created_by,
+        status,
+        currentOrder.status
+      ).catch(err => {
         console.error('Failed to send order status email:', err);
       });
     }
@@ -187,21 +199,27 @@ exports.handler = withHandler(async function(event){
     // All authenticated users can create orders
     const { user, response: authResponse } = await requirePermission(event, 'orders', 'create');
     if (authResponse) return authResponse;
-    
+
     const orderData = parseBody(event);
     if (!orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
       return error(400, 'Order must contain at least one item');
     }
-    
+
     // Use the authenticated user's email as the creator
     const createdBy = user.email || orderData.requestedBy || 'unknown';
-    
+
     const orderResult = await database.run(
       'INSERT INTO orders (created_by, total_items, status, priority, notes) VALUES (?, ?, ?, ?, ?)',
-      [createdBy, orderData.items.length, 'pending', orderData.priority || 'normal', orderData.notes || null]
+      [
+        createdBy,
+        orderData.items.length,
+        'pending',
+        orderData.priority || 'normal',
+        orderData.notes || null
+      ]
     );
     const orderId = orderResult.id;
-    
+
     for (const item of orderData.items) {
       await database.run(
         'INSERT INTO order_items (order_id, product_name, product_code, quantity) VALUES (?, ?, ?, ?)',
@@ -231,7 +249,7 @@ exports.handler = withHandler(async function(event){
     sendOrderCreatedNotification(orderId, createdBy).catch(err => {
       console.error('Failed to send order created email:', err);
     });
-    
+
     return ok({ orderId, message: 'Order created successfully' }, 201);
   }
 
@@ -291,7 +309,8 @@ exports.handler = withHandler(async function(event){
   }
 
   async function exportOrdersCSV(status, created_by, date_from, date_to) {
-    let query = 'SELECT o.*, GROUP_CONCAT(oi.product_name || " x" || oi.quantity) as items FROM orders o LEFT JOIN order_items oi ON o.id = oi.order_id WHERE 1=1';
+    let query =
+      'SELECT o.*, GROUP_CONCAT(oi.product_name || " x" || oi.quantity) as items FROM orders o LEFT JOIN order_items oi ON o.id = oi.order_id WHERE 1=1';
     const queryParams = [];
 
     if (status) {
@@ -319,7 +338,17 @@ exports.handler = withHandler(async function(event){
     const orders = await database.all(query, queryParams);
 
     // Generate CSV
-    const headers = ['Order ID', 'Created By', 'Status', 'Priority', 'Items', 'Total Items', 'Notes', 'Created At', 'Updated At'];
+    const headers = [
+      'Order ID',
+      'Created By',
+      'Status',
+      'Priority',
+      'Items',
+      'Total Items',
+      'Notes',
+      'Created At',
+      'Updated At'
+    ];
     const rows = orders.map(o => [
       o.id,
       o.created_by,

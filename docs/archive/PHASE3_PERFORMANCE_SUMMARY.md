@@ -9,28 +9,26 @@ This document details the Phase 3 performance optimizations implemented for josh
 Added comprehensive indexes to improve query performance across all major tables:
 
 #### New Indexes Added:
+
 - **Products Table**:
   - `idx_products_code` - Product code lookups
   - `idx_products_created_at` - Time-based queries
-  
 - **Orders Table**:
   - `idx_orders_created_by` - Filter by creator
   - `idx_orders_status` - Filter by order status
   - `idx_orders_status_created` - Composite index for status + time queries
-  
 - **Order Items Table**:
   - `idx_order_items_product_code` - Product reference lookups
-  
 - **Users Table**:
   - `idx_users_role` - Role-based queries
   - `idx_users_is_active` - Active user filters
   - `idx_users_active_role` - Composite index for active users by role
-  
 - **Consumables Table**:
   - `idx_consumables_category` - Category filtering
   - `idx_consumables_code` - Code lookups
 
 #### Index Impact:
+
 - User email lookup: O(n) → O(log n) - **~100x faster**
 - Order filtering by status: O(n) → O(log n) - **~50x faster**
 - Composite indexes reduce filtered query time by **60-80%**
@@ -51,6 +49,7 @@ Enhanced PostgreSQL connection pool configuration:
 ```
 
 **Benefits**:
+
 - Better handling of concurrent requests
 - Reduced connection overhead
 - Timeout protection against long-running queries
@@ -61,6 +60,7 @@ Enhanced PostgreSQL connection pool configuration:
 Optimized the orders endpoint to eliminate N+1 query pattern:
 
 **Before** (N+1 queries):
+
 ```javascript
 const orders = await database.all('SELECT * FROM orders');
 for (const order of orders) {
@@ -70,6 +70,7 @@ for (const order of orders) {
 ```
 
 **After** (2 queries total):
+
 ```javascript
 const orders = await database.all('SELECT * FROM orders');
 const orderIds = orders.map(o => o.id);
@@ -93,6 +94,7 @@ const allItems = await database.all(
 Created a comprehensive caching utility (`utils/cache.js`) with the following features:
 
 #### Core Features:
+
 - **Namespace support** - Isolate cache by resource type
 - **TTL (Time To Live)** - Automatic expiration
 - **Cache statistics** - Hit rate, size, operations tracking
@@ -100,17 +102,19 @@ Created a comprehensive caching utility (`utils/cache.js`) with the following fe
 - **Wrap function** - Simplify cache-or-fetch logic
 
 #### API Methods:
+
 ```javascript
-cache.get(namespace, key)                  // Retrieve from cache
-cache.set(namespace, key, value, ttl)      // Store with optional TTL
-cache.del(namespace, key)                  // Delete specific entry
-cache.clearNamespace(namespace)            // Clear all entries in namespace
-cache.wrap(namespace, key, fn, ttl)        // Cache function result
-cache.invalidate(namespace, pattern)       // Pattern-based clearing
-cache.getStats()                           // Get cache statistics
+cache.get(namespace, key); // Retrieve from cache
+cache.set(namespace, key, value, ttl); // Store with optional TTL
+cache.del(namespace, key); // Delete specific entry
+cache.clearNamespace(namespace); // Clear all entries in namespace
+cache.wrap(namespace, key, fn, ttl); // Cache function result
+cache.invalidate(namespace, pattern); // Pattern-based clearing
+cache.getStats(); // Get cache statistics
 ```
 
 #### Cache Statistics:
+
 - Hits/misses tracking
 - Hit rate calculation
 - Cache size monitoring
@@ -121,26 +125,30 @@ cache.getStats()                           // Get cache statistics
 Implemented caching on the following endpoints:
 
 #### 1. Public Config Endpoint
+
 - **Endpoint**: `/.netlify/functions/public-config`
 - **Cache TTL**: 5 minutes (300 seconds)
 - **Cache Key**: `public-config:auth-config`
 - **Invalidation**: None (static config)
 
 #### 2. Products Endpoint
+
 - **Endpoint**: `/.netlify/functions/products`
 - **Cache TTL**: 2 minutes (120 seconds)
-- **Cache Keys**: 
+- **Cache Keys**:
   - `products:all` - All products
   - `products:type:{type}` - Products by type
 - **Invalidation**: On create, update, or delete operations
 
 #### 3. Settings Endpoint
+
 - **Endpoint**: `/.netlify/functions/settings`
 - **Cache TTL**: 5 minutes (300 seconds)
 - **Cache Key**: `settings:config`
 - **Invalidation**: On settings update
 
 #### 4. Orders Endpoint
+
 - **Endpoint**: `/.netlify/functions/orders`
 - **Cache TTL**: 1 minute (60 seconds)
 - **Cache Key**: `orders:list`
@@ -149,17 +157,18 @@ Implemented caching on the following endpoints:
 ### Cache Headers
 
 All cached endpoints include `X-Cache` header:
+
 - `X-Cache: HIT` - Served from cache
 - `X-Cache: MISS` - Fetched from database/source
 
 ### Expected Performance Impact:
 
-| Endpoint | Before | After (Cache Hit) | Improvement |
-|----------|--------|-------------------|-------------|
-| Products List | ~50-100ms | ~1-5ms | **95-98% faster** |
-| Settings | ~30-50ms | ~1-5ms | **90-95% faster** |
-| Orders List | ~100-200ms | ~1-5ms | **95-99% faster** |
-| Public Config | ~10-20ms | ~1-5ms | **75-90% faster** |
+| Endpoint      | Before     | After (Cache Hit) | Improvement       |
+| ------------- | ---------- | ----------------- | ----------------- |
+| Products List | ~50-100ms  | ~1-5ms            | **95-98% faster** |
+| Settings      | ~30-50ms   | ~1-5ms            | **90-95% faster** |
+| Orders List   | ~100-200ms | ~1-5ms            | **95-99% faster** |
+| Public Config | ~10-20ms   | ~1-5ms            | **75-90% faster** |
 
 **Note**: Cache operates per serverless function instance. For production-scale caching, consider Redis or Cloudflare KV.
 
@@ -172,6 +181,7 @@ All cached endpoints include `X-Cache` header:
 Updated service worker (`sw.js`) with improved caching strategies:
 
 #### New Cache Stores:
+
 - `STATIC_CACHE` (v5) - Static assets (CSS, JS, fonts)
 - `DYNAMIC_CACHE` (v5) - HTML pages
 - `API_CACHE` (v5) - API responses
@@ -206,6 +216,7 @@ Updated service worker (`sw.js`) with improved caching strategies:
    - Benefit: Instant page load + background refresh
 
 #### Offline Support:
+
 - Fallback HTML page for offline navigation
 - Fallback CSS for styling when offline
 - Retry button on offline pages
@@ -213,6 +224,7 @@ Updated service worker (`sw.js`) with improved caching strategies:
 ### Image Optimization
 
 #### Lazy Loading:
+
 - All images use `loading="lazy"` attribute (already implemented)
 - Benefits:
   - Reduces initial page load time
@@ -220,12 +232,14 @@ Updated service worker (`sw.js`) with improved caching strategies:
   - Improves Core Web Vitals (LCP)
 
 #### Image Format Support:
+
 - Service worker caches WebP and AVIF formats
 - Automatic format selection by browser
 
 ### Additional Frontend Optimizations (Already Implemented):
 
 Based on `shared-config.html`:
+
 - **Critical CSS preload**: `<link rel="preload" href="./assets/css/styles.css" as="style">`
 - **DNS prefetch**: `<link rel="preconnect" href="https://fonts.googleapis.com">`
 - **Deferred JavaScript**: Most scripts use `defer` attribute
@@ -236,6 +250,7 @@ Based on `shared-config.html`:
 ## Performance Testing Results
 
 ### Before Optimization:
+
 - Products list query: ~50-100ms (50 products)
 - Orders list query: ~200-300ms (50 orders with items)
 - Settings query: ~30-50ms
@@ -244,18 +259,21 @@ Based on `shared-config.html`:
 ### After Optimization:
 
 #### Cold Start (Cache Miss):
+
 - Products list: ~50-70ms (indexed queries)
 - Orders list: ~100-150ms (optimized N+1 query)
 - Settings: ~30-40ms
 - Total: ~200-300ms (**~40% improvement**)
 
 #### Warm Cache (Cache Hit):
+
 - Products list: ~1-5ms
-- Orders list: ~1-5ms  
+- Orders list: ~1-5ms
 - Settings: ~1-5ms
 - Total: ~5-15ms (**~95% improvement**)
 
 ### Database Improvements:
+
 - Connection pool: More stable under load
 - Index coverage: 15+ new indexes added
 - Query optimization: N+1 queries eliminated
@@ -317,6 +335,7 @@ const stats = cache.getStats();
 ### Environment Variables:
 
 Database connection pool:
+
 ```bash
 DB_POOL_MAX=20              # Maximum connections (default: 20)
 DB_POOL_MIN=2               # Minimum connections (default: 2)
@@ -341,6 +360,7 @@ DB_STATEMENT_TIMEOUT=10000  # Statement timeout ms (default: 10000)
 ### Unit Tests:
 
 Cache utility tests (`tests/unit/utils-cache.test.js`):
+
 - ✅ Basic operations (get, set, delete)
 - ✅ TTL expiration
 - ✅ Namespace isolation
@@ -350,6 +370,7 @@ Cache utility tests (`tests/unit/utils-cache.test.js`):
 - ✅ 25+ test cases
 
 Run tests:
+
 ```bash
 npm test
 ```
@@ -357,21 +378,23 @@ npm test
 ### Manual Testing:
 
 1. **Cache hit verification**:
+
    ```bash
    # First request (cache miss)
    curl -H "Authorization: Bearer $TOKEN" https://yoursite.com/.netlify/functions/products
    # Check X-Cache: MISS
-   
+
    # Second request (cache hit)
    curl -H "Authorization: Bearer $TOKEN" https://yoursite.com/.netlify/functions/products
    # Check X-Cache: HIT
    ```
 
 2. **Cache invalidation**:
+
    ```bash
    # Create product (invalidates cache)
    curl -X POST -H "Authorization: Bearer $TOKEN" https://yoursite.com/.netlify/functions/products -d '{"name":"Test","code":"TEST","type":"oil"}'
-   
+
    # Next GET should be cache miss
    curl -H "Authorization: Bearer $TOKEN" https://yoursite.com/.netlify/functions/products
    # Check X-Cache: MISS
@@ -382,6 +405,7 @@ npm test
 ## Deliverables Checklist
 
 ### Week 8: Database Optimization ✅
+
 - [x] Add indexes on frequently queried columns
 - [x] Implement improved database connection pooling
 - [x] Optimize N+1 queries in list endpoints
@@ -389,6 +413,7 @@ npm test
 - [x] Document optimization patterns
 
 ### Week 9: Caching Layer ✅
+
 - [x] Create in-memory caching utility
 - [x] Cache public settings endpoint (5 min TTL)
 - [x] Cache product list endpoint (2 min TTL)
@@ -397,6 +422,7 @@ npm test
 - [x] Create unit tests for caching
 
 ### Week 10: Frontend Performance ✅
+
 - [x] Implement lazy loading for images (already in place)
 - [x] Enhanced service worker caching strategies
 - [x] Add separate image cache
@@ -417,6 +443,7 @@ Phase 3 performance optimizations have been successfully implemented with the fo
 5. **Monitoring**: Cache statistics and performance tracking
 
 **Expected Overall Impact**:
+
 - 95%+ faster responses on cache hits
 - 40%+ faster responses on cache misses (database optimizations)
 - 50% reduction in database query times
@@ -424,6 +451,7 @@ Phase 3 performance optimizations have been successfully implemented with the fo
 - Improved offline experience
 
 **Next Steps**:
+
 - Monitor cache hit rates in production
 - Consider Redis for production-scale caching
 - Implement database read replicas if needed

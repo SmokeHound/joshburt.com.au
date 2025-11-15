@@ -18,7 +18,10 @@ async function applyMigration() {
     console.log('✅ Database connected\n');
 
     // Read migration file
-    const migrationPath = path.join(__dirname, '../migrations/005_add_email_verification_tracking.sql');
+    const migrationPath = path.join(
+      __dirname,
+      '../migrations/005_add_email_verification_tracking.sql'
+    );
     const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
     console.log('📋 Executing migration SQL...\n');
@@ -55,7 +58,9 @@ async function applyMigration() {
       console.log('📊 Table structure:');
       console.log('-------------------');
       columns.forEach(col => {
-        console.log(`  ${col.column_name.padEnd(20)} ${col.data_type.padEnd(25)} ${col.is_nullable === 'NO' ? 'NOT NULL' : 'NULL'}`);
+        console.log(
+          `  ${col.column_name.padEnd(20)} ${col.data_type.padEnd(25)} ${col.is_nullable === 'NO' ? 'NOT NULL' : 'NULL'}`
+        );
       });
       console.log('');
 
@@ -80,7 +85,6 @@ async function applyMigration() {
     }
 
     process.exit(0);
-
   } catch (error) {
     console.error('\n❌ Migration failed:', error.message);
     console.error('\nFull error:', error);

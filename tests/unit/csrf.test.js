@@ -1,5 +1,10 @@
 // Unit tests for CSRF protection utilities
-const { generateCSRFToken, validateCSRFToken, consumeCSRFToken, cleanupCSRFTokens } = require('../../utils/csrf');
+const {
+  generateCSRFToken,
+  validateCSRFToken,
+  consumeCSRFToken,
+  cleanupCSRFTokens
+} = require('../../utils/csrf');
 
 describe('CSRF Protection Utilities', () => {
   beforeEach(() => {

@@ -24,6 +24,7 @@ Complete guide to authentication and security in joshburt.com.au.
 **Optional**: Auth0 OAuth for social login (Google, GitHub, etc.)
 
 **Security Features**:
+
 - Password hashing (bcrypt, 12 rounds)
 - Optional 2FA (TOTP)
 - Rate limiting (5 failed attempts per 15 minutes)
@@ -39,6 +40,7 @@ Complete guide to authentication and security in joshburt.com.au.
 **Endpoint**: `POST /.netlify/functions/auth?action=login`
 
 **Flow**:
+
 ```
 1. User submits email + password
 2. Backend queries users table for email
@@ -52,15 +54,17 @@ Complete guide to authentication and security in joshburt.com.au.
 ```
 
 **Request**:
+
 ```json
 {
   "email": "user@example.com",
   "password": "SecurePass123",
-  "totpCode": "123456"  // Required if 2FA enabled
+  "totpCode": "123456" // Required if 2FA enabled
 }
 ```
 
 **Response** (`200 OK`):
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -77,6 +81,7 @@ Complete guide to authentication and security in joshburt.com.au.
 ```
 
 **Errors**:
+
 - `401 Unauthorized`: Invalid credentials
 - `403 Forbidden`: 2FA required, account locked
 - `429 Too Many Requests`: Rate limit exceeded
@@ -88,6 +93,7 @@ Complete guide to authentication and security in joshburt.com.au.
 **Endpoint**: `POST /.netlify/functions/auth?action=register`
 
 **Flow**:
+
 ```
 1. User submits email, password, name
 2. Backend validates email uniqueness
@@ -100,6 +106,7 @@ Complete guide to authentication and security in joshburt.com.au.
 ```
 
 **Request**:
+
 ```json
 {
   "email": "newuser@example.com",
@@ -109,6 +116,7 @@ Complete guide to authentication and security in joshburt.com.au.
 ```
 
 **Response** (`201 Created`):
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -123,6 +131,7 @@ Complete guide to authentication and security in joshburt.com.au.
 ```
 
 **Errors**:
+
 - `400 Bad Request`: Weak password, invalid email format
 - `409 Conflict`: Email already registered
 
@@ -133,6 +142,7 @@ Complete guide to authentication and security in joshburt.com.au.
 **Endpoint**: `POST /.netlify/functions/auth?action=refresh`
 
 **Flow**:
+
 ```
 1. Client sends refresh token
 2. Backend verifies token exists in database
@@ -143,6 +153,7 @@ Complete guide to authentication and security in joshburt.com.au.
 ```
 
 **Request**:
+
 ```json
 {
   "refreshToken": "abc123def456..."
@@ -150,6 +161,7 @@ Complete guide to authentication and security in joshburt.com.au.
 ```
 
 **Response** (`200 OK`):
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -157,23 +169,25 @@ Complete guide to authentication and security in joshburt.com.au.
 ```
 
 **Errors**:
+
 - `401 Unauthorized`: Invalid or expired refresh token
 
 **Frontend Implementation**:
+
 ```javascript
 // Auto-refresh before token expires
 const refreshAccessToken = async () => {
   const refreshToken = localStorage.getItem('refreshToken');
-  
+
   const response = await fetch('/.netlify/functions/auth?action=refresh', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ refreshToken })
   });
-  
+
   const { accessToken } = await response.json();
   localStorage.setItem('accessToken', accessToken);
-  
+
   return accessToken;
 };
 
@@ -188,6 +202,7 @@ setInterval(refreshAccessToken, 6 * 24 * 60 * 60 * 1000);
 **Endpoint**: `POST /.netlify/functions/auth?action=logout`
 
 **Flow**:
+
 ```
 1. Client sends refresh token
 2. Backend deletes token from database (invalidates)
@@ -196,6 +211,7 @@ setInterval(refreshAccessToken, 6 * 24 * 60 * 60 * 1000);
 ```
 
 **Request**:
+
 ```json
 {
   "refreshToken": "abc123def456..."
@@ -203,6 +219,7 @@ setInterval(refreshAccessToken, 6 * 24 * 60 * 60 * 1000);
 ```
 
 **Response** (`200 OK`):
+
 ```json
 {
   "message": "Logged out successfully"
@@ -210,20 +227,21 @@ setInterval(refreshAccessToken, 6 * 24 * 60 * 60 * 1000);
 ```
 
 **Frontend Implementation**:
+
 ```javascript
 const logout = async () => {
   const refreshToken = localStorage.getItem('refreshToken');
-  
+
   await fetch('/.netlify/functions/auth?action=logout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ refreshToken })
   });
-  
+
   // Clear local storage
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
-  
+
   // Redirect to login
   window.location.href = '/login.html';
 };
@@ -259,7 +277,7 @@ const logout = async () => {
 ```javascript
 const jwt = require('jsonwebtoken');
 
-const generateAccessToken = (user) => {
+const generateAccessToken = user => {
   return jwt.sign(
     {
       userId: user.id,
@@ -275,7 +293,7 @@ const generateAccessToken = (user) => {
 **Verification** (`utils/http.js`):
 
 ```javascript
-const verifyToken = (token) => {
+const verifyToken = token => {
   try {
     return jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
@@ -286,10 +304,10 @@ const verifyToken = (token) => {
 
 ### Token Storage
 
-| Token | Storage | Lifetime | Usage |
-|-------|---------|----------|-------|
-| **Access Token** | `localStorage.accessToken` | 7 days | API authentication |
-| **Refresh Token** | `localStorage.refreshToken` + DB | 30 days | Renew access token |
+| Token             | Storage                          | Lifetime | Usage              |
+| ----------------- | -------------------------------- | -------- | ------------------ |
+| **Access Token**  | `localStorage.accessToken`       | 7 days   | API authentication |
+| **Refresh Token** | `localStorage.refreshToken` + DB | 30 days  | Renew access token |
 
 **Security Note**: For production, consider HTTP-only cookies for refresh tokens to prevent XSS attacks.
 
@@ -299,11 +317,11 @@ const verifyToken = (token) => {
 
 ### Roles
 
-| Role | Level | Permissions |
-|------|-------|-------------|
-| **mechanic** | 1 | Read products/consumables/filters, create/read own orders |
-| **manager** | 2 | mechanic + create/update products, view all users, manage orders |
-| **admin** | 3 | Full access including delete operations, site settings, audit logs |
+| Role         | Level | Permissions                                                        |
+| ------------ | ----- | ------------------------------------------------------------------ |
+| **mechanic** | 1     | Read products/consumables/filters, create/read own orders          |
+| **manager**  | 2     | mechanic + create/update products, view all users, manage orders   |
+| **admin**    | 3     | Full access including delete operations, site settings, audit logs |
 
 ### Permission Matrix
 
@@ -327,14 +345,14 @@ const permissions = {
     settings: ['read']
   },
   admin: {
-    '*': ['*']  // All permissions on all resources
+    '*': ['*'] // All permissions on all resources
   }
 };
 
 const hasPermission = (role, resource, action) => {
   // Check wildcard for admin
   if (permissions[role]?.['*']?.includes('*')) return true;
-  
+
   // Check specific resource permission
   return permissions[role]?.[resource]?.includes(action) || false;
 };
@@ -350,19 +368,19 @@ module.exports = { hasPermission };
 const requirePermission = async (event, resource, action) => {
   // Extract JWT from Authorization header
   const token = event.headers.authorization?.replace('Bearer ', '');
-  
+
   if (!token) {
     throw new Error('Unauthorized: No token provided');
   }
-  
+
   // Verify JWT
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  
+
   // Check RBAC permissions
   if (!hasPermission(decoded.role, resource, action)) {
     throw new Error('Forbidden: Insufficient permissions');
   }
-  
+
   // Return decoded user info
   return decoded;
 };
@@ -375,18 +393,18 @@ const requirePermission = async (event, resource, action) => {
 const { withHandler } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
 
-exports.handler = withHandler(async (event) => {
+exports.handler = withHandler(async event => {
   if (event.httpMethod === 'POST') {
     // Require manager+ to create products
     await requirePermission(event, 'products', 'create');
-    
+
     // Create product logic...
   }
-  
+
   if (event.httpMethod === 'GET') {
     // All authenticated users can read
     await requirePermission(event, 'products', 'read');
-    
+
     // List products logic...
   }
 });
@@ -409,6 +427,7 @@ exports.handler = withHandler(async (event) => {
 **Endpoint**: `POST /.netlify/functions/auth?action=2fa-setup`
 
 **Backend**:
+
 ```javascript
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
@@ -422,10 +441,7 @@ const secret = speakeasy.generateSecret({
 const qrCodeDataURL = await qrcode.toDataURL(secret.otpauth_url);
 
 // Store secret temporarily (not enabled yet)
-await pool.query(
-  'UPDATE users SET totp_secret = $1 WHERE id = $2',
-  [secret.base32, userId]
-);
+await pool.query('UPDATE users SET totp_secret = $1 WHERE id = $2', [secret.base32, userId]);
 
 return {
   secret: secret.base32,
@@ -434,6 +450,7 @@ return {
 ```
 
 **Response**:
+
 ```json
 {
   "secret": "JBSWY3DPEHPK3PXP",
@@ -450,6 +467,7 @@ User scans QR code with authenticator app, which generates 6-digit codes every 3
 **Endpoint**: `POST /.netlify/functions/auth?action=2fa-enable`
 
 **Request**:
+
 ```json
 {
   "totpCode": "123456"
@@ -457,12 +475,13 @@ User scans QR code with authenticator app, which generates 6-digit codes every 3
 ```
 
 **Backend Verification**:
+
 ```javascript
 const verified = speakeasy.totp.verify({
   secret: user.totp_secret,
   encoding: 'base32',
   token: totpCode,
-  window: 1  // Allow 30s window for clock drift
+  window: 1 // Allow 30s window for clock drift
 });
 
 if (!verified) {
@@ -470,13 +489,11 @@ if (!verified) {
 }
 
 // Enable 2FA
-await pool.query(
-  'UPDATE users SET totp_enabled = TRUE WHERE id = $1',
-  [userId]
-);
+await pool.query('UPDATE users SET totp_enabled = TRUE WHERE id = $1', [userId]);
 ```
 
 **Response**:
+
 ```json
 {
   "message": "2FA enabled successfully"
@@ -486,6 +503,7 @@ await pool.query(
 ### Login with 2FA
 
 **Modified Login Flow**:
+
 ```
 1. User submits email + password
 2. Backend verifies credentials
@@ -497,6 +515,7 @@ await pool.query(
 ```
 
 **Request**:
+
 ```json
 {
   "email": "user@example.com",
@@ -510,11 +529,11 @@ await pool.query(
 **Endpoint**: `POST /.netlify/functions/auth?action=2fa-disable`
 
 **Backend**:
+
 ```javascript
-await pool.query(
-  'UPDATE users SET totp_enabled = FALSE, totp_secret = NULL WHERE id = $1',
-  [userId]
-);
+await pool.query('UPDATE users SET totp_enabled = FALSE, totp_secret = NULL WHERE id = $1', [
+  userId
+]);
 ```
 
 ---
@@ -564,7 +583,7 @@ const handleCallback = async () => {
   const result = await auth0.handleRedirectCallback();
   const user = await auth0.getUser();
   const token = await auth0.getTokenSilently();
-  
+
   // Exchange Auth0 token for backend JWT
   const response = await fetch('/.netlify/functions/auth?action=login', {
     method: 'POST',
@@ -575,10 +594,10 @@ const handleCallback = async () => {
       name: user.name
     })
   });
-  
+
   const { accessToken } = await response.json();
   localStorage.setItem('accessToken', accessToken);
-  
+
   window.location.href = '/administration.html';
 };
 ```
@@ -588,12 +607,12 @@ const handleCallback = async () => {
 ```html
 <!DOCTYPE html>
 <html>
-<body>
-  <script type="module">
-    import { handleCallback } from '/assets/js/auth0.js';
-    handleCallback();
-  </script>
-</body>
+  <body>
+    <script type="module">
+      import { handleCallback } from '/assets/js/auth0.js';
+      handleCallback();
+    </script>
+  </body>
 </html>
 ```
 
@@ -614,23 +633,23 @@ const handleCallback = async () => {
 **Validation** (`utils/password.js`):
 
 ```javascript
-const validatePassword = (password) => {
+const validatePassword = password => {
   if (password.length < 8) {
     throw new Error('Password must be at least 8 characters');
   }
-  
+
   if (!/[A-Z]/.test(password)) {
     throw new Error('Password must contain uppercase letter');
   }
-  
+
   if (!/[a-z]/.test(password)) {
     throw new Error('Password must contain lowercase letter');
   }
-  
+
   if (!/[0-9]/.test(password)) {
     throw new Error('Password must contain number');
   }
-  
+
   return true;
 };
 ```
@@ -655,10 +674,10 @@ if (parseInt(recentAttempts.rows[0].count) >= 5) {
 
 // Log failed attempt
 if (loginFailed) {
-  await pool.query(
-    'INSERT INTO login_attempts (email, ip_address) VALUES ($1, $2)',
-    [email, ipAddress]
-  );
+  await pool.query('INSERT INTO login_attempts (email, ip_address) VALUES ($1, $2)', [
+    email,
+    ipAddress
+  ]);
 }
 ```
 
@@ -671,12 +690,14 @@ DELETE FROM login_attempts WHERE attempt_time < NOW() - INTERVAL '24 hours';
 ### Token Security
 
 **JWT Secret**:
+
 - Minimum 32 characters
 - Cryptographically random
 - Never commit to Git
 - Rotate periodically (invalidates all tokens)
 
 **Refresh Token**:
+
 - Hashed before storage (bcrypt)
 - One-time use (rotate on refresh)
 - Stored in database for revocation
@@ -707,6 +728,7 @@ DELETE FROM login_attempts WHERE attempt_time < NOW() - INTERVAL '24 hours';
 **Endpoint**: `POST /.netlify/functions/auth?action=forgot-password`
 
 **Request**:
+
 ```json
 {
   "email": "user@example.com"
@@ -714,6 +736,7 @@ DELETE FROM login_attempts WHERE attempt_time < NOW() - INTERVAL '24 hours';
 ```
 
 **Backend**:
+
 ```javascript
 // Generate reset token (random, 32 chars)
 const resetToken = crypto.randomBytes(32).toString('hex');
@@ -721,10 +744,11 @@ const resetTokenHash = await bcrypt.hash(resetToken, 12);
 const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
 // Store token
-await pool.query(
-  'UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE email = $3',
-  [resetTokenHash, expiresAt, email]
-);
+await pool.query('UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE email = $3', [
+  resetTokenHash,
+  expiresAt,
+  email
+]);
 
 // Send email
 await sendEmail(email, {
@@ -738,6 +762,7 @@ await sendEmail(email, {
 **Endpoint**: `POST /.netlify/functions/auth?action=reset-password`
 
 **Request**:
+
 ```json
 {
   "token": "abc123def456...",
@@ -746,6 +771,7 @@ await sendEmail(email, {
 ```
 
 **Backend**:
+
 ```javascript
 // Find user by valid token
 const user = await pool.query(

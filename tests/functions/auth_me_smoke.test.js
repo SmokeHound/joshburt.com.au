@@ -45,7 +45,10 @@ async function callUsers(token) {
   }
   try {
     // 1. Login with default admin (ensure env seeded DB)
-    const login = await callAuth('login', { email: 'admin@joshburt.com.au', password: 'admin123!' });
+    const login = await callAuth('login', {
+      email: 'admin@joshburt.com.au',
+      password: 'admin123!'
+    });
     if (login.status !== 200 || !login.json.accessToken) {
       console.error('❌ Login failed', login);
       process.exitCode = 1;

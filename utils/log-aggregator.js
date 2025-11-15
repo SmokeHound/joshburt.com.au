@@ -71,10 +71,10 @@ class LogAggregator {
    */
   logToConsole(entry) {
     const levelColors = {
-      DEBUG: '\x1b[36m',   // Cyan
-      INFO: '\x1b[32m',    // Green
-      WARN: '\x1b[33m',    // Yellow
-      ERROR: '\x1b[31m',   // Red
+      DEBUG: '\x1b[36m', // Cyan
+      INFO: '\x1b[32m', // Green
+      WARN: '\x1b[33m', // Yellow
+      ERROR: '\x1b[31m', // Red
       CRITICAL: '\x1b[35m' // Magenta
     };
 
@@ -148,13 +148,7 @@ class LogAggregator {
    * Query logs by criteria
    */
   async query(options = {}) {
-    const {
-      level = null,
-      startDate = null,
-      endDate = null,
-      limit = 100,
-      search = null
-    } = options;
+    const { level = null, startDate = null, endDate = null, limit = 100, search = null } = options;
 
     const logs = [];
     const files = await this.getLogFiles(startDate, endDate);
@@ -214,23 +208,28 @@ class LogAggregator {
       return logFiles.sort().reverse(); // Most recent first
     }
 
-    return logFiles.filter(file => {
-      const fileName = path.basename(file);
-      const dateMatch = fileName.match(/app-(\d{4}-\d{2}-\d{2})\.log/);
-      if (!dateMatch) {return false;}
+    return logFiles
+      .filter(file => {
+        const fileName = path.basename(file);
+        const dateMatch = fileName.match(/app-(\d{4}-\d{2}-\d{2})\.log/);
+        if (!dateMatch) {
+          return false;
+        }
 
-      const fileDate = new Date(dateMatch[1]);
+        const fileDate = new Date(dateMatch[1]);
 
-      if (startDate && fileDate < new Date(startDate)) {
-        return false;
-      }
+        if (startDate && fileDate < new Date(startDate)) {
+          return false;
+        }
 
-      if (endDate && fileDate > new Date(endDate)) {
-        return false;
-      }
+        if (endDate && fileDate > new Date(endDate)) {
+          return false;
+        }
 
-      return true;
-    }).sort().reverse();
+        return true;
+      })
+      .sort()
+      .reverse();
   }
 
   /**
@@ -269,9 +268,7 @@ class LogAggregator {
 
     // Calculate error rate
     const errorLogs = stats.byLevel.ERROR + stats.byLevel.CRITICAL;
-    stats.errorRate = stats.total > 0
-      ? (errorLogs / stats.total * 100).toFixed(2)
-      : 0;
+    stats.errorRate = stats.total > 0 ? ((errorLogs / stats.total) * 100).toFixed(2) : 0;
 
     return stats;
   }

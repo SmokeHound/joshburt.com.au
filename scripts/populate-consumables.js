@@ -28,16 +28,13 @@ async function populateConsumables() {
     let imported = 0;
     for (const item of consumablesData) {
       try {
-        await database.run(`
+        await database.run(
+          `
           INSERT INTO consumables (name, code, type, category, description)
           VALUES (?, ?, ?, ?, ?)
-        `, [
-          item.name,
-          item.code || '',
-          item.type,
-          item.category,
-          item.description || ''
-        ]);
+        `,
+          [item.name, item.code || '', item.type, item.category, item.description || '']
+        );
         imported++;
       } catch (error) {
         if (error.message.includes('UNIQUE constraint')) {
@@ -53,7 +50,6 @@ async function populateConsumables() {
     // Verify import
     const finalCount = await database.get('SELECT COUNT(*) as count FROM consumables');
     console.log(`📊 Total consumables in database: ${finalCount.count}`);
-
   } catch (error) {
     console.error('❌ Error populating consumables:', error);
   } finally {

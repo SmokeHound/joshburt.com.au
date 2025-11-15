@@ -3,7 +3,7 @@ const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requireAuth } = require('../../utils/http');
 
-exports.handler = withHandler(async function(event) {
+exports.handler = withHandler(async function (event) {
   await database.connect();
 
   const method = event.httpMethod;
@@ -24,10 +24,7 @@ exports.handler = withHandler(async function(event) {
 
       // Create default preferences if they don't exist
       if (!preferences) {
-        await database.run(
-          'INSERT INTO notification_preferences (user_id) VALUES (?)',
-          [user.id]
-        );
+        await database.run('INSERT INTO notification_preferences (user_id) VALUES (?)', [user.id]);
         preferences = await database.get(
           'SELECT * FROM notification_preferences WHERE user_id = ?',
           [user.id]

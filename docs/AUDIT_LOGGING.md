@@ -22,7 +22,7 @@ This document defines the in-repo conventions for client-side audit logging so U
 
 Admin-only storage key
 
--------------------------
+---
 
 - `localStorage.adminAuditLogs` — optional admin-only store for richer admin telemetry. Admin loggers may continue to write here for separation, but should also mirror essential entries into `auditLogs` so dashboards and public UI can surface recent events.
 
@@ -34,13 +34,9 @@ Events
 
 - `auditLogUpdated` — dispatched when an entry is added to `localStorage.auditLogs`. UI components should listen for this event to refresh recent-activity lists.
 
-**Storage**: `audit_logs` table in PostgreSQL  Example: window.dispatchEvent(new CustomEvent('auditLogUpdated', { detail: entry }));
-
-
+**Storage**: `audit_logs` table in PostgreSQL Example: window.dispatchEvent(new CustomEvent('auditLogUpdated', { detail: entry }));
 
 **Access**: Admin only via `audit-logs.html` or API- `adminAuditLog` — an admin-scoped event (dispatched by admin tools). Prefer mirroring admin entries into `auditLogs` and dispatching `auditLogUpdated` as well.
-
-
 
 **Features**:Standard log shape
 
@@ -52,17 +48,17 @@ Events
 
 - Export to CSV{
 
-  id: string | number,           // unique id (timestamp + random suffix ok)
+  id: string | number, // unique id (timestamp + random suffix ok)
 
----  timestamp: ISOString,          // e.g. new Date().toISOString()
+--- timestamp: ISOString, // e.g. new Date().toISOString()
 
-  userId: string | number|null,  // user identifier or null for system
+userId: string | number|null, // user identifier or null for system
 
-## Audit Events  action: string,                // short action name, e.g. 'user_login', 'order_created'
+## Audit Events action: string, // short action name, e.g. 'user_login', 'order_created'
 
-  details: object|null,          // optional structured details
+details: object|null, // optional structured details
 
-### User Actions  ip: string                     // optional ip or empty string
+### User Actions ip: string // optional ip or empty string
 
 }
 
@@ -88,87 +84,82 @@ Events
 
 | `user:2fa-disable` | 2FA disabled | User ID |Use a small helper to standardize writes:
 
-
-
 ### Resource Actions```js
 
 function logAudit(entry) {
 
-| Event | Description | Logged Details |  try {
+| Event | Description | Logged Details | try {
 
-|-------|-------------|----------------|    const key = 'auditLogs';
+|-------|-------------|----------------| const key = 'auditLogs';
 
-| `product:create` | Product created | Product name, code |    const existing = JSON.parse(localStorage.getItem(key) || '[]');
+| `product:create` | Product created | Product name, code | const existing = JSON.parse(localStorage.getItem(key) || '[]');
 
-| `product:update` | Product updated | Product ID, changed fields |    const normalized = {
+| `product:update` | Product updated | Product ID, changed fields | const normalized = {
 
-| `product:delete` | Product deleted | Product name, code |      id: entry.id || Date.now(),
+| `product:delete` | Product deleted | Product name, code | id: entry.id || Date.now(),
 
-| `order:create` | Order created | Order ID, user, total items |      timestamp: entry.timestamp || new Date().toISOString(),
+| `order:create` | Order created | Order ID, user, total items | timestamp: entry.timestamp || new Date().toISOString(),
 
-| `order:update` | Order status changed | Order ID, old status, new status |      userId: entry.userId ?? null,
+| `order:update` | Order status changed | Order ID, old status, new status | userId: entry.userId ?? null,
 
-| `order:delete` | Order cancelled/deleted | Order ID, reason |      action: entry.action || 'activity',
+| `order:delete` | Order cancelled/deleted | Order ID, reason | action: entry.action || 'activity',
 
-| `settings:update` | Site settings changed | Changed settings |      details: entry.details || {},
+| `settings:update` | Site settings changed | Changed settings | details: entry.details || {},
 
       ip: entry.ip || ''
 
-### Inventory Actions    };
+### Inventory Actions };
 
     existing.unshift(normalized);
 
-| Event | Description | Logged Details |    if (existing.length > 1000) existing.splice(1000);
+| Event | Description | Logged Details | if (existing.length > 1000) existing.splice(1000);
 
-|-------|-------------|----------------|    localStorage.setItem(key, JSON.stringify(existing));
+|-------|-------------|----------------| localStorage.setItem(key, JSON.stringify(existing));
 
-| `inventory:update` | Stock level changed | Item type/ID, old count, new count |    try { window.dispatchEvent(new CustomEvent('auditLogUpdated', { detail: normalized })); } catch (e) {}
+| `inventory:update` | Stock level changed | Item type/ID, old count, new count | try { window.dispatchEvent(new CustomEvent('auditLogUpdated', { detail: normalized })); } catch (e) {}
 
-| `inventory:reorder` | Reorder point triggered | Item details, current stock |    return normalized;
+| `inventory:reorder` | Reorder point triggered | Item details, current stock | return normalized;
 
-  } catch (e) {
+} catch (e) {
 
----    // best-effort logging - don't throw
+--- // best-effort logging - don't throw
 
     return null;
 
-## Implementation  }
+## Implementation }
 
 }
 
 ### Automatic Logging```
 
-
-
 **Utility**: `utils/audit.js`Adoption
 
---------
+---
 
-```javascript- When implementing new loggers, call `logAudit()` or replicate its behavior (normalize, persist to `auditLogs`, dispatch `auditLogUpdated`).
+```javascript- When implementing new loggers, call `logAudit()`or replicate its behavior (normalize, persist to`auditLogs`, dispatch `auditLogUpdated`).
 
 const { pool } = require('../config/database');- For admin-only utilities, continue to write richer data to `adminAuditLogs`, but mirror an appropriate, trimmed entry into `auditLogs` so non-admin UI can surface it.
 
+/\*\*Questions or improvements
 
+- Log audit event------------------------
 
-/**Questions or improvements
+- @param {number} userId - User ID performing actionOpen an issue or PR if you want to change the shape, storage key, or event names. Keep changes backward-compatible where possible.
 
- * Log audit event------------------------
-
- * @param {number} userId - User ID performing actionOpen an issue or PR if you want to change the shape, storage key, or event names. Keep changes backward-compatible where possible.
-
- * @param {string} action - Action type (e.g., 'user:create')
- * @param {string} details - Additional details (JSON string)
- * @param {string} ipAddress - User IP address
- */
-const logAudit = async (userId, action, details, ipAddress) => {
+- @param {string} action - Action type (e.g., 'user:create')
+- @param {string} details - Additional details (JSON string)
+- @param {string} ipAddress - User IP address
+  \*/
+  const logAudit = async (userId, action, details, ipAddress) => {
   await pool.query(
-    'INSERT INTO audit_logs (user_id, action, details, ip_address) VALUES ($1, $2, $3, $4)',
-    [userId, action, details, ipAddress]
+  'INSERT INTO audit_logs (user_id, action, details, ip_address) VALUES ($1, $2, $3, $4)',
+  [userId, action, details, ipAddress]
   );
-};
+  };
 
 module.exports = { logAudit };
-```
+
+````
 
 ### Usage in Functions
 
@@ -178,15 +169,15 @@ const { logAudit } = require('../../utils/audit');
 
 exports.handler = withHandler(async (event) => {
   const user = await requirePermission(event, 'users', 'create');
-  
+
   const newUser = JSON.parse(event.body);
-  
+
   // Create user in database
   const result = await pool.query(
     'INSERT INTO users (email, name, role) VALUES ($1, $2, $3) RETURNING id',
     [newUser.email, newUser.name, newUser.role]
   );
-  
+
   // Log audit event
   await logAudit(
     user.userId,
@@ -194,13 +185,13 @@ exports.handler = withHandler(async (event) => {
     JSON.stringify({ email: newUser.email, role: newUser.role }),
     event.headers['x-forwarded-for'] || event.headers['client-ip']
   );
-  
+
   return {
     statusCode: 201,
     body: JSON.stringify({ id: result.rows[0].id })
   };
 });
-```
+````
 
 ---
 
@@ -213,6 +204,7 @@ exports.handler = withHandler(async (event) => {
 **Auth**: Admin only
 
 **Query Parameters**:
+
 - `page` (default: 1)
 - `limit` (default: 50)
 - `userId`: Filter by user ID
@@ -221,12 +213,14 @@ exports.handler = withHandler(async (event) => {
 - `endDate`: Filter by date range (ISO 8601)
 
 **Example**:
+
 ```bash
 curl "https://joshburt.netlify.app/.netlify/functions/audit-logs?userId=1&action=user:update&startDate=2025-11-01" \
   -H "Authorization: Bearer ADMIN_TOKEN"
 ```
 
 **Response**:
+
 ```json
 {
   "data": [
@@ -252,7 +246,7 @@ curl "https://joshburt.netlify.app/.netlify/functions/audit-logs?userId=1&action
 
 ```sql
 -- Recent admin actions
-SELECT 
+SELECT
   u.name as user,
   al.action,
   al.details,
@@ -272,7 +266,7 @@ GROUP BY action
 ORDER BY count DESC;
 
 -- Failed login attempts
-SELECT 
+SELECT
   details->>'email' as email,
   COUNT(*) as attempts,
   MAX(created_at) as last_attempt
@@ -341,12 +335,13 @@ echo "Audit logs archived: $(date)"
 **Button**: "Export to CSV"
 
 **Implementation**:
+
 ```javascript
 const exportAuditLogs = async () => {
   const logs = await fetch('/.netlify/functions/audit-logs?limit=10000', {
-    headers: { 'Authorization': `Bearer ${accessToken}` }
+    headers: { Authorization: `Bearer ${accessToken}` }
   }).then(r => r.json());
-  
+
   // Convert to CSV
   const csv = [
     ['ID', 'User', 'Action', 'Details', 'IP Address', 'Timestamp'],
@@ -358,8 +353,10 @@ const exportAuditLogs = async () => {
       log.ipAddress,
       log.createdAt
     ])
-  ].map(row => row.join(',')).join('\n');
-  
+  ]
+    .map(row => row.join(','))
+    .join('\n');
+
   // Download
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);

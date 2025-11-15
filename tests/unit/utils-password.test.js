@@ -1,5 +1,9 @@
 // Unit tests for utils/password.js
-const { validatePassword, getPasswordRequirements, PASSWORD_MIN_LENGTH } = require('../../utils/password');
+const {
+  validatePassword,
+  getPasswordRequirements,
+  PASSWORD_MIN_LENGTH
+} = require('../../utils/password');
 
 describe('Password Validation Utilities', () => {
   describe('validatePassword', () => {
@@ -42,7 +46,9 @@ describe('Password Validation Utilities', () => {
     test('should reject password without special character', () => {
       const result = validatePassword('Password123');
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
+      expect(result.errors).toContain(
+        'Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)'
+      );
     });
 
     test('should accept valid password with all requirements', () => {

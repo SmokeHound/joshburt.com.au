@@ -1,10 +1,6 @@
 # Deployment Guide# Deployment Guide (Serverless Architecture)
 
-
-
 Complete deployment procedures for joshburt.com.au across all environments.The application runs as a static frontend plus Netlify Functions (serverless backend). All dynamic features are provided by serverless endpoints with automated deployment pipelines.
-
-
 
 ## Table of Contents## Table of Contents
 
@@ -40,19 +36,13 @@ Complete deployment procedures for joshburt.com.au across all environments.The a
 
 ### Deployment Strategy- **Monitoring**: Custom metrics and logging
 
-
-
 - **Primary**: Netlify (static + serverless functions)### Deployment Targets
 
 - **Mirror**: FTP server (static files only, optional)1. **Netlify (Primary)**: Automatic deployment on push
 
 - **CI/CD**: GitHub Actions for automated deployments2. **FTP Mirror (Secondary)**: Static file backup
 
-
-
 ### Environments## Deployment Workflows
-
-
 
 | Environment | URL | Deployment |### Automatic Deployment (Main Branch)
 
@@ -66,45 +56,41 @@ Complete deployment procedures for joshburt.com.au across all environments.The a
 
 ┌─────────────────────────────────────────────────────────┐
 
----│  1. Pre-Deployment Checks                               │
+---│ 1. Pre-Deployment Checks │
 
-│     ├─ Install dependencies                             │
+│ ├─ Install dependencies │
 
-## Prerequisites│     ├─ Run database migrations (dry-run)                │
+## Prerequisites│ ├─ Run database migrations (dry-run) │
 
-│     ├─ Lint code (ESLint + HTMLHint)                   │
+│ ├─ Lint code (ESLint + HTMLHint) │
 
-### Required Software│     ├─ Build CSS (Tailwind)                            │
+### Required Software│ ├─ Build CSS (Tailwind) │
 
-│     └─ Run tests (Jest)                                │
+│ └─ Run tests (Jest) │
 
-- **Node.js**: 18+ (LTS)│                                                         │
+- **Node.js**: 18+ (LTS)│ │
 
-- **npm**: 9+│  2. Deployment                                          │
+- **npm**: 9+│ 2. Deployment │
 
-- **Git**: Any recent version│     ├─ Deploy to FTP server                            │
+- **Git**: Any recent version│ ├─ Deploy to FTP server │
 
-- **Netlify CLI**: `npm install -g netlify-cli` (for local functions)│     └─ Deploy to Netlify (automatic)                   │
+- **Netlify CLI**: `npm install -g netlify-cli` (for local functions)│ └─ Deploy to Netlify (automatic) │
 
-│                                                         │
+│ │
 
-### Required Accounts│  3. Post-Deployment                                     │
+### Required Accounts│ 3. Post-Deployment │
 
-│     ├─ Run database migrations (production)            │
+│ ├─ Run database migrations (production) │
 
-- **GitHub**: For code repository│     ├─ Send deployment notification                    │
+- **GitHub**: For code repository│ ├─ Send deployment notification │
 
-- **Netlify**: For hosting + serverless functions│     └─ Generate deployment summary                     │
+- **Netlify**: For hosting + serverless functions│ └─ Generate deployment summary │
 
 - **Neon** (or PostgreSQL provider): For database└─────────────────────────────────────────────────────────┘
 
 - **FTP Server** (optional): For mirror deployment```
 
-
-
 ---**Workflow File**: `.github/workflows/main.yml`
-
-
 
 ## Local Development**Key Features**:
 
@@ -132,23 +118,23 @@ npm install
 
 # 3. Create environment file┌─────────────────────────────────────────────────────────┐
 
-cp .env.example .env│  1. Security Audit                                      │
+cp .env.example .env│ 1. Security Audit │
 
-# Edit .env with your credentials (see Environment Variables section)│     └─ Run npm audit (production dependencies)         │
+# Edit .env with your credentials (see Environment Variables section)│ └─ Run npm audit (production dependencies) │
 
-│                                                         │
+│ │
 
-# 4. Run database migrations│  2. Database Cleanup                                    │
+# 4. Run database migrations│ 2. Database Cleanup │
 
-npm run migrate│     └─ Prune expired refresh tokens                    │
+npm run migrate│ └─ Prune expired refresh tokens │
 
-│                                                         │
+│ │
 
-# 5. Verify database connectivity│  3. Dependency Check                                    │
+# 5. Verify database connectivity│ 3. Dependency Check │
 
-npm run health│     └─ Check for outdated packages                     │
+npm run health│ └─ Check for outdated packages │
 
-```│                                                         │
+````│ │
 
 │  4. Code Quality                                        │
 
@@ -168,7 +154,7 @@ npm run dev```
 
 # Use for frontend-only development**Workflow File**: `.github/workflows/nightly-maintenance.yml`
 
-```
+````
 
 **Artifacts**: Maintenance reports retained for 30 days
 
@@ -176,7 +162,7 @@ npm run dev```
 
 ### Weekly Performance Reports (Monday 9 AM UTC)
 
-```bash
+````bash
 
 npm run dev:functionsAutomated performance analysis:
 
@@ -268,11 +254,11 @@ npm run build:css     # CSS compilation1. **Connect Repository**
 
    - **Functions directory**: `netlify/functions`# PostgreSQL credentials required: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
 
-```
+````
 
 #### 2. Configure Environment VariablesOptional:
 
-```
+````
 
 Navigate to **Site Settings → Environment Variables** and add:SMTP_HOST=...
 
@@ -342,7 +328,7 @@ git push origin mainDB_PASSWORD=your-db-password
 
 ```DB_NAME=your-db-name
 
-```
+````
 
 **Build Process**:
 
@@ -354,7 +340,7 @@ git push origin mainDB_PASSWORD=your-db-password
 
 4. Deploy functions to serverless runtime3. Click "New repository secret"
 
-4. Add each secret individually
+5. Add each secret individually
 
 **Deployment Time**: ~2-3 minutes
 
@@ -364,13 +350,13 @@ git push origin mainDB_PASSWORD=your-db-password
 
 1. **Clone Repository**
 
-```bash```bash
+`bash`bash
 
 # Using Netlify CLIgit clone https://github.com/SmokeHound/joshburt.com.au.git
 
 netlify deploy --prodcd joshburt.com.au
 
-```
+```````
 
 # Or via dashboard
 
@@ -431,23 +417,21 @@ npm install
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-```
+```````
 
 ### Monitoring Deployments
 
 on:);
 
-  push:
+push:
 
     branches:CREATE INDEX idx_new_feature_name ON new_feature(name);
 
       - main```
 
-
-
 jobs:3. **Test Locally**
 
-  deploy:```bash
+deploy:```bash
 
     runs-on: ubuntu-latest# Dry run first
 
@@ -475,7 +459,7 @@ jobs:3. **Test Locally**
 
         run: npm install```
 
-      
+
 
       - name: Build CSSThe CI/CD pipeline will automatically apply the migration on deployment.
 
@@ -509,7 +493,7 @@ jobs:3. **Test Locally**
 
             **/.env
 
-``````bash
+````bash
 
 # Check application health
 
@@ -687,9 +671,7 @@ touch migrations/005_rollback_feature.sql
 
 curl http://localhost:8888/.netlify/functions/healthnode scripts/run-migrations.js
 
-``````
-
-
+````
 
 ### Alternative PostgreSQL Providers**Netlify**:
 
@@ -717,7 +699,7 @@ On deployment failure, GitHub Actions automatically:
 
 - Creates failure tracking information
 
-```bash
+````bash
 
 # 1. Health check## Troubleshooting
 
@@ -741,15 +723,15 @@ curl -X POST https://joshburt.netlify.app/.netlify/functions/auth?action=login \
 
   -d '{"email":"test@example.com","password":"testpass"}'git push
 
-```
+````
 
 # 4. Authenticated endpoint
 
-curl https://joshburt.netlify.app/.netlify/functions/products \**2. Deployment Fails at Test Step**
+curl https://joshburt.netlify.app/.netlify/functions/products \*\*2. Deployment Fails at Test Step\*\*
 
-  -H "Authorization: Bearer YOUR_TOKEN"```bash
+-H "Authorization: Bearer YOUR_TOKEN"```bash
 
-```# Run tests locally
+````# Run tests locally
 
 npm test
 
@@ -781,7 +763,7 @@ VALUES (node scripts/run-migrations.js --dry-run
 
 );```
 
-```
+````
 
 **4. Function Not Working**
 
@@ -793,7 +775,7 @@ Or register via UI and manually update role:- Check Netlify function logs
 
 UPDATE users SET role = 'admin' WHERE email = 'admin@joshburt.com.au';- Check database connectivity
 
-```
+````
 
 **5. Database Connection Issues**
 
@@ -863,7 +845,7 @@ netlify deploy:list2. Rotate tokens by pruning `refresh_tokens` table periodical
 
 netlify deploy:publish <deploy-id>5. Audit logs available via `/.netlify/functions/audit-logs`
 
-```
+````
 
 ### Security/Ops Checklist (Production)
 
@@ -907,9 +889,9 @@ pg_restore -h your-host.neon.tech \## Monitoring & Logs
 
 psql -h your-host.neon.tech -U your-user -d your-db \test@example.com / password
 
-  -f migrations/rollback/002_rollback_order_tracking.sqlmanager@example.com / manager123
+-f migrations/rollback/002_rollback_order_tracking.sqlmanager@example.com / manager123
 
-``````
+````
 
 
 
@@ -965,7 +947,7 @@ UPDATE settings SET data = jsonb_set(data, '{maintenanceMode}', 'false');
 
   "scripts": {- `SMTP_HOST`: SMTP server host
 
-    "build:css": "npx tailwindcss -i src/styles.css -o assets/css/styles.css --minify"- `SMTP_PORT`: SMTP server port  
+    "build:css": "npx tailwindcss -i src/styles.css -o assets/css/styles.css --minify"- `SMTP_PORT`: SMTP server port
 
   }- `SMTP_USER`: SMTP username
 
@@ -1061,7 +1043,7 @@ jobs:3. **Rate Limiting**: Already configured, adjust limits as needed
 
     runs-on: ubuntu-latest5. **Database**: Secure database access and regular backups
 
-    
+
 
     steps:## Performance Optimization
 
@@ -1089,11 +1071,11 @@ jobs:3. **Rate Limiting**: Already configured, adjust limits as needed
 
         run: npm run lint- Manager: manager@example.com / manager123
 
-      
+
 
       - name: Run testsChange these credentials in production!
         run: npm run test:all
-      
+
       - name: Build CSS
         run: npm run build:css
 ```
@@ -1113,5 +1095,6 @@ jobs:3. **Rate Limiting**: Already configured, adjust limits as needed
 
 ---
 
-**Last Updated**: 2025-11-11  
+**Last Updated**: 2025-11-11
 **Maintained By**: Development Team
+````

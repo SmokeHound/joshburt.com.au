@@ -3,7 +3,7 @@ const { database } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
 
-exports.handler = withHandler(async function(event) {
+exports.handler = withHandler(async function (event) {
   await database.connect();
 
   const method = event.httpMethod;
@@ -13,34 +13,32 @@ exports.handler = withHandler(async function(event) {
 
   // Only admins and managers can access analytics
   const { user, response: authResponse } = await requirePermission(event, 'orders', 'list');
-  if (authResponse) {return authResponse;}
+  if (authResponse) {
+    return authResponse;
+  }
 
   try {
     const params = event.queryStringParameters || {};
-    const {
-      report_type,
-      date_from,
-      date_to,
-      compare_previous = 'false'
-    } = params;
+    const { report_type, date_from, date_to, compare_previous = 'false' } = params;
 
     // Default date range: last 30 days
     const endDate = date_to || new Date().toISOString().split('T')[0];
-    const startDate = date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const startDate =
+      date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
     switch (report_type) {
-    case 'order_trends':
-      return await getOrderTrends(startDate, endDate, compare_previous === 'true');
-    case 'top_products':
-      return await getTopProducts(startDate, endDate);
-    case 'category_breakdown':
-      return await getCategoryBreakdown(startDate, endDate);
-    case 'order_summary':
-      return await getOrderSummary(startDate, endDate, compare_previous === 'true');
-    case 'user_activity':
-      return await getUserActivity(startDate, endDate);
-    default:
-      return await getOverviewReport(startDate, endDate);
+      case 'order_trends':
+        return await getOrderTrends(startDate, endDate, compare_previous === 'true');
+      case 'top_products':
+        return await getTopProducts(startDate, endDate);
+      case 'category_breakdown':
+        return await getCategoryBreakdown(startDate, endDate);
+      case 'order_summary':
+        return await getOrderSummary(startDate, endDate, compare_previous === 'true');
+      case 'user_activity':
+        return await getUserActivity(startDate, endDate);
+      default:
+        return await getOverviewReport(startDate, endDate);
     }
   } catch (e) {
     console.error('Analytics function error:', e);
@@ -71,9 +69,15 @@ exports.handler = withHandler(async function(event) {
 
     let previousTrends = null;
     if (comparePrevious) {
-      const daysDiff = Math.floor((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
-      const prevStart = new Date(new Date(startDate) - daysDiff * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      const prevEnd = new Date(new Date(startDate) - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const daysDiff = Math.floor(
+        (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
+      );
+      const prevStart = new Date(new Date(startDate) - daysDiff * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
+      const prevEnd = new Date(new Date(startDate) - 1 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
       previousTrends = await database.all(query, [prevStart, prevEnd]);
     }
 
@@ -166,18 +170,36 @@ exports.handler = withHandler(async function(event) {
     let comparison = null;
 
     if (comparePrevious) {
-      const daysDiff = Math.floor((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
-      const prevStart = new Date(new Date(startDate) - daysDiff * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      const prevEnd = new Date(new Date(startDate) - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const daysDiff = Math.floor(
+        (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
+      );
+      const prevStart = new Date(new Date(startDate) - daysDiff * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
+      const prevEnd = new Date(new Date(startDate) - 1 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
 
       previousSummary = await database.get(summaryQuery, [prevStart, prevEnd]);
 
       // Calculate percentage changes
       comparison = {
-        total_orders_change: calculatePercentageChange(previousSummary.total_orders, summary.total_orders),
-        total_items_change: calculatePercentageChange(previousSummary.total_items, summary.total_items),
-        completed_orders_change: calculatePercentageChange(previousSummary.completed_orders, summary.completed_orders),
-        unique_users_change: calculatePercentageChange(previousSummary.unique_users, summary.unique_users)
+        total_orders_change: calculatePercentageChange(
+          previousSummary.total_orders,
+          summary.total_orders
+        ),
+        total_items_change: calculatePercentageChange(
+          previousSummary.total_items,
+          summary.total_items
+        ),
+        completed_orders_change: calculatePercentageChange(
+          previousSummary.completed_orders,
+          summary.completed_orders
+        ),
+        unique_users_change: calculatePercentageChange(
+          previousSummary.unique_users,
+          summary.unique_users
+        )
       };
     }
 

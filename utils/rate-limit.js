@@ -39,9 +39,7 @@ function checkRateLimit(key, limit = 30, windowMs = 60 * 1000) {
   const remaining = Math.max(0, limit - rateBuckets[key].length);
 
   // Calculate reset time (when oldest entry expires)
-  const resetAt = rateBuckets[key].length > 0
-    ? rateBuckets[key][0] + windowMs
-    : now + windowMs;
+  const resetAt = rateBuckets[key].length > 0 ? rateBuckets[key][0] + windowMs : now + windowMs;
 
   return {
     allowed,
@@ -57,11 +55,13 @@ function checkRateLimit(key, limit = 30, windowMs = 60 * 1000) {
  * @returns {string} - IP address
  */
 function getClientIP(event) {
-  return (event.headers && (
-    event.headers['x-forwarded-for']?.split(',')[0].trim() ||
-    event.headers['x-real-ip'] ||
-    event.headers['client-ip']
-  )) || 'unknown';
+  return (
+    (event.headers &&
+      (event.headers['x-forwarded-for']?.split(',')[0].trim() ||
+        event.headers['x-real-ip'] ||
+        event.headers['client-ip'])) ||
+    'unknown'
+  );
 }
 
 /**

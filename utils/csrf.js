@@ -81,10 +81,8 @@ function consumeCSRFToken(token, sessionId) {
  */
 function extractCSRFToken(event) {
   // Check headers first (X-CSRF-Token)
-  const headerToken = event.headers && (
-    event.headers['x-csrf-token'] ||
-    event.headers['X-CSRF-Token']
-  );
+  const headerToken =
+    event.headers && (event.headers['x-csrf-token'] || event.headers['X-CSRF-Token']);
 
   if (headerToken) {
     return headerToken;

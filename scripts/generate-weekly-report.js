@@ -22,12 +22,14 @@ async function loadMetrics() {
 }
 
 function filterByTimeWindow(items, days = 7) {
-  const cutoff = Date.now() - (days * ONE_DAY);
+  const cutoff = Date.now() - days * ONE_DAY;
   return items.filter(item => new Date(item.timestamp).getTime() > cutoff);
 }
 
 function calculatePercentile(values, percentile) {
-  if (values.length === 0) {return 0;}
+  if (values.length === 0) {
+    return 0;
+  }
   const sorted = [...values].sort((a, b) => a - b);
   const index = Math.ceil(sorted.length * (percentile / 100)) - 1;
   return sorted[Math.max(0, index)];
@@ -55,17 +57,20 @@ function generateReport(metrics) {
   report.summary = {
     totalRequests: requests.length,
     totalErrors: errors.length,
-    errorRate: requests.length > 0 ? (errors.length / requests.length * 100).toFixed(2) : 0,
+    errorRate: requests.length > 0 ? ((errors.length / requests.length) * 100).toFixed(2) : 0,
     averageRequestsPerDay: Math.round(requests.length / 7)
   };
 
   // Request analysis
-  const responseTimes = requests.map(r => r.responseTime).filter(t => t !== null && t !== undefined);
+  const responseTimes = requests
+    .map(r => r.responseTime)
+    .filter(t => t !== null && t !== undefined);
   report.requests = {
     total: requests.length,
-    avgResponseTime: responseTimes.length > 0
-      ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
-      : 0,
+    avgResponseTime:
+      responseTimes.length > 0
+        ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
+        : 0,
     p50: calculatePercentile(responseTimes, 50),
     p95: calculatePercentile(responseTimes, 95),
     p99: calculatePercentile(responseTimes, 99),
@@ -122,9 +127,10 @@ function generateReport(metrics) {
   const durations = performance.map(p => p.duration).filter(d => d !== null && d !== undefined);
   report.performance = {
     totalOperations: performance.length,
-    avgDuration: durations.length > 0
-      ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
-      : 0,
+    avgDuration:
+      durations.length > 0
+        ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
+        : 0,
     p50: calculatePercentile(durations, 50),
     p95: calculatePercentile(durations, 95),
     p99: calculatePercentile(durations, 99)
@@ -134,9 +140,10 @@ function generateReport(metrics) {
   const dbDurations = database.map(d => d.duration).filter(d => d !== null && d !== undefined);
   report.database = {
     totalQueries: database.length,
-    avgDuration: dbDurations.length > 0
-      ? Math.round(dbDurations.reduce((a, b) => a + b, 0) / dbDurations.length)
-      : 0,
+    avgDuration:
+      dbDurations.length > 0
+        ? Math.round(dbDurations.reduce((a, b) => a + b, 0) / dbDurations.length)
+        : 0,
     slowQueries: database.filter(d => d.duration > 1000).length,
     failedQueries: database.filter(d => d.error).length
   };
@@ -262,9 +269,14 @@ function formatReportAsMarkdown(report) {
 
   md += '## Recommendations\n\n';
   report.recommendations.forEach(rec => {
-    const emoji = rec.severity === 'critical' ? '🔴' :
-      rec.severity === 'high' ? '🟠' :
-        rec.severity === 'medium' ? '🟡' : '🟢';
+    const emoji =
+      rec.severity === 'critical'
+        ? '🔴'
+        : rec.severity === 'high'
+          ? '🟠'
+          : rec.severity === 'medium'
+            ? '🟡'
+            : '🟢';
     md += `### ${emoji} ${rec.issue}\n\n`;
     md += `**Severity:** ${rec.severity}\n\n`;
     md += `${rec.message}\n\n`;
@@ -316,7 +328,7 @@ if (require.main === module) {
       console.log('✅ Weekly report generation complete');
       process.exit(0);
     })
-    .catch((error) => {
+    .catch(error => {
       console.error('❌ Report generation failed:', error);
       process.exit(1);
     });

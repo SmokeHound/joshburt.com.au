@@ -3,6 +3,7 @@
 **Production-ready serverless web application** for workshop management and product ordering.
 
 ## 🔗 Live Sites
+
 - **Primary**: https://joshburt.netlify.app/ [![Netlify Status](https://api.netlify.com/api/v1/badges/6390337a-60f4-4d6e-8078-0fdbd19ae28b/deploy-status)](https://app.netlify.com/projects/joshburt/deploys) (Netlify + Functions)
 - **Mirror**: https://joshburt.com.au/ [![Deploy via FTP](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SmokeHound/joshburt.com.au/actions/workflows/main.yml) (FTP static mirror)
 
@@ -11,6 +12,7 @@
 ## 🎯 Overview
 
 Modern full-stack application with:
+
 - 🎨 **Frontend**: Static HTML + TailwindCSS v4 + Vanilla JS
 - ⚡ **Backend**: Netlify Functions (serverless Node.js)
 - 💾 **Database**: PostgreSQL (Neon)
@@ -24,13 +26,15 @@ Modern full-stack application with:
 ## ✨ Key Features
 
 ### User-Facing
+
 - **Product Catalogs**: Oil products, consumables, filters
 - **Order Management**: Create, track, and review orders
 - **User Profiles**: Avatar upload, preferences, 2FA
 - **Notifications**: Real-time in-app notifications
 - **Multi-Theme**: Dark, light, neon, ocean, high-contrast
 
-### Admin Features  
+### Admin Features
+
 - **User Management**: CRUD operations with role-based access
 - **Analytics Dashboard**: Usage stats, product insights
 - **Audit Logging**: Comprehensive action tracking with search/export
@@ -38,6 +42,7 @@ Modern full-stack application with:
 - **Inventory Control**: Stock tracking and alerts
 
 ### Technical Features
+
 - **Serverless Architecture**: Zero server management
 - **Database Management**: PostgreSQL schema with full CRUD operations
 - **Permission System**: Role-based access control (mechanic/manager/admin)
@@ -49,6 +54,7 @@ Modern full-stack application with:
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - PostgreSQL database (Neon recommended)
 - Netlify account (for deployment)
@@ -184,6 +190,7 @@ joshburt.com.au/
 ## 🔌 API Reference
 
 ### Base URL
+
 - **Local**: `http://localhost:8888/.netlify/functions`
 - **Production**: `https://joshburt.netlify.app/.netlify/functions`
 
@@ -202,17 +209,17 @@ curl -X POST '/.netlify/functions/auth?action=login' \
 
 ### Resource Endpoints
 
-| Endpoint | Methods | Description |
-|----------|---------|-------------|
-| `/users` | GET, POST, PUT, DELETE | User management |
-| `/products` | GET, POST, PUT, DELETE | Product catalog |
-| `/orders` | GET, POST, PUT, DELETE | Order management |
-| `/consumables` | GET, POST, PUT, DELETE | Consumables |
-| `/filters` | GET, POST, PUT, DELETE | Filters/parts |
-| `/audit-logs` | GET, POST, DELETE | Audit logging |
-| `/settings` | GET, PUT | Site settings |
-| `/notifications` | GET, POST, PUT, DELETE | Notifications |
-| `/health` | GET | Health check (no auth) |
+| Endpoint         | Methods                | Description            |
+| ---------------- | ---------------------- | ---------------------- |
+| `/users`         | GET, POST, PUT, DELETE | User management        |
+| `/products`      | GET, POST, PUT, DELETE | Product catalog        |
+| `/orders`        | GET, POST, PUT, DELETE | Order management       |
+| `/consumables`   | GET, POST, PUT, DELETE | Consumables            |
+| `/filters`       | GET, POST, PUT, DELETE | Filters/parts          |
+| `/audit-logs`    | GET, POST, DELETE      | Audit logging          |
+| `/settings`      | GET, PUT               | Site settings          |
+| `/notifications` | GET, POST, PUT, DELETE | Notifications          |
+| `/health`        | GET                    | Health check (no auth) |
 
 **Full API documentation**: See [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)
 
@@ -254,7 +261,7 @@ const FN_BASE = window.FN_BASE || '/.netlify/functions';
 
 // Authenticated request
 const response = await fetch(`${FN_BASE}/products`, {
-  headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+  headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
 });
 
 // Multi-action auth
@@ -282,6 +289,7 @@ npm run health
 ```
 
 ### Core Tables
+
 - `users` - User accounts with roles and auth
 - `products` - Product catalog with categories
 - `orders` - Order headers with status tracking
@@ -297,12 +305,15 @@ npm run health
 ## 🚢 Deployment
 
 ### Netlify (Primary)
+
 Automatically deploys on push to `main`:
+
 - Static files → Netlify CDN
 - Functions → Serverless runtime
 - Environment variables via Netlify dashboard
 
 ### FTP Mirror (Optional)
+
 GitHub Actions workflow deploys to FTP server.  
 Configure via GitHub Secrets: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`
 
@@ -337,6 +348,7 @@ git push origin main
 ## 🎯 Performance
 
 ### Optimizations Implemented
+
 - Browser caching (1 year for assets)
 - Gzip/Brotli compression
 - Database connection pooling
@@ -345,6 +357,7 @@ git push origin main
 - CDN delivery (Netlify)
 
 ### Metrics
+
 - **Page load**: <2s (was 3.5s)
 - **Asset size**: 80KB (was 250KB)
 - **Database queries**: <50ms (was 500ms)
@@ -357,6 +370,7 @@ git push origin main
 ## 📚 Documentation
 
 Comprehensive documentation in `/docs`:
+
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design
 - **[API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)** - API reference
 - **[DATABASE.md](docs/DATABASE.md)** - Schema and queries
@@ -385,6 +399,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for detailed guidelines.
 ## 📋 Common Tasks
 
 ### Add New Page
+
 ```bash
 # 1. Create HTML file
 touch my-page.html
@@ -398,6 +413,7 @@ touch my-page.html
 ```
 
 ### Add New Function
+
 ```bash
 # 1. Create function file
 touch netlify/functions/my-function.js
@@ -414,7 +430,8 @@ curl http://localhost:8888/.netlify/functions/my-function
 ```
 
 ### Database Migration
-```bash
+
+````bash
 ### Database Schema
 
 The complete database schema is in `database-schema.sql`. Apply it to a fresh PostgreSQL database:
@@ -422,7 +439,8 @@ The complete database schema is in `database-schema.sql`. Apply it to a fresh Po
 ```bash
 # Apply complete schema
 psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f database-schema.sql
-```
+````
+
 ```
 
 ---
@@ -462,3 +480,4 @@ This project is licensed under the MIT License.
 ---
 
 **Built with ❤️ using Netlify Functions, PostgreSQL, and TailwindCSS**
+```
