@@ -22,7 +22,7 @@ async function applyMigration() {
     const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
     console.log('📋 Executing migration SQL...\n');
-    
+
     // Use the pool directly to avoid double-release issues
     const client = await database.pool.connect();
     try {
@@ -43,7 +43,7 @@ async function applyMigration() {
 
     if (tableCheck && tableCheck.exists) {
       console.log('✅ email_verification_attempts table verified\n');
-      
+
       // Show table structure
       const columns = await database.all(
         `SELECT column_name, data_type, is_nullable
@@ -51,7 +51,7 @@ async function applyMigration() {
          WHERE table_name = 'email_verification_attempts'
          ORDER BY ordinal_position`
       );
-      
+
       console.log('📊 Table structure:');
       console.log('-------------------');
       columns.forEach(col => {
@@ -65,7 +65,7 @@ async function applyMigration() {
          FROM pg_indexes 
          WHERE tablename = 'email_verification_attempts'`
       );
-      
+
       console.log('📊 Indexes created:');
       console.log('-------------------');
       indexes.forEach(idx => {
