@@ -220,22 +220,46 @@
   async function generateData(){ 
     const days = filters.dateRange;
     
-    // Fetch all business data
-    const [ordersRes, productsRes, consumablesRes, filtersRes, returnsRes, inventoryRes] = await Promise.all([
+    // Check user role to avoid unnecessary 401s on inventory
+    const currentUser = await (async () => {
+      try {
+        const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/auth?action=me`) : fetch(`${FN_BASE}/auth?action=me`));
+        if (res.ok) {
+          const data = await res.json();
+          return data.user;
+        }
+      } catch (e) {
+        console.warn('Could not fetch current user');
+      }
+      return null;
+    })();
+    
+    const canAccessInventory = currentUser && (currentUser.role === 'admin' || currentUser.role === 'manager');
+    
+    // Fetch all business data (conditionally fetch inventory)
+    const promises = [
       fetchJSON(`${FN_BASE}/orders`),
       fetchJSON(`${FN_BASE}/products`),
       fetchJSON(`${FN_BASE}/consumables`),
       fetchJSON(`${FN_BASE}/filters`),
-      fetchJSON(`${FN_BASE}/supplier-returns`),
-      fetchJSON(`${FN_BASE}/inventory`)
-    ]);
+      fetchJSON(`${FN_BASE}/supplier-returns`)
+    ];
+    
+    if (canAccessInventory) {
+      promises.push(fetchJSON(`${FN_BASE}/inventory`));
+    }
+    
+    const results = await Promise.all(promises);
+    const [ordersRes, productsRes, consumablesRes, filtersRes, returnsRes, inventoryRes] = canAccessInventory
+      ? results
+      : [...results, null];
     
     const orders = (ordersRes && ordersRes.orders) || [];
     const products = (productsRes && productsRes.products) || [];
     const consumables = (consumablesRes && consumablesRes.consumables) || [];
     const filterItems = (filtersRes && filtersRes.filters) || [];
     const returns = (returnsRes && returnsRes.data) || (Array.isArray(returnsRes) ? returnsRes : []);
-    const inventory = inventoryRes ? ((inventoryRes.inventory) || []) : [];
+    const inventory = canAccessInventory ? ((inventoryRes && inventoryRes.inventory) || []) : [];
     
     // Filter orders by date range
     const ordersInRange = orders.filter(o => isWithinDays(o.created_at || o.createdAt, days));
@@ -326,27 +350,50 @@
   async function buildUserBreakdown(){ let users=[]; try{ const u=await fetchJSON(`${FN_BASE}/users`); users=(u&&u.users)||[]; }catch(_){} const list=document.getElementById('user-breakdown-list'); if(list){ const total=users.length; const admins=users.filter(u=>u.role==='admin').length; const regular=users.filter(u=>u.role==='user').length; const locked=users.filter(u=>u.locked).length; const now=new Date(); const newUsers=users.filter(u=>u.created_at && (now-new Date(u.created_at))<7*24*60*60*1000).length; list.innerHTML=`<li>Total: <strong>${total}</strong></li><li>Admins: <strong>${admins}</strong></li><li>Regular: <strong>${regular}</strong></li><li>Locked: <strong>${locked}</strong></li><li>New (7d): <strong>${newUsers}</strong></li>`; } const growthCanvas=document.getElementById('user-growth-sparkline'); if(growthCanvas && window.Chart){ const arr=Array(30).fill(0); const now=new Date(); users.forEach(u=>{ if(u.created_at){ const daysAgo=Math.floor((now-new Date(u.created_at))/(24*60*60*1000)); if(daysAgo>=0 && daysAgo<30) arr[29-daysAgo]++; }}); if(userGrowthSparkline) userGrowthSparkline.destroy(); userGrowthSparkline=new Chart(growthCanvas.getContext('2d'),{ type:'line', data:{ labels:Array.from({length:30},(_,i)=>i+1), datasets:[{ data:arr,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',tension:.4,fill:true,pointRadius:0,borderWidth:2 }]}, options:{responsive:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}}); } const topList=document.getElementById('top-users-list'); if(topList){ const logs=await fetchAuditLogs(2000); const counts={}; logs.forEach(l=>{ if(l.user_id!=null){ const k=String(l.user_id); counts[k]=(counts[k]||0)+1; } }); const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5); topList.innerHTML= top.length? top.map(([id,c])=>{ const u=users.find(x=> String(x.id||x.user_id)===id); const name=(u&&(u.username||u.name))||`User #${id}`; return `<li class='flex items-center'><span class='inline-block w-2 h-2 rounded-full bg-blue-400 mr-2'></span><strong>${name}</strong><span class='ml-2 text-xs text-gray-400'>${c} events</span></li>`; }).join(''):'<li>N/A</li>'; } }
   async function updateRealtime(){ 
     try {
-      // Fetch current business data
-      const [ordersRes, inventoryRes, returnsRes, usersRes] = await Promise.all([
+      // Check user role to avoid unnecessary 401s on inventory
+      const currentUser = await (async () => {
+        try {
+          const res = await (window.authFetch ? window.authFetch(`${FN_BASE}/auth?action=me`) : fetch(`${FN_BASE}/auth?action=me`));
+          if (res.ok) {
+            const data = await res.json();
+            return data.user;
+          }
+        } catch (e) {
+          console.warn('Could not fetch current user');
+        }
+        return null;
+      })();
+      
+      const canAccessInventory = currentUser && (currentUser.role === 'admin' || currentUser.role === 'manager');
+      
+      // Fetch current business data (conditionally fetch inventory based on permissions)
+      const promises = [
         fetchJSON(`${FN_BASE}/orders`),
-        fetchJSON(`${FN_BASE}/inventory`),
         fetchJSON(`${FN_BASE}/supplier-returns`),
         fetchJSON(`${FN_BASE}/users`)
-      ]);
+      ];
+      
+      if (canAccessInventory) {
+        promises.push(fetchJSON(`${FN_BASE}/inventory`));
+      }
+      
+      const results = await Promise.all(promises);
+      const [ordersRes, returnsRes, usersRes, inventoryRes] = canAccessInventory 
+        ? results 
+        : [...results, null];
       
       const orders = (ordersRes && ordersRes.orders) || [];
       const inventory = (inventoryRes && inventoryRes.inventory) || [];
       const returns = (returnsRes && returnsRes.data) || (Array.isArray(returnsRes) ? returnsRes : []);
-      const users = (usersRes && usersRes.users) || [];
       
       const totalOrders = orders.length;
       const pendingOrders = orders.filter(o => o.status === 'pending').length;
-      const lowStockItems = inventory.filter(i => (i.stock_quantity || i.quantity || 0) < 10).length;
+      const lowStockItems = canAccessInventory ? inventory.filter(i => (i.stock_quantity || i.quantity || 0) < 10).length : 0;
       const pendingReturns = returns.filter(r => r.status === 'pending_shipment' || r.status === 'in_transit').length;
       
       document.getElementById('total-orders').textContent = String(totalOrders);
       document.getElementById('pending-orders').textContent = String(pendingOrders);
-      document.getElementById('low-stock-items').textContent = String(lowStockItems);
+      document.getElementById('low-stock-items').textContent = canAccessInventory ? String(lowStockItems) : 'N/A';
       document.getElementById('pending-returns').textContent = String(pendingReturns);
     } catch(e) {
       console.error('Realtime update error:', e);

@@ -21,6 +21,47 @@
     .user-item{transition:all .2s ease;background:#111;border:1px solid #333}
     .user-item:hover{background:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
     
+    /* Stats cards */
+    .stat-card {
+      background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+      border: 1px solid #333;
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      border-color: #00d4ff;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #00d4ff, #0080ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Advanced search */
+    .search-container {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 0.5rem;
+      padding: 1rem;
+    }
+    
+    /* Table enhancements */
+    tbody tr {
+      transition: all 0.2s ease;
+    }
+    tbody tr:hover {
+      background: #1a1a1a;
+      box-shadow: 0 2px 8px rgba(0, 212, 255, 0.1);
+    }
+    tbody tr.selected {
+      background: rgba(0, 212, 255, 0.1);
+      border-left: 3px solid #00d4ff;
+    }
+    
     /* Modal styles */
     .modal-overlay {
       position: fixed;
@@ -114,28 +155,83 @@
                         </div>
                     </div>
                 </header>
+
+        <!-- Stats Dashboard -->
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card rounded-lg p-6">
+                <div class="text-gray-400 text-sm mb-2">Total Users</div>
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="text-xs text-gray-500 mt-2">All registered users</div>
+            </div>
+            <div class="stat-card rounded-lg p-6">
+                <div class="text-gray-400 text-sm mb-2">Active Users</div>
+                <div class="stat-value" id="stat-active">0</div>
+                <div class="text-xs text-gray-500 mt-2">Currently enabled</div>
+            </div>
+            <div class="stat-card rounded-lg p-6">
+                <div class="text-gray-400 text-sm mb-2">Admins</div>
+                <div class="stat-value" id="stat-admins">0</div>
+                <div class="text-xs text-gray-500 mt-2">Admin & Manager roles</div>
+            </div>
+            <div class="stat-card rounded-lg p-6">
+                <div class="text-gray-400 text-sm mb-2">Verified Emails</div>
+                <div class="stat-value" id="stat-verified">0</div>
+                <div class="text-xs text-gray-500 mt-2">Email confirmed</div>
+            </div>
+        </section>
+
         <section>
-            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Manage user accounts and permissions. Add, edit, or remove users from the system.</p>
-            <!-- User Filters/Search/Sort -->
-            <div class="flex flex-wrap gap-4 items-center mb-4">
-                <input id="user-search" type="text" placeholder="Search name or email..." class="p-2 rounded border border-gray-400 dark:border-gray-600 bg-gray-900 text-white text-sm min-w-[180px]" />
-                <select id="user-role-filter" class="p-2 rounded border border-gray-400 dark:border-gray-600 bg-gray-900 text-white text-sm">
-                    <option value="">All Roles</option>
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                    <option value="manager">Manager</option>
-                </select>
-                <select id="user-status-filter" class="p-2 rounded border border-gray-400 dark:border-gray-600 bg-gray-900 text-white text-sm">
-                    <option value="">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
-                <select id="user-sort" class="p-2 rounded border border-gray-400 dark:border-gray-600 bg-gray-900 text-white text-sm">
-                    <option value="created_at_desc">Newest</option>
-                    <option value="created_at_asc">Oldest</option>
-                    <option value="name_asc">Name A-Z</option>
-                    <option value="name_desc">Name Z-A</option>
-                </select>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">Manage user accounts and permissions. Add, edit, or remove users from the system.</p>
+            
+            <!-- Advanced Search & Filters -->\n            <div class="search-container mb-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input id="user-search" type="text" placeholder="Search by name, email, or ID..." class="flex-1 p-2 rounded border border-gray-600 bg-gray-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400" />
+                    <button id="clear-search" class="px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors">Clear</button>
+                </div>
+                <div class="flex flex-wrap gap-3 items-center">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-400">Role:</label>
+                        <select id="user-role-filter" class="p-2 rounded border border-gray-600 bg-gray-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                            <option value="">All Roles</option>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="manager">Manager</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-400">Status:</label>
+                        <select id="user-status-filter" class="p-2 rounded border border-gray-600 bg-gray-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-400">Verification:</label>
+                        <select id="user-verification-filter" class="p-2 rounded border border-gray-600 bg-gray-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                            <option value="">All</option>
+                            <option value="verified">Verified</option>
+                            <option value="unverified">Unverified</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-400">Sort:</label>
+                        <select id="user-sort" class="p-2 rounded border border-gray-600 bg-gray-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                            <option value="created_at_desc">Newest First</option>
+                            <option value="created_at_asc">Oldest First</option>
+                            <option value="name_asc">Name A-Z</option>
+                            <option value="name_desc">Name Z-A</option>
+                            <option value="last_login_desc">Recent Login</option>
+                        </select>
+                    </div>
+                    <div class="flex-1"></div>
+                    <div class="text-sm text-gray-400">
+                        <span id="results-count">0</span> results
+                    </div>
+                </div>
             </div>
             <!-- Deep-link banner (shown when focusing a specific userId) -->
             <div id="user-deeplink-banner" class="hidden mb-4 p-3 rounded border border-gray-700 bg-gray-900 text-gray-200 flex items-center justify-between">
@@ -285,6 +381,7 @@ async function loadUsers(page = 1) {
                 usersState.list = data.users || [];
                 usersState.pagination = data.pagination || { page:1, limit:limit, total:usersState.list.length, pages:1 };
                 renderUsers();
+                updateStats();
             } catch(err){
                 console.error('loadUsers', err);
                 showToast('Error loading users: '+(err.message||'Network error'),'error');
@@ -292,9 +389,31 @@ async function loadUsers(page = 1) {
             } finally { usersState.loading = false; }
         }
 
+        // Update statistics dashboard
+        function updateStats() {
+            try {
+                const total = usersState.pagination.total || usersState.list.length;
+                const active = usersState.list.filter(u => u.is_active).length;
+                const admins = usersState.list.filter(u => ['admin', 'manager'].includes(u.role)).length;
+                const verified = usersState.list.filter(u => u.email_verified).length;
+                
+                document.getElementById('stat-total').textContent = total;
+                document.getElementById('stat-active').textContent = active;
+                document.getElementById('stat-admins').textContent = admins;
+                document.getElementById('stat-verified').textContent = verified;
+            } catch(e) {
+                console.error('Error updating stats:', e);
+            }
+        }
+
         function renderUsers(){
             const tbody = document.querySelector('tbody');
             tbody.innerHTML='';
+            
+            // Update results count
+            const resultsCount = document.getElementById('results-count');
+            if (resultsCount) resultsCount.textContent = usersState.pagination.total || usersState.list.length;
+            
             usersState.list.forEach(u => {
                 const tr = document.createElement('tr');
                 tr.className='border-b border-gray-700';
@@ -302,19 +421,22 @@ async function loadUsers(page = 1) {
                 tr.id = `user-row-${u.id}`;
                 const avatar = u.avatar_url ? `<img src="${u.avatar_url}" class="inline w-8 h-8 rounded-full mr-2"/>` : `<span class="inline-block w-8 h-8 rounded-full bg-gray-600 mr-2"></span>`;
                 const status = u.is_active ? '<span class="text-green-400">Active</span>' : '<span class="text-red-400">Inactive</span>';
+                const emailVerified = u.email_verified ? '<span class="text-green-400 text-xs">✓ Verified</span>' : '<span class="text-yellow-400 text-xs">⚠ Unverified</span>';
                 const lastLogin = u.last_login ? new Date(u.last_login).toLocaleString() : '--';
                 tr.innerHTML = `
                     <td class="py-2 px-3 flex items-center">${avatar}<a href="profile.html?user_id=${u.id}" class="text-blue-400 hover:underline">${u.name}</a></td>
-                    <td class="py-2 px-3">${u.email}</td>
+                    <td class="py-2 px-3">${u.email}<br/>${emailVerified}</td>
                     <td class="py-2 px-3">${u.role.charAt(0).toUpperCase()+u.role.slice(1)}</td>
                     <td class="py-2 px-3">${status}</td>
                     <td class="py-2 px-3">${lastLogin}</td>
                     <td class="py-2 px-3">
                         <button class="px-2 py-1 bg-secondary text-white rounded mr-2 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 edit-user" data-id="${u.id}">Edit</button>
+                        ${!u.email_verified ? `<button class="px-2 py-1 bg-purple-500 text-white rounded mr-2 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 verify-email-user" data-id="${u.id}" data-email="${u.email}">Verify Email</button>` : ''}
                         <button class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 delete-user" data-id="${u.id}">Delete</button>
                         <button class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 lock-user" data-id="${u.id}">${u.is_active ? 'Lock':'Unlock'}</button>
                         <button class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 reset-password-user" data-id="${u.id}">Reset PW</button>
                         <button class="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 impersonate-user" data-id="${u.id}">Impersonate</button>
+                        <button class="px-2 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 view-verification-attempts" data-id="${u.id}">Verify Attempts</button>
                     </td>`;
                 tbody.appendChild(tr);
             });
@@ -629,8 +751,14 @@ async function loadUsers(page = 1) {
                 if (filterDebounce) clearTimeout(filterDebounce);
                 filterDebounce = setTimeout(()=> loadUsers(1), 250);
             });
+            document.getElementById('clear-search').addEventListener('click', () => {
+                document.getElementById('user-search').value = '';
+                usersState.filters.search = '';
+                loadUsers(1);
+            });
             document.getElementById('user-role-filter').addEventListener('change', e => { usersState.filters.role=e.target.value; loadUsers(1); });
             document.getElementById('user-status-filter').addEventListener('change', e => { usersState.filters.status=e.target.value; loadUsers(1); });
+            document.getElementById('user-verification-filter').addEventListener('change', e => { usersState.filters.verification=e.target.value; loadUsers(1); });
             document.getElementById('user-sort').addEventListener('change', e => { usersState.filters.sort=e.target.value; loadUsers(1); });
             const tbody=document.querySelector('tbody');
             tbody.addEventListener('click', async e => {
@@ -672,6 +800,97 @@ async function loadUsers(page = 1) {
                         showToast('Error: '+err.message,'error'); 
                     } 
                     return; 
+                }
+                if(e.target.classList.contains('verify-email-user')){
+                    const user = usersState.list.find(u => u.id == id);
+                    const userEmail = user ? user.email : e.target.dataset.email;
+                    const userName = user ? (user.name || user.email) : 'this user';
+                    let confirmed = false;
+                    if (window.ModalUtils && window.ModalUtils.confirm) {
+                        confirmed = await window.ModalUtils.confirm({
+                            title: 'Manually Verify Email',
+                            message: `Manually verify email for ${userName} (${userEmail})? This will mark their email as verified without requiring them to click a link.`,
+                            confirmText: 'Verify Email',
+                            cancelText: 'Cancel',
+                            type: 'info'
+                        });
+                    } else {
+                        confirmed = confirm(`Manually verify email for ${userName} (${userEmail})?`);
+                    }
+                    if(!confirmed) return;
+                    try {
+                        const res = await fetch(`${FN_BASE}/users/${id}/verify-email`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                            }
+                        });
+                        if(!res.ok) {
+                            const err = await res.json().catch(() => ({}));
+                            throw new Error(err.error || 'Failed to verify email');
+                        }
+                        showToast(`Email verified for ${userName}`, 'success');
+                        await loadUsers(usersState.pagination.page);
+                    } catch(err) {
+                        showToast('Error: ' + err.message, 'error');
+                    }
+                    return;
+                }
+                if(e.target.classList.contains('view-verification-attempts')){
+                    try {
+                        const res = await fetch(`${FN_BASE}/users/${id}/verification-attempts`, {
+                            headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) }
+                        });
+                        if(!res.ok) {
+                            const err = await res.json().catch(() => ({}));
+                            throw new Error(err.error || 'Failed to fetch attempts');
+                        }
+                        const data = await res.json();
+                        const attempts = data.attempts || [];
+                        
+                        // Show modal with attempts
+                        const overlay = document.createElement('div');
+                        overlay.className = 'modal-overlay';
+                        overlay.innerHTML = `
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 class="text-lg font-semibold">Email Verification Attempts</h3>
+                                    <button class="modal-close" aria-label="Close">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    ${attempts.length === 0 ? '<p class="text-gray-400">No verification attempts found</p>' : `
+                                        <div class="space-y-3">
+                                            ${attempts.map(a => `
+                                                <div class="p-3 rounded border ${a.success ? 'border-green-700 bg-green-900/20' : 'border-red-700 bg-red-900/20'}">
+                                                    <div class="flex items-center justify-between mb-2">
+                                                        <span class="font-semibold">${a.attempt_type.replace(/_/g, ' ').toUpperCase()}</span>
+                                                        <span class="text-xs ${a.success ? 'text-green-400' : 'text-red-400'}">${a.success ? '✓ Success' : '✗ Failed'}</span>
+                                                    </div>
+                                                    <div class="text-sm text-gray-400 space-y-1">
+                                                        <div>Email: ${a.email}</div>
+                                                        <div>IP: ${a.ip_address || 'N/A'}</div>
+                                                        <div>Time: ${new Date(a.created_at).toLocaleString()}</div>
+                                                        ${a.error_message ? `<div class="text-red-400">Error: ${a.error_message}</div>` : ''}
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                        `;
+                        document.body.appendChild(overlay);
+                        
+                        // Close handlers
+                        const closeBtn = overlay.querySelector('.modal-close');
+                        closeBtn.onclick = () => overlay.remove();
+                        overlay.onclick = (e) => { if(e.target === overlay) overlay.remove(); };
+                        
+                    } catch(err) {
+                        showToast('Error: ' + err.message, 'error');
+                    }
+                    return;
                 }
                 if(e.target.classList.contains('impersonate-user')){ showToast('Impersonation not implemented'); }
             });

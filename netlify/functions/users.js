@@ -104,6 +104,66 @@ exports.handler = withHandler(async (event) => {
       await logAudit(event, { action: 'user.avatar.select', userId: user.id, details: { targetUserId: uploadId, avatar: storedUrl } });
       return ok({ message: 'Avatar selected', user: updated });
     }
+    
+    // Email verification management: /users/:id/verify-email (POST - admin only)
+    if (pathParts.length >= 3 && pathParts[pathParts.length - 1] === 'verify-email') {
+      const idPart = pathParts[pathParts.length - 2];
+      const targetUserId = parseInt(idPart, 10);
+      if (Number.isNaN(targetUserId)) { return error(400, 'Invalid user id'); }
+      if (method !== 'POST') { return error(405, 'Method not allowed'); }
+
+      // Admin only
+      const { user, response: authResponse } = await requirePermission(event, 'users', 'update');
+      if (authResponse) { return authResponse; }
+
+      const targetUser = await database.get('SELECT id, email, name, email_verified FROM users WHERE id = ?', [targetUserId]);
+      if (!targetUser) { return error(404, 'User not found'); }
+
+      if (targetUser.email_verified) {
+        return error(400, 'Email already verified');
+      }
+
+      // Manually verify email
+      await database.run('UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?', [targetUserId]);
+      
+      // Track attempt
+      try {
+        await database.run(
+          'INSERT INTO email_verification_attempts (user_id, email, attempt_type, success, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)',
+          [targetUserId, targetUser.email, 'admin_manual', 1, event.headers['x-forwarded-for'] || 'admin', event.headers['user-agent'] || null]
+        );
+      } catch (e) {
+        console.error('Failed to track manual verification:', e);
+      }
+
+      await logAudit(event, { 
+        action: 'user.email.manually_verified', 
+        userId: user.id, 
+        details: { targetUserId, email: targetUser.email, verifiedBy: user.email }
+      });
+
+      return ok({ message: 'Email verified successfully', user: { id: targetUser.id, email: targetUser.email, email_verified: true } });
+    }
+
+    // Get verification attempts: /users/:id/verification-attempts (GET - admin only)
+    if (pathParts.length >= 3 && pathParts[pathParts.length - 1] === 'verification-attempts') {
+      const idPart = pathParts[pathParts.length - 2];
+      const targetUserId = parseInt(idPart, 10);
+      if (Number.isNaN(targetUserId)) { return error(400, 'Invalid user id'); }
+      if (method !== 'GET') { return error(405, 'Method not allowed'); }
+
+      // Admin only
+      const { user, response: authResponse } = await requirePermission(event, 'users', 'read');
+      if (authResponse) { return authResponse; }
+
+      const attempts = await database.all(
+        'SELECT id, email, attempt_type, success, ip_address, created_at FROM email_verification_attempts WHERE user_id = ? ORDER BY created_at DESC LIMIT 50',
+        [targetUserId]
+      );
+
+      return ok({ attempts });
+    }
+    
     // Stats endpoint: /users/stats/overview
     if (isStats) {
       const { user, response: authResponse } = await requirePermission(event, 'users', 'stats');

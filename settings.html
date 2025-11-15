@@ -14,24 +14,6 @@
   <script src="./assets/js/theme-enhanced.js" defer></script>
   <script src="./assets/js/theme-ui.js" defer></script>
   <script>
-    // Load centralized theme manager early
-    (function() {
-      fetch('shared-theme.html')
-        .then(r => r.text())
-        .then(html => {
-          const temp = document.createElement('div');
-          temp.innerHTML = html;
-          const scripts = temp.getElementsByTagName('script');
-          for (let script of scripts) {
-            const newScript = document.createElement('script');
-            newScript.textContent = script.textContent;
-            document.head.appendChild(newScript);
-          }
-        })
-        .catch(err => console.warn('Failed to load shared-theme.html:', err));
-    })();
-  </script>
-  <script>
     // Purge legacy role demo key to avoid stale UI state
     try { localStorage.removeItem('currentUser'); } catch (_) {}
   </script>
@@ -1482,12 +1464,19 @@
           themeSelect.value = themeId;
           updateActiveThemeCard(themeId);
           
+          // Wait for ThemeManager to be ready
+          let attempts = 0;
+          while (!window.Theme && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+          }
+          
           // Apply theme immediately using ThemeManager
-          if (window.Theme) {
+          if (window.Theme && typeof window.Theme.setTheme === 'function') {
             window.Theme.setTheme(themeId, true);
           } else {
             // Fallback: manually apply theme if ThemeManager not loaded yet
-            console.warn('ThemeManager not loaded, applying theme manually');
+            console.warn('ThemeManager not loaded after waiting, applying theme manually');
             const body = document.body;
             const html = document.documentElement;
             

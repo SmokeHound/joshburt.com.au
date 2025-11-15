@@ -422,3 +422,6 @@ data/metrics/*.json
 # SQLite database files (no longer used)
 *.sqlite
 *.sqlite3
+
+# Local environment variables file
+.env

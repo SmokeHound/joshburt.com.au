@@ -220,6 +220,25 @@ CREATE TABLE IF NOT EXISTS login_attempts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Email verification attempts table (migrations/005_add_email_verification_tracking.sql)
+CREATE TABLE IF NOT EXISTS email_verification_attempts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
+    attempt_type VARCHAR(50) NOT NULL,
+    token_used VARCHAR(255),
+    success BOOLEAN DEFAULT false,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_verification_attempts_user_id ON email_verification_attempts(user_id);
+CREATE INDEX IF NOT EXISTS idx_verification_attempts_email ON email_verification_attempts(email);
+CREATE INDEX IF NOT EXISTS idx_verification_attempts_created_at ON email_verification_attempts(created_at);
+CREATE INDEX IF NOT EXISTS idx_verification_attempts_success ON email_verification_attempts(success);
+
 -- Settings table (store JSON/text config)
 CREATE TABLE IF NOT EXISTS settings (
     id INTEGER PRIMARY KEY,

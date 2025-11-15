@@ -9,6 +9,7 @@ const { isValidRole } = require('../../utils/rbac');
 const { checkRateLimit, getClientIP } = require('../../utils/rate-limit');
 const { generateCSRFToken } = require('../../utils/csrf');
 const { logAudit } = require('../../utils/audit');
+const { sendVerificationEmail } = require('../../utils/email');
 const { 
   generateTOTPSecret, 
   verifyTOTPToken, 
@@ -20,6 +21,20 @@ const {
 } = require('../../utils/totp');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
+
+// Helper to track email verification attempts
+const trackVerificationAttempt = async (userId, email, attemptType, success, token = null, errorMessage = null, event = null) => {
+  try {
+    const ip = event ? (event.headers['x-forwarded-for'] || event.headers['X-Forwarded-For'] || 'unknown') : null;
+    const userAgent = event ? (event.headers['user-agent'] || event.headers['User-Agent'] || null) : null;
+    await database.run(
+      'INSERT INTO email_verification_attempts (user_id, email, attempt_type, token_used, success, ip_address, user_agent, error_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [userId, email, attemptType, token, success ? 1 : 0, ip, userAgent, errorMessage]
+    );
+  } catch (e) {
+    console.error('Failed to track verification attempt:', e);
+  }
+};
 
 // Generate tokens with optional "remember me" extended expiry
 const generateTokens = (userId, rememberMe = false) => {
@@ -83,17 +98,86 @@ exports.handler = withHandler(async (event) => {
         details: { email, name }
       });
       
+      // Send verification email
+      const verificationUrl = `${process.env.FRONTEND_URL || 'https://joshburt.com.au'}/verify-email.html?token=${verificationToken}`;
+      try {
+        await sendVerificationEmail(email, name, verificationUrl);
+        await trackVerificationAttempt(result.id, email, 'initial', true, verificationToken, null, event);
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError);
+        await trackVerificationAttempt(result.id, email, 'initial', false, verificationToken, emailError.message, event);
+        // Don't fail registration if email fails
+      }
+      
       return jsonResponse(201, { message: 'Registered. Verify email.', userId: result.id });
+    }
+
+    // RESEND VERIFICATION EMAIL
+    if (action === 'resend-verification') {
+      const { email } = payload;
+      if (!email) return errorResponse(400, 'Email required');
+      
+      const user = await database.get('SELECT id, name, email, email_verified, email_verification_token, email_verification_expires FROM users WHERE email = ?', [email]);
+      if (!user) {
+        // Don't reveal if user exists - always return success
+        return jsonResponse(200, { message: 'If account exists and is not verified, verification email sent.' });
+      }
+      
+      if (user.email_verified) {
+        return errorResponse(400, 'Email already verified');
+      }
+      
+      // Generate new verification token
+      const verificationToken = nodeCrypto.randomBytes(32).toString('hex');
+      const verificationExpires = Date.now() + 24*60*60*1000; // 24 hours
+      
+      await database.run('UPDATE users SET email_verification_token = ?, email_verification_expires = ? WHERE id = ?', [verificationToken, verificationExpires, user.id]);
+      
+      // Send verification email
+      const verificationUrl = `${process.env.FRONTEND_URL || 'https://joshburt.com.au'}/verify-email.html?token=${verificationToken}`;
+      try {
+        await sendVerificationEmail(user.email, user.name, verificationUrl);
+        await trackVerificationAttempt(user.id, user.email, 'resend', true, verificationToken, null, event);
+        
+        // Log resend verification
+        await logAudit(event, { 
+          action: 'auth.verification_resent', 
+          userId: user.id, 
+          details: { email: user.email }
+        });
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError);
+        await trackVerificationAttempt(user.id, user.email, 'resend', false, verificationToken, emailError.message, event);
+        return errorResponse(500, 'Failed to send verification email. Please try again later.');
+      }
+      
+      return jsonResponse(200, { message: 'Verification email sent.' });
     }
 
     // VERIFY EMAIL
     if (action === 'verify-email') {
       const { token } = event.queryStringParameters || {};
       if (!token) return errorResponse(400, 'Missing verification token');
-      const user = await database.get('SELECT id, email_verification_expires FROM users WHERE email_verification_token = ?', [token]);
-      if (!user) return errorResponse(400, 'Invalid or expired verification token');
-      if (user.email_verification_expires && user.email_verification_expires < Date.now()) return errorResponse(400, 'Verification token expired');
+      const user = await database.get('SELECT id, email FROM users WHERE email_verification_token = ?', [token]);
+      if (!user) {
+        await trackVerificationAttempt(null, 'unknown', 'verify', false, token, 'Invalid token', event);
+        return errorResponse(400, 'Invalid or expired verification token');
+      }
+      const userFull = await database.get('SELECT id, email, email_verification_expires FROM users WHERE id = ?', [user.id]);
+      if (userFull.email_verification_expires && userFull.email_verification_expires < Date.now()) {
+        await trackVerificationAttempt(user.id, user.email, 'verify', false, token, 'Token expired', event);
+        return errorResponse(400, 'Verification token expired');
+      }
       await database.run('UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?', [user.id]);
+      await trackVerificationAttempt(user.id, user.email, 'verify', true, token, null, event);
+      
+      // Log successful verification
+      await logAudit(event, { 
+        action: 'auth.email_verified', 
+        userId: user.id, 
+        details: { email: user.email }
+      });
+      
       return jsonResponse(200, { message: 'Email verified' });
     }
 

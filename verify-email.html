@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Email - Josh Burt</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="/shared-config.html"></script>
+  <script src="/shared-theme.html"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+  
+  <div class="max-w-md w-full mx-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+      
+      <!-- Loading State -->
+      <div id="loadingState" class="text-center">
+        <div class="mb-4">
+          <svg class="animate-spin h-12 w-12 mx-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Verifying your email...</h2>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">Please wait</p>
+      </div>
+
+      <!-- Success State -->
+      <div id="successState" class="hidden text-center">
+        <div class="mb-4">
+          <svg class="h-16 w-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Email Verified!</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">Your email has been successfully verified.</p>
+        <a href="/login.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
+          Continue to Login
+        </a>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="hidden text-center">
+        <div class="mb-4">
+          <svg class="h-16 w-16 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Verification Failed</h2>
+        <p id="errorMessage" class="text-gray-600 dark:text-gray-400 mb-6"></p>
+        <div class="space-y-3">
+          <a href="/resend-verification.html" class="block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
+            Request New Verification Email
+          </a>
+          <a href="/login.html" class="block text-blue-600 dark:text-blue-400 hover:underline">
+            Back to Login
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    const loadingState = document.getElementById('loadingState');
+    const successState = document.getElementById('successState');
+    const errorState = document.getElementById('errorState');
+    const errorMessage = document.getElementById('errorMessage');
+
+    async function verifyEmail() {
+      // Get token from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+
+      if (!token) {
+        showError('No verification token provided');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${FN_BASE}/auth?action=verify-email&token=${encodeURIComponent(token)}`, {
+          method: 'GET'
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Verification failed');
+        }
+
+        // Show success
+        loadingState.classList.add('hidden');
+        successState.classList.remove('hidden');
+
+      } catch (error) {
+        console.error('Verification error:', error);
+        showError(error.message || 'Invalid or expired verification token');
+      }
+    }
+
+    function showError(message) {
+      loadingState.classList.add('hidden');
+      errorState.classList.remove('hidden');
+      errorMessage.textContent = message;
+    }
+
+    // Start verification on page load
+    verifyEmail();
+  </script>
+
+</body>
+</html>
