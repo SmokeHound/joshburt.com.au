@@ -7,7 +7,7 @@ const path = require('path');
 const DB_TYPE = 'postgres';
 
 // PostgreSQL configuration (prefer single URL if provided)
-const DATABASE_URL = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL || null;
+const DATABASE_URL = process.env.DATABASE_URL || null;
 const pgConfig = DATABASE_URL
   ? {
     connectionString: DATABASE_URL,
