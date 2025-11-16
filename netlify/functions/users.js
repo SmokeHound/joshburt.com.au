@@ -158,7 +158,7 @@ exports.handler = withHandler(async event => {
 
       // Manually verify email
       await database.run(
-        'UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?',
+        'UPDATE users SET email_verified = TRUE, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?',
         [targetUserId]
       );
 
@@ -170,7 +170,7 @@ exports.handler = withHandler(async event => {
             targetUserId,
             targetUser.email,
             'admin_manual',
-            1,
+            true,
             event.headers['x-forwarded-for'] || 'admin',
             event.headers['user-agent'] || null
           ]

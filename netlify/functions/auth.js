@@ -263,7 +263,7 @@ exports.handler = withHandler(async event => {
         return errorResponse(400, 'Verification token expired');
       }
       await database.run(
-        'UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?',
+        'UPDATE users SET email_verified = TRUE, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?',
         [user.id]
       );
       await trackVerificationAttempt(user.id, user.email, 'verify', true, token, null, event);
