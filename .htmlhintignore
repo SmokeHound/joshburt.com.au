@@ -1,0 +1,3 @@
+# HTMLHint ignore file
+# Ignore shared-* partial HTML templates (they don't have DOCTYPE, html, head, body tags)
+shared-*.html
