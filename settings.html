@@ -1815,10 +1815,19 @@
       // Check 2FA status on load
       async function check2FAStatus() {
         try {
-          const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
-          const response = await fetch(`${window.FN_BASE || '/.netlify/functions'}/auth?action=me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
+          const FN_BASE = window.FN_BASE || '/.netlify/functions';
+          const token = getAuthToken();
+          const response = await (window.authFetch 
+            ? window.authFetch(`${FN_BASE}/auth?action=me`)
+            : fetch(`${FN_BASE}/auth?action=me`, {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+              }));
+          
+          if (!response.ok) {
+            console.warn('Failed to check 2FA status:', response.status);
+            return;
+          }
+          
           const data = await response.json();
           
           if (data.user && data.user.totpEnabled) {
