@@ -1334,11 +1334,11 @@
           document.getElementById('feature-new-dashboard').checked = !!newDashboard;
           document.getElementById('feature-advanced-reports').checked = !!advancedReports;
         }
-                // Integrations
-                if (settings.smtpHost) document.getElementById('smtp-host').value = settings.smtpHost;
-                if (settings.smtpPort) document.getElementById('smtp-port').value = settings.smtpPort;
-                if (settings.smtpUser) document.getElementById('smtp-user').value = settings.smtpUser;
-                if (settings.smtpPassword) document.getElementById('smtp-password').value = settings.smtpPassword;
+                // Integrations - Use nullish coalescing to handle null/empty values
+                document.getElementById('smtp-host').value = settings.smtpHost ?? '';
+                document.getElementById('smtp-port').value = settings.smtpPort ?? '';
+                document.getElementById('smtp-user').value = settings.smtpUser ?? '';
+                document.getElementById('smtp-password').value = settings.smtpPassword ?? '';
                 if (settings.customCss) document.getElementById('custom-css').value = settings.customCss;
                 if (settings.customJs) document.getElementById('custom-js').value = settings.customJs;
                 // Theme customization
@@ -1747,11 +1747,21 @@
 
     // Theme schedule functionality (save to API)
     function initThemeSchedule() {
+      const scheduleEnabledEl = document.getElementById('schedule-enabled');
+      const darkModeStartEl = document.getElementById('dark-mode-start');
+      const lightModeStartEl = document.getElementById('light-mode-start');
+      
+      // Exit early if elements don't exist
+      if (!scheduleEnabledEl || !darkModeStartEl || !lightModeStartEl) {
+        console.warn('Theme schedule elements not found, skipping initialization');
+        return;
+      }
+      
       function updateTimeDisplay() {
         const now = new Date();
         const currentTimeEl = document.getElementById('current-time');
         const scheduledModeEl = document.getElementById('scheduled-mode');
-        const enabled = document.getElementById('schedule-enabled').checked;
+        const enabled = scheduleEnabledEl.checked;
         if (currentTimeEl) {
           currentTimeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
@@ -1762,8 +1772,8 @@
           } else {
             // Just show which mode would be active
             const nowMins = now.getHours() * 60 + now.getMinutes();
-            const darkStart = parseInt(document.getElementById('dark-mode-start').value.split(':')[0]) * 60 + parseInt(document.getElementById('dark-mode-start').value.split(':')[1]);
-            const lightStart = parseInt(document.getElementById('light-mode-start').value.split(':')[0]) * 60 + parseInt(document.getElementById('light-mode-start').value.split(':')[1]);
+            const darkStart = parseInt(darkModeStartEl.value.split(':')[0]) * 60 + parseInt(darkModeStartEl.value.split(':')[1]);
+            const lightStart = parseInt(lightModeStartEl.value.split(':')[0]) * 60 + parseInt(lightModeStartEl.value.split(':')[1]);
             let isDark = false;
             if (darkStart > lightStart) {
               isDark = (nowMins >= darkStart || nowMins < lightStart);
@@ -1775,17 +1785,17 @@
           }
         }
       }
-      document.getElementById('schedule-enabled').addEventListener('change', async (e) => {
+      scheduleEnabledEl.addEventListener('change', async (e) => {
         await saveSettings();
         const msg = `Theme scheduling ${e.target.checked ? 'enabled' : 'disabled'} via API`;
         AuditLogger.log('theme_schedule', msg);
         sendAudit('theme_schedule', msg);
         showToast(e.target.checked ? 'Theme scheduling enabled' : 'Theme scheduling disabled');
       });
-      document.getElementById('dark-mode-start').addEventListener('change', async (e) => {
+      darkModeStartEl.addEventListener('change', async (e) => {
         await saveSettings();
       });
-      document.getElementById('light-mode-start').addEventListener('change', async (e) => {
+      lightModeStartEl.addEventListener('change', async (e) => {
         await saveSettings();
       });
       updateTimeDisplay();
