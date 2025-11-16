@@ -1299,7 +1299,12 @@
     async function loadSettings() {
       try {
         const FN_BASE = window.FN_BASE || '/.netlify/functions';
-        const res = await fetch(`${FN_BASE}/settings`);
+        const token = getAuthToken();
+        const res = await (window.authFetch 
+          ? window.authFetch(`${FN_BASE}/settings`)
+          : fetch(`${FN_BASE}/settings`, {
+              headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            }));
         if (!res.ok) throw new Error('Failed to load settings');
         const settings = await res.json();
                 if (settings.siteTitle) document.getElementById('site-title').value = settings.siteTitle;
