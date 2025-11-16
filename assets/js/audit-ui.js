@@ -297,17 +297,17 @@
         let detailsPart = '';
         if (hiddenPretty || hiddenRaw) {
           if (chipsHtml) {
-            // Smaller button and tighter gap when chips are present
+            // Details button with same height as chips (py-0.5)
             detailsPart =
               '<div class="mb-1 flex items-center gap-1">' +
               chipsHtml +
-              '<button class="audit-open-modal px-2 py-0.5 text-[11px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400 ml-1" data-base="' +
+              '<button class="audit-open-modal px-2 py-0.5 text-[10px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400 ml-1" data-base="' +
               base +
               '">Details</button></div>';
           } else {
-            // Smaller standalone Details button
+            // Standalone Details button
             detailsPart =
-              '<div class="mb-1"><button class="audit-open-modal px-2 py-0.5 text-[11px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400" data-base="' +
+              '<div class="mb-1"><button class="audit-open-modal px-2 py-0.5 text-[10px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400" data-base="' +
               base +
               '">Details</button></div>';
           }
