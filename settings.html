@@ -1318,22 +1318,14 @@
                 // Branding & contact
                 if (settings.logoUrl) document.getElementById('logo-url').value = settings.logoUrl;
                 if (settings.faviconUrl) document.getElementById('favicon-url').value = settings.faviconUrl;
-        // Feature toggles/flags - Use FeatureFlags.isEnabled for consistency
-        if (window.FeatureFlags) {
-          const enableRegistration = await window.FeatureFlags.isEnabled('enableRegistration');
-          const enableGuestCheckout = await window.FeatureFlags.isEnabled('enableGuestCheckout');
-          
-          const betaFeatures = await window.FeatureFlags.isEnabled('betaFeatures');
-          const newDashboard = await window.FeatureFlags.isEnabled('newDashboard');
-          const advancedReports = await window.FeatureFlags.isEnabled('advancedReports');
-          
-          document.getElementById('enable-registration').checked = !!enableRegistration;
-          document.getElementById('enable-guest-checkout').checked = !!enableGuestCheckout;
-          
-          document.getElementById('feature-beta-features').checked = !!betaFeatures;
-          document.getElementById('feature-new-dashboard').checked = !!newDashboard;
-          document.getElementById('feature-advanced-reports').checked = !!advancedReports;
-        }
+        // Feature toggles/flags - Read from settings.featureFlags object
+        const featureFlags = settings.featureFlags || {};
+        document.getElementById('enable-registration').checked = !!featureFlags.enableRegistration;
+        document.getElementById('enable-guest-checkout').checked = !!featureFlags.enableGuestCheckout;
+        
+        document.getElementById('feature-beta-features').checked = !!featureFlags.betaFeatures;
+        document.getElementById('feature-new-dashboard').checked = !!featureFlags.newDashboard;
+        document.getElementById('feature-advanced-reports').checked = !!featureFlags.advancedReports;
                 // Integrations - Use nullish coalescing to handle null/empty values
                 document.getElementById('smtp-host').value = settings.smtpHost ?? '';
                 document.getElementById('smtp-port').value = settings.smtpPort ?? '';

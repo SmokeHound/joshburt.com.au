@@ -22,6 +22,7 @@ const pool = new Pool(pgConfig);
 
 async function checkSMTPSettings() {
   try {
+    // Check SMTP settings
     const res = await pool.query(
       "SELECT key, value, is_sensitive FROM settings WHERE key LIKE 'smtp%' ORDER BY key"
     );
@@ -35,6 +36,32 @@ async function checkSMTPSettings() {
       res.rows.forEach(r => {
         const displayValue = r.is_sensitive ? '***REDACTED***' : (r.value || '(null)');
         console.log(`  ${r.key} = ${displayValue}`);
+      });
+    }
+    
+    console.log('\n');
+    
+    // Check feature flags
+    const ffRes = await pool.query(
+      "SELECT key, value, data_type FROM settings WHERE key = 'featureFlags'"
+    );
+    
+    console.log('Feature Flags Setting:');
+    console.log('======================');
+    
+    if (ffRes.rows.length === 0) {
+      console.log('No featureFlags setting found!');
+    } else {
+      ffRes.rows.forEach(r => {
+        console.log(`  ${r.key} (${r.data_type}) = ${r.value || '(null)'}`);
+        if (r.value) {
+          try {
+            const parsed = JSON.parse(r.value);
+            console.log('  Parsed JSON:', JSON.stringify(parsed, null, 2));
+          } catch (e) {
+            console.log('  (Failed to parse JSON)');
+          }
+        }
       });
     }
     
