@@ -239,12 +239,42 @@ CREATE INDEX IF NOT EXISTS idx_verification_attempts_email ON email_verification
 CREATE INDEX IF NOT EXISTS idx_verification_attempts_created_at ON email_verification_attempts(created_at);
 CREATE INDEX IF NOT EXISTS idx_verification_attempts_success ON email_verification_attempts(success);
 
--- Settings table (store JSON/text config)
+-- Settings table (enhanced structure with key-value pairs)
+-- Migrated in migrations/006_upgrade_settings_table.sql
 CREATE TABLE IF NOT EXISTS settings (
-    id INTEGER PRIMARY KEY,
-    data TEXT,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id SERIAL PRIMARY KEY,
+    key VARCHAR(255) UNIQUE NOT NULL,
+    value TEXT,
+    category VARCHAR(100) DEFAULT 'general', -- 'general', 'theme', 'security', 'integrations', 'features'
+    data_type VARCHAR(50) DEFAULT 'string', -- 'string', 'number', 'boolean', 'json', 'array'
+    is_sensitive BOOLEAN DEFAULT false, -- For passwords, tokens, etc.
+    description TEXT,
+    default_value TEXT,
+    validation_rules JSONB, -- Store validation constraints
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by INTEGER REFERENCES users(id) ON DELETE SET NULL
 );
+
+-- Indexes for settings table
+CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
+CREATE INDEX IF NOT EXISTS idx_settings_category ON settings(category);
+CREATE INDEX IF NOT EXISTS idx_settings_updated_at ON settings(updated_at);
+
+-- Backward compatibility view for legacy JSON format
+CREATE OR REPLACE VIEW settings_json_view AS
+SELECT 
+    1 as id,
+    jsonb_object_agg(key, 
+        CASE 
+            WHEN data_type = 'boolean' THEN to_jsonb((value = 'true'))
+            WHEN data_type = 'number' THEN to_jsonb(value::numeric)
+            WHEN data_type = 'json' THEN value::jsonb
+            ELSE to_jsonb(value)
+        END
+    ) as data,
+    MAX(updated_at) as updated_at
+FROM settings;
 
 -- Filters table (product/filter catalog) added in migrations/004_add_filters.sql
 CREATE TABLE IF NOT EXISTS filters (

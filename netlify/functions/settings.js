@@ -16,8 +16,16 @@ exports.handler = withHandler(async function (event) {
     const { user, response: authResponse } = await requirePermission(event, 'settings', 'read');
     if (authResponse) return authResponse;
 
+    // Parse query parameters for filtering
+    const params = event.queryStringParameters || {};
+    const category = params.category;
+    const keys = params.keys ? params.keys.split(',') : null;
+
+    // Generate cache key based on filters
+    const cacheKey = `config:${category || 'all'}:${keys ? keys.join(',') : 'all'}`;
+
     // Try cache first (5 minute TTL)
-    const cached = cache.get('settings', 'config');
+    const cached = cache.get('settings', cacheKey);
     if (cached) {
       return {
         statusCode: 200,
@@ -30,14 +38,53 @@ exports.handler = withHandler(async function (event) {
       };
     }
 
-    // Single row table: settings (id INTEGER PRIMARY KEY, data TEXT)
-    const row = await database.get('SELECT data FROM settings WHERE id = 1');
-    // If no row, return empty object
-    const data = row && row.data ? JSON.parse(row.data) : {};
+    // Build query based on filters
+    let query = 'SELECT key, value, category, data_type, description FROM settings';
+    const queryParams = [];
+    const whereClauses = [];
 
-    // Cache the parsed object for 5 minutes (300 seconds)
-    const dataString = JSON.stringify(data);
-    cache.set('settings', 'config', dataString, 300);
+    if (category) {
+      whereClauses.push('category = ?');
+      queryParams.push(category);
+    }
+
+    if (keys && keys.length > 0) {
+      whereClauses.push(`key IN (${keys.map(() => '?').join(', ')})`);
+      queryParams.push(...keys);
+    }
+
+    if (whereClauses.length > 0) {
+      query += ' WHERE ' + whereClauses.join(' AND ');
+    }
+
+    query += ' ORDER BY category, key';
+
+    const rows = await database.all(query, queryParams);
+
+    // Transform to key-value object for backward compatibility
+    const settings = {};
+    for (const row of rows) {
+      let value = row.value;
+
+      // Parse value based on data type
+      if (row.data_type === 'boolean') {
+        value = value === 'true' || value === '1' || value === true;
+      } else if (row.data_type === 'number') {
+        value = parseFloat(value);
+      } else if (row.data_type === 'json' || row.data_type === 'array') {
+        try {
+          value = JSON.parse(value);
+        } catch (e) {
+          // Keep as string if parse fails
+        }
+      }
+
+      settings[row.key] = value;
+    }
+
+    // Cache the result for 5 minutes (300 seconds)
+    const dataString = JSON.stringify(settings);
+    cache.set('settings', cacheKey, dataString, 300);
 
     return {
       statusCode: 200,
@@ -55,7 +102,7 @@ exports.handler = withHandler(async function (event) {
     const { user, response: authResponse } = await requirePermission(event, 'settings', 'update');
     if (authResponse) return authResponse;
 
-    // Parse the incoming JSON to validate it, then store as string
+    // Parse the incoming settings object
     let settingsData;
     try {
       settingsData = JSON.parse(event.body || '{}');
@@ -63,15 +110,57 @@ exports.handler = withHandler(async function (event) {
       return error(400, 'Invalid JSON in request body');
     }
 
-    const dataString = JSON.stringify(settingsData);
-    await database.run(
-      'INSERT INTO settings (id, data) VALUES (1, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data;',
-      [dataString]
-    );
+    // Get database client for transaction
+    const client = await database.pool.connect();
 
-    // Invalidate cache on update
-    cache.del('settings', 'config');
+    try {
+      await client.query('BEGIN');
 
-    return ok({ message: 'Settings updated' });
+      // Update each setting individually
+      for (const [key, value] of Object.entries(settingsData)) {
+        // Get the current setting to know its data_type
+        const existing = await client.query('SELECT data_type FROM settings WHERE key = $1', [
+          key
+        ]);
+
+        if (existing.rows.length === 0) {
+          // Setting doesn't exist, skip or create with default type 'string'
+          console.warn(`Setting key '${key}' does not exist in database, skipping`);
+          continue;
+        }
+
+        const dataType = existing.rows[0].data_type;
+
+        // Convert value to string based on data type
+        let valueString;
+        if (dataType === 'boolean') {
+          valueString = value ? 'true' : 'false';
+        } else if (dataType === 'json' || dataType === 'array') {
+          valueString = typeof value === 'string' ? value : JSON.stringify(value);
+        } else if (dataType === 'number') {
+          valueString = String(value);
+        } else {
+          valueString = String(value);
+        }
+
+        // Update the setting
+        await client.query(
+          'UPDATE settings SET value = $1, updated_at = CURRENT_TIMESTAMP, updated_by = $2 WHERE key = $3',
+          [valueString, user.id, key]
+        );
+      }
+
+      await client.query('COMMIT');
+
+      // Invalidate all settings cache on update
+      cache.clearNamespace('settings');
+
+      return ok({ message: 'Settings updated', updated: Object.keys(settingsData).length });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 });

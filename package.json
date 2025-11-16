@@ -12,6 +12,7 @@
     "build": "npm run build:css",
     "prune:tokens": "node scripts/prune-refresh-tokens.js",
     "migrate": "node scripts/apply-migration.js",
+    "migrate:settings": "node scripts/migrate-settings-table.js",
     "test:smtp": "node scripts/test-smtp.js",
     "test:email-verification": "node scripts/test-email-verification.js",
     "test:smoke:functions": "node tests/functions/auth_me_smoke.test.js",
