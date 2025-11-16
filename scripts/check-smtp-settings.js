@@ -24,31 +24,31 @@ async function checkSMTPSettings() {
   try {
     // Check SMTP settings
     const res = await pool.query(
-      "SELECT key, value, is_sensitive FROM settings WHERE key LIKE 'smtp%' ORDER BY key"
+      'SELECT key, value, is_sensitive FROM settings WHERE key LIKE \'smtp%\' ORDER BY key'
     );
-    
+
     console.log('SMTP Settings in Database:');
     console.log('===========================');
-    
+
     if (res.rows.length === 0) {
       console.log('No SMTP settings found!');
     } else {
       res.rows.forEach(r => {
-        const displayValue = r.is_sensitive ? '***REDACTED***' : (r.value || '(null)');
+        const displayValue = r.is_sensitive ? '***REDACTED***' : r.value || '(null)';
         console.log(`  ${r.key} = ${displayValue}`);
       });
     }
-    
+
     console.log('\n');
-    
+
     // Check feature flags
     const ffRes = await pool.query(
-      "SELECT key, value, data_type FROM settings WHERE key = 'featureFlags'"
+      'SELECT key, value, data_type FROM settings WHERE key = \'featureFlags\''
     );
-    
+
     console.log('Feature Flags Setting:');
     console.log('======================');
-    
+
     if (ffRes.rows.length === 0) {
       console.log('No featureFlags setting found!');
     } else {
@@ -64,7 +64,7 @@ async function checkSMTPSettings() {
         }
       });
     }
-    
+
     await pool.end();
   } catch (e) {
     console.error('Error:', e.message);

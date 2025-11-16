@@ -201,7 +201,7 @@
     interactiveElements.forEach(element => {
       const rect = element.getBoundingClientRect();
       const computedStyle = window.getComputedStyle(element);
-      const padding = {
+      const _padding = {
         top: parseFloat(computedStyle.paddingTop),
         bottom: parseFloat(computedStyle.paddingBottom),
         left: parseFloat(computedStyle.paddingLeft),

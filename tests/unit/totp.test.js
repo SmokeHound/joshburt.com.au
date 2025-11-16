@@ -1,7 +1,7 @@
 // Unit tests for TOTP 2FA utilities
 const {
   generateTOTPSecret,
-  verifyTOTPToken,
+  _verifyTOTPToken: _verifyTOTPToken,
   generateBackupCodes,
   hashBackupCode,
   verifyBackupCode,

@@ -119,9 +119,7 @@ exports.handler = withHandler(async function (event) {
       // Update each setting individually
       for (const [key, value] of Object.entries(settingsData)) {
         // Get the current setting to know its data_type
-        const existing = await client.query('SELECT data_type FROM settings WHERE key = $1', [
-          key
-        ]);
+        const existing = await client.query('SELECT data_type FROM settings WHERE key = $1', [key]);
 
         if (existing.rows.length === 0) {
           // Setting doesn't exist, skip or create with default type 'string'

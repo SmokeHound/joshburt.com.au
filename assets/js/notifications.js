@@ -110,7 +110,7 @@
       setTimeout(() => toast.remove(), 250);
     }, 5000);
   }
-  window.showNotification = function (message, type = 'info', duration = 5000) {
+  window.showNotification = function (message, type = 'info', _duration = 5000) {
     if (type !== 'error' && settings.mutedTypes.includes(type)) {
       return null;
     }

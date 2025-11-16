@@ -142,7 +142,7 @@
     if (!client) {
       return;
     }
-    const cfg = getConfig();
+    const _cfg = getConfig();
     client.logout({
       logoutParams: { returnTo: returnTo || window.location.origin + '/login.html' }
     });
