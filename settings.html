@@ -1248,7 +1248,7 @@
         faviconUrl: document.getElementById('favicon-url')?.value || '',
         // Integrations
         smtpHost: document.getElementById('smtp-host')?.value || '',
-        smtpPort: document.getElementById('smtp-port')?.value || '',
+        smtpPort: parseInt(document.getElementById('smtp-port')?.value) || 587,
         smtpUser: document.getElementById('smtp-user')?.value || '',
         smtpPassword: document.getElementById('smtp-password')?.value || '',
         customCss: document.getElementById('custom-css')?.value || '',
@@ -1279,8 +1279,8 @@
           lightModeStart: document.getElementById('light-mode-start')?.value || '06:00'
         },
         // Security
-        sessionTimeout: document.getElementById('session-timeout')?.value || '60',
-        maxLoginAttempts: document.getElementById('max-login-attempts')?.value || '5',
+        sessionTimeout: parseInt(document.getElementById('session-timeout')?.value) || 60,
+        maxLoginAttempts: parseInt(document.getElementById('max-login-attempts')?.value) || 5,
         enable2FA: document.getElementById('enable-2fa')?.checked || false,
         auditAllActions: document.getElementById('audit-all-actions')?.checked || false
       };
@@ -1448,11 +1448,15 @@
                     },
                     body: JSON.stringify(settings)
                 });
+                
+                console.log('Save response status:', res.status);
+                
                 if (!res.ok) {
                   const errorData = await res.json().catch((e) => {
                     console.warn('Failed to parse error response:', e);
                     return {};
                   });
+                  console.error('Save failed:', errorData);
                   throw new Error(errorData.error || `Failed to save settings (${res.status})`);
                 }
                 
