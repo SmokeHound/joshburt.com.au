@@ -72,11 +72,14 @@ async function testSettingsQuery() {
     // Test: Update a setting
     console.log('4. Update siteTitle:');
     const testTitle = `Test ${Date.now()}`;
-    await pool.query(`
+    await pool.query(
+      `
       UPDATE settings 
       SET value = $1, updated_at = CURRENT_TIMESTAMP 
       WHERE key = 'siteTitle'
-    `, [testTitle]);
+    `,
+      [testTitle]
+    );
 
     const updated = await pool.query(`
       SELECT value FROM settings WHERE key = 'siteTitle'
@@ -84,15 +87,17 @@ async function testSettingsQuery() {
     console.log(`Updated siteTitle to: "${updated.rows[0].value}"`);
 
     // Restore original
-    await pool.query(`
+    await pool.query(
+      `
       UPDATE settings 
       SET value = $1, updated_at = CURRENT_TIMESTAMP 
       WHERE key = 'siteTitle'
-    `, ['']);
+    `,
+      ['']
+    );
     console.log('Restored original value\n');
 
     console.log('✅ All database queries working correctly!');
-
   } catch (error) {
     console.error('❌ Error:', error.message);
     throw error;

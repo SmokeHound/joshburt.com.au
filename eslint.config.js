@@ -1,4 +1,3 @@
-
 const { defineConfig } = require('eslint/config');
 
 const globals = require('globals');

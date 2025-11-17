@@ -53,13 +53,13 @@ console.log(`  SMTP User: ${process.env.SMTP_USER}`);
 console.log(`  SMTP Pass: ${'*'.repeat(process.env.SMTP_PASS?.length || 0)}`);
 console.log(`  From Email: ${process.env.FROM_EMAIL || 'noreply@joshburt.com.au'}`);
 console.log(`  Recipient: ${recipientEmail}`);
-console.log(`  Secure: ${process.env.SMTP_PORT == 465 ? 'Yes (TLS)' : 'No (STARTTLS)'}\n`);
+console.log(`  Secure: ${process.env.SMTP_PORT === '465' ? 'Yes (TLS)' : 'No (STARTTLS)'}\n`);
 
 // Create transporter
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT),
-  secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
+  secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
@@ -145,7 +145,7 @@ const mailOptions = {
 console.log('════════════════════════════════════════');
 console.log('Testing SMTP connection...\n');
 
-transporter.verify((error, success) => {
+transporter.verify((error, _success) => {
   if (error) {
     console.error('❌ SMTP Connection Failed!\n');
     console.error('Error:', error.message);

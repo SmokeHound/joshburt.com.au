@@ -124,9 +124,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentPwdField = document.getElementById('profile-current-password');
     const newPwdField = document.getElementById('profile-new-password');
     const confirmPwdField = document.getElementById('profile-confirm-password');
-    if (currentPwdField) {currentPwdField.value = '';}
-    if (newPwdField) {newPwdField.value = '';}
-    if (confirmPwdField) {confirmPwdField.value = '';}
+    if (currentPwdField) {
+      currentPwdField.value = '';
+    }
+    if (newPwdField) {
+      newPwdField.value = '';
+    }
+    if (confirmPwdField) {
+      confirmPwdField.value = '';
+    }
   };
 
   // Password section toggle functionality
@@ -427,7 +433,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const cancelBtn = modal.querySelector('#init-cancel');
-    if (cancelBtn) {cancelBtn.onclick = () => safeClose();}
+    if (cancelBtn) {
+      cancelBtn.onclick = () => safeClose();
+    }
 
     const initialsInput = modal.querySelector('#init-initials');
     const themeSelect = modal.querySelector('#init-theme');
@@ -435,7 +443,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const preview = modal.querySelector('#init-preview');
 
     function updatePreview() {
-      if (!initialsInput || !themeSelect || !styleSelect || !preview) {return;}
+      if (!initialsInput || !themeSelect || !styleSelect || !preview) {
+        return;
+      }
       const i =
         (initialsInput.value || '')
           .toUpperCase()
@@ -447,15 +457,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       preview.innerHTML = `<img src="${url}" alt="Initials Avatar" class="h-36 w-36 rounded-full" />`;
     }
 
-    if (initialsInput) {initialsInput.oninput = updatePreview;}
-    if (themeSelect) {themeSelect.onchange = updatePreview;}
-    if (styleSelect) {styleSelect.onchange = updatePreview;}
+    if (initialsInput) {
+      initialsInput.oninput = updatePreview;
+    }
+    if (themeSelect) {
+      themeSelect.onchange = updatePreview;
+    }
+    if (styleSelect) {
+      styleSelect.onchange = updatePreview;
+    }
     updatePreview();
 
     const saveBtn = modal.querySelector('#init-save');
     if (saveBtn) {
       saveBtn.onclick = async () => {
-        if (!initialsInput || !themeSelect || !styleSelect) {return;}
+        if (!initialsInput || !themeSelect || !styleSelect) {
+          return;
+        }
         const i =
           (initialsInput.value || '')
             .toUpperCase()

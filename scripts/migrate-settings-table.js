@@ -11,17 +11,21 @@ require('dotenv').config();
 
 // Create database pool directly
 const DATABASE_URL = process.env.DATABASE_URL;
-const pool = new Pool(DATABASE_URL ? {
-  connectionString: DATABASE_URL,
-  ssl: true
-} : {
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT || 5432,
-  ssl: { rejectUnauthorized: true }
-});
+const pool = new Pool(
+  DATABASE_URL
+    ? {
+      connectionString: DATABASE_URL,
+      ssl: true
+    }
+    : {
+      user: process.env.DB_USER,
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      password: process.env.DB_PASSWORD,
+      port: process.env.DB_PORT || 5432,
+      ssl: { rejectUnauthorized: true }
+    }
+);
 
 async function runMigration() {
   const client = await pool.connect();
@@ -44,7 +48,10 @@ async function runMigration() {
       ORDER BY ordinal_position
     `);
 
-    console.log('Current columns:', tableCheck.rows.map(r => `${r.column_name} (${r.data_type})`).join(', '));
+    console.log(
+      'Current columns:',
+      tableCheck.rows.map(r => `${r.column_name} (${r.data_type})`).join(', ')
+    );
 
     // Check if already migrated
     const hasKeyColumn = tableCheck.rows.some(r => r.column_name === 'key');
@@ -68,7 +75,10 @@ async function runMigration() {
     `);
 
     console.log('\n✅ Migration completed successfully!');
-    console.log('New columns:', newTableCheck.rows.map(r => `${r.column_name} (${r.data_type})`).join(', '));
+    console.log(
+      'New columns:',
+      newTableCheck.rows.map(r => `${r.column_name} (${r.data_type})`).join(', ')
+    );
 
     // Show migrated settings count
     const countResult = await client.query('SELECT COUNT(*) as count FROM settings');
@@ -91,7 +101,6 @@ async function runMigration() {
     console.log('\n✨ Migration complete! The settings table has been upgraded.');
     console.log('\n⚠️  Note: The old settings table is preserved as "settings_legacy" for backup.');
     console.log('   A compatibility view "settings_json_view" is available for legacy access.\n');
-
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('\n❌ Migration failed:', error.message);

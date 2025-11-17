@@ -135,6 +135,7 @@ async function initializeDatabase() {
     }
     await createPostgreSQLTables();
     await createDefaultUsers();
+    await createDefaultSettings();
     console.log('✅ Database initialized successfully');
   } catch (error) {
     console.error('❌ Database initialization failed:', error);
@@ -349,18 +350,28 @@ async function createPostgreSQLTables() {
     )
   `);
 
-  // Create settings table for PostgreSQL (store JSON as TEXT for cross-DB parity)
+  // Create settings table for PostgreSQL with enhanced key-value structure
   await database.run(`
     CREATE TABLE IF NOT EXISTS settings (
-      id INTEGER PRIMARY KEY,
-      data TEXT,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      id SERIAL PRIMARY KEY,
+      key VARCHAR(255) UNIQUE NOT NULL,
+      value TEXT,
+      category VARCHAR(100) DEFAULT 'general',
+      data_type VARCHAR(50) DEFAULT 'string',
+      is_sensitive BOOLEAN DEFAULT false,
+      description TEXT,
+      default_value TEXT,
+      validation_rules JSONB,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_by INTEGER REFERENCES users(id) ON DELETE SET NULL
     )
   `);
-  // Backfill legacy settings tables missing updated_at
-  await database.run(
-    'ALTER TABLE settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
-  );
+
+  // Create indexes for settings table
+  await database.run('CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_settings_category ON settings(category)');
+  await database.run('CREATE INDEX IF NOT EXISTS idx_settings_updated_at ON settings(updated_at)');
 
   // Ensure all timestamp columns exist before creating indexes (for legacy databases)
   await database.run(
@@ -487,6 +498,81 @@ async function createDefaultUsers() {
 
     console.log('👔 Manager user created: manager@example.com / Manager123!');
   }
+}
+
+async function createDefaultSettings() {
+  // Check if settings already exist
+  const existingSettings = await database.get('SELECT COUNT(*) as count FROM settings');
+
+  if (existingSettings && existingSettings.count > 0) {
+    return; // Settings already exist, don't recreate
+  }
+
+  console.log('🔧 Creating default settings...');
+
+  const defaultSettings = [
+    // General settings
+    { key: 'siteTitle', value: '', category: 'general', data_type: 'string', description: 'Website title' },
+    { key: 'siteDescription', value: '', category: 'general', data_type: 'string', description: 'Website description' },
+    { key: 'contactEmail', value: '', category: 'general', data_type: 'string', description: 'Contact email address' },
+    { key: 'maintenanceMode', value: 'false', category: 'general', data_type: 'boolean', description: 'Enable maintenance mode' },
+    { key: 'logoUrl', value: '', category: 'general', data_type: 'string', description: 'Logo image URL' },
+    { key: 'faviconUrl', value: '', category: 'general', data_type: 'string', description: 'Favicon image URL' },
+    { key: 'oilDataSource', value: 'api', category: 'general', data_type: 'string', description: 'Oil products data source' },
+    { key: 'consumablesDataSource', value: 'api', category: 'general', data_type: 'string', description: 'Consumables data source' },
+    { key: 'customJs', value: '', category: 'general', data_type: 'string', description: 'Custom JavaScript code' },
+
+    // Theme settings
+    { key: 'theme', value: 'dark', category: 'theme', data_type: 'string', description: 'Active theme preset' },
+    { key: 'primaryColor', value: '#3b82f6', category: 'theme', data_type: 'string', description: 'Primary theme color' },
+    { key: 'secondaryColor', value: '#10b981', category: 'theme', data_type: 'string', description: 'Secondary theme color' },
+    { key: 'accentColor', value: '#8b5cf6', category: 'theme', data_type: 'string', description: 'Accent theme color' },
+    { key: 'buttonPrimaryColor', value: '#3b82f6', category: 'theme', data_type: 'string', description: 'Primary button color' },
+    { key: 'buttonSecondaryColor', value: '#10b981', category: 'theme', data_type: 'string', description: 'Secondary button color' },
+    { key: 'buttonDangerColor', value: '#ef4444', category: 'theme', data_type: 'string', description: 'Danger button color' },
+    { key: 'buttonSuccessColor', value: '#10b981', category: 'theme', data_type: 'string', description: 'Success button color' },
+    { key: 'customCss', value: '', category: 'theme', data_type: 'string', description: 'Custom CSS code' },
+    { key: 'themeSchedule', value: JSON.stringify({ enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' }), category: 'theme', data_type: 'json', description: 'Automatic theme scheduling' },
+
+    // Security settings
+    { key: 'sessionTimeout', value: '60', category: 'security', data_type: 'number', description: 'Session timeout in minutes' },
+    { key: 'maxLoginAttempts', value: '5', category: 'security', data_type: 'number', description: 'Maximum login attempts before lockout' },
+    { key: 'enable2FA', value: 'false', category: 'security', data_type: 'boolean', description: 'Enable two-factor authentication' },
+    { key: 'auditAllActions', value: 'false', category: 'security', data_type: 'boolean', description: 'Audit all user actions' },
+
+    // Integration settings
+    { key: 'smtpHost', value: '', category: 'integrations', data_type: 'string', is_sensitive: false, description: 'SMTP server host' },
+    { key: 'smtpPort', value: '', category: 'integrations', data_type: 'number', is_sensitive: false, description: 'SMTP server port' },
+    { key: 'smtpUser', value: '', category: 'integrations', data_type: 'string', is_sensitive: false, description: 'SMTP username' },
+    { key: 'smtpPassword', value: '', category: 'integrations', data_type: 'string', is_sensitive: true, description: 'SMTP password' },
+
+    // Feature flags
+    { key: 'featureFlags', value: JSON.stringify({
+      betaFeatures: false,
+      newDashboard: false,
+      advancedReports: false,
+      enableRegistration: false,
+      enableGuestCheckout: false
+    }), category: 'features', data_type: 'json', description: 'Feature flag settings' }
+  ];
+
+  for (const setting of defaultSettings) {
+    await database.run(
+      `INSERT INTO settings (key, value, category, data_type, is_sensitive, description) 
+       VALUES (?, ?, ?, ?, ?, ?) 
+       ON CONFLICT (key) DO NOTHING`,
+      [
+        setting.key,
+        setting.value,
+        setting.category,
+        setting.data_type,
+        setting.is_sensitive ?? false,
+        setting.description
+      ]
+    );
+  }
+
+  console.log('✅ Default settings created');
 }
 
 module.exports = {
