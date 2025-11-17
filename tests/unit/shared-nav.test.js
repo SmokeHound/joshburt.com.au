@@ -96,4 +96,10 @@ describe('Shared Navigation Component', () => {
     const anchor = document.querySelector('a[href="#main-content"]');
     expect(anchor).toBeNull();
   });
+
+  test('should have login button hidden by default to prevent flash on logged-in pages', () => {
+    const loginBtn = document.getElementById('login-btn');
+    expect(loginBtn).toBeTruthy();
+    expect(loginBtn.classList.contains('hidden')).toBe(true);
+  });
 });
