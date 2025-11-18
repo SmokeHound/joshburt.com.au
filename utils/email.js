@@ -1,3 +1,15 @@
+// Internal helper: build mail options and send via transporter
+const buildAndSend = async (mailOptions) => {
+  const transporter = await getTransporter();
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    console.error('📧 Failed to send email:', error);
+    throw error;
+  }
+};
+
 // Send email verification email
 const sendVerificationEmail = async (email, name, verificationUrl) => {
   const mailOptions = {
@@ -45,39 +57,84 @@ const sendVerificationEmail = async (email, name, verificationUrl) => {
       \nThank you for registering on the Josh Burt website.\n\nVerify your email: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\n© 2025 Josh Burt. All rights reserved.
     `
   };
-  try {
-    const result = await transporter.sendMail(mailOptions);
-    return result;
-  } catch (error) {
-    console.error('📧 Failed to send verification email:', error);
-    throw error;
-  }
+  return await buildAndSend(mailOptions);
 };
 const nodemailer = require('nodemailer');
 
-// Create transporter
-const createTransporter = () => {
+let _transporterPromise = null;
+
+// Try to create transporter from env, otherwise try reading settings from DB
+const createTransporter = async () => {
   if (process.env.NODE_ENV === 'test') {
-    // For development, do not send emails (no-op)
     return {
-      sendMail: async _mailOptions => {
-        return { messageId: 'dev-mode-' + Date.now() };
+      sendMail: async _mailOptions => ({ messageId: 'dev-mode-' + Date.now() })
+    };
+  }
+
+  let host = process.env.SMTP_HOST;
+  let port = process.env.SMTP_PORT;
+  let user = process.env.SMTP_USER;
+  let pass = process.env.SMTP_PASS;
+
+  // If any required value missing, try to read from settings table
+  if (!host || !port || !user || !pass) {
+    try {
+      const { database } = require('../config/database');
+      // Safely attempt to read settings; ignore errors if DB unavailable
+      const rows = await database.all('SELECT key, value FROM settings WHERE key IN (?, ?, ?, ?)', [
+        'smtpHost',
+        'smtpPort',
+        'smtpUser',
+        'smtpPassword'
+      ]);
+      rows.forEach(r => {
+        if (r.key === 'smtpHost' && r.value) host = host || r.value;
+        if (r.key === 'smtpPort' && r.value) port = port || String(r.value);
+        if (r.key === 'smtpUser' && r.value) user = user || r.value;
+        if (r.key === 'smtpPassword' && r.value) pass = pass || r.value;
+      });
+    } catch (e) {
+      // DB unavailable or query failed - fall back to env vars only
+      console.warn('Could not read SMTP settings from database:', e && e.message);
+    }
+  }
+
+  if (!host || !port || !user || !pass) {
+    // Return a transporter that throws a clear error when used
+    return {
+      sendMail: async _opts => {
+        const missing = [];
+        if (!host) missing.push('SMTP_HOST');
+        if (!port) missing.push('SMTP_PORT');
+        if (!user) missing.push('SMTP_USER');
+        if (!pass) missing.push('SMTP_PASS');
+        const msg = `Missing SMTP credentials (${missing.join(', ')}). Set environment variables or configure settings.`;
+        const err = new Error(msg);
+        console.error('📧 SMTP misconfiguration:', msg);
+        throw err;
       }
     };
   }
 
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
-  });
+  const numericPort = Number(port) || (process.env.SMTP_SECURE === 'true' ? 465 : 587);
+  const secure = numericPort === 465;
+
+  const transportOptions = {
+    host,
+    port: numericPort,
+    secure,
+    auth: { user, pass }
+  };
+
+  return nodemailer.createTransport(transportOptions);
 };
 
-const transporter = createTransporter();
+const getTransporter = async () => {
+  if (!_transporterPromise) {
+    _transporterPromise = createTransporter();
+  }
+  return _transporterPromise;
+};
 
 // Send password reset email
 const sendResetEmail = async (email, name, resetUrl) => {
@@ -137,14 +194,7 @@ const sendResetEmail = async (email, name, resetUrl) => {
     `
   };
 
-  try {
-    const result = await transporter.sendMail(mailOptions);
-    // ...existing code...
-    return result;
-  } catch (error) {
-    console.error('📧 Failed to send password reset email:', error);
-    throw error;
-  }
+  return await buildAndSend(mailOptions);
 };
 
 // Send welcome email
@@ -209,9 +259,7 @@ const sendWelcomeEmail = async (email, name) => {
   };
 
   try {
-    const result = await transporter.sendMail(mailOptions);
-    // ...existing code...
-    return result;
+    return await buildAndSend(mailOptions);
   } catch (error) {
     console.error('📧 Failed to send welcome email:', error);
     throw error;
@@ -293,8 +341,7 @@ const sendOrderStatusEmail = async (email, name, orderId, oldStatus, newStatus) 
   };
 
   try {
-    const result = await transporter.sendMail(mailOptions);
-    return result;
+    return await buildAndSend(mailOptions);
   } catch (error) {
     console.error('📧 Failed to send order status email:', error);
     throw error;
@@ -368,8 +415,7 @@ const sendOrderCreatedEmail = async (email, name, orderId) => {
   };
 
   try {
-    const result = await transporter.sendMail(mailOptions);
-    return result;
+    return await buildAndSend(mailOptions);
   } catch (error) {
     console.error('📧 Failed to send order created email:', error);
     throw error;
