@@ -302,39 +302,60 @@
     </div>
 
     <!-- Edit User Modal -->
-    <div id="edit-user-modal" class="modal-overlay hidden">
+    <div id="edit-user-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="edit-user-title">
       <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="text-xl font-semibold text-gray-100">Edit User</h3>
+          <div class="modal-header">
+          <h3 id="edit-user-title" class="text-xl font-semibold text-gray-100">Edit User</h3>
           <button class="modal-close" id="close-modal" aria-label="Close modal">&times;</button>
         </div>
         <div class="modal-body">
-          <form id="edit-user-form">
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Name</label>
-                <input type="text" id="edit-name" required class="w-full p-3 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                <input type="email" id="edit-email" disabled class="w-full p-3 rounded-lg border border-gray-600 bg-gray-700 text-gray-400 cursor-not-allowed" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Role</label>
-                <select id="edit-role" required class="w-full p-3 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                  <option value="">Select Role</option>
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                  <option value="manager">Manager</option>
-                </select>
-              </div>
-            </div>
-            <div class="flex gap-3 mt-6">
-              <button type="submit" class="btn-neon-blue flex-1 p-3 rounded-lg">Update User</button>
-              <button type="button" id="cancel-modal" class="btn-neon-green px-6 p-3 rounded-lg">Cancel</button>
-            </div>
-          </form>
-        </div>
+                    <form id="edit-user-form">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                                <input type="text" id="edit-name" required class="w-full p-3 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                                <input type="email" id="edit-email" disabled class="w-full p-3 rounded-lg border border-gray-600 bg-gray-700 text-gray-400 cursor-not-allowed" />
+                            </div>
+                            <div class="md:flex md:gap-4">
+                                <div class="md:flex-1">
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Role</label>
+                                    <select id="edit-role" required class="w-full p-3 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                        <option value="">Select Role</option>
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="manager">Manager</option>
+                                    </select>
+                                </div>
+                                <div class="md:w-40 mt-3 md:mt-0">
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" id="edit-active" class="mr-2" />
+                                        <span class="text-sm text-gray-300">Active</span>
+                                    </label>
+                                    <div class="text-xs text-gray-400 mt-2" id="edit-last-login">Last login: --</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button type="button" id="toggle-change-password" class="text-sm text-cyan-400 hover:underline">Change password</button>
+                                <div id="change-password-section" class="mt-3 hidden">
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">New Password (optional)</label>
+                                    <input type="password" id="edit-new-password" placeholder="Enter new password" class="w-full p-3 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <input type="checkbox" id="edit-send-reset-email" />
+                                        <label for="edit-send-reset-email" class="text-sm text-gray-400">Send password reset email</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button type="submit" id="edit-submit" class="btn-neon-blue flex-1 p-3 rounded-lg">Update User</button>
+                            <button type="button" id="cancel-modal" class="btn-neon-green px-6 p-3 rounded-lg">Cancel</button>
+                        </div>
+                    </form>
+                </div>
       </div>
     </div>
 
@@ -585,27 +606,60 @@ async function loadUsers(page = 1) {
         // Update user from modal
         async function updateUserFromModal(e){
             e.preventDefault();
+            const submitBtn = document.getElementById('edit-submit');
+            const cancelBtn = document.getElementById('cancel-modal');
             const name = document.getElementById('edit-name').value.trim();
             const role = document.getElementById('edit-role').value;
+            const isActive = !!document.getElementById('edit-active').checked;
+            const newPassword = document.getElementById('edit-new-password').value.trim();
+            const sendResetEmail = !!document.getElementById('edit-send-reset-email').checked;
             const token = (window.getToken && window.getToken()) || null;
             if(!name||!role){ showToast('Please fill in all fields'); return; }
             if(!usersState.editingId){ showToast('No user selected for editing','error'); return; }
             try {
-                const res = await fetch(`${FN_BASE}/users/${usersState.editingId}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify({ name, role }) });
-                if(!res.ok) throw new Error('Failed to update user');
+                // Disable buttons to prevent double submit
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Saving...'; }
+                if (cancelBtn) cancelBtn.disabled = true;
+
+                const body = { name, role, is_active: isActive };
+                if (newPassword) {
+                    // include newPassword if provided
+                    body.newPassword = newPassword;
+                    // optionally include flag to send reset email
+                    if (sendResetEmail) body.sendResetEmail = true;
+                }
+
+                const res = await fetch(`${FN_BASE}/users/${usersState.editingId}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(token?{ 'Authorization':`Bearer ${token}` }:{}) }, body:JSON.stringify(body) });
+                if(!res.ok){
+                    const err = await res.json().catch(()=>({}));
+                    throw new Error(err.error || 'Failed to update user');
+                }
                 showToast('User updated','success');
                 closeEditModal();
                 await loadUsers(usersState.pagination.page || 1);
             } catch(err){ showToast('Error: '+err.message,'error'); }
+            finally {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Update User'; }
+                if (cancelBtn) cancelBtn.disabled = false;
+            }
         }
 
         // Open edit modal
         function openEditModal(id){ 
             const u=usersState.list.find(x=>x.id===id); 
             if(!u) return; 
-            document.getElementById('edit-name').value=u.name; 
-            document.getElementById('edit-email').value=u.email; 
-            document.getElementById('edit-role').value=u.role; 
+            document.getElementById('edit-name').value = u.name || '';
+            document.getElementById('edit-email').value = u.email || '';
+            document.getElementById('edit-role').value = u.role || '';
+            document.getElementById('edit-active').checked = !!u.is_active;
+            // show last login if available
+            const lastLoginElem = document.getElementById('edit-last-login');
+            if (lastLoginElem) lastLoginElem.textContent = 'Last login: ' + (u.last_login ? new Date(u.last_login).toLocaleString() : '--');
+            // reset change-password section
+            document.getElementById('change-password-section').classList.add('hidden');
+            document.getElementById('edit-new-password').value = '';
+            document.getElementById('edit-send-reset-email').checked = false;
+
             usersState.editingId=id; 
             document.getElementById('edit-user-modal').classList.remove('hidden');
             // Focus the name field
@@ -615,8 +669,17 @@ async function loadUsers(page = 1) {
         // Close edit modal
         function closeEditModal(){ 
             usersState.editingId=null; 
-            document.getElementById('edit-user-modal').classList.add('hidden');
-            document.getElementById('edit-user-form').reset();
+            const modal = document.getElementById('edit-user-modal');
+            if (modal) modal.classList.add('hidden');
+            // Clear and reset fields
+            const form = document.getElementById('edit-user-form');
+            if (form) {
+                try { form.reset(); } catch(_){}
+            }
+            const changeSection = document.getElementById('change-password-section');
+            if (changeSection) changeSection.classList.add('hidden');
+            const lastLoginElem = document.getElementById('edit-last-login');
+            if (lastLoginElem) lastLoginElem.textContent = 'Last login: --';
         }
 
         // Edit user (deprecated - now opens modal)
@@ -726,6 +789,20 @@ async function loadUsers(page = 1) {
             document.getElementById('edit-user-form').addEventListener('submit', updateUserFromModal);
             document.getElementById('close-modal').addEventListener('click', closeEditModal);
             document.getElementById('cancel-modal').addEventListener('click', closeEditModal);
+            // Toggle change-password section inside modal
+            const togglePwd = document.getElementById('toggle-change-password');
+            if (togglePwd) togglePwd.addEventListener('click', () => {
+                const sec = document.getElementById('change-password-section');
+                if (!sec) return;
+                const visible = !sec.classList.contains('hidden');
+                if (visible) {
+                    sec.classList.add('hidden');
+                } else {
+                    sec.classList.remove('hidden');
+                    // focus new password input
+                    setTimeout(() => { const np = document.getElementById('edit-new-password'); if (np) np.focus(); }, 50);
+                }
+            });
             // Close modal when clicking outside
             document.getElementById('edit-user-modal').addEventListener('click', (e) => {
                 if (e.target.id === 'edit-user-modal') closeEditModal();
