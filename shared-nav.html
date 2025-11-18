@@ -9,12 +9,7 @@
 <body>
 <!-- Sidebar -->
 <aside id="sidebar" class="sidebar sidebar-width fixed top-0 left-0 h-full p-4 flex flex-col shadow-lg" aria-label="Main navigation" role="navigation">
-    <!-- Sidebar Toggle Button (Desktop only) -->
-    <button id="sidebar-toggle" class="sidebar-toggle hidden md:flex" aria-label="Toggle sidebar" title="Toggle sidebar">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-        </svg>
-    </button>
+    <!-- (Desktop collapse feature removed) -->
     
     <!-- App Branding -->
     <h1 class="text-2xl font-bold mb-6 text-blue-500">Josh's App</h1>
@@ -66,47 +61,7 @@
     // Also run it immediately in case this script runs after DOM is ready
     setActiveNavLink();
 
-    // Desktop sidebar expand/collapse functionality
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    
-    // Check if user has a saved preference for sidebar state
-    const sidebarExpanded = localStorage.getItem('sidebarExpanded') === 'true';
-    
-    // Apply saved state on desktop only
-    if (window.innerWidth >= 768) {
-        if (sidebarExpanded) {
-            sidebar.classList.add('expanded');
-        }
-    }
-    
-    // Toggle sidebar on desktop
-    if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', function() {
-            const isExpanded = sidebar.classList.toggle('expanded');
-            
-            // Update toggle button icon
-            const icon = sidebarToggle.querySelector('svg path');
-            if (icon) {
-                icon.setAttribute('d', isExpanded ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7');
-            }
-            
-            // Save preference
-            localStorage.setItem('sidebarExpanded', isExpanded);
-            
-            // Update aria-label
-            sidebarToggle.setAttribute('aria-label', isExpanded ? 'Collapse sidebar' : 'Expand sidebar');
-        });
-        
-        // Set initial icon state
-        if (sidebarExpanded && window.innerWidth >= 768) {
-            const icon = sidebarToggle.querySelector('svg path');
-            if (icon) {
-                icon.setAttribute('d', 'M15 19l-7-7 7-7');
-            }
-            sidebarToggle.setAttribute('aria-label', 'Collapse sidebar');
-        }
-    }
+    // Desktop collapse feature removed: sidebar will always display in full width on desktop.
 
     // Mobile menu toggle functionality with enhanced accessibility
     // Create lightweight fallbacks in case the host page hasn't provided them (e.g., in tests)
