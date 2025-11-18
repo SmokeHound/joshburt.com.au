@@ -5,8 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resend Verification Email - Josh Burt</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
-  <script src="/shared-config.html"></script>
-  <script src="/shared-theme.html"></script>
+  <script>
+    (function(){
+      fetch('shared-config.html').then(r=>r.text()).then(html=>{
+        const t=document.createElement('div'); t.innerHTML=html;
+        Array.from(t.children).forEach(c=>{
+          const tag = c.tagName;
+          if (tag === 'LINK' || tag === 'STYLE') {
+            document.head.appendChild(c.cloneNode(true));
+          } else if (tag === 'SCRIPT') {
+            const s = document.createElement('script');
+            if (c.src) s.src = c.src;
+            s.type = c.type || 'text/javascript';
+            s.text = c.textContent;
+            document.body.appendChild(s);
+          } else {
+            document.head.appendChild(c.cloneNode(true));
+          }
+        });
+      }).catch(()=>{});
+
+      fetch('shared-theme.html').then(r=>r.text()).then(html=>{
+        const t=document.createElement('div'); t.innerHTML=html;
+        Array.from(t.children).forEach(c=>{
+          if (c.tagName === 'SCRIPT') {
+            const s = document.createElement('script');
+            if (c.src) s.src = c.src;
+            s.type = c.type || 'text/javascript';
+            s.text = c.textContent;
+            document.body.appendChild(s);
+          } else if (c.tagName === 'LINK' || c.tagName === 'STYLE') {
+            document.head.appendChild(c.cloneNode(true));
+          } else {
+            document.body.appendChild(c);
+          }
+        });
+      }).catch(()=>{});
+    })();
+  </script>
 </head>
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
   
