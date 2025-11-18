@@ -12,7 +12,14 @@
     try { localStorage.removeItem('currentUser'); } catch (_) {}
   </script>
   <script>
-    fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
+      const container = document.getElementById('main-nav');
+      const t = document.createElement('div'); t.innerHTML = html;
+      Array.from(t.childNodes).forEach(node => {
+        if (node.tagName === 'SCRIPT') {
+          const s = document.createElement('script'); if (node.src) s.src = node.src; s.type = node.type || 'text/javascript'; s.text = node.textContent; document.body.appendChild(s);
+        } else { container.appendChild(node); }
+      });
+      if (window.setActiveNavLink) window.setActiveNavLink();
     fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
     fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>document.head.appendChild(c.cloneNode(true)));});
   </script>
