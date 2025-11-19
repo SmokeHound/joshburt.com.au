@@ -369,8 +369,32 @@ git push origin main
 
 ## 📚 Documentation
 
+### 🆕 Upgrade & Improvements Plan
+
+**Want to add features without paid services?** [**Start here → START_HERE.md**](START_HERE.md)
+
+The upgrade plan includes:
+- Self-hosted error tracking (replaces Sentry) 
+- Email queue system (no external SMTP)
+- Full-text search (PostgreSQL native)
+- Advanced analytics & automated reports
+- Multi-layer caching
+- Security monitoring & API keys
+- Offline PWA support
+- Business intelligence & forecasting
+- And 30+ more features!
+
+**Total cost**: $0 | **Savings**: $500-5000/year | **Timeline**: 6-21 weeks
+
+### Technical Documentation
+
 Comprehensive documentation in `/docs`:
 
+- **[START_HERE.md](START_HERE.md)** - 🆕 **New to upgrades? Start here!**
+- **[UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md)** - 🆕 Quick upgrade plan overview
+- **[VISUAL_ROADMAP.md](VISUAL_ROADMAP.md)** - 🆕 Interactive visual journey
+- **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** - 🆕 Complete upgrade specification (1100+ lines)
+- **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - 🆕 Step-by-step how-to guide
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design
 - **[API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)** - API reference
 - **[DATABASE.md](docs/DATABASE.md)** - Schema and queries
