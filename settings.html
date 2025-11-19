@@ -505,134 +505,6 @@
                 </div>
               </div>
 
-              <!-- Color Customization Section -->
-              <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
-                <h3 class="text-lg font-bold text-white mb-4">Custom Colors</h3>
-                <p class="text-sm text-gray-400 mb-6">Fine-tune your theme colors</p>
-                
-                <!-- Hidden select for preset compatibility -->
-                <select id="theme-preset" class="hidden">
-                  <option value="">Custom</option>
-                  <option value="default">Default (Blue/Green/Purple)</option>
-                  <option value="ocean">Ocean</option>
-                  <option value="forest">Forest</option>
-                  <option value="sunset">Sunset</option>
-                  <option value="mono">Monochrome</option>
-                </select>
-                
-                <!-- Color Preset Buttons -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="default">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-3b82f6"></div>
-                      <div class="w-full h-6 rounded sw-10b981"></div>
-                      <div class="w-full h-6 rounded sw-8b5cf6"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Default</p>
-                  </button>
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="ocean">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-0284c7"></div>
-                      <div class="w-full h-6 rounded sw-06b6d4"></div>
-                      <div class="w-full h-6 rounded sw-0ea5e9"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Ocean</p>
-                  </button>
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="forest">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-166534"></div>
-                      <div class="w-full h-6 rounded sw-22c55e"></div>
-                      <div class="w-full h-6 rounded sw-84cc16"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Forest</p>
-                  </button>
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="sunset">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-f59e42"></div>
-                      <div class="w-full h-6 rounded sw-ef4444"></div>
-                      <div class="w-full h-6 rounded sw-f472b6"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Sunset</p>
-                  </button>
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="mono">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-22223b"></div>
-                      <div class="w-full h-6 rounded sw-4a4e69"></div>
-                      <div class="w-full h-6 rounded sw-9a8c98"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Mono</p>
-                  </button>
-                </div>
-
-                <!-- Color Pickers -->
-                <div class="space-y-4">
-                  <div class="flex items-center gap-3">
-                    <label for="primaryColor" class="w-24 font-semibold">Primary</label>
-                    <input id="primaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#3b82f6" />
-                    <div aria-hidden="true" title="Primary preview" class="w-10 h-8 rounded preview-box-primary border border-gray-600"></div>
-                    <input id="primaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#3b82f6" title="Primary color hex" placeholder="#3b82f6" />
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <label for="secondaryColor" class="w-24 font-semibold">Secondary</label>
-                    <input id="secondaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#10b981" />
-                    <div aria-hidden="true" title="Secondary preview" class="w-10 h-8 rounded preview-box-secondary border border-gray-600"></div>
-                    <input id="secondaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#10b981" title="Secondary color hex" placeholder="#10b981" />
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <label for="accentColor" class="w-24 font-semibold">Accent</label>
-                    <input id="accentColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#8b5cf6" />
-                    <div aria-hidden="true" title="Accent preview" class="w-10 h-8 rounded preview-box-accent border border-gray-600"></div>
-                    <input id="accentColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#8b5cf6" title="Accent color hex" placeholder="#8b5cf6" />
-                  </div>
-                  
-                  <!-- Button Colors Section -->
-                  <div class="mt-6 pt-6 border-t border-gray-700">
-                    <h4 class="text-sm font-bold text-gray-400 mb-4 flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                      </svg>
-                      Button Colors
-                    </h4>
-                    <div class="space-y-3">
-                      <div class="flex items-center gap-3">
-                        <label for="buttonPrimaryColor" class="w-24 font-semibold text-sm">Primary</label>
-                        <input id="buttonPrimaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#3b82f6" />
-                        <div aria-hidden="true" title="Button Primary preview" class="w-10 h-8 rounded preview-box-btn-primary border border-gray-600"></div>
-                        <input id="buttonPrimaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#3b82f6" title="Button Primary color hex" placeholder="#3b82f6" />
-                      </div>
-                      <div class="flex items-center gap-3">
-                        <label for="buttonSecondaryColor" class="w-24 font-semibold text-sm">Secondary</label>
-                        <input id="buttonSecondaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#6b7280" />
-                        <div aria-hidden="true" title="Button Secondary preview" class="w-10 h-8 rounded preview-box-btn-secondary border border-gray-600"></div>
-                        <input id="buttonSecondaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#6b7280" title="Button Secondary color hex" placeholder="#6b7280" />
-                      </div>
-                      <div class="flex items-center gap-3">
-                        <label for="buttonDangerColor" class="w-24 font-semibold text-sm">Danger</label>
-                        <input id="buttonDangerColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#ef4444" />
-                        <div aria-hidden="true" title="Button Danger preview" class="w-10 h-8 rounded preview-box-btn-danger border border-gray-600"></div>
-                        <input id="buttonDangerColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#ef4444" title="Button Danger color hex" placeholder="#ef4444" />
-                      </div>
-                      <div class="flex items-center gap-3">
-                        <label for="buttonSuccessColor" class="w-24 font-semibold text-sm">Success</label>
-                        <input id="buttonSuccessColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#10b981" />
-                        <div aria-hidden="true" title="Button Success preview" class="w-10 h-8 rounded preview-box-btn-success border border-gray-600"></div>
-                        <input id="buttonSuccessColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#10b981" title="Button Success color hex" placeholder="#10b981" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <button id="apply-theme" class="w-full btn-neon-green px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all mt-6">
-                  <span class="flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Apply Theme Changes
-                  </span>
-                </button>
-              </div>
-
-              <!-- Theme Schedule Section - Enhanced -->
               <div id="theme-scheduler-container" class="card widget-secondary p-6 rounded-lg border border-gray-700">
                 <h3 class="text-lg font-bold text-white mb-4">Theme Schedule</h3>
                 <p class="text-sm text-gray-400 mb-6">Automatically switch themes based on time of day</p>
@@ -919,14 +791,6 @@
           enableGuestCheckout: document.getElementById('enable-guest-checkout')?.checked || false,
           
         },
-        // Theme customization
-        primaryColor: document.getElementById('primaryColor')?.value || '#3b82f6',
-        secondaryColor: document.getElementById('secondaryColor')?.value || '#10b981',
-        accentColor: document.getElementById('accentColor')?.value || '#8b5cf6',
-        buttonPrimaryColor: document.getElementById('buttonPrimaryColor')?.value || '#3b82f6',
-        buttonSecondaryColor: document.getElementById('buttonSecondaryColor')?.value || '#6b7280',
-        buttonDangerColor: document.getElementById('buttonDangerColor')?.value || '#ef4444',
-        buttonSuccessColor: document.getElementById('buttonSuccessColor')?.value || '#10b981',
         // Theme schedule
         themeSchedule: {
           enabled: document.getElementById('schedule-enabled')?.checked || false,
@@ -988,22 +852,6 @@
                 document.getElementById('smtp-password').value = settings.smtpPassword ?? '';
                 if (settings.customCss) document.getElementById('custom-css').value = settings.customCss;
                 if (settings.customJs) document.getElementById('custom-js').value = settings.customJs;
-                // Theme customization
-                if (settings.primaryColor) document.getElementById('primaryColor').value = settings.primaryColor;
-                if (settings.secondaryColor) document.getElementById('secondaryColor').value = settings.secondaryColor;
-                if (settings.accentColor) document.getElementById('accentColor').value = settings.accentColor;
-                if (settings.primaryColor) document.getElementById('primaryColorText').value = settings.primaryColor;
-                if (settings.secondaryColor) document.getElementById('secondaryColorText').value = settings.secondaryColor;
-                if (settings.accentColor) document.getElementById('accentColorText').value = settings.accentColor;
-                // Button colors
-                if (settings.buttonPrimaryColor) document.getElementById('buttonPrimaryColor').value = settings.buttonPrimaryColor;
-                if (settings.buttonSecondaryColor) document.getElementById('buttonSecondaryColor').value = settings.buttonSecondaryColor;
-                if (settings.buttonDangerColor) document.getElementById('buttonDangerColor').value = settings.buttonDangerColor;
-                if (settings.buttonSuccessColor) document.getElementById('buttonSuccessColor').value = settings.buttonSuccessColor;
-                if (settings.buttonPrimaryColor) document.getElementById('buttonPrimaryColorText').value = settings.buttonPrimaryColor;
-                if (settings.buttonSecondaryColor) document.getElementById('buttonSecondaryColorText').value = settings.buttonSecondaryColor;
-                if (settings.buttonDangerColor) document.getElementById('buttonDangerColorText').value = settings.buttonDangerColor;
-                if (settings.buttonSuccessColor) document.getElementById('buttonSuccessColorText').value = settings.buttonSuccessColor;
                 // Theme schedule
                 if (settings.themeSchedule) {
                     document.getElementById('schedule-enabled').checked = settings.themeSchedule.enabled;
@@ -1197,149 +1045,6 @@
     
     // Expose for theme cards module
     window.saveSettingsQuiet = saveSettingsQuiet;
-
-    // Color theme functionality (update preview only)
-    function initThemeCustomization() {
-      const colorInputs = ['primaryColor', 'secondaryColor', 'accentColor'];
-      const colorTexts = ['primaryColorText', 'secondaryColorText', 'accentColorText'];
-      
-      // Preset themes
-      const themePresets = {
-        default: { primary: '#3b82f6', secondary: '#10b981', accent: '#8b5cf6' },
-        ocean:   { primary: '#0284c7', secondary: '#06b6d4', accent: '#0ea5e9' },
-        forest:  { primary: '#166534', secondary: '#22c55e', accent: '#84cc16' },
-        sunset:  { primary: '#f59e42', secondary: '#ef4444', accent: '#f472b6' },
-        mono:    { primary: '#22223b', secondary: '#4a4e69', accent: '#9a8c98' }
-      };
-      
-      // Handle color preset buttons
-      const colorPresetButtons = document.querySelectorAll('.color-preset-btn');
-      const presetSelect = document.getElementById('theme-preset');
-      
-      colorPresetButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const preset = btn.getAttribute('data-preset');
-          presetSelect.value = preset;
-          if (themePresets[preset]) {
-            document.getElementById('primaryColor').value = themePresets[preset].primary;
-            document.getElementById('secondaryColor').value = themePresets[preset].secondary;
-            document.getElementById('accentColor').value = themePresets[preset].accent;
-            document.getElementById('primaryColorText').value = themePresets[preset].primary;
-            document.getElementById('secondaryColorText').value = themePresets[preset].secondary;
-            document.getElementById('accentColorText').value = themePresets[preset].accent;
-            
-            // Update button styling
-            colorPresetButtons.forEach(b => {
-              b.classList.remove('border-blue-500', 'border-4');
-              b.classList.add('border-2', 'border-gray-600');
-            });
-            btn.classList.add('border-blue-500', 'border-4');
-            btn.classList.remove('border-2', 'border-gray-600');
-          }
-        });
-      });
-      
-      // Color pickers and text inputs sync
-        colorInputs.forEach((inputId, index) => {
-        const colorInput = document.getElementById(inputId);
-        const textInput = document.getElementById(colorTexts[index]);
-        const varName = ['--preview-primary','--preview-secondary','--preview-accent'][index];
-        
-        // initialize from existing inputs
-        if (colorInput && colorInput.value) {
-          document.documentElement.style.setProperty(varName, colorInput.value);
-        }
-
-        colorInput.addEventListener('change', (e) => {
-          textInput.value = e.target.value;
-          // set CSS variable on :root for live preview styling
-          document.documentElement.style.setProperty(varName, e.target.value);
-          presetSelect.value = '';
-          // Reset preset button styling
-          colorPresetButtons.forEach(b => {
-            b.classList.remove('border-blue-500', 'border-4');
-            b.classList.add('border-2', 'border-gray-600');
-          });
-        });
-
-        textInput.addEventListener('change', (e) => {
-          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            colorInput.value = e.target.value;
-            document.documentElement.style.setProperty(varName, e.target.value);
-            presetSelect.value = '';
-            // Reset preset button styling
-            colorPresetButtons.forEach(b => {
-              b.classList.remove('border-blue-500', 'border-4');
-              b.classList.add('border-2', 'border-gray-600');
-            });
-          }
-        });
-      });
-      
-      // Button color pickers and text inputs sync
-      const buttonColorInputs = ['buttonPrimaryColor', 'buttonSecondaryColor', 'buttonDangerColor', 'buttonSuccessColor'];
-      const buttonColorTexts = ['buttonPrimaryColorText', 'buttonSecondaryColorText', 'buttonDangerColorText', 'buttonSuccessColorText'];
-      const buttonVarNames = ['--btn-primary-bg', '--btn-secondary-bg', '--btn-danger-bg', '--btn-success-bg'];
-      const buttonPreviewClasses = ['.preview-box-btn-primary', '.preview-box-btn-secondary', '.preview-box-btn-danger', '.preview-box-btn-success'];
-      
-      buttonColorInputs.forEach((inputId, index) => {
-        const colorInput = document.getElementById(inputId);
-        const textInput = document.getElementById(buttonColorTexts[index]);
-        const varName = buttonVarNames[index];
-        const previewBox = document.querySelector(buttonPreviewClasses[index]);
-        
-        if (!colorInput || !textInput) return;
-        
-        // Initialize from existing inputs
-        if (colorInput.value) {
-          document.documentElement.style.setProperty(varName, colorInput.value);
-          if (previewBox) previewBox.style.backgroundColor = colorInput.value;
-        }
-
-        colorInput.addEventListener('change', (e) => {
-          textInput.value = e.target.value;
-          // Set CSS variable on :root for live preview styling
-          document.documentElement.style.setProperty(varName, e.target.value);
-          // Update preview box background
-          if (previewBox) previewBox.style.backgroundColor = e.target.value;
-        });
-
-        textInput.addEventListener('change', (e) => {
-          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            colorInput.value = e.target.value;
-            document.documentElement.style.setProperty(varName, e.target.value);
-            // Update preview box background
-            if (previewBox) previewBox.style.backgroundColor = e.target.value;
-          }
-        });
-      });
-      
-      document.getElementById('apply-theme').addEventListener('click', async () => {
-        // Immediate pulse for instant feedback
-        try { pulsePreviews(700); } catch (e) {}
-        
-        // Apply colors immediately via ThemeManager
-        if (window.Theme) {
-          const colors = {
-            primary: document.getElementById('primaryColor')?.value,
-            secondary: document.getElementById('secondaryColor')?.value,
-            accent: document.getElementById('accentColor')?.value,
-            buttonPrimary: document.getElementById('buttonPrimaryColor')?.value,
-            buttonSecondary: document.getElementById('buttonSecondaryColor')?.value,
-            buttonDanger: document.getElementById('buttonDangerColor')?.value,
-            buttonSuccess: document.getElementById('buttonSuccessColor')?.value
-          };
-          window.Theme.setPalette(colors, true);
-        }
-        
-        await saveSettings();
-        // Theme will be applied automatically via ThemeManager when siteSettingsUpdated event fires
-        const msg = 'Applied custom theme via API';
-        AuditLogger.log('theme_change', msg);
-        sendAudit('theme_change', msg);
-        showToast('Theme applied successfully!');
-      });
-    }
 
     // Theme schedule functionality (save to API)
     function initThemeSchedule() {
@@ -1661,9 +1366,6 @@
               // Data sources
               oilDataSource: 'api',
               consumablesDataSource: 'api',
-              primaryColor: '#3b82f6',
-              secondaryColor: '#10b981',
-              accentColor: '#8b5cf6',
               themeSchedule: { enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' },
               sessionTimeout: '60',
               maxLoginAttempts: '5',
@@ -1748,7 +1450,6 @@
         window.initThemeCards();
       }
       
-      initThemeCustomization();
       initThemeSchedule();
       initSecuritySettings();
       loadSettings();
