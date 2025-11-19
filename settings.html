@@ -13,6 +13,7 @@
   <script src="./assets/js/accessibility.js" defer></script>
   <script src="./assets/js/theme-enhanced.js" defer></script>
   <script src="./assets/js/theme-ui.js" defer></script>
+  <script src="./assets/js/settings-theme-cards.js" defer></script>
   <script>
     // Purge legacy role demo key to avoid stale UI state
     try { localStorage.removeItem('currentUser'); } catch (_) {}
@@ -477,14 +478,14 @@
             </div>
             <!-- Theme Selection Cards -->
             <div class="space-y-6">
-              <div class="card widget-secondary p-6 rounded-xl border border-purple-500/30 shadow-xl hover:border-purple-500/50 transition-all duration-300">
+               <div class="card widget-secondary p-6 rounded-xl border border-purple-500/30 shadow-xl">
                 <div class="flex items-center justify-between mb-6">
                   <div>
                     <h3 class="text-lg font-bold text-white mb-2">Choose Your Theme</h3>
                     <p class="text-xs text-gray-400">Select a theme to instantly transform your site's appearance</p>
                   </div>
                   <div class="hidden sm:block px-4 py-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
-                    <span class="text-xs font-semibold text-purple-300">9 Themes Available</span>
+                    <span class="text-xs font-semibold text-purple-300">6 Themes Available</span>
                   </div>
                 </div>
                 
@@ -496,504 +497,14 @@
                   <option value="neon">Neon</option>
                   <option value="high-contrast">High Contrast</option>
                   <option value="ocean">Ocean</option>
-                  <option value="forest">Forest</option>
-                  <option value="sunset">Sunset</option>
-                  <option value="mono">Monochrome</option>
                 </select>
                 
-                <!-- Theme Cards Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                  <!-- Dark Theme -->
-                  <div class="theme-card relative cursor-pointer rounded-xl border-2 border-gray-600 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 overflow-hidden group hover:scale-105 hover:-translate-y-1" data-theme="dark">
-                    <!-- Active Badge -->
-                    <div class="theme-active-indicator absolute top-3 right-3 z-10 hidden">
-                      <div class="bg-green-500 rounded-full p-1.5 shadow-lg shadow-green-500/50 animate-pulse">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <!-- Card Content -->
-                    <div class="relative">
-                      <!-- Animated gradient overlay on hover -->
-                      <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      
-                      <div class="p-5 bg-gray-900 relative">
-                        <div class="flex items-center justify-between mb-4">
-                          <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                              </svg>
-                            </div>
-                            <h4 class="font-bold text-white text-base">Dark</h4>
-                          </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">Popular</span>
-                        </div>
-                        
-                        <!-- Color Palette Preview -->
-                        <div class="flex gap-2 mb-4">
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg transform group-hover:scale-110 transition-transform duration-300"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-75"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-150"></div>
-                        </div>
-                        
-                        <p class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">Classic dark theme for comfortable viewing</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Light Theme -->
-                  <div class="theme-card relative cursor-pointer rounded-xl border-2 border-gray-600 hover:border-yellow-500 hover:shadow-2xl hover:shadow-yellow-500/20 transition-all duration-300 overflow-hidden group hover:scale-105 hover:-translate-y-1" data-theme="light">
-                    <!-- Active Badge -->
-                    <div class="theme-active-indicator absolute top-3 right-3 z-10 hidden">
-                      <div class="bg-green-500 rounded-full p-1.5 shadow-lg shadow-green-500/50 animate-pulse">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <!-- Card Content -->
-                    <div class="relative">
-                      <!-- Animated gradient overlay on hover -->
-                      <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-orange-500/10 to-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      
-                      <div class="p-5 bg-white relative">
-                        <div class="flex items-center justify-between mb-4">
-                          <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center shadow-lg">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                              </svg>
-                            </div>
-                            <h4 class="font-bold text-gray-900 text-base">Light</h4>
-                          </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-500/20 text-yellow-700 border border-yellow-500/30">Clean</span>
-                        </div>
-                        
-                        <!-- Color Palette Preview -->
-                        <div class="flex gap-2 mb-4">
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 shadow-lg transform group-hover:scale-110 transition-transform duration-300"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-green-400 to-green-500 shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-75"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-150"></div>
-                        </div>
-                        
-                        <p class="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Bright and clean for daytime viewing</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- System Auto Theme -->
-                  <div class="theme-card relative cursor-pointer rounded-xl border-2 border-gray-600 hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300 overflow-hidden group hover:scale-105 hover:-translate-y-1" data-theme="system">
-                    <!-- Active Badge -->
-                    <div class="theme-active-indicator absolute top-3 right-3 z-10 hidden">
-                      <div class="bg-green-500 rounded-full p-1.5 shadow-lg shadow-green-500/50 animate-pulse">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <!-- Card Content -->
-                    <div class="relative">
-                      <!-- Split background for system theme -->
-                      <div class="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-600 to-gray-100"></div>
-                      <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      
-                      <div class="p-5 relative">
-                        <div class="flex items-center justify-between mb-4">
-                          <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                            <h4 class="font-bold text-white drop-shadow-lg text-base">System Auto</h4>
-                          </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-500/30 text-white border border-indigo-400/50">Smart</span>
-                        </div>
-                        
-                        <!-- Color Palette Preview with split -->
-                        <div class="flex gap-2 mb-4">
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-gray-700 shadow-lg transform group-hover:scale-110 transition-transform duration-300"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-gray-400 to-gray-200 shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-75"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-150"></div>
-                        </div>
-                        
-                        <p class="text-xs text-white drop-shadow-lg group-hover:text-gray-100 transition-colors">Automatically follows system preference</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Neon Theme -->
-                  <div class="theme-card relative cursor-pointer rounded-xl border-2 border-gray-600 hover:border-cyan-400 hover:shadow-2xl hover:shadow-cyan-400/30 transition-all duration-300 overflow-hidden group hover:scale-105 hover:-translate-y-1" data-theme="neon">
-                    <!-- Active Badge -->
-                    <div class="theme-active-indicator absolute top-3 right-3 z-10 hidden">
-                      <div class="bg-green-500 rounded-full p-1.5 shadow-lg shadow-green-500/50 animate-pulse">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <!-- Card Content -->
-                    <div class="relative">
-                      <!-- Animated neon glow overlay -->
-                      <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-pink-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
-                      
-                      <div class="p-5 bg-black relative">
-                        <div class="flex items-center justify-between mb-4">
-                          <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-pink-500 flex items-center justify-center shadow-lg shadow-cyan-400/50">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                              </svg>
-                            </div>
-                            <h4 class="font-bold text-cyan-400 text-base">Neon</h4>
-                          </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/50 shadow-lg shadow-cyan-400/20">Vibrant</span>
-                        </div>
-                        
-                        <!-- Color Palette Preview with neon glow -->
-                        <div class="flex gap-2 mb-4">
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-500 shadow-lg shadow-cyan-400/50 transform group-hover:scale-110 transition-transform duration-300"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 shadow-lg shadow-pink-400/50 transform group-hover:scale-110 transition-transform duration-300 delay-75"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 shadow-lg shadow-purple-400/50 transform group-hover:scale-110 transition-transform duration-300 delay-150"></div>
-                        </div>
-                        
-                        <p class="text-xs text-cyan-300 group-hover:text-cyan-200 transition-colors">Vibrant neon glow for bold aesthetics</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- High Contrast Theme -->
-                  <div class="theme-card relative cursor-pointer rounded-xl border-2 border-gray-600 hover:border-yellow-400 hover:shadow-2xl hover:shadow-yellow-400/30 transition-all duration-300 overflow-hidden group hover:scale-105 hover:-translate-y-1" data-theme="high-contrast">
-                    <!-- Active Badge -->
-                    <div class="theme-active-indicator absolute top-3 right-3 z-10 hidden">
-                      <div class="bg-green-500 rounded-full p-1.5 shadow-lg shadow-green-500/50 animate-pulse">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <!-- Card Content -->
-                    <div class="relative">
-                      <!-- Animated contrast overlay -->
-                      <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/20 via-white/10 to-yellow-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      
-                      <div class="p-5 bg-black relative">
-                        <div class="flex items-center justify-between mb-4">
-                          <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center shadow-lg shadow-yellow-400/50">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                              </svg>
-                            </div>
-                            <h4 class="font-bold text-yellow-400 text-base">High Contrast</h4>
-                          </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/50">A11y</span>
-                        </div>
-                        
-                        <!-- Color Palette Preview with high contrast -->
-                        <div class="flex gap-2 mb-4">
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-500 shadow-lg shadow-cyan-400/50 border-2 border-white transform group-hover:scale-110 transition-transform duration-300"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-lime-400 to-lime-500 shadow-lg shadow-lime-400/50 border-2 border-white transform group-hover:scale-110 transition-transform duration-300 delay-75"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-lg shadow-yellow-400/50 border-2 border-white transform group-hover:scale-110 transition-transform duration-300 delay-150"></div>
-                        </div>
-                        
-                        <p class="text-xs text-yellow-300 group-hover:text-yellow-200 transition-colors">Maximum readability and accessibility</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Ocean Theme -->
-                  <div class="theme-card relative cursor-pointer rounded-xl border-2 border-gray-600 hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-400/30 transition-all duration-300 overflow-hidden group hover:scale-105 hover:-translate-y-1" data-theme="ocean">
-                    <!-- Active Badge -->
-                    <div class="theme-active-indicator absolute top-3 right-3 z-10 hidden">
-                      <div class="bg-green-500 rounded-full p-1.5 shadow-lg shadow-green-500/50 animate-pulse">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <!-- Card Content -->
-                    <div class="relative">
-                      <!-- Animated ocean wave overlay -->
-                      <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-cyan-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      
-                      <div class="p-5 bg-gradient-to-br from-blue-900 to-cyan-900 relative">
-                        <div class="flex items-center justify-between mb-4">
-                          <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-400/50">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
-                              </svg>
-                            </div>
-                            <h4 class="font-bold text-blue-200 text-base">Ocean</h4>
-                          </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-400/20 text-blue-200 border border-blue-400/50">Calm</span>
-                        </div>
-                        
-                        <!-- Color Palette Preview with ocean blues -->
-                        <div class="flex gap-2 mb-4">
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg shadow-blue-500/50 transform group-hover:scale-110 transition-transform duration-300"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-lg shadow-cyan-500/50 transform group-hover:scale-110 transition-transform duration-300 delay-75"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-sky-400 to-sky-500 shadow-lg shadow-sky-400/50 transform group-hover:scale-110 transition-transform duration-300 delay-150"></div>
-                        </div>
-                        
-                        <p class="text-xs text-blue-200 group-hover:text-blue-100 transition-colors">Deep sea blues for tranquil focus</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Forest Theme -->
-                  <div class="theme-card relative cursor-pointer rounded-xl border-2 border-gray-600 hover:border-green-500 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-300 overflow-hidden group hover:scale-105 hover:-translate-y-1" data-theme="forest">
-                    <!-- Active Badge -->
-                    <div class="theme-active-indicator absolute top-3 right-3 z-10 hidden">
-                      <div class="bg-green-500 rounded-full p-1.5 shadow-lg shadow-green-500/50 animate-pulse">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <!-- Card Content -->
-                    <div class="relative">
-                      <!-- Animated forest overlay -->
-                      <div class="absolute inset-0 bg-gradient-to-br from-green-500/20 via-emerald-500/20 to-green-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      
-                      <div class="p-5 bg-gradient-to-br from-green-900 to-emerald-900 relative">
-                        <div class="flex items-center justify-between mb-4">
-                          <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/50">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                              </svg>
-                            </div>
-                            <h4 class="font-bold text-green-200 text-base">Forest</h4>
-                          </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-400/20 text-green-200 border border-green-400/50">Natural</span>
-                        </div>
-                        
-                        <!-- Color Palette Preview with forest greens -->
-                        <div class="flex gap-2 mb-4">
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-green-700 to-green-800 shadow-lg shadow-green-600/50 transform group-hover:scale-110 transition-transform duration-300"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/50 transform group-hover:scale-110 transition-transform duration-300 delay-75"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-lime-500 to-lime-600 shadow-lg shadow-lime-500/50 transform group-hover:scale-110 transition-transform duration-300 delay-150"></div>
-                        </div>
-                        
-                        <p class="text-xs text-green-200 group-hover:text-green-100 transition-colors">Earthy greens for natural harmony</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Sunset Theme -->
-                  <div class="theme-card relative cursor-pointer rounded-xl border-2 border-gray-600 hover:border-orange-400 hover:shadow-2xl hover:shadow-orange-400/30 transition-all duration-300 overflow-hidden group hover:scale-105 hover:-translate-y-1" data-theme="sunset">
-                    <!-- Active Badge -->
-                    <div class="theme-active-indicator absolute top-3 right-3 z-10 hidden">
-                      <div class="bg-green-500 rounded-full p-1.5 shadow-lg shadow-green-500/50 animate-pulse">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <!-- Card Content -->
-                    <div class="relative">
-                      <!-- Animated sunset gradient overlay -->
-                      <div class="absolute inset-0 bg-gradient-to-br from-orange-500/20 via-pink-500/20 to-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      
-                      <div class="p-5 bg-gradient-to-br from-orange-100 to-pink-100 relative">
-                        <div class="flex items-center justify-between mb-4">
-                          <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 flex items-center justify-center shadow-lg shadow-orange-500/50">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                              </svg>
-                            </div>
-                            <h4 class="font-bold text-orange-700 text-base">Sunset</h4>
-                          </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-orange-400/30 text-orange-700 border border-orange-500/50">Warm</span>
-                        </div>
-                        
-                        <!-- Color Palette Preview with sunset colors -->
-                        <div class="flex gap-2 mb-4">
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-orange-400 to-orange-500 shadow-lg shadow-orange-400/50 transform group-hover:scale-110 transition-transform duration-300"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-red-400 to-red-500 shadow-lg shadow-red-400/50 transform group-hover:scale-110 transition-transform duration-300 delay-75"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 shadow-lg shadow-pink-400/50 transform group-hover:scale-110 transition-transform duration-300 delay-150"></div>
-                        </div>
-                        
-                        <p class="text-xs text-orange-700 group-hover:text-orange-800 transition-colors">Warm sunset hues for cozy ambiance</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Monochrome Theme -->
-                  <div class="theme-card relative cursor-pointer rounded-xl border-2 border-gray-600 hover:border-gray-400 hover:shadow-2xl hover:shadow-gray-400/30 transition-all duration-300 overflow-hidden group hover:scale-105 hover:-translate-y-1" data-theme="mono">
-                    <!-- Active Badge -->
-                    <div class="theme-active-indicator absolute top-3 right-3 z-10 hidden">
-                      <div class="bg-green-500 rounded-full p-1.5 shadow-lg shadow-green-500/50 animate-pulse">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <!-- Card Content -->
-                    <div class="relative">
-                      <!-- Animated monochrome overlay -->
-                      <div class="absolute inset-0 bg-gradient-to-br from-gray-500/10 via-gray-400/10 to-gray-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      
-                      <div class="p-5 bg-gray-800 relative">
-                        <div class="flex items-center justify-between mb-4">
-                          <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center shadow-lg">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                              </svg>
-                            </div>
-                            <h4 class="font-bold text-gray-200 text-base">Monochrome</h4>
-                          </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-600/30 text-gray-300 border border-gray-500/50">Minimal</span>
-                        </div>
-                        
-                        <!-- Color Palette Preview with monochrome shades -->
-                        <div class="flex gap-2 mb-4">
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-gray-800 shadow-lg transform group-hover:scale-110 transition-transform duration-300"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-gray-600 to-gray-700 shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-75"></div>
-                          <div class="flex-1 h-12 rounded-lg bg-gradient-to-br from-gray-400 to-gray-500 shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-150"></div>
-                        </div>
-                        
-                        <p class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">Subtle monochrome tones for minimalism</p>
-                      </div>
-                    </div>
+                <!-- Theme Cards Container - Dynamically populated -->
+                <div id="theme-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <!-- Theme cards will be rendered here by JavaScript -->
                 </div>
               </div>
 
-              <!-- Color Customization Section -->
-              <div class="card widget-secondary p-6 rounded-lg border border-gray-700">
-                <h3 class="text-lg font-bold text-white mb-4">Custom Colors</h3>
-                <p class="text-sm text-gray-400 mb-6">Fine-tune your theme colors</p>
-                
-                <!-- Hidden select for preset compatibility -->
-                <select id="theme-preset" class="hidden">
-                  <option value="">Custom</option>
-                  <option value="default">Default (Blue/Green/Purple)</option>
-                  <option value="ocean">Ocean</option>
-                  <option value="forest">Forest</option>
-                  <option value="sunset">Sunset</option>
-                  <option value="mono">Monochrome</option>
-                </select>
-                
-                <!-- Color Preset Buttons -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="default">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-3b82f6"></div>
-                      <div class="w-full h-6 rounded sw-10b981"></div>
-                      <div class="w-full h-6 rounded sw-8b5cf6"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Default</p>
-                  </button>
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="ocean">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-0284c7"></div>
-                      <div class="w-full h-6 rounded sw-06b6d4"></div>
-                      <div class="w-full h-6 rounded sw-0ea5e9"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Ocean</p>
-                  </button>
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="forest">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-166534"></div>
-                      <div class="w-full h-6 rounded sw-22c55e"></div>
-                      <div class="w-full h-6 rounded sw-84cc16"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Forest</p>
-                  </button>
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="sunset">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-f59e42"></div>
-                      <div class="w-full h-6 rounded sw-ef4444"></div>
-                      <div class="w-full h-6 rounded sw-f472b6"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Sunset</p>
-                  </button>
-                  <button type="button" class="color-preset-btn p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-all" data-preset="mono">
-                    <div class="flex gap-1 mb-2">
-                      <div class="w-full h-6 rounded sw-22223b"></div>
-                      <div class="w-full h-6 rounded sw-4a4e69"></div>
-                      <div class="w-full h-6 rounded sw-9a8c98"></div>
-                    </div>
-                    <p class="text-xs font-semibold">Mono</p>
-                  </button>
-                </div>
-
-                <!-- Color Pickers -->
-                <div class="space-y-4">
-                  <div class="flex items-center gap-3">
-                    <label for="primaryColor" class="w-24 font-semibold">Primary</label>
-                    <input id="primaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#3b82f6" />
-                    <div aria-hidden="true" title="Primary preview" class="w-10 h-8 rounded preview-box-primary border border-gray-600"></div>
-                    <input id="primaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#3b82f6" title="Primary color hex" placeholder="#3b82f6" />
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <label for="secondaryColor" class="w-24 font-semibold">Secondary</label>
-                    <input id="secondaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#10b981" />
-                    <div aria-hidden="true" title="Secondary preview" class="w-10 h-8 rounded preview-box-secondary border border-gray-600"></div>
-                    <input id="secondaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#10b981" title="Secondary color hex" placeholder="#10b981" />
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <label for="accentColor" class="w-24 font-semibold">Accent</label>
-                    <input id="accentColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#8b5cf6" />
-                    <div aria-hidden="true" title="Accent preview" class="w-10 h-8 rounded preview-box-accent border border-gray-600"></div>
-                    <input id="accentColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono" value="#8b5cf6" title="Accent color hex" placeholder="#8b5cf6" />
-                  </div>
-                  
-                  <!-- Button Colors Section -->
-                  <div class="mt-6 pt-6 border-t border-gray-700">
-                    <h4 class="text-sm font-bold text-gray-400 mb-4 flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                      </svg>
-                      Button Colors
-                    </h4>
-                    <div class="space-y-3">
-                      <div class="flex items-center gap-3">
-                        <label for="buttonPrimaryColor" class="w-24 font-semibold text-sm">Primary</label>
-                        <input id="buttonPrimaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#3b82f6" />
-                        <div aria-hidden="true" title="Button Primary preview" class="w-10 h-8 rounded preview-box-btn-primary border border-gray-600"></div>
-                        <input id="buttonPrimaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#3b82f6" title="Button Primary color hex" placeholder="#3b82f6" />
-                      </div>
-                      <div class="flex items-center gap-3">
-                        <label for="buttonSecondaryColor" class="w-24 font-semibold text-sm">Secondary</label>
-                        <input id="buttonSecondaryColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#6b7280" />
-                        <div aria-hidden="true" title="Button Secondary preview" class="w-10 h-8 rounded preview-box-btn-secondary border border-gray-600"></div>
-                        <input id="buttonSecondaryColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#6b7280" title="Button Secondary color hex" placeholder="#6b7280" />
-                      </div>
-                      <div class="flex items-center gap-3">
-                        <label for="buttonDangerColor" class="w-24 font-semibold text-sm">Danger</label>
-                        <input id="buttonDangerColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#ef4444" />
-                        <div aria-hidden="true" title="Button Danger preview" class="w-10 h-8 rounded preview-box-btn-danger border border-gray-600"></div>
-                        <input id="buttonDangerColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#ef4444" title="Button Danger color hex" placeholder="#ef4444" />
-                      </div>
-                      <div class="flex items-center gap-3">
-                        <label for="buttonSuccessColor" class="w-24 font-semibold text-sm">Success</label>
-                        <input id="buttonSuccessColor" type="color" class="w-16 h-12 rounded cursor-pointer" value="#10b981" />
-                        <div aria-hidden="true" title="Button Success preview" class="w-10 h-8 rounded preview-box-btn-success border border-gray-600"></div>
-                        <input id="buttonSuccessColorText" class="flex-1 p-3 rounded bg-gray-100 dark:bg-gray-700 font-mono text-sm" value="#10b981" title="Button Success color hex" placeholder="#10b981" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <button id="apply-theme" class="w-full btn-neon-green px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all mt-6">
-                  <span class="flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Apply Theme Changes
-                  </span>
-                </button>
-              </div>
-
-              <!-- Theme Schedule Section - Enhanced -->
               <div id="theme-scheduler-container" class="card widget-secondary p-6 rounded-lg border border-gray-700">
                 <h3 class="text-lg font-bold text-white mb-4">Theme Schedule</h3>
                 <p class="text-sm text-gray-400 mb-6">Automatically switch themes based on time of day</p>
@@ -1280,14 +791,6 @@
           enableGuestCheckout: document.getElementById('enable-guest-checkout')?.checked || false,
           
         },
-        // Theme customization
-        primaryColor: document.getElementById('primaryColor')?.value || '#3b82f6',
-        secondaryColor: document.getElementById('secondaryColor')?.value || '#10b981',
-        accentColor: document.getElementById('accentColor')?.value || '#8b5cf6',
-        buttonPrimaryColor: document.getElementById('buttonPrimaryColor')?.value || '#3b82f6',
-        buttonSecondaryColor: document.getElementById('buttonSecondaryColor')?.value || '#6b7280',
-        buttonDangerColor: document.getElementById('buttonDangerColor')?.value || '#ef4444',
-        buttonSuccessColor: document.getElementById('buttonSuccessColor')?.value || '#10b981',
         // Theme schedule
         themeSchedule: {
           enabled: document.getElementById('schedule-enabled')?.checked || false,
@@ -1349,22 +852,6 @@
                 document.getElementById('smtp-password').value = settings.smtpPassword ?? '';
                 if (settings.customCss) document.getElementById('custom-css').value = settings.customCss;
                 if (settings.customJs) document.getElementById('custom-js').value = settings.customJs;
-                // Theme customization
-                if (settings.primaryColor) document.getElementById('primaryColor').value = settings.primaryColor;
-                if (settings.secondaryColor) document.getElementById('secondaryColor').value = settings.secondaryColor;
-                if (settings.accentColor) document.getElementById('accentColor').value = settings.accentColor;
-                if (settings.primaryColor) document.getElementById('primaryColorText').value = settings.primaryColor;
-                if (settings.secondaryColor) document.getElementById('secondaryColorText').value = settings.secondaryColor;
-                if (settings.accentColor) document.getElementById('accentColorText').value = settings.accentColor;
-                // Button colors
-                if (settings.buttonPrimaryColor) document.getElementById('buttonPrimaryColor').value = settings.buttonPrimaryColor;
-                if (settings.buttonSecondaryColor) document.getElementById('buttonSecondaryColor').value = settings.buttonSecondaryColor;
-                if (settings.buttonDangerColor) document.getElementById('buttonDangerColor').value = settings.buttonDangerColor;
-                if (settings.buttonSuccessColor) document.getElementById('buttonSuccessColor').value = settings.buttonSuccessColor;
-                if (settings.buttonPrimaryColor) document.getElementById('buttonPrimaryColorText').value = settings.buttonPrimaryColor;
-                if (settings.buttonSecondaryColor) document.getElementById('buttonSecondaryColorText').value = settings.buttonSecondaryColor;
-                if (settings.buttonDangerColor) document.getElementById('buttonDangerColorText').value = settings.buttonDangerColor;
-                if (settings.buttonSuccessColor) document.getElementById('buttonSuccessColorText').value = settings.buttonSuccessColor;
                 // Theme schedule
                 if (settings.themeSchedule) {
                     document.getElementById('schedule-enabled').checked = settings.themeSchedule.enabled;
@@ -1533,229 +1020,31 @@
                 }
             }
     }
-
-    // Color theme functionality (update preview only)
-    function initThemeCustomization() {
-      const colorInputs = ['primaryColor', 'secondaryColor', 'accentColor'];
-      const colorTexts = ['primaryColorText', 'secondaryColorText', 'accentColorText'];
-      const previews = ['primary-preview', 'secondary-preview', 'accent-preview'];
-      
-      // Preset themes
-      const themePresets = {
-        default: { primary: '#3b82f6', secondary: '#10b981', accent: '#8b5cf6' },
-        ocean:   { primary: '#0284c7', secondary: '#06b6d4', accent: '#0ea5e9' },
-        forest:  { primary: '#166534', secondary: '#22c55e', accent: '#84cc16' },
-        sunset:  { primary: '#f59e42', secondary: '#ef4444', accent: '#f472b6' },
-        mono:    { primary: '#22223b', secondary: '#4a4e69', accent: '#9a8c98' }
-      };
-      
-      // Handle theme card selection
-      const themeCards = document.querySelectorAll('.theme-card');
-      const themeSelect = document.getElementById('theme-select');
-      
-      function updateActiveThemeCard(themeId) {
-        themeCards.forEach(card => {
-          const cardTheme = card.getAttribute('data-theme');
-          const indicator = card.querySelector('.theme-active-indicator');
-          if (cardTheme === themeId) {
-            card.classList.add('border-green-500', 'border-4');
-            card.classList.remove('border-2', 'border-gray-600');
-            if (indicator) indicator.classList.remove('hidden');
-          } else {
-            card.classList.remove('border-green-500', 'border-4');
-            card.classList.add('border-2', 'border-gray-600');
-            if (indicator) indicator.classList.add('hidden');
-          }
+    
+    // Quiet save for theme changes (no UI feedback)
+    async function saveSettingsQuiet() {
+      try {
+        const settings = getFormSettings();
+        const FN_BASE = window.FN_BASE || '/.netlify/functions';
+        const token = getAuthToken();
+        
+        await fetch(`${FN_BASE}/settings`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
+          body: JSON.stringify(settings)
         });
+        
+        markSaved();
+      } catch (e) {
+        console.error('Quiet save failed:', e);
       }
-      
-      themeCards.forEach(card => {
-        card.addEventListener('click', async () => {
-          const themeId = card.getAttribute('data-theme');
-          themeSelect.value = themeId;
-          updateActiveThemeCard(themeId);
-          
-          // Wait for ThemeManager to be ready
-          let attempts = 0;
-          while (!window.Theme && attempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            attempts++;
-          }
-          
-          // Apply theme immediately using ThemeManager
-          if (window.Theme && typeof window.Theme.setTheme === 'function') {
-            window.Theme.setTheme(themeId, true);
-          } else {
-            // Fallback: manually apply theme if ThemeManager not loaded yet
-            console.warn('ThemeManager not loaded after waiting, applying theme manually');
-            const body = document.body;
-            const html = document.documentElement;
-            
-            // Update body and html classes
-            body.classList.remove('dark', 'light');
-            html.classList.remove('dark', 'light');
-            
-            if (themeId === 'light' || themeId === 'sunset') {
-              body.classList.add('light');
-              html.classList.add('light');
-            } else {
-              body.classList.add('dark');
-              html.classList.add('dark');
-            }
-            
-            // Save to localStorage for persistence
-            try {
-              const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-              siteSettings.theme = themeId;
-              localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
-              localStorage.setItem('theme', themeId);
-            } catch (e) {
-              console.error('Failed to save theme to localStorage:', e);
-            }
-          }
-          
-          // Provide immediate visual feedback
-          try { pulsePreviews(700); } catch (e) {}
-          await saveSettings();
-          const msg = `Changed theme to ${themeId} via theme card`;
-          AuditLogger.log('theme_change', msg);
-          sendAudit('theme_change', msg);
-          showToast(`Theme changed to ${themeId}!`);
-        });
-      });
-      
-      // Initialize active theme on load
-      const currentTheme = themeSelect.value || 'dark';
-      updateActiveThemeCard(currentTheme);
-      
-      // Handle color preset buttons
-      const colorPresetButtons = document.querySelectorAll('.color-preset-btn');
-      const presetSelect = document.getElementById('theme-preset');
-      
-      colorPresetButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const preset = btn.getAttribute('data-preset');
-          presetSelect.value = preset;
-          if (themePresets[preset]) {
-            document.getElementById('primaryColor').value = themePresets[preset].primary;
-            document.getElementById('secondaryColor').value = themePresets[preset].secondary;
-            document.getElementById('accentColor').value = themePresets[preset].accent;
-            document.getElementById('primaryColorText').value = themePresets[preset].primary;
-            document.getElementById('secondaryColorText').value = themePresets[preset].secondary;
-            document.getElementById('accentColorText').value = themePresets[preset].accent;
-            
-            // Update button styling
-            colorPresetButtons.forEach(b => {
-              b.classList.remove('border-blue-500', 'border-4');
-              b.classList.add('border-2', 'border-gray-600');
-            });
-            btn.classList.add('border-blue-500', 'border-4');
-            btn.classList.remove('border-2', 'border-gray-600');
-          }
-        });
-      });
-      
-      // Color pickers and text inputs sync
-        colorInputs.forEach((inputId, index) => {
-        const colorInput = document.getElementById(inputId);
-        const textInput = document.getElementById(colorTexts[index]);
-        const varName = ['--preview-primary','--preview-secondary','--preview-accent'][index];
-        
-        // initialize from existing inputs
-        if (colorInput && colorInput.value) {
-          document.documentElement.style.setProperty(varName, colorInput.value);
-        }
-
-        colorInput.addEventListener('change', (e) => {
-          textInput.value = e.target.value;
-          // set CSS variable on :root for live preview styling
-          document.documentElement.style.setProperty(varName, e.target.value);
-          presetSelect.value = '';
-          // Reset preset button styling
-          colorPresetButtons.forEach(b => {
-            b.classList.remove('border-blue-500', 'border-4');
-            b.classList.add('border-2', 'border-gray-600');
-          });
-        });
-
-        textInput.addEventListener('change', (e) => {
-          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            colorInput.value = e.target.value;
-            document.documentElement.style.setProperty(varName, e.target.value);
-            presetSelect.value = '';
-            // Reset preset button styling
-            colorPresetButtons.forEach(b => {
-              b.classList.remove('border-blue-500', 'border-4');
-              b.classList.add('border-2', 'border-gray-600');
-            });
-          }
-        });
-      });
-      
-      // Button color pickers and text inputs sync
-      const buttonColorInputs = ['buttonPrimaryColor', 'buttonSecondaryColor', 'buttonDangerColor', 'buttonSuccessColor'];
-      const buttonColorTexts = ['buttonPrimaryColorText', 'buttonSecondaryColorText', 'buttonDangerColorText', 'buttonSuccessColorText'];
-      const buttonVarNames = ['--btn-primary-bg', '--btn-secondary-bg', '--btn-danger-bg', '--btn-success-bg'];
-      const buttonPreviewClasses = ['.preview-box-btn-primary', '.preview-box-btn-secondary', '.preview-box-btn-danger', '.preview-box-btn-success'];
-      
-      buttonColorInputs.forEach((inputId, index) => {
-        const colorInput = document.getElementById(inputId);
-        const textInput = document.getElementById(buttonColorTexts[index]);
-        const varName = buttonVarNames[index];
-        const previewBox = document.querySelector(buttonPreviewClasses[index]);
-        
-        if (!colorInput || !textInput) return;
-        
-        // Initialize from existing inputs
-        if (colorInput.value) {
-          document.documentElement.style.setProperty(varName, colorInput.value);
-          if (previewBox) previewBox.style.backgroundColor = colorInput.value;
-        }
-
-        colorInput.addEventListener('change', (e) => {
-          textInput.value = e.target.value;
-          // Set CSS variable on :root for live preview styling
-          document.documentElement.style.setProperty(varName, e.target.value);
-          // Update preview box background
-          if (previewBox) previewBox.style.backgroundColor = e.target.value;
-        });
-
-        textInput.addEventListener('change', (e) => {
-          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            colorInput.value = e.target.value;
-            document.documentElement.style.setProperty(varName, e.target.value);
-            // Update preview box background
-            if (previewBox) previewBox.style.backgroundColor = e.target.value;
-          }
-        });
-      });
-      
-      document.getElementById('apply-theme').addEventListener('click', async () => {
-        // Immediate pulse for instant feedback
-        try { pulsePreviews(700); } catch (e) {}
-        
-        // Apply colors immediately via ThemeManager
-        if (window.Theme) {
-          const colors = {
-            primary: document.getElementById('primaryColor')?.value,
-            secondary: document.getElementById('secondaryColor')?.value,
-            accent: document.getElementById('accentColor')?.value,
-            buttonPrimary: document.getElementById('buttonPrimaryColor')?.value,
-            buttonSecondary: document.getElementById('buttonSecondaryColor')?.value,
-            buttonDanger: document.getElementById('buttonDangerColor')?.value,
-            buttonSuccess: document.getElementById('buttonSuccessColor')?.value
-          };
-          window.Theme.setPalette(colors, true);
-        }
-        
-        await saveSettings();
-        // Theme will be applied automatically via ThemeManager when siteSettingsUpdated event fires
-        const msg = 'Applied custom theme via API';
-        AuditLogger.log('theme_change', msg);
-        sendAudit('theme_change', msg);
-        showToast('Theme applied successfully!');
-      });
     }
+    
+    // Expose for theme cards module
+    window.saveSettingsQuiet = saveSettingsQuiet;
 
     // Theme schedule functionality (save to API)
     function initThemeSchedule() {
@@ -2077,9 +1366,6 @@
               // Data sources
               oilDataSource: 'api',
               consumablesDataSource: 'api',
-              primaryColor: '#3b82f6',
-              secondaryColor: '#10b981',
-              accentColor: '#8b5cf6',
               themeSchedule: { enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' },
               sessionTimeout: '60',
               maxLoginAttempts: '5',
@@ -2158,7 +1444,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       AuditLogger.log('page_access', 'Accessed Settings page');
       initTabs();
-      initThemeCustomization();
+      
+      // Initialize theme cards (data-driven approach)
+      if (typeof window.initThemeCards === 'function') {
+        window.initThemeCards();
+      }
+      
       initThemeSchedule();
       initSecuritySettings();
       loadSettings();

@@ -40,12 +40,16 @@ Modern full-stack application with:
 - **Audit Logging**: Comprehensive action tracking with search/export
 - **Site Settings**: Database-backed configuration
 - **Inventory Control**: Stock tracking and alerts
+- **Error Tracking**: Self-hosted error monitoring (Phase 1.1)
+- **Email Queue**: Reliable email delivery with retry logic (Phase 1.2)
 
 ### Technical Features
 
 - **Serverless Architecture**: Zero server management
 - **Database Management**: PostgreSQL schema with full CRUD operations
 - **Permission System**: Role-based access control (mechanic/manager/admin)
+- **Error Tracking**: Database-backed error logging with grouping
+- **Email Queue**: Priority-based email delivery with templates
 - **Testing Suite**: Jest unit/integration + function smoke tests
 - **CI/CD**: Automated testing, linting, and deployment
 
@@ -369,8 +373,32 @@ git push origin main
 
 ## 📚 Documentation
 
+### 🆕 Upgrade & Improvements Plan
+
+**Want to add features without paid services?** [**Start here → START_HERE.md**](START_HERE.md)
+
+The upgrade plan includes:
+- Self-hosted error tracking (replaces Sentry) 
+- Email queue system (no external SMTP)
+- Full-text search (PostgreSQL native)
+- Advanced analytics & automated reports
+- Multi-layer caching
+- Security monitoring & API keys
+- Offline PWA support
+- Business intelligence & forecasting
+- And 30+ more features!
+
+**Total cost**: $0 | **Savings**: $500-5000/year | **Timeline**: 6-21 weeks
+
+### Technical Documentation
+
 Comprehensive documentation in `/docs`:
 
+- **[START_HERE.md](START_HERE.md)** - 🆕 **New to upgrades? Start here!**
+- **[UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md)** - 🆕 Quick upgrade plan overview
+- **[VISUAL_ROADMAP.md](VISUAL_ROADMAP.md)** - 🆕 Interactive visual journey
+- **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** - 🆕 Complete upgrade specification (1100+ lines)
+- **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - 🆕 Step-by-step how-to guide
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design
 - **[API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)** - API reference
 - **[DATABASE.md](docs/DATABASE.md)** - Schema and queries

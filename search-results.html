@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - joshburt.com.au</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Navigation -->
+    <div id="shared-nav-container"></div>
+
+    <!-- Main Content -->
+    <div class="lg:ml-64 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Search Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Search</h1>
+                
+                <!-- Search Input -->
+                <div class="relative max-w-3xl">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        class="w-full px-4 py-3 pl-12 pr-4 text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Search products, consumables, filters..."
+                        autocomplete="off"
+                    >
+                    <svg class="absolute left-4 top-4 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="hidden text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">Searching...</p>
+            </div>
+
+            <!-- No Results -->
+            <div id="noResults" class="hidden text-center py-12">
+                <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No results found</h3>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">Try different keywords or check your spelling</p>
+            </div>
+
+            <!-- Search Results -->
+            <div id="searchResults" class="hidden">
+                <!-- Filter Tabs -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button class="filter-tab active px-4 py-2 rounded-lg bg-blue-600 text-white" data-type="all">
+                        All Results (<span id="count-all">0</span>)
+                    </button>
+                    <button class="filter-tab px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" data-type="product">
+                        Products (<span id="count-product">0</span>)
+                    </button>
+                    <button class="filter-tab px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" data-type="consumable">
+                        Consumables (<span id="count-consumable">0</span>)
+                    </button>
+                    <button class="filter-tab px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" data-type="filter">
+                        Filters (<span id="count-filter">0</span>)
+                    </button>
+                </div>
+
+                <!-- Sort Options -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        <span id="resultsSummary">Found 0 results</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-600 dark:text-gray-400">Sort by:</label>
+                        <select id="sortSelect" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            <option value="relevance">Relevance</option>
+                            <option value="name">Name</option>
+                            <option value="recent">Most Recent</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Results Container -->
+                <div id="resultsContainer" class="space-y-4">
+                    <!-- Results will be inserted here -->
+                </div>
+
+                <!-- Pagination -->
+                <div id="pagination" class="hidden mt-8 flex justify-center items-center gap-2">
+                    <button id="prevPage" class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50">
+                        Previous
+                    </button>
+                    <span id="pageInfo" class="text-gray-600 dark:text-gray-400">Page 1</span>
+                    <button id="nextPage" class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50">
+                        Next
+                    </button>
+                </div>
+            </div>
+
+            <!-- Popular Searches -->
+            <div id="popularSearches" class="mt-12">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Popular Searches</h2>
+                <div id="popularContainer" class="flex flex-wrap gap-2">
+                    <!-- Popular searches will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Components -->
+    <script src="/shared-config.html"></script>
+    <script src="/shared-nav.html"></script>
+    <script src="/shared-theme.html"></script>
+    <script src="/shared-modals.html"></script>
+    <script src="/shared-notifications.html"></script>
+    <script src="/assets/js/search-autocomplete.js"></script>
+    <script src="/assets/js/init-shared.js"></script>
+
+    <script>
+        const FN_BASE = window.FN_BASE || '/.netlify/functions';
+        let currentQuery = '';
+        let currentType = 'all';
+        let currentSort = 'relevance';
+        let currentPage = 0;
+        const pageSize = 20;
+        let searchResults = null;
+
+        // Initialize autocomplete
+        const autocomplete = window.initSearchAutocomplete('#searchInput', {
+            onSelect: (suggestion) => {
+                performSearch(suggestion.text);
+            }
+        });
+
+        // Get query from URL if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialQuery = urlParams.get('q');
+        if (initialQuery) {
+            document.getElementById('searchInput').value = initialQuery;
+            performSearch(initialQuery);
+        }
+
+        // Search input event
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch(e.target.value);
+            }
+        });
+
+        // Filter tab events
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                currentType = tab.dataset.type;
+                updateFilterTabs();
+                renderResults();
+            });
+        });
+
+        // Sort select event
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            performSearch(currentQuery);
+        });
+
+        // Pagination events
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                performSearch(currentQuery);
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            currentPage++;
+            performSearch(currentQuery);
+        });
+
+        /**
+         * Perform search
+         */
+        async function performSearch(query) {
+            if (!query || query.trim().length === 0) return;
+
+            currentQuery = query.trim();
+            currentPage = 0;
+
+            // Update URL
+            const url = new URL(window.location);
+            url.searchParams.set('q', currentQuery);
+            window.history.pushState({}, '', url);
+
+            // Show loading
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('searchResults').classList.add('hidden');
+            document.getElementById('noResults').classList.add('hidden');
+
+            try {
+                const response = await fetch(
+                    `${FN_BASE}/search?q=${encodeURIComponent(currentQuery)}&type=all&sort=${currentSort}&limit=${pageSize}&offset=${currentPage * pageSize}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Search failed');
+                }
+
+                searchResults = await response.json();
+                displayResults();
+            } catch (err) {
+                console.error('Search error:', err);
+                window.showNotification('Search failed. Please try again.', 'error');
+                document.getElementById('loadingState').classList.add('hidden');
+            }
+        }
+
+        /**
+         * Display search results
+         */
+        function displayResults() {
+            document.getElementById('loadingState').classList.add('hidden');
+
+            if (searchResults.total === 0) {
+                document.getElementById('noResults').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('searchResults').classList.remove('hidden');
+
+            // Update counts
+            document.getElementById('count-all').textContent = searchResults.total;
+            document.getElementById('count-product').textContent = searchResults.products.length;
+            document.getElementById('count-consumable').textContent = searchResults.consumables.length;
+            document.getElementById('count-filter').textContent = searchResults.filters.length;
+
+            // Update summary
+            document.getElementById('resultsSummary').textContent = 
+                `Found ${searchResults.total} result${searchResults.total !== 1 ? 's' : ''} for "${currentQuery}"`;
+
+            renderResults();
+        }
+
+        /**
+         * Render filtered results
+         */
+        function renderResults() {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '';
+
+            let results = [];
+            if (currentType === 'all') {
+                results = [
+                    ...searchResults.products,
+                    ...searchResults.consumables,
+                    ...searchResults.filters
+                ];
+            } else if (currentType === 'product') {
+                results = searchResults.products;
+            } else if (currentType === 'consumable') {
+                results = searchResults.consumables;
+            } else if (currentType === 'filter') {
+                results = searchResults.filters;
+            }
+
+            if (results.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-600 dark:text-gray-400 py-8">No results in this category</p>';
+                return;
+            }
+
+            results.forEach(result => {
+                container.appendChild(createResultCard(result));
+            });
+        }
+
+        /**
+         * Create result card element
+         */
+        function createResultCard(result) {
+            const card = document.createElement('div');
+            card.className = 'bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer';
+            
+            // Determine link based on type
+            let link = '#';
+            if (result.result_type === 'product') {
+                link = `/oil-products.html`;
+            } else if (result.result_type === 'consumable') {
+                link = `/consumables.html`;
+            } else if (result.result_type === 'filter') {
+                link = `/filters.html`;
+            }
+
+            card.addEventListener('click', () => {
+                trackClick(result);
+                window.location.href = link;
+            });
+
+            // Type badge
+            const badge = document.createElement('span');
+            badge.className = 'inline-block px-2 py-1 text-xs rounded-full mb-2';
+            switch (result.result_type) {
+                case 'product':
+                    badge.textContent = 'Product';
+                    badge.className += ' bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+                    break;
+                case 'consumable':
+                    badge.textContent = 'Consumable';
+                    badge.className += ' bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+                    break;
+                case 'filter':
+                    badge.textContent = 'Filter';
+                    badge.className += ' bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+                    break;
+            }
+            card.appendChild(badge);
+
+            // Title
+            const title = document.createElement('h3');
+            title.className = 'text-lg font-semibold text-gray-900 dark:text-white mb-2';
+            title.textContent = result.name;
+            card.appendChild(title);
+
+            // Code
+            const code = document.createElement('p');
+            code.className = 'text-sm text-gray-600 dark:text-gray-400 mb-2';
+            code.textContent = `Code: ${result.code}`;
+            card.appendChild(code);
+
+            // Description
+            if (result.description) {
+                const desc = document.createElement('p');
+                desc.className = 'text-sm text-gray-700 dark:text-gray-300 mb-3';
+                desc.textContent = result.description.substring(0, 150) + (result.description.length > 150 ? '...' : '');
+                card.appendChild(desc);
+            }
+
+            // Stock info
+            const stock = document.createElement('p');
+            stock.className = 'text-sm';
+            const stockQty = result.stock_quantity || result.soh || 0;
+            if (stockQty > 0) {
+                stock.className += ' text-green-600 dark:text-green-400';
+                stock.textContent = `In Stock (${stockQty})`;
+            } else {
+                stock.className += ' text-red-600 dark:text-red-400';
+                stock.textContent = 'Out of Stock';
+            }
+            card.appendChild(stock);
+
+            return card;
+        }
+
+        /**
+         * Track search result click
+         */
+        async function trackClick(result) {
+            try {
+                await fetch(`${FN_BASE}/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
+                    },
+                    body: JSON.stringify({
+                        query: currentQuery,
+                        result_id: result.id,
+                        result_type: result.result_type
+                    })
+                });
+            } catch (err) {
+                console.error('Error tracking click:', err);
+            }
+        }
+
+        /**
+         * Update filter tab styles
+         */
+        function updateFilterTabs() {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                if (tab.dataset.type === currentType) {
+                    tab.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+                    tab.classList.add('bg-blue-600', 'text-white');
+                } else {
+                    tab.classList.remove('bg-blue-600', 'text-white');
+                    tab.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+                }
+            });
+        }
+
+        /**
+         * Load popular searches
+         */
+        async function loadPopularSearches() {
+            try {
+                const response = await fetch(`${FN_BASE}/search?popular=true&limit=10`);
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const container = document.getElementById('popularContainer');
+                
+                if (data.popular && data.popular.length > 0) {
+                    container.innerHTML = '';
+                    data.popular.forEach(item => {
+                        const tag = document.createElement('button');
+                        tag.className = 'px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 text-sm';
+                        tag.textContent = item.query;
+                        tag.addEventListener('click', () => {
+                            document.getElementById('searchInput').value = item.query;
+                            performSearch(item.query);
+                        });
+                        container.appendChild(tag);
+                    });
+                }
+            } catch (err) {
+                console.error('Error loading popular searches:', err);
+            }
+        }
+
+        // Load popular searches on page load
+        loadPopularSearches();
+    </script>
+</body>
+</html>
