@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Error Monitoring - joshburt.com.au</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
+  <script src="./assets/js/feature-flags.js" defer></script>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
+</head>
+<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+
+<button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+<div id="main-nav"></div>
+<script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
+
+<main id="main-content" class="flex-1 p-4 space-y-6" role="main">
+  <header class="page-header card border">
+    <h1 class="text-2xl font-bold">Error Monitoring</h1>
+    <p class="text-sm text-gray-400 mt-1">Self-hosted error tracking and monitoring</p>
+  </header>
+
+  <!-- Stats Overview -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="card p-4 widget-primary rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Total Errors</h3>
+      <div id="stat-total-errors" class="text-2xl font-bold text-red-400">-</div>
+    </div>
+    <div class="card p-4 widget-secondary rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Unresolved</h3>
+      <div id="stat-unresolved" class="text-2xl font-bold text-yellow-400">-</div>
+    </div>
+    <div class="card p-4 widget-accent rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Last 24 Hours</h3>
+      <div id="stat-last-24h" class="text-2xl font-bold text-orange-400">-</div>
+    </div>
+    <div class="card p-4 widget-yellow rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Resolved</h3>
+      <div id="stat-resolved" class="text-2xl font-bold text-green-400">-</div>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="card p-4">
+    <h2 class="text-lg font-semibold mb-4">Filters</h2>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div>
+        <label class="block text-sm font-semibold mb-2">Level</label>
+        <select id="filter-level" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="">All Levels</option>
+          <option value="error">Error</option>
+          <option value="warning">Warning</option>
+          <option value="info">Info</option>
+          <option value="critical">Critical</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-2">Status</label>
+        <select id="filter-resolved" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="">All</option>
+          <option value="false">Unresolved</option>
+          <option value="true">Resolved</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-2">Environment</label>
+        <select id="filter-environment" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="">All</option>
+          <option value="production">Production</option>
+          <option value="staging">Staging</option>
+          <option value="development">Development</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-2">Limit</label>
+        <select id="filter-limit" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+        </select>
+      </div>
+      <div class="flex items-end">
+        <button id="refresh-btn" class="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Refresh
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Errors Table -->
+  <section class="card p-6">
+    <h2 class="text-lg font-semibold mb-4">Error Logs</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-gray-700">
+            <th class="pb-3">Level</th>
+            <th class="pb-3">Message</th>
+            <th class="pb-3">Occurrences</th>
+            <th class="pb-3">First Seen</th>
+            <th class="pb-3">Last Seen</th>
+            <th class="pb-3">Status</th>
+            <th class="pb-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="errors-table">
+          <tr>
+            <td colspan="7" class="py-4 text-center text-gray-400">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- Error Detail Modal -->
+<div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div class="card p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold" id="modal-title">Error Details</h2>
+      <button id="close-modal" class="text-gray-400 hover:text-white">×</button>
+    </div>
+
+    <div id="error-details" class="space-y-4">
+      <div>
+        <h3 class="font-semibold mb-2">Message</h3>
+        <p id="detail-message" class="text-gray-300"></p>
+      </div>
+      
+      <div>
+        <h3 class="font-semibold mb-2">Stack Trace</h3>
+        <pre id="detail-stack" class="bg-gray-900 p-4 rounded text-sm overflow-x-auto"></pre>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <h3 class="font-semibold mb-2">Level</h3>
+          <p id="detail-level" class="text-gray-300"></p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">Occurrences</h3>
+          <p id="detail-occurrences" class="text-gray-300"></p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">Environment</h3>
+          <p id="detail-environment" class="text-gray-300"></p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">URL</h3>
+          <p id="detail-url" class="text-gray-300 text-sm break-all"></p>
+        </div>
+      </div>
+
+      <div id="detail-metadata-section" class="hidden">
+        <h3 class="font-semibold mb-2">Metadata</h3>
+        <pre id="detail-metadata" class="bg-gray-900 p-4 rounded text-sm overflow-x-auto"></pre>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-4">
+        <button id="resolve-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+          Mark as Resolved
+        </button>
+        <button id="delete-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const FN_BASE = window.FN_BASE || '/.netlify/functions';
+  let currentError = null;
+
+  async function loadErrors() {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      const level = document.getElementById('filter-level').value;
+      const resolved = document.getElementById('filter-resolved').value;
+      const environment = document.getElementById('filter-environment').value;
+      const limit = document.getElementById('filter-limit').value;
+
+      let url = `${FN_BASE}/error-logs?limit=${limit}&offset=0`;
+      if (level) url += `&level=${level}`;
+      if (resolved) url += `&resolved=${resolved}`;
+      if (environment) url += `&environment=${environment}`;
+
+      const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load errors');
+      }
+
+      const data = await response.json();
+      displayErrors(data.errors || []);
+      
+      // Load stats
+      loadStats();
+
+    } catch (error) {
+      console.error('Error loading errors:', error);
+      document.getElementById('errors-table').innerHTML = '<tr><td colspan="7" class="py-4 text-center text-red-400">Failed to load errors</td></tr>';
+    }
+  }
+
+  async function loadStats() {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${FN_BASE}/error-logs?stats=true`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const stats = await response.json();
+        document.getElementById('stat-total-errors').textContent = stats.total || 0;
+        document.getElementById('stat-unresolved').textContent = stats.unresolved || 0;
+        document.getElementById('stat-last-24h').textContent = stats.last_24h || 0;
+        document.getElementById('stat-resolved').textContent = stats.resolved || 0;
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  }
+
+  function displayErrors(errors) {
+    const table = document.getElementById('errors-table');
+
+    if (errors.length === 0) {
+      table.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-400">No errors found</td></tr>';
+      return;
+    }
+
+    table.innerHTML = errors.map(error => {
+      const levelColor = {
+        'critical': 'text-red-500',
+        'error': 'text-orange-500',
+        'warning': 'text-yellow-500',
+        'info': 'text-blue-500'
+      }[error.level] || 'text-gray-500';
+
+      return `
+        <tr class="border-b border-gray-700 hover:bg-gray-800 cursor-pointer" onclick="showErrorDetail(${error.id})">
+          <td class="py-3"><span class="${levelColor} font-bold uppercase text-xs">${error.level}</span></td>
+          <td class="py-3 max-w-md truncate">${error.message}</td>
+          <td class="py-3">${error.occurrences || 1}</td>
+          <td class="py-3 text-sm">${new Date(error.first_seen).toLocaleString()}</td>
+          <td class="py-3 text-sm">${new Date(error.last_seen).toLocaleString()}</td>
+          <td class="py-3">
+            <span class="px-2 py-1 text-xs rounded ${error.resolved ? 'bg-green-600' : 'bg-yellow-600'}">
+              ${error.resolved ? 'Resolved' : 'Unresolved'}
+            </span>
+          </td>
+          <td class="py-3">
+            <button onclick="event.stopPropagation(); showErrorDetail(${error.id})" class="text-blue-400 hover:text-blue-300 text-sm">
+              View
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function showErrorDetail(errorId) {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${FN_BASE}/error-logs?id=${errorId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load error details');
+      }
+
+      const data = await response.json();
+      const error = data.errors && data.errors[0];
+      
+      if (!error) {
+        throw new Error('Error not found');
+      }
+
+      currentError = error;
+
+      document.getElementById('detail-message').textContent = error.message;
+      document.getElementById('detail-stack').textContent = error.stack_trace || 'No stack trace available';
+      document.getElementById('detail-level').textContent = error.level;
+      document.getElementById('detail-occurrences').textContent = error.occurrences || 1;
+      document.getElementById('detail-environment').textContent = error.environment || 'N/A';
+      document.getElementById('detail-url').textContent = error.url || 'N/A';
+
+      if (error.metadata && Object.keys(error.metadata).length > 0) {
+        document.getElementById('detail-metadata-section').classList.remove('hidden');
+        document.getElementById('detail-metadata').textContent = JSON.stringify(error.metadata, null, 2);
+      } else {
+        document.getElementById('detail-metadata-section').classList.add('hidden');
+      }
+
+      document.getElementById('error-modal').classList.remove('hidden');
+    } catch (error) {
+      console.error('Error loading error details:', error);
+      alert('Failed to load error details');
+    }
+  }
+
+  async function resolveError() {
+    if (!currentError) return;
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${FN_BASE}/error-logs/${currentError.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ resolved: true })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to resolve error');
+      }
+
+      document.getElementById('error-modal').classList.add('hidden');
+      loadErrors();
+    } catch (error) {
+      console.error('Error resolving error:', error);
+      alert('Failed to resolve error');
+    }
+  }
+
+  async function deleteError() {
+    if (!currentError) return;
+    if (!confirm('Are you sure you want to delete this error?')) return;
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${FN_BASE}/error-logs/${currentError.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete error');
+      }
+
+      document.getElementById('error-modal').classList.add('hidden');
+      loadErrors();
+    } catch (error) {
+      console.error('Error deleting error:', error);
+      alert('Failed to delete error');
+    }
+  }
+
+  // Event listeners
+  document.getElementById('refresh-btn').addEventListener('click', loadErrors);
+  document.getElementById('filter-level').addEventListener('change', loadErrors);
+  document.getElementById('filter-resolved').addEventListener('change', loadErrors);
+  document.getElementById('filter-environment').addEventListener('change', loadErrors);
+  document.getElementById('filter-limit').addEventListener('change', loadErrors);
+
+  document.getElementById('close-modal').addEventListener('click', () => {
+    document.getElementById('error-modal').classList.add('hidden');
+  });
+
+  document.getElementById('resolve-btn').addEventListener('click', resolveError);
+  document.getElementById('delete-btn').addEventListener('click', deleteError);
+
+  // Make function global for onclick
+  window.showErrorDetail = showErrorDetail;
+
+  // Load initial data
+  loadErrors();
+</script>
+
+</body>
+</html>

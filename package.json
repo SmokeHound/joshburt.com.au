@@ -16,6 +16,8 @@
     "migrate:run": "node scripts/run-migrations.js",
     "email:worker": "node scripts/email-worker.js --cron",
     "email:worker:watch": "node scripts/email-worker.js --watch",
+    "report:worker": "node scripts/report-generator.js",
+    "report:worker:watch": "node scripts/report-generator.js --watch",
     "test:smtp": "node scripts/test-smtp.js",
     "test:email-verification": "node scripts/test-email-verification.js",
     "test:smoke:functions": "node tests/functions/auth_me_smoke.test.js",
