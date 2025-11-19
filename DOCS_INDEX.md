@@ -85,7 +85,22 @@ Welcome to the joshburt.com.au documentation. All technical documentation is org
 
 ### Current Planning
 
-- **[IMPROVEMENTS.md](IMPROVEMENTS.md)** - Planned improvements
+- **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** - Comprehensive upgrade and improvements plan
+  - Replace external services with self-hosted solutions
+  - Advanced analytics and reporting
+  - Search and discovery features
+  - Data management enhancements
+  - Performance optimizations
+  - Security improvements
+  - PWA and offline support
+  - Business intelligence features
+- **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - Quick-start implementation guide
+  - Phase-by-phase implementation steps
+  - Code examples and templates
+  - Testing strategies
+  - Deployment checklists
+  - Troubleshooting tips
+- **[IMPROVEMENTS.md](IMPROVEMENTS.md)** - Planned improvements (legacy)
 - **[MODAL-IMPROVEMENTS.md](MODAL-IMPROVEMENTS.md)** - Modal component improvements
 - **[OPTIMIZATIONS.md](OPTIMIZATIONS.md)** - Performance optimizations
   - Asset optimization
