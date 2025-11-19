@@ -3,6 +3,11 @@
  * Phase 3.1 of UPGRADE_PLAN.md
  */
 
+// Mock database before importing
+jest.mock('../../config/database', () => ({
+  query: jest.fn()
+}));
+
 const db = require('../../config/database');
 
 describe('Search API', () => {

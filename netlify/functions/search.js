@@ -1,10 +1,10 @@
 /**
  * Universal Search API
  * Phase 3.1 of UPGRADE_PLAN.md
- * 
+ *
  * Provides full-text search across products, consumables, filters, and users
  * using PostgreSQL's built-in search capabilities with weighted ranking.
- * 
+ *
  * Endpoints:
  * - GET /search?q=query&type=all&limit=20&offset=0&sort=relevance
  * - POST /search - Track search query and clicked result
@@ -30,7 +30,7 @@ async function performSearch(query, type = 'all', limit = 20, offset = 0, sort =
 
   const searchQuery = query.trim();
   const tsQuery = searchQuery.split(/\s+/).map(term => `${term}:*`).join(' & ');
-  
+
   const results = {
     query: searchQuery,
     type,
@@ -47,15 +47,15 @@ async function performSearch(query, type = 'all', limit = 20, offset = 0, sort =
   };
 
   // Build ORDER BY clause based on sort option
-  const getOrderBy = (tableName) => {
+  const getOrderBy = () => {
     switch (sort) {
-      case 'name':
-        return 'name ASC';
-      case 'recent':
-        return 'created_at DESC';
-      case 'relevance':
-      default:
-        return 'rank DESC, name ASC';
+    case 'name':
+      return 'name ASC';
+    case 'recent':
+      return 'created_at DESC';
+    case 'relevance':
+    default:
+      return 'rank DESC, name ASC';
     }
   };
 
@@ -77,10 +77,10 @@ async function performSearch(query, type = 'all', limit = 20, offset = 0, sort =
         FROM products
         WHERE search_vector @@ to_tsquery('english', $1)
           AND is_active = true
-        ORDER BY ${getOrderBy('products')}
+        ORDER BY ${getOrderBy()}
         LIMIT $2 OFFSET $3
       `;
-      
+
       const productResult = await db.query(productQuery, [tsQuery, limit, offset]);
       results.products = productResult.rows.map(row => ({
         ...row,
@@ -102,10 +102,10 @@ async function performSearch(query, type = 'all', limit = 20, offset = 0, sort =
           ts_rank(search_vector, to_tsquery('english', $1)) as rank
         FROM consumables
         WHERE search_vector @@ to_tsquery('english', $1)
-        ORDER BY ${getOrderBy('consumables')}
+        ORDER BY ${getOrderBy()}
         LIMIT $2 OFFSET $3
       `;
-      
+
       const consumableResult = await db.query(consumableQuery, [tsQuery, limit, offset]);
       results.consumables = consumableResult.rows.map(row => ({
         ...row,
@@ -128,10 +128,10 @@ async function performSearch(query, type = 'all', limit = 20, offset = 0, sort =
         FROM filters
         WHERE search_vector @@ to_tsquery('english', $1)
           AND is_active = true
-        ORDER BY ${getOrderBy('filters')}
+        ORDER BY ${getOrderBy()}
         LIMIT $2 OFFSET $3
       `;
-      
+
       const filterResult = await db.query(filterQuery, [tsQuery, limit, offset]);
       results.filters = filterResult.rows.map(row => ({
         ...row,
@@ -153,10 +153,10 @@ async function performSearch(query, type = 'all', limit = 20, offset = 0, sort =
         FROM users
         WHERE search_vector @@ to_tsquery('english', $1)
           AND is_active = true
-        ORDER BY ${getOrderBy('users')}
+        ORDER BY ${getOrderBy()}
         LIMIT $2 OFFSET $3
       `;
-      
+
       const userResult = await db.query(userQuery, [tsQuery, limit, offset]);
       results.users = userResult.rows.map(row => ({
         id: row.id,
@@ -170,7 +170,7 @@ async function performSearch(query, type = 'all', limit = 20, offset = 0, sort =
     }
 
     // Calculate total results
-    results.total = results.products.length + results.consumables.length + 
+    results.total = results.products.length + results.consumables.length +
                    results.filters.length + results.users.length;
 
     // Track search query (fire and forget, don't await)
@@ -225,7 +225,7 @@ async function trackSearchClick(query, resultId, resultType, userId = null) {
        RETURNING id`,
       [resultId, resultType, query, userId]
     );
-    
+
     return result.rows.length > 0;
   } catch (err) {
     console.error('Error tracking search click:', err);
@@ -246,7 +246,7 @@ async function getPopularSearches(limit = 10) {
        LIMIT $1`,
       [limit]
     );
-    
+
     return result.rows;
   } catch (err) {
     console.error('Error getting popular searches:', err);
@@ -330,7 +330,7 @@ const handler = async (event) => {
   // GET - Perform search or get suggestions/popular
   if (method === 'GET') {
     const params = event.queryStringParameters || {};
-    
+
     // Get search suggestions
     if (params.suggest) {
       const suggestions = await getSearchSuggestions(params.suggest, parseInt(params.limit) || 5);
@@ -374,7 +374,7 @@ const handler = async (event) => {
     }
 
     const results = await performSearch(query, type, limit, offset, sort, userId);
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify(results)
@@ -384,7 +384,7 @@ const handler = async (event) => {
   // POST - Track search click
   if (method === 'POST') {
     const body = JSON.parse(event.body || '{}');
-    
+
     if (!body.query || !body.result_id || !body.result_type) {
       return error(400, 'Missing required fields: query, result_id, result_type');
     }
@@ -403,10 +403,10 @@ const handler = async (event) => {
     }
 
     const tracked = await trackSearchClick(body.query, body.result_id, body.result_type, userId);
-    
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         success: tracked,
         message: tracked ? 'Search click tracked' : 'No matching search query found'
       })

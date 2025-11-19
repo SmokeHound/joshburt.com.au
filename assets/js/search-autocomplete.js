@@ -1,7 +1,7 @@
 /**
  * Search Autocomplete Component
  * Phase 3.1 of UPGRADE_PLAN.md
- * 
+ *
  * Provides real-time search suggestions with keyboard navigation
  * Features:
  * - Real-time suggestions as user types
@@ -15,7 +15,7 @@
   'use strict';
 
   const FN_BASE = window.FN_BASE || '/.netlify/functions';
-  
+
   /**
    * SearchAutocomplete class
    */
@@ -29,12 +29,12 @@
         onSelect: null,
         ...options
       };
-      
+
       this.container = null;
       this.suggestions = [];
       this.selectedIndex = -1;
       this.debounceTimer = null;
-      
+
       this.init();
     }
 
@@ -44,7 +44,7 @@
     init() {
       // Create suggestions container
       this.createContainer();
-      
+
       // Bind event listeners
       this.input.addEventListener('input', this.handleInput.bind(this));
       this.input.addEventListener('keydown', this.handleKeydown.bind(this));
@@ -59,7 +59,7 @@
       this.container = document.createElement('div');
       this.container.className = 'search-autocomplete-container absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hidden max-h-80 overflow-y-auto';
       this.container.setAttribute('role', 'listbox');
-      
+
       // Insert after input
       this.input.parentNode.style.position = 'relative';
       this.input.parentNode.appendChild(this.container);
@@ -70,13 +70,13 @@
      */
     handleInput(e) {
       const query = e.target.value.trim();
-      
+
       // Clear suggestions if query too short
       if (query.length < this.options.minChars) {
         this.hideSuggestions();
         return;
       }
-      
+
       // Debounce API call
       clearTimeout(this.debounceTimer);
       this.debounceTimer = setTimeout(() => {
@@ -100,28 +100,28 @@
     handleKeydown(e) {
       if (!this.container.classList.contains('hidden')) {
         switch (e.key) {
-          case 'ArrowDown':
-            e.preventDefault();
-            this.selectNext();
-            break;
-          case 'ArrowUp':
-            e.preventDefault();
-            this.selectPrevious();
-            break;
-          case 'Enter':
-            e.preventDefault();
-            if (this.selectedIndex >= 0) {
-              this.selectSuggestion(this.suggestions[this.selectedIndex]);
-            } else {
-              // Submit search with current input value
-              if (this.options.onSelect) {
-                this.options.onSelect({ text: this.input.value, source: 'manual' });
-              }
+        case 'ArrowDown':
+          e.preventDefault();
+          this.selectNext();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          this.selectPrevious();
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (this.selectedIndex >= 0) {
+            this.selectSuggestion(this.suggestions[this.selectedIndex]);
+          } else {
+            // Submit search with current input value
+            if (this.options.onSelect) {
+              this.options.onSelect({ text: this.input.value, source: 'manual' });
             }
-            break;
-          case 'Escape':
-            this.hideSuggestions();
-            break;
+          }
+          break;
+        case 'Escape':
+          this.hideSuggestions();
+          break;
         }
       }
     }
@@ -143,12 +143,12 @@
         const response = await fetch(
           `${FN_BASE}/search?suggest=${encodeURIComponent(query)}&limit=${this.options.maxSuggestions}`
         );
-        
+
         if (!response.ok) {
           console.error('Failed to fetch suggestions:', response.statusText);
           return;
         }
-        
+
         const data = await response.json();
         this.suggestions = data.suggestions || [];
         this.renderSuggestions();
@@ -166,54 +166,54 @@
         this.hideSuggestions();
         return;
       }
-      
+
       this.container.innerHTML = '';
       this.selectedIndex = -1;
-      
+
       this.suggestions.forEach((suggestion, index) => {
         const item = document.createElement('div');
         item.className = 'search-autocomplete-item px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between';
         item.setAttribute('role', 'option');
         item.setAttribute('data-index', index);
-        
+
         // Suggestion text
         const textSpan = document.createElement('span');
         textSpan.textContent = suggestion.text;
         textSpan.className = 'text-gray-900 dark:text-gray-100';
         item.appendChild(textSpan);
-        
+
         // Source badge
         const badge = document.createElement('span');
         badge.className = 'text-xs px-2 py-1 rounded-full';
-        
+
         switch (suggestion.source) {
-          case 'recent':
-            badge.textContent = 'Recent';
-            badge.className += ' bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-            break;
-          case 'product':
-            badge.textContent = 'Product';
-            badge.className += ' bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-            break;
-          case 'consumable':
-            badge.textContent = 'Consumable';
-            badge.className += ' bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-            break;
-          case 'filter':
-            badge.textContent = 'Filter';
-            badge.className += ' bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-            break;
+        case 'recent':
+          badge.textContent = 'Recent';
+          badge.className += ' bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+          break;
+        case 'product':
+          badge.textContent = 'Product';
+          badge.className += ' bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+          break;
+        case 'consumable':
+          badge.textContent = 'Consumable';
+          badge.className += ' bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+          break;
+        case 'filter':
+          badge.textContent = 'Filter';
+          badge.className += ' bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+          break;
         }
         item.appendChild(badge);
-        
+
         // Click handler
         item.addEventListener('click', () => {
           this.selectSuggestion(suggestion);
         });
-        
+
         this.container.appendChild(item);
       });
-      
+
       this.container.classList.remove('hidden');
     }
 
@@ -249,7 +249,7 @@
         if (index === this.selectedIndex) {
           item.classList.add('bg-gray-100', 'dark:bg-gray-700');
           item.setAttribute('aria-selected', 'true');
-          
+
           // Update input with selected suggestion
           this.input.value = this.suggestions[index].text;
         } else {
@@ -265,7 +265,7 @@
     selectSuggestion(suggestion) {
       this.input.value = suggestion.text;
       this.hideSuggestions();
-      
+
       if (this.options.onSelect) {
         this.options.onSelect(suggestion);
       }
@@ -288,11 +288,11 @@
       this.input.removeEventListener('keydown', this.handleKeydown);
       this.input.removeEventListener('focus', this.handleFocus);
       document.removeEventListener('click', this.handleClickOutside);
-      
+
       if (this.container && this.container.parentNode) {
         this.container.parentNode.removeChild(this.container);
       }
-      
+
       clearTimeout(this.debounceTimer);
     }
   }
@@ -304,15 +304,15 @@
    * Helper function to initialize autocomplete on an input
    */
   window.initSearchAutocomplete = function(selector, options) {
-    const input = typeof selector === 'string' 
+    const input = typeof selector === 'string'
       ? document.querySelector(selector)
       : selector;
-    
+
     if (!input) {
       console.error('Search input not found:', selector);
       return null;
     }
-    
+
     return new SearchAutocomplete(input, options);
   };
 

@@ -1,7 +1,7 @@
 /**
  * Advanced Filters Component
  * Phase 3.2 of UPGRADE_PLAN.md
- * 
+ *
  * Provides advanced filtering with faceted search capabilities
  * Features:
  * - Multi-criteria filtering
@@ -19,10 +19,10 @@
    */
   class AdvancedFilters {
     constructor(container, options = {}) {
-      this.container = typeof container === 'string' 
+      this.container = typeof container === 'string'
         ? document.querySelector(container)
         : container;
-      
+
       this.options = {
         itemType: 'product', // 'product', 'consumable', 'filter'
         storageKey: null, // Auto-generated if not provided
@@ -38,7 +38,7 @@
 
       this.activeFilters = {};
       this.facets = {};
-      
+
       this.init();
     }
 
@@ -48,7 +48,7 @@
     init() {
       // Load saved filters
       this.loadFilters();
-      
+
       // Render filter UI
       this.render();
     }
@@ -82,7 +82,7 @@
      * Render filter UI
      */
     render() {
-      if (!this.container) return;
+      if (!this.container) {return;}
 
       this.container.innerHTML = '';
       this.container.className = 'advanced-filters bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6';
@@ -102,14 +102,14 @@
       if (Object.keys(this.activeFilters).length > 0) {
         const activePills = document.createElement('div');
         activePills.className = 'flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700';
-        
+
         Object.entries(this.activeFilters).forEach(([key, value]) => {
-          if (Array.isArray(value) && value.length === 0) return;
-          if (!value) return;
-          
+          if (Array.isArray(value) && value.length === 0) {return;}
+          if (!value) {return;}
+
           const pill = document.createElement('div');
           pill.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm';
-          
+
           const label = this.getFilterLabel(key, value);
           pill.innerHTML = `
             <span>${label}</span>
@@ -121,7 +121,7 @@
           `;
           activePills.appendChild(pill);
         });
-        
+
         this.container.appendChild(activePills);
       }
 
@@ -162,18 +162,18 @@
       content.className = 'filter-content mt-2';
 
       switch (filter.type) {
-        case 'checkbox':
-          content.appendChild(this.renderCheckboxFilter(filter));
-          break;
-        case 'range':
-          content.appendChild(this.renderRangeFilter(filter));
-          break;
-        case 'select':
-          content.appendChild(this.renderSelectFilter(filter));
-          break;
-        case 'radio':
-          content.appendChild(this.renderRadioFilter(filter));
-          break;
+      case 'checkbox':
+        content.appendChild(this.renderCheckboxFilter(filter));
+        break;
+      case 'range':
+        content.appendChild(this.renderRangeFilter(filter));
+        break;
+      case 'select':
+        content.appendChild(this.renderSelectFilter(filter));
+        break;
+      case 'radio':
+        content.appendChild(this.renderRadioFilter(filter));
+        break;
       }
 
       section.appendChild(content);
@@ -452,7 +452,7 @@
      */
     onFilterUpdate() {
       this.saveFilters();
-      
+
       if (this.options.onFilterChange) {
         this.options.onFilterChange(this.activeFilters);
       }
@@ -463,7 +463,7 @@
      */
     getFilterLabel(key, value) {
       // Find the filter definition
-      const filter = this.options.filters.find(f => 
+      const filter = this.options.filters.find(f =>
         f.key === key || f.key === key.replace(/_min|_max/, '')
       );
 
