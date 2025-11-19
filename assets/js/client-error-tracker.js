@@ -8,7 +8,7 @@
 
   const FN_BASE = window.FN_BASE || '/.netlify/functions';
   const ERROR_LOG_ENDPOINT = `${FN_BASE}/error-logs`;
-  
+
   // Configuration
   const config = {
     enabled: true,
@@ -20,29 +20,29 @@
     ],
     environment: window.location.hostname.includes('localhost') ? 'development' : 'production'
   };
-  
+
   // Session error counter
   let errorCount = 0;
-  
+
   /**
    * Check if error should be reported
    */
   function shouldReportError(message) {
     // Check if tracking is enabled
-    if (!config.enabled) return false;
-    
+    if (!config.enabled) {return false;}
+
     // Check session limit
-    if (errorCount >= config.maxErrorsPerSession) return false;
-    
+    if (errorCount >= config.maxErrorsPerSession) {return false;}
+
     // Check sample rate
-    if (Math.random() > config.sampleRate) return false;
-    
+    if (Math.random() > config.sampleRate) {return false;}
+
     // Check ignore list
-    if (config.ignoreErrors.some(ignore => message.includes(ignore))) return false;
-    
+    if (config.ignoreErrors.some(ignore => message.includes(ignore))) {return false;}
+
     return true;
   }
-  
+
   /**
    * Get screen and viewport info
    */
@@ -54,7 +54,7 @@
       pixelRatio: window.devicePixelRatio || 1
     };
   }
-  
+
   /**
    * Get browser info
    */
@@ -68,15 +68,15 @@
       onLine: navigator.onLine
     };
   }
-  
+
   /**
    * Report error to backend
    */
   async function reportError({ level = 'error', message, stack, url, metadata = {} }) {
-    if (!shouldReportError(message)) return;
-    
+    if (!shouldReportError(message)) {return;}
+
     errorCount++;
-    
+
     try {
       const payload = {
         level,
@@ -92,7 +92,7 @@
           referrer: document.referrer
         }
       };
-      
+
       // Use sendBeacon if available (doesn't block page unload)
       if (navigator.sendBeacon) {
         const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
@@ -113,7 +113,7 @@
       console.warn('Error tracker failed:', err);
     }
   }
-  
+
   /**
    * Handle uncaught JavaScript errors
    */
@@ -121,7 +121,7 @@
     const message = event.message || 'Unknown error';
     const stack = event.error ? event.error.stack : null;
     const url = event.filename || window.location.href;
-    
+
     reportError({
       level: 'error',
       message: `${message} at ${url}:${event.lineno}:${event.colno}`,
@@ -135,14 +135,14 @@
       }
     });
   });
-  
+
   /**
    * Handle unhandled promise rejections
    */
   window.addEventListener('unhandledrejection', function (event) {
     const message = event.reason ? String(event.reason) : 'Unhandled promise rejection';
     const stack = event.reason && event.reason.stack ? event.reason.stack : null;
-    
+
     reportError({
       level: 'error',
       message,
@@ -154,7 +154,7 @@
       }
     });
   });
-  
+
   /**
    * Manual error reporting API
    * Usage: window.ErrorTracker.logError('Something went wrong', { context: 'checkout' })
@@ -175,7 +175,7 @@
         }
       });
     },
-    
+
     /**
      * Log a warning
      */
@@ -191,7 +191,7 @@
         }
       });
     },
-    
+
     /**
      * Log an info message
      */
@@ -206,21 +206,21 @@
         }
       });
     },
-    
+
     /**
      * Configure error tracker
      */
     configure: function (options) {
       Object.assign(config, options);
     },
-    
+
     /**
      * Get current config
      */
     getConfig: function () {
       return { ...config };
     },
-    
+
     /**
      * Get error count for this session
      */
@@ -228,6 +228,6 @@
       return errorCount;
     }
   };
-  
+
   console.log('✅ Error Tracker initialized');
 })();

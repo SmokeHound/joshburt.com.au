@@ -14,8 +14,8 @@ const nodemailer = require('nodemailer');
  * @returns {string} - Template with substituted values
  */
 function substituteVariables(template, data) {
-  if (!template) return '';
-  
+  if (!template) {return '';}
+
   return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
     return data[key] !== undefined ? data[key] : match;
   });
@@ -49,10 +49,10 @@ async function enqueueEmail({
     if (!to || !subject) {
       throw new Error('Email "to" and "subject" are required');
     }
-    
+
     // Use default from address if not provided
     const fromAddress = from || process.env.FROM_EMAIL || 'noreply@joshburt.com.au';
-    
+
     // Insert into queue
     const result = await database.run(
       `INSERT INTO email_queue 
@@ -69,9 +69,9 @@ async function enqueueEmail({
         JSON.stringify(metadata)
       ]
     );
-    
+
     console.log(`📧 Email queued (ID: ${result.id}) to: ${to}`);
-    
+
     return {
       id: result.id,
       to,
@@ -108,16 +108,16 @@ async function enqueueTemplateEmail({
       'SELECT subject, body_html, body_text FROM email_templates WHERE name = ?',
       [templateName]
     );
-    
+
     if (!template) {
       throw new Error(`Email template "${templateName}" not found`);
     }
-    
+
     // Substitute variables
     const subject = substituteVariables(template.subject, data);
     const html = substituteVariables(template.body_html, data);
     const text = template.body_text ? substituteVariables(template.body_text, data) : null;
-    
+
     // Enqueue email
     return await enqueueEmail({
       to,
@@ -150,7 +150,7 @@ async function getPendingEmails(limit = 10) {
        LIMIT ?`,
       [limit]
     );
-    
+
     return emails;
   } catch (err) {
     console.error('Failed to get pending emails:', err);
@@ -176,7 +176,7 @@ async function sendEmail(email) {
         pass: process.env.SMTP_PASS
       }
     });
-    
+
     // Send email
     const info = await transporter.sendMail({
       from: email.from_address,
@@ -185,7 +185,7 @@ async function sendEmail(email) {
       html: email.body_html,
       text: email.body_text
     });
-    
+
     return {
       success: true,
       messageId: info.messageId,
@@ -212,32 +212,32 @@ async function processEmailQueue(batchSize = 10) {
     failed: 0,
     errors: []
   };
-  
+
   try {
     // Get pending emails
     const emails = await getPendingEmails(batchSize);
-    
+
     if (emails.length === 0) {
       console.log('📧 No emails in queue');
       return stats;
     }
-    
+
     console.log(`📧 Processing ${emails.length} emails from queue`);
-    
+
     // Process each email
     for (const email of emails) {
       stats.processed++;
-      
+
       try {
         // Mark as sending
         await database.run(
           'UPDATE email_queue SET status = ?, attempts = attempts + 1 WHERE id = ?',
           ['sending', email.id]
         );
-        
+
         // Send email
         const result = await sendEmail(email);
-        
+
         if (result.success) {
           // Mark as sent
           await database.run(
@@ -250,21 +250,21 @@ async function processEmailQueue(batchSize = 10) {
           // Mark as failed
           const newAttempts = email.attempts + 1;
           const status = newAttempts >= email.max_attempts ? 'failed' : 'pending';
-          
+
           await database.run(
             `UPDATE email_queue 
              SET status = ?, failed_at = NOW(), error_message = ? 
              WHERE id = ?`,
             [status, result.error, email.id]
           );
-          
+
           stats.failed++;
           stats.errors.push({
             emailId: email.id,
             to: email.to_address,
             error: result.error
           });
-          
+
           console.error(`❌ Email failed (ID: ${email.id}): ${result.error}`);
         }
       } catch (err) {
@@ -275,9 +275,9 @@ async function processEmailQueue(batchSize = 10) {
           to: email.to_address,
           error: err.message
         });
-        
+
         console.error(`❌ Error processing email (ID: ${email.id}):`, err);
-        
+
         // Mark as pending for retry (unless max attempts reached)
         await database.run(
           'UPDATE email_queue SET status = ?, error_message = ? WHERE id = ?',
@@ -285,9 +285,9 @@ async function processEmailQueue(batchSize = 10) {
         );
       }
     }
-    
+
     console.log(`📧 Queue processing complete: ${stats.sent} sent, ${stats.failed} failed`);
-    
+
     return stats;
   } catch (err) {
     console.error('Failed to process email queue:', err);
@@ -311,7 +311,7 @@ async function getQueueStats() {
         AVG(attempts) as avg_attempts
       FROM email_queue
     `);
-    
+
     return stats || {};
   } catch (err) {
     console.error('Failed to get queue stats:', err);

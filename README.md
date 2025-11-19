@@ -40,12 +40,16 @@ Modern full-stack application with:
 - **Audit Logging**: Comprehensive action tracking with search/export
 - **Site Settings**: Database-backed configuration
 - **Inventory Control**: Stock tracking and alerts
+- **Error Tracking**: Self-hosted error monitoring (Phase 1.1)
+- **Email Queue**: Reliable email delivery with retry logic (Phase 1.2)
 
 ### Technical Features
 
 - **Serverless Architecture**: Zero server management
 - **Database Management**: PostgreSQL schema with full CRUD operations
 - **Permission System**: Role-based access control (mechanic/manager/admin)
+- **Error Tracking**: Database-backed error logging with grouping
+- **Email Queue**: Priority-based email delivery with templates
 - **Testing Suite**: Jest unit/integration + function smoke tests
 - **CI/CD**: Automated testing, linting, and deployment
 

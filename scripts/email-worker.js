@@ -3,7 +3,7 @@
 /**
  * Email Queue Worker
  * Processes pending emails from the queue
- * 
+ *
  * Usage:
  *   node scripts/email-worker.js          # Process once
  *   node scripts/email-worker.js --watch  # Run continuously
@@ -21,7 +21,7 @@ const MAX_PROCESSING_TIME = parseInt(process.env.EMAIL_WORKER_MAX_TIME) || 30000
 
 let isWatchMode = false;
 let isRunning = false;
-let startTime = Date.now();
+const startTime = Date.now();
 
 /**
  * Process email queue once
@@ -31,21 +31,21 @@ async function processOnce() {
     console.log('⏳ Worker already running, skipping...');
     return;
   }
-  
+
   isRunning = true;
-  
+
   try {
     console.log('📧 Starting email queue processing...');
-    
+
     // Get queue stats before processing
     const statsBefore = await getQueueStats();
     console.log(`📊 Queue stats: ${statsBefore.pending} pending, ${statsBefore.failed} failed`);
-    
+
     // Process emails
     const result = await processEmailQueue(BATCH_SIZE);
-    
+
     console.log(`✅ Processed ${result.processed} emails: ${result.sent} sent, ${result.failed} failed`);
-    
+
     // Show errors if any
     if (result.errors.length > 0) {
       console.error('❌ Errors:');
@@ -53,11 +53,11 @@ async function processOnce() {
         console.error(`  - Email ${err.emailId} to ${err.to}: ${err.error}`);
       });
     }
-    
+
     // Get queue stats after processing
     const statsAfter = await getQueueStats();
     console.log(`📊 Queue stats: ${statsAfter.pending} pending, ${statsAfter.failed} failed`);
-    
+
   } catch (err) {
     console.error('❌ Email worker error:', err);
   } finally {
@@ -70,16 +70,16 @@ async function processOnce() {
  */
 async function watch() {
   console.log(`👀 Email worker running in watch mode (polling every ${POLL_INTERVAL}ms)`);
-  
+
   while (isWatchMode) {
     // Check if we've exceeded max processing time
     if (Date.now() - startTime > MAX_PROCESSING_TIME) {
       console.log('⏱️ Max processing time reached, exiting...');
       process.exit(0);
     }
-    
+
     await processOnce();
-    
+
     // Wait before next poll
     if (isWatchMode) {
       await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
@@ -96,36 +96,36 @@ async function main() {
     const args = process.argv.slice(2);
     const watchMode = args.includes('--watch');
     const cronMode = args.includes('--cron');
-    
+
     console.log('🚀 Email Queue Worker starting...');
-    
+
     // Initialize database
     await initializeDatabase();
-    
+
     if (watchMode) {
       // Watch mode - run continuously
       isWatchMode = true;
-      
+
       // Handle graceful shutdown
       process.on('SIGINT', () => {
         console.log('\n👋 Shutting down gracefully...');
         isWatchMode = false;
       });
-      
+
       process.on('SIGTERM', () => {
         console.log('\n👋 Shutting down gracefully...');
         isWatchMode = false;
       });
-      
+
       await watch();
     } else {
       // One-time processing (cron mode or manual run)
       await processOnce();
-      
+
       if (!cronMode) {
         console.log('✅ Email worker completed');
       }
-      
+
       process.exit(0);
     }
   } catch (err) {

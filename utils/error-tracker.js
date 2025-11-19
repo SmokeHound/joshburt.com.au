@@ -3,7 +3,7 @@
  * Replaces Sentry with database-backed error logging
  */
 
-const crypto = require('crypto');
+const cryptoModule = require('crypto');
 const { database } = require('../config/database');
 
 /**
@@ -17,12 +17,12 @@ function generateFingerprint(error, url = 'unknown') {
   const errorName = error.name || 'Error';
   const errorMessage = error.message || String(error);
   const urlPath = url ? new URL(url, 'http://localhost').pathname : 'unknown';
-  
+
   // Create signature from error characteristics
   const signature = `${errorName}:${errorMessage}:${urlPath}`;
-  
+
   // Generate SHA256 hash
-  return crypto.createHash('sha256').update(signature).digest('hex').substring(0, 64);
+  return cryptoModule.createHash('sha256').update(signature).digest('hex').substring(0, 64);
 }
 
 /**
@@ -71,16 +71,16 @@ async function logError({
 
     // Generate fingerprint for grouping
     const fingerprint = generateFingerprint({ message }, url || 'unknown');
-    
+
     // Set environment
     const env = environment || process.env.NODE_ENV || 'production';
-    
+
     // Check if error already exists
     const existing = await database.get(
       'SELECT id, occurrences FROM error_logs WHERE fingerprint = ?',
       [fingerprint]
     );
-    
+
     if (existing) {
       // Update existing error - increment occurrences and update last_seen
       await database.run(
@@ -90,7 +90,7 @@ async function logError({
          WHERE fingerprint = ?`,
         [fingerprint]
       );
-      
+
       return {
         id: existing.id,
         fingerprint,
@@ -116,7 +116,7 @@ async function logError({
           fingerprint
         ]
       );
-      
+
       return {
         id: result.id,
         fingerprint,
@@ -143,13 +143,13 @@ async function logServerError(error, event, level = 'error') {
   const url = event.path || event.rawUrl || 'unknown';
   const userAgent = event.headers && (event.headers['user-agent'] || event.headers['User-Agent']);
   const ipAddress = event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip']);
-  
+
   // Try to extract user from event context
   let userId = null;
   if (event.requestContext && event.requestContext.user) {
     userId = event.requestContext.user.id;
   }
-  
+
   return await logError({
     level,
     message: error.message || String(error),
@@ -188,25 +188,25 @@ async function getErrorLogs({
   try {
     let sql = 'SELECT * FROM error_logs WHERE 1=1';
     const params = [];
-    
+
     if (resolved !== null) {
       sql += ' AND resolved = ?';
       params.push(resolved);
     }
-    
+
     if (level) {
       sql += ' AND level = ?';
       params.push(level);
     }
-    
+
     if (environment) {
       sql += ' AND environment = ?';
       params.push(environment);
     }
-    
+
     sql += ' ORDER BY last_seen DESC LIMIT ? OFFSET ?';
     params.push(parseInt(limit), parseInt(offset));
-    
+
     const errors = await database.all(sql, params);
     return errors;
   } catch (err) {
@@ -232,7 +232,7 @@ async function getErrorStats() {
         COUNT(CASE WHEN level = 'warning' THEN 1 END) as warning_count
       FROM error_logs
     `);
-    
+
     return stats || {};
   } catch (err) {
     console.error('Failed to fetch error stats:', err);
