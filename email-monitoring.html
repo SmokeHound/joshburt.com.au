@@ -224,21 +224,13 @@
 
   async function loadQueue() {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        window.location.href = '/login.html';
-        return;
-      }
-
       const status = document.getElementById('filter-status').value;
       const limit = document.getElementById('filter-limit').value;
 
       let url = `${FN_BASE}/email-queue?limit=${limit}&offset=0`;
       if (status) url += `&status=${status}`;
 
-      const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await window.authFetch(url);
 
       if (!response.ok) {
         throw new Error('Failed to load email queue');
@@ -258,10 +250,7 @@
 
   async function loadStats() {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/email-queue?stats=true`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await window.authFetch(`${FN_BASE}/email-queue?stats=true`);
 
       if (response.ok) {
         const stats = await response.json();
@@ -319,10 +308,7 @@
 
   async function showEmailDetail(emailId) {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/email-queue?id=${emailId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await window.authFetch(`${FN_BASE}/email-queue?id=${emailId}`);
 
       if (!response.ok) {
         throw new Error('Failed to load email details');
@@ -371,10 +357,8 @@
     if (!confirm('Are you sure you want to cancel this email?')) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/email-queue/${currentEmail.id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+      const response = await window.authFetch(`${FN_BASE}/email-queue/${currentEmail.id}`, {
+        method: 'DELETE'
       });
 
       if (!response.ok) {
@@ -416,15 +400,13 @@
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('accessToken');
       const to = document.getElementById('test-to').value;
       const subject = document.getElementById('test-subject').value;
       const message = document.getElementById('test-message').value;
 
-      const response = await fetch(`${FN_BASE}/email-queue`, {
+      const response = await window.authFetch(`${FN_BASE}/email-queue`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
