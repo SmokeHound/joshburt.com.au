@@ -7,8 +7,17 @@ Welcome to the joshburt.com.au documentation. All technical documentation is org
 **New to the project?** Start here:
 
 1. [README.md](README.md) - Project overview and quick start guide
-2. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture and design
-3. [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) - Development workflow and guidelines
+2. [START_HERE.md](START_HERE.md) - 🆕 Entry point for upgrade documentation
+3. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture and design
+4. [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) - Development workflow and guidelines
+
+**Want to add features without paid services?** See the upgrade plan:
+
+1. [START_HERE.md](START_HERE.md) - Choose your path
+2. [UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md) - 5-minute overview
+3. [VISUAL_ROADMAP.md](VISUAL_ROADMAP.md) - See the journey
+4. [UPGRADE_PLAN.md](UPGRADE_PLAN.md) - Complete specifications
+5. [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) - Start coding
 
 ## Core Documentation
 
@@ -85,17 +94,22 @@ Welcome to the joshburt.com.au documentation. All technical documentation is org
 
 ### Current Planning
 
-- **[UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md)** - 🆕 Quick reference upgrade plan (start here!)
+- **[START_HERE.md](START_HERE.md)** - 🆕 Entry point for upgrade documentation (start here!)
+  - Reading order guide
+  - Quick navigation by goal
+  - Decision tree
+  - Pre-flight checklist
+- **[UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md)** - 🆕 Quick reference upgrade plan (5 min read)
   - 10-phase overview
   - Cost savings breakdown
   - Priority recommendations
   - Technology stack
-- **[VISUAL_ROADMAP.md](VISUAL_ROADMAP.md)** - 🆕 Visual implementation journey
+- **[VISUAL_ROADMAP.md](VISUAL_ROADMAP.md)** - 🆕 Visual implementation journey (10 min read)
   - Interactive phase diagrams
   - Priority paths (Quick Wins, Business Focus, Performance First)
   - Feature matrix with difficulty/impact ratings
   - Growth metrics visualization
-- **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** - 🆕 Comprehensive upgrade and improvements plan
+- **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** - 🆕 Comprehensive upgrade and improvements plan (30 min read)
   - Replace external services with self-hosted solutions
   - Advanced analytics and reporting
   - Search and discovery features
