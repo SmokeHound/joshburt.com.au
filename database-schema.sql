@@ -492,3 +492,102 @@ CREATE TRIGGER update_product_variants_updated_at
 BEFORE UPDATE ON product_variants
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+-- Phase 2: Advanced Analytics & Reporting Tables
+-- Analytics events table for tracking user interactions (from migration 009)
+CREATE TABLE IF NOT EXISTS analytics_events (
+  id SERIAL PRIMARY KEY,
+  event_type VARCHAR(100) NOT NULL,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  session_id VARCHAR(64) NOT NULL,
+  page_url TEXT,
+  referrer TEXT,
+  properties JSONB,
+  timestamp TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_analytics_events_type ON analytics_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_analytics_events_timestamp ON analytics_events(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_analytics_events_user ON analytics_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_events_session ON analytics_events(session_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_events_type_timestamp ON analytics_events(event_type, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_analytics_events_session_timestamp ON analytics_events(session_id, timestamp DESC);
+
+-- Analytics sessions table for session tracking (from migration 009)
+CREATE TABLE IF NOT EXISTS analytics_sessions (
+  id SERIAL PRIMARY KEY,
+  session_id VARCHAR(64) UNIQUE NOT NULL,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  ip_address INET,
+  user_agent TEXT,
+  country VARCHAR(2),
+  started_at TIMESTAMP DEFAULT NOW(),
+  last_activity TIMESTAMP DEFAULT NOW(),
+  page_views INTEGER DEFAULT 0,
+  duration_seconds INTEGER,
+  entry_page TEXT,
+  exit_page TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_analytics_sessions_session_id ON analytics_sessions(session_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_sessions_started ON analytics_sessions(started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_analytics_sessions_user ON analytics_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_sessions_last_activity ON analytics_sessions(last_activity DESC);
+
+-- Materialized view for daily statistics (from migration 009)
+CREATE MATERIALIZED VIEW IF NOT EXISTS analytics_daily_stats AS
+SELECT 
+  DATE(timestamp) as date,
+  event_type,
+  COUNT(*) as event_count,
+  COUNT(DISTINCT user_id) as unique_users,
+  COUNT(DISTINCT session_id) as unique_sessions
+FROM analytics_events
+GROUP BY DATE(timestamp), event_type
+ORDER BY date DESC, event_type;
+
+CREATE INDEX IF NOT EXISTS idx_analytics_daily_stats_date ON analytics_daily_stats(date DESC);
+CREATE INDEX IF NOT EXISTS idx_analytics_daily_stats_type ON analytics_daily_stats(event_type);
+
+-- Scheduled reports table (from migration 010)
+CREATE TABLE IF NOT EXISTS scheduled_reports (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  report_type VARCHAR(100) NOT NULL,
+  frequency VARCHAR(20) NOT NULL CHECK (frequency IN ('daily', 'weekly', 'monthly', 'once')),
+  recipients TEXT[],
+  filters JSONB,
+  format VARCHAR(20) DEFAULT 'pdf' CHECK (format IN ('pdf', 'csv', 'excel')),
+  last_run TIMESTAMP,
+  next_run TIMESTAMP,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_scheduled_reports_active ON scheduled_reports(is_active);
+CREATE INDEX IF NOT EXISTS idx_scheduled_reports_next_run ON scheduled_reports(next_run) WHERE is_active = TRUE;
+CREATE INDEX IF NOT EXISTS idx_scheduled_reports_type ON scheduled_reports(report_type);
+CREATE INDEX IF NOT EXISTS idx_scheduled_reports_created_by ON scheduled_reports(created_by);
+
+-- Report history table (from migration 010)
+CREATE TABLE IF NOT EXISTS report_history (
+  id SERIAL PRIMARY KEY,
+  scheduled_report_id INTEGER REFERENCES scheduled_reports(id) ON DELETE CASCADE,
+  report_name VARCHAR(255) NOT NULL,
+  report_type VARCHAR(100) NOT NULL,
+  generated_at TIMESTAMP DEFAULT NOW(),
+  file_path TEXT,
+  file_size INTEGER,
+  recipient_count INTEGER,
+  status VARCHAR(20) CHECK (status IN ('success', 'failed', 'cancelled')),
+  error_message TEXT,
+  metadata JSONB,
+  generated_by INTEGER REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_report_history_scheduled_report ON report_history(scheduled_report_id);
+CREATE INDEX IF NOT EXISTS idx_report_history_generated_at ON report_history(generated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_report_history_status ON report_history(status);
+CREATE INDEX IF NOT EXISTS idx_report_history_type ON report_history(report_type);
