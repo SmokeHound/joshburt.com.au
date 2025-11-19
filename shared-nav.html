@@ -65,6 +65,7 @@
 
     // Mobile menu toggle functionality with enhanced accessibility
     // Create lightweight fallbacks in case the host page hasn't provided them (e.g., in tests)
+    const sidebar = document.getElementById('sidebar');
     let menuToggle = document.getElementById('menu-toggle');
     let sidebarBackdrop = document.getElementById('sidebar-backdrop');
     if (!menuToggle) {
