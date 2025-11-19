@@ -591,3 +591,86 @@ CREATE INDEX IF NOT EXISTS idx_report_history_scheduled_report ON report_history
 CREATE INDEX IF NOT EXISTS idx_report_history_generated_at ON report_history(generated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_report_history_status ON report_history(status);
 CREATE INDEX IF NOT EXISTS idx_report_history_type ON report_history(report_type);
+-- =====================================================
+-- Phase 3: Search & Discovery (Migration 011)
+-- =====================================================
+
+-- Add search_vector columns to tables (if not exists)
+-- Note: These will be populated by triggers
+
+-- Function to update product search vector
+CREATE OR REPLACE FUNCTION update_product_search_vector() RETURNS trigger AS $$
+BEGIN
+  NEW.search_vector := 
+    setweight(to_tsvector('english', COALESCE(NEW.name, '')), 'A') ||
+    setweight(to_tsvector('english', COALESCE(NEW.code, '')), 'B') ||
+    setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'C') ||
+    setweight(to_tsvector('english', COALESCE(NEW.specs, '')), 'D');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to update consumable search vector
+CREATE OR REPLACE FUNCTION update_consumable_search_vector() RETURNS trigger AS $$
+BEGIN
+  NEW.search_vector := 
+    setweight(to_tsvector('english', COALESCE(NEW.name, '')), 'A') ||
+    setweight(to_tsvector('english', COALESCE(NEW.code, '')), 'B') ||
+    setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'C') ||
+    setweight(to_tsvector('english', COALESCE(NEW.type, '')), 'D') ||
+    setweight(to_tsvector('english', COALESCE(NEW.category, '')), 'D');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to update filter search vector
+CREATE OR REPLACE FUNCTION update_filter_search_vector() RETURNS trigger AS $$
+BEGIN
+  NEW.search_vector := 
+    setweight(to_tsvector('english', COALESCE(NEW.name, '')), 'A') ||
+    setweight(to_tsvector('english', COALESCE(NEW.code, '')), 'B') ||
+    setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'C') ||
+    setweight(to_tsvector('english', COALESCE(NEW.type, '')), 'D');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to update user search vector
+CREATE OR REPLACE FUNCTION update_user_search_vector() RETURNS trigger AS $$
+BEGIN
+  NEW.search_vector := 
+    setweight(to_tsvector('english', COALESCE(NEW.name, '')), 'A') ||
+    setweight(to_tsvector('english', COALESCE(NEW.email, '')), 'B') ||
+    setweight(to_tsvector('english', COALESCE(NEW.role, '')), 'C');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Search queries tracking table
+CREATE TABLE IF NOT EXISTS search_queries (
+  id SERIAL PRIMARY KEY,
+  query TEXT NOT NULL,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  results_count INTEGER DEFAULT 0,
+  clicked_result_id INTEGER,
+  clicked_result_type VARCHAR(50),
+  timestamp TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_search_queries_query ON search_queries(query);
+CREATE INDEX IF NOT EXISTS idx_search_queries_timestamp ON search_queries(timestamp);
+CREATE INDEX IF NOT EXISTS idx_search_queries_user_id ON search_queries(user_id);
+
+-- Popular searches view
+CREATE OR REPLACE VIEW popular_searches AS
+SELECT 
+  query,
+  COUNT(*) as search_count,
+  COUNT(DISTINCT user_id) as unique_users,
+  AVG(results_count) as avg_results,
+  MAX(timestamp) as last_searched
+FROM search_queries
+WHERE timestamp > NOW() - INTERVAL '30 days'
+GROUP BY query
+ORDER BY search_count DESC
+LIMIT 100;

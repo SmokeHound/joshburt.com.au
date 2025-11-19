@@ -3,7 +3,7 @@
 /**
  * Database Migration Runner
  * Runs all pending migrations in the migrations/ directory
- * 
+ *
  * Usage:
  *   node scripts/run-migrations.js           # Run all pending migrations
  *   node scripts/run-migrations.js --dry-run # Show pending migrations without running
@@ -24,11 +24,11 @@ function getMigrationFiles() {
     console.log('⚠️  Migrations directory not found');
     return [];
   }
-  
+
   const files = fs.readdirSync(MIGRATIONS_DIR)
     .filter(f => f.endsWith('.sql'))
     .sort();
-  
+
   return files;
 }
 
@@ -61,23 +61,23 @@ async function getAppliedMigrations() {
 async function applyMigration(filename) {
   const filepath = path.join(MIGRATIONS_DIR, filename);
   const sql = fs.readFileSync(filepath, 'utf8');
-  
+
   console.log(`📦 Applying migration: ${filename}`);
-  
+
   // Execute migration in a transaction
   const client = await database.pool.connect();
   try {
     await client.query('BEGIN');
-    
+
     // Execute migration SQL
     await client.query(sql);
-    
+
     // Record migration as applied
     await client.query(
       'INSERT INTO schema_migrations (filename) VALUES ($1)',
       [filename]
     );
-    
+
     await client.query('COMMIT');
     console.log(`✅ Applied: ${filename}`);
     return true;
@@ -96,50 +96,50 @@ async function applyMigration(filename) {
 async function runMigrations(dryRun = false) {
   try {
     console.log('🚀 Database Migration Runner\n');
-    
+
     // Initialize database connection
     await initializeDatabase();
-    
+
     // Create migrations table
     await createMigrationsTable();
-    
+
     // Get migration files
     const allMigrations = getMigrationFiles();
     const appliedMigrations = await getAppliedMigrations();
-    
+
     // Find pending migrations
     const pendingMigrations = allMigrations.filter(
       m => !appliedMigrations.includes(m)
     );
-    
-    console.log(`📊 Migration Status:`);
+
+    console.log('📊 Migration Status:');
     console.log(`   Total migrations: ${allMigrations.length}`);
     console.log(`   Applied: ${appliedMigrations.length}`);
     console.log(`   Pending: ${pendingMigrations.length}\n`);
-    
+
     if (pendingMigrations.length === 0) {
       console.log('✅ No pending migrations');
       return;
     }
-    
+
     // Show pending migrations
     console.log('📋 Pending migrations:');
     pendingMigrations.forEach(m => console.log(`   - ${m}`));
     console.log('');
-    
+
     if (dryRun) {
       console.log('🏁 Dry run complete (no changes made)');
       return;
     }
-    
+
     // Apply pending migrations
     console.log('🔨 Applying migrations...\n');
     for (const migration of pendingMigrations) {
       await applyMigration(migration);
     }
-    
+
     console.log('\n✅ All migrations applied successfully');
-    
+
   } catch (err) {
     console.error('\n❌ Migration failed:', err);
     process.exit(1);
@@ -152,7 +152,7 @@ async function runMigrations(dryRun = false) {
 if (require.main === module) {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
-  
+
   runMigrations(dryRun);
 }
 
