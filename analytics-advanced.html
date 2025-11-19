@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Advanced Analytics - joshburt.com.au</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
+  <script src="./assets/js/feature-flags.js" defer></script>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+
+<button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+<div id="main-nav"></div>
+<script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
+
+<main id="main-content" class="flex-1 p-4 space-y-6" role="main">
+  <header class="page-header card border">
+    <h1 class="text-2xl font-bold">Advanced Analytics</h1>
+    <p class="text-sm text-gray-400 mt-1">Deep insights into user behavior, sessions, and events</p>
+  </header>
+
+  <!-- Filters Section -->
+  <section class="card p-4">
+    <h2 class="text-lg font-semibold mb-4">Filters</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-semibold mb-2">Date Range</label>
+        <select id="date-range" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="1">Last 24 hours</option>
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-2">Event Type</label>
+        <select id="event-type" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="">All Events</option>
+          <option value="page_view">Page Views</option>
+          <option value="click">Clicks</option>
+          <option value="search">Searches</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-2">Group By</label>
+        <select id="group-by" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="day">Day</option>
+          <option value="hour">Hour</option>
+        </select>
+      </div>
+      <div class="flex items-end">
+        <button id="refresh-btn" class="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Refresh Data
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overview Stats -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="card p-4 widget-primary rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Total Events</h3>
+      <div id="stat-total-events" class="text-2xl font-bold text-blue-400">-</div>
+    </div>
+    <div class="card p-4 widget-secondary rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Unique Users</h3>
+      <div id="stat-unique-users" class="text-2xl font-bold text-green-400">-</div>
+    </div>
+    <div class="card p-4 widget-accent rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Unique Sessions</h3>
+      <div id="stat-unique-sessions" class="text-2xl font-bold text-purple-400">-</div>
+    </div>
+    <div class="card p-4 widget-yellow rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Avg Session Duration</h3>
+      <div id="stat-avg-duration" class="text-2xl font-bold text-yellow-400">-</div>
+    </div>
+  </section>
+
+  <!-- Charts Section -->
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="card widget-primary p-6 rounded-lg shadow-md">
+      <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
+        <span class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
+        Events Over Time
+      </h3>
+      <div class="h-72">
+        <canvas id="events-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="card widget-secondary p-6 rounded-lg shadow-md">
+      <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
+        <span class="inline-block w-2 h-2 bg-green-400 rounded-full"></span>
+        Event Type Distribution
+      </h3>
+      <div class="h-72">
+        <canvas id="event-type-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="card widget-accent p-6 rounded-lg shadow-md lg:col-span-2">
+      <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
+        <span class="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>
+        Top Pages
+      </h3>
+      <div class="h-80">
+        <canvas id="top-pages-chart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Session Details Table -->
+  <section class="card p-6">
+    <h2 class="text-lg font-semibold mb-4">Recent Sessions</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-gray-700">
+            <th class="pb-3">Session ID</th>
+            <th class="pb-3">Started</th>
+            <th class="pb-3">Duration</th>
+            <th class="pb-3">Page Views</th>
+            <th class="pb-3">User</th>
+          </tr>
+        </thead>
+        <tbody id="sessions-table">
+          <tr>
+            <td colspan="5" class="py-4 text-center text-gray-400">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Export Section -->
+  <section class="card p-4">
+    <div class="flex justify-between items-center">
+      <h2 class="text-lg font-semibold">Export Data</h2>
+      <div class="flex gap-2">
+        <button id="export-csv" class="btn-neon-green px-4 py-2 rounded-lg">Export CSV</button>
+        <button id="export-json" class="btn-neon-blue px-4 py-2 rounded-lg">Export JSON</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const FN_BASE = window.FN_BASE || '/.netlify/functions';
+  let currentData = null;
+
+  // Initialize charts
+  let eventsChart, eventTypeChart, topPagesChart;
+
+  async function loadAnalytics() {
+    try {
+      const dateRange = document.getElementById('date-range').value;
+      const eventType = document.getElementById('event-type').value;
+      const groupBy = document.getElementById('group-by').value;
+
+      const endDate = new Date().toISOString().split('T')[0];
+      const startDate = new Date(Date.now() - parseInt(dateRange) * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      let url = `${FN_BASE}/analytics-events?aggregate=true&date_from=${startDate}&date_to=${endDate}&group_by=${groupBy}`;
+      if (eventType) {
+        url += `&event_type=${eventType}`;
+      }
+
+      const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load analytics');
+      }
+
+      const data = await response.json();
+      currentData = data;
+
+      updateStats(data);
+      updateCharts(data);
+      loadSessions();
+
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+      alert('Failed to load analytics data');
+    }
+  }
+
+  function updateStats(data) {
+    // Calculate totals from event_types
+    const totalEvents = data.event_types.reduce((sum, item) => sum + parseInt(item.count), 0);
+    const uniqueUsers = data.event_types.reduce((max, item) => Math.max(max, parseInt(item.unique_users)), 0);
+    const uniqueSessions = data.event_types.reduce((max, item) => Math.max(max, parseInt(item.unique_sessions)), 0);
+
+    document.getElementById('stat-total-events').textContent = totalEvents.toLocaleString();
+    document.getElementById('stat-unique-users').textContent = uniqueUsers.toLocaleString();
+    document.getElementById('stat-unique-sessions').textContent = uniqueSessions.toLocaleString();
+
+    // Format average duration
+    const avgDuration = data.sessions?.avg_duration || 0;
+    const minutes = Math.floor(avgDuration / 60);
+    const seconds = Math.floor(avgDuration % 60);
+    document.getElementById('stat-avg-duration').textContent = `${minutes}m ${seconds}s`;
+  }
+
+  function updateCharts(data) {
+    // Events over time
+    const trendsData = data.trends || [];
+    const dates = [...new Set(trendsData.map(item => {
+      const date = new Date(item.period);
+      return date.toLocaleDateString();
+    }))];
+
+    const datasets = {};
+    trendsData.forEach(item => {
+      const date = new Date(item.period).toLocaleDateString();
+      if (!datasets[item.event_type]) {
+        datasets[item.event_type] = new Array(dates.length).fill(0);
+      }
+      const index = dates.indexOf(date);
+      datasets[item.event_type][index] = parseInt(item.count);
+    });
+
+    if (eventsChart) {
+      eventsChart.destroy();
+    }
+
+    const ctx1 = document.getElementById('events-chart').getContext('2d');
+    eventsChart = new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: Object.keys(datasets).map((eventType, index) => ({
+          label: eventType,
+          data: datasets[eventType],
+          borderColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b'][index % 4],
+          backgroundColor: ['#3b82f620', '#10b98120', '#8b5cf620', '#f59e0b20'][index % 4],
+          tension: 0.4
+        }))
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top' }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    // Event type distribution
+    if (eventTypeChart) {
+      eventTypeChart.destroy();
+    }
+
+    const ctx2 = document.getElementById('event-type-chart').getContext('2d');
+    eventTypeChart = new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: data.event_types.map(item => item.event_type),
+        datasets: [{
+          data: data.event_types.map(item => parseInt(item.count)),
+          backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right' }
+        }
+      }
+    });
+
+    // Top pages
+    if (topPagesChart) {
+      topPagesChart.destroy();
+    }
+
+    const topPages = (data.top_pages || []).slice(0, 10);
+    const ctx3 = document.getElementById('top-pages-chart').getContext('2d');
+    topPagesChart = new Chart(ctx3, {
+      type: 'bar',
+      data: {
+        labels: topPages.map(item => item.page_url.substring(0, 50) + (item.page_url.length > 50 ? '...' : '')),
+        datasets: [{
+          label: 'Page Views',
+          data: topPages.map(item => parseInt(item.views)),
+          backgroundColor: '#3b82f6'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: { beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  async function loadSessions() {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${FN_BASE}/analytics-events?aggregate=false&per_page=10`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load sessions');
+      }
+
+      const data = await response.json();
+      const sessionsTable = document.getElementById('sessions-table');
+
+      if (data.events && data.events.length > 0) {
+        // Group by session
+        const sessions = {};
+        data.events.forEach(event => {
+          if (!sessions[event.session_id]) {
+            sessions[event.session_id] = {
+              session_id: event.session_id,
+              started: event.timestamp,
+              events: []
+            };
+          }
+          sessions[event.session_id].events.push(event);
+        });
+
+        sessionsTable.innerHTML = Object.values(sessions).slice(0, 10).map(session => {
+          const duration = 'N/A'; // Would need to calculate from events
+          const pageViews = session.events.filter(e => e.event_type === 'page_view').length;
+          const userId = session.events[0].user_id || 'Anonymous';
+
+          return `
+            <tr class="border-b border-gray-700">
+              <td class="py-3 font-mono text-sm">${session.session_id.substring(0, 16)}...</td>
+              <td class="py-3">${new Date(session.started).toLocaleString()}</td>
+              <td class="py-3">${duration}</td>
+              <td class="py-3">${pageViews}</td>
+              <td class="py-3">${userId}</td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        sessionsTable.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-gray-400">No sessions found</td></tr>';
+      }
+    } catch (error) {
+      console.error('Error loading sessions:', error);
+    }
+  }
+
+  // Event listeners
+  document.getElementById('refresh-btn').addEventListener('click', loadAnalytics);
+  document.getElementById('date-range').addEventListener('change', loadAnalytics);
+  document.getElementById('event-type').addEventListener('change', loadAnalytics);
+  document.getElementById('group-by').addEventListener('change', loadAnalytics);
+
+  document.getElementById('export-csv').addEventListener('click', () => {
+    if (!currentData) return;
+
+    const csv = convertToCSV(currentData.event_types);
+    downloadFile(csv, 'analytics-export.csv', 'text/csv');
+  });
+
+  document.getElementById('export-json').addEventListener('click', () => {
+    if (!currentData) return;
+
+    const json = JSON.stringify(currentData, null, 2);
+    downloadFile(json, 'analytics-export.json', 'application/json');
+  });
+
+  function convertToCSV(data) {
+    if (!data || data.length === 0) return '';
+
+    const headers = Object.keys(data[0]);
+    const rows = data.map(row => headers.map(h => row[h]).join(','));
+
+    return [headers.join(','), ...rows].join('\n');
+  }
+
+  function downloadFile(content, filename, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Load initial data
+  loadAnalytics();
+</script>
+
+</body>
+</html>
