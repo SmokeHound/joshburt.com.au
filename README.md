@@ -371,8 +371,10 @@ git push origin main
 
 Comprehensive documentation in `/docs`:
 
-- **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** - 🆕 Comprehensive upgrade and improvements roadmap
-- **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - 🆕 Quick-start implementation guide
+- **[UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md)** - 🆕 **Start here!** Quick upgrade plan overview
+- **[VISUAL_ROADMAP.md](VISUAL_ROADMAP.md)** - 🆕 Interactive visual implementation journey
+- **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** - 🆕 Complete upgrade specification (1100+ lines)
+- **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - 🆕 Step-by-step how-to guide
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design
 - **[API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)** - API reference
 - **[DATABASE.md](docs/DATABASE.md)** - Schema and queries

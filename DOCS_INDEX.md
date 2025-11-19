@@ -85,7 +85,17 @@ Welcome to the joshburt.com.au documentation. All technical documentation is org
 
 ### Current Planning
 
-- **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** - Comprehensive upgrade and improvements plan
+- **[UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md)** - 🆕 Quick reference upgrade plan (start here!)
+  - 10-phase overview
+  - Cost savings breakdown
+  - Priority recommendations
+  - Technology stack
+- **[VISUAL_ROADMAP.md](VISUAL_ROADMAP.md)** - 🆕 Visual implementation journey
+  - Interactive phase diagrams
+  - Priority paths (Quick Wins, Business Focus, Performance First)
+  - Feature matrix with difficulty/impact ratings
+  - Growth metrics visualization
+- **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** - 🆕 Comprehensive upgrade and improvements plan
   - Replace external services with self-hosted solutions
   - Advanced analytics and reporting
   - Search and discovery features
@@ -94,7 +104,7 @@ Welcome to the joshburt.com.au documentation. All technical documentation is org
   - Security improvements
   - PWA and offline support
   - Business intelligence features
-- **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - Quick-start implementation guide
+- **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - 🆕 Quick-start implementation guide
   - Phase-by-phase implementation steps
   - Code examples and templates
   - Testing strategies
