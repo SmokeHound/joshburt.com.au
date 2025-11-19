@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Email Queue Monitoring - joshburt.com.au</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
+  <script src="./assets/js/feature-flags.js" defer></script>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
+</head>
+<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+
+<button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+<div id="main-nav"></div>
+<script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
+
+<main id="main-content" class="flex-1 p-4 space-y-6" role="main">
+  <header class="page-header card border flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold">Email Queue Monitoring</h1>
+      <p class="text-sm text-gray-400 mt-1">Monitor and manage email delivery queue</p>
+    </div>
+    <button id="send-test-email-btn" class="btn-neon-green px-4 py-2 rounded-lg">
+      Send Test Email
+    </button>
+  </header>
+
+  <!-- Stats Overview -->
+  <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div class="card p-4 widget-primary rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Pending</h3>
+      <div id="stat-pending" class="text-2xl font-bold text-yellow-400">-</div>
+    </div>
+    <div class="card p-4 widget-secondary rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Sending</h3>
+      <div id="stat-sending" class="text-2xl font-bold text-blue-400">-</div>
+    </div>
+    <div class="card p-4 widget-accent rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Sent</h3>
+      <div id="stat-sent" class="text-2xl font-bold text-green-400">-</div>
+    </div>
+    <div class="card p-4 widget-yellow rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Failed</h3>
+      <div id="stat-failed" class="text-2xl font-bold text-red-400">-</div>
+    </div>
+    <div class="card p-4 widget-primary rounded-lg">
+      <h3 class="text-sm font-semibold mb-1">Total</h3>
+      <div id="stat-total" class="text-2xl font-bold text-purple-400">-</div>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="card p-4">
+    <h2 class="text-lg font-semibold mb-4">Filters</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-semibold mb-2">Status</label>
+        <select id="filter-status" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="">All</option>
+          <option value="pending">Pending</option>
+          <option value="sending">Sending</option>
+          <option value="sent">Sent</option>
+          <option value="failed">Failed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-2">Priority</label>
+        <select id="filter-priority" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="">All</option>
+          <option value="1">Highest (1)</option>
+          <option value="2-3">High (2-3)</option>
+          <option value="4-6">Normal (4-6)</option>
+          <option value="7-10">Low (7-10)</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-2">Limit</label>
+        <select id="filter-limit" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+      <div class="flex items-end">
+        <button id="refresh-btn" class="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Refresh
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Email Queue Table -->
+  <section class="card p-6">
+    <h2 class="text-lg font-semibold mb-4">Email Queue</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-gray-700">
+            <th class="pb-3">To</th>
+            <th class="pb-3">Subject</th>
+            <th class="pb-3">Priority</th>
+            <th class="pb-3">Status</th>
+            <th class="pb-3">Attempts</th>
+            <th class="pb-3">Scheduled For</th>
+            <th class="pb-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="queue-table">
+          <tr>
+            <td colspan="7" class="py-4 text-center text-gray-400">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- Email Detail Modal -->
+<div id="email-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div class="card p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Email Details</h2>
+      <button id="close-modal" class="text-gray-400 hover:text-white">×</button>
+    </div>
+
+    <div id="email-details" class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <h3 class="font-semibold mb-2">To</h3>
+          <p id="detail-to" class="text-gray-300"></p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">From</h3>
+          <p id="detail-from" class="text-gray-300"></p>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="font-semibold mb-2">Subject</h3>
+        <p id="detail-subject" class="text-gray-300"></p>
+      </div>
+
+      <div>
+        <h3 class="font-semibold mb-2">Body</h3>
+        <div id="detail-body" class="bg-gray-900 p-4 rounded max-h-96 overflow-y-auto"></div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <h3 class="font-semibold mb-2">Status</h3>
+          <p id="detail-status" class="text-gray-300"></p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">Priority</h3>
+          <p id="detail-priority" class="text-gray-300"></p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">Attempts</h3>
+          <p id="detail-attempts" class="text-gray-300"></p>
+        </div>
+      </div>
+
+      <div id="detail-error-section" class="hidden">
+        <h3 class="font-semibold mb-2 text-red-400">Error Message</h3>
+        <pre id="detail-error" class="bg-gray-900 p-4 rounded text-sm overflow-x-auto text-red-300"></pre>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-4">
+        <button id="retry-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hidden">
+          Retry Now
+        </button>
+        <button id="cancel-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+          Cancel Email
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Send Test Email Modal -->
+<div id="test-email-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div class="card p-6 max-w-2xl w-full mx-4">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Send Test Email</h2>
+      <button id="close-test-modal" class="text-gray-400 hover:text-white">×</button>
+    </div>
+
+    <form id="test-email-form" class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold mb-2">To</label>
+        <input type="email" id="test-to" required class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" placeholder="recipient@example.com" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-2">Subject</label>
+        <input type="text" id="test-subject" required class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" placeholder="Test Email" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-2">Message</label>
+        <textarea id="test-message" rows="5" required class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" placeholder="This is a test email..."></textarea>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button type="button" id="cancel-test-btn" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">
+          Cancel
+        </button>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Send
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const FN_BASE = window.FN_BASE || '/.netlify/functions';
+  let currentEmail = null;
+
+  async function loadQueue() {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      const status = document.getElementById('filter-status').value;
+      const limit = document.getElementById('filter-limit').value;
+
+      let url = `${FN_BASE}/email-queue?limit=${limit}&offset=0`;
+      if (status) url += `&status=${status}`;
+
+      const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load email queue');
+      }
+
+      const data = await response.json();
+      displayQueue(data.emails || []);
+      
+      // Load stats
+      loadStats();
+
+    } catch (error) {
+      console.error('Error loading queue:', error);
+      document.getElementById('queue-table').innerHTML = '<tr><td colspan="7" class="py-4 text-center text-red-400">Failed to load email queue</td></tr>';
+    }
+  }
+
+  async function loadStats() {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${FN_BASE}/email-queue?stats=true`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const stats = await response.json();
+        document.getElementById('stat-pending').textContent = stats.pending || 0;
+        document.getElementById('stat-sending').textContent = stats.sending || 0;
+        document.getElementById('stat-sent').textContent = stats.sent || 0;
+        document.getElementById('stat-failed').textContent = stats.failed || 0;
+        document.getElementById('stat-total').textContent = stats.total || 0;
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  }
+
+  function displayQueue(emails) {
+    const table = document.getElementById('queue-table');
+
+    if (emails.length === 0) {
+      table.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-400">No emails in queue</td></tr>';
+      return;
+    }
+
+    table.innerHTML = emails.map(email => {
+      const statusColor = {
+        'pending': 'bg-yellow-600',
+        'sending': 'bg-blue-600',
+        'sent': 'bg-green-600',
+        'failed': 'bg-red-600',
+        'cancelled': 'bg-gray-600'
+      }[email.status] || 'bg-gray-600';
+
+      const priorityLabel = email.priority <= 2 ? 'High' : email.priority <= 5 ? 'Normal' : 'Low';
+
+      return `
+        <tr class="border-b border-gray-700 hover:bg-gray-800">
+          <td class="py-3">${email.to_address}</td>
+          <td class="py-3 max-w-md truncate">${email.subject}</td>
+          <td class="py-3">${priorityLabel} (${email.priority})</td>
+          <td class="py-3">
+            <span class="px-2 py-1 text-xs rounded ${statusColor}">
+              ${email.status}
+            </span>
+          </td>
+          <td class="py-3">${email.attempts || 0}/${email.max_attempts || 3}</td>
+          <td class="py-3 text-sm">${new Date(email.scheduled_for).toLocaleString()}</td>
+          <td class="py-3">
+            <button onclick="showEmailDetail(${email.id})" class="text-blue-400 hover:text-blue-300 text-sm">
+              View
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function showEmailDetail(emailId) {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${FN_BASE}/email-queue?id=${emailId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load email details');
+      }
+
+      const data = await response.json();
+      const email = data.emails && data.emails[0];
+      
+      if (!email) {
+        throw new Error('Email not found');
+      }
+
+      currentEmail = email;
+
+      document.getElementById('detail-to').textContent = email.to_address;
+      document.getElementById('detail-from').textContent = email.from_address;
+      document.getElementById('detail-subject').textContent = email.subject;
+      document.getElementById('detail-body').innerHTML = email.body_html || `<pre class="whitespace-pre-wrap">${email.body_text || 'No content'}</pre>`;
+      document.getElementById('detail-status').textContent = email.status;
+      document.getElementById('detail-priority').textContent = email.priority;
+      document.getElementById('detail-attempts').textContent = `${email.attempts || 0}/${email.max_attempts || 3}`;
+
+      if (email.error_message) {
+        document.getElementById('detail-error-section').classList.remove('hidden');
+        document.getElementById('detail-error').textContent = email.error_message;
+      } else {
+        document.getElementById('detail-error-section').classList.add('hidden');
+      }
+
+      // Show retry button for failed emails
+      if (email.status === 'failed') {
+        document.getElementById('retry-btn').classList.remove('hidden');
+      } else {
+        document.getElementById('retry-btn').classList.add('hidden');
+      }
+
+      document.getElementById('email-modal').classList.remove('hidden');
+    } catch (error) {
+      console.error('Error loading email details:', error);
+      alert('Failed to load email details');
+    }
+  }
+
+  async function cancelEmail() {
+    if (!currentEmail) return;
+    if (!confirm('Are you sure you want to cancel this email?')) return;
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${FN_BASE}/email-queue/${currentEmail.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel email');
+      }
+
+      document.getElementById('email-modal').classList.add('hidden');
+      loadQueue();
+    } catch (error) {
+      console.error('Error cancelling email:', error);
+      alert('Failed to cancel email');
+    }
+  }
+
+  // Event listeners
+  document.getElementById('refresh-btn').addEventListener('click', loadQueue);
+  document.getElementById('filter-status').addEventListener('change', loadQueue);
+  document.getElementById('filter-limit').addEventListener('change', loadQueue);
+
+  document.getElementById('close-modal').addEventListener('click', () => {
+    document.getElementById('email-modal').classList.add('hidden');
+  });
+
+  document.getElementById('cancel-btn').addEventListener('click', cancelEmail);
+
+  document.getElementById('send-test-email-btn').addEventListener('click', () => {
+    document.getElementById('test-email-modal').classList.remove('hidden');
+  });
+
+  document.getElementById('close-test-modal').addEventListener('click', () => {
+    document.getElementById('test-email-modal').classList.add('hidden');
+  });
+
+  document.getElementById('cancel-test-btn').addEventListener('click', () => {
+    document.getElementById('test-email-modal').classList.add('hidden');
+  });
+
+  document.getElementById('test-email-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const to = document.getElementById('test-to').value;
+      const subject = document.getElementById('test-subject').value;
+      const message = document.getElementById('test-message').value;
+
+      const response = await fetch(`${FN_BASE}/email-queue`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          to_address: to,
+          subject,
+          body_text: message,
+          priority: 5
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send test email');
+      }
+
+      document.getElementById('test-email-modal').classList.add('hidden');
+      document.getElementById('test-email-form').reset();
+      alert('Test email queued successfully!');
+      loadQueue();
+    } catch (error) {
+      console.error('Error sending test email:', error);
+      alert('Failed to send test email');
+    }
+  });
+
+  // Make function global for onclick
+  window.showEmailDetail = showEmailDetail;
+
+  // Load initial data
+  loadQueue();
+
+  // Auto-refresh every 30 seconds
+  setInterval(loadQueue, 30000);
+</script>
+
+</body>
+</html>
