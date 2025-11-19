@@ -6,20 +6,20 @@ describe('Settings Table Schema', () => {
   describe('Default Settings Structure', () => {
     test('default settings include all required categories', () => {
       const expectedCategories = ['general', 'theme', 'security', 'integrations', 'features'];
-      
+
       // These would be the keys we expect in each category
       const generalKeys = ['siteTitle', 'siteDescription', 'contactEmail', 'maintenanceMode', 'logoUrl', 'faviconUrl', 'oilDataSource', 'consumablesDataSource', 'customJs'];
       const themeKeys = ['theme', 'primaryColor', 'secondaryColor', 'accentColor', 'buttonPrimaryColor', 'buttonSecondaryColor', 'buttonDangerColor', 'buttonSuccessColor', 'customCss', 'themeSchedule'];
       const securityKeys = ['sessionTimeout', 'maxLoginAttempts', 'enable2FA', 'auditAllActions'];
       const integrationKeys = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpPassword'];
       const featureKeys = ['featureFlags'];
-      
+
       expect(generalKeys.length).toBeGreaterThan(0);
       expect(themeKeys.length).toBeGreaterThan(0);
       expect(securityKeys.length).toBeGreaterThan(0);
       expect(integrationKeys.length).toBeGreaterThan(0);
       expect(featureKeys.length).toBeGreaterThan(0);
-      
+
       // Validate we have settings in all expected categories
       expect(expectedCategories).toContain('general');
       expect(expectedCategories).toContain('theme');
@@ -38,7 +38,7 @@ describe('Settings Table Schema', () => {
         'buttonDangerColor',
         'buttonSuccessColor'
       ];
-      
+
       requiredColorFields.forEach(field => {
         expect(field).toBeTruthy();
         expect(field).toMatch(/Color$/);
@@ -53,7 +53,7 @@ describe('Settings Table Schema', () => {
         enableRegistration: false,
         enableGuestCheckout: false
       });
-      
+
       const parsed = JSON.parse(featureFlagsValue);
       expect(parsed).toHaveProperty('betaFeatures');
       expect(parsed).toHaveProperty('newDashboard');
@@ -69,7 +69,7 @@ describe('Settings Table Schema', () => {
         darkModeStart: '18:00',
         lightModeStart: '06:00'
       });
-      
+
       const parsed = JSON.parse(themeScheduleValue);
       expect(parsed).toHaveProperty('enabled');
       expect(parsed).toHaveProperty('darkModeStart');
@@ -85,7 +85,7 @@ describe('Settings Table Schema', () => {
         { key: 'enable2FA', value: 'false' },
         { key: 'auditAllActions', value: 'false' }
       ];
-      
+
       booleanSettings.forEach(setting => {
         expect(setting.value).toMatch(/^(true|false)$/);
       });
@@ -96,7 +96,7 @@ describe('Settings Table Schema', () => {
         { key: 'sessionTimeout', value: '60' },
         { key: 'maxLoginAttempts', value: '5' }
       ];
-      
+
       numberSettings.forEach(setting => {
         const parsed = parseInt(setting.value);
         expect(parsed).toBeGreaterThan(0);
@@ -107,11 +107,11 @@ describe('Settings Table Schema', () => {
     test('sensitive settings are properly marked', () => {
       const sensitiveKeys = ['smtpPassword'];
       const nonSensitiveKeys = ['smtpHost', 'smtpPort', 'smtpUser'];
-      
+
       sensitiveKeys.forEach(key => {
         expect(key).toContain('Password');
       });
-      
+
       nonSensitiveKeys.forEach(key => {
         expect(key).not.toContain('Password');
         expect(key).not.toContain('Secret');
@@ -129,7 +129,7 @@ describe('Settings Table Schema', () => {
         { key: 'buttonDangerColor', value: '#ef4444' },
         { key: 'buttonSuccessColor', value: '#10b981' }
       ];
-      
+
       colorSettings.forEach(setting => {
         expect(setting.value).toMatch(/^#[0-9a-f]{6}$/i);
       });
@@ -141,7 +141,7 @@ describe('Settings Table Schema', () => {
         { key: 'oilDataSource', value: 'api' },
         { key: 'consumablesDataSource', value: 'api' }
       ];
-      
+
       dataSourceSettings.forEach(setting => {
         expect(validDataSources).toContain(setting.value);
       });
@@ -164,7 +164,7 @@ describe('Settings Table Schema', () => {
         'updated_at',
         'updated_by'
       ];
-      
+
       expect(requiredColumns).toHaveLength(12);
       expect(requiredColumns).toContain('key');
       expect(requiredColumns).toContain('value');
@@ -178,7 +178,7 @@ describe('Settings Table Schema', () => {
         keyUnique: true,
         keyRequired: true
       };
-      
+
       expect(schemaRequirements.keyUnique).toBe(true);
       expect(schemaRequirements.keyRequired).toBe(true);
     });
@@ -189,7 +189,7 @@ describe('Settings Table Schema', () => {
         'idx_settings_category',
         'idx_settings_updated_at'
       ];
-      
+
       expect(expectedIndexes).toHaveLength(3);
       expect(expectedIndexes).toContain('idx_settings_key');
       expect(expectedIndexes).toContain('idx_settings_category');

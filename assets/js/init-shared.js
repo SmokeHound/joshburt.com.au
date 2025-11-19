@@ -546,7 +546,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   try {
     const container = document.getElementById('main-nav');
-    if (!container) return;
+    if (!container) {return;}
     // Only inject if container is empty (avoid double-injection)
     if (container.children.length === 0) {
       fetch('shared-nav.html')
@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function () {
           Array.from(t.childNodes).forEach(node => {
             if (node.tagName === 'SCRIPT') {
               const s = document.createElement('script');
-              if (node.src) s.src = node.src;
+              if (node.src) {s.src = node.src;}
               s.type = node.type || 'text/javascript';
               s.text = node.textContent;
               document.body.appendChild(s);
@@ -565,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function () {
               container.appendChild(node);
             }
           });
-          if (window.setActiveNavLink) window.setActiveNavLink();
+          if (window.setActiveNavLink) {window.setActiveNavLink();}
         })
         .catch(() => {});
     }

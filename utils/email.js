@@ -88,10 +88,10 @@ const createTransporter = async () => {
         'smtpPassword'
       ]);
       rows.forEach(r => {
-        if (r.key === 'smtpHost' && r.value) host = host || r.value;
-        if (r.key === 'smtpPort' && r.value) port = port || String(r.value);
-        if (r.key === 'smtpUser' && r.value) user = user || r.value;
-        if (r.key === 'smtpPassword' && r.value) pass = pass || r.value;
+        if (r.key === 'smtpHost' && r.value) {host = host || r.value;}
+        if (r.key === 'smtpPort' && r.value) {port = port || String(r.value);}
+        if (r.key === 'smtpUser' && r.value) {user = user || r.value;}
+        if (r.key === 'smtpPassword' && r.value) {pass = pass || r.value;}
       });
     } catch (e) {
       // DB unavailable or query failed - fall back to env vars only
@@ -104,10 +104,10 @@ const createTransporter = async () => {
     return {
       sendMail: async _opts => {
         const missing = [];
-        if (!host) missing.push('SMTP_HOST');
-        if (!port) missing.push('SMTP_PORT');
-        if (!user) missing.push('SMTP_USER');
-        if (!pass) missing.push('SMTP_PASS');
+        if (!host) {missing.push('SMTP_HOST');}
+        if (!port) {missing.push('SMTP_PORT');}
+        if (!user) {missing.push('SMTP_USER');}
+        if (!pass) {missing.push('SMTP_PASS');}
         const msg = `Missing SMTP credentials (${missing.join(', ')}). Set environment variables or configure settings.`;
         const err = new Error(msg);
         console.error('📧 SMTP misconfiguration:', msg);
@@ -422,10 +422,98 @@ const sendOrderCreatedEmail = async (email, name, orderId) => {
   }
 };
 
+/**
+ * Queue-based email wrappers (Phase 1.2 implementation)
+ * These functions use the email queue for reliable delivery with retry logic
+ */
+
+// Check if email queue is enabled (feature flag)
+const isEmailQueueEnabled = () => {
+  const enabled = process.env.EMAIL_QUEUE_ENABLED || 'false';
+  return enabled.toLowerCase() === 'true' || enabled === '1';
+};
+
+// Queue-based email wrappers
+const queueResetEmail = async (email, name, resetUrl) => {
+  if (!isEmailQueueEnabled()) {
+    return sendResetEmail(email, name, resetUrl);
+  }
+
+  try {
+    const { enqueueTemplateEmail } = require('./email-queue');
+    return await enqueueTemplateEmail({
+      templateName: 'password_reset',
+      to: email,
+      data: {
+        name,
+        resetUrl,
+        siteName: 'Josh Burt Website'
+      },
+      priority: 3 // High priority
+    });
+  } catch (err) {
+    console.warn('Failed to queue email, falling back to direct send:', err);
+    return sendResetEmail(email, name, resetUrl);
+  }
+};
+
+const queueVerificationEmail = async (email, name, verificationUrl) => {
+  if (!isEmailQueueEnabled()) {
+    return sendVerificationEmail(email, name, verificationUrl);
+  }
+
+  try {
+    const { enqueueTemplateEmail } = require('./email-queue');
+    return await enqueueTemplateEmail({
+      templateName: 'email_verification',
+      to: email,
+      data: {
+        name,
+        verificationUrl,
+        siteName: 'Josh Burt Website'
+      },
+      priority: 3 // High priority
+    });
+  } catch (err) {
+    console.warn('Failed to queue email, falling back to direct send:', err);
+    return sendVerificationEmail(email, name, verificationUrl);
+  }
+};
+
+const queueWelcomeEmail = async (email, name) => {
+  if (!isEmailQueueEnabled()) {
+    return sendWelcomeEmail(email, name);
+  }
+
+  try {
+    const { enqueueEmail } = require('./email-queue');
+    const mailOptions = {
+      to: email,
+      subject: 'Welcome to Josh Burt Website',
+      html: '<!-- HTML content from sendWelcomeEmail -->',
+      text: `Hello ${name}, Welcome to the Josh Burt website!`,
+      priority: 5 // Normal priority
+    };
+    return await enqueueEmail(mailOptions);
+  } catch (err) {
+    console.warn('Failed to queue email, falling back to direct send:', err);
+    return sendWelcomeEmail(email, name);
+  }
+};
+
 module.exports = {
+  // Direct send functions (legacy)
   sendResetEmail,
   sendWelcomeEmail,
   sendVerificationEmail,
   sendOrderStatusEmail,
-  sendOrderCreatedEmail
+  sendOrderCreatedEmail,
+
+  // Queue-based functions (new - Phase 1.2)
+  queueResetEmail,
+  queueVerificationEmail,
+  queueWelcomeEmail,
+
+  // Feature flag check
+  isEmailQueueEnabled
 };

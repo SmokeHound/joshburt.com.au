@@ -154,15 +154,15 @@ function initThemeCards() {
     themeCards.forEach(card => {
       const cardTheme = card.getAttribute('data-theme');
       const indicator = card.querySelector('.theme-active-indicator');
-      
+
       if (cardTheme === themeId) {
         card.classList.add('border-green-500', 'border-4');
         card.classList.remove('border-2', 'border-gray-700');
-        if (indicator) indicator.classList.remove('hidden');
+        if (indicator) {indicator.classList.remove('hidden');}
       } else {
         card.classList.remove('border-green-500', 'border-4');
         card.classList.add('border-2', 'border-gray-700');
-        if (indicator) indicator.classList.add('hidden');
+        if (indicator) {indicator.classList.add('hidden');}
       }
     });
   }
@@ -170,13 +170,13 @@ function initThemeCards() {
   themeCards.forEach(card => {
     card.addEventListener('click', async () => {
       const themeId = card.getAttribute('data-theme');
-      if (themeSelect) themeSelect.value = themeId;
+      if (themeSelect) {themeSelect.value = themeId;}
       updateActiveCard(themeId);
 
       // Apply theme using ThemeManager
       if (window.Theme && typeof window.Theme.setTheme === 'function') {
         window.Theme.setTheme(themeId, true);
-        
+
         // Save settings and show feedback
         if (typeof window.saveSettingsQuiet === 'function') {
           await window.saveSettingsQuiet();
