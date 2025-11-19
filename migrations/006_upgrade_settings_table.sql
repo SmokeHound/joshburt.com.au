@@ -29,12 +29,22 @@ DO $$
 DECLARE
     settings_json JSONB;
     current_data TEXT;
+    has_data_column BOOLEAN;
 BEGIN
-    -- Get existing settings data
-    SELECT data INTO current_data FROM settings WHERE id = 1;
+    -- Check if the old 'data' column exists (legacy table structure)
+    SELECT EXISTS (
+        SELECT FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'settings' 
+        AND column_name = 'data'
+    ) INTO has_data_column;
     
-    IF current_data IS NOT NULL THEN
-        settings_json := current_data::JSONB;
+    IF has_data_column THEN
+        -- Get existing settings data from legacy JSON structure
+        SELECT data INTO current_data FROM settings WHERE id = 1;
+        
+        IF current_data IS NOT NULL THEN
+            settings_json := current_data::JSONB;
         
         -- Core Identity
         INSERT INTO settings_v2 (key, value, category, data_type, description) VALUES
@@ -161,12 +171,31 @@ BEGIN
         INSERT INTO settings_v2 (key, value, category, data_type, description) VALUES
             ('auditAllActions', (settings_json->>'auditAllActions')::TEXT, 'security', 'boolean', 'Audit all user actions')
             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = CURRENT_TIMESTAMP;
+        END IF;
+    ELSE
+        -- New table structure already exists, copy data from current settings table
+        INSERT INTO settings_v2 (key, value, category, data_type, is_sensitive, description, default_value, validation_rules, created_at, updated_at, updated_by)
+        SELECT key, value, category, data_type, is_sensitive, description, default_value, validation_rules, created_at, updated_at, updated_by
+        FROM settings
+        ON CONFLICT (key) DO NOTHING;
     END IF;
 END $$;
 
 -- Rename old table and new table
-ALTER TABLE settings RENAME TO settings_legacy;
-ALTER TABLE settings_v2 RENAME TO settings;
+-- Drop legacy table if it exists from previous failed migration
+DROP TABLE IF EXISTS settings_legacy;
+
+-- Only rename if settings_v2 exists (migration was successful)
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'settings_v2') THEN
+        -- Check if settings table still exists (not already renamed)
+        IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'settings') THEN
+            ALTER TABLE settings RENAME TO settings_legacy;
+        END IF;
+        ALTER TABLE settings_v2 RENAME TO settings;
+    END IF;
+END $$;
 
 -- Create function to auto-update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_settings_updated_at()

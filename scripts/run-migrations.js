@@ -36,23 +36,63 @@ function getMigrationFiles() {
  * Create migrations tracking table
  */
 async function createMigrationsTable() {
-  await database.run(`
-    CREATE TABLE IF NOT EXISTS schema_migrations (
-      id SERIAL PRIMARY KEY,
-      filename VARCHAR(255) UNIQUE NOT NULL,
-      applied_at TIMESTAMP DEFAULT NOW()
-    )
-  `);
+  // First, check if the table exists and has the correct schema
+  const client = await database.pool.connect();
+  try {
+    // Check if table exists
+    const tableExists = await client.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'schema_migrations'
+      ) as exists
+    `);
+
+    if (tableExists.rows[0].exists) {
+      // Check if filename column exists
+      const columnExists = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'schema_migrations' 
+          AND column_name = 'filename'
+        ) as exists
+      `);
+
+      if (!columnExists.rows[0].exists) {
+        // Drop and recreate table if it has wrong schema
+        console.log('⚠️  Recreating schema_migrations table with correct schema');
+        await client.query('DROP TABLE schema_migrations');
+      }
+    }
+
+    // Create table with correct schema
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        id SERIAL PRIMARY KEY,
+        filename VARCHAR(255) UNIQUE NOT NULL,
+        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+  } finally {
+    client.release();
+  }
 }
 
 /**
  * Get list of applied migrations
  */
 async function getAppliedMigrations() {
-  const rows = await database.all(
-    'SELECT filename FROM schema_migrations ORDER BY filename'
-  );
-  return rows.map(r => r.filename);
+  try {
+    const rows = await database.all(
+      'SELECT filename FROM schema_migrations ORDER BY filename'
+    );
+    return rows.map(r => r.filename);
+  } catch (err) {
+    // If table doesn't exist or has wrong schema, return empty array
+    console.log('⚠️  Creating new schema_migrations table');
+    return [];
+  }
 }
 
 /**

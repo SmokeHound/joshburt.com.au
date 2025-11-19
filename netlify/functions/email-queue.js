@@ -130,15 +130,16 @@ exports.handler = withHandler(async (event) => {
     }
     
     // Enqueue custom email
-    if (!to || !subject) {
+    const toAddress = to || body.to_address;
+    if (!toAddress || !subject) {
       return badRequest('Email "to" and "subject" are required');
     }
     
     const result = await enqueueEmail({
-      to,
+      to: toAddress,
       subject,
       html,
-      text,
+      text: text || body.body_text,
       priority: priority || 5,
       scheduledFor: scheduledFor ? new Date(scheduledFor) : null
     });

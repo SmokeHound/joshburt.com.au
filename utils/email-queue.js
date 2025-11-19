@@ -57,7 +57,8 @@ async function enqueueEmail({
     const result = await database.run(
       `INSERT INTO email_queue 
        (to_address, from_address, subject, body_html, body_text, priority, scheduled_for, metadata)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+       RETURNING id`,
       [
         to,
         fromAddress,
@@ -65,7 +66,7 @@ async function enqueueEmail({
         html,
         text,
         priority,
-        scheduledFor || new Date(),
+        scheduledFor || new Date().toISOString(),
         JSON.stringify(metadata)
       ]
     );
@@ -145,7 +146,7 @@ async function getPendingEmails(limit = 10) {
       `SELECT * FROM email_queue 
        WHERE status IN ('pending', 'failed') 
        AND attempts < max_attempts 
-       AND scheduled_for <= NOW()
+       AND scheduled_for <= CURRENT_TIMESTAMP
        ORDER BY priority ASC, scheduled_for ASC 
        LIMIT ?`,
       [limit]
@@ -166,6 +167,11 @@ async function getPendingEmails(limit = 10) {
  */
 async function sendEmail(email) {
   try {
+    // Validate SMTP configuration
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      throw new Error('SMTP configuration missing. Please set SMTP_HOST, SMTP_USER, and SMTP_PASS environment variables.');
+    }
+
     // Create transporter
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -241,7 +247,7 @@ async function processEmailQueue(batchSize = 10) {
         if (result.success) {
           // Mark as sent
           await database.run(
-            'UPDATE email_queue SET status = ?, sent_at = NOW() WHERE id = ?',
+            'UPDATE email_queue SET status = ?, sent_at = CURRENT_TIMESTAMP WHERE id = ?',
             ['sent', email.id]
           );
           stats.sent++;
@@ -253,7 +259,7 @@ async function processEmailQueue(batchSize = 10) {
 
           await database.run(
             `UPDATE email_queue 
-             SET status = ?, failed_at = NOW(), error_message = ? 
+             SET status = ?, failed_at = CURRENT_TIMESTAMP, error_message = ? 
              WHERE id = ?`,
             [status, result.error, email.id]
           );
@@ -347,7 +353,7 @@ async function cleanupOldEmails(daysOld = 30) {
     const result = await database.run(
       `DELETE FROM email_queue 
        WHERE status IN ('sent', 'failed', 'cancelled') 
-       AND created_at < NOW() - INTERVAL '? days'`,
+       AND created_at < CURRENT_TIMESTAMP - INTERVAL '1 day' * ?`,
       [daysOld]
     );
     return result.changes || 0;
