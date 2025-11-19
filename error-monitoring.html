@@ -179,12 +179,6 @@
 
   async function loadErrors() {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        window.location.href = '/login.html';
-        return;
-      }
-
       const level = document.getElementById('filter-level').value;
       const resolved = document.getElementById('filter-resolved').value;
       const environment = document.getElementById('filter-environment').value;
@@ -195,9 +189,7 @@
       if (resolved) url += `&resolved=${resolved}`;
       if (environment) url += `&environment=${environment}`;
 
-      const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await window.authFetch(url);
 
       if (!response.ok) {
         throw new Error('Failed to load errors');
@@ -217,10 +209,7 @@
 
   async function loadStats() {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/error-logs?stats=true`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await window.authFetch(`${FN_BASE}/error-logs?stats=true`);
 
       if (response.ok) {
         const stats = await response.json();
