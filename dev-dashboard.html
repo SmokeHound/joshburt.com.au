@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Development Dashboard - joshburt.com.au</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <style>
+    .metric-card {
+      transition: all 0.3s ease;
+    }
+    .metric-card:hover {
+      transform: translateY(-2px);
+    }
+    .log-entry {
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+    }
+    .log-level-error { color: #ef4444; }
+    .log-level-warn { color: #f59e0b; }
+    .log-level-info { color: #3b82f6; }
+    .log-level-debug { color: #6b7280; }
+    .code-block {
+      background: #1f2937;
+      color: #f3f4f6;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+    }
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .status-healthy { background: #10b981; }
+    .status-degraded { background: #f59e0b; }
+    .status-down { background: #ef4444; }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+  <div id="shared-nav-container"></div>
+
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Development Dashboard</h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        Monitor function execution, performance metrics, and system health
+      </p>
+    </div>
+
+    <!-- Health Status -->
+    <div id="health-status" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">System Health</h2>
+      <div id="health-content" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Health info will be populated here -->
+      </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div id="metrics-grid" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <!-- Metrics will be populated here -->
+    </div>
+
+    <!-- Tabs -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6">
+      <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="flex -mb-px">
+          <button onclick="switchTab('function-logs')" class="tab-btn active px-6 py-3 border-b-2 border-blue-600 text-blue-600 font-medium">
+            Function Logs
+          </button>
+          <button onclick="switchTab('errors')" class="tab-btn px-6 py-3 border-b-2 border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium">
+            Error Logs
+          </button>
+          <button onclick="switchTab('performance')" class="tab-btn px-6 py-3 border-b-2 border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium">
+            Performance
+          </button>
+          <button onclick="switchTab('database')" class="tab-btn px-6 py-3 border-b-2 border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium">
+            Database
+          </button>
+          <button onclick="switchTab('cache')" class="tab-btn px-6 py-3 border-b-2 border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium">
+            Cache
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="p-6">
+        <!-- Function Logs Tab -->
+        <div id="tab-function-logs" class="tab-content">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Function Executions</h3>
+            <button onclick="refreshLogs()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">
+              Refresh
+            </button>
+          </div>
+          <div id="function-logs-content" class="space-y-2">
+            <!-- Logs will be populated here -->
+          </div>
+        </div>
+
+        <!-- Error Logs Tab -->
+        <div id="tab-errors" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Errors</h3>
+            <button onclick="refreshErrors()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">
+              Refresh
+            </button>
+          </div>
+          <div id="errors-content" class="space-y-2">
+            <!-- Errors will be populated here -->
+          </div>
+        </div>
+
+        <!-- Performance Tab -->
+        <div id="tab-performance" class="tab-content hidden">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Performance Metrics</h3>
+          <div id="performance-content">
+            <!-- Performance metrics will be populated here -->
+          </div>
+        </div>
+
+        <!-- Database Tab -->
+        <div id="tab-database" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Database Performance</h3>
+            <button onclick="refreshDatabase()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">
+              Refresh
+            </button>
+          </div>
+          <div id="database-content">
+            <!-- Database metrics will be populated here -->
+          </div>
+        </div>
+
+        <!-- Cache Tab -->
+        <div id="tab-cache" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Cache Statistics</h3>
+            <button onclick="refreshCache()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">
+              Refresh
+            </button>
+          </div>
+          <div id="cache-content">
+            <!-- Cache stats will be populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared components -->
+  <script src="/shared-nav.html"></script>
+  <script src="/shared-theme.html"></script>
+  <script src="/shared-config.html"></script>
+
+  <script>
+    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+
+    // Load health status
+    async function loadHealth() {
+      try {
+        const response = await fetch(`${FN_BASE}/health`);
+        const data = await response.json();
+        renderHealth(data);
+      } catch (error) {
+        console.error('Failed to load health:', error);
+      }
+    }
+
+    // Render health status
+    function renderHealth(health) {
+      const statusClass = health.status === 'healthy' ? 'status-healthy' : 
+                         health.status === 'degraded' ? 'status-degraded' : 'status-down';
+      
+      document.getElementById('health-content').innerHTML = `
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="status-indicator ${statusClass}"></span>
+            <span class="font-semibold text-gray-900 dark:text-white">${health.status.toUpperCase()}</span>
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Environment: ${health.environment}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Version: ${health.version}</p>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-900 dark:text-white mb-2">Database</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Status: ${health.database?.status || 'unknown'}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Latency: ${health.database?.latencyMs || 0}ms</p>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-900 dark:text-white mb-2">Memory</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Heap: ${health.memory?.heapUsed || 0}/${health.memory?.heapTotal || 0} MB</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Uptime: ${health.uptime?.containerSeconds || 0}s</p>
+        </div>
+      `;
+
+      // Update metrics
+      renderMetrics(health);
+    }
+
+    // Render metrics
+    function renderMetrics(health) {
+      document.getElementById('metrics-grid').innerHTML = `
+        <div class="metric-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">DB Latency</div>
+          <div class="text-2xl font-bold ${health.database?.latencyMs < 30 ? 'text-green-600' : 'text-yellow-600'} dark:text-white">
+            ${health.database?.latencyMs || 0}ms
+          </div>
+        </div>
+        <div class="metric-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Memory Usage</div>
+          <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            ${health.memory?.heapUsed || 0}MB
+          </div>
+        </div>
+        <div class="metric-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Response Time</div>
+          <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+            ${health.latencyMs || 0}ms
+          </div>
+        </div>
+        <div class="metric-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Uptime</div>
+          <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+            ${Math.floor((health.uptime?.containerSeconds || 0) / 60)}m
+          </div>
+        </div>
+      `;
+    }
+
+    // Load error logs
+    async function loadErrors() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${FN_BASE}/error-logs?limit=20`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        renderErrors(data.errors || []);
+      } catch (error) {
+        console.error('Failed to load errors:', error);
+        document.getElementById('errors-content').innerHTML = `
+          <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <p class="text-red-800 dark:text-red-200">Failed to load error logs</p>
+          </div>
+        `;
+      }
+    }
+
+    // Render error logs
+    function renderErrors(errors) {
+      if (errors.length === 0) {
+        document.getElementById('errors-content').innerHTML = `
+          <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <p class="text-green-800 dark:text-green-200">No recent errors 🎉</p>
+          </div>
+        `;
+        return;
+      }
+
+      document.getElementById('errors-content').innerHTML = errors.map(error => `
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-semibold text-red-800 dark:text-red-200">${error.level?.toUpperCase()}</span>
+                <span class="text-xs text-red-600 dark:text-red-400">${new Date(error.timestamp).toLocaleString()}</span>
+              </div>
+              <p class="text-sm text-red-800 dark:text-red-200 font-semibold mb-1">${error.message}</p>
+              ${error.url ? `<p class="text-xs text-red-600 dark:text-red-400">URL: ${error.url}</p>` : ''}
+              ${error.stack_trace ? `
+                <details class="mt-2">
+                  <summary class="text-xs text-red-600 dark:text-red-400 cursor-pointer">Stack Trace</summary>
+                  <pre class="text-xs text-red-700 dark:text-red-300 mt-2 overflow-x-auto">${error.stack_trace}</pre>
+                </details>
+              ` : ''}
+            </div>
+            <span class="text-xs bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200 px-2 py-1 rounded">
+              ${error.occurrences || 1}x
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Load database performance
+    async function loadDatabase() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${FN_BASE}/database-performance`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        renderDatabase(data);
+      } catch (error) {
+        console.error('Failed to load database metrics:', error);
+        document.getElementById('database-content').innerHTML = `
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+            <p class="text-yellow-800 dark:text-yellow-200">Database performance metrics not available</p>
+          </div>
+        `;
+      }
+    }
+
+    // Render database metrics
+    function renderDatabase(data) {
+      if (!data.queries) {
+        document.getElementById('database-content').innerHTML = `
+          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <p class="text-gray-600 dark:text-gray-400">No query data available</p>
+          </div>
+        `;
+        return;
+      }
+
+      document.getElementById('database-content').innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="text-sm text-gray-600 dark:text-gray-400">Total Queries</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">${data.queries.total || 0}</div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="text-sm text-gray-600 dark:text-gray-400">Avg Latency</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">${data.queries.avg_latency || 0}ms</div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="text-sm text-gray-600 dark:text-gray-400">Slow Queries</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">${data.queries.slow_count || 0}</div>
+          </div>
+        </div>
+        
+        ${data.slowQueries?.length ? `
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Slow Queries (>100ms)</h4>
+          <div class="space-y-2">
+            ${data.slowQueries.map(q => `
+              <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-mono text-sm text-gray-900 dark:text-white">${q.query}</span>
+                  <span class="text-sm text-red-600 dark:text-red-400">${q.duration}ms</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : '<p class="text-gray-600 dark:text-gray-400">No slow queries detected</p>'}
+      `;
+    }
+
+    // Load cache statistics
+    async function loadCache() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${FN_BASE}/cache-management`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        renderCache(data);
+      } catch (error) {
+        console.error('Failed to load cache stats:', error);
+        document.getElementById('cache-content').innerHTML = `
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+            <p class="text-yellow-800 dark:text-yellow-200">Cache statistics not available</p>
+          </div>
+        `;
+      }
+    }
+
+    // Render cache statistics
+    function renderCache(data) {
+      const hitRate = data.stats?.hit_rate || 0;
+      document.getElementById('cache-content').innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="text-sm text-gray-600 dark:text-gray-400">Hit Rate</div>
+            <div class="text-2xl font-bold ${hitRate > 80 ? 'text-green-600' : 'text-yellow-600'} dark:text-white">
+              ${hitRate}%
+            </div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="text-sm text-gray-600 dark:text-gray-400">Total Hits</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">${data.stats?.hits || 0}</div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="text-sm text-gray-600 dark:text-gray-400">Total Misses</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">${data.stats?.misses || 0}</div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="text-sm text-gray-600 dark:text-gray-400">Cache Size</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">${data.stats?.size || 0}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Generate mock function logs (since we don't have actual logs)
+    function generateMockLogs() {
+      const functions = ['auth', 'products', 'orders', 'users', 'analytics'];
+      const methods = ['GET', 'POST', 'PUT', 'DELETE'];
+      const logs = [];
+      
+      for (let i = 0; i < 10; i++) {
+        const fn = functions[Math.floor(Math.random() * functions.length)];
+        const method = methods[Math.floor(Math.random() * methods.length)];
+        const status = Math.random() > 0.9 ? 500 : 200;
+        const duration = Math.floor(Math.random() * 200) + 10;
+        
+        logs.push({
+          timestamp: new Date(Date.now() - i * 60000).toISOString(),
+          function: fn,
+          method,
+          status,
+          duration,
+          path: `/.netlify/functions/${fn}`
+        });
+      }
+      
+      return logs;
+    }
+
+    // Render function logs
+    function renderFunctionLogs() {
+      const logs = generateMockLogs();
+      
+      document.getElementById('function-logs-content').innerHTML = logs.map(log => `
+        <div class="log-entry bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border-l-4 ${log.status === 200 ? 'border-green-500' : 'border-red-500'}">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-gray-500 dark:text-gray-400">${new Date(log.timestamp).toLocaleTimeString()}</span>
+              <span class="font-semibold text-gray-900 dark:text-white">${log.method}</span>
+              <span class="text-gray-600 dark:text-gray-300">${log.path}</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-sm ${log.status === 200 ? 'text-green-600' : 'text-red-600'}">${log.status}</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">${log.duration}ms</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'border-blue-600', 'text-blue-600');
+        btn.classList.add('border-transparent', 'text-gray-600', 'dark:text-gray-400');
+      });
+      event.target.classList.add('active', 'border-blue-600', 'text-blue-600');
+      event.target.classList.remove('border-transparent', 'text-gray-600', 'dark:text-gray-400');
+
+      // Hide all tab content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+
+      // Show selected tab
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+      // Load data for the tab
+      if (tabName === 'errors') loadErrors();
+      if (tabName === 'database') loadDatabase();
+      if (tabName === 'cache') loadCache();
+      if (tabName === 'function-logs') renderFunctionLogs();
+    }
+
+    // Refresh functions
+    function refreshLogs() {
+      renderFunctionLogs();
+    }
+
+    function refreshErrors() {
+      loadErrors();
+    }
+
+    function refreshDatabase() {
+      loadDatabase();
+    }
+
+    function refreshCache() {
+      loadCache();
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadHealth();
+      renderFunctionLogs();
+      
+      // Auto-refresh every 30 seconds
+      setInterval(() => {
+        loadHealth();
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) {
+          const tabName = activeTab.textContent.trim().toLowerCase().replace(/ /g, '-');
+          if (tabName === 'errors') loadErrors();
+          if (tabName === 'database') loadDatabase();
+          if (tabName === 'cache') loadCache();
+          if (tabName === 'function-logs') renderFunctionLogs();
+        }
+      }, 30000);
+    });
+  </script>
+
+  <script src="/shared-modals.html"></script>
+  <script src="/shared-notifications.html"></script>
+</body>
+</html>
