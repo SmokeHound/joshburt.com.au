@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Customer Insights - joshburt.com.au</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
+  <script src="./assets/js/feature-flags.js" defer></script>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+
+<button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+<div id="main-nav"></div>
+<script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
+
+<main id="main-content" class="flex-1 p-4 space-y-6" role="main">
+  <header class="page-header card border">
+    <h1 class="text-2xl font-bold">👥 Customer Insights</h1>
+    <p class="text-sm text-gray-400 mt-1">Customer segmentation, purchase patterns, and personalized recommendations</p>
+  </header>
+
+  <!-- Action Buttons -->
+  <section class="flex gap-4 flex-wrap">
+    <button id="calculate-patterns-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-400">
+      📊 Calculate Purchase Patterns
+    </button>
+    <button id="calculate-affinity-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-400">
+      🔗 Calculate Product Affinity
+    </button>
+    <button id="refresh-btn" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-400">
+      🔄 Refresh Data
+    </button>
+  </section>
+
+  <!-- Tab Navigation -->
+  <section class="card p-2">
+    <div class="flex gap-2 border-b border-gray-700">
+      <button class="tab-btn px-4 py-2 font-semibold rounded-t-lg bg-blue-900 text-blue-300" data-tab="segmentation">
+        Customer Segmentation
+      </button>
+      <button class="tab-btn px-4 py-2 font-semibold rounded-t-lg text-gray-400 hover:bg-gray-800" data-tab="patterns">
+        Purchase Patterns
+      </button>
+      <button class="tab-btn px-4 py-2 font-semibold rounded-t-lg text-gray-400 hover:bg-gray-800" data-tab="affinity">
+        Product Affinity
+      </button>
+    </div>
+  </section>
+
+  <!-- Segmentation Tab -->
+  <section id="tab-segmentation" class="tab-content">
+    <div class="card p-6">
+      <h2 class="text-xl font-semibold mb-4">Customer Segmentation (RFM Analysis)</h2>
+      <p class="text-sm text-gray-400 mb-4">Customers segmented by Recency, Frequency, and Monetary value</p>
+      
+      <!-- Segment Distribution Chart -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-3">Segment Distribution</h3>
+        <div class="h-64">
+          <canvas id="segment-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Segment Summary Cards -->
+      <div id="segment-summary" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <!-- Will be populated dynamically -->
+      </div>
+
+      <!-- Customer Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead>
+            <tr class="bg-gray-800">
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Customer</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Orders</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Last Order</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">RFM Scores</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Segment</th>
+            </tr>
+          </thead>
+          <tbody id="segmentation-table-body" class="bg-gray-900 divide-y divide-gray-700">
+            <tr>
+              <td colspan="6" class="px-4 py-8 text-center text-gray-400">
+                Loading customer data...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Purchase Patterns Tab -->
+  <section id="tab-patterns" class="tab-content" style="display: none;">
+    <div class="card p-6">
+      <h2 class="text-xl font-semibold mb-4">Customer Purchase Patterns</h2>
+      
+      <!-- Filter -->
+      <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-2">Filter by User ID</label>
+          <input type="number" id="patterns-user-filter" 
+                 class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" 
+                 placeholder="Leave empty for all users">
+        </div>
+        <div class="flex items-end">
+          <button id="apply-patterns-filter" class="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Apply Filter
+          </button>
+        </div>
+      </div>
+
+      <!-- Patterns Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead>
+            <tr class="bg-gray-800">
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Customer</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Item</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Purchases</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Total Qty</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Last Purchase</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Frequency</th>
+            </tr>
+          </thead>
+          <tbody id="patterns-table-body" class="bg-gray-900 divide-y divide-gray-700">
+            <tr>
+              <td colspan="7" class="px-4 py-8 text-center text-gray-400">
+                Loading patterns...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Affinity Tab -->
+  <section id="tab-affinity" class="tab-content" style="display: none;">
+    <div class="card p-6">
+      <h2 class="text-xl font-semibold mb-4">Product Affinity Analysis</h2>
+      <p class="text-sm text-gray-400 mb-4">Products frequently purchased together</p>
+      
+      <!-- Filter -->
+      <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-2">Min Confidence</label>
+          <select id="affinity-confidence" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+            <option value="0">All (0%+)</option>
+            <option value="0.3" selected>Low (30%+)</option>
+            <option value="0.5">Medium (50%+)</option>
+            <option value="0.7">High (70%+)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Limit</label>
+          <select id="affinity-limit" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+            <option value="20">20 results</option>
+            <option value="50" selected>50 results</option>
+            <option value="100">100 results</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button id="apply-affinity-filter" class="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Apply Filter
+          </button>
+        </div>
+      </div>
+
+      <!-- Affinity Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead>
+            <tr class="bg-gray-800">
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Item A</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Item B</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Co-occurrences</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Confidence</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Recommendation</th>
+            </tr>
+          </thead>
+          <tbody id="affinity-table-body" class="bg-gray-900 divide-y divide-gray-700">
+            <tr>
+              <td colspan="5" class="px-4 py-8 text-center text-gray-400">
+                Loading affinity data...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const FN_BASE = window.FN_BASE || '/.netlify/functions';
+let segmentChart = null;
+
+// Check authentication
+const accessToken = localStorage.getItem('accessToken');
+if (!accessToken) {
+  window.location.href = '/login.html';
+}
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    
+    // Update button styles
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('bg-blue-900', 'text-blue-300');
+      b.classList.add('text-gray-400', 'hover:bg-gray-800');
+    });
+    btn.classList.add('bg-blue-900', 'text-blue-300');
+    btn.classList.remove('text-gray-400', 'hover:bg-gray-800');
+    
+    // Show/hide content
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.style.display = 'none';
+    });
+    document.getElementById(`tab-${tab}`).style.display = 'block';
+  });
+});
+
+// Load customer segmentation
+async function loadSegmentation() {
+  try {
+    const response = await fetch(`${FN_BASE}/customer-insights?action=segmentation`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    
+    if (!response.ok) throw new Error('Failed to load segmentation');
+    
+    const data = await response.json();
+    
+    // Render segment distribution chart
+    const segmentCounts = data.segment_counts || {};
+    const segmentColors = {
+      'Champions': 'rgb(34, 197, 94)',
+      'Loyal Customers': 'rgb(59, 130, 246)',
+      'Promising': 'rgb(251, 191, 36)',
+      'Need Attention': 'rgb(249, 115, 22)',
+      'At Risk': 'rgb(239, 68, 68)',
+      'Lost': 'rgb(156, 163, 175)'
+    };
+    
+    const ctx = document.getElementById('segment-chart').getContext('2d');
+    if (segmentChart) segmentChart.destroy();
+    
+    segmentChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(segmentCounts),
+        datasets: [{
+          data: Object.values(segmentCounts),
+          backgroundColor: Object.keys(segmentCounts).map(s => segmentColors[s] || 'rgb(107, 114, 128)')
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { color: 'rgb(209, 213, 219)' }
+          }
+        }
+      }
+    });
+    
+    // Render segment summary cards
+    const summaryHtml = Object.entries(segmentCounts).map(([segment, count]) => `
+      <div class="card p-4 border-l-4" style="border-color: ${segmentColors[segment]}">
+        <h4 class="text-sm font-semibold text-gray-400">${segment}</h4>
+        <div class="text-2xl font-bold" style="color: ${segmentColors[segment]}">${count}</div>
+      </div>
+    `).join('');
+    document.getElementById('segment-summary').innerHTML = summaryHtml;
+    
+    // Render customer table
+    const tbody = document.getElementById('segmentation-table-body');
+    if (data.customers.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No customer data available</td></tr>';
+    } else {
+      tbody.innerHTML = data.customers.slice(0, 50).map(c => {
+        const segmentColor = segmentColors[c.segment] || 'rgb(107, 114, 128)';
+        const daysSince = parseInt(c.recency_days);
+        
+        return `
+          <tr class="hover:bg-gray-800">
+            <td class="px-4 py-3 text-sm">${c.name || 'N/A'}</td>
+            <td class="px-4 py-3 text-sm text-gray-400">${c.email}</td>
+            <td class="px-4 py-3 text-sm">${c.order_count}</td>
+            <td class="px-4 py-3 text-sm">${daysSince} days ago</td>
+            <td class="px-4 py-3 text-sm">
+              <div class="flex gap-2">
+                <span class="px-2 py-1 text-xs bg-gray-800 rounded">R:${c.recency_score}</span>
+                <span class="px-2 py-1 text-xs bg-gray-800 rounded">F:${c.frequency_score}</span>
+                <span class="px-2 py-1 text-xs bg-gray-800 rounded">M:${c.monetary_score}</span>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <span class="px-2 py-1 text-xs rounded" style="background-color: ${segmentColor}30; color: ${segmentColor}">
+                ${c.segment}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+  } catch (error) {
+    console.error('Error loading segmentation:', error);
+    document.getElementById('segmentation-table-body').innerHTML = 
+      '<tr><td colspan="6" class="px-4 py-8 text-center text-red-400">Failed to load customer data</td></tr>';
+  }
+}
+
+// Load purchase patterns
+async function loadPatterns() {
+  try {
+    const userId = document.getElementById('patterns-user-filter').value;
+    let url = `${FN_BASE}/customer-insights?action=patterns&limit=100`;
+    if (userId) url += `&user_id=${userId}`;
+    
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    
+    if (!response.ok) throw new Error('Failed to load patterns');
+    
+    const data = await response.json();
+    const tbody = document.getElementById('patterns-table-body');
+    
+    if (data.patterns.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">No patterns found. Click "Calculate Purchase Patterns" first.</td></tr>';
+    } else {
+      tbody.innerHTML = data.patterns.map(p => `
+        <tr class="hover:bg-gray-800">
+          <td class="px-4 py-3 text-sm">${p.user_name || p.user_email || `User #${p.user_id}`}</td>
+          <td class="px-4 py-3 text-sm">${p.item_name}</td>
+          <td class="px-4 py-3 text-sm">
+            <span class="px-2 py-1 text-xs rounded ${
+              p.item_type === 'product' ? 'bg-blue-900 text-blue-300' :
+              p.item_type === 'consumable' ? 'bg-green-900 text-green-300' :
+              'bg-purple-900 text-purple-300'
+            }">${p.item_type}</span>
+          </td>
+          <td class="px-4 py-3 text-sm font-semibold">${p.purchase_count}</td>
+          <td class="px-4 py-3 text-sm">${p.total_quantity}</td>
+          <td class="px-4 py-3 text-sm text-gray-400">${p.last_purchase_date ? new Date(p.last_purchase_date).toLocaleDateString() : 'N/A'}</td>
+          <td class="px-4 py-3 text-sm">${p.purchase_frequency_days ? `${p.purchase_frequency_days} days` : 'N/A'}</td>
+        </tr>
+      `).join('');
+    }
+    
+  } catch (error) {
+    console.error('Error loading patterns:', error);
+    document.getElementById('patterns-table-body').innerHTML = 
+      '<tr><td colspan="7" class="px-4 py-8 text-center text-red-400">Failed to load patterns</td></tr>';
+  }
+}
+
+// Load product affinity
+async function loadAffinity() {
+  try {
+    const minScore = document.getElementById('affinity-confidence').value;
+    const limit = document.getElementById('affinity-limit').value;
+    
+    const url = `${FN_BASE}/customer-insights?action=affinity&min_score=${minScore}&limit=${limit}`;
+    
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    
+    if (!response.ok) throw new Error('Failed to load affinity');
+    
+    const data = await response.json();
+    const tbody = document.getElementById('affinity-table-body');
+    
+    if (data.affinities.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No affinity data found. Click "Calculate Product Affinity" first.</td></tr>';
+    } else {
+      tbody.innerHTML = data.affinities.map(a => {
+        const confidence = (a.confidence_score * 100).toFixed(0);
+        const confidenceColor = confidence >= 70 ? 'text-green-400' : confidence >= 50 ? 'text-yellow-400' : 'text-orange-400';
+        
+        return `
+          <tr class="hover:bg-gray-800">
+            <td class="px-4 py-3 text-sm">
+              <div class="font-semibold">${a.item_a_name}</div>
+              <div class="text-xs text-gray-400">${a.item_a_type}</div>
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <div class="font-semibold">${a.item_b_name}</div>
+              <div class="text-xs text-gray-400">${a.item_b_type}</div>
+            </td>
+            <td class="px-4 py-3 text-sm">${a.co_occurrence_count}</td>
+            <td class="px-4 py-3 text-sm ${confidenceColor} font-semibold">${confidence}%</td>
+            <td class="px-4 py-3 text-sm text-gray-400">
+              Suggest "${a.item_b_name}" to buyers of "${a.item_a_name}"
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+  } catch (error) {
+    console.error('Error loading affinity:', error);
+    document.getElementById('affinity-table-body').innerHTML = 
+      '<tr><td colspan="5" class="px-4 py-8 text-center text-red-400">Failed to load affinity data</td></tr>';
+  }
+}
+
+// Calculate purchase patterns
+async function calculatePatterns() {
+  const btn = document.getElementById('calculate-patterns-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Calculating...';
+  
+  try {
+    const response = await fetch(`${FN_BASE}/customer-insights?action=calculate-patterns`, {
+      method: 'POST',
+      headers: { 
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) throw new Error('Failed to calculate patterns');
+    
+    const data = await response.json();
+    alert(`✅ ${data.message}\nPatterns created: ${data.patterns_created}`);
+    
+    await loadPatterns();
+    
+  } catch (error) {
+    console.error('Error calculating patterns:', error);
+    alert('❌ Failed to calculate patterns');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📊 Calculate Purchase Patterns';
+  }
+}
+
+// Calculate product affinity
+async function calculateAffinity() {
+  const btn = document.getElementById('calculate-affinity-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Calculating...';
+  
+  try {
+    const response = await fetch(`${FN_BASE}/customer-insights?action=calculate-affinity`, {
+      method: 'POST',
+      headers: { 
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) throw new Error('Failed to calculate affinity');
+    
+    const data = await response.json();
+    alert(`✅ ${data.message}\nAffinities created: ${data.affinities_created}`);
+    
+    await loadAffinity();
+    
+  } catch (error) {
+    console.error('Error calculating affinity:', error);
+    alert('❌ Failed to calculate affinity');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔗 Calculate Product Affinity';
+  }
+}
+
+// Event listeners
+document.getElementById('calculate-patterns-btn').addEventListener('click', calculatePatterns);
+document.getElementById('calculate-affinity-btn').addEventListener('click', calculateAffinity);
+document.getElementById('refresh-btn').addEventListener('click', async () => {
+  await loadSegmentation();
+  await loadPatterns();
+  await loadAffinity();
+});
+document.getElementById('apply-patterns-filter').addEventListener('click', loadPatterns);
+document.getElementById('apply-affinity-filter').addEventListener('click', loadAffinity);
+
+// Initial load
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadSegmentation();
+  await loadPatterns();
+  await loadAffinity();
+});
+</script>
+
+<script src="./shared-theme.html"></script>
+<script src="./shared-config.html"></script>
+<script src="./shared-pwa.html"></script>
+<script src="./shared-modals.html"></script>
+
+</body>
+</html>
