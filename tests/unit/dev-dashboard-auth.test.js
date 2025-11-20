@@ -24,7 +24,7 @@ describe('Dev Dashboard auth:required event handler', () => {
     window.addEventListener('auth:required', (e) => {
       e.preventDefault();
       eventPrevented = true;
-      
+
       // Create banner element (simplified version for testing)
       const banner = document.createElement('div');
       banner.className = 'auth-banner';
@@ -38,15 +38,15 @@ describe('Dev Dashboard auth:required event handler', () => {
       detail: { returnUrl: '/dev-dashboard.html', reason: 'refresh_failed' },
       cancelable: true
     });
-    
-    const handled = window.dispatchEvent(event);
+
+    window.dispatchEvent(event);
 
     // Verify the event was prevented (consumed)
     expect(eventPrevented).toBe(true);
-    
+
     // Verify a banner was created instead of redirecting
     expect(bannerCreated).toBe(true);
-    
+
     // Verify the banner exists in the DOM
     const banner = document.querySelector('.auth-banner');
     expect(banner).toBeTruthy();
@@ -83,7 +83,7 @@ describe('Dev Dashboard auth:required event handler', () => {
     // Set up event handler
     window.addEventListener('auth:required', (e) => {
       e.preventDefault();
-      
+
       const banner = document.createElement('div');
       banner.className = 'auth-banner fixed top-4 left-1/2';
       banner.innerHTML = `
@@ -122,8 +122,8 @@ describe('Dev Dashboard auth:required event handler', () => {
       detail: { returnUrl: '/dev-dashboard.html', reason: 'refresh_failed' },
       cancelable: true
     });
-    
-    const result = window.dispatchEvent(event);
+
+    window.dispatchEvent(event);
 
     // When preventDefault is called, dispatchEvent returns false
     expect(defaultPrevented).toBe(true);
