@@ -113,13 +113,46 @@ Enhance joshburt.com.au with advanced features using **only free, open-source, s
 ### 🛡️ Phase 6: Security (Weeks 13-14)
 **Add**: Advanced security monitoring, API keys
 
-- Suspicious activity detection
-- IP blacklist/whitelist
-- Advanced rate limiting
+**Status**: 🚧 In Progress  
+**Completion**: 66% (Backend complete, UI pending)
+
+- Automatic IP blacklisting (threshold-based)
+- SQL injection & XSS detection
 - Security event dashboard
 - API key management system
+- Advanced rate limiting (database-backed)
+- Suspicious activity detection
 
 **Impact**: Enhanced security, better compliance
+
+**Implemented**:
+- ✅ Security Monitoring System (Phase 6.1)
+  - Database schema with security_events, ip_blacklist, api_rate_limits tables
+  - Auto-blacklist trigger (10 high/critical events per hour)
+  - Security event logging utility
+  - SQL injection detection (UNION, OR, comments, etc.)
+  - XSS detection (script tags, event handlers, iframes)
+  - Suspicious login pattern detection
+  - IP blacklist management API
+  - Security statistics materialized view
+  - Unit tests (51 tests passing)
+  
+- ✅ API Key Management System (Phase 6.2)
+  - Database schema with api_keys and api_key_usage tables
+  - API key generation (sk_live_* / sk_test_* format)
+  - SHA-256 key hashing for secure storage
+  - Permission system with wildcards (resource:action format)
+  - Multi-header authentication (Bearer, X-API-Key, query param)
+  - Usage tracking with response time analytics
+  - API key management endpoint
+  - Per-key rate limiting
+  - Unit tests (28 tests passing)
+
+**Remaining**:
+- ⬜ Security dashboard UI (security-dashboard.html)
+- ⬜ API keys management UI (api-keys.html)
+
+**Documentation**: See [PHASE_6_SUMMARY.md](PHASE_6_SUMMARY.md)
 
 ---
 

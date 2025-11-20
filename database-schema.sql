@@ -866,6 +866,106 @@ $$ LANGUAGE plpgsql;
 --          AFTER INSERT OR UPDATE OR DELETE ON products
 --          FOR EACH ROW EXECUTE FUNCTION track_data_changes();
 
+-- ============================================================================
+-- PHASE 6: SECURITY ENHANCEMENTS
+-- ============================================================================
+
+-- Security Events Table (from migrations/015_add_security_monitoring.sql)
+CREATE TABLE IF NOT EXISTS security_events (
+  id SERIAL PRIMARY KEY,
+  event_type VARCHAR(100) NOT NULL,
+  severity VARCHAR(20) NOT NULL,
+  user_id INTEGER REFERENCES users(id),
+  ip_address INET,
+  user_agent TEXT,
+  description TEXT,
+  metadata JSONB,
+  resolved BOOLEAN DEFAULT FALSE,
+  resolved_by INTEGER REFERENCES users(id),
+  resolved_at TIMESTAMP,
+  resolution_notes TEXT,
+  timestamp TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_security_events_type ON security_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_security_events_severity ON security_events(severity);
+CREATE INDEX IF NOT EXISTS idx_security_events_timestamp ON security_events(timestamp);
+CREATE INDEX IF NOT EXISTS idx_security_events_resolved ON security_events(resolved);
+CREATE INDEX IF NOT EXISTS idx_security_events_ip ON security_events(ip_address);
+
+-- IP Blacklist Table
+CREATE TABLE IF NOT EXISTS ip_blacklist (
+  id SERIAL PRIMARY KEY,
+  ip_address INET UNIQUE NOT NULL,
+  reason TEXT,
+  added_by INTEGER REFERENCES users(id),
+  added_at TIMESTAMP DEFAULT NOW(),
+  expires_at TIMESTAMP,
+  is_active BOOLEAN DEFAULT TRUE,
+  auto_added BOOLEAN DEFAULT FALSE
+);
+
+CREATE INDEX IF NOT EXISTS idx_ip_blacklist_ip ON ip_blacklist(ip_address);
+CREATE INDEX IF NOT EXISTS idx_ip_blacklist_active ON ip_blacklist(is_active);
+CREATE INDEX IF NOT EXISTS idx_ip_blacklist_expires ON ip_blacklist(expires_at);
+
+-- Database-backed Rate Limiting Table
+CREATE TABLE IF NOT EXISTS api_rate_limits (
+  id SERIAL PRIMARY KEY,
+  identifier VARCHAR(255) NOT NULL,
+  endpoint VARCHAR(255) NOT NULL,
+  request_count INTEGER DEFAULT 1,
+  window_start TIMESTAMP DEFAULT NOW(),
+  last_request TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_api_rate_limits_identifier ON api_rate_limits(identifier);
+CREATE INDEX IF NOT EXISTS idx_api_rate_limits_endpoint ON api_rate_limits(endpoint);
+CREATE INDEX IF NOT EXISTS idx_api_rate_limits_window ON api_rate_limits(window_start);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_api_rate_limits_unique ON api_rate_limits(identifier, endpoint, window_start);
+
+-- API Keys Table (from migrations/016_add_api_keys.sql)
+CREATE TABLE IF NOT EXISTS api_keys (
+  id SERIAL PRIMARY KEY,
+  key_hash VARCHAR(255) UNIQUE NOT NULL,
+  key_prefix VARCHAR(20) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  permissions TEXT[],
+  rate_limit INTEGER DEFAULT 100,
+  expires_at TIMESTAMP,
+  last_used TIMESTAMP,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT NOW(),
+  metadata JSONB
+);
+
+CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash);
+CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id);
+CREATE INDEX IF NOT EXISTS idx_api_keys_active ON api_keys(is_active);
+CREATE INDEX IF NOT EXISTS idx_api_keys_prefix ON api_keys(key_prefix);
+
+-- API Key Usage Tracking Table
+CREATE TABLE IF NOT EXISTS api_key_usage (
+  id SERIAL PRIMARY KEY,
+  api_key_id INTEGER REFERENCES api_keys(id) ON DELETE CASCADE,
+  endpoint VARCHAR(255) NOT NULL,
+  method VARCHAR(10) NOT NULL,
+  ip_address INET,
+  user_agent TEXT,
+  response_status INTEGER,
+  response_time_ms INTEGER,
+  timestamp TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_api_key_usage_key ON api_key_usage(api_key_id);
+CREATE INDEX IF NOT EXISTS idx_api_key_usage_timestamp ON api_key_usage(timestamp);
+CREATE INDEX IF NOT EXISTS idx_api_key_usage_endpoint ON api_key_usage(endpoint);
+
+-- ============================================================================
+-- PHASE 7: PWA & OFFLINE SUPPORT
+-- ============================================================================
+
 -- Push Subscriptions Table for Web Push Notifications (Phase 7.1)
 CREATE TABLE IF NOT EXISTS push_subscriptions (
   id SERIAL PRIMARY KEY,
