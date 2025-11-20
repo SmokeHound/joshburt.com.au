@@ -256,7 +256,6 @@ Product 2,PROD002,oil,50</pre>
     // Validate import data
     async function validateImportData() {
       try {
-        const token = localStorage.getItem('accessToken');
         const targetTable = document.getElementById('import-table').value;
         const format = document.getElementById('import-format').value;
         const data = document.getElementById('import-data').value;
@@ -266,10 +265,9 @@ Product 2,PROD002,oil,50</pre>
           return;
         }
 
-        const response = await fetch(`${FN_BASE}/bulk-operations`, {
+        const response = await window.authFetch(`${FN_BASE}/bulk-operations`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -357,16 +355,14 @@ Product 2,PROD002,oil,50</pre>
       event.preventDefault();
 
       try {
-        const token = localStorage.getItem('accessToken');
         const targetTable = document.getElementById('import-table').value;
         const format = document.getElementById('import-format').value;
         const data = document.getElementById('import-data').value;
 
         // Create operation
-        const createResponse = await fetch(`${FN_BASE}/bulk-operations`, {
+        const createResponse = await window.authFetch(`${FN_BASE}/bulk-operations`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -382,10 +378,9 @@ Product 2,PROD002,oil,50</pre>
         const operation = await createResponse.json();
 
         // Execute operation
-        const executeResponse = await fetch(`${FN_BASE}/bulk-operations/${operation.id}/execute`, {
+        const executeResponse = await window.authFetch(`${FN_BASE}/bulk-operations/${operation.id}/execute`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ data })
@@ -418,15 +413,12 @@ Product 2,PROD002,oil,50</pre>
       event.preventDefault();
 
       try {
-        const token = localStorage.getItem('accessToken');
         const targetTable = document.getElementById('export-table').value;
         const format = document.getElementById('export-format').value;
 
         const params = new URLSearchParams({ target_table: targetTable, format });
 
-        const response = await fetch(`${FN_BASE}/bulk-operations/export?${params}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await window.authFetch(`${FN_BASE}/bulk-operations/export?${params}`);
 
         if (!response.ok) throw new Error('Export failed');
 
@@ -453,10 +445,7 @@ Product 2,PROD002,oil,50</pre>
     // View operation details
     async function viewOperation(id) {
       try {
-        const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${FN_BASE}/bulk-operations?limit=100`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await window.authFetch(`${FN_BASE}/bulk-operations?limit=100`);
 
         if (!response.ok) throw new Error('Failed to load operation');
 

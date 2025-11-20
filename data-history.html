@@ -184,24 +184,22 @@
     let currentFilters = {};
     let currentHistoryId = null;
 
-    // Load change history
+    // Load history with filters and pagination
     async function loadHistory() {
-      try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-          window.location.href = '/login.html';
-          return;
-        }
+      if (!window.authFetch) {
+        console.warn('authFetch not ready, retrying...');
+        setTimeout(loadHistory, 100);
+        return;
+      }
 
+      try {
         const params = new URLSearchParams({
           limit: 50,
           offset: currentPage * 50,
           ...currentFilters
         });
 
-        const response = await fetch(`${FN_BASE}/data-history?${params}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await window.authFetch(`${FN_BASE}/data-history?${params}`);
 
         if (!response.ok) throw new Error('Failed to load history');
 
@@ -252,10 +250,7 @@
     // Load statistics
     async function loadStats() {
       try {
-        const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${FN_BASE}/data-history/stats`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await window.authFetch(`${FN_BASE}/data-history/stats`);
 
         if (!response.ok) throw new Error('Failed to load stats');
 
@@ -279,13 +274,10 @@
     async function viewChange(id) {
       try {
         currentHistoryId = id;
-        const token = localStorage.getItem('accessToken');
         
         // Get the change from the current list
         const params = new URLSearchParams({ limit: 1000 });
-        const response = await fetch(`${FN_BASE}/data-history?${params}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await window.authFetch(`${FN_BASE}/data-history?${params}`);
 
         if (!response.ok) throw new Error('Failed to load change details');
 
@@ -374,10 +366,8 @@
       }
 
       try {
-        const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${FN_BASE}/data-history/${currentHistoryId}/restore`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await window.authFetch(`${FN_BASE}/data-history/${currentHistoryId}/restore`, {
+          method: 'POST'
         });
 
         if (!response.ok) throw new Error('Failed to restore version');
@@ -397,13 +387,11 @@
       event.preventDefault();
 
       try {
-        const token = localStorage.getItem('accessToken');
         const tableName = document.getElementById('tracking-table').value;
 
-        const response = await fetch(`${FN_BASE}/data-history/enable-tracking`, {
+        const response = await window.authFetch(`${FN_BASE}/data-history/enable-tracking`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ table_name: tableName })
