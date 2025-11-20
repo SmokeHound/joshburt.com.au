@@ -1,7 +1,7 @@
 // Enhanced Service Worker for PWA offline functionality with performance optimizations
-const STATIC_CACHE = 'joshburt-static-v5';
-const DYNAMIC_CACHE = 'joshburt-dynamic-v5';
-const API_CACHE = 'joshburt-api-v5';
+const STATIC_CACHE = 'joshburt-static-v6';
+const DYNAMIC_CACHE = 'joshburt-dynamic-v6';
+const API_CACHE = 'joshburt-api-v6';
 const IMAGE_CACHE = 'joshburt-images-v1';
 
 // Static resources to cache on install
@@ -10,6 +10,8 @@ const urlsToCache = [
   '/index.html',
   '/administration.html',
   '/analytics.html',
+  '/cache-monitor.html',
+  '/database-performance.html',
   '/login.html',
   '/oil-products.html',
   '/settings.html',
