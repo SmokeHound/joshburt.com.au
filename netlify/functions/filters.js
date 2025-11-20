@@ -3,6 +3,7 @@ const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { logAudit } = require('../../utils/audit');
 const { requirePermission } = require('../../utils/http');
+const cache = require('../../utils/cache');
 
 exports.handler = withHandler(async function (event) {
   await database.connect();
@@ -15,11 +16,28 @@ exports.handler = withHandler(async function (event) {
 
   async function handleGet(event) {
     try {
-      let query = 'SELECT * FROM filters WHERE is_active = true ORDER BY name';
-      let params = [];
-
       // Optional filters
       const { type, search, include_inactive } = event.queryStringParameters || {};
+      
+      // Generate cache key based on query parameters
+      const cacheKey = `list:${type || 'all'}:${search || 'none'}:${include_inactive || 'false'}`;
+      
+      // Try cache first (2 minute TTL)
+      const cached = cache.get('filters', cacheKey);
+      if (cached) {
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cache': 'HIT',
+            ...require('../../utils/http').corsHeaders
+          },
+          body: cached
+        };
+      }
+      
+      let query = 'SELECT * FROM filters WHERE is_active = true ORDER BY name';
+      let params = [];
 
       if (include_inactive === 'true') {
         query = 'SELECT * FROM filters ORDER BY name';
@@ -46,7 +64,20 @@ exports.handler = withHandler(async function (event) {
       }
 
       const filters = await database.all(query, params);
-      return ok(filters);
+      
+      // Cache the result for 2 minutes (120 seconds)
+      const dataString = JSON.stringify(filters);
+      cache.set('filters', cacheKey, dataString, 120);
+      
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cache': 'MISS',
+          ...require('../../utils/http').corsHeaders
+        },
+        body: dataString
+      };
     } catch (e) {
       console.error('GET /filters error:', e);
       return error(500, 'Failed to fetch filters');
@@ -85,6 +116,9 @@ exports.handler = withHandler(async function (event) {
         userId: user && user.id,
         details: { id: result.id, name, code, type }
       });
+
+      // Invalidate filters cache on create
+      cache.clearNamespace('filters');
 
       return ok(
         {
@@ -160,6 +194,9 @@ exports.handler = withHandler(async function (event) {
         details: { id, name, code, type }
       });
 
+      // Invalidate filters cache on update
+      cache.clearNamespace('filters');
+
       return ok({
         message: 'Filter updated successfully',
         filter: {
@@ -201,6 +238,9 @@ exports.handler = withHandler(async function (event) {
         userId: user && user.id,
         details: { id, name: existing.name, code: existing.code }
       });
+
+      // Invalidate filters cache on delete
+      cache.clearNamespace('filters');
 
       return ok({ message: 'Filter deleted successfully' });
     } catch (e) {

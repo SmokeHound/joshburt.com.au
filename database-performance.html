@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database Performance - joshburt.com.au</title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body class="bg-gray-50 dark:bg-gray-900">
+    <div id="shared-nav-container"></div>
+
+    <main class="ml-0 lg:ml-64 p-6 transition-all duration-300">
+      <!-- Page Header -->
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Database Performance</h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          Monitor database query performance and identify bottlenecks
+        </p>
+      </div>
+
+      <!-- Summary Statistics -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-8 w-8 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Queries</p>
+              <p id="total-queries" class="text-2xl font-semibold text-gray-900 dark:text-white">
+                0
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-8 w-8 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Duration</p>
+              <p id="avg-duration" class="text-2xl font-semibold text-gray-900 dark:text-white">
+                0ms
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-8 w-8 text-purple-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Unique Queries</p>
+              <p id="unique-queries" class="text-2xl font-semibold text-gray-900 dark:text-white">
+                0
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-8 w-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Slow Queries</p>
+              <p id="slow-queries-count" class="text-2xl font-semibold text-gray-900 dark:text-white">
+                0
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Actions</h2>
+        <div class="flex flex-wrap gap-4">
+          <button
+            id="refresh-btn"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Refresh Stats
+          </button>
+          <button
+            id="reset-metrics-btn"
+            class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          >
+            Reset Metrics
+          </button>
+        </div>
+      </div>
+
+      <!-- Slow Queries -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Slow Queries (>100ms)
+        </h2>
+        <div class="overflow-x-auto">
+          <table
+            id="slow-queries-table"
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+          >
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  Query
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  Duration
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  Timestamp
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              id="slow-queries-tbody"
+              class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+            >
+              <tr>
+                <td
+                  colspan="3"
+                  class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
+                >
+                  No slow queries detected
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- Shared Components -->
+    <script src="/shared-config.html"></script>
+    <script src="/shared-nav.html"></script>
+    <script src="/shared-theme.html"></script>
+    <script src="/shared-modals.html"></script>
+    <script src="/shared-notifications.html"></script>
+
+    <!-- Page Script -->
+    <script type="module">
+      import { authFetch } from '/assets/js/auth.js';
+
+      const FN_BASE = window.FN_BASE || '/.netlify/functions';
+
+      // Load database performance summary
+      async function loadSummary() {
+        try {
+          const response = await authFetch(`${FN_BASE}/database-performance?view=summary`);
+          const data = await response.json();
+
+          if (response.ok) {
+            document.getElementById('total-queries').textContent = data.totalQueries || 0;
+            document.getElementById('avg-duration').textContent = `${data.avgDuration || 0}ms`;
+            document.getElementById('unique-queries').textContent = data.uniqueQueries || 0;
+            document.getElementById('slow-queries-count').textContent = data.slowQueryCount || 0;
+          }
+        } catch (error) {
+          console.error('Error loading summary:', error);
+          window.showToast?.('Failed to load database performance summary', 'error');
+        }
+      }
+
+      // Load slow queries
+      async function loadSlowQueries() {
+        try {
+          const response = await authFetch(`${FN_BASE}/database-performance?view=slow&limit=20`);
+          const data = await response.json();
+
+          if (response.ok && data.slowQueries) {
+            const tbody = document.getElementById('slow-queries-tbody');
+            
+            if (data.slowQueries.length === 0) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                    No slow queries detected
+                  </td>
+                </tr>
+              `;
+            } else {
+              tbody.innerHTML = data.slowQueries
+                .map(
+                  q => `
+                <tr>
+                  <td class="px-6 py-4 text-sm text-gray-900 dark:text-white font-mono">
+                    ${escapeHtml(q.query.substring(0, 100))}${q.query.length > 100 ? '...' : ''}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                    ${q.duration}ms
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                    ${new Date(q.timestamp).toLocaleString()}
+                  </td>
+                </tr>
+              `
+                )
+                .join('');
+            }
+          }
+        } catch (error) {
+          console.error('Error loading slow queries:', error);
+          window.showToast?.('Failed to load slow queries', 'error');
+        }
+      }
+
+      // Reset metrics
+      async function resetMetrics() {
+        if (!confirm('Are you sure you want to reset database performance metrics?')) return;
+
+        try {
+          const response = await authFetch(`${FN_BASE}/database-performance`, {
+            method: 'DELETE'
+          });
+
+          if (response.ok) {
+            window.showToast?.('Database performance metrics reset successfully', 'success');
+            await loadAll();
+          } else {
+            throw new Error('Failed to reset metrics');
+          }
+        } catch (error) {
+          console.error('Error resetting metrics:', error);
+          window.showToast?.('Failed to reset database performance metrics', 'error');
+        }
+      }
+
+      // Load all data
+      async function loadAll() {
+        await Promise.all([loadSummary(), loadSlowQueries()]);
+      }
+
+      // Helper function to escape HTML
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Event listeners
+      document.getElementById('refresh-btn').addEventListener('click', loadAll);
+      document.getElementById('reset-metrics-btn').addEventListener('click', resetMetrics);
+
+      // Initial load
+      loadAll();
+
+      // Auto-refresh every 30 seconds
+      setInterval(loadAll, 30000);
+    </script>
+  </body>
+</html>

@@ -3,6 +3,7 @@ const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
 const { logAudit } = require('../../utils/audit');
+const cache = require('../../utils/cache');
 
 exports.handler = withHandler(async function (event) {
   // Initialize database connection (idempotent)
@@ -23,6 +24,23 @@ exports.handler = withHandler(async function (event) {
     try {
       const params = event.queryStringParameters || {};
       const { search, category_id, type, is_active, page = 1, limit = 50 } = params;
+
+      // Generate cache key based on query parameters
+      const cacheKey = `list:${search || 'all'}:${category_id || 'all'}:${type || 'all'}:${is_active || 'all'}:${page}:${limit}`;
+
+      // Try cache first (2 minute TTL for products)
+      const cached = cache.get('products', cacheKey);
+      if (cached) {
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cache': 'HIT',
+            ...require('../../utils/http').corsHeaders
+          },
+          body: cached
+        };
+      }
 
       // Build query with filters
       let query =
@@ -90,7 +108,7 @@ exports.handler = withHandler(async function (event) {
       const countResult = await database.get(countQuery, countParams);
       const total = countResult.total || 0;
 
-      return ok({
+      const result = {
         products,
         pagination: {
           page: parseInt(page),
@@ -98,7 +116,21 @@ exports.handler = withHandler(async function (event) {
           total,
           totalPages: Math.ceil(total / parseInt(limit))
         }
-      });
+      };
+
+      // Cache the result for 2 minutes (120 seconds)
+      const dataString = JSON.stringify(result);
+      cache.set('products', cacheKey, dataString, 120);
+
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cache': 'MISS',
+          ...require('../../utils/http').corsHeaders
+        },
+        body: dataString
+      };
     } catch (e) {
       console.error('GET /products error:', e);
       return error(500, 'Failed to fetch products');
@@ -155,6 +187,9 @@ exports.handler = withHandler(async function (event) {
           categoryId: category_id
         }
       });
+
+      // Invalidate product cache on create
+      cache.clearNamespace('products');
 
       return ok(
         {
@@ -229,6 +264,9 @@ exports.handler = withHandler(async function (event) {
         return error(404, 'Product not found');
       }
 
+      // Invalidate product cache on update
+      cache.clearNamespace('products');
+
       return ok({
         message: 'Product updated successfully',
         product: {
@@ -263,6 +301,9 @@ exports.handler = withHandler(async function (event) {
       if (!id) return error(400, 'Missing required field: id');
       const result = await database.run('DELETE FROM products WHERE id = ?', [id]);
       if (result.changes === 0) return error(404, 'Product not found');
+
+      // Invalidate product cache on delete
+      cache.clearNamespace('products');
 
       return ok({ message: 'Product deleted successfully' });
     } catch (e) {
