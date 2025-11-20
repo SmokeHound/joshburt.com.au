@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data History - joshburt.com.au</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="/shared-config.html"></script>
+  <script src="/shared-theme.html"></script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+  <div id="shared-nav-container"></div>
+  <script src="/shared-nav.html"></script>
+
+  <main class="ml-64 p-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">Data Version History</h1>
+        <p class="text-gray-400">Track and audit all data changes</p>
+      </div>
+
+      <!-- Statistics Cards -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card p-6">
+          <div class="text-gray-400 text-sm mb-2">Total Changes (30 days)</div>
+          <div id="stat-total" class="text-3xl font-bold">0</div>
+        </div>
+        <div class="card p-6">
+          <div class="text-gray-400 text-sm mb-2">Tables Tracked</div>
+          <div id="stat-tables" class="text-3xl font-bold">0</div>
+        </div>
+        <div class="card p-6">
+          <div class="text-gray-400 text-sm mb-2">Active Users</div>
+          <div id="stat-users" class="text-3xl font-bold">0</div>
+        </div>
+      </section>
+
+      <!-- Filters -->
+      <section class="card p-6 mb-8">
+        <h2 class="text-lg font-semibold mb-4">Filters</h2>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2">Table</label>
+            <select id="filter-table" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+              <option value="">All Tables</option>
+              <option value="products">Products</option>
+              <option value="consumables">Consumables</option>
+              <option value="filters">Filters</option>
+              <option value="users">Users</option>
+              <option value="orders">Orders</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-2">Action</label>
+            <select id="filter-action" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+              <option value="">All Actions</option>
+              <option value="insert">Insert</option>
+              <option value="update">Update</option>
+              <option value="delete">Delete</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-2">Date From</label>
+            <input type="date" id="filter-date-from" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-2">Date To</label>
+            <input type="date" id="filter-date-to" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          </div>
+          <div class="flex items-end">
+            <button id="apply-filters-btn" class="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              Apply Filters
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Change History Table -->
+      <section class="card p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold">Change History</h2>
+          <button id="refresh-btn" class="btn-secondary px-4 py-2">🔄 Refresh</button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="border-b border-gray-700">
+                <th class="pb-3 pr-4">ID</th>
+                <th class="pb-3 pr-4">Table</th>
+                <th class="pb-3 pr-4">Record ID</th>
+                <th class="pb-3 pr-4">Action</th>
+                <th class="pb-3 pr-4">Changed By</th>
+                <th class="pb-3 pr-4">Changed At</th>
+                <th class="pb-3 pr-4">Fields</th>
+                <th class="pb-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="history-table">
+              <tr>
+                <td colspan="8" class="py-8 text-center text-gray-400">Loading history...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="mt-4 flex justify-between items-center">
+          <div id="pagination-info" class="text-sm text-gray-400"></div>
+          <div class="flex gap-2">
+            <button id="prev-page" class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50" disabled>
+              Previous
+            </button>
+            <button id="next-page" class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50" disabled>
+              Next
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Change Details Modal -->
+  <div id="change-details-modal" class="modal hidden">
+    <div class="modal-content max-w-4xl">
+      <h2 class="text-2xl font-bold mb-4">Change Details</h2>
+      <div id="change-details-content" class="space-y-4"></div>
+      <div class="flex gap-4 mt-6">
+        <button id="restore-version-btn" class="btn-primary flex-1 hidden">🔄 Restore This Version</button>
+        <button id="close-details-btn" class="btn-secondary flex-1">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare Versions Modal -->
+  <div id="compare-modal" class="modal hidden">
+    <div class="modal-content max-w-5xl">
+      <h2 class="text-2xl font-bold mb-4">Compare Versions</h2>
+      <div id="compare-content" class="space-y-4"></div>
+      <div class="flex gap-4 mt-6">
+        <button id="close-compare-btn" class="btn-secondary flex-1">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enable Tracking Modal -->
+  <div id="enable-tracking-modal" class="modal hidden">
+    <div class="modal-content max-w-2xl">
+      <h2 class="text-2xl font-bold mb-4">Enable Data Tracking</h2>
+      
+      <form id="enable-tracking-form">
+        <div class="mb-4">
+          <label class="block text-sm font-semibold mb-2">Table to Track</label>
+          <select id="tracking-table" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" required>
+            <option value="">Select Table...</option>
+            <option value="products">Products</option>
+            <option value="consumables">Consumables</option>
+            <option value="filters">Filters</option>
+            <option value="users">Users</option>
+            <option value="orders">Orders</option>
+          </select>
+        </div>
+
+        <div class="bg-blue-900/20 border border-blue-500 rounded p-4 mb-4">
+          <p class="text-sm">Enabling tracking will automatically record all INSERT, UPDATE, and DELETE operations on this table.</p>
+        </div>
+
+        <div class="flex gap-4 mt-6">
+          <button type="submit" class="btn-primary flex-1">Enable Tracking</button>
+          <button type="button" id="cancel-tracking-btn" class="btn-secondary flex-1">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/shared-modals.html"></script>
+  <script src="/shared-notifications.html"></script>
+
+  <script>
+    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    let currentPage = 0;
+    let currentFilters = {};
+    let currentHistoryId = null;
+
+    // Load change history
+    async function loadHistory() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        const params = new URLSearchParams({
+          limit: 50,
+          offset: currentPage * 50,
+          ...currentFilters
+        });
+
+        const response = await fetch(`${FN_BASE}/data-history?${params}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load history');
+
+        const data = await response.json();
+        displayHistory(data.history);
+        updatePagination(data);
+
+        // Load stats
+        await loadStats();
+
+      } catch (error) {
+        console.error('Error loading history:', error);
+        showNotification('Failed to load history', 'error');
+      }
+    }
+
+    // Display history in table
+    function displayHistory(history) {
+      const tbody = document.getElementById('history-table');
+      
+      if (history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-gray-400">No changes found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = history.map(item => `
+        <tr class="border-b border-gray-700 hover:bg-gray-800">
+          <td class="py-3 pr-4">#${item.id}</td>
+          <td class="py-3 pr-4">${item.table_name}</td>
+          <td class="py-3 pr-4">#${item.record_id}</td>
+          <td class="py-3 pr-4">
+            <span class="px-2 py-1 rounded text-xs ${getActionColor(item.action)}">
+              ${item.action}
+            </span>
+          </td>
+          <td class="py-3 pr-4">${item.changed_by_name || item.changed_by_email || 'System'}</td>
+          <td class="py-3 pr-4">${formatDate(item.changed_at)}</td>
+          <td class="py-3 pr-4">
+            ${item.changed_fields ? `<span class="text-xs text-gray-400">${item.changed_fields.length} field(s)</span>` : '-'}
+          </td>
+          <td class="py-3">
+            <button onclick="viewChange(${item.id})" class="text-blue-500 hover:underline">View</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Load statistics
+    async function loadStats() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${FN_BASE}/data-history/stats`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load stats');
+
+        const data = await response.json();
+        
+        // Calculate totals
+        const totalChanges = data.statistics.reduce((sum, stat) => sum + parseInt(stat.change_count), 0);
+        const uniqueTables = new Set(data.statistics.map(stat => stat.table_name)).size;
+        const uniqueUsers = Math.max(...data.statistics.map(stat => parseInt(stat.unique_users) || 0), 0);
+
+        document.getElementById('stat-total').textContent = totalChanges;
+        document.getElementById('stat-tables').textContent = uniqueTables;
+        document.getElementById('stat-users').textContent = uniqueUsers;
+
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+
+    // View change details
+    async function viewChange(id) {
+      try {
+        currentHistoryId = id;
+        const token = localStorage.getItem('accessToken');
+        
+        // Get the change from the current list
+        const params = new URLSearchParams({ limit: 1000 });
+        const response = await fetch(`${FN_BASE}/data-history?${params}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load change details');
+
+        const data = await response.json();
+        const change = data.history.find(h => h.id === id);
+
+        if (!change) throw new Error('Change not found');
+
+        const content = document.getElementById('change-details-content');
+        
+        let html = `
+          <div class="grid grid-cols-2 gap-4">
+            <div><strong>ID:</strong> ${change.id}</div>
+            <div><strong>Table:</strong> ${change.table_name}</div>
+            <div><strong>Record ID:</strong> ${change.record_id}</div>
+            <div><strong>Action:</strong> <span class="px-2 py-1 rounded text-xs ${getActionColor(change.action)}">${change.action}</span></div>
+            <div><strong>Changed By:</strong> ${change.changed_by_name || change.changed_by_email || 'System'}</div>
+            <div><strong>Changed At:</strong> ${formatDate(change.changed_at)}</div>
+            <div><strong>IP Address:</strong> ${change.ip_address || 'N/A'}</div>
+            <div><strong>User Agent:</strong> ${change.user_agent ? `<span class="text-xs">${change.user_agent.substring(0, 50)}...</span>` : 'N/A'}</div>
+          </div>
+        `;
+
+        // Show changed fields
+        if (change.changed_fields && change.changed_fields.length > 0) {
+          html += `
+            <div class="mt-4">
+              <strong>Changed Fields:</strong>
+              <div class="flex flex-wrap gap-2 mt-2">
+                ${change.changed_fields.map(field => `<span class="px-2 py-1 bg-blue-900/30 rounded text-xs">${field}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        // Show data comparison
+        if (change.old_data || change.new_data) {
+          html += '<div class="mt-4"><strong>Data Changes:</strong></div>';
+          html += '<div class="grid grid-cols-2 gap-4 mt-2">';
+          
+          if (change.old_data) {
+            html += `
+              <div>
+                <div class="text-sm text-gray-400 mb-2">Old Data:</div>
+                <pre class="bg-gray-800 p-3 rounded text-xs overflow-x-auto">${JSON.stringify(change.old_data, null, 2)}</pre>
+              </div>
+            `;
+          }
+          
+          if (change.new_data) {
+            html += `
+              <div>
+                <div class="text-sm text-gray-400 mb-2">New Data:</div>
+                <pre class="bg-gray-800 p-3 rounded text-xs overflow-x-auto">${JSON.stringify(change.new_data, null, 2)}</pre>
+              </div>
+            `;
+          }
+          
+          html += '</div>';
+        }
+
+        content.innerHTML = html;
+
+        // Show restore button for updates and deletes
+        const restoreBtn = document.getElementById('restore-version-btn');
+        if (change.action === 'update' || change.action === 'delete') {
+          restoreBtn.classList.remove('hidden');
+        } else {
+          restoreBtn.classList.add('hidden');
+        }
+
+        document.getElementById('change-details-modal').classList.remove('hidden');
+
+      } catch (error) {
+        console.error('Error viewing change:', error);
+        showNotification('Failed to load change details', 'error');
+      }
+    }
+
+    // Restore version
+    async function restoreVersion() {
+      if (!currentHistoryId) return;
+
+      if (!confirm('Are you sure you want to restore this version? This will update the record to its previous state.')) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${FN_BASE}/data-history/${currentHistoryId}/restore`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to restore version');
+
+        showNotification('Version restored successfully', 'success');
+        document.getElementById('change-details-modal').classList.add('hidden');
+        await loadHistory();
+
+      } catch (error) {
+        console.error('Error restoring version:', error);
+        showNotification('Failed to restore version', 'error');
+      }
+    }
+
+    // Enable tracking
+    async function enableTracking(event) {
+      event.preventDefault();
+
+      try {
+        const token = localStorage.getItem('accessToken');
+        const tableName = document.getElementById('tracking-table').value;
+
+        const response = await fetch(`${FN_BASE}/data-history/enable-tracking`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ table_name: tableName })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to enable tracking');
+        }
+
+        showNotification(`Tracking enabled for ${tableName}`, 'success');
+        document.getElementById('enable-tracking-modal').classList.add('hidden');
+        document.getElementById('enable-tracking-form').reset();
+
+      } catch (error) {
+        console.error('Error enabling tracking:', error);
+        showNotification(error.message, 'error');
+      }
+    }
+
+    // Helper functions
+    function getActionColor(action) {
+      const colors = {
+        insert: 'bg-green-600',
+        update: 'bg-blue-600',
+        delete: 'bg-red-600'
+      };
+      return colors[action] || 'bg-gray-600';
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '-';
+      return new Date(dateString).toLocaleString();
+    }
+
+    function updatePagination(data) {
+      const info = document.getElementById('pagination-info');
+      const limit = 50;
+      const start = currentPage * limit + 1;
+      const end = Math.min(start + data.history.length - 1, data.total);
+      
+      info.textContent = `Showing ${start}-${end} of ${data.total}`;
+      
+      document.getElementById('prev-page').disabled = currentPage === 0;
+      document.getElementById('next-page').disabled = end >= data.total;
+    }
+
+    // Event listeners
+    document.getElementById('apply-filters-btn').addEventListener('click', () => {
+      currentFilters = {
+        table_name: document.getElementById('filter-table').value,
+        action: document.getElementById('filter-action').value,
+        date_from: document.getElementById('filter-date-from').value,
+        date_to: document.getElementById('filter-date-to').value
+      };
+      currentPage = 0;
+      loadHistory();
+    });
+
+    document.getElementById('refresh-btn').addEventListener('click', loadHistory);
+
+    document.getElementById('close-details-btn').addEventListener('click', () => {
+      document.getElementById('change-details-modal').classList.add('hidden');
+    });
+
+    document.getElementById('close-compare-btn').addEventListener('click', () => {
+      document.getElementById('compare-modal').classList.add('hidden');
+    });
+
+    document.getElementById('restore-version-btn').addEventListener('click', restoreVersion);
+
+    document.getElementById('cancel-tracking-btn').addEventListener('click', () => {
+      document.getElementById('enable-tracking-modal').classList.add('hidden');
+      document.getElementById('enable-tracking-form').reset();
+    });
+
+    document.getElementById('enable-tracking-form').addEventListener('submit', enableTracking);
+
+    document.getElementById('prev-page').addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        loadHistory();
+      }
+    });
+
+    document.getElementById('next-page').addEventListener('click', () => {
+      currentPage++;
+      loadHistory();
+    });
+
+    // Initialize
+    loadHistory();
+
+    // Auto-refresh every 60 seconds
+    setInterval(loadHistory, 60000);
+  </script>
+</body>
+</html>
