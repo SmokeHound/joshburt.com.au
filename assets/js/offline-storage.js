@@ -1,7 +1,7 @@
 /**
  * Offline Storage Manager - IndexedDB wrapper for offline data persistence
  * Part of Phase 7.2: Offline Data Storage
- * 
+ *
  * Provides a simple API for storing and retrieving data offline using IndexedDB.
  * Supports products, orders, and other catalog data for offline browsing.
  */
@@ -17,8 +17,10 @@ class OfflineStorage {
    * Initialize the IndexedDB database
    * @returns {Promise<IDBDatabase>}
    */
-  async init() {
-    if (this.db) return this.db;
+  init() {
+    if (this.db) {
+      return Promise.resolve(this.db);
+    }
 
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.version);
@@ -253,7 +255,7 @@ class OfflineStorage {
    * Get pending sync items
    * @returns {Promise<Array>}
    */
-  async getPendingSync() {
+  getPendingSync() {
     return this.getAll('sync_queue');
   }
 
@@ -261,7 +263,7 @@ class OfflineStorage {
    * Remove item from sync queue
    * @param {number} id - Sync item ID
    */
-  async removeFromSyncQueue(id) {
+  removeFromSyncQueue(id) {
     return this.delete('sync_queue', id);
   }
 

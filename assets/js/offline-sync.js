@@ -1,7 +1,7 @@
 /**
  * Offline Sync Manager - Background synchronization for offline operations
  * Part of Phase 7.2: Offline Data Storage
- * 
+ *
  * Handles syncing offline data to the server when connection is restored.
  * Provides conflict resolution and retry logic.
  */
@@ -24,7 +24,7 @@ class OfflineSyncManager {
   /**
    * Handle coming online
    */
-  async handleOnline() {
+  handleOnline() {
     console.log('[OfflineSync] Connection restored');
     this.isOnline = true;
     this.updateUI();
@@ -173,7 +173,7 @@ class OfflineSyncManager {
    * Sync a single item
    * @param {Object} item - Sync queue item
    */
-  async syncItem(item) {
+  syncItem(item) {
     const { type, data } = item;
 
     switch (type) {
