@@ -22,13 +22,13 @@ const pool = new Pool({
  */
 async function getPurchasePatterns(event) {
   await requirePermission(event, 'insights', 'read');
-  
+
   const params = event.queryStringParameters || {};
   const userId = params.user_id ? parseInt(params.user_id) : null;
   const limit = params.limit ? parseInt(params.limit) : 50;
-  
+
   const client = await pool.connect();
-  
+
   try {
     let query = `
       SELECT 
@@ -55,21 +55,21 @@ async function getPurchasePatterns(event) {
       LEFT JOIN filters f ON cpp.item_type = 'filter' AND cpp.item_id = f.id
       WHERE 1=1
     `;
-    
+
     const queryParams = [];
     let paramIndex = 1;
-    
+
     if (userId) {
       query += ` AND cpp.user_id = $${paramIndex}`;
       queryParams.push(userId);
       paramIndex++;
     }
-    
+
     query += ` ORDER BY cpp.purchase_count DESC LIMIT $${paramIndex}`;
     queryParams.push(limit);
-    
+
     const result = await client.query(query, queryParams);
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -77,7 +77,6 @@ async function getPurchasePatterns(event) {
         count: result.rows.length
       })
     };
-    
   } finally {
     client.release();
   }
@@ -89,9 +88,9 @@ async function getPurchasePatterns(event) {
  */
 async function getCustomerSegmentation(event) {
   await requirePermission(event, 'insights', 'read');
-  
+
   const client = await pool.connect();
-  
+
   try {
     const query = `
       WITH customer_metrics AS (
@@ -144,16 +143,16 @@ async function getCustomerSegmentation(event) {
       FROM rfm_scores
       ORDER BY avg_score DESC
     `;
-    
+
     const result = await client.query(query);
-    
+
     // Group by segment
     const segmentCounts = {};
     result.rows.forEach(row => {
       const segment = row.segment;
       segmentCounts[segment] = (segmentCounts[segment] || 0) + 1;
     });
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -162,7 +161,6 @@ async function getCustomerSegmentation(event) {
         total_customers: result.rows.length
       })
     };
-    
   } finally {
     client.release();
   }
@@ -174,15 +172,15 @@ async function getCustomerSegmentation(event) {
  */
 async function getProductAffinity(event) {
   await requirePermission(event, 'insights', 'read');
-  
+
   const params = event.queryStringParameters || {};
   const itemType = params.item_type;
   const itemId = params.item_id ? parseInt(params.item_id) : null;
   const minScore = params.min_score ? parseFloat(params.min_score) : 0.3;
   const limit = params.limit ? parseInt(params.limit) : 50;
-  
+
   const client = await pool.connect();
-  
+
   try {
     let query = `
       SELECT 
@@ -211,22 +209,22 @@ async function getProductAffinity(event) {
       LEFT JOIN filters f2 ON pa.item_b_type = 'filter' AND pa.item_b_id = f2.id
       WHERE pa.confidence_score >= $1
     `;
-    
+
     const queryParams = [minScore];
     let paramIndex = 2;
-    
+
     if (itemType && itemId) {
       query += ` AND ((pa.item_a_type = $${paramIndex} AND pa.item_a_id = $${paramIndex + 1})
                    OR (pa.item_b_type = $${paramIndex} AND pa.item_b_id = $${paramIndex + 1}))`;
       queryParams.push(itemType, itemId);
       paramIndex += 2;
     }
-    
+
     query += ` ORDER BY pa.confidence_score DESC LIMIT $${paramIndex}`;
     queryParams.push(limit);
-    
+
     const result = await client.query(query, queryParams);
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -234,7 +232,6 @@ async function getProductAffinity(event) {
         count: result.rows.length
       })
     };
-    
   } finally {
     client.release();
   }
@@ -246,15 +243,15 @@ async function getProductAffinity(event) {
  */
 async function calculatePurchasePatterns(event) {
   await requirePermission(event, 'insights', 'create');
-  
+
   const client = await pool.connect();
-  
+
   try {
     await client.query('BEGIN');
-    
+
     // Clear existing patterns
     await client.query('DELETE FROM customer_purchase_patterns');
-    
+
     // Calculate patterns from order history
     const insertQuery = `
       INSERT INTO customer_purchase_patterns 
@@ -282,11 +279,11 @@ async function calculatePurchasePatterns(event) {
       GROUP BY o.created_by::INTEGER, p.id
       HAVING COUNT(DISTINCT o.id) > 0
     `;
-    
+
     const result = await client.query(insertQuery);
-    
+
     await client.query('COMMIT');
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -294,7 +291,6 @@ async function calculatePurchasePatterns(event) {
         patterns_created: result.rowCount
       })
     };
-    
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('Error calculating patterns:', err);
@@ -310,15 +306,15 @@ async function calculatePurchasePatterns(event) {
  */
 async function calculateProductAffinity(event) {
   await requirePermission(event, 'insights', 'create');
-  
+
   const client = await pool.connect();
-  
+
   try {
     await client.query('BEGIN');
-    
+
     // Clear existing affinity data
     await client.query('DELETE FROM product_affinity');
-    
+
     // Find products bought together in same order
     const insertQuery = `
       INSERT INTO product_affinity 
@@ -341,11 +337,11 @@ async function calculateProductAffinity(event) {
       GROUP BY p1.id, p2.id
       HAVING COUNT(DISTINCT oi1.order_id) >= 2
     `;
-    
+
     const result = await client.query(insertQuery);
-    
+
     await client.query('COMMIT');
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -353,7 +349,6 @@ async function calculateProductAffinity(event) {
         affinities_created: result.rowCount
       })
     };
-    
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('Error calculating affinity:', err);
@@ -369,16 +364,16 @@ async function calculateProductAffinity(event) {
  */
 async function getRecommendations(event) {
   await requirePermission(event, 'insights', 'read');
-  
+
   const params = event.queryStringParameters || {};
   const userId = params.user_id ? parseInt(params.user_id) : null;
-  
+
   if (!userId) {
     return error(400, 'user_id is required');
   }
-  
+
   const client = await pool.connect();
-  
+
   try {
     // Get recommendations based on purchase patterns and affinity
     const query = `
@@ -409,9 +404,9 @@ async function getRecommendations(event) {
       ORDER BY pa.confidence_score DESC
       LIMIT 10
     `;
-    
+
     const result = await client.query(query, [userId]);
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -420,17 +415,16 @@ async function getRecommendations(event) {
         count: result.rows.length
       })
     };
-    
   } finally {
     client.release();
   }
 }
 
 // Main handler
-const handler = withHandler(async (event) => {
+const handler = withHandler(async event => {
   const method = event.httpMethod;
   const action = event.queryStringParameters?.action;
-  
+
   if (method === 'GET') {
     switch (action) {
       case 'patterns':
@@ -442,7 +436,10 @@ const handler = withHandler(async (event) => {
       case 'recommendations':
         return await getRecommendations(event);
       default:
-        return error(400, 'Invalid action. Valid actions: patterns, segmentation, affinity, recommendations');
+        return error(
+          400,
+          'Invalid action. Valid actions: patterns, segmentation, affinity, recommendations'
+        );
     }
   } else if (method === 'POST') {
     switch (action) {
@@ -454,7 +451,7 @@ const handler = withHandler(async (event) => {
         return error(400, 'Invalid action. Valid actions: calculate-patterns, calculate-affinity');
     }
   }
-  
+
   return error(405, 'Method not allowed');
 });
 

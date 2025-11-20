@@ -5,11 +5,11 @@ const cache = require('../../utils/cache');
 
 exports.handler = withHandler(async function (event) {
   const method = event.httpMethod;
-  
+
   if (method === 'GET') return handleGet(event);
   if (method === 'POST') return handlePost(event);
   if (method === 'DELETE') return handleDelete(event);
-  
+
   return error(405, 'Method Not Allowed');
 
   async function handleGet(event) {
@@ -20,7 +20,7 @@ exports.handler = withHandler(async function (event) {
     try {
       // Get cache statistics
       const stats = cache.getStats();
-      
+
       return ok({
         stats,
         cacheType: 'in-memory',

@@ -19,7 +19,7 @@ jest.mock('../../utils/http', () => ({
 }));
 
 jest.mock('../../utils/fn', () => ({
-  withHandler: (fn) => fn
+  withHandler: fn => fn
 }));
 
 const { Pool } = require('../../config/database');
@@ -220,9 +220,7 @@ describe('Data History API', () => {
           ]
         })
         .mockResolvedValueOnce({
-          rows: [
-            { change_date: '2024-01-01', total_changes: '5' }
-          ]
+          rows: [{ change_date: '2024-01-01', total_changes: '5' }]
         });
 
       const event = createMockEvent('GET', '/data-history/stats');
@@ -235,9 +233,7 @@ describe('Data History API', () => {
     });
 
     it('should filter stats by table', async () => {
-      mockQuery
-        .mockResolvedValueOnce({ rows: [] })
-        .mockResolvedValueOnce({ rows: [] });
+      mockQuery.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [] });
 
       const event = createMockEvent('GET', '/data-history/stats', null, {
         table_name: 'products',
@@ -253,12 +249,14 @@ describe('Data History API', () => {
     it('should restore a previous version', async () => {
       mockQuery
         .mockResolvedValueOnce({
-          rows: [{
-            id: 1,
-            table_name: 'products',
-            record_id: 123,
-            new_data: { name: 'Product A', price: 10 }
-          }]
+          rows: [
+            {
+              id: 1,
+              table_name: 'products',
+              record_id: 123,
+              new_data: { name: 'Product A', price: 10 }
+            }
+          ]
         })
         .mockResolvedValueOnce({
           rows: [{ id: 123, name: 'Product A', price: 10 }]
@@ -284,13 +282,15 @@ describe('Data History API', () => {
 
     it('should return 400 if no data to restore', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [{
-          id: 1,
-          table_name: 'products',
-          record_id: 123,
-          new_data: null,
-          old_data: null
-        }]
+        rows: [
+          {
+            id: 1,
+            table_name: 'products',
+            record_id: 123,
+            new_data: null,
+            old_data: null
+          }
+        ]
       });
 
       const event = createMockEvent('POST', '/data-history/1/restore');

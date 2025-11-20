@@ -23,13 +23,23 @@ const db = require('../../config/database');
  * @param {number|null} userId - Optional user ID for tracking
  * @returns {Object} Search results with metadata
  */
-async function performSearch(query, type = 'all', limit = 20, offset = 0, sort = 'relevance', userId = null) {
+async function performSearch(
+  query,
+  type = 'all',
+  limit = 20,
+  offset = 0,
+  sort = 'relevance',
+  userId = null
+) {
   if (!query || query.trim().length === 0) {
     throw new Error('Search query is required');
   }
 
   const searchQuery = query.trim();
-  const tsQuery = searchQuery.split(/\s+/).map(term => `${term}:*`).join(' & ');
+  const tsQuery = searchQuery
+    .split(/\s+/)
+    .map(term => `${term}:*`)
+    .join(' & ');
 
   const results = {
     query: searchQuery,
@@ -49,13 +59,13 @@ async function performSearch(query, type = 'all', limit = 20, offset = 0, sort =
   // Build ORDER BY clause based on sort option
   const getOrderBy = () => {
     switch (sort) {
-    case 'name':
-      return 'name ASC';
-    case 'recent':
-      return 'created_at DESC';
-    case 'relevance':
-    default:
-      return 'rank DESC, name ASC';
+      case 'name':
+        return 'name ASC';
+      case 'recent':
+        return 'created_at DESC';
+      case 'relevance':
+      default:
+        return 'rank DESC, name ASC';
     }
   };
 
@@ -170,8 +180,11 @@ async function performSearch(query, type = 'all', limit = 20, offset = 0, sort =
     }
 
     // Calculate total results
-    results.total = results.products.length + results.consumables.length +
-                   results.filters.length + results.users.length;
+    results.total =
+      results.products.length +
+      results.consumables.length +
+      results.filters.length +
+      results.users.length;
 
     // Track search query (fire and forget, don't await)
     trackSearchQuery(searchQuery, results.total, userId).catch(err => {
@@ -299,7 +312,11 @@ async function getSearchSuggestions(partial, limit = 5) {
 
     // Combine and deduplicate
     const allSuggestions = [
-      ...recentResult.rows.map(r => ({ text: r.query, source: 'recent', frequency: parseInt(r.frequency) })),
+      ...recentResult.rows.map(r => ({
+        text: r.query,
+        source: 'recent',
+        frequency: parseInt(r.frequency)
+      })),
       ...nameResult.rows.map(r => ({ text: r.suggestion, source: r.source, frequency: 0 }))
     ];
 
@@ -324,7 +341,7 @@ async function getSearchSuggestions(partial, limit = 5) {
 /**
  * Handler function
  */
-const handler = async (event) => {
+const handler = async event => {
   const method = event.httpMethod;
 
   // GET - Perform search or get suggestions/popular

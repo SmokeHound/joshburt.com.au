@@ -57,6 +57,7 @@ Multi-action endpoint for push notification management:
 - **GET** `/push-notifications/vapid-public-key` - Get VAPID public key (no auth)
 
 **Environment Variables Required**:
+
 ```env
 VAPID_PUBLIC_KEY=your-vapid-public-key
 VAPID_PRIVATE_KEY=your-vapid-private-key
@@ -92,6 +93,7 @@ const pending = await window.OfflineStorage.getPendingSync();
 ```
 
 **Object Stores**:
+
 - `products` - Product catalog
 - `consumables` - Consumables catalog
 - `filters` - Filters catalog
@@ -105,7 +107,7 @@ Background synchronization for offline operations:
 
 ```javascript
 // Listen for online/offline status
-window.OfflineSyncManager.addStatusListener((isOnline) => {
+window.OfflineSyncManager.addStatusListener(isOnline => {
   console.log('Online:', isOnline);
 });
 
@@ -123,6 +125,7 @@ await window.OfflineSyncManager.createOfflineOrder(orderData);
 ```
 
 **Features**:
+
 - Automatic sync when connection is restored
 - Retry logic with exponential backoff (max 3 attempts)
 - Conflict resolution
@@ -135,6 +138,7 @@ await window.OfflineSyncManager.createOfflineOrder(orderData);
 Added app shortcuts and share target:
 
 **App Shortcuts**:
+
 - Products catalog
 - Orders management
 - Analytics dashboard
@@ -145,6 +149,7 @@ Added app shortcuts and share target:
 #### 2. Service Worker (`sw.js`)
 
 Enhanced with:
+
 - Background sync event handler
 - IndexedDB integration for sync queue
 - Improved offline fallbacks
@@ -153,6 +158,7 @@ Enhanced with:
 #### 3. PWA Configuration (`shared-pwa.html`)
 
 Added:
+
 - Install prompt with custom UI
 - Offline indicator banner
 - Offline storage/sync initialization
@@ -169,6 +175,7 @@ npx web-push generate-vapid-keys
 ```
 
 Add to `.env`:
+
 ```env
 VAPID_PUBLIC_KEY=BNq...
 VAPID_PRIVATE_KEY=OPs...
@@ -212,7 +219,7 @@ if (permission === 'granted') {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${accessToken}`
+      Authorization: `Bearer ${accessToken}`
     },
     body: JSON.stringify({
       endpoint: subscription.endpoint,
@@ -232,7 +239,7 @@ await fetch('/.netlify/functions/push-notifications/send', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${adminToken}`
+    Authorization: `Bearer ${adminToken}`
   },
   body: JSON.stringify({
     user_id: 1,
@@ -250,12 +257,12 @@ await fetch('/.netlify/functions/push-notifications/send', {
 // Initialize on page load
 window.addEventListener('load', async () => {
   await window.OfflineStorage.init();
-  
+
   // Cache products for offline browsing
   if (navigator.onLine) {
     await window.OfflineSyncManager.cacheData('products');
   }
-  
+
   // Get products (online or offline)
   const products = await window.OfflineSyncManager.getData('products');
   displayProducts(products);
@@ -269,7 +276,7 @@ async function createOrder(orderData) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(orderData)
     });
@@ -289,6 +296,7 @@ async function createOrder(orderData) {
 **File**: `tests/unit/offline-storage.test.js`
 
 Tests IndexedDB wrapper functionality (11 tests, all passing):
+
 - Module structure
 - Initialization
 - API structure
@@ -303,6 +311,7 @@ npm run test:unit -- offline-storage
 **File**: `tests/functions/push_notifications_smoke.test.js`
 
 Tests push notification endpoints:
+
 - VAPID key retrieval
 - Subscription management
 - Send notification
@@ -351,14 +360,15 @@ console.log('Last sync:', info.lastSync);
 Subscriptions that return 410 Gone are automatically marked as inactive. Periodically clean up:
 
 ```sql
-DELETE FROM push_subscriptions 
-WHERE is_active = FALSE 
+DELETE FROM push_subscriptions
+WHERE is_active = FALSE
 AND last_used < NOW() - INTERVAL '30 days';
 ```
 
 ### Monitor Background Sync
 
 Service worker logs sync events:
+
 ```javascript
 navigator.serviceWorker.addEventListener('message', event => {
   if (event.data.type === 'sync-complete') {

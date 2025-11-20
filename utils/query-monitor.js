@@ -47,7 +47,9 @@ function trackQuery(query, duration, params = []) {
     slowQueries.unshift({
       query: normalizedQuery,
       duration,
-      params: params.map(p => (typeof p === 'string' && p.length > 100 ? p.substring(0, 100) + '...' : p)),
+      params: params.map(p =>
+        typeof p === 'string' && p.length > 100 ? p.substring(0, 100) + '...' : p
+      ),
       timestamp: new Date().toISOString()
     });
 
@@ -65,10 +67,7 @@ function trackQuery(query, duration, params = []) {
  */
 function normalizeQuery(query) {
   // Remove extra whitespace and normalize
-  return query
-    .replace(/\s+/g, ' ')
-    .trim()
-    .substring(0, 200); // Limit length for storage
+  return query.replace(/\s+/g, ' ').trim().substring(0, 200); // Limit length for storage
 }
 
 /**
@@ -76,8 +75,7 @@ function normalizeQuery(query) {
  * @returns {Array} - Array of query metrics
  */
 function getMetrics() {
-  return Array.from(queryMetrics.values())
-    .sort((a, b) => b.totalDuration - a.totalDuration); // Sort by total duration
+  return Array.from(queryMetrics.values()).sort((a, b) => b.totalDuration - a.totalDuration); // Sort by total duration
 }
 
 /**

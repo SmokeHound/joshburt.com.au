@@ -38,7 +38,7 @@
       });
 
       // Track clicks on links and buttons
-      document.addEventListener('click', (e) => {
+      document.addEventListener('click', e => {
         const target = e.target.closest('a, button');
         if (target) {
           this.trackClick(target);
@@ -85,10 +85,13 @@
      */
     saveSession(sessionId) {
       try {
-        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
-          sessionId,
-          timestamp: Date.now()
-        }));
+        sessionStorage.setItem(
+          SESSION_STORAGE_KEY,
+          JSON.stringify({
+            sessionId,
+            timestamp: Date.now()
+          })
+        );
       } catch (e) {
         console.warn('Failed to save session to storage:', e);
       }
@@ -203,7 +206,7 @@
             'Content-Type': 'application/json',
             // Include auth token if available
             ...(localStorage.getItem('accessToken') && {
-              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`
             })
           },
           body: JSON.stringify(eventData)

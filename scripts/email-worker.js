@@ -44,7 +44,9 @@ async function processOnce() {
     // Process emails
     const result = await processEmailQueue(BATCH_SIZE);
 
-    console.log(`✅ Processed ${result.processed} emails: ${result.sent} sent, ${result.failed} failed`);
+    console.log(
+      `✅ Processed ${result.processed} emails: ${result.sent} sent, ${result.failed} failed`
+    );
 
     // Show errors if any
     if (result.errors.length > 0) {
@@ -57,7 +59,6 @@ async function processOnce() {
     // Get queue stats after processing
     const statsAfter = await getQueueStats();
     console.log(`📊 Queue stats: ${statsAfter.pending} pending, ${statsAfter.failed} failed`);
-
   } catch (err) {
     console.error('❌ Email worker error:', err);
   } finally {

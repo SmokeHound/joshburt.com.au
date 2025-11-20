@@ -9,11 +9,7 @@ const { withHandler } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
 const { logAudit } = require('../../utils/audit');
 const { getClientIp } = require('../../utils/security-monitor');
-const {
-  generateApiKey,
-  hashApiKey,
-  getKeyPrefix
-} = require('../../utils/api-key-auth');
+const { generateApiKey, hashApiKey, getKeyPrefix } = require('../../utils/api-key-auth');
 
 /**
  * List API keys for a user
@@ -25,7 +21,8 @@ async function listApiKeys(event, pool) {
   const { include_all } = event.queryStringParameters || {};
 
   // Admins can see all keys, regular users only their own
-  let query = 'SELECT id, key_prefix, name, permissions, rate_limit, expires_at, last_used, is_active, created_at FROM api_keys';
+  let query =
+    'SELECT id, key_prefix, name, permissions, rate_limit, expires_at, last_used, is_active, created_at FROM api_keys';
   const params = [];
 
   if (include_all === 'true' && event.user?.role === 'admin') {
@@ -57,7 +54,8 @@ async function getApiKey(event, pool) {
   const userId = event.user?.id;
   const isAdmin = event.user?.role === 'admin';
 
-  let query = 'SELECT id, key_prefix, name, permissions, rate_limit, expires_at, last_used, is_active, created_at, metadata FROM api_keys WHERE id = $1';
+  let query =
+    'SELECT id, key_prefix, name, permissions, rate_limit, expires_at, last_used, is_active, created_at, metadata FROM api_keys WHERE id = $1';
   const params = [keyId];
 
   // Non-admins can only see their own keys
@@ -92,10 +90,7 @@ async function getApiKeyStats(event, pool) {
   const isAdmin = event.user?.role === 'admin';
 
   // Verify ownership or admin
-  const keyCheck = await pool.query(
-    'SELECT user_id FROM api_keys WHERE id = $1',
-    [keyId]
-  );
+  const keyCheck = await pool.query('SELECT user_id FROM api_keys WHERE id = $1', [keyId]);
 
   if (keyCheck.rows.length === 0) {
     return {
@@ -213,16 +208,19 @@ async function createApiKey(event, pool) {
       metadata
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING id, key_prefix, name, permissions, rate_limit, expires_at, created_at`,
-    [keyHash, keyPrefix, name, userId, permissions, rate_limit, expires_at, JSON.stringify(metadata)]
+    [
+      keyHash,
+      keyPrefix,
+      name,
+      userId,
+      permissions,
+      rate_limit,
+      expires_at,
+      JSON.stringify(metadata)
+    ]
   );
 
-  await logAudit(
-    pool,
-    userId,
-    'create_api_key',
-    `Created API key: ${name}`,
-    getClientIp(event)
-  );
+  await logAudit(pool, userId, 'create_api_key', `Created API key: ${name}`, getClientIp(event));
 
   // Return the API key - THIS IS THE ONLY TIME IT WILL BE SHOWN
   return {
@@ -248,10 +246,7 @@ async function updateApiKey(event, pool) {
   const body = JSON.parse(event.body || '{}');
 
   // Verify ownership or admin
-  const keyCheck = await pool.query(
-    'SELECT user_id FROM api_keys WHERE id = $1',
-    [keyId]
-  );
+  const keyCheck = await pool.query('SELECT user_id FROM api_keys WHERE id = $1', [keyId]);
 
   if (keyCheck.rows.length === 0) {
     return {
@@ -317,13 +312,7 @@ async function updateApiKey(event, pool) {
     params
   );
 
-  await logAudit(
-    pool,
-    userId,
-    'update_api_key',
-    `Updated API key #${keyId}`,
-    getClientIp(event)
-  );
+  await logAudit(pool, userId, 'update_api_key', `Updated API key #${keyId}`, getClientIp(event));
 
   return {
     statusCode: 200,
@@ -342,10 +331,7 @@ async function revokeApiKey(event, pool) {
   const isAdmin = event.user?.role === 'admin';
 
   // Verify ownership or admin
-  const keyCheck = await pool.query(
-    'SELECT user_id, name FROM api_keys WHERE id = $1',
-    [keyId]
-  );
+  const keyCheck = await pool.query('SELECT user_id, name FROM api_keys WHERE id = $1', [keyId]);
 
   if (keyCheck.rows.length === 0) {
     return {
@@ -364,18 +350,9 @@ async function revokeApiKey(event, pool) {
   const keyName = keyCheck.rows[0].name;
 
   // Soft delete - mark as inactive
-  await pool.query(
-    'UPDATE api_keys SET is_active = FALSE WHERE id = $1',
-    [keyId]
-  );
+  await pool.query('UPDATE api_keys SET is_active = FALSE WHERE id = $1', [keyId]);
 
-  await logAudit(
-    pool,
-    userId,
-    'revoke_api_key',
-    `Revoked API key: ${keyName}`,
-    getClientIp(event)
-  );
+  await logAudit(pool, userId, 'revoke_api_key', `Revoked API key: ${keyName}`, getClientIp(event));
 
   return {
     statusCode: 200,
@@ -389,7 +366,7 @@ async function revokeApiKey(event, pool) {
 /**
  * Main handler
  */
-const handler = withHandler(async (event) => {
+const handler = withHandler(async event => {
   const pool = Pool();
   const path = event.path;
   const method = event.httpMethod;

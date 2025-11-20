@@ -20,6 +20,8 @@
     "report:worker:watch": "node scripts/report-generator.js --watch",
     "backup:worker": "node scripts/backup-database.js process",
     "backup:worker:watch": "node scripts/backup-database.js watch",
+    "forecast:calculate": "node scripts/forecast-calculator.js",
+    "forecast:alerts": "node scripts/forecast-calculator.js alerts",
     "test:smtp": "node scripts/test-smtp.js",
     "test:email-verification": "node scripts/test-email-verification.js",
     "test:smoke:functions": "node tests/functions/auth_me_smoke.test.js",

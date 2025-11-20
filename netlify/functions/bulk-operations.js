@@ -106,7 +106,7 @@ async function listOperations(event, pool) {
  */
 async function createImport(event, pool) {
   const user = await requirePermission(event, 'bulk_operations', 'create');
-  
+
   const { target_table, format, data, validate_only = false } = JSON.parse(event.body || '{}');
 
   // Validate table name
@@ -114,7 +114,9 @@ async function createImport(event, pool) {
   if (!validTables.includes(target_table)) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `Invalid target_table. Must be one of: ${validTables.join(', ')}` })
+      body: JSON.stringify({
+        error: `Invalid target_table. Must be one of: ${validTables.join(', ')}`
+      })
     };
   }
 
@@ -142,7 +144,7 @@ async function createImport(event, pool) {
   if (validationErrors.length > 0 && !validate_only) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         error: 'Validation failed',
         validation_errors: validationErrors
       })
@@ -174,11 +176,17 @@ async function createImport(event, pool) {
 
   const operation = result.rows[0];
 
-  await logAudit(pool, user.id, 'bulk_import_created', {
-    operation_id: operation.id,
-    target_table,
-    total_records: rows.length
-  }, event);
+  await logAudit(
+    pool,
+    user.id,
+    'bulk_import_created',
+    {
+      operation_id: operation.id,
+      target_table,
+      total_records: rows.length
+    },
+    event
+  );
 
   return {
     statusCode: 201,
@@ -191,13 +199,13 @@ async function createImport(event, pool) {
  */
 async function executeOperation(event, pool) {
   const user = await requirePermission(event, 'bulk_operations', 'update');
-  
+
   const operationId = event.path.split('/').pop();
   const { data } = JSON.parse(event.body || '{}');
 
   // Get operation details
   const opResult = await pool.query('SELECT * FROM bulk_operations WHERE id = $1', [operationId]);
-  
+
   if (opResult.rows.length === 0) {
     return {
       statusCode: 404,
@@ -208,10 +216,10 @@ async function executeOperation(event, pool) {
   const operation = opResult.rows[0];
 
   // Update status to processing
-  await pool.query(
-    'UPDATE bulk_operations SET status = $1 WHERE id = $2',
-    ['processing', operationId]
-  );
+  await pool.query('UPDATE bulk_operations SET status = $1 WHERE id = $2', [
+    'processing',
+    operationId
+  ]);
 
   // Parse data
   let rows = [];
@@ -266,11 +274,17 @@ async function executeOperation(event, pool) {
     ]
   );
 
-  await logAudit(pool, user.id, 'bulk_import_executed', {
-    operation_id: operationId,
-    success_count: successCount,
-    error_count: errorCount
-  }, event);
+  await logAudit(
+    pool,
+    user.id,
+    'bulk_import_executed',
+    {
+      operation_id: operationId,
+      success_count: successCount,
+      error_count: errorCount
+    },
+    event
+  );
 
   return {
     statusCode: 200,
@@ -328,7 +342,7 @@ async function exportData(event, pool) {
     } else {
       const headers = Object.keys(result.rows[0]);
       const csvRows = [headers.join(',')];
-      
+
       for (const row of result.rows) {
         const values = headers.map(h => {
           const value = row[h];
@@ -338,7 +352,7 @@ async function exportData(event, pool) {
         });
         csvRows.push(values.join(','));
       }
-      
+
       output = csvRows.join('\n');
     }
   }
@@ -356,7 +370,7 @@ async function exportData(event, pool) {
 /**
  * Main handler
  */
-exports.handler = withHandler(async (event) => {
+exports.handler = withHandler(async event => {
   const pool = new Pool();
 
   try {
@@ -387,7 +401,6 @@ exports.handler = withHandler(async (event) => {
       statusCode: 404,
       body: JSON.stringify({ error: 'Not found' })
     };
-
   } finally {
     await pool.end();
   }

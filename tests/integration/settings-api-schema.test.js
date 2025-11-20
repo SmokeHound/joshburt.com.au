@@ -8,12 +8,48 @@ describe('Settings API Integration', () => {
     test('should transform database rows to settings object', () => {
       // Mock database rows from new schema
       const mockRows = [
-        { key: 'siteTitle', value: 'My Site', category: 'general', data_type: 'string', description: 'Website title' },
-        { key: 'maintenanceMode', value: 'false', category: 'general', data_type: 'boolean', description: 'Enable maintenance mode' },
-        { key: 'sessionTimeout', value: '60', category: 'security', data_type: 'number', description: 'Session timeout in minutes' },
-        { key: 'primaryColor', value: '#3b82f6', category: 'theme', data_type: 'string', description: 'Primary theme color' },
-        { key: 'featureFlags', value: '{"betaFeatures":true,"newDashboard":false}', category: 'features', data_type: 'json', description: 'Feature flags' },
-        { key: 'themeSchedule', value: '{"enabled":true,"darkModeStart":"18:00","lightModeStart":"06:00"}', category: 'theme', data_type: 'json', description: 'Theme schedule' }
+        {
+          key: 'siteTitle',
+          value: 'My Site',
+          category: 'general',
+          data_type: 'string',
+          description: 'Website title'
+        },
+        {
+          key: 'maintenanceMode',
+          value: 'false',
+          category: 'general',
+          data_type: 'boolean',
+          description: 'Enable maintenance mode'
+        },
+        {
+          key: 'sessionTimeout',
+          value: '60',
+          category: 'security',
+          data_type: 'number',
+          description: 'Session timeout in minutes'
+        },
+        {
+          key: 'primaryColor',
+          value: '#3b82f6',
+          category: 'theme',
+          data_type: 'string',
+          description: 'Primary theme color'
+        },
+        {
+          key: 'featureFlags',
+          value: '{"betaFeatures":true,"newDashboard":false}',
+          category: 'features',
+          data_type: 'json',
+          description: 'Feature flags'
+        },
+        {
+          key: 'themeSchedule',
+          value: '{"enabled":true,"darkModeStart":"18:00","lightModeStart":"06:00"}',
+          category: 'theme',
+          data_type: 'json',
+          description: 'Theme schedule'
+        }
       ];
 
       // Simulate the transformation logic from settings.js
@@ -43,7 +79,11 @@ describe('Settings API Integration', () => {
       expect(settings.sessionTimeout).toBe(60);
       expect(settings.primaryColor).toBe('#3b82f6');
       expect(settings.featureFlags).toEqual({ betaFeatures: true, newDashboard: false });
-      expect(settings.themeSchedule).toEqual({ enabled: true, darkModeStart: '18:00', lightModeStart: '06:00' });
+      expect(settings.themeSchedule).toEqual({
+        enabled: true,
+        darkModeStart: '18:00',
+        lightModeStart: '06:00'
+      });
     });
 
     test('should handle different data types correctly', () => {
@@ -147,7 +187,9 @@ describe('Settings API Integration', () => {
       expect(dbValues.sessionTimeout).toBe('120');
       expect(dbValues.primaryColor).toBe('#ff0000');
       expect(dbValues.featureFlags).toBe('{"betaFeatures":true,"newDashboard":true}');
-      expect(dbValues.themeSchedule).toBe('{"enabled":false,"darkModeStart":"20:00","lightModeStart":"08:00"}');
+      expect(dbValues.themeSchedule).toBe(
+        '{"enabled":false,"darkModeStart":"20:00","lightModeStart":"08:00"}'
+      );
     });
 
     test('should handle all data types in conversion', () => {

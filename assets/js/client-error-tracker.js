@@ -29,16 +29,24 @@
    */
   function shouldReportError(message) {
     // Check if tracking is enabled
-    if (!config.enabled) {return false;}
+    if (!config.enabled) {
+      return false;
+    }
 
     // Check session limit
-    if (errorCount >= config.maxErrorsPerSession) {return false;}
+    if (errorCount >= config.maxErrorsPerSession) {
+      return false;
+    }
 
     // Check sample rate
-    if (Math.random() > config.sampleRate) {return false;}
+    if (Math.random() > config.sampleRate) {
+      return false;
+    }
 
     // Check ignore list
-    if (config.ignoreErrors.some(ignore => message.includes(ignore))) {return false;}
+    if (config.ignoreErrors.some(ignore => message.includes(ignore))) {
+      return false;
+    }
 
     return true;
   }
@@ -73,7 +81,9 @@
    * Report error to backend
    */
   async function reportError({ level = 'error', message, stack, url, metadata = {} }) {
-    if (!shouldReportError(message)) {return;}
+    if (!shouldReportError(message)) {
+      return;
+    }
 
     errorCount++;
 

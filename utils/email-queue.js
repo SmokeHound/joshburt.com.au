@@ -14,7 +14,9 @@ const nodemailer = require('nodemailer');
  * @returns {string} - Template with substituted values
  */
 function substituteVariables(template, data) {
-  if (!template) {return '';}
+  if (!template) {
+    return '';
+  }
 
   return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
     return data[key] !== undefined ? data[key] : match;
@@ -169,7 +171,9 @@ async function sendEmail(email) {
   try {
     // Validate SMTP configuration
     if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      throw new Error('SMTP configuration missing. Please set SMTP_HOST, SMTP_USER, and SMTP_PASS environment variables.');
+      throw new Error(
+        'SMTP configuration missing. Please set SMTP_HOST, SMTP_USER, and SMTP_PASS environment variables.'
+      );
     }
 
     // Create transporter
@@ -285,10 +289,11 @@ async function processEmailQueue(batchSize = 10) {
         console.error(`❌ Error processing email (ID: ${email.id}):`, err);
 
         // Mark as pending for retry (unless max attempts reached)
-        await database.run(
-          'UPDATE email_queue SET status = ?, error_message = ? WHERE id = ?',
-          ['pending', err.message, email.id]
-        );
+        await database.run('UPDATE email_queue SET status = ?, error_message = ? WHERE id = ?', [
+          'pending',
+          err.message,
+          email.id
+        ]);
       }
     }
 
@@ -332,10 +337,12 @@ async function getQueueStats() {
  */
 async function cancelEmail(emailId) {
   try {
-    await database.run(
-      'UPDATE email_queue SET status = ? WHERE id = ? AND status IN (?, ?)',
-      ['cancelled', emailId, 'pending', 'failed']
-    );
+    await database.run('UPDATE email_queue SET status = ? WHERE id = ? AND status IN (?, ?)', [
+      'cancelled',
+      emailId,
+      'pending',
+      'failed'
+    ]);
     return true;
   } catch (err) {
     console.error('Failed to cancel email:', err);

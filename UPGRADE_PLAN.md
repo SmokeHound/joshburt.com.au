@@ -37,6 +37,7 @@ This document outlines a comprehensive plan to upgrade and improve the joshburt.
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE error_logs (
   id SERIAL PRIMARY KEY,
@@ -64,6 +65,7 @@ CREATE TABLE error_logs (
 ```
 
 **Features**:
+
 - Client-side error capturing (window.onerror, Promise rejections)
 - Server-side error logging in all Netlify Functions
 - Error aggregation by fingerprint (group similar errors)
@@ -73,6 +75,7 @@ CREATE TABLE error_logs (
 - Source map support for stack traces
 
 **New Files**:
+
 - `utils/error-tracker.js` - Error logging utility
 - `netlify/functions/error-logs.js` - Error logs API
 - `error-monitoring.html` - Admin error dashboard
@@ -90,6 +93,7 @@ CREATE TABLE error_logs (
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE email_queue (
   id SERIAL PRIMARY KEY,
@@ -126,6 +130,7 @@ CREATE TABLE email_templates (
 ```
 
 **Features**:
+
 - Queue-based email sending with priority
 - Automatic retry with exponential backoff
 - Email templates with variable substitution
@@ -136,6 +141,7 @@ CREATE TABLE email_templates (
 - Fallback to in-app notifications if email fails
 
 **New Files**:
+
 - `netlify/functions/email-queue.js` - Email queue API
 - `scripts/email-worker.js` - Background email processor
 - `email-templates.html` - Template management UI
@@ -153,6 +159,7 @@ CREATE TABLE email_templates (
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE oauth_clients (
   id SERIAL PRIMARY KEY,
@@ -193,6 +200,7 @@ CREATE TABLE oauth_access_tokens (
 ```
 
 **Features**:
+
 - OAuth 2.0 Authorization Code flow with PKCE
 - Self-hosted authorization server
 - Client application management
@@ -202,6 +210,7 @@ CREATE TABLE oauth_access_tokens (
 - Token revocation
 
 **New Files**:
+
 - `netlify/functions/oauth-authorize.js` - Authorization endpoint
 - `netlify/functions/oauth-token.js` - Token endpoint
 - `oauth-consent.html` - User consent screen
@@ -223,6 +232,7 @@ CREATE TABLE oauth_access_tokens (
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE analytics_events (
   id SERIAL PRIMARY KEY,
@@ -254,7 +264,7 @@ CREATE TABLE analytics_sessions (
 );
 
 CREATE MATERIALIZED VIEW analytics_daily_stats AS
-SELECT 
+SELECT
   DATE(timestamp) as date,
   event_type,
   COUNT(*) as event_count,
@@ -267,6 +277,7 @@ CREATE INDEX idx_analytics_daily_stats_date ON analytics_daily_stats(date);
 ```
 
 **Features**:
+
 - Real-time event tracking (page views, clicks, searches)
 - Session tracking and duration
 - User journey visualization
@@ -280,12 +291,14 @@ CREATE INDEX idx_analytics_daily_stats_date ON analytics_daily_stats(date);
 - Dashboard widgets with drill-down
 
 **New Files**:
+
 - `netlify/functions/analytics-events.js` - Event tracking API
 - `assets/js/analytics-tracker.js` - Client-side tracking
 - `analytics-advanced.html` - Advanced analytics dashboard
 - `analytics-reports.html` - Report builder
 
-**Dependencies**: 
+**Dependencies**:
+
 - `chart.js` or similar (free, MIT license) for visualizations
 - Or use D3.js for custom charts
 
@@ -296,6 +309,7 @@ CREATE INDEX idx_analytics_daily_stats_date ON analytics_daily_stats(date);
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE scheduled_reports (
   id SERIAL PRIMARY KEY,
@@ -325,6 +339,7 @@ CREATE TABLE report_history (
 ```
 
 **Features**:
+
 - Schedule reports (daily, weekly, monthly)
 - Generate PDF reports with charts
 - CSV/Excel exports
@@ -334,11 +349,13 @@ CREATE TABLE report_history (
 - Report builder UI
 
 **New Files**:
+
 - `netlify/functions/scheduled-reports.js` - Report scheduling API
 - `scripts/report-generator.js` - Report generation worker
 - `scheduled-reports.html` - Report management UI
 
 **Dependencies**:
+
 - `pdfkit` or `puppeteer` for PDF generation (free)
 - `exceljs` for Excel files (free)
 
@@ -354,6 +371,7 @@ CREATE TABLE report_history (
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 -- Add to existing tables
 ALTER TABLE products ADD COLUMN search_vector tsvector;
@@ -364,7 +382,7 @@ ALTER TABLE users ADD COLUMN search_vector tsvector;
 -- Update vectors on insert/update
 CREATE FUNCTION update_product_search_vector() RETURNS trigger AS $$
 BEGIN
-  NEW.search_vector := 
+  NEW.search_vector :=
     setweight(to_tsvector('english', COALESCE(NEW.name, '')), 'A') ||
     setweight(to_tsvector('english', COALESCE(NEW.code, '')), 'B') ||
     setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'C') ||
@@ -373,7 +391,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER product_search_vector_update 
+CREATE TRIGGER product_search_vector_update
   BEFORE INSERT OR UPDATE ON products
   FOR EACH ROW EXECUTE FUNCTION update_product_search_vector();
 
@@ -393,6 +411,7 @@ CREATE TABLE search_queries (
 ```
 
 **Features**:
+
 - Fast full-text search across all content
 - Weighted ranking (title > code > description)
 - Fuzzy matching and typo tolerance
@@ -403,6 +422,7 @@ CREATE TABLE search_queries (
 - Sort by relevance, price, popularity
 
 **New Files**:
+
 - `netlify/functions/search.js` - Universal search API
 - `assets/js/search-autocomplete.js` - Search UI component
 - `search-results.html` - Dedicated search page
@@ -416,6 +436,7 @@ CREATE TABLE search_queries (
 #### Implementation
 
 **Features**:
+
 - Multi-criteria filtering (category, price range, stock status)
 - Faceted search with counts
 - Filter persistence (save filter sets)
@@ -424,6 +445,7 @@ CREATE TABLE search_queries (
 - Dynamic filter generation
 
 **New Files**:
+
 - `assets/js/advanced-filters.js` - Filter component
 - Update existing product/consumable/filter pages
 
@@ -438,6 +460,7 @@ CREATE TABLE search_queries (
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE backups (
   id SERIAL PRIMARY KEY,
@@ -457,6 +480,7 @@ CREATE TABLE backups (
 ```
 
 **Features**:
+
 - Scheduled automatic backups
 - On-demand backup generation
 - Table-specific backups
@@ -468,11 +492,13 @@ CREATE TABLE backups (
 - Download backup files
 
 **New Files**:
+
 - `netlify/functions/backups.js` - Backup API
 - `scripts/backup-database.js` - Backup worker
 - `backups.html` - Backup management UI
 
-**Dependencies**: 
+**Dependencies**:
+
 - `pg_dump` via PostgreSQL client (already available)
 - `node-gzip` for compression (free)
 
@@ -483,6 +509,7 @@ CREATE TABLE backups (
 #### Implementation
 
 **Features**:
+
 - Bulk product import (CSV/Excel)
 - Bulk user creation
 - Bulk price updates
@@ -493,10 +520,12 @@ CREATE TABLE backups (
 - Import history
 
 **New Files**:
+
 - `netlify/functions/bulk-operations.js` - Bulk operations API
 - `bulk-import.html` - Import/export UI
 
-**Dependencies**: 
+**Dependencies**:
+
 - `csv-parse` for CSV parsing (free)
 - `exceljs` for Excel parsing (free)
 
@@ -507,6 +536,7 @@ CREATE TABLE backups (
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE data_history (
   id SERIAL PRIMARY KEY,
@@ -525,6 +555,7 @@ CREATE TABLE data_history (
 ```
 
 **Features**:
+
 - Track all data changes
 - View change history for any record
 - Compare versions
@@ -533,6 +564,7 @@ CREATE TABLE data_history (
 - Change analytics
 
 **New Files**:
+
 - `utils/version-tracker.js` - Version tracking utility
 - `data-history.html` - Version history viewer
 
@@ -550,15 +582,18 @@ CREATE TABLE data_history (
 #### Implementation
 
 **Strategy**:
+
 - **In-Memory Cache**: Node.js Map for frequently accessed data
 - **File-Based Cache**: JSON files in `/tmp` for larger datasets
 - **Cache Invalidation**: Smart invalidation on data changes
 
 **Files to Update**:
+
 - `config/cache.js` - Cache manager
 - Update all Netlify Functions to use caching
 
 **Features**:
+
 - Cache frequently accessed products
 - Cache user sessions
 - Cache analytics aggregations
@@ -569,6 +604,7 @@ CREATE TABLE data_history (
 - Admin cache management UI
 
 **New Files**:
+
 - `config/cache.js` - Cache implementation
 - `netlify/functions/cache-management.js` - Cache control API
 - `cache-monitor.html` - Cache monitoring dashboard
@@ -582,6 +618,7 @@ CREATE TABLE data_history (
 #### Implementation
 
 **Features**:
+
 - Identify slow queries
 - Query execution plan analysis
 - Index recommendations
@@ -590,6 +627,7 @@ CREATE TABLE data_history (
 - Prepared statement optimization
 
 **New Files**:
+
 - `utils/query-monitor.js` - Query performance tracking
 - `database-performance.html` - DB performance dashboard
 
@@ -602,6 +640,7 @@ CREATE TABLE data_history (
 #### Implementation
 
 **Features**:
+
 - Image compression and optimization
 - Lazy loading images
 - WebP format conversion
@@ -611,10 +650,12 @@ CREATE TABLE data_history (
 - Service Worker caching improvements
 
 **New Files**:
+
 - `scripts/optimize-images.js` - Image optimization script
 - Update `sw.js` for better caching
 
 **Dependencies**:
+
 - `sharp` for image processing (free)
 
 ---
@@ -626,6 +667,7 @@ CREATE TABLE data_history (
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE security_events (
   id SERIAL PRIMARY KEY,
@@ -664,6 +706,7 @@ CREATE TABLE api_rate_limits (
 ```
 
 **Features**:
+
 - Suspicious activity detection
 - Geo-blocking (IP-based)
 - Advanced rate limiting per endpoint
@@ -677,6 +720,7 @@ CREATE TABLE api_rate_limits (
 - Automated incident response
 
 **New Files**:
+
 - `utils/security-monitor.js` - Security monitoring
 - `netlify/functions/security-events.js` - Security events API
 - `security-dashboard.html` - Security monitoring UI
@@ -690,6 +734,7 @@ CREATE TABLE api_rate_limits (
 #### Implementation
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE api_keys (
   id SERIAL PRIMARY KEY,
@@ -708,6 +753,7 @@ CREATE TABLE api_keys (
 ```
 
 **Features**:
+
 - Generate API keys for programmatic access
 - Scope permissions per key
 - Rate limiting per key
@@ -716,6 +762,7 @@ CREATE TABLE api_keys (
 - Expiration management
 
 **New Files**:
+
 - `netlify/functions/api-keys.js` - API key management
 - `api-keys.html` - Key management UI
 - `utils/api-key-auth.js` - API key authentication middleware
@@ -734,6 +781,7 @@ CREATE TABLE api_keys (
 #### Implementation
 
 **Features**:
+
 - Offline product catalog browsing
 - Offline order creation (sync when online)
 - Background sync
@@ -744,11 +792,13 @@ CREATE TABLE api_keys (
 - File handling API
 
 **Files to Update**:
+
 - `sw.js` - Enhanced service worker
 - `shared-pwa.html` - Better install prompt
 - `manifest.json` - Add shortcuts and handlers
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE push_subscriptions (
   id SERIAL PRIMARY KEY,
@@ -762,10 +812,12 @@ CREATE TABLE push_subscriptions (
 ```
 
 **New Files**:
+
 - `netlify/functions/push-notifications.js` - Push notification API
 - `assets/js/offline-sync.js` - Offline sync manager
 
 **Dependencies**:
+
 - `web-push` for push notifications (free)
 
 ---
@@ -775,6 +827,7 @@ CREATE TABLE push_subscriptions (
 #### Implementation
 
 **Features**:
+
 - IndexedDB for offline data
 - Periodic background sync
 - Conflict resolution
@@ -782,6 +835,7 @@ CREATE TABLE push_subscriptions (
 - Sync status dashboard
 
 **New Files**:
+
 - `assets/js/offline-storage.js` - IndexedDB wrapper
 
 **Dependencies**: None (use browser IndexedDB)
@@ -795,6 +849,7 @@ CREATE TABLE push_subscriptions (
 #### Implementation
 
 **Features**:
+
 - Historical sales analysis
 - Trend detection
 - Reorder point calculation
@@ -803,6 +858,7 @@ CREATE TABLE push_subscriptions (
 - Automated purchase order suggestions
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE inventory_forecasts (
   id SERIAL PRIMARY KEY,
@@ -818,6 +874,7 @@ CREATE TABLE inventory_forecasts (
 ```
 
 **New Files**:
+
 - `scripts/forecast-calculator.js` - Forecasting engine
 - `netlify/functions/inventory-forecast.js` - Forecast API
 - `inventory-forecast.html` - Forecast dashboard
@@ -831,6 +888,7 @@ CREATE TABLE inventory_forecasts (
 #### Implementation
 
 **Features**:
+
 - Customer segmentation
 - Purchase patterns
 - Product affinity analysis
@@ -839,6 +897,7 @@ CREATE TABLE inventory_forecasts (
 - Personalized recommendations
 
 **New Files**:
+
 - `netlify/functions/customer-insights.js` - Insights API
 - `customer-insights.html` - Insights dashboard
 
@@ -853,6 +912,7 @@ CREATE TABLE inventory_forecasts (
 #### Implementation
 
 **Features**:
+
 - Data tables with sorting, filtering, pagination
 - Drag-and-drop interfaces
 - Rich text editor for product descriptions
@@ -863,12 +923,14 @@ CREATE TABLE inventory_forecasts (
 - Kanban boards for order workflow
 
 **New Files**:
+
 - `assets/js/components/data-table.js`
 - `assets/js/components/drag-drop.js`
 - `assets/js/components/rich-editor.js`
 - `assets/js/components/image-gallery.js`
 
 **Dependencies**:
+
 - `quill` or `tiptap` for rich text (free, MIT)
 - `sortablejs` for drag-drop (free, MIT)
 
@@ -879,6 +941,7 @@ CREATE TABLE inventory_forecasts (
 #### Implementation
 
 **Features**:
+
 - Customizable dashboard widgets
 - Drag-to-rearrange layout
 - Widget configuration
@@ -887,6 +950,7 @@ CREATE TABLE inventory_forecasts (
 - Export/import dashboard configs
 
 **New Files**:
+
 - `assets/js/dashboard-builder.js`
 - `dashboard-settings.html`
 
@@ -901,6 +965,7 @@ CREATE TABLE inventory_forecasts (
 #### Implementation
 
 **Features**:
+
 - Auto-generate API docs from code
 - Interactive API explorer (like Swagger)
 - Request/response examples
@@ -909,10 +974,12 @@ CREATE TABLE inventory_forecasts (
 - Version history
 
 **New Files**:
+
 - `scripts/generate-api-docs.js`
 - `api-docs.html` - Interactive API docs
 
 **Dependencies**:
+
 - `swagger-jsdoc` (free) or custom implementation
 
 ---
@@ -922,6 +989,7 @@ CREATE TABLE inventory_forecasts (
 #### Implementation
 
 **Features**:
+
 - Function execution logs
 - Performance metrics
 - Error logs
@@ -930,6 +998,7 @@ CREATE TABLE inventory_forecasts (
 - Request/response inspector
 
 **New Files**:
+
 - `dev-dashboard.html` - Developer tools
 
 **Dependencies**: None
@@ -939,44 +1008,54 @@ CREATE TABLE inventory_forecasts (
 ## 📅 Implementation Timeline
 
 ### Phase 1: Replace External Services (Weeks 1-4)
+
 - Week 1: Error tracking system
 - Week 2: Email queue system
 - Week 3: OAuth provider (optional)
 - Week 4: Testing and refinement
 
 ### Phase 2: Advanced Analytics (Weeks 5-6)
+
 - Week 5: Event tracking and session management
 - Week 6: Advanced dashboards and reports
 
 ### Phase 3: Search & Discovery (Weeks 7-8)
+
 - Week 7: Full-text search implementation
 - Week 8: Advanced filtering and facets
 
 ### Phase 4: Data Management (Weeks 9-10)
+
 - Week 9: Backup system
 - Week 10: Bulk operations and version history
 
 ### Phase 5: Performance (Weeks 11-12)
+
 - Week 11: Caching implementation
 - Week 12: Optimization and monitoring
 
 ### Phase 6: Security (Weeks 13-14)
+
 - Week 13: Security monitoring
 - Week 14: API key management
 
 ### Phase 7: PWA (Weeks 15-16)
+
 - Week 15: Offline support
 - Week 16: Push notifications
 
 ### Phase 8: Business Intelligence (Weeks 17-18)
+
 - Week 17: Inventory forecasting
 - Week 18: Customer insights
 
 ### Phase 9: UI/UX (Weeks 19-20)
+
 - Week 19: Advanced components
 - Week 20: Dashboard customization
 
 ### Phase 10: Developer Tools (Week 21)
+
 - Week 21: Documentation and dev tools
 
 ---
@@ -984,18 +1063,21 @@ CREATE TABLE inventory_forecasts (
 ## 🎯 Success Metrics
 
 ### Performance
+
 - Page load time: < 1.5s (target: 1s)
 - API response time: < 100ms (target: 50ms)
 - Database query time: < 30ms (target: 10ms)
 - Cache hit rate: > 80%
 
 ### User Experience
+
 - Error rate: < 0.1%
 - Session duration: +25%
 - User engagement: +30%
 - Mobile traffic: +20%
 
 ### Business Impact
+
 - Reduced dependency on external services: 100%
 - Operational cost savings: ~$500/year
 - Feature development velocity: +50%
@@ -1006,24 +1088,28 @@ CREATE TABLE inventory_forecasts (
 ## 🔄 Maintenance Plan
 
 ### Daily
+
 - Monitor error logs
 - Check email queue
 - Review security events
 - Verify backup completion
 
 ### Weekly
+
 - Analyze performance metrics
 - Review cache efficiency
 - Check database size
 - Update documentation
 
 ### Monthly
+
 - Security audit
 - Dependency updates
 - Performance optimization
 - Backup verification
 
 ### Quarterly
+
 - Feature roadmap review
 - User feedback integration
 - Capacity planning
@@ -1036,28 +1122,35 @@ CREATE TABLE inventory_forecasts (
 ### Libraries (All Free & Open Source)
 
 **Analytics & Charts**:
+
 - Chart.js - https://www.chartjs.org/ (MIT)
 - D3.js - https://d3js.org/ (BSD)
 
 **Data Processing**:
+
 - csv-parse - https://csv.js.org/parse/ (MIT)
 - exceljs - https://github.com/exceljs/exceljs (MIT)
 
 **PDF Generation**:
+
 - pdfkit - https://pdfkit.org/ (MIT)
 - puppeteer - https://pptr.dev/ (Apache 2.0)
 
 **Image Processing**:
+
 - sharp - https://sharp.pixelplumbering.com/ (Apache 2.0)
 
 **Rich Text**:
+
 - Quill - https://quilljs.com/ (BSD)
 - Tiptap - https://tiptap.dev/ (MIT)
 
 **Drag & Drop**:
+
 - SortableJS - https://sortablejs.github.io/Sortable/ (MIT)
 
 **Push Notifications**:
+
 - web-push - https://github.com/web-push-libs/web-push (MIT)
 
 ### PostgreSQL Features

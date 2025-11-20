@@ -61,14 +61,14 @@ async function getRecordHistory(event, pool) {
 async function getAllHistory(event, pool) {
   await requirePermission(event, 'data_history', 'read');
 
-  const { 
-    table_name, 
-    action, 
+  const {
+    table_name,
+    action,
     changed_by,
     date_from,
     date_to,
-    limit = 50, 
-    offset = 0 
+    limit = 50,
+    offset = 0
   } = event.queryStringParameters || {};
 
   let query = `
@@ -192,7 +192,7 @@ async function compareVersions(event, pool) {
   const data2 = version2.new_data || version2.old_data || {};
 
   const allKeys = new Set([...Object.keys(data1), ...Object.keys(data2)]);
-  
+
   for (const key of allKeys) {
     if (JSON.stringify(data1[key]) !== JSON.stringify(data2[key])) {
       differences.push({
@@ -256,11 +256,17 @@ async function restoreVersion(event, pool) {
 
   const result = await pool.query(updateQuery, values);
 
-  await logAudit(pool, user.id, 'version_restored', {
-    history_id: historyId,
-    table_name: history.table_name,
-    record_id: history.record_id
-  }, event);
+  await logAudit(
+    pool,
+    user.id,
+    'version_restored',
+    {
+      history_id: historyId,
+      table_name: history.table_name,
+      record_id: history.record_id
+    },
+    event
+  );
 
   return {
     statusCode: 200,
@@ -348,9 +354,15 @@ async function enableTracking(event, pool) {
   try {
     await pool.query(triggerQuery);
 
-    await logAudit(pool, user.id, 'tracking_enabled', {
-      table_name
-    }, event);
+    await logAudit(
+      pool,
+      user.id,
+      'tracking_enabled',
+      {
+        table_name
+      },
+      event
+    );
 
     return {
       statusCode: 200,
@@ -370,7 +382,7 @@ async function enableTracking(event, pool) {
 /**
  * Main handler
  */
-exports.handler = withHandler(async (event) => {
+exports.handler = withHandler(async event => {
   const pool = new Pool();
 
   try {
@@ -411,7 +423,6 @@ exports.handler = withHandler(async (event) => {
       statusCode: 404,
       body: JSON.stringify({ error: 'Not found' })
     };
-
   } finally {
     await pool.end();
   }

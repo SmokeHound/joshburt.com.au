@@ -6,7 +6,11 @@
 const { Pool } = require('pg');
 const { withHandler, error } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
-const { calculateForecast, storeForecasts, getLowStockAlerts } = require('../../scripts/forecast-calculator');
+const {
+  calculateForecast,
+  storeForecasts,
+  getLowStockAlerts
+} = require('../../scripts/forecast-calculator');
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -28,15 +32,15 @@ const pool = new Pool({
  */
 async function getForecasts(event) {
   await requirePermission(event, 'forecast', 'read');
-  
+
   const params = event.queryStringParameters || {};
   const itemType = params.item_type;
   const itemId = params.item_id ? parseInt(params.item_id) : null;
   const days = params.days ? parseInt(params.days) : 30;
   const minConfidence = params.min_confidence ? parseFloat(params.min_confidence) : 0;
-  
+
   const client = await pool.connect();
-  
+
   try {
     let query = `
       SELECT 
@@ -66,26 +70,26 @@ async function getForecasts(event) {
         AND f.forecast_date <= CURRENT_DATE + $1
         AND f.confidence_level >= $2
     `;
-    
+
     const queryParams = [days, minConfidence];
     let paramIndex = 3;
-    
+
     if (itemType) {
       query += ` AND f.item_type = $${paramIndex}`;
       queryParams.push(itemType);
       paramIndex++;
     }
-    
+
     if (itemId) {
       query += ` AND f.item_id = $${paramIndex}`;
       queryParams.push(itemId);
       paramIndex++;
     }
-    
+
     query += ' ORDER BY f.forecast_date ASC, f.item_type, f.item_id';
-    
+
     const result = await client.query(query, queryParams);
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -93,7 +97,6 @@ async function getForecasts(event) {
         count: result.rows.length
       })
     };
-    
   } finally {
     client.release();
   }
@@ -109,25 +112,25 @@ async function getForecasts(event) {
  */
 async function generateForecast(event) {
   await requirePermission(event, 'forecast', 'create');
-  
+
   const body = JSON.parse(event.body || '{}');
   const { item_type, item_id, days = 30 } = body;
-  
+
   if (!item_type || !item_id) {
     return error(400, 'item_type and item_id are required');
   }
-  
+
   if (!['product', 'consumable', 'filter'].includes(item_type)) {
     return error(400, 'item_type must be product, consumable, or filter');
   }
-  
+
   try {
     const result = await calculateForecast(item_type, item_id, days);
-    
+
     if (result.forecasts.length > 0) {
       await storeForecasts(item_type, item_id, result.forecasts, result.factors);
     }
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -135,7 +138,6 @@ async function generateForecast(event) {
         forecast: result
       })
     };
-    
   } catch (err) {
     console.error('Error generating forecast:', err);
     return error(500, 'Failed to generate forecast');
@@ -148,24 +150,24 @@ async function generateForecast(event) {
  */
 async function generateAllForecasts(event) {
   await requirePermission(event, 'forecast', 'create');
-  
+
   const client = await pool.connect();
-  
+
   try {
     // Get all active items
     const productsResult = await client.query('SELECT id FROM products WHERE is_active = true');
     const consumablesResult = await client.query('SELECT id FROM consumables');
     const filtersResult = await client.query('SELECT id FROM filters WHERE is_active = true');
-    
+
     const allItems = [
       ...productsResult.rows.map(r => ({ type: 'product', id: r.id })),
       ...consumablesResult.rows.map(r => ({ type: 'consumable', id: r.id })),
       ...filtersResult.rows.map(r => ({ type: 'filter', id: r.id }))
     ];
-    
+
     let processed = 0;
     let skipped = 0;
-    
+
     for (const item of allItems) {
       try {
         const result = await calculateForecast(item.type, item.id, 30);
@@ -180,7 +182,7 @@ async function generateAllForecasts(event) {
         skipped++;
       }
     }
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -190,7 +192,6 @@ async function generateAllForecasts(event) {
         skipped
       })
     };
-    
   } finally {
     client.release();
   }
@@ -202,13 +203,13 @@ async function generateAllForecasts(event) {
  */
 async function getAlerts(event) {
   await requirePermission(event, 'forecast', 'read');
-  
+
   const params = event.queryStringParameters || {};
   const days = params.days ? parseInt(params.days) : 7;
-  
+
   try {
     const alerts = await getLowStockAlerts(days);
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -217,7 +218,6 @@ async function getAlerts(event) {
         days_ahead: days
       })
     };
-    
   } catch (err) {
     console.error('Error getting alerts:', err);
     return error(500, 'Failed to get low stock alerts');
@@ -230,9 +230,9 @@ async function getAlerts(event) {
  */
 async function getSummary(event) {
   await requirePermission(event, 'forecast', 'read');
-  
+
   const client = await pool.connect();
-  
+
   try {
     const summaryQuery = `
       SELECT 
@@ -247,12 +247,12 @@ async function getSummary(event) {
       WHERE forecast_date >= CURRENT_DATE
       GROUP BY item_type
     `;
-    
+
     const result = await client.query(summaryQuery);
-    
+
     // Get low stock count
     const alerts = await getLowStockAlerts(7);
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -260,17 +260,16 @@ async function getSummary(event) {
         low_stock_alerts: alerts.length
       })
     };
-    
   } finally {
     client.release();
   }
 }
 
 // Main handler
-const handler = withHandler(async (event) => {
+const handler = withHandler(async event => {
   const method = event.httpMethod;
   const action = event.queryStringParameters?.action;
-  
+
   if (method === 'GET') {
     if (action === 'alerts') {
       return await getAlerts(event);
@@ -286,7 +285,7 @@ const handler = withHandler(async (event) => {
       return await generateForecast(event);
     }
   }
-  
+
   return error(405, 'Method not allowed');
 });
 

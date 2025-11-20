@@ -98,20 +98,21 @@ function generateReportData(reportConfig) {
   const { date_from, date_to } = filters;
 
   // Default to last 30 days
-  const startDate = date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const startDate =
+    date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const endDate = date_to || new Date().toISOString().split('T')[0];
 
   switch (reportConfig.report_type) {
-  case 'sales':
-    return generateSalesReport(startDate, endDate, filters);
-  case 'inventory':
-    return generateInventoryReport(filters);
-  case 'users':
-    return generateUsersReport(startDate, endDate, filters);
-  case 'analytics':
-    return generateAnalyticsReport(startDate, endDate, filters);
-  default:
-    throw new Error(`Unknown report type: ${reportConfig.report_type}`);
+    case 'sales':
+      return generateSalesReport(startDate, endDate, filters);
+    case 'inventory':
+      return generateInventoryReport(filters);
+    case 'users':
+      return generateUsersReport(startDate, endDate, filters);
+    case 'analytics':
+      return generateAnalyticsReport(startDate, endDate, filters);
+    default:
+      throw new Error(`Unknown report type: ${reportConfig.report_type}`);
   }
 }
 
@@ -207,20 +208,20 @@ async function generateAnalyticsReport(startDate, endDate) {
  */
 function formatReport(data, format) {
   switch (format) {
-  case 'csv':
-    return formatAsCSV(data);
-  case 'pdf':
-    // PDF generation would require a library like pdfkit or puppeteer
-    // For now, fall back to CSV
-    console.warn('PDF format not yet implemented, using CSV');
-    return formatAsCSV(data);
-  case 'excel':
-    // Excel generation would require a library like exceljs
-    // For now, fall back to CSV
-    console.warn('Excel format not yet implemented, using CSV');
-    return formatAsCSV(data);
-  default:
-    return formatAsCSV(data);
+    case 'csv':
+      return formatAsCSV(data);
+    case 'pdf':
+      // PDF generation would require a library like pdfkit or puppeteer
+      // For now, fall back to CSV
+      console.warn('PDF format not yet implemented, using CSV');
+      return formatAsCSV(data);
+    case 'excel':
+      // Excel generation would require a library like exceljs
+      // For now, fall back to CSV
+      console.warn('Excel format not yet implemented, using CSV');
+      return formatAsCSV(data);
+    default:
+      return formatAsCSV(data);
   }
 }
 
@@ -337,17 +338,17 @@ function calculateNextRun(frequency) {
   const now = new Date();
 
   switch (frequency) {
-  case 'daily':
-    now.setDate(now.getDate() + 1);
-    break;
-  case 'weekly':
-    now.setDate(now.getDate() + 7);
-    break;
-  case 'monthly':
-    now.setMonth(now.getMonth() + 1);
-    break;
-  default:
-    now.setDate(now.getDate() + 1);
+    case 'daily':
+      now.setDate(now.getDate() + 1);
+      break;
+    case 'weekly':
+      now.setDate(now.getDate() + 7);
+      break;
+    case 'monthly':
+      now.setMonth(now.getMonth() + 1);
+      break;
+    default:
+      now.setDate(now.getDate() + 1);
   }
 
   return now;

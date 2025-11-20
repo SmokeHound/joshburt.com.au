@@ -40,13 +40,7 @@ exports.handler = withHandler(async function (event) {
   async function trackEvent(event) {
     try {
       const body = JSON.parse(event.body || '{}');
-      const {
-        event_type,
-        session_id,
-        page_url,
-        referrer,
-        properties = {}
-      } = body;
+      const { event_type, session_id, page_url, referrer, properties = {} } = body;
 
       // Validate required fields
       if (!event_type || !session_id) {
@@ -68,8 +62,8 @@ exports.handler = withHandler(async function (event) {
       }
 
       // Get IP address and user agent
-      const ip_address = event.headers['x-forwarded-for']?.split(',')[0] || 
-                        event.headers['client-ip'] || null;
+      const ip_address =
+        event.headers['x-forwarded-for']?.split(',')[0] || event.headers['client-ip'] || null;
       const user_agent = event.headers['user-agent'] || null;
 
       // Insert event
@@ -204,7 +198,7 @@ exports.handler = withHandler(async function (event) {
       let countQuery = 'SELECT COUNT(*) FROM analytics_events WHERE 1=1';
       const countParams = queryParams.slice(0, -2); // Remove limit and offset
       let countParamIndex = 1;
-      
+
       if (event_type) {
         countQuery += ` AND event_type = $${countParamIndex++}`;
       }
@@ -244,7 +238,8 @@ exports.handler = withHandler(async function (event) {
     const { date_from, date_to, group_by = 'day' } = params;
 
     const endDate = date_to || new Date().toISOString().split('T')[0];
-    const startDate = date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const startDate =
+      date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
     // Get stats by event type
     const eventTypeQuery = `
@@ -268,7 +263,7 @@ exports.handler = withHandler(async function (event) {
         break;
       case 'day':
       default:
-        timeFormat = "DATE(timestamp)";
+        timeFormat = 'DATE(timestamp)';
     }
 
     const trendsQuery = `

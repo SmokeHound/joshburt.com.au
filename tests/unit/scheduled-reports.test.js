@@ -14,7 +14,7 @@ jest.mock('../../config/database', () => ({
 
 // Mock utils
 jest.mock('../../utils/fn', () => ({
-  withHandler: (fn) => fn,
+  withHandler: fn => fn,
   ok: (data, status = 200) => ({
     statusCode: status,
     body: JSON.stringify(data)
@@ -113,14 +113,16 @@ describe('scheduled-reports function', () => {
       });
 
       database.query.mockResolvedValueOnce({
-        rows: [{
-          id: 1,
-          name: 'Weekly Sales Report',
-          report_type: 'sales',
-          frequency: 'weekly',
-          is_active: true,
-          execution_count: 10
-        }]
+        rows: [
+          {
+            id: 1,
+            name: 'Weekly Sales Report',
+            report_type: 'sales',
+            frequency: 'weekly',
+            is_active: true,
+            execution_count: 10
+          }
+        ]
       });
 
       const mockEvent = {
@@ -146,12 +148,14 @@ describe('scheduled-reports function', () => {
       });
 
       database.query.mockResolvedValueOnce({
-        rows: [{
-          id: 1,
-          name: 'Daily Sales Report',
-          report_type: 'sales',
-          frequency: 'daily'
-        }]
+        rows: [
+          {
+            id: 1,
+            name: 'Daily Sales Report',
+            report_type: 'sales',
+            frequency: 'daily'
+          }
+        ]
       });
 
       const mockEvent = {
@@ -230,14 +234,16 @@ describe('scheduled-reports function', () => {
 
       // Mock report config query
       database.query.mockResolvedValueOnce({
-        rows: [{
-          id: 1,
-          name: 'Sales Report',
-          report_type: 'sales',
-          frequency: 'daily',
-          format: 'csv',
-          filters: {}
-        }]
+        rows: [
+          {
+            id: 1,
+            name: 'Sales Report',
+            report_type: 'sales',
+            frequency: 'daily',
+            format: 'csv',
+            filters: {}
+          }
+        ]
       });
 
       // Mock report data query
@@ -250,11 +256,13 @@ describe('scheduled-reports function', () => {
 
       // Mock history insert
       database.query.mockResolvedValueOnce({
-        rows: [{
-          id: 1,
-          report_name: 'Sales Report',
-          status: 'success'
-        }]
+        rows: [
+          {
+            id: 1,
+            report_name: 'Sales Report',
+            status: 'success'
+          }
+        ]
       });
 
       const mockEvent = {
@@ -284,11 +292,13 @@ describe('scheduled-reports function', () => {
       });
 
       database.query.mockResolvedValueOnce({
-        rows: [{
-          id: 1,
-          name: 'Updated Report Name',
-          is_active: false
-        }]
+        rows: [
+          {
+            id: 1,
+            name: 'Updated Report Name',
+            is_active: false
+          }
+        ]
       });
 
       const mockEvent = {
@@ -341,10 +351,12 @@ describe('scheduled-reports function', () => {
       });
 
       database.query.mockResolvedValueOnce({
-        rows: [{
-          id: 1,
-          name: 'Deleted Report'
-        }]
+        rows: [
+          {
+            id: 1,
+            name: 'Deleted Report'
+          }
+        ]
       });
 
       const mockEvent = {

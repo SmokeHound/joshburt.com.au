@@ -11,10 +11,7 @@ jest.mock('../../config/database', () => ({
   }
 }));
 
-const {
-  generateFingerprint,
-  extractStackTrace
-} = require('../../utils/error-tracker');
+const { generateFingerprint, extractStackTrace } = require('../../utils/error-tracker');
 
 describe('Error Tracker', () => {
   describe('generateFingerprint', () => {

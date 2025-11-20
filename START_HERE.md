@@ -9,6 +9,7 @@
 ### 1️⃣ First Time? Start Here!
 
 **[UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md)** (5 min read)
+
 - Quick overview of all 10 phases
 - Cost savings breakdown
 - Recommended priorities
@@ -17,6 +18,7 @@
 ### 2️⃣ Want to See the Journey?
 
 **[VISUAL_ROADMAP.md](VISUAL_ROADMAP.md)** (10 min read)
+
 - Visual phase diagrams
 - 4 different implementation paths
 - Feature difficulty/impact matrix
@@ -25,6 +27,7 @@
 ### 3️⃣ Need Complete Details?
 
 **[UPGRADE_PLAN.md](UPGRADE_PLAN.md)** (30 min read)
+
 - Complete specifications for all phases
 - Database schemas
 - Feature lists
@@ -34,6 +37,7 @@
 ### 4️⃣ Ready to Build?
 
 **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** (15 min read + coding)
+
 - Step-by-step instructions
 - Code templates
 - Testing strategies
@@ -63,18 +67,18 @@
 
 ### By Phase
 
-| Phase | Summary | Details | Implementation |
-|-------|---------|---------|----------------|
-| 1. External Services | [Summary](UPGRADE_SUMMARY.md#-phase-1-replace-external-services-weeks-1-4) | [Plan](UPGRADE_PLAN.md#-phase-1-replace-external-services-priority-high) | [Guide](IMPLEMENTATION_GUIDE.md#phase-1-error-tracking-week-1) |
-| 2. Analytics | [Summary](UPGRADE_SUMMARY.md#-phase-2-advanced-analytics-weeks-5-6) | [Plan](UPGRADE_PLAN.md#-phase-2-advanced-analytics--reporting-priority-high) | [Guide](IMPLEMENTATION_GUIDE.md#phase-2-email-queue-week-2) |
-| 3. Search | [Summary](UPGRADE_SUMMARY.md#-phase-3-search--discovery-weeks-7-8) | [Plan](UPGRADE_PLAN.md#-phase-3-search--discovery-priority-high) | [Guide](IMPLEMENTATION_GUIDE.md#phase-3-full-text-search-week-7) |
-| 4. Data Mgmt | [Summary](UPGRADE_SUMMARY.md#-phase-4-data-management-weeks-9-10) | [Plan](UPGRADE_PLAN.md#-phase-4-data-management-priority-medium) | [Guide](IMPLEMENTATION_GUIDE.md#testing-each-phase) |
-| 5. Performance | [Summary](UPGRADE_SUMMARY.md#-phase-5-performance--caching-weeks-11-12) | [Plan](UPGRADE_PLAN.md#-phase-5-performance--caching-priority-medium) | [Guide](IMPLEMENTATION_GUIDE.md#performance-optimization-tips) |
-| 6. Security | [Summary](UPGRADE_SUMMARY.md#-phase-6-security-weeks-13-14) | [Plan](UPGRADE_PLAN.md#-phase-6-security-enhancements-priority-high) | [Guide](IMPLEMENTATION_GUIDE.md#monitoring--alerts) |
-| 7. PWA | [Summary](UPGRADE_SUMMARY.md#-phase-7-pwa--offline-weeks-15-16) | [Plan](UPGRADE_PLAN.md#-phase-7-pwa--offline-support-priority-medium) | [Guide](IMPLEMENTATION_GUIDE.md#deployment-checklist) |
-| 8. Intelligence | [Summary](UPGRADE_SUMMARY.md#-phase-8-business-intelligence-weeks-17-18) | [Plan](UPGRADE_PLAN.md#-phase-8-business-intelligence-priority-medium) | [Guide](IMPLEMENTATION_GUIDE.md#common-issues--solutions) |
-| 9. UI/UX | [Summary](UPGRADE_SUMMARY.md#-phase-9-uiux-weeks-19-20) | [Plan](UPGRADE_PLAN.md#-phase-9-uiux-improvements-priority-low) | - |
-| 10. Dev Tools | [Summary](UPGRADE_SUMMARY.md#-phase-10-developer-tools-week-21) | [Plan](UPGRADE_PLAN.md#-phase-10-developer-tools-priority-low) | - |
+| Phase                | Summary                                                                    | Details                                                                      | Implementation                                                   |
+| -------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| 1. External Services | [Summary](UPGRADE_SUMMARY.md#-phase-1-replace-external-services-weeks-1-4) | [Plan](UPGRADE_PLAN.md#-phase-1-replace-external-services-priority-high)     | [Guide](IMPLEMENTATION_GUIDE.md#phase-1-error-tracking-week-1)   |
+| 2. Analytics         | [Summary](UPGRADE_SUMMARY.md#-phase-2-advanced-analytics-weeks-5-6)        | [Plan](UPGRADE_PLAN.md#-phase-2-advanced-analytics--reporting-priority-high) | [Guide](IMPLEMENTATION_GUIDE.md#phase-2-email-queue-week-2)      |
+| 3. Search            | [Summary](UPGRADE_SUMMARY.md#-phase-3-search--discovery-weeks-7-8)         | [Plan](UPGRADE_PLAN.md#-phase-3-search--discovery-priority-high)             | [Guide](IMPLEMENTATION_GUIDE.md#phase-3-full-text-search-week-7) |
+| 4. Data Mgmt         | [Summary](UPGRADE_SUMMARY.md#-phase-4-data-management-weeks-9-10)          | [Plan](UPGRADE_PLAN.md#-phase-4-data-management-priority-medium)             | [Guide](IMPLEMENTATION_GUIDE.md#testing-each-phase)              |
+| 5. Performance       | [Summary](UPGRADE_SUMMARY.md#-phase-5-performance--caching-weeks-11-12)    | [Plan](UPGRADE_PLAN.md#-phase-5-performance--caching-priority-medium)        | [Guide](IMPLEMENTATION_GUIDE.md#performance-optimization-tips)   |
+| 6. Security          | [Summary](UPGRADE_SUMMARY.md#-phase-6-security-weeks-13-14)                | [Plan](UPGRADE_PLAN.md#-phase-6-security-enhancements-priority-high)         | [Guide](IMPLEMENTATION_GUIDE.md#monitoring--alerts)              |
+| 7. PWA               | [Summary](UPGRADE_SUMMARY.md#-phase-7-pwa--offline-weeks-15-16)            | [Plan](UPGRADE_PLAN.md#-phase-7-pwa--offline-support-priority-medium)        | [Guide](IMPLEMENTATION_GUIDE.md#deployment-checklist)            |
+| 8. Intelligence      | [Summary](UPGRADE_SUMMARY.md#-phase-8-business-intelligence-weeks-17-18)   | [Plan](UPGRADE_PLAN.md#-phase-8-business-intelligence-priority-medium)       | [Guide](IMPLEMENTATION_GUIDE.md#common-issues--solutions)        |
+| 9. UI/UX             | [Summary](UPGRADE_SUMMARY.md#-phase-9-uiux-weeks-19-20)                    | [Plan](UPGRADE_PLAN.md#-phase-9-uiux-improvements-priority-low)              | -                                                                |
+| 10. Dev Tools        | [Summary](UPGRADE_SUMMARY.md#-phase-10-developer-tools-week-21)            | [Plan](UPGRADE_PLAN.md#-phase-10-developer-tools-priority-low)               | -                                                                |
 
 ---
 
@@ -147,12 +151,14 @@ Before starting any implementation:
 ## 🎓 Skill Requirements
 
 ### Required (You Already Have)
+
 - ✅ JavaScript/Node.js
 - ✅ PostgreSQL basics
 - ✅ Netlify Functions
 - ✅ HTML/CSS
 
 ### Nice to Have (Will Learn)
+
 - PostgreSQL full-text search
 - Service workers
 - Web push API
@@ -207,6 +213,7 @@ All technologies used are well-documented:
 ## 📚 All Documentation
 
 ### Upgrade Planning
+
 - **[START_HERE.md](START_HERE.md)** - This file
 - **[UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md)** - Quick reference
 - **[VISUAL_ROADMAP.md](VISUAL_ROADMAP.md)** - Visual journey
@@ -214,11 +221,13 @@ All technologies used are well-documented:
 - **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - How-to guide
 
 ### Project Documentation
+
 - **[README.md](README.md)** - Project overview
 - **[DOCS_INDEX.md](DOCS_INDEX.md)** - Documentation index
 - **[docs/](docs/)** - Technical documentation
 
 ### Quick Links
+
 - Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - API Reference: [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
 - Database: [docs/DATABASE.md](docs/DATABASE.md)
