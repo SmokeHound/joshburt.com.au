@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulk Operations - joshburt.com.au</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="/shared-config.html"></script>
+  <script src="/shared-theme.html"></script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+  <div id="shared-nav-container"></div>
+  <script src="/shared-nav.html"></script>
+
+  <main class="ml-64 p-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">Bulk Operations</h1>
+        <p class="text-gray-400">Import, export, and manage data in bulk</p>
+      </div>
+
+      <!-- Action Cards -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="card p-6">
+          <h2 class="text-xl font-bold mb-4">📥 Import Data</h2>
+          <p class="text-gray-400 mb-4">Import products, users, or other data from CSV or JSON files</p>
+          <button id="import-btn" class="btn-primary w-full">Start Import</button>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-bold mb-4">📤 Export Data</h2>
+          <p class="text-gray-400 mb-4">Export data to CSV or JSON format for backup or analysis</p>
+          <button id="export-btn" class="btn-primary w-full">Start Export</button>
+        </div>
+      </section>
+
+      <!-- Operations History -->
+      <section class="card p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold">Operations History</h2>
+          <button id="refresh-btn" class="btn-secondary px-4 py-2">🔄 Refresh</button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="border-b border-gray-700">
+                <th class="pb-3 pr-4">ID</th>
+                <th class="pb-3 pr-4">Type</th>
+                <th class="pb-3 pr-4">Table</th>
+                <th class="pb-3 pr-4">Status</th>
+                <th class="pb-3 pr-4">Records</th>
+                <th class="pb-3 pr-4">Success/Error</th>
+                <th class="pb-3 pr-4">Started</th>
+                <th class="pb-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="operations-table">
+              <tr>
+                <td colspan="8" class="py-8 text-center text-gray-400">Loading operations...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Import Modal -->
+  <div id="import-modal" class="modal hidden">
+    <div class="modal-content max-w-4xl">
+      <h2 class="text-2xl font-bold mb-4">Import Data</h2>
+      
+      <form id="import-form">
+        <!-- Step 1: Select Table & Format -->
+        <div id="import-step-1" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2">Target Table</label>
+            <select id="import-table" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" required>
+              <option value="">Select Table...</option>
+              <option value="products">Products</option>
+              <option value="consumables">Consumables</option>
+              <option value="filters">Filters</option>
+              <option value="users">Users</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">File Format</label>
+            <select id="import-format" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" required>
+              <option value="csv">CSV (Comma-Separated Values)</option>
+              <option value="json">JSON (JavaScript Object Notation)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">Upload File or Paste Data</label>
+            <div class="flex gap-4 mb-2">
+              <button type="button" id="upload-file-btn" class="btn-secondary flex-1">📁 Upload File</button>
+              <button type="button" id="paste-data-btn" class="btn-secondary flex-1">📋 Paste Data</button>
+            </div>
+            <input type="file" id="file-input" accept=".csv,.json" class="hidden">
+            <textarea id="import-data" class="w-full h-64 p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700 font-mono text-sm" placeholder="Paste your CSV or JSON data here..." required></textarea>
+          </div>
+
+          <div class="bg-blue-900/20 border border-blue-500 rounded p-4">
+            <p class="text-sm"><strong>CSV Format Example:</strong></p>
+            <pre class="text-xs mt-2 text-gray-300">name,code,type,stock_quantity
+Product 1,PROD001,oil,100
+Product 2,PROD002,oil,50</pre>
+          </div>
+
+          <div class="flex gap-4 mt-6">
+            <button type="button" id="validate-btn" class="btn-primary flex-1">Validate Data</button>
+            <button type="button" id="cancel-import-btn" class="btn-secondary flex-1">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Preview & Confirm -->
+        <div id="import-step-2" class="space-y-4 hidden">
+          <div class="bg-green-900/20 border border-green-500 rounded p-4">
+            <h3 class="font-bold mb-2">✅ Validation Successful</h3>
+            <div id="validation-summary"></div>
+          </div>
+
+          <div>
+            <h3 class="font-bold mb-2">Preview (First 5 Records)</h3>
+            <div id="preview-data" class="overflow-x-auto"></div>
+          </div>
+
+          <div id="validation-errors" class="hidden bg-red-900/20 border border-red-500 rounded p-4">
+            <h3 class="font-bold mb-2">⚠️ Validation Warnings</h3>
+            <div id="error-list"></div>
+          </div>
+
+          <div class="flex gap-4 mt-6">
+            <button type="submit" id="execute-import-btn" class="btn-primary flex-1">Execute Import</button>
+            <button type="button" id="back-to-step1-btn" class="btn-secondary flex-1">Back</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="export-modal" class="modal hidden">
+    <div class="modal-content max-w-2xl">
+      <h2 class="text-2xl font-bold mb-4">Export Data</h2>
+      
+      <form id="export-form">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2">Table to Export</label>
+            <select id="export-table" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" required>
+              <option value="">Select Table...</option>
+              <option value="products">Products</option>
+              <option value="consumables">Consumables</option>
+              <option value="filters">Filters</option>
+              <option value="users">Users</option>
+              <option value="orders">Orders</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">Export Format</label>
+            <select id="export-format" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" required>
+              <option value="csv">CSV (Excel Compatible)</option>
+              <option value="json">JSON (Developer Friendly)</option>
+            </select>
+          </div>
+
+          <div class="bg-blue-900/20 border border-blue-500 rounded p-4">
+            <p class="text-sm">The export will download all records from the selected table in the chosen format.</p>
+          </div>
+
+          <div class="flex gap-4 mt-6">
+            <button type="submit" class="btn-primary flex-1">Download Export</button>
+            <button type="button" id="cancel-export-btn" class="btn-secondary flex-1">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Operation Details Modal -->
+  <div id="operation-details-modal" class="modal hidden">
+    <div class="modal-content max-w-3xl">
+      <h2 class="text-2xl font-bold mb-4">Operation Details</h2>
+      <div id="operation-details-content" class="space-y-4"></div>
+      <div class="flex gap-4 mt-6">
+        <button id="close-details-btn" class="btn-secondary flex-1">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/shared-modals.html"></script>
+  <script src="/shared-notifications.html"></script>
+
+  <script>
+    const FN_BASE = window.FN_BASE || '/.netlify/functions';
+    let currentOperationId = null;
+    let validationResult = null;
+
+    // Load operations history
+    async function loadOperations() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        const response = await fetch(`${FN_BASE}/bulk-operations?limit=50`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load operations');
+
+        const data = await response.json();
+        displayOperations(data.operations);
+
+      } catch (error) {
+        console.error('Error loading operations:', error);
+        showNotification('Failed to load operations', 'error');
+      }
+    }
+
+    // Display operations in table
+    function displayOperations(operations) {
+      const tbody = document.getElementById('operations-table');
+      
+      if (operations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-gray-400">No operations found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = operations.map(op => `
+        <tr class="border-b border-gray-700 hover:bg-gray-800">
+          <td class="py-3 pr-4">#${op.id}</td>
+          <td class="py-3 pr-4 capitalize">${op.operation_type}</td>
+          <td class="py-3 pr-4">${op.target_table}</td>
+          <td class="py-3 pr-4">
+            <span class="px-2 py-1 rounded text-xs ${getStatusColor(op.status)}">
+              ${op.status}
+            </span>
+          </td>
+          <td class="py-3 pr-4">${op.total_records || 0}</td>
+          <td class="py-3 pr-4">${op.success_count || 0} / ${op.error_count || 0}</td>
+          <td class="py-3 pr-4">${formatDate(op.started_at)}</td>
+          <td class="py-3">
+            <button onclick="viewOperation(${op.id})" class="text-blue-500 hover:underline">View</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Validate import data
+    async function validateImportData() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const targetTable = document.getElementById('import-table').value;
+        const format = document.getElementById('import-format').value;
+        const data = document.getElementById('import-data').value;
+
+        if (!targetTable || !data) {
+          showNotification('Please select a table and provide data', 'error');
+          return;
+        }
+
+        const response = await fetch(`${FN_BASE}/bulk-operations`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            target_table: targetTable,
+            format,
+            data,
+            validate_only: true
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          if (error.validation_errors) {
+            displayValidationErrors(error.validation_errors);
+          } else {
+            throw new Error(error.error || 'Validation failed');
+          }
+          return;
+        }
+
+        validationResult = await response.json();
+        
+        if (validationResult.valid) {
+          displayValidationSuccess(validationResult);
+          document.getElementById('import-step-1').classList.add('hidden');
+          document.getElementById('import-step-2').classList.remove('hidden');
+        } else {
+          displayValidationErrors(validationResult.validation_errors);
+        }
+
+      } catch (error) {
+        console.error('Validation error:', error);
+        showNotification('Validation failed: ' + error.message, 'error');
+      }
+    }
+
+    // Display validation success
+    function displayValidationSuccess(result) {
+      const summary = document.getElementById('validation-summary');
+      summary.innerHTML = `
+        <p><strong>Total Records:</strong> ${result.total_records}</p>
+        <p><strong>Valid:</strong> All records passed validation ✓</p>
+      `;
+
+      // Display preview
+      const preview = document.getElementById('preview-data');
+      if (result.preview_data && result.preview_data.length > 0) {
+        const headers = Object.keys(result.preview_data[0]);
+        preview.innerHTML = `
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr class="border-b border-gray-700">
+                ${headers.map(h => `<th class="pb-2 pr-4">${h}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${result.preview_data.map(row => `
+                <tr class="border-b border-gray-700">
+                  ${headers.map(h => `<td class="py-2 pr-4">${row[h] || ''}</td>`).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+    }
+
+    // Display validation errors
+    function displayValidationErrors(errors) {
+      const errorContainer = document.getElementById('validation-errors');
+      const errorList = document.getElementById('error-list');
+      
+      errorList.innerHTML = `
+        <ul class="list-disc pl-5 space-y-1">
+          ${errors.map(err => `<li>Row ${err.row}: ${err.message}</li>`).join('')}
+        </ul>
+      `;
+      
+      errorContainer.classList.remove('hidden');
+      showNotification(`Found ${errors.length} validation error(s)`, 'error');
+    }
+
+    // Execute import
+    async function executeImport(event) {
+      event.preventDefault();
+
+      try {
+        const token = localStorage.getItem('accessToken');
+        const targetTable = document.getElementById('import-table').value;
+        const format = document.getElementById('import-format').value;
+        const data = document.getElementById('import-data').value;
+
+        // Create operation
+        const createResponse = await fetch(`${FN_BASE}/bulk-operations`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            target_table: targetTable,
+            format,
+            data,
+            validate_only: false
+          })
+        });
+
+        if (!createResponse.ok) throw new Error('Failed to create operation');
+
+        const operation = await createResponse.json();
+
+        // Execute operation
+        const executeResponse = await fetch(`${FN_BASE}/bulk-operations/${operation.id}/execute`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ data })
+        });
+
+        if (!executeResponse.ok) throw new Error('Failed to execute operation');
+
+        const result = await executeResponse.json();
+
+        showNotification(
+          `Import completed: ${result.success_count} successful, ${result.error_count} errors`,
+          result.error_count === 0 ? 'success' : 'warning'
+        );
+
+        document.getElementById('import-modal').classList.add('hidden');
+        document.getElementById('import-form').reset();
+        document.getElementById('import-step-1').classList.remove('hidden');
+        document.getElementById('import-step-2').classList.add('hidden');
+        
+        await loadOperations();
+
+      } catch (error) {
+        console.error('Import error:', error);
+        showNotification('Import failed: ' + error.message, 'error');
+      }
+    }
+
+    // Execute export
+    async function executeExport(event) {
+      event.preventDefault();
+
+      try {
+        const token = localStorage.getItem('accessToken');
+        const targetTable = document.getElementById('export-table').value;
+        const format = document.getElementById('export-format').value;
+
+        const params = new URLSearchParams({ target_table: targetTable, format });
+
+        const response = await fetch(`${FN_BASE}/bulk-operations/export?${params}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Export failed');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${targetTable}_export.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        showNotification('Export downloaded successfully', 'success');
+        document.getElementById('export-modal').classList.add('hidden');
+        document.getElementById('export-form').reset();
+
+      } catch (error) {
+        console.error('Export error:', error);
+        showNotification('Export failed: ' + error.message, 'error');
+      }
+    }
+
+    // View operation details
+    async function viewOperation(id) {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${FN_BASE}/bulk-operations?limit=100`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load operation');
+
+        const data = await response.json();
+        const operation = data.operations.find(op => op.id === id);
+
+        if (!operation) throw new Error('Operation not found');
+
+        const content = document.getElementById('operation-details-content');
+        
+        content.innerHTML = `
+          <div class="grid grid-cols-2 gap-4">
+            <div><strong>ID:</strong> ${operation.id}</div>
+            <div><strong>Type:</strong> ${operation.operation_type}</div>
+            <div><strong>Table:</strong> ${operation.target_table}</div>
+            <div><strong>Format:</strong> ${operation.format || 'N/A'}</div>
+            <div><strong>Status:</strong> <span class="px-2 py-1 rounded text-xs ${getStatusColor(operation.status)}">${operation.status}</span></div>
+            <div><strong>Total Records:</strong> ${operation.total_records || 0}</div>
+            <div><strong>Processed:</strong> ${operation.processed_records || 0}</div>
+            <div><strong>Success:</strong> ${operation.success_count || 0}</div>
+            <div><strong>Errors:</strong> ${operation.error_count || 0}</div>
+            <div><strong>Started:</strong> ${formatDate(operation.started_at)}</div>
+            <div><strong>Completed:</strong> ${operation.completed_at ? formatDate(operation.completed_at) : 'N/A'}</div>
+            <div><strong>Committed:</strong> ${operation.committed ? 'Yes' : 'No'}</div>
+          </div>
+          ${operation.error_log && operation.error_log.length > 0 ? `
+            <div class="mt-4 p-4 bg-red-900/20 border border-red-500 rounded">
+              <strong>Errors:</strong>
+              <ul class="list-disc pl-5 mt-2 max-h-64 overflow-y-auto">
+                ${operation.error_log.map(err => `<li>Row ${err.row}: ${err.error}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+        `;
+
+        document.getElementById('operation-details-modal').classList.remove('hidden');
+
+      } catch (error) {
+        console.error('Error viewing operation:', error);
+        showNotification('Failed to load operation details', 'error');
+      }
+    }
+
+    // Helper functions
+    function getStatusColor(status) {
+      const colors = {
+        pending: 'bg-gray-600',
+        processing: 'bg-yellow-600',
+        completed: 'bg-green-600',
+        failed: 'bg-red-600',
+        cancelled: 'bg-gray-600'
+      };
+      return colors[status] || 'bg-gray-600';
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '-';
+      return new Date(dateString).toLocaleString();
+    }
+
+    // Event listeners
+    document.getElementById('import-btn').addEventListener('click', () => {
+      document.getElementById('import-modal').classList.remove('hidden');
+    });
+
+    document.getElementById('export-btn').addEventListener('click', () => {
+      document.getElementById('export-modal').classList.remove('hidden');
+    });
+
+    document.getElementById('cancel-import-btn').addEventListener('click', () => {
+      document.getElementById('import-modal').classList.add('hidden');
+      document.getElementById('import-form').reset();
+      document.getElementById('import-step-1').classList.remove('hidden');
+      document.getElementById('import-step-2').classList.add('hidden');
+    });
+
+    document.getElementById('cancel-export-btn').addEventListener('click', () => {
+      document.getElementById('export-modal').classList.add('hidden');
+      document.getElementById('export-form').reset();
+    });
+
+    document.getElementById('close-details-btn').addEventListener('click', () => {
+      document.getElementById('operation-details-modal').classList.add('hidden');
+    });
+
+    document.getElementById('upload-file-btn').addEventListener('click', () => {
+      document.getElementById('file-input').click();
+    });
+
+    document.getElementById('file-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const text = await file.text();
+        document.getElementById('import-data').value = text;
+      }
+    });
+
+    document.getElementById('paste-data-btn').addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('import-data').value = text;
+        showNotification('Data pasted from clipboard', 'success');
+      } catch (err) {
+        showNotification('Failed to read clipboard', 'error');
+      }
+    });
+
+    document.getElementById('validate-btn').addEventListener('click', validateImportData);
+
+    document.getElementById('back-to-step1-btn').addEventListener('click', () => {
+      document.getElementById('import-step-1').classList.remove('hidden');
+      document.getElementById('import-step-2').classList.add('hidden');
+    });
+
+    document.getElementById('import-form').addEventListener('submit', executeImport);
+    document.getElementById('export-form').addEventListener('submit', executeExport);
+    document.getElementById('refresh-btn').addEventListener('click', loadOperations);
+
+    // Initialize
+    loadOperations();
+  </script>
+</body>
+</html>

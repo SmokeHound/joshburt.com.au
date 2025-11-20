@@ -674,3 +674,194 @@ WHERE timestamp > NOW() - INTERVAL '30 days'
 GROUP BY query
 ORDER BY search_count DESC
 LIMIT 100;
+
+-- =====================================================
+-- Phase 4: Data Management (Migrations 012-014)
+-- =====================================================
+
+-- ============== Migration 012: Backups ==============
+
+CREATE TABLE IF NOT EXISTS backups (
+  id SERIAL PRIMARY KEY,
+  backup_type VARCHAR(50) NOT NULL CHECK (backup_type IN ('full', 'incremental', 'table')),
+  format VARCHAR(20) DEFAULT 'sql' CHECK (format IN ('sql', 'json', 'csv')),
+  file_path TEXT,
+  file_size BIGINT,
+  compression VARCHAR(20) CHECK (compression IN ('gzip', 'none')),
+  tables TEXT[],
+  started_at TIMESTAMP DEFAULT NOW(),
+  completed_at TIMESTAMP,
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'running', 'completed', 'failed')),
+  error_message TEXT,
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  metadata JSONB
+);
+
+CREATE INDEX IF NOT EXISTS idx_backups_started ON backups(started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_backups_status ON backups(status);
+CREATE INDEX IF NOT EXISTS idx_backups_type ON backups(backup_type);
+
+COMMENT ON TABLE backups IS 'Tracks database backup and export operations';
+COMMENT ON COLUMN backups.backup_type IS 'Type of backup: full (all tables), incremental (changes only), table (specific tables)';
+COMMENT ON COLUMN backups.format IS 'Export format: sql (PostgreSQL dump), json (JSON export), csv (CSV export)';
+COMMENT ON COLUMN backups.compression IS 'Compression method: gzip or none';
+COMMENT ON COLUMN backups.tables IS 'Array of table names included in backup';
+COMMENT ON COLUMN backups.status IS 'Current status: pending, running, completed, failed';
+COMMENT ON COLUMN backups.metadata IS 'Additional backup information (e.g., row counts, schema version)';
+
+-- ============== Migration 013: Bulk Operations ==============
+
+CREATE TABLE IF NOT EXISTS bulk_operations (
+  id SERIAL PRIMARY KEY,
+  operation_type VARCHAR(50) NOT NULL CHECK (operation_type IN ('import', 'export', 'update', 'delete')),
+  target_table VARCHAR(100) NOT NULL,
+  format VARCHAR(20) CHECK (format IN ('csv', 'json', 'excel')),
+  file_name VARCHAR(255),
+  total_records INTEGER DEFAULT 0,
+  processed_records INTEGER DEFAULT 0,
+  success_count INTEGER DEFAULT 0,
+  error_count INTEGER DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled')),
+  started_at TIMESTAMP DEFAULT NOW(),
+  completed_at TIMESTAMP,
+  error_log JSONB,
+  validation_errors JSONB,
+  preview_data JSONB,
+  committed BOOLEAN DEFAULT FALSE,
+  can_undo BOOLEAN DEFAULT FALSE,
+  undo_data JSONB,
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  metadata JSONB
+);
+
+CREATE INDEX IF NOT EXISTS idx_bulk_ops_status ON bulk_operations(status);
+CREATE INDEX IF NOT EXISTS idx_bulk_ops_table ON bulk_operations(target_table);
+CREATE INDEX IF NOT EXISTS idx_bulk_ops_started ON bulk_operations(started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_bulk_ops_created_by ON bulk_operations(created_by);
+
+COMMENT ON TABLE bulk_operations IS 'Tracks bulk data operations (import, export, update, delete)';
+COMMENT ON COLUMN bulk_operations.operation_type IS 'Type: import (add new), export (download), update (modify existing), delete (remove)';
+COMMENT ON COLUMN bulk_operations.target_table IS 'Database table affected by operation';
+COMMENT ON COLUMN bulk_operations.error_log IS 'JSON array of errors with row numbers and messages';
+COMMENT ON COLUMN bulk_operations.preview_data IS 'Sample of changes for user review before commit';
+COMMENT ON COLUMN bulk_operations.undo_data IS 'Original data before changes, for rollback capability';
+
+-- ============== Migration 014: Data History & Version Tracking ==============
+
+CREATE TABLE IF NOT EXISTS data_history (
+  id SERIAL PRIMARY KEY,
+  table_name VARCHAR(100) NOT NULL,
+  record_id INTEGER NOT NULL,
+  action VARCHAR(20) NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
+  old_data JSONB,
+  new_data JSONB,
+  changed_fields TEXT[],
+  changed_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  changed_at TIMESTAMP DEFAULT NOW(),
+  ip_address INET,
+  user_agent TEXT,
+  reason TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_data_history_table_record ON data_history(table_name, record_id);
+CREATE INDEX IF NOT EXISTS idx_data_history_changed_at ON data_history(changed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_data_history_changed_by ON data_history(changed_by);
+CREATE INDEX IF NOT EXISTS idx_data_history_action ON data_history(action);
+
+COMMENT ON TABLE data_history IS 'Tracks all data changes across monitored tables';
+COMMENT ON COLUMN data_history.table_name IS 'Name of table where change occurred';
+COMMENT ON COLUMN data_history.record_id IS 'ID of record that was changed';
+COMMENT ON COLUMN data_history.action IS 'Type of change: insert, update, delete';
+COMMENT ON COLUMN data_history.old_data IS 'Complete record state before change (null for inserts)';
+COMMENT ON COLUMN data_history.new_data IS 'Complete record state after change (null for deletes)';
+COMMENT ON COLUMN data_history.changed_fields IS 'Array of field names that were modified (updates only)';
+
+-- Function to track changes on any table
+CREATE OR REPLACE FUNCTION track_data_changes()
+RETURNS TRIGGER AS $$
+DECLARE
+  changed_fields TEXT[] := ARRAY[]::TEXT[];
+  old_json JSONB;
+  new_json JSONB;
+  col RECORD;
+BEGIN
+  -- Convert old and new rows to JSONB
+  IF TG_OP = 'DELETE' THEN
+    old_json := row_to_json(OLD)::JSONB;
+    new_json := NULL;
+  ELSIF TG_OP = 'INSERT' THEN
+    old_json := NULL;
+    new_json := row_to_json(NEW)::JSONB;
+  ELSE -- UPDATE
+    old_json := row_to_json(OLD)::JSONB;
+    new_json := row_to_json(NEW)::JSONB;
+    
+    -- Determine which fields changed
+    FOR col IN 
+      SELECT key 
+      FROM jsonb_each(old_json) 
+      WHERE old_json->key IS DISTINCT FROM new_json->key
+    LOOP
+      changed_fields := array_append(changed_fields, col.key);
+    END LOOP;
+  END IF;
+
+  -- Insert history record
+  INSERT INTO data_history (
+    table_name,
+    record_id,
+    action,
+    old_data,
+    new_data,
+    changed_fields,
+    changed_by
+  ) VALUES (
+    TG_TABLE_NAME,
+    CASE 
+      WHEN TG_OP = 'DELETE' THEN (OLD.id)::INTEGER
+      ELSE (NEW.id)::INTEGER
+    END,
+    LOWER(TG_OP),
+    old_json,
+    new_json,
+    changed_fields,
+    NULLIF(current_setting('app.current_user_id', TRUE), '')::INTEGER
+  );
+
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  ELSE
+    RETURN NEW;
+  END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION track_data_changes() IS 'Trigger function to automatically track data changes';
+
+-- Create materialized view for change statistics
+CREATE MATERIALIZED VIEW IF NOT EXISTS data_history_stats AS
+SELECT 
+  table_name,
+  action,
+  DATE(changed_at) as change_date,
+  COUNT(*) as change_count,
+  COUNT(DISTINCT record_id) as unique_records,
+  COUNT(DISTINCT changed_by) as unique_users
+FROM data_history
+GROUP BY table_name, action, DATE(changed_at);
+
+CREATE INDEX IF NOT EXISTS idx_data_history_stats_date ON data_history_stats(change_date DESC);
+CREATE INDEX IF NOT EXISTS idx_data_history_stats_table ON data_history_stats(table_name);
+
+-- Function to refresh materialized view
+CREATE OR REPLACE FUNCTION refresh_data_history_stats()
+RETURNS void AS $$
+BEGIN
+  REFRESH MATERIALIZED VIEW CONCURRENTLY data_history_stats;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Note: Triggers must be created manually on tables to track
+-- Example: CREATE TRIGGER track_products_changes 
+--          AFTER INSERT OR UPDATE OR DELETE ON products
+--          FOR EACH ROW EXECUTE FUNCTION track_data_changes();
