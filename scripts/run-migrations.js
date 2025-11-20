@@ -25,7 +25,8 @@ function getMigrationFiles() {
     return [];
   }
 
-  const files = fs.readdirSync(MIGRATIONS_DIR)
+  const files = fs
+    .readdirSync(MIGRATIONS_DIR)
     .filter(f => f.endsWith('.sql'))
     .sort();
 
@@ -84,9 +85,7 @@ async function createMigrationsTable() {
  */
 async function getAppliedMigrations() {
   try {
-    const rows = await database.all(
-      'SELECT filename FROM schema_migrations ORDER BY filename'
-    );
+    const rows = await database.all('SELECT filename FROM schema_migrations ORDER BY filename');
     return rows.map(r => r.filename);
   } catch (err) {
     // If table doesn't exist or has wrong schema, return empty array
@@ -113,10 +112,7 @@ async function applyMigration(filename) {
     await client.query(sql);
 
     // Record migration as applied
-    await client.query(
-      'INSERT INTO schema_migrations (filename) VALUES ($1)',
-      [filename]
-    );
+    await client.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [filename]);
 
     await client.query('COMMIT');
     console.log(`✅ Applied: ${filename}`);
@@ -148,9 +144,7 @@ async function runMigrations(dryRun = false) {
     const appliedMigrations = await getAppliedMigrations();
 
     // Find pending migrations
-    const pendingMigrations = allMigrations.filter(
-      m => !appliedMigrations.includes(m)
-    );
+    const pendingMigrations = allMigrations.filter(m => !appliedMigrations.includes(m));
 
     console.log('📊 Migration Status:');
     console.log(`   Total migrations: ${allMigrations.length}`);
@@ -179,7 +173,6 @@ async function runMigrations(dryRun = false) {
     }
 
     console.log('\n✅ All migrations applied successfully');
-
   } catch (err) {
     console.error('\n❌ Migration failed:', err);
     process.exit(1);

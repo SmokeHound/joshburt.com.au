@@ -69,26 +69,26 @@ function generateFingerprint(error, url) {
  */
 async function logError({ level, message, stack, userId, url, userAgent, ipAddress, environment, metadata }) {
   const fingerprint = generateFingerprint({ name: 'Error', message }, url || 'unknown');
-  
+
   try {
     // Check if error already exists
     const existing = await query(
       'SELECT id, occurrences FROM error_logs WHERE fingerprint = $1',
       [fingerprint]
     );
-    
+
     if (existing.rows.length > 0) {
       // Update existing error
       await query(
-        `UPDATE error_logs 
-         SET occurrences = occurrences + 1, last_seen = NOW() 
+        `UPDATE error_logs
+         SET occurrences = occurrences + 1, last_seen = NOW()
          WHERE fingerprint = $1`,
         [fingerprint]
       );
     } else {
       // Insert new error
       await query(
-        `INSERT INTO error_logs 
+        `INSERT INTO error_logs
          (level, message, stack_trace, user_id, url, user_agent, ip_address, environment, metadata, fingerprint)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [level, message, stack, userId, url, userAgent, ipAddress, environment, JSON.stringify(metadata), fingerprint]
@@ -115,12 +115,12 @@ const { logError } = require('../../utils/error-tracker');
 
 exports.handler = withHandler(async (event) => {
   const method = event.httpMethod;
-  
+
   if (method === 'POST') {
     // Log error from client
     const { level, message, stack, url, userAgent, metadata } = JSON.parse(event.body);
     const ipAddress = event.headers['x-forwarded-for'] || event.headers['client-ip'];
-    
+
     await logError({
       level: level || 'error',
       message,
@@ -131,46 +131,46 @@ exports.handler = withHandler(async (event) => {
       environment: process.env.NODE_ENV || 'production',
       metadata
     });
-    
+
     return { statusCode: 201, body: JSON.stringify({ success: true }) };
   }
-  
+
   if (method === 'GET') {
     // Get errors (admin only)
     await requirePermission(event, 'error-logs', 'read');
-    
+
     const { resolved, limit = 50, offset = 0 } = event.queryStringParameters || {};
-    
+
     let sql = 'SELECT * FROM error_logs';
     const params = [];
-    
+
     if (resolved !== undefined) {
       sql += ' WHERE resolved = $1';
       params.push(resolved === 'true');
     }
-    
+
     sql += ' ORDER BY last_seen DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
     params.push(parseInt(limit), parseInt(offset));
-    
+
     const result = await query(sql, params);
     return { statusCode: 200, body: JSON.stringify(result.rows) };
   }
-  
+
   if (method === 'PUT') {
     // Resolve error (admin only)
     await requirePermission(event, 'error-logs', 'update');
-    
+
     const { id, resolved } = JSON.parse(event.body);
     const user = event.requestContext.user;
-    
+
     await query(
       'UPDATE error_logs SET resolved = $1, resolved_by = $2, resolved_at = NOW() WHERE id = $3',
       [resolved, user.id, id]
     );
-    
+
     return { statusCode: 200, body: JSON.stringify({ success: true }) };
   }
-  
+
   return error(405, 'Method not allowed');
 });
 EOF
@@ -275,7 +275,7 @@ ALTER TABLE filters ADD COLUMN search_vector tsvector;
 -- Create update function
 CREATE OR REPLACE FUNCTION update_product_search_vector() RETURNS trigger AS $$
 BEGIN
-  NEW.search_vector := 
+  NEW.search_vector :=
     setweight(to_tsvector('english', COALESCE(NEW.name, '')), 'A') ||
     setweight(to_tsvector('english', COALESCE(NEW.code, '')), 'B') ||
     setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'C');
@@ -284,7 +284,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create triggers
-CREATE TRIGGER product_search_vector_update 
+CREATE TRIGGER product_search_vector_update
   BEFORE INSERT OR UPDATE ON products
   FOR EACH ROW EXECUTE FUNCTION update_product_search_vector();
 
@@ -414,11 +414,13 @@ psql -c "REINDEX INDEX idx_products_search_vector;"
 ### Database
 
 1. **Use EXPLAIN ANALYZE** for slow queries
+
    ```sql
    EXPLAIN ANALYZE SELECT * FROM products WHERE search_vector @@ to_tsquery('oil');
    ```
 
 2. **Create partial indexes** for common filters
+
    ```sql
    CREATE INDEX idx_products_active ON products(id) WHERE is_active = true;
    ```

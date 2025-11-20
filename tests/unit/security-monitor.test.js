@@ -45,18 +45,18 @@ describe('Security Monitor Utilities', () => {
 
     test('should detect UNION SELECT attacks', () => {
       expect(detectSqlInjection("1' UNION SELECT * FROM users--")).toBe(true);
-      expect(detectSqlInjection("id=1 UNION SELECT password")).toBe(true);
+      expect(detectSqlInjection('id=1 UNION SELECT password')).toBe(true);
     });
 
     test('should detect SQL comments', () => {
       expect(detectSqlInjection("admin'--")).toBe(true);
-      expect(detectSqlInjection("value=1; /* comment */")).toBe(true);
+      expect(detectSqlInjection('value=1; /* comment */')).toBe(true);
     });
 
     test('should not flag normal input', () => {
-      expect(detectSqlInjection("john.doe@example.com")).toBe(false);
-      expect(detectSqlInjection("normal text")).toBe(false);
-      expect(detectSqlInjection("123456")).toBe(false);
+      expect(detectSqlInjection('john.doe@example.com')).toBe(false);
+      expect(detectSqlInjection('normal text')).toBe(false);
+      expect(detectSqlInjection('123456')).toBe(false);
     });
 
     test('should handle null and undefined', () => {

@@ -149,7 +149,7 @@ describe('Input Sanitization Utilities', () => {
     });
 
     test('should detect SQL injection patterns', () => {
-      expect(isSQLSafe('\' OR \'1\'=\'1')).toBe(false);
+      expect(isSQLSafe("' OR '1'='1")).toBe(false);
       expect(isSQLSafe('admin--')).toBe(false);
     });
   });

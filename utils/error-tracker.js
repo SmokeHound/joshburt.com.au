@@ -142,7 +142,8 @@ async function logError({
 async function logServerError(error, event, level = 'error') {
   const url = event.path || event.rawUrl || 'unknown';
   const userAgent = event.headers && (event.headers['user-agent'] || event.headers['User-Agent']);
-  const ipAddress = event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip']);
+  const ipAddress =
+    event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip']);
 
   // Try to extract user from event context
   let userId = null;

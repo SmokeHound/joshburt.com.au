@@ -250,10 +250,10 @@ exports.handler = withHandler(async event => {
         });
         const search = (event.queryStringParameters && event.queryStringParameters.search) || '';
         const role = (event.queryStringParameters && event.queryStringParameters.role) || '';
-        
+
         // Generate cache key based on query parameters
         const cacheKey = `list:${page}:${limit}:${search}:${role}`;
-        
+
         // Try cache first (1 minute TTL for users list)
         const cached = cache.get('users', cacheKey);
         if (cached) {
@@ -267,7 +267,7 @@ exports.handler = withHandler(async event => {
             body: cached
           };
         }
-        
+
         let query =
           'SELECT id, email, name, role, is_active, email_verified, created_at, last_login FROM users';
         let countQuery = 'SELECT COUNT(*) as total FROM users';
@@ -292,7 +292,7 @@ exports.handler = withHandler(async event => {
           database.all(query, params),
           database.get(countQuery, countParams)
         ]);
-        
+
         const result = {
           users: usersList,
           pagination: {
@@ -302,11 +302,11 @@ exports.handler = withHandler(async event => {
             pages: Math.ceil(countResult.total / limit)
           }
         };
-        
+
         // Cache the result for 1 minute (60 seconds)
         const dataString = JSON.stringify(result);
         cache.set('users', cacheKey, dataString, 60);
-        
+
         return {
           statusCode: 200,
           headers: {
@@ -360,10 +360,10 @@ exports.handler = withHandler(async event => {
           userId: user.id,
           details: { targetUserId: result.id, email, name, role }
         });
-        
+
         // Invalidate users cache on create
         cache.clearNamespace('users');
-        
+
         return ok({ message: 'User created successfully', user: newUser }, 201);
       }
       return error(405, 'Method not allowed');
@@ -455,10 +455,10 @@ exports.handler = withHandler(async event => {
         auditDetails.is_active = is_active;
       }
       await logAudit(event, { action: 'user.update', userId: user.id, details: auditDetails });
-      
+
       // Invalidate users cache on update
       cache.clearNamespace('users');
-      
+
       return ok({ message: 'User updated successfully', user: updated });
     }
     if (method === 'DELETE') {
@@ -481,10 +481,10 @@ exports.handler = withHandler(async event => {
         userId: user.id,
         details: { targetUserId: id, email: exists.email }
       });
-      
+
       // Invalidate users cache on delete
       cache.clearNamespace('users');
-      
+
       return ok({ message: 'User deleted successfully' });
     }
     // Password change: not implemented

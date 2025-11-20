@@ -25,10 +25,14 @@ async function generateSQLBackup(tables = [], compression = 'gzip') {
 
   return new Promise((resolve, reject) => {
     const args = [
-      '-h', process.env.DB_HOST,
-      '-p', process.env.DB_PORT || '5432',
-      '-U', process.env.DB_USER,
-      '-d', process.env.DB_NAME,
+      '-h',
+      process.env.DB_HOST,
+      '-p',
+      process.env.DB_PORT || '5432',
+      '-U',
+      process.env.DB_USER,
+      '-d',
+      process.env.DB_NAME,
       '--no-password',
       '--clean',
       '--if-exists'
@@ -48,15 +52,15 @@ async function generateSQLBackup(tables = [], compression = 'gzip') {
     let output = '';
     let errorOutput = '';
 
-    pgDump.stdout.on('data', (data) => {
+    pgDump.stdout.on('data', data => {
       output += data.toString();
     });
 
-    pgDump.stderr.on('data', (data) => {
+    pgDump.stderr.on('data', data => {
       errorOutput += data.toString();
     });
 
-    pgDump.on('close', async (code) => {
+    pgDump.on('close', async code => {
       if (code !== 0) {
         reject(new Error(`pg_dump failed: ${errorOutput}`));
         return;
@@ -64,7 +68,7 @@ async function generateSQLBackup(tables = [], compression = 'gzip') {
 
       try {
         let finalData = output;
-        
+
         if (compression === 'gzip') {
           const compressed = await gzip(Buffer.from(output));
           await fs.writeFile(filePath, compressed);
@@ -73,7 +77,7 @@ async function generateSQLBackup(tables = [], compression = 'gzip') {
         }
 
         const stats = await fs.stat(filePath);
-        
+
         resolve({
           filePath,
           fileSize: stats.size,
@@ -124,7 +128,7 @@ async function generateJSONBackup(pool, tables = [], compression = 'gzip') {
   }
 
   const jsonData = JSON.stringify(backup, null, 2);
-  
+
   if (compression === 'gzip') {
     const compressed = await gzip(Buffer.from(jsonData));
     await fs.writeFile(filePath, compressed);
@@ -166,7 +170,7 @@ async function generateCSVBackup(pool, tables = [], compression = 'none') {
   // Export each table to CSV
   for (const table of tablesToBackup) {
     const result = await pool.query(`SELECT * FROM ${table}`);
-    
+
     if (result.rows.length === 0) continue;
 
     const headers = Object.keys(result.rows[0]);
@@ -213,10 +217,7 @@ async function createBackup(backupConfig) {
     const { id, backup_type, format, compression, tables } = backupConfig;
 
     // Update status to running
-    await pool.query(
-      'UPDATE backups SET status = $1 WHERE id = $2',
-      ['running', id]
-    );
+    await pool.query('UPDATE backups SET status = $1 WHERE id = $2', ['running', id]);
 
     let result;
 
@@ -251,7 +252,6 @@ async function createBackup(backupConfig) {
     console.log(`- Size: ${(result.fileSize / 1024 / 1024).toFixed(2)} MB`);
 
     return result;
-
   } catch (error) {
     console.error(`Backup failed:`, error.message);
 
@@ -264,7 +264,6 @@ async function createBackup(backupConfig) {
     );
 
     throw error;
-
   } finally {
     await pool.end();
   }
@@ -299,7 +298,6 @@ async function processPendingBackups() {
     }
 
     console.log('All pending backups processed');
-
   } finally {
     await pool.end();
   }
@@ -317,19 +315,24 @@ async function main() {
   } else if (command === 'watch') {
     console.log('Starting backup worker in watch mode...');
     console.log('Checking for pending backups every 5 minutes');
-    
+
     // Process immediately
     await processPendingBackups();
-    
+
     // Then check every 5 minutes
-    setInterval(async () => {
-      console.log('\n--- Checking for pending backups ---');
-      await processPendingBackups();
-    }, 5 * 60 * 1000);
+    setInterval(
+      async () => {
+        console.log('\n--- Checking for pending backups ---');
+        await processPendingBackups();
+      },
+      5 * 60 * 1000
+    );
   } else {
     console.log('Usage:');
     console.log('  node scripts/backup-database.js process  - Process pending backups once');
-    console.log('  node scripts/backup-database.js watch    - Run in watch mode (checks every 5 min)');
+    console.log(
+      '  node scripts/backup-database.js watch    - Run in watch mode (checks every 5 min)'
+    );
     process.exit(1);
   }
 }

@@ -19,7 +19,7 @@ jest.mock('../../utils/http', () => ({
 }));
 
 jest.mock('../../utils/fn', () => ({
-  withHandler: (fn) => fn
+  withHandler: fn => fn
 }));
 
 const { Pool } = require('../../config/database');
@@ -86,7 +86,7 @@ describe('Bulk Operations API', () => {
   describe('POST /bulk-operations (create import)', () => {
     it('should validate CSV data only', async () => {
       const csvData = 'name,code,type\nProduct 1,P001,oil\nProduct 2,P002,oil';
-      
+
       mockQuery
         .mockResolvedValueOnce({ rows: [{ column_name: 'name' }, { column_name: 'code' }] })
         .mockResolvedValueOnce({ rows: [{ id: 1 }] });
@@ -134,12 +134,10 @@ describe('Bulk Operations API', () => {
 
     it('should create import operation', async () => {
       const csvData = 'name,code\nProduct 1,P001';
-      
-      mockQuery
-        .mockResolvedValueOnce({ rows: [{ column_name: 'name' }] })
-        .mockResolvedValueOnce({
-          rows: [{ id: 1, operation_type: 'import', status: 'pending' }]
-        });
+
+      mockQuery.mockResolvedValueOnce({ rows: [{ column_name: 'name' }] }).mockResolvedValueOnce({
+        rows: [{ id: 1, operation_type: 'import', status: 'pending' }]
+      });
 
       const event = createMockEvent('POST', '/bulk-operations', {
         target_table: 'products',
@@ -159,7 +157,7 @@ describe('Bulk Operations API', () => {
   describe('POST /bulk-operations/:id/execute', () => {
     it('should execute import operation', async () => {
       const csvData = 'name,code\nProduct 1,P001';
-      
+
       mockQuery
         .mockResolvedValueOnce({
           rows: [{ id: 1, operation_type: 'import', target_table: 'products', format: 'csv' }]
@@ -216,9 +214,7 @@ describe('Bulk Operations API', () => {
 
     it('should export data as JSON', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [
-          { id: 1, name: 'Product 1' }
-        ]
+        rows: [{ id: 1, name: 'Product 1' }]
       });
 
       const event = createMockEvent('GET', '/bulk-operations/export', null, {
@@ -252,7 +248,7 @@ describe('Bulk Operations API', () => {
       // This test would require access to the internal parseCSV function
       // For now, we test it indirectly through the API
       const csvData = 'name,code\n"Product 1",P001\n"Product 2",P002';
-      
+
       mockQuery
         .mockResolvedValueOnce({ rows: [{ column_name: 'name' }] })
         .mockResolvedValueOnce({ rows: [{ id: 1 }] });

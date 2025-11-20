@@ -40,7 +40,7 @@ async function withTracking(pool, userId, operation) {
  */
 async function enableTableTracking(pool, tableName) {
   const triggerName = `track_${tableName}_changes`;
-  
+
   // Check if trigger already exists
   const checkQuery = `
     SELECT EXISTS (
@@ -48,9 +48,9 @@ async function enableTableTracking(pool, tableName) {
       WHERE tgname = $1 AND tgrelid = $2::regclass
     )
   `;
-  
+
   const exists = await pool.query(checkQuery, [triggerName, tableName]);
-  
+
   if (exists.rows[0].exists) {
     return { enabled: false, message: 'Tracking already enabled' };
   }
@@ -63,7 +63,7 @@ async function enableTableTracking(pool, tableName) {
   `;
 
   await pool.query(createTrigger);
-  
+
   return { enabled: true, message: 'Tracking enabled successfully' };
 }
 
@@ -72,10 +72,10 @@ async function enableTableTracking(pool, tableName) {
  */
 async function disableTableTracking(pool, tableName) {
   const triggerName = `track_${tableName}_changes`;
-  
+
   const dropTrigger = `DROP TRIGGER IF EXISTS ${triggerName} ON ${tableName}`;
   await pool.query(dropTrigger);
-  
+
   return { disabled: true, message: 'Tracking disabled successfully' };
 }
 
@@ -92,7 +92,7 @@ async function getTrackedTables(pool) {
     WHERE t.tgname LIKE 'track_%_changes'
     ORDER BY table_name
   `;
-  
+
   const result = await pool.query(query);
   return result.rows;
 }
@@ -112,7 +112,7 @@ async function getRecordChangeSummary(pool, tableName, recordId) {
     WHERE table_name = $1 AND record_id = $2
     GROUP BY action
   `;
-  
+
   const result = await pool.query(query, [tableName, recordId]);
   return result.rows;
 }
@@ -128,7 +128,7 @@ async function getLatestVersion(pool, tableName, recordId) {
     ORDER BY changed_at DESC
     LIMIT 1
   `;
-  
+
   const result = await pool.query(query, [tableName, recordId]);
   return result.rows[0] || null;
 }
@@ -138,15 +138,12 @@ async function getLatestVersion(pool, tableName, recordId) {
  */
 function compareVersions(oldData, newData) {
   const differences = [];
-  const allKeys = new Set([
-    ...Object.keys(oldData || {}),
-    ...Object.keys(newData || {})
-  ]);
+  const allKeys = new Set([...Object.keys(oldData || {}), ...Object.keys(newData || {})]);
 
   for (const key of allKeys) {
     const oldValue = oldData?.[key];
     const newValue = newData?.[key];
-    
+
     if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
       differences.push({
         field: key,
@@ -177,7 +174,7 @@ async function getChangeTimeline(pool, tableName, recordId) {
     WHERE h.table_name = $1 AND h.record_id = $2
     ORDER BY h.changed_at ASC
   `;
-  
+
   const result = await pool.query(query, [tableName, recordId]);
   return result.rows;
 }
@@ -189,7 +186,7 @@ async function revertToVersion(pool, historyId, userId) {
   // Get the version
   const historyQuery = 'SELECT * FROM data_history WHERE id = $1';
   const historyResult = await pool.query(historyQuery, [historyId]);
-  
+
   if (historyResult.rows.length === 0) {
     throw new Error('Version not found');
   }

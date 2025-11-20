@@ -174,9 +174,9 @@ describe('Query Monitor Utility', () => {
     it('should track query even if it fails', async () => {
       const mockQueryFn = jest.fn().mockRejectedValue(new Error('Query failed'));
 
-      await expect(
-        queryMonitor.monitor(mockQueryFn, 'SELECT * FROM products', [])
-      ).rejects.toThrow('Query failed');
+      await expect(queryMonitor.monitor(mockQueryFn, 'SELECT * FROM products', [])).rejects.toThrow(
+        'Query failed'
+      );
 
       const metrics = queryMonitor.getMetrics();
       expect(metrics.length).toBe(1);

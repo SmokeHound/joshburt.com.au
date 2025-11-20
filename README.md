@@ -378,7 +378,8 @@ git push origin main
 **Want to add features without paid services?** [**Start here → START_HERE.md**](START_HERE.md)
 
 The upgrade plan includes:
-- Self-hosted error tracking (replaces Sentry) 
+
+- Self-hosted error tracking (replaces Sentry)
 - Email queue system (no external SMTP)
 - Full-text search (PostgreSQL native)
 - Advanced analytics & automated reports

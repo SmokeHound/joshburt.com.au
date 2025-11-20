@@ -13,7 +13,11 @@ const THEME_CARDS_CONFIG = [
     textColor: 'text-white',
     hoverBorder: 'hover:border-blue-500',
     hoverShadow: 'hover:shadow-blue-500/20',
-    colors: ['from-blue-500 to-blue-600', 'from-green-500 to-green-600', 'from-purple-500 to-purple-600']
+    colors: [
+      'from-blue-500 to-blue-600',
+      'from-green-500 to-green-600',
+      'from-purple-500 to-purple-600'
+    ]
   },
   {
     id: 'light',
@@ -26,7 +30,11 @@ const THEME_CARDS_CONFIG = [
     textColor: 'text-gray-900',
     hoverBorder: 'hover:border-yellow-500',
     hoverShadow: 'hover:shadow-yellow-500/20',
-    colors: ['from-blue-400 to-blue-500', 'from-green-400 to-green-500', 'from-purple-400 to-purple-500']
+    colors: [
+      'from-blue-400 to-blue-500',
+      'from-green-400 to-green-500',
+      'from-purple-400 to-purple-500'
+    ]
   },
   {
     id: 'system',
@@ -39,7 +47,11 @@ const THEME_CARDS_CONFIG = [
     textColor: 'text-white drop-shadow-lg',
     hoverBorder: 'hover:border-indigo-500',
     hoverShadow: 'hover:shadow-indigo-500/20',
-    colors: ['from-gray-900 to-gray-700', 'from-gray-400 to-gray-200', 'from-indigo-500 to-purple-500']
+    colors: [
+      'from-gray-900 to-gray-700',
+      'from-gray-400 to-gray-200',
+      'from-indigo-500 to-purple-500'
+    ]
   },
   {
     id: 'neon',
@@ -52,7 +64,11 @@ const THEME_CARDS_CONFIG = [
     textColor: 'text-cyan-400',
     hoverBorder: 'hover:border-cyan-400',
     hoverShadow: 'hover:shadow-cyan-400/30',
-    colors: ['from-cyan-400 to-cyan-500 shadow-cyan-400/50', 'from-pink-400 to-pink-500 shadow-pink-400/50', 'from-purple-400 to-purple-500 shadow-purple-400/50']
+    colors: [
+      'from-cyan-400 to-cyan-500 shadow-cyan-400/50',
+      'from-pink-400 to-pink-500 shadow-pink-400/50',
+      'from-purple-400 to-purple-500 shadow-purple-400/50'
+    ]
   },
   {
     id: 'high-contrast',
@@ -65,7 +81,11 @@ const THEME_CARDS_CONFIG = [
     textColor: 'text-yellow-400',
     hoverBorder: 'hover:border-yellow-400',
     hoverShadow: 'hover:shadow-yellow-400/30',
-    colors: ['from-cyan-400 to-cyan-500 shadow-cyan-400/50 border-2 border-white', 'from-lime-400 to-lime-500 shadow-lime-400/50 border-2 border-white', 'from-yellow-400 to-yellow-500 shadow-yellow-400/50 border-2 border-white']
+    colors: [
+      'from-cyan-400 to-cyan-500 shadow-cyan-400/50 border-2 border-white',
+      'from-lime-400 to-lime-500 shadow-lime-400/50 border-2 border-white',
+      'from-yellow-400 to-yellow-500 shadow-yellow-400/50 border-2 border-white'
+    ]
   },
   {
     id: 'ocean',
@@ -78,17 +98,24 @@ const THEME_CARDS_CONFIG = [
     textColor: 'text-blue-200',
     hoverBorder: 'hover:border-blue-400',
     hoverShadow: 'hover:shadow-blue-400/30',
-    colors: ['from-blue-600 to-blue-700 shadow-blue-500/50', 'from-cyan-500 to-cyan-600 shadow-cyan-500/50', 'from-sky-400 to-sky-500 shadow-sky-400/50']
+    colors: [
+      'from-blue-600 to-blue-700 shadow-blue-500/50',
+      'from-cyan-500 to-cyan-600 shadow-cyan-500/50',
+      'from-sky-400 to-sky-500 shadow-sky-400/50'
+    ]
   }
 ];
 
 const ICONS = {
   moon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />',
   sun: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />',
-  desktop: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />',
-  lightning: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />',
+  desktop:
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />',
+  lightning:
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />',
   eye: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />',
-  water: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />'
+  water:
+    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />'
 };
 
 function renderThemeCard(config) {
@@ -158,11 +185,15 @@ function initThemeCards() {
       if (cardTheme === themeId) {
         card.classList.add('border-green-500', 'border-4');
         card.classList.remove('border-2', 'border-gray-700');
-        if (indicator) {indicator.classList.remove('hidden');}
+        if (indicator) {
+          indicator.classList.remove('hidden');
+        }
       } else {
         card.classList.remove('border-green-500', 'border-4');
         card.classList.add('border-2', 'border-gray-700');
-        if (indicator) {indicator.classList.add('hidden');}
+        if (indicator) {
+          indicator.classList.add('hidden');
+        }
       }
     });
   }
@@ -170,7 +201,9 @@ function initThemeCards() {
   themeCards.forEach(card => {
     card.addEventListener('click', async () => {
       const themeId = card.getAttribute('data-theme');
-      if (themeSelect) {themeSelect.value = themeId;}
+      if (themeSelect) {
+        themeSelect.value = themeId;
+      }
       updateActiveCard(themeId);
 
       // Apply theme using ThemeManager

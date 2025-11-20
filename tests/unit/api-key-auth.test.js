@@ -1,7 +1,7 @@
 /**
  * Tests for API Key Authentication
  * Part of Phase 6: Security Enhancements
- * 
+ *
  * NOTE: All API keys in this file are TEST FIXTURES ONLY and not real secrets.
  * Format: sk_live_TEST... or sk_test_TEST... to clearly indicate test data.
  */
@@ -90,8 +90,12 @@ describe('API Key Authentication Utilities', () => {
     });
 
     test('should reject key with wrong prefix', () => {
-      expect(isValidApiKeyFormat('pk_live_TEST1234567890abcdefTEST1234567890abcdefTEST1234')).toBe(false);
-      expect(isValidApiKeyFormat('api_key_TEST1234567890abcdefTEST1234567890abcdefTEST1234')).toBe(false);
+      expect(isValidApiKeyFormat('pk_live_TEST1234567890abcdefTEST1234567890abcdefTEST1234')).toBe(
+        false
+      );
+      expect(isValidApiKeyFormat('api_key_TEST1234567890abcdefTEST1234567890abcdefTEST1234')).toBe(
+        false
+      );
     });
 
     test('should reject key that is too short', () => {
@@ -114,7 +118,9 @@ describe('API Key Authentication Utilities', () => {
     });
 
     test('should reject key without environment', () => {
-      expect(isValidApiKeyFormat('sk_TEST1234567890abcdefTEST1234567890abcdefTEST1234')).toBe(false);
+      expect(isValidApiKeyFormat('sk_TEST1234567890abcdefTEST1234567890abcdefTEST1234')).toBe(
+        false
+      );
     });
   });
 

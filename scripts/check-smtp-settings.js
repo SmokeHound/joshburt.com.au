@@ -6,17 +6,17 @@ const { Pool } = require('pg');
 const DATABASE_URL = process.env.DATABASE_URL || null;
 const pgConfig = DATABASE_URL
   ? {
-    connectionString: DATABASE_URL,
-    ssl: true
-  }
+      connectionString: DATABASE_URL,
+      ssl: true
+    }
   : {
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT || 5432,
-    ssl: { rejectUnauthorized: true }
-  };
+      user: process.env.DB_USER,
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      password: process.env.DB_PASSWORD,
+      port: process.env.DB_PORT || 5432,
+      ssl: { rejectUnauthorized: true }
+    };
 
 const pool = new Pool(pgConfig);
 
@@ -24,7 +24,7 @@ async function checkSMTPSettings() {
   try {
     // Check SMTP settings
     const res = await pool.query(
-      'SELECT key, value, is_sensitive FROM settings WHERE key LIKE \'smtp%\' ORDER BY key'
+      "SELECT key, value, is_sensitive FROM settings WHERE key LIKE 'smtp%' ORDER BY key"
     );
 
     console.log('SMTP Settings in Database:');
@@ -43,7 +43,7 @@ async function checkSMTPSettings() {
 
     // Check feature flags
     const ffRes = await pool.query(
-      'SELECT key, value, data_type FROM settings WHERE key = \'featureFlags\''
+      "SELECT key, value, data_type FROM settings WHERE key = 'featureFlags'"
     );
 
     console.log('Feature Flags Setting:');

@@ -91,9 +91,7 @@ describe('Search API', () => {
   });
 
   test('should filter search by content type', async () => {
-    db.query
-      .mockResolvedValueOnce({ rows: mockProducts })
-      .mockResolvedValueOnce({ rows: [] });
+    db.query.mockResolvedValueOnce({ rows: mockProducts }).mockResolvedValueOnce({ rows: [] });
 
     const { handler } = require('../../netlify/functions/search');
     const event = {
@@ -133,9 +131,7 @@ describe('Search API', () => {
       { query: 'oil change', frequency: 5 }
     ];
 
-    db.query
-      .mockResolvedValueOnce({ rows: mockSuggestions })
-      .mockResolvedValueOnce({ rows: [] });
+    db.query.mockResolvedValueOnce({ rows: mockSuggestions }).mockResolvedValueOnce({ rows: [] });
 
     const { handler } = require('../../netlify/functions/search');
     const event = {

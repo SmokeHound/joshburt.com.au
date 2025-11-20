@@ -19,7 +19,7 @@ jest.mock('../../utils/http', () => ({
 }));
 
 jest.mock('../../utils/fn', () => ({
-  withHandler: (fn) => fn
+  withHandler: fn => fn
 }));
 
 const { Pool } = require('../../config/database');
@@ -227,14 +227,16 @@ describe('Backups API', () => {
   describe('GET /backups/stats', () => {
     it('should return backup statistics', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [{
-          total_backups: '10',
-          completed: '8',
-          failed: '1',
-          running: '1',
-          total_size: '1048576',
-          last_backup_time: new Date()
-        }]
+        rows: [
+          {
+            total_backups: '10',
+            completed: '8',
+            failed: '1',
+            running: '1',
+            total_size: '1048576',
+            last_backup_time: new Date()
+          }
+        ]
       });
 
       const event = createMockEvent('GET', '/backups/stats');

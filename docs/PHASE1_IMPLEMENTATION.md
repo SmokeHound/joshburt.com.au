@@ -57,15 +57,17 @@ CREATE TABLE error_logs (
 ### Error Fingerprinting
 
 Errors are automatically grouped using a fingerprint based on:
+
 - Error name
 - Error message
 - URL path (normalized)
 
 Example:
+
 ```javascript
 const fingerprint = generateFingerprint(
   { message: "Cannot read property 'x' of undefined" },
-  "https://example.com/products/123"
+  'https://example.com/products/123'
 );
 // Result: SHA256 hash of "Error:Cannot read property 'x' of undefined:/products/123"
 ```
@@ -79,6 +81,7 @@ Include the client-side error tracker in your HTML:
 ```
 
 The tracker automatically captures:
+
 - Uncaught JavaScript errors
 - Unhandled promise rejections
 
@@ -98,7 +101,7 @@ window.ErrorTracker.logWarning('Deprecated feature used');
 window.ErrorTracker.configure({
   enabled: true,
   maxErrorsPerSession: 50,
-  sampleRate: 1.0,  // Report 100% of errors
+  sampleRate: 1.0, // Report 100% of errors
   ignoreErrors: ['ResizeObserver loop limit exceeded']
 });
 ```
@@ -110,13 +113,13 @@ In Netlify Functions:
 ```javascript
 const { logError, logServerError } = require('../../utils/error-tracker');
 
-exports.handler = async (event) => {
+exports.handler = async event => {
   try {
     // Your function logic
   } catch (error) {
     // Log the error
     await logServerError(error, event, 'error');
-    
+
     // Return error response
     return {
       statusCode: 500,
@@ -145,6 +148,7 @@ await logError({
 ### API Endpoints
 
 **POST /error-logs** - Log error (public)
+
 ```bash
 curl -X POST https://your-site.com/.netlify/functions/error-logs \
   -H "Content-Type: application/json" \
@@ -157,6 +161,7 @@ curl -X POST https://your-site.com/.netlify/functions/error-logs \
 ```
 
 **GET /error-logs** - View errors (admin only)
+
 ```bash
 curl https://your-site.com/.netlify/functions/error-logs \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -164,12 +169,14 @@ curl https://your-site.com/.netlify/functions/error-logs \
 ```
 
 **GET /error-logs?stats=true** - Get statistics (admin only)
+
 ```bash
 curl https://your-site.com/.netlify/functions/error-logs?stats=true \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
 **PUT /error-logs** - Resolve error (admin only)
+
 ```bash
 curl -X PUT https://your-site.com/.netlify/functions/error-logs \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -230,6 +237,7 @@ console.log(`Deleted ${deleted} old errors`);
 ### Database Schema
 
 **email_queue** - Queue for pending/sent emails:
+
 ```sql
 CREATE TABLE email_queue (
   id SERIAL PRIMARY KEY,
@@ -253,6 +261,7 @@ CREATE TABLE email_queue (
 ```
 
 **email_templates** - Reusable templates:
+
 ```sql
 CREATE TABLE email_templates (
   id SERIAL PRIMARY KEY,
@@ -279,8 +288,8 @@ await enqueueEmail({
   subject: 'Welcome to Our Platform',
   html: '<h1>Welcome!</h1><p>Thanks for joining.</p>',
   text: 'Welcome! Thanks for joining.',
-  priority: 3,  // High priority (1-10)
-  scheduledFor: new Date('2025-12-01T09:00:00Z'),  // Optional
+  priority: 3, // High priority (1-10)
+  scheduledFor: new Date('2025-12-01T09:00:00Z'), // Optional
   metadata: { userId: 123 }
 });
 ```
@@ -319,16 +328,19 @@ await queueResetEmail(email, name, resetUrl);
 The email worker processes the queue:
 
 **One-time processing (for cron):**
+
 ```bash
 npm run email:worker
 ```
 
 **Continuous processing (for development):**
+
 ```bash
 npm run email:worker:watch
 ```
 
 **Custom configuration:**
+
 ```bash
 # In .env:
 EMAIL_WORKER_BATCH_SIZE=10           # Process 10 emails per batch
@@ -349,6 +361,7 @@ crontab -e
 ### Email Templates
 
 Default templates included:
+
 - `password_reset` - Password reset emails
 - `email_verification` - Email verification emails
 
@@ -377,6 +390,7 @@ VALUES (
 ### API Endpoints
 
 **GET /email-queue** - View queue (admin only)
+
 ```bash
 curl https://your-site.com/.netlify/functions/email-queue \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -384,12 +398,14 @@ curl https://your-site.com/.netlify/functions/email-queue \
 ```
 
 **GET /email-queue?stats=true** - Queue statistics (admin only)
+
 ```bash
 curl https://your-site.com/.netlify/functions/email-queue?stats=true \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
 **POST /email-queue** - Enqueue email (admin only)
+
 ```bash
 curl -X POST https://your-site.com/.netlify/functions/email-queue \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -403,6 +419,7 @@ curl -X POST https://your-site.com/.netlify/functions/email-queue \
 ```
 
 **POST /email-queue (process queue manually)** - Process queue (admin only)
+
 ```bash
 curl -X POST https://your-site.com/.netlify/functions/email-queue \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -411,6 +428,7 @@ curl -X POST https://your-site.com/.netlify/functions/email-queue \
 ```
 
 **DELETE /email-queue** - Cancel email (admin only)
+
 ```bash
 curl -X DELETE "https://your-site.com/.netlify/functions/email-queue?id=123" \
   -H "Authorization: Bearer YOUR_TOKEN"
@@ -459,11 +477,13 @@ console.log(`Deleted ${deleted} old emails`);
 **Status**: Optional - Not implemented in this phase
 
 Auth0 is currently used as an optional OAuth provider. The existing implementation supports:
+
 - Auth0 OAuth login
 - Automatic user provisioning
 - Email-based user mapping
 
 To implement a self-hosted OAuth server in the future:
+
 1. Review OAuth 2.0 specification
 2. Implement authorization code flow with PKCE
 3. Create client management system
@@ -476,12 +496,14 @@ To implement a self-hosted OAuth server in the future:
 ### From Direct SMTP to Email Queue
 
 **Before:**
+
 ```javascript
 const { sendResetEmail } = require('./utils/email');
 await sendResetEmail(email, name, resetUrl);
 ```
 
 **After (with backwards compatibility):**
+
 ```javascript
 // Option 1: Feature flag (recommended)
 const { queueResetEmail } = require('./utils/email');
@@ -499,12 +521,14 @@ await enqueueTemplateEmail({
 ### From Sentry to Self-Hosted Error Tracking
 
 **Before:**
+
 ```javascript
 const Sentry = require('@sentry/node');
 Sentry.captureException(error);
 ```
 
 **After:**
+
 ```javascript
 const { logError, logServerError } = require('./utils/error-tracker');
 
@@ -564,28 +588,33 @@ EMAIL_WORKER_MAX_TIME=300000
 ### Error Tracking
 
 **Problem**: Errors not being logged
+
 - Check ERROR_TRACKING_ENABLED environment variable
 - Verify database migration was run
 - Check network connectivity from client to API
 
 **Problem**: Duplicate errors not being grouped
+
 - Verify fingerprint generation logic
 - Check that errors have consistent messages
 
 ### Email Queue
 
 **Problem**: Emails stuck in pending status
+
 - Check that email worker is running
 - Verify SMTP credentials
 - Check worker logs for errors
 
 **Problem**: Emails failing repeatedly
+
 - Check SMTP server status
 - Verify email addresses are valid
 - Review error messages in email_queue table
 
 **Problem**: Worker not processing emails
-- Verify EMAIL_WORKER_* environment variables
+
+- Verify EMAIL*WORKER*\* environment variables
 - Check that database connection is working
 - Ensure no other worker instances are running
 

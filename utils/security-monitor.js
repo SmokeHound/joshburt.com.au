@@ -58,15 +58,7 @@ async function logSecurityEvent({
   try {
     const result = await pool.query(
       `SELECT log_security_event($1, $2, $3, $4, $5, $6, $7) as event_id`,
-      [
-        eventType,
-        severity,
-        userId,
-        ipAddress,
-        userAgent,
-        description,
-        JSON.stringify(metadata)
-      ]
+      [eventType, severity, userId, ipAddress, userAgent, description, JSON.stringify(metadata)]
     );
 
     return result.rows[0].event_id;
@@ -136,10 +128,9 @@ async function removeFromBlacklist(ipAddress) {
   const pool = Pool();
 
   try {
-    await pool.query(
-      'UPDATE ip_blacklist SET is_active = FALSE WHERE ip_address = $1',
-      [ipAddress]
-    );
+    await pool.query('UPDATE ip_blacklist SET is_active = FALSE WHERE ip_address = $1', [
+      ipAddress
+    ]);
     return true;
   } catch (error) {
     console.error('Error removing IP from blacklist:', error);
@@ -161,9 +152,7 @@ async function trackRateLimit(identifier, endpoint, limit, windowMs) {
 
   try {
     // Clean up old entries first
-    await pool.query(
-      `DELETE FROM api_rate_limits WHERE window_start < NOW() - INTERVAL '1 hour'`
-    );
+    await pool.query(`DELETE FROM api_rate_limits WHERE window_start < NOW() - INTERVAL '1 hour'`);
 
     // Get or create rate limit entry for current window
     const result = await pool.query(

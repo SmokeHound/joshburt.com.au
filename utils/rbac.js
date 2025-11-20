@@ -86,6 +86,20 @@ const PERMISSIONS = {
     update: ['admin', 'manager'],
     delete: ['admin'],
     list: ['admin', 'manager', 'user']
+  },
+  forecast: {
+    create: ['admin', 'manager'],
+    read: ['admin', 'manager'],
+    update: ['admin', 'manager'],
+    delete: ['admin'],
+    list: ['admin', 'manager']
+  },
+  insights: {
+    create: ['admin', 'manager'],
+    read: ['admin', 'manager'],
+    update: ['admin', 'manager'],
+    delete: ['admin'],
+    list: ['admin', 'manager']
   }
 };
 

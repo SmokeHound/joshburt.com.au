@@ -10,31 +10,31 @@ const DB_TYPE = 'postgres';
 const DATABASE_URL = process.env.DATABASE_URL || null;
 const pgConfig = DATABASE_URL
   ? {
-    connectionString: DATABASE_URL,
-    ssl: true,
-    max: parseInt(process.env.DB_POOL_MAX) || 20, // Increased for better concurrency
-    min: parseInt(process.env.DB_POOL_MIN) || 2, // Maintain minimum connections
-    idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
-    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
-    // Query timeout to prevent long-running queries
-    query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
-    // Enable statement timeout for PostgreSQL
-    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
-  }
+      connectionString: DATABASE_URL,
+      ssl: true,
+      max: parseInt(process.env.DB_POOL_MAX) || 20, // Increased for better concurrency
+      min: parseInt(process.env.DB_POOL_MIN) || 2, // Maintain minimum connections
+      idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
+      connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
+      // Query timeout to prevent long-running queries
+      query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
+      // Enable statement timeout for PostgreSQL
+      statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
+    }
   : {
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT || 5432,
-    ssl: { rejectUnauthorized: true },
-    max: parseInt(process.env.DB_POOL_MAX) || 20,
-    min: parseInt(process.env.DB_POOL_MIN) || 2,
-    idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
-    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
-    query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
-    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
-  };
+      user: process.env.DB_USER,
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      password: process.env.DB_PASSWORD,
+      port: process.env.DB_PORT || 5432,
+      ssl: { rejectUnauthorized: true },
+      max: parseInt(process.env.DB_POOL_MAX) || 20,
+      min: parseInt(process.env.DB_POOL_MIN) || 2,
+      idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
+      connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
+      query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
+      statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
+    };
 
 class Database {
   constructor() {
@@ -254,16 +254,16 @@ async function createPostgreSQLTables() {
 
   // Backfill missing columns for legacy deployments (safe no-ops with IF NOT EXISTS)
   await database.run(
-    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_by VARCHAR(255) DEFAULT \'mechanic\''
+    "ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_by VARCHAR(255) DEFAULT 'mechanic'"
   );
   await database.run(
     'ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_items INTEGER NOT NULL DEFAULT 0'
   );
   await database.run(
-    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT \'pending\''
+    "ALTER TABLE orders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending'"
   );
   await database.run(
-    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT \'normal\''
+    "ALTER TABLE orders ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT 'normal'"
   );
   await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS notes TEXT');
   await database.run(
@@ -427,13 +427,13 @@ async function createPostgreSQLTables() {
   // Expression indexes on common JSON fields in details for faster filtering (PostgreSQL)
   // Use partial indexes guarded to rows where details appears to be JSON to avoid cast errors on legacy text rows
   await database.run(
-    'CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs ((details::json->>\'path\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')'
+    "CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs ((details::json->>'path')) WHERE substring(details from 1 for 1) IN ('{','[')"
   );
   await database.run(
-    'CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs ((details::json->>\'method\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')'
+    "CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs ((details::json->>'method')) WHERE substring(details from 1 for 1) IN ('{','[')"
   );
   await database.run(
-    'CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs ((details::json->>\'requestId\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')'
+    "CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs ((details::json->>'requestId')) WHERE substring(details from 1 for 1) IN ('{','[')"
   );
   await database.run(
     'CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip_address, created_at)'
@@ -512,48 +512,220 @@ async function createDefaultSettings() {
 
   const defaultSettings = [
     // General settings
-    { key: 'siteTitle', value: '', category: 'general', data_type: 'string', description: 'Website title' },
-    { key: 'siteDescription', value: '', category: 'general', data_type: 'string', description: 'Website description' },
-    { key: 'contactEmail', value: '', category: 'general', data_type: 'string', description: 'Contact email address' },
-    { key: 'maintenanceMode', value: 'false', category: 'general', data_type: 'boolean', description: 'Enable maintenance mode' },
-    { key: 'logoUrl', value: '', category: 'general', data_type: 'string', description: 'Logo image URL' },
-    { key: 'faviconUrl', value: '', category: 'general', data_type: 'string', description: 'Favicon image URL' },
-    { key: 'oilDataSource', value: 'api', category: 'general', data_type: 'string', description: 'Oil products data source' },
-    { key: 'consumablesDataSource', value: 'api', category: 'general', data_type: 'string', description: 'Consumables data source' },
-    { key: 'customJs', value: '', category: 'general', data_type: 'string', description: 'Custom JavaScript code' },
+    {
+      key: 'siteTitle',
+      value: '',
+      category: 'general',
+      data_type: 'string',
+      description: 'Website title'
+    },
+    {
+      key: 'siteDescription',
+      value: '',
+      category: 'general',
+      data_type: 'string',
+      description: 'Website description'
+    },
+    {
+      key: 'contactEmail',
+      value: '',
+      category: 'general',
+      data_type: 'string',
+      description: 'Contact email address'
+    },
+    {
+      key: 'maintenanceMode',
+      value: 'false',
+      category: 'general',
+      data_type: 'boolean',
+      description: 'Enable maintenance mode'
+    },
+    {
+      key: 'logoUrl',
+      value: '',
+      category: 'general',
+      data_type: 'string',
+      description: 'Logo image URL'
+    },
+    {
+      key: 'faviconUrl',
+      value: '',
+      category: 'general',
+      data_type: 'string',
+      description: 'Favicon image URL'
+    },
+    {
+      key: 'oilDataSource',
+      value: 'api',
+      category: 'general',
+      data_type: 'string',
+      description: 'Oil products data source'
+    },
+    {
+      key: 'consumablesDataSource',
+      value: 'api',
+      category: 'general',
+      data_type: 'string',
+      description: 'Consumables data source'
+    },
+    {
+      key: 'customJs',
+      value: '',
+      category: 'general',
+      data_type: 'string',
+      description: 'Custom JavaScript code'
+    },
 
     // Theme settings
-    { key: 'theme', value: 'dark', category: 'theme', data_type: 'string', description: 'Active theme preset' },
-    { key: 'primaryColor', value: '#3b82f6', category: 'theme', data_type: 'string', description: 'Primary theme color' },
-    { key: 'secondaryColor', value: '#10b981', category: 'theme', data_type: 'string', description: 'Secondary theme color' },
-    { key: 'accentColor', value: '#8b5cf6', category: 'theme', data_type: 'string', description: 'Accent theme color' },
-    { key: 'buttonPrimaryColor', value: '#3b82f6', category: 'theme', data_type: 'string', description: 'Primary button color' },
-    { key: 'buttonSecondaryColor', value: '#10b981', category: 'theme', data_type: 'string', description: 'Secondary button color' },
-    { key: 'buttonDangerColor', value: '#ef4444', category: 'theme', data_type: 'string', description: 'Danger button color' },
-    { key: 'buttonSuccessColor', value: '#10b981', category: 'theme', data_type: 'string', description: 'Success button color' },
-    { key: 'customCss', value: '', category: 'theme', data_type: 'string', description: 'Custom CSS code' },
-    { key: 'themeSchedule', value: JSON.stringify({ enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' }), category: 'theme', data_type: 'json', description: 'Automatic theme scheduling' },
+    {
+      key: 'theme',
+      value: 'dark',
+      category: 'theme',
+      data_type: 'string',
+      description: 'Active theme preset'
+    },
+    {
+      key: 'primaryColor',
+      value: '#3b82f6',
+      category: 'theme',
+      data_type: 'string',
+      description: 'Primary theme color'
+    },
+    {
+      key: 'secondaryColor',
+      value: '#10b981',
+      category: 'theme',
+      data_type: 'string',
+      description: 'Secondary theme color'
+    },
+    {
+      key: 'accentColor',
+      value: '#8b5cf6',
+      category: 'theme',
+      data_type: 'string',
+      description: 'Accent theme color'
+    },
+    {
+      key: 'buttonPrimaryColor',
+      value: '#3b82f6',
+      category: 'theme',
+      data_type: 'string',
+      description: 'Primary button color'
+    },
+    {
+      key: 'buttonSecondaryColor',
+      value: '#10b981',
+      category: 'theme',
+      data_type: 'string',
+      description: 'Secondary button color'
+    },
+    {
+      key: 'buttonDangerColor',
+      value: '#ef4444',
+      category: 'theme',
+      data_type: 'string',
+      description: 'Danger button color'
+    },
+    {
+      key: 'buttonSuccessColor',
+      value: '#10b981',
+      category: 'theme',
+      data_type: 'string',
+      description: 'Success button color'
+    },
+    {
+      key: 'customCss',
+      value: '',
+      category: 'theme',
+      data_type: 'string',
+      description: 'Custom CSS code'
+    },
+    {
+      key: 'themeSchedule',
+      value: JSON.stringify({ enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' }),
+      category: 'theme',
+      data_type: 'json',
+      description: 'Automatic theme scheduling'
+    },
 
     // Security settings
-    { key: 'sessionTimeout', value: '60', category: 'security', data_type: 'number', description: 'Session timeout in minutes' },
-    { key: 'maxLoginAttempts', value: '5', category: 'security', data_type: 'number', description: 'Maximum login attempts before lockout' },
-    { key: 'enable2FA', value: 'false', category: 'security', data_type: 'boolean', description: 'Enable two-factor authentication' },
-    { key: 'auditAllActions', value: 'false', category: 'security', data_type: 'boolean', description: 'Audit all user actions' },
+    {
+      key: 'sessionTimeout',
+      value: '60',
+      category: 'security',
+      data_type: 'number',
+      description: 'Session timeout in minutes'
+    },
+    {
+      key: 'maxLoginAttempts',
+      value: '5',
+      category: 'security',
+      data_type: 'number',
+      description: 'Maximum login attempts before lockout'
+    },
+    {
+      key: 'enable2FA',
+      value: 'false',
+      category: 'security',
+      data_type: 'boolean',
+      description: 'Enable two-factor authentication'
+    },
+    {
+      key: 'auditAllActions',
+      value: 'false',
+      category: 'security',
+      data_type: 'boolean',
+      description: 'Audit all user actions'
+    },
 
     // Integration settings
-    { key: 'smtpHost', value: '', category: 'integrations', data_type: 'string', is_sensitive: false, description: 'SMTP server host' },
-    { key: 'smtpPort', value: '', category: 'integrations', data_type: 'number', is_sensitive: false, description: 'SMTP server port' },
-    { key: 'smtpUser', value: '', category: 'integrations', data_type: 'string', is_sensitive: false, description: 'SMTP username' },
-    { key: 'smtpPassword', value: '', category: 'integrations', data_type: 'string', is_sensitive: true, description: 'SMTP password' },
+    {
+      key: 'smtpHost',
+      value: '',
+      category: 'integrations',
+      data_type: 'string',
+      is_sensitive: false,
+      description: 'SMTP server host'
+    },
+    {
+      key: 'smtpPort',
+      value: '',
+      category: 'integrations',
+      data_type: 'number',
+      is_sensitive: false,
+      description: 'SMTP server port'
+    },
+    {
+      key: 'smtpUser',
+      value: '',
+      category: 'integrations',
+      data_type: 'string',
+      is_sensitive: false,
+      description: 'SMTP username'
+    },
+    {
+      key: 'smtpPassword',
+      value: '',
+      category: 'integrations',
+      data_type: 'string',
+      is_sensitive: true,
+      description: 'SMTP password'
+    },
 
     // Feature flags
-    { key: 'featureFlags', value: JSON.stringify({
-      betaFeatures: false,
-      newDashboard: false,
-      advancedReports: false,
-      enableRegistration: false,
-      enableGuestCheckout: false
-    }), category: 'features', data_type: 'json', description: 'Feature flag settings' }
+    {
+      key: 'featureFlags',
+      value: JSON.stringify({
+        betaFeatures: false,
+        newDashboard: false,
+        advancedReports: false,
+        enableRegistration: false,
+        enableGuestCheckout: false
+      }),
+      category: 'features',
+      data_type: 'json',
+      description: 'Feature flag settings'
+    }
   ];
 
   for (const setting of defaultSettings) {

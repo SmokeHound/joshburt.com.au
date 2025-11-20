@@ -5,10 +5,10 @@ const queryMonitor = require('../../utils/query-monitor');
 
 exports.handler = withHandler(async function (event) {
   const method = event.httpMethod;
-  
+
   if (method === 'GET') return handleGet(event);
   if (method === 'DELETE') return handleDelete(event);
-  
+
   return error(405, 'Method Not Allowed');
 
   async function handleGet(event) {
@@ -26,28 +26,28 @@ exports.handler = withHandler(async function (event) {
         case 'summary':
           data = queryMonitor.getSummary();
           break;
-          
+
         case 'all':
           data = {
             summary: queryMonitor.getSummary(),
             metrics: queryMonitor.getMetrics()
           };
           break;
-          
+
         case 'slow':
           data = {
             slowQueries: queryMonitor.getSlowQueries(parseInt(limit)),
             threshold: queryMonitor.slowQueryThreshold
           };
           break;
-          
+
         case 'top':
           data = {
             topQueries: queryMonitor.getTopQueries(metric, parseInt(limit)),
             metric
           };
           break;
-          
+
         default:
           return error(400, 'Invalid view. Valid options: summary, all, slow, top');
       }

@@ -16,7 +16,7 @@ jest.mock('../../config/database', () => ({
 
 // Mock utils
 jest.mock('../../utils/fn', () => ({
-  withHandler: (fn) => fn,
+  withHandler: fn => fn,
   ok: (data, status = 200) => ({
     statusCode: status,
     body: JSON.stringify(data)
@@ -56,11 +56,13 @@ describe('analytics-events function', () => {
       };
 
       database.query.mockResolvedValueOnce({
-        rows: [{
-          id: 1,
-          event_type: 'page_view',
-          session_id: 'sess_123'
-        }]
+        rows: [
+          {
+            id: 1,
+            event_type: 'page_view',
+            session_id: 'sess_123'
+          }
+        ]
       });
 
       // Mock session check
@@ -154,15 +156,11 @@ describe('analytics-events function', () => {
 
       // Mock aggregated queries
       database.query.mockResolvedValueOnce({
-        rows: [
-          { event_type: 'page_view', count: '100', unique_users: '10', unique_sessions: '20' }
-        ]
+        rows: [{ event_type: 'page_view', count: '100', unique_users: '10', unique_sessions: '20' }]
       });
 
       database.query.mockResolvedValueOnce({
-        rows: [
-          { period: '2025-11-19', event_type: 'page_view', count: '50' }
-        ]
+        rows: [{ period: '2025-11-19', event_type: 'page_view', count: '50' }]
       });
 
       database.query.mockResolvedValueOnce({
@@ -172,9 +170,7 @@ describe('analytics-events function', () => {
       });
 
       database.query.mockResolvedValueOnce({
-        rows: [
-          { page_url: '/home', views: '50', unique_sessions: '15' }
-        ]
+        rows: [{ page_url: '/home', views: '50', unique_sessions: '15' }]
       });
 
       const mockEvent = {

@@ -18,10 +18,10 @@ exports.handler = withHandler(async function (event) {
     try {
       // Optional filters
       const { type, category } = event.queryStringParameters || {};
-      
+
       // Generate cache key based on filters
       const cacheKey = `list:${type || 'all'}:${category || 'all'}`;
-      
+
       // Try cache first (2 minute TTL)
       const cached = cache.get('consumables', cacheKey);
       if (cached) {
@@ -35,7 +35,7 @@ exports.handler = withHandler(async function (event) {
           body: cached
         };
       }
-      
+
       let query = 'SELECT * FROM consumables ORDER BY name';
       let params = [];
       if (type && category) {
@@ -49,11 +49,11 @@ exports.handler = withHandler(async function (event) {
         params = [category];
       }
       const consumables = await database.all(query, params);
-      
+
       // Cache the result for 2 minutes (120 seconds)
       const dataString = JSON.stringify(consumables);
       cache.set('consumables', cacheKey, dataString, 120);
-      
+
       return {
         statusCode: 200,
         headers: {
@@ -94,10 +94,10 @@ exports.handler = withHandler(async function (event) {
         userId: user && user.id,
         details: { id: result.id, name, code, type, category }
       });
-      
+
       // Invalidate consumables cache on create
       cache.clearNamespace('consumables');
-      
+
       return ok(
         {
           id: result.id,
@@ -142,10 +142,10 @@ exports.handler = withHandler(async function (event) {
         userId: user && user.id,
         details: { id, name, code, type, category }
       });
-      
+
       // Invalidate consumables cache on update
       cache.clearNamespace('consumables');
-      
+
       return ok({
         message: 'Consumable updated successfully',
         consumable: { id, name, code, type, category, description }
@@ -178,10 +178,10 @@ exports.handler = withHandler(async function (event) {
         userId: user && user.id,
         details: { id, name: existing.name, code: existing.code }
       });
-      
+
       // Invalidate consumables cache on delete
       cache.clearNamespace('consumables');
-      
+
       return ok({ message: 'Consumable deleted successfully' });
     } catch (e) {
       console.error('DELETE /consumables error:', e);

@@ -157,14 +157,7 @@ exports.handler = withHandler(async function (event) {
   async function createReport(event, user) {
     try {
       const body = JSON.parse(event.body || '{}');
-      const {
-        name,
-        report_type,
-        frequency,
-        recipients = [],
-        filters = {},
-        format = 'pdf'
-      } = body;
+      const { name, report_type, frequency, recipients = [], filters = {}, format = 'pdf' } = body;
 
       // Validate required fields
       if (!name || !report_type || !frequency) {
@@ -212,10 +205,13 @@ exports.handler = withHandler(async function (event) {
         user.userId
       ]);
 
-      return ok({
-        message: 'Scheduled report created successfully',
-        report: result.rows[0]
-      }, 201);
+      return ok(
+        {
+          message: 'Scheduled report created successfully',
+          report: result.rows[0]
+        },
+        201
+      );
     } catch (e) {
       console.error('Error creating report:', e);
       return error(500, 'Failed to create report');
@@ -226,14 +222,7 @@ exports.handler = withHandler(async function (event) {
   async function updateReport(reportId, event, user) {
     try {
       const body = JSON.parse(event.body || '{}');
-      const {
-        name,
-        frequency,
-        recipients,
-        filters,
-        format,
-        is_active
-      } = body;
+      const { name, frequency, recipients, filters, format, is_active } = body;
 
       // Build update query dynamically
       const updates = [];
@@ -328,11 +317,11 @@ exports.handler = withHandler(async function (event) {
         // Generate from scheduled report
         const query = 'SELECT * FROM scheduled_reports WHERE id = $1';
         const result = await database.query(query, [parseInt(report_id, 10)]);
-        
+
         if (result.rows.length === 0) {
           return error(404, 'Scheduled report not found');
         }
-        
+
         reportConfig = result.rows[0];
         reportName = reportConfig.name;
       } else if (report_type) {
@@ -344,7 +333,10 @@ exports.handler = withHandler(async function (event) {
       }
 
       // Generate the report data
-      const reportData = await generateReportData(reportConfig.report_type, reportConfig.filters || filters);
+      const reportData = await generateReportData(
+        reportConfig.report_type,
+        reportConfig.filters || filters
+      );
 
       // Format the report
       const formattedReport = await formatReport(reportData, reportConfig.format || format);
@@ -381,7 +373,8 @@ exports.handler = withHandler(async function (event) {
   // Generate report data based on type
   async function generateReportData(reportType, filters) {
     const { date_from, date_to } = filters;
-    const startDate = date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const startDate =
+      date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const endDate = date_to || new Date().toISOString().split('T')[0];
 
     switch (reportType) {
@@ -420,7 +413,7 @@ exports.handler = withHandler(async function (event) {
       GROUP BY o.id
       ORDER BY o.created_at DESC
     `;
-    
+
     const result = await database.query(query, [startDate, endDate]);
     return result.rows;
   }
@@ -440,7 +433,7 @@ exports.handler = withHandler(async function (event) {
       WHERE p.is_active = true
       ORDER BY p.stock_quantity ASC
     `;
-    
+
     const result = await database.query(query);
     return result.rows;
   }
@@ -460,7 +453,7 @@ exports.handler = withHandler(async function (event) {
       GROUP BY u.id
       ORDER BY u.created_at DESC
     `;
-    
+
     const result = await database.query(query, [startDate, endDate]);
     return result.rows;
   }
@@ -479,7 +472,7 @@ exports.handler = withHandler(async function (event) {
       GROUP BY DATE(timestamp), event_type
       ORDER BY date DESC, event_type
     `;
-    
+
     const result = await database.query(query, [startDate, endDate]);
     return result.rows;
   }
@@ -489,7 +482,7 @@ exports.handler = withHandler(async function (event) {
     if (format === 'csv') {
       return formatAsCSV(data);
     }
-    
+
     // Default to JSON
     return JSON.stringify(data, null, 2);
   }
@@ -502,11 +495,11 @@ exports.handler = withHandler(async function (event) {
 
     // Get headers from first row
     const headers = Object.keys(data[0]);
-    
+
     // Build CSV
     const csvRows = [];
     csvRows.push(headers.join(','));
-    
+
     for (const row of data) {
       const values = headers.map(header => {
         const value = row[header];
@@ -522,7 +515,7 @@ exports.handler = withHandler(async function (event) {
       });
       csvRows.push(values.join(','));
     }
-    
+
     return csvRows.join('\n');
   }
 });

@@ -15,6 +15,7 @@ Phase 3 implements full-text search and advanced filtering capabilities using Po
 ### 3.1 Full-Text Search
 
 #### Database Layer
+
 - **Migration 011**: `migrations/011_add_full_text_search.sql`
   - Added `search_vector` tsvector columns to: products, consumables, filters, users
   - Created trigger functions to automatically update search vectors on data changes
@@ -24,6 +25,7 @@ Phase 3 implements full-text search and advanced filtering capabilities using Po
   - Created `popular_searches` view for trending queries
 
 #### Backend API
+
 - **Function**: `netlify/functions/search.js`
   - **GET /search?q=query&type=all&limit=20&offset=0&sort=relevance**
     - Universal search across all content types
@@ -43,6 +45,7 @@ Phase 3 implements full-text search and advanced filtering capabilities using Po
     - Analytics for search effectiveness
 
 #### Client-Side Components
+
 - **Autocomplete**: `assets/js/search-autocomplete.js`
   - Real-time suggestions as user types
   - Keyboard navigation (arrow keys, enter, escape)
@@ -63,6 +66,7 @@ Phase 3 implements full-text search and advanced filtering capabilities using Po
 ### 3.2 Advanced Filtering
 
 #### Filter Component
+
 - **Component**: `assets/js/advanced-filters.js`
   - Multi-criteria filtering
   - Filter types:
@@ -92,6 +96,7 @@ GET /search?q={query}&type={type}&limit={limit}&offset={offset}&sort={sort}
 ```
 
 **Query Parameters**:
+
 - `q` (required): Search query string
 - `type` (optional): Filter by content type - `all` (default), `product`, `consumable`, `filter`, `user`
 - `limit` (optional): Max results per type (1-100, default 20)
@@ -99,6 +104,7 @@ GET /search?q={query}&type={type}&limit={limit}&offset={offset}&sort={sort}
 - `sort` (optional): Sort order - `relevance` (default), `name`, `recent`
 
 **Response**:
+
 ```json
 {
   "query": "oil filter",
@@ -134,10 +140,12 @@ GET /search?suggest={partial}&limit={limit}
 ```
 
 **Query Parameters**:
+
 - `suggest` (required): Partial search query (minimum 2 characters)
 - `limit` (optional): Max suggestions (default 5)
 
 **Response**:
+
 ```json
 {
   "suggestions": [
@@ -162,6 +170,7 @@ GET /search?popular=true&limit={limit}
 ```
 
 **Response**:
+
 ```json
 {
   "popular": [
@@ -183,6 +192,7 @@ POST /search
 ```
 
 **Request Body**:
+
 ```json
 {
   "query": "oil filter",
@@ -192,6 +202,7 @@ POST /search
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -208,14 +219,14 @@ POST /search
 #### Initialize Autocomplete
 
 ```html
-<input type="text" id="searchInput" placeholder="Search...">
+<input type="text" id="searchInput" placeholder="Search..." />
 <script src="/assets/js/search-autocomplete.js"></script>
 <script>
   const autocomplete = window.initSearchAutocomplete('#searchInput', {
     minChars: 2,
     debounceMs: 300,
     maxSuggestions: 5,
-    onSelect: (suggestion) => {
+    onSelect: suggestion => {
       console.log('Selected:', suggestion);
       // Redirect to search results or perform search
       window.location.href = `/search-results.html?q=${encodeURIComponent(suggestion.text)}`;
@@ -234,11 +245,11 @@ async function performSearch(query) {
     `${FN_BASE}/search?q=${encodeURIComponent(query)}&type=all&sort=relevance`,
     {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
+        Authorization: `Bearer ${localStorage.getItem('accessToken') || ''}`
       }
     }
   );
-  
+
   const results = await response.json();
   console.log('Found', results.total, 'results');
   displayResults(results);
@@ -281,7 +292,7 @@ const filters = new AdvancedFilters('#filtersContainer', {
       ]
     }
   ],
-  onFilterChange: (activeFilters) => {
+  onFilterChange: activeFilters => {
     console.log('Filters changed:', activeFilters);
     // Reload data with filters
     loadProducts(activeFilters);
@@ -343,7 +354,7 @@ CREATE TABLE search_queries (
 
 ```sql
 CREATE VIEW popular_searches AS
-SELECT 
+SELECT
   query,
   COUNT(*) as search_count,
   COUNT(DISTINCT user_id) as unique_users,
@@ -361,12 +372,14 @@ LIMIT 100;
 ## Performance Considerations
 
 ### Search Performance
+
 - **GIN Indexes**: All search_vector columns use GIN indexes for fast lookups
 - **Materialized Views**: Consider creating materialized views for frequently searched content
 - **Query Optimization**: ts_rank calculation is efficient but scales with result set size
 - **Caching**: Implement caching for popular searches and autocomplete results
 
 ### Best Practices
+
 1. **Limit Result Sets**: Always use LIMIT/OFFSET for pagination
 2. **Debounce Autocomplete**: Use 300ms+ debounce to reduce API calls
 3. **Cache Suggestions**: Cache autocomplete suggestions client-side
@@ -386,6 +399,7 @@ npm test -- tests/unit/search.test.js
 ```
 
 **Test Coverage**:
+
 - ✅ Universal search across all content types
 - ✅ Content type filtering
 - ✅ Missing query validation
@@ -400,16 +414,17 @@ npm test -- tests/unit/search.test.js
 ### Manual Testing
 
 1. **Search Functionality**
+
    ```bash
    # Start dev server
    npm run dev:functions
-   
+
    # Test search
    curl "http://localhost:8888/.netlify/functions/search?q=oil"
-   
+
    # Test suggestions
    curl "http://localhost:8888/.netlify/functions/search?suggest=oil"
-   
+
    # Test popular
    curl "http://localhost:8888/.netlify/functions/search?popular=true"
    ```
@@ -457,6 +472,7 @@ curl "https://yoursite.com/.netlify/functions/search?q=test"
 ## Future Enhancements
 
 ### Planned Features
+
 - [ ] **Fuzzy Matching**: Implement pg_trgm for typo tolerance
 - [ ] **Search Filters**: Add filters directly to search results page
 - [ ] **Search Analytics Dashboard**: Visualize search trends and popular queries
@@ -467,6 +483,7 @@ curl "https://yoursite.com/.netlify/functions/search?q=test"
 - [ ] **Faceted Navigation**: Dynamic facet generation based on results
 
 ### Performance Improvements
+
 - [ ] **Caching Layer**: Implement Redis for search result caching
 - [ ] **Elasticsearch Integration**: Consider for very large datasets
 - [ ] **Query Optimization**: Analyze slow queries and add indexes
@@ -506,17 +523,20 @@ curl "https://yoursite.com/.netlify/functions/search?q=test"
 ## Security Considerations
 
 ### Authentication
+
 - Search endpoint works for both authenticated and anonymous users
 - User-specific results require valid JWT token
 - User search results are filtered based on permissions
 
 ### Input Validation
+
 - All search queries are sanitized
 - SQL injection prevented via parameterized queries
 - Maximum query length enforced
 - Special characters handled properly
 
 ### Rate Limiting
+
 - Consider implementing rate limiting for search endpoint
 - Recommended: 60 requests per minute per IP
 - Use existing rate limiting middleware
@@ -528,15 +548,18 @@ curl "https://yoursite.com/.netlify/functions/search?q=test"
 ### Regular Tasks
 
 **Daily**:
+
 - Monitor search query performance
 - Check error logs for search failures
 
 **Weekly**:
+
 - Review popular searches for insights
 - Analyze search click-through rates
 - Update autocomplete suggestions
 
 **Monthly**:
+
 - Run VACUUM ANALYZE on search tables
 - Archive old search_queries data (>90 days)
 - Review and optimize slow queries
@@ -547,6 +570,7 @@ curl "https://yoursite.com/.netlify/functions/search?q=test"
 ## Support
 
 For questions or issues:
+
 - Check documentation in `/docs`
 - Review test files for usage examples
 - Open issue on GitHub: https://github.com/SmokeHound/joshburt.com.au/issues

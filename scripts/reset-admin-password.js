@@ -12,7 +12,7 @@ async function resetAdminPassword() {
   try {
     const newHash = await bcrypt.hash('Admin123!', 12);
     const result = await pool.query(
-      'UPDATE users SET password_hash = $1 WHERE email = \'admin@joshburt.com.au\' RETURNING email',
+      "UPDATE users SET password_hash = $1 WHERE email = 'admin@joshburt.com.au' RETURNING email",
       [newHash]
     );
     console.log('✅ Password reset for:', result.rows[0].email);

@@ -213,15 +213,7 @@ async function createEvent(event, pool) {
   // Don't require specific permission as this is used internally
 
   const body = JSON.parse(event.body || '{}');
-  const {
-    event_type,
-    severity,
-    user_id,
-    ip_address,
-    user_agent,
-    description,
-    metadata
-  } = body;
+  const { event_type, severity, user_id, ip_address, user_agent, description, metadata } = body;
 
   // Validate required fields
   if (!event_type || !severity || !ip_address || !description) {
@@ -437,7 +429,7 @@ async function checkBlacklist(event, pool) {
 /**
  * Main handler
  */
-const handler = withHandler(async (event) => {
+const handler = withHandler(async event => {
   const pool = Pool();
   const path = event.path;
   const method = event.httpMethod;

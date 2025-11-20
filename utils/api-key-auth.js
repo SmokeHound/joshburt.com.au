@@ -46,17 +46,17 @@ function getKeyPrefix(apiKey) {
  */
 function isValidApiKeyFormat(apiKey) {
   if (!apiKey || typeof apiKey !== 'string') return false;
-  
+
   // Must start with sk_live_ or sk_test_
   if (!apiKey.startsWith('sk_live_') && !apiKey.startsWith('sk_test_')) {
     return false;
   }
-  
+
   // Must be at least 56 characters (prefix + 48 hex chars)
   if (apiKey.length < 56) {
     return false;
   }
-  
+
   return true;
 }
 
@@ -184,10 +184,15 @@ async function logApiKeyUsage({
   try {
     const keyHash = hashApiKey(apiKey);
 
-    await pool.query(
-      'SELECT log_api_key_usage($1, $2, $3, $4, $5, $6, $7)',
-      [keyHash, endpoint, method, ipAddress, userAgent, responseStatus, responseTimeMs]
-    );
+    await pool.query('SELECT log_api_key_usage($1, $2, $3, $4, $5, $6, $7)', [
+      keyHash,
+      endpoint,
+      method,
+      ipAddress,
+      userAgent,
+      responseStatus,
+      responseTimeMs
+    ]);
   } catch (error) {
     console.error('Error logging API key usage:', error);
     // Don't throw - logging failures shouldn't break the request

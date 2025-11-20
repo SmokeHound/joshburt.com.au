@@ -18,10 +18,10 @@ exports.handler = withHandler(async function (event) {
     try {
       // Optional filters
       const { type, search, include_inactive } = event.queryStringParameters || {};
-      
+
       // Generate cache key based on query parameters
       const cacheKey = `list:${type || 'all'}:${search || 'none'}:${include_inactive || 'false'}`;
-      
+
       // Try cache first (2 minute TTL)
       const cached = cache.get('filters', cacheKey);
       if (cached) {
@@ -35,7 +35,7 @@ exports.handler = withHandler(async function (event) {
           body: cached
         };
       }
-      
+
       let query = 'SELECT * FROM filters WHERE is_active = true ORDER BY name';
       let params = [];
 
@@ -64,11 +64,11 @@ exports.handler = withHandler(async function (event) {
       }
 
       const filters = await database.all(query, params);
-      
+
       // Cache the result for 2 minutes (120 seconds)
       const dataString = JSON.stringify(filters);
       cache.set('filters', cacheKey, dataString, 120);
-      
+
       return {
         statusCode: 200,
         headers: {

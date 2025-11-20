@@ -8,8 +8,29 @@ describe('Settings Table Schema', () => {
       const expectedCategories = ['general', 'theme', 'security', 'integrations', 'features'];
 
       // These would be the keys we expect in each category
-      const generalKeys = ['siteTitle', 'siteDescription', 'contactEmail', 'maintenanceMode', 'logoUrl', 'faviconUrl', 'oilDataSource', 'consumablesDataSource', 'customJs'];
-      const themeKeys = ['theme', 'primaryColor', 'secondaryColor', 'accentColor', 'buttonPrimaryColor', 'buttonSecondaryColor', 'buttonDangerColor', 'buttonSuccessColor', 'customCss', 'themeSchedule'];
+      const generalKeys = [
+        'siteTitle',
+        'siteDescription',
+        'contactEmail',
+        'maintenanceMode',
+        'logoUrl',
+        'faviconUrl',
+        'oilDataSource',
+        'consumablesDataSource',
+        'customJs'
+      ];
+      const themeKeys = [
+        'theme',
+        'primaryColor',
+        'secondaryColor',
+        'accentColor',
+        'buttonPrimaryColor',
+        'buttonSecondaryColor',
+        'buttonDangerColor',
+        'buttonSuccessColor',
+        'customCss',
+        'themeSchedule'
+      ];
       const securityKeys = ['sessionTimeout', 'maxLoginAttempts', 'enable2FA', 'auditAllActions'];
       const integrationKeys = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpPassword'];
       const featureKeys = ['featureFlags'];

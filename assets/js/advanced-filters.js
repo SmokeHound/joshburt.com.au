@@ -11,7 +11,7 @@
  * - Dynamic filter generation
  */
 
-(function() {
+(function () {
   'use strict';
 
   /**
@@ -19,9 +19,8 @@
    */
   class AdvancedFilters {
     constructor(container, options = {}) {
-      this.container = typeof container === 'string'
-        ? document.querySelector(container)
-        : container;
+      this.container =
+        typeof container === 'string' ? document.querySelector(container) : container;
 
       this.options = {
         itemType: 'product', // 'product', 'consumable', 'filter'
@@ -82,10 +81,13 @@
      * Render filter UI
      */
     render() {
-      if (!this.container) {return;}
+      if (!this.container) {
+        return;
+      }
 
       this.container.innerHTML = '';
-      this.container.className = 'advanced-filters bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6';
+      this.container.className =
+        'advanced-filters bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6';
 
       // Header
       const header = document.createElement('div');
@@ -101,14 +103,20 @@
       // Active filters pills
       if (Object.keys(this.activeFilters).length > 0) {
         const activePills = document.createElement('div');
-        activePills.className = 'flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700';
+        activePills.className =
+          'flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700';
 
         Object.entries(this.activeFilters).forEach(([key, value]) => {
-          if (Array.isArray(value) && value.length === 0) {return;}
-          if (!value) {return;}
+          if (Array.isArray(value) && value.length === 0) {
+            return;
+          }
+          if (!value) {
+            return;
+          }
 
           const pill = document.createElement('div');
-          pill.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm';
+          pill.className =
+            'inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm';
 
           const label = this.getFilterLabel(key, value);
           pill.innerHTML = `
@@ -162,18 +170,18 @@
       content.className = 'filter-content mt-2';
 
       switch (filter.type) {
-      case 'checkbox':
-        content.appendChild(this.renderCheckboxFilter(filter));
-        break;
-      case 'range':
-        content.appendChild(this.renderRangeFilter(filter));
-        break;
-      case 'select':
-        content.appendChild(this.renderSelectFilter(filter));
-        break;
-      case 'radio':
-        content.appendChild(this.renderRadioFilter(filter));
-        break;
+        case 'checkbox':
+          content.appendChild(this.renderCheckboxFilter(filter));
+          break;
+        case 'range':
+          content.appendChild(this.renderRangeFilter(filter));
+          break;
+        case 'select':
+          content.appendChild(this.renderSelectFilter(filter));
+          break;
+        case 'radio':
+          content.appendChild(this.renderRadioFilter(filter));
+          break;
       }
 
       section.appendChild(content);
@@ -270,7 +278,8 @@
       const selected = this.activeFilters[filter.key] || '';
 
       const select = document.createElement('select');
-      select.className = 'filter-select w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm';
+      select.className =
+        'filter-select w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm';
       select.dataset.filter = filter.key;
 
       const defaultOption = document.createElement('option');
@@ -337,7 +346,7 @@
 
       // Remove individual filter
       this.container.querySelectorAll('.remove-filter').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', e => {
           const filterKey = e.currentTarget.dataset.filter;
           this.removeFilter(filterKey);
         });
@@ -345,28 +354,32 @@
 
       // Checkbox filters
       this.container.querySelectorAll('.filter-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', (e) => {
-          this.updateCheckboxFilter(e.target.dataset.filter, e.target.dataset.value, e.target.checked);
+        checkbox.addEventListener('change', e => {
+          this.updateCheckboxFilter(
+            e.target.dataset.filter,
+            e.target.dataset.value,
+            e.target.checked
+          );
         });
       });
 
       // Range filters
       this.container.querySelectorAll('.filter-range-min, .filter-range-max').forEach(input => {
-        input.addEventListener('change', (e) => {
+        input.addEventListener('change', e => {
           this.updateRangeFilter(e.target.dataset.filter, e.target.value);
         });
       });
 
       // Select filters
       this.container.querySelectorAll('.filter-select').forEach(select => {
-        select.addEventListener('change', (e) => {
+        select.addEventListener('change', e => {
           this.updateSelectFilter(e.target.dataset.filter, e.target.value);
         });
       });
 
       // Radio filters
       this.container.querySelectorAll('.filter-radio').forEach(radio => {
-        radio.addEventListener('change', (e) => {
+        radio.addEventListener('change', e => {
           this.updateRadioFilter(e.target.dataset.filter, e.target.dataset.value);
         });
       });
@@ -463,8 +476,8 @@
      */
     getFilterLabel(key, value) {
       // Find the filter definition
-      const filter = this.options.filters.find(f =>
-        f.key === key || f.key === key.replace(/_min|_max/, '')
+      const filter = this.options.filters.find(
+        f => f.key === key || f.key === key.replace(/_min|_max/, '')
       );
 
       if (!filter) {
@@ -552,5 +565,4 @@
 
   // Export to window
   window.AdvancedFilters = AdvancedFilters;
-
 })();

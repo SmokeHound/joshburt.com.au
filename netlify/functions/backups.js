@@ -89,8 +89,13 @@ async function getBackup(event, pool) {
  */
 async function createBackup(event, pool) {
   const user = await requirePermission(event, 'backups', 'create');
-  
-  const { backup_type, format = 'sql', compression = 'gzip', tables = [] } = JSON.parse(event.body || '{}');
+
+  const {
+    backup_type,
+    format = 'sql',
+    compression = 'gzip',
+    tables = []
+  } = JSON.parse(event.body || '{}');
 
   // Validate backup type
   const validTypes = ['full', 'incremental', 'table'];
@@ -129,12 +134,18 @@ async function createBackup(event, pool) {
   const backup = result.rows[0];
 
   // Log audit
-  await logAudit(pool, user.id, 'backup_created', {
-    backup_id: backup.id,
-    backup_type,
-    format,
-    tables
-  }, event);
+  await logAudit(
+    pool,
+    user.id,
+    'backup_created',
+    {
+      backup_id: backup.id,
+      backup_type,
+      format,
+      tables
+    },
+    event
+  );
 
   return {
     statusCode: 201,
@@ -147,9 +158,11 @@ async function createBackup(event, pool) {
  */
 async function updateBackup(event, pool) {
   const user = await requirePermission(event, 'backups', 'update');
-  
+
   const backupId = event.path.split('/').pop();
-  const { status, file_path, file_size, error_message, completed_at, metadata } = JSON.parse(event.body || '{}');
+  const { status, file_path, file_size, error_message, completed_at, metadata } = JSON.parse(
+    event.body || '{}'
+  );
 
   // Build dynamic update query
   const updates = [];
@@ -204,10 +217,16 @@ async function updateBackup(event, pool) {
     };
   }
 
-  await logAudit(pool, user.id, 'backup_updated', {
-    backup_id: backupId,
-    updates: { status, file_path, file_size }
-  }, event);
+  await logAudit(
+    pool,
+    user.id,
+    'backup_updated',
+    {
+      backup_id: backupId,
+      updates: { status, file_path, file_size }
+    },
+    event
+  );
 
   return {
     statusCode: 200,
@@ -220,12 +239,12 @@ async function updateBackup(event, pool) {
  */
 async function deleteBackup(event, pool) {
   const user = await requirePermission(event, 'backups', 'delete');
-  
+
   const backupId = event.path.split('/').pop();
 
   // Get backup details first
   const backup = await pool.query('SELECT * FROM backups WHERE id = $1', [backupId]);
-  
+
   if (backup.rows.length === 0) {
     return {
       statusCode: 404,
@@ -236,11 +255,17 @@ async function deleteBackup(event, pool) {
   // Delete the backup record
   await pool.query('DELETE FROM backups WHERE id = $1', [backupId]);
 
-  await logAudit(pool, user.id, 'backup_deleted', {
-    backup_id: backupId,
-    backup_type: backup.rows[0].backup_type,
-    file_path: backup.rows[0].file_path
-  }, event);
+  await logAudit(
+    pool,
+    user.id,
+    'backup_deleted',
+    {
+      backup_id: backupId,
+      backup_type: backup.rows[0].backup_type,
+      file_path: backup.rows[0].file_path
+    },
+    event
+  );
 
   return {
     statusCode: 200,
@@ -274,7 +299,7 @@ async function getBackupStats(event, pool) {
 /**
  * Main handler
  */
-exports.handler = withHandler(async (event) => {
+exports.handler = withHandler(async event => {
   const pool = new Pool();
 
   try {
@@ -315,7 +340,6 @@ exports.handler = withHandler(async (event) => {
       statusCode: 404,
       body: JSON.stringify({ error: 'Not found' })
     };
-
   } finally {
     await pool.end();
   }
