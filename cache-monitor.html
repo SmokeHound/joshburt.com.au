@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cache Monitor - joshburt.com.au</title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body class="bg-gray-50 dark:bg-gray-900">
+    <div id="shared-nav-container"></div>
+
+    <main class="ml-0 lg:ml-64 p-6 transition-all duration-300">
+      <!-- Page Header -->
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Cache Monitor</h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          Monitor cache performance and manage cache entries
+        </p>
+      </div>
+
+      <!-- Cache Statistics -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-8 w-8 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Cache Size</p>
+              <p id="cache-size" class="text-2xl font-semibold text-gray-900 dark:text-white">
+                0
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-8 w-8 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Hit Rate</p>
+              <p id="hit-rate" class="text-2xl font-semibold text-gray-900 dark:text-white">0%</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-8 w-8 text-purple-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Hits</p>
+              <p id="total-hits" class="text-2xl font-semibold text-gray-900 dark:text-white">0</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-8 w-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Misses</p>
+              <p id="total-misses" class="text-2xl font-semibold text-gray-900 dark:text-white">
+                0
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cache Actions -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Cache Actions</h2>
+        <div class="flex flex-wrap gap-4">
+          <button
+            id="refresh-btn"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Refresh Stats
+          </button>
+          <button
+            id="reset-stats-btn"
+            class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          >
+            Reset Statistics
+          </button>
+          <button
+            id="clear-all-btn"
+            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            Clear All Cache
+          </button>
+        </div>
+      </div>
+
+      <!-- Cache Details -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Cache Statistics Details
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                  Cache Type
+                </td>
+                <td id="cache-type" class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                  In-Memory
+                </td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                  Total Sets
+                </td>
+                <td id="total-sets" class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                  0
+                </td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                  Total Deletes
+                </td>
+                <td id="total-deletes" class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                  0
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- Shared Components -->
+    <script src="/shared-config.html"></script>
+    <script src="/shared-nav.html"></script>
+    <script src="/shared-theme.html"></script>
+    <script src="/shared-modals.html"></script>
+    <script src="/shared-notifications.html"></script>
+
+    <!-- Page Script -->
+    <script type="module">
+      import { authFetch } from '/assets/js/auth.js';
+
+      const FN_BASE = window.FN_BASE || '/.netlify/functions';
+
+      // Load cache statistics
+      async function loadCacheStats() {
+        try {
+          const response = await authFetch(`${FN_BASE}/cache-management`);
+          const data = await response.json();
+
+          if (response.ok && data.stats) {
+            document.getElementById('cache-size').textContent = data.stats.size || 0;
+            document.getElementById('hit-rate').textContent = data.stats.hitRate || '0%';
+            document.getElementById('total-hits').textContent = data.stats.hits || 0;
+            document.getElementById('total-misses').textContent = data.stats.misses || 0;
+            document.getElementById('total-sets').textContent = data.stats.sets || 0;
+            document.getElementById('total-deletes').textContent = data.stats.deletes || 0;
+            document.getElementById('cache-type').textContent = data.cacheType || 'In-Memory';
+          }
+        } catch (error) {
+          console.error('Error loading cache stats:', error);
+          window.showToast?.('Failed to load cache statistics', 'error');
+        }
+      }
+
+      // Reset cache statistics
+      async function resetStats() {
+        if (!confirm('Are you sure you want to reset cache statistics?')) return;
+
+        try {
+          const response = await authFetch(`${FN_BASE}/cache-management`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'reset-stats' })
+          });
+
+          if (response.ok) {
+            window.showToast?.('Cache statistics reset successfully', 'success');
+            await loadCacheStats();
+          } else {
+            throw new Error('Failed to reset statistics');
+          }
+        } catch (error) {
+          console.error('Error resetting stats:', error);
+          window.showToast?.('Failed to reset cache statistics', 'error');
+        }
+      }
+
+      // Clear all cache
+      async function clearAllCache() {
+        if (
+          !confirm(
+            'Are you sure you want to clear all cache? This will temporarily reduce performance until the cache is rebuilt.'
+          )
+        )
+          return;
+
+        try {
+          const response = await authFetch(`${FN_BASE}/cache-management`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+          });
+
+          if (response.ok) {
+            window.showToast?.('All cache cleared successfully', 'success');
+            await loadCacheStats();
+          } else {
+            throw new Error('Failed to clear cache');
+          }
+        } catch (error) {
+          console.error('Error clearing cache:', error);
+          window.showToast?.('Failed to clear cache', 'error');
+        }
+      }
+
+      // Event listeners
+      document.getElementById('refresh-btn').addEventListener('click', loadCacheStats);
+      document.getElementById('reset-stats-btn').addEventListener('click', resetStats);
+      document.getElementById('clear-all-btn').addEventListener('click', clearAllCache);
+
+      // Initial load
+      loadCacheStats();
+
+      // Auto-refresh every 30 seconds
+      setInterval(loadCacheStats, 30000);
+    </script>
+  </body>
+</html>
