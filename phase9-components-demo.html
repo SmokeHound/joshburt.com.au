@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Phase 9 Components Demo</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/init-shared.js" defer></script>
+  
+  <!-- Component Scripts -->
+  <script src="./assets/js/components/data-table.js"></script>
+  <script src="./assets/js/components/drag-drop.js"></script>
+  <script src="./assets/js/components/rich-editor.js"></script>
+  <script src="./assets/js/components/image-gallery.js"></script>
+  <script src="./assets/js/components/dashboard-builder.js"></script>
+  
+  <style>
+    .demo-section {
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 0.5rem;
+    }
+    
+    .demo-section h2 {
+      margin-bottom: 1rem;
+      color: #00d4ff;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .demo-section p {
+      margin-bottom: 1.5rem;
+      color: #999;
+    }
+  </style>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
+</head>
+<body class="dark">
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar">☰</button>
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+  
+  <div class="flex min-h-screen">
+    <!-- Shared Navigation -->
+    <div id="main-nav"></div>
+    <script>
+      fetch('shared-nav.html')
+        .then(r => r.text())
+        .then(html => {
+          document.getElementById('main-nav').innerHTML = html;
+          if (window.setActiveNavLink) window.setActiveNavLink();
+        });
+    </script>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="flex-1 p-4 md:p-6" role="main">
+      <!-- Header -->
+      <header class="page-header card border mb-6">
+        <h1 class="text-3xl font-bold text-white">Phase 9 UI Components</h1>
+        <p class="text-lg mt-2 nav-link-muted">Advanced UI components demonstration</p>
+      </header>
+
+      <!-- Data Table Demo -->
+      <section class="demo-section">
+        <h2>1. Data Table Component</h2>
+        <p>Sortable, filterable, and paginated data table with row selection</p>
+        <div id="table-demo"></div>
+      </section>
+
+      <!-- Drag and Drop Demo -->
+      <section class="demo-section">
+        <h2>2. Drag and Drop Component</h2>
+        <p>Reorderable list using drag and drop - try dragging the items!</p>
+        <ul id="drag-drop-demo" class="space-y-2">
+          <li class="p-4 bg-gray-800 border border-gray-700 rounded cursor-move">
+            <span class="drag-handle mr-2">☰</span> Item 1 - Drag me!
+          </li>
+          <li class="p-4 bg-gray-800 border border-gray-700 rounded cursor-move">
+            <span class="drag-handle mr-2">☰</span> Item 2 - Drag me!
+          </li>
+          <li class="p-4 bg-gray-800 border border-gray-700 rounded cursor-move">
+            <span class="drag-handle mr-2">☰</span> Item 3 - Drag me!
+          </li>
+          <li class="p-4 bg-gray-800 border border-gray-700 rounded cursor-move">
+            <span class="drag-handle mr-2">☰</span> Item 4 - Drag me!
+          </li>
+        </ul>
+      </section>
+
+      <!-- Rich Text Editor Demo -->
+      <section class="demo-section">
+        <h2>3. Rich Text Editor Component</h2>
+        <p>Full-featured rich text editor powered by Quill.js</p>
+        <div id="editor-demo" style="min-height: 200px;"></div>
+        <button id="get-content-btn" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
+          Get Content
+        </button>
+      </section>
+
+      <!-- Image Gallery Demo -->
+      <section class="demo-section">
+        <h2>4. Image Gallery Component</h2>
+        <p>Responsive image gallery with lightbox - click images to open lightbox</p>
+        <div id="gallery-demo"></div>
+      </section>
+
+      <!-- Dashboard Builder Demo -->
+      <section class="demo-section">
+        <h2>5. Dashboard Builder Component</h2>
+        <p>Customizable dashboard with drag-to-rearrange widgets - click "Edit Dashboard" to start</p>
+        <div id="dashboard-demo"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Data Table Demo
+      const tableData = [
+        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
+        { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Manager', status: 'Active' },
+        { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Mechanic', status: 'Inactive' },
+        { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'Admin', status: 'Active' },
+        { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Mechanic', status: 'Active' },
+        { id: 6, name: 'Diana Prince', email: 'diana@example.com', role: 'Manager', status: 'Active' },
+        { id: 7, name: 'Eve Adams', email: 'eve@example.com', role: 'Mechanic', status: 'Inactive' },
+        { id: 8, name: 'Frank Miller', email: 'frank@example.com', role: 'Admin', status: 'Active' },
+      ];
+
+      const table = new DataTable('table-demo', {
+        data: tableData,
+        columns: [
+          { field: 'id', label: 'ID', sortable: true },
+          { field: 'name', label: 'Name', sortable: true },
+          { field: 'email', label: 'Email', sortable: true },
+          { field: 'role', label: 'Role', sortable: true },
+          { 
+            field: 'status', 
+            label: 'Status', 
+            sortable: true,
+            render: (value) => {
+              const color = value === 'Active' ? 'green' : 'red';
+              return `<span class="px-2 py-1 bg-${color}-600 text-white text-xs rounded">${value}</span>`;
+            }
+          },
+        ],
+        pageSize: 5,
+        sortable: true,
+        filterable: true,
+        selectable: true,
+        onRowClick: (row) => {
+          console.log('Row clicked:', row);
+        },
+      });
+
+      // 2. Drag and Drop Demo
+      const dragDrop = new DragDrop('drag-drop-demo', {
+        handle: '.drag-handle',
+        animation: 150,
+        onSort: (event) => {
+          console.log('Items reordered');
+        },
+      });
+
+      // 3. Rich Text Editor Demo
+      const editor = new RichEditor('editor-demo', {
+        placeholder: 'Start typing...',
+        onChange: (content) => {
+          console.log('Content changed');
+        },
+      });
+
+      document.getElementById('get-content-btn').addEventListener('click', () => {
+        const content = editor.getContent('html');
+        alert('Editor content logged to console');
+        console.log('Editor HTML:', content);
+        console.log('Editor Text:', editor.getContent('text'));
+      });
+
+      // 4. Image Gallery Demo
+      const galleryImages = [
+        {
+          url: 'https://via.placeholder.com/400x300/3b82f6/ffffff?text=Image+1',
+          alt: 'Sample Image 1',
+          caption: 'Beautiful landscape photo'
+        },
+        {
+          url: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Image+2',
+          alt: 'Sample Image 2',
+          caption: 'Mountain view'
+        },
+        {
+          url: 'https://via.placeholder.com/400x300/8b5cf6/ffffff?text=Image+3',
+          alt: 'Sample Image 3',
+          caption: 'Ocean sunset'
+        },
+        {
+          url: 'https://via.placeholder.com/400x300/f59e0b/ffffff?text=Image+4',
+          alt: 'Sample Image 4',
+          caption: 'City skyline'
+        },
+        {
+          url: 'https://via.placeholder.com/400x300/ef4444/ffffff?text=Image+5',
+          alt: 'Sample Image 5',
+          caption: 'Forest path'
+        },
+        {
+          url: 'https://via.placeholder.com/400x300/06b6d4/ffffff?text=Image+6',
+          alt: 'Sample Image 6',
+          caption: 'Desert dunes'
+        },
+      ];
+
+      const gallery = new ImageGallery('gallery-demo', {
+        images: galleryImages,
+        columns: 3,
+        gap: 16,
+        lightbox: true,
+        lazy: true,
+      });
+
+      // 5. Dashboard Builder Demo
+      const widgets = [
+        {
+          id: 'stats-widget',
+          title: 'Statistics',
+          content: `
+            <div class="grid grid-cols-2 gap-4">
+              <div class="text-center">
+                <div class="text-3xl font-bold text-blue-400">1,234</div>
+                <div class="text-sm text-gray-400">Total Users</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-green-400">567</div>
+                <div class="text-sm text-gray-400">Active Orders</div>
+              </div>
+            </div>
+          `,
+        },
+        {
+          id: 'chart-widget',
+          title: 'Sales Chart',
+          content: `
+            <div class="h-40 flex items-center justify-center bg-gray-800 rounded">
+              <p class="text-gray-400">Chart placeholder</p>
+            </div>
+          `,
+        },
+        {
+          id: 'activity-widget',
+          title: 'Recent Activity',
+          content: `
+            <ul class="space-y-2">
+              <li class="text-sm text-gray-300">• User created: John Doe</li>
+              <li class="text-sm text-gray-300">• Order placed: #12345</li>
+              <li class="text-sm text-gray-300">• Product added: Engine Oil</li>
+            </ul>
+          `,
+        },
+        {
+          id: 'tasks-widget',
+          title: 'Pending Tasks',
+          content: `
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2">
+                <input type="checkbox" class="form-checkbox" />
+                <span class="text-sm text-gray-300">Review new orders</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <input type="checkbox" class="form-checkbox" />
+                <span class="text-sm text-gray-300">Update inventory</span>
+              </li>
+            </ul>
+          `,
+        },
+      ];
+
+      const dashboard = new DashboardBuilder('dashboard-demo', {
+        widgets: widgets,
+        columns: 2,
+        editable: true,
+        storageKey: 'demo-dashboard-layout',
+        onSave: (layout) => {
+          console.log('Dashboard saved:', layout);
+        },
+        onLayoutChange: (widgets) => {
+          console.log('Layout changed:', widgets);
+        },
+      });
+    });
+  </script>
+</body>
+</html>
