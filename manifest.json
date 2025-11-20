@@ -18,5 +18,65 @@
   "categories": ["business", "productivity"],
   "lang": "en",
   "scope": "/",
-  "id": "joshburt-webapp"
+  "id": "joshburt-webapp",
+  "shortcuts": [
+    {
+      "name": "Products",
+      "short_name": "Products",
+      "description": "Browse oil products catalog",
+      "url": "/oil-products.html",
+      "icons": [
+        {
+          "src": "./assets/images/logo.jpeg",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "short_name": "Orders",
+      "description": "View and manage orders",
+      "url": "/orders-review.html",
+      "icons": [
+        {
+          "src": "./assets/images/logo.jpeg",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "short_name": "Analytics",
+      "description": "View analytics dashboard",
+      "url": "/analytics.html",
+      "icons": [
+        {
+          "src": "./assets/images/logo.jpeg",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "Administration",
+      "short_name": "Admin",
+      "description": "Access admin dashboard",
+      "url": "/administration.html",
+      "icons": [
+        {
+          "src": "./assets/images/logo.jpeg",
+          "sizes": "any"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }

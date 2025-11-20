@@ -235,8 +235,145 @@ function isHTMLRequest(request) {
   return request.headers.get('accept')?.includes('text/html');
 }
 
-// Enhanced background sync for offline actions
-// Background sync removed: Service workers cannot access localStorage. Use IndexedDB or postMessage for offline sync if needed.
+// Background sync event handler
+self.addEventListener('sync', event => {
+  console.log('[SW] Background sync event:', event.tag);
+
+  if (event.tag === 'offline-sync') {
+    event.waitUntil(performBackgroundSync());
+  }
+});
+
+async function performBackgroundSync() {
+  console.log('[SW] Performing background sync...');
+
+  try {
+    // Open IndexedDB to get pending sync items
+    const db = await openIndexedDB();
+    const syncQueue = await getAllFromStore(db, 'sync_queue');
+
+    console.log(`[SW] Found ${syncQueue.length} items to sync`);
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const item of syncQueue) {
+      try {
+        await syncItemToServer(item);
+
+        // Remove from queue on success
+        await deleteFromStore(db, 'sync_queue', item.id);
+        successCount++;
+      } catch (error) {
+        console.error('[SW] Failed to sync item:', item.id, error);
+        failCount++;
+
+        // Increment retry count
+        item.attempts = (item.attempts || 0) + 1;
+
+        // Remove if max retries exceeded
+        if (item.attempts >= 3) {
+          await deleteFromStore(db, 'sync_queue', item.id);
+        } else {
+          await updateInStore(db, 'sync_queue', item);
+        }
+      }
+    }
+
+    console.log(`[SW] Sync complete: ${successCount} success, ${failCount} failed`);
+
+    // Notify all clients about sync completion
+    const clients = await self.clients.matchAll();
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'sync-complete',
+        success: successCount,
+        failed: failCount
+      });
+    });
+  } catch (error) {
+    console.error('[SW] Background sync failed:', error);
+    throw error;
+  }
+}
+
+// Helper function to open IndexedDB
+function openIndexedDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('joshburt-offline', 1);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Helper function to get all items from a store
+function getAllFromStore(db, storeName) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readonly');
+    const store = tx.objectStore(storeName);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Helper function to delete from store
+function deleteFromStore(db, storeName, id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Helper function to update item in store
+function updateInStore(db, storeName, item) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    const request = store.put(item);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Helper function to sync item to server
+async function syncItemToServer(item) {
+  const { type, data } = item;
+  const FN_BASE = '/.netlify/functions';
+
+  // Map sync types to endpoints and methods
+  const syncMap = {
+    create_order: { endpoint: '/orders', method: 'POST' },
+    update_order: { endpoint: '/orders', method: 'PUT' },
+    create_product: { endpoint: '/products', method: 'POST' },
+    update_product: { endpoint: '/products', method: 'PUT' }
+  };
+
+  const config = syncMap[type];
+  if (!config) {
+    throw new Error(`Unknown sync type: ${type}`);
+  }
+
+  // Note: Service workers cannot access localStorage
+  // The sync will need to include auth token in the data or use alternative auth
+  const response = await fetch(`${FN_BASE}${config.endpoint}`, {
+    method: config.method,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || `Failed to sync ${type}`);
+  }
+
+  return response.json();
+}
 
 // Enhanced push notifications
 // Push notification handler
