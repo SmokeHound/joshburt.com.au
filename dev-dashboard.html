@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Development Dashboard - joshburt.com.au</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="/assets/js/init-shared.js" defer></script>
   <style>
     .metric-card {
       transition: all 0.3s ease;
@@ -233,13 +234,14 @@
 
     // Load error logs
     async function loadErrors() {
-      const token = localStorage.getItem('accessToken');
-      if (!token) return;
+      if (!window.authFetch) {
+        console.warn('authFetch not ready, retrying...');
+        setTimeout(loadErrors, 100);
+        return;
+      }
 
       try {
-        const response = await fetch(`${FN_BASE}/error-logs?limit=20`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await window.authFetch(`${FN_BASE}/error-logs?limit=20`);
         const data = await response.json();
         renderErrors(data.errors || []);
       } catch (error) {
@@ -290,13 +292,14 @@
 
     // Load database performance
     async function loadDatabase() {
-      const token = localStorage.getItem('accessToken');
-      if (!token) return;
+      if (!window.authFetch) {
+        console.warn('authFetch not ready, retrying...');
+        setTimeout(loadDatabase, 100);
+        return;
+      }
 
       try {
-        const response = await fetch(`${FN_BASE}/database-performance`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await window.authFetch(`${FN_BASE}/database-performance`);
         const data = await response.json();
         renderDatabase(data);
       } catch (error) {
@@ -354,13 +357,14 @@
 
     // Load cache statistics
     async function loadCache() {
-      const token = localStorage.getItem('accessToken');
-      if (!token) return;
+      if (!window.authFetch) {
+        console.warn('authFetch not ready, retrying...');
+        setTimeout(loadCache, 100);
+        return;
+      }
 
       try {
-        const response = await fetch(`${FN_BASE}/cache-management`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await window.authFetch(`${FN_BASE}/cache-management`);
         const data = await response.json();
         renderCache(data);
       } catch (error) {
