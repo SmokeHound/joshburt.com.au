@@ -61,6 +61,8 @@
     "nodemailer": "^7.0.10",
     "pg": "^8.11.3",
     "qrcode": "^1.5.4",
+    "quill": "^2.0.3",
+    "sortablejs": "^1.15.6",
     "speakeasy": "^2.0.0",
     "web-push": "^3.6.7"
   },
