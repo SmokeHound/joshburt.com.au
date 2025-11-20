@@ -176,17 +176,43 @@ Enhance joshburt.com.au with advanced features using **only free, open-source, s
 
 ---
 
-### 📈 Phase 8: Business Intelligence (Weeks 17-18)
+### ✅ Phase 8: Business Intelligence (Weeks 17-18)
+
+**Status**: ✅ Complete  
+**Completion**: 100% (5/5 features)
 
 **Add**: Forecasting, customer insights
 
-- Inventory demand forecasting
-- Customer segmentation
-- Product affinity analysis
-- Lifetime value calculation
-- Personalized recommendations
+- ✅ Inventory demand forecasting
+- ✅ Customer segmentation (RFM analysis)
+- ✅ Product affinity analysis
+- ✅ Lifetime value calculation (via RFM monetary score)
+- ✅ Personalized recommendations
 
 **Impact**: Predictive analytics, better inventory management
+
+**Implemented**:
+
+- ✅ Inventory Forecasting System (Phase 8.1)
+  - Database schema with inventory_forecasts table
+  - Statistical forecasting engine (moving average, trend, seasonality)
+  - Confidence scoring based on coefficient of variation
+  - Low stock alerts with 7-day lookahead
+  - API endpoints for forecast management
+  - Interactive dashboard with Chart.js visualizations
+  - CLI tools: `npm run forecast:calculate` and `forecast:alerts`
+  - 90-day historical analysis window
+- ✅ Customer Insights System (Phase 8.2)
+  - Database schemas: customer_purchase_patterns, product_affinity
+  - RFM customer segmentation (6 tiers)
+  - Purchase pattern tracking per customer-item
+  - Product affinity analysis (co-occurrence based)
+  - Personalized recommendation engine
+  - API endpoints for insights, patterns, affinity
+  - Tabbed dashboard with segment visualizations
+  - Batch calculation endpoints for data refresh
+
+**Documentation**: PHASE_8_SUMMARY.md
 
 ---
 
@@ -427,11 +453,11 @@ Track implementation progress:
   - [ ] 1.3 OAuth (optional)
 - [ ] Phase 2: Advanced Analytics
 - [ ] Phase 3: Search & Discovery
-- [ ] Phase 4: Data Management
-- [ ] Phase 5: Performance & Caching
-- [ ] Phase 6: Security Enhancements
-- [ ] Phase 7: PWA & Offline
-- [ ] Phase 8: Business Intelligence
+- [x] Phase 4: Data Management
+- [x] Phase 5: Performance & Caching
+- [x] Phase 6: Security Enhancements
+- [x] Phase 7: PWA & Offline
+- [x] Phase 8: Business Intelligence ✅ **NEW**
 - [ ] Phase 9: UI/UX Improvements
 - [ ] Phase 10: Developer Tools
 ```
