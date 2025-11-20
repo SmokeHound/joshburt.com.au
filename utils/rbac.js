@@ -100,6 +100,71 @@ const PERMISSIONS = {
     update: ['admin', 'manager'],
     delete: ['admin'],
     list: ['admin', 'manager']
+  },
+  'error-logs': {
+    create: ['admin', 'manager', 'user'], // Anyone can create error logs (client-side errors)
+    read: ['admin', 'manager'],
+    update: ['admin'], // Resolving errors is admin-only
+    delete: ['admin'],
+    list: ['admin', 'manager']
+  },
+  analytics: {
+    create: ['admin', 'manager'],
+    read: ['admin', 'manager'],
+    update: ['admin', 'manager'],
+    delete: ['admin'],
+    list: ['admin', 'manager']
+  },
+  api_keys: {
+    create: ['admin'],
+    read: ['admin'],
+    write: ['admin'],
+    update: ['admin'],
+    delete: ['admin'],
+    list: ['admin']
+  },
+  backups: {
+    create: ['admin'],
+    read: ['admin'],
+    update: ['admin'],
+    delete: ['admin'],
+    list: ['admin']
+  },
+  bulk_operations: {
+    create: ['admin', 'manager'],
+    read: ['admin', 'manager'],
+    update: ['admin', 'manager'],
+    delete: ['admin'],
+    list: ['admin', 'manager']
+  },
+  data_history: {
+    create: ['admin', 'manager'],
+    read: ['admin', 'manager'],
+    update: ['admin', 'manager'],
+    delete: ['admin'],
+    list: ['admin', 'manager']
+  },
+  'email-queue': {
+    create: ['admin', 'manager'],
+    read: ['admin', 'manager'],
+    update: ['admin', 'manager'],
+    delete: ['admin'],
+    list: ['admin', 'manager']
+  },
+  reports: {
+    create: ['admin', 'manager'],
+    read: ['admin', 'manager'],
+    update: ['admin', 'manager'],
+    delete: ['admin'],
+    list: ['admin', 'manager']
+  },
+  security: {
+    create: ['admin'],
+    read: ['admin'],
+    write: ['admin'],
+    update: ['admin'],
+    delete: ['admin'],
+    list: ['admin']
   }
 };
 
