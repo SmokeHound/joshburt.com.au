@@ -2,9 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Database Performance - joshburt.com.au</title>
-    <link rel="stylesheet" href="/assets/css/styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Database Performance - joshburt.com.au</title>
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <script src="/assets/js/init-shared.js" defer></script>
   </head>
   <body class="bg-gray-50 dark:bg-gray-900">
     <div id="shared-nav-container"></div>
@@ -302,8 +303,14 @@
       document.getElementById('refresh-btn').addEventListener('click', loadAll);
       document.getElementById('reset-metrics-btn').addEventListener('click', resetMetrics);
 
-      // Initial load
-      loadAll();
+      // Initial load - wait for authFetch to be available
+      if (window.authFetch) {
+        loadAll();
+      } else {
+        window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(loadAll, 100);
+        });
+      }
 
       // Auto-refresh every 30 seconds
       setInterval(loadAll, 30000);

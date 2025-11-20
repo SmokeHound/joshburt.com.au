@@ -434,8 +434,14 @@
   // Make function global for onclick
   window.showEmailDetail = showEmailDetail;
 
-  // Load initial data
-  loadQueue();
+  // Load initial data - wait for authFetch to be available
+  if (window.authFetch) {
+    loadQueue();
+  } else {
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(loadQueue, 100);
+    });
+  }
 
   // Auto-refresh every 30 seconds
   setInterval(loadQueue, 30000);

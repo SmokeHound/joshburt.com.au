@@ -368,8 +368,16 @@
   // Make function global for onclick
   window.showErrorDetail = showErrorDetail;
 
-  // Load initial data
-  loadErrors();
+  // Load initial data after init-shared.js is ready
+  if (window.authFetch) {
+    loadErrors();
+  } else {
+    // Wait for init-shared.js to load
+    window.addEventListener('DOMContentLoaded', () => {
+      // Give deferred scripts a moment to execute
+      setTimeout(loadErrors, 100);
+    });
+  }
 </script>
 
 </body>
