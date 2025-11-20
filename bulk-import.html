@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bulk Operations - joshburt.com.au</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="/assets/js/init-shared.js" defer></script>
   <script src="/shared-config.html"></script>
   <script src="/shared-theme.html"></script>
 </head>
@@ -204,17 +205,14 @@ Product 2,PROD002,oil,50</pre>
 
     // Load operations history
     async function loadOperations() {
+      if (!window.authFetch) {
+        console.warn('authFetch not ready, retrying...');
+        setTimeout(loadOperations, 100);
+        return;
+      }
+
       try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-          window.location.href = '/login.html';
-          return;
-        }
-
-        const response = await fetch(`${FN_BASE}/bulk-operations?limit=50`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
+        const response = await window.authFetch(`${FN_BASE}/bulk-operations?limit=50`);
         if (!response.ok) throw new Error('Failed to load operations');
 
         const data = await response.json();
