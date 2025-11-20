@@ -16,11 +16,13 @@ CREATE TABLE IF NOT EXISTS backups (
   status VARCHAR(20) DEFAULT 'running', -- running, completed, failed
   error_message TEXT,
   created_by INTEGER REFERENCES users(id),
-  metadata JSONB, -- Additional backup metadata
-  INDEX idx_backups_started (started_at),
-  INDEX idx_backups_status (status),
-  INDEX idx_backups_type (backup_type)
+  metadata JSONB -- Additional backup metadata
 );
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_backups_started ON backups(started_at);
+CREATE INDEX IF NOT EXISTS idx_backups_status ON backups(status);
+CREATE INDEX IF NOT EXISTS idx_backups_type ON backups(backup_type);
 
 -- Add comments for documentation
 COMMENT ON TABLE backups IS 'Tracks database backup and export operations';

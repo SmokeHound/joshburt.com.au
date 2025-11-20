@@ -15,12 +15,14 @@ CREATE TABLE IF NOT EXISTS data_history (
   changed_at TIMESTAMP DEFAULT NOW(),
   ip_address INET,
   user_agent TEXT,
-  reason TEXT, -- Optional reason for change
-  INDEX idx_data_history_table_record (table_name, record_id),
-  INDEX idx_data_history_changed_at (changed_at),
-  INDEX idx_data_history_changed_by (changed_by),
-  INDEX idx_data_history_action (action)
+  reason TEXT -- Optional reason for change
 );
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_data_history_table_record ON data_history(table_name, record_id);
+CREATE INDEX IF NOT EXISTS idx_data_history_changed_at ON data_history(changed_at);
+CREATE INDEX IF NOT EXISTS idx_data_history_changed_by ON data_history(changed_by);
+CREATE INDEX IF NOT EXISTS idx_data_history_action ON data_history(action);
 
 -- Create function to track changes on any table
 CREATE OR REPLACE FUNCTION track_data_changes()

@@ -141,15 +141,7 @@
 
   async function loadReports() {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        window.location.href = '/login.html';
-        return;
-      }
-
-      const response = await fetch(`${FN_BASE}/scheduled-reports`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await window.authFetch(`${FN_BASE}/scheduled-reports`);
 
       if (!response.ok) {
         throw new Error('Failed to load reports');
@@ -215,7 +207,6 @@
 
   async function loadHistory() {
     try {
-      const token = localStorage.getItem('accessToken');
       // For now, show placeholder since we don't have a separate history endpoint
       const historyTable = document.getElementById('history-table');
       historyTable.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-gray-400">Report history will appear here after execution</td></tr>';
@@ -226,13 +217,9 @@
 
   async function generateNow(reportId) {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/scheduled-reports`, {
+      const response = await window.authFetch(`${FN_BASE}/scheduled-reports`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'generate',
           report_id: reportId
@@ -266,13 +253,9 @@
 
   async function toggleReportStatus(reportId, isActive) {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/scheduled-reports/${reportId}`, {
+      const response = await window.authFetch(`${FN_BASE}/scheduled-reports/${reportId}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: isActive })
       });
 
@@ -293,10 +276,8 @@
     }
 
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/scheduled-reports/${reportId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+      const response = await window.authFetch(`${FN_BASE}/scheduled-reports/${reportId}`, {
+        method: 'DELETE'
       });
 
       if (!response.ok) {
@@ -402,8 +383,14 @@
   window.deleteReport = deleteReport;
   window.editReport = editReport;
 
-  // Load initial data
-  loadReports();
+  // Load initial data - wait for authFetch to be available
+  if (window.authFetch) {
+    loadReports();
+  } else {
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(loadReports, 100);
+    });
+  }
 </script>
 
 </body>

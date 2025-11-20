@@ -15,12 +15,14 @@ CREATE TABLE IF NOT EXISTS api_keys (
   last_used TIMESTAMP,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT NOW(),
-  metadata JSONB, -- Additional metadata (e.g., IP restrictions, allowed origins)
-  INDEX idx_api_keys_hash (key_hash),
-  INDEX idx_api_keys_user (user_id),
-  INDEX idx_api_keys_active (is_active),
-  INDEX idx_api_keys_prefix (key_prefix)
+  metadata JSONB -- Additional metadata (e.g., IP restrictions, allowed origins)
 );
+
+-- Create indexes for api_keys
+CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash);
+CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id);
+CREATE INDEX IF NOT EXISTS idx_api_keys_active ON api_keys(is_active);
+CREATE INDEX IF NOT EXISTS idx_api_keys_prefix ON api_keys(key_prefix);
 
 -- Create table to track API key usage
 CREATE TABLE IF NOT EXISTS api_key_usage (
@@ -32,11 +34,13 @@ CREATE TABLE IF NOT EXISTS api_key_usage (
   user_agent TEXT,
   response_status INTEGER,
   response_time_ms INTEGER, -- Response time in milliseconds
-  timestamp TIMESTAMP DEFAULT NOW(),
-  INDEX idx_api_key_usage_key (api_key_id),
-  INDEX idx_api_key_usage_timestamp (timestamp),
-  INDEX idx_api_key_usage_endpoint (endpoint)
+  timestamp TIMESTAMP DEFAULT NOW()
 );
+
+-- Create indexes for api_key_usage
+CREATE INDEX IF NOT EXISTS idx_api_key_usage_key ON api_key_usage(api_key_id);
+CREATE INDEX IF NOT EXISTS idx_api_key_usage_timestamp ON api_key_usage(timestamp);
+CREATE INDEX IF NOT EXISTS idx_api_key_usage_endpoint ON api_key_usage(endpoint);
 
 -- Create materialized view for API key statistics
 CREATE MATERIALIZED VIEW IF NOT EXISTS api_key_stats AS

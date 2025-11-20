@@ -23,12 +23,14 @@ CREATE TABLE IF NOT EXISTS bulk_operations (
   can_undo BOOLEAN DEFAULT FALSE, -- Whether operation can be undone
   undo_data JSONB, -- Data needed to undo operation
   created_by INTEGER REFERENCES users(id),
-  metadata JSONB,
-  INDEX idx_bulk_ops_status (status),
-  INDEX idx_bulk_ops_table (target_table),
-  INDEX idx_bulk_ops_started (started_at),
-  INDEX idx_bulk_ops_created_by (created_by)
+  metadata JSONB
 );
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_bulk_ops_status ON bulk_operations(status);
+CREATE INDEX IF NOT EXISTS idx_bulk_ops_table ON bulk_operations(target_table);
+CREATE INDEX IF NOT EXISTS idx_bulk_ops_started ON bulk_operations(started_at);
+CREATE INDEX IF NOT EXISTS idx_bulk_ops_created_by ON bulk_operations(created_by);
 
 -- Add comments for documentation
 COMMENT ON TABLE bulk_operations IS 'Tracks bulk data operations (import, export, update, delete)';

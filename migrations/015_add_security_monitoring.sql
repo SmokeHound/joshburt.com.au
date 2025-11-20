@@ -16,13 +16,15 @@ CREATE TABLE IF NOT EXISTS security_events (
   resolved_by INTEGER REFERENCES users(id),
   resolved_at TIMESTAMP,
   resolution_notes TEXT,
-  timestamp TIMESTAMP DEFAULT NOW(),
-  INDEX idx_security_events_type (event_type),
-  INDEX idx_security_events_severity (severity),
-  INDEX idx_security_events_timestamp (timestamp),
-  INDEX idx_security_events_resolved (resolved),
-  INDEX idx_security_events_ip (ip_address)
+  timestamp TIMESTAMP DEFAULT NOW()
 );
+
+-- Create indexes for security_events
+CREATE INDEX IF NOT EXISTS idx_security_events_type ON security_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_security_events_severity ON security_events(severity);
+CREATE INDEX IF NOT EXISTS idx_security_events_timestamp ON security_events(timestamp);
+CREATE INDEX IF NOT EXISTS idx_security_events_resolved ON security_events(resolved);
+CREATE INDEX IF NOT EXISTS idx_security_events_ip ON security_events(ip_address);
 
 -- Create IP blacklist table for blocking malicious IPs
 CREATE TABLE IF NOT EXISTS ip_blacklist (
@@ -33,11 +35,13 @@ CREATE TABLE IF NOT EXISTS ip_blacklist (
   added_at TIMESTAMP DEFAULT NOW(),
   expires_at TIMESTAMP, -- NULL means permanent
   is_active BOOLEAN DEFAULT TRUE,
-  auto_added BOOLEAN DEFAULT FALSE, -- TRUE if added by automated system
-  INDEX idx_ip_blacklist_ip (ip_address),
-  INDEX idx_ip_blacklist_active (is_active),
-  INDEX idx_ip_blacklist_expires (expires_at)
+  auto_added BOOLEAN DEFAULT FALSE -- TRUE if added by automated system
 );
+
+-- Create indexes for ip_blacklist
+CREATE INDEX IF NOT EXISTS idx_ip_blacklist_ip ON ip_blacklist(ip_address);
+CREATE INDEX IF NOT EXISTS idx_ip_blacklist_active ON ip_blacklist(is_active);
+CREATE INDEX IF NOT EXISTS idx_ip_blacklist_expires ON ip_blacklist(expires_at);
 
 -- Create database-backed rate limiting table for persistent rate limiting
 CREATE TABLE IF NOT EXISTS api_rate_limits (
@@ -47,11 +51,13 @@ CREATE TABLE IF NOT EXISTS api_rate_limits (
   request_count INTEGER DEFAULT 1,
   window_start TIMESTAMP DEFAULT NOW(),
   last_request TIMESTAMP DEFAULT NOW(),
-  INDEX idx_api_rate_limits_identifier (identifier),
-  INDEX idx_api_rate_limits_endpoint (endpoint),
-  INDEX idx_api_rate_limits_window (window_start),
   UNIQUE(identifier, endpoint, window_start)
 );
+
+-- Create indexes for api_rate_limits
+CREATE INDEX IF NOT EXISTS idx_api_rate_limits_identifier ON api_rate_limits(identifier);
+CREATE INDEX IF NOT EXISTS idx_api_rate_limits_endpoint ON api_rate_limits(endpoint);
+CREATE INDEX IF NOT EXISTS idx_api_rate_limits_window ON api_rate_limits(window_start);
 
 -- Create function to check if IP is blacklisted
 CREATE OR REPLACE FUNCTION is_ip_blacklisted(check_ip INET)
