@@ -57,7 +57,7 @@ async function logSecurityEvent({
 
   try {
     const result = await pool.query(
-      `SELECT log_security_event($1, $2, $3, $4, $5, $6, $7) as event_id`,
+      'SELECT log_security_event($1, $2, $3, $4, $5, $6, $7) as event_id',
       [eventType, severity, userId, ipAddress, userAgent, description, JSON.stringify(metadata)]
     );
 
@@ -152,7 +152,7 @@ async function trackRateLimit(identifier, endpoint, limit, windowMs) {
 
   try {
     // Clean up old entries first
-    await pool.query(`DELETE FROM api_rate_limits WHERE window_start < NOW() - INTERVAL '1 hour'`);
+    await pool.query('DELETE FROM api_rate_limits WHERE window_start < NOW() - INTERVAL \'1 hour\'');
 
     // Get or create rate limit entry for current window
     const result = await pool.query(
@@ -242,7 +242,7 @@ async function detectSuspiciousLogin(ipAddress, email) {
  * @returns {boolean} - True if SQL injection detected
  */
 function detectSqlInjection(input) {
-  if (!input || typeof input !== 'string') return false;
+  if (!input || typeof input !== 'string') {return false;}
 
   // Common SQL injection patterns
   const sqlPatterns = [
@@ -265,7 +265,7 @@ function detectSqlInjection(input) {
  * @returns {boolean} - True if XSS detected
  */
 function detectXss(input) {
-  if (!input || typeof input !== 'string') return false;
+  if (!input || typeof input !== 'string') {return false;}
 
   // Common XSS patterns
   const xssPatterns = [

@@ -1,7 +1,7 @@
 /**
  * Rich Text Editor Component
  * Wrapper around Quill.js for rich text editing
- * 
+ *
  * Usage:
  * const editor = new RichEditor('editor-container', {
  *   placeholder: 'Enter text...',
@@ -9,6 +9,8 @@
  *   onChange: (content) => console.log(content)
  * });
  */
+
+/* global Quill */
 
 class RichEditor {
   constructor(containerId, options = {}) {
@@ -23,7 +25,7 @@ class RichEditor {
       readOnly: options.readOnly || false,
       modules: options.modules || this.getDefaultModules(),
       onChange: options.onChange || null,
-      onSelectionChange: options.onSelectionChange || null,
+      onSelectionChange: options.onSelectionChange || null
     };
 
     this.editor = null;
@@ -85,8 +87,8 @@ class RichEditor {
         [{ color: [] }, { background: [] }],
         [{ align: [] }],
         ['link', 'image'],
-        ['clean'],
-      ],
+        ['clean']
+      ]
     };
   }
 
@@ -95,7 +97,7 @@ class RichEditor {
       theme: this.options.theme,
       placeholder: this.options.placeholder,
       readOnly: this.options.readOnly,
-      modules: this.options.modules,
+      modules: this.options.modules
     });
 
     // Set up event handlers
@@ -114,35 +116,35 @@ class RichEditor {
   }
 
   getContent(format = 'html') {
-    if (!this.quill) return '';
+    if (!this.quill) {return '';}
 
     switch (format) {
-      case 'html':
-        return this.quill.root.innerHTML;
-      case 'text':
-        return this.quill.getText();
-      case 'delta':
-        return this.quill.getContents();
-      default:
-        return this.quill.root.innerHTML;
+    case 'html':
+      return this.quill.root.innerHTML;
+    case 'text':
+      return this.quill.getText();
+    case 'delta':
+      return this.quill.getContents();
+    default:
+      return this.quill.root.innerHTML;
     }
   }
 
   setContent(content, format = 'html') {
-    if (!this.quill) return;
+    if (!this.quill) {return;}
 
     switch (format) {
-      case 'html':
-        this.quill.root.innerHTML = content;
-        break;
-      case 'text':
-        this.quill.setText(content);
-        break;
-      case 'delta':
-        this.quill.setContents(content);
-        break;
-      default:
-        this.quill.root.innerHTML = content;
+    case 'html':
+      this.quill.root.innerHTML = content;
+      break;
+    case 'text':
+      this.quill.setText(content);
+      break;
+    case 'delta':
+      this.quill.setContents(content);
+      break;
+    default:
+      this.quill.root.innerHTML = content;
     }
   }
 
@@ -219,7 +221,7 @@ class RichEditor {
 
 // Utility function to add custom styles for dark theme
 RichEditor.addDarkTheme = function() {
-  if (document.getElementById('quill-dark-theme')) return;
+  if (document.getElementById('quill-dark-theme')) {return;}
 
   const style = document.createElement('style');
   style.id = 'quill-dark-theme';

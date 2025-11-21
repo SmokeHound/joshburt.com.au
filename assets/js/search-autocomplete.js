@@ -101,28 +101,28 @@
     handleKeydown(e) {
       if (!this.container.classList.contains('hidden')) {
         switch (e.key) {
-          case 'ArrowDown':
-            e.preventDefault();
-            this.selectNext();
-            break;
-          case 'ArrowUp':
-            e.preventDefault();
-            this.selectPrevious();
-            break;
-          case 'Enter':
-            e.preventDefault();
-            if (this.selectedIndex >= 0) {
-              this.selectSuggestion(this.suggestions[this.selectedIndex]);
-            } else {
-              // Submit search with current input value
-              if (this.options.onSelect) {
-                this.options.onSelect({ text: this.input.value, source: 'manual' });
-              }
+        case 'ArrowDown':
+          e.preventDefault();
+          this.selectNext();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          this.selectPrevious();
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (this.selectedIndex >= 0) {
+            this.selectSuggestion(this.suggestions[this.selectedIndex]);
+          } else {
+            // Submit search with current input value
+            if (this.options.onSelect) {
+              this.options.onSelect({ text: this.input.value, source: 'manual' });
             }
-            break;
-          case 'Escape':
-            this.hideSuggestions();
-            break;
+          }
+          break;
+        case 'Escape':
+          this.hideSuggestions();
+          break;
         }
       }
     }
@@ -189,24 +189,24 @@
         badge.className = 'text-xs px-2 py-1 rounded-full';
 
         switch (suggestion.source) {
-          case 'recent':
-            badge.textContent = 'Recent';
-            badge.className += ' bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-            break;
-          case 'product':
-            badge.textContent = 'Product';
-            badge.className += ' bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-            break;
-          case 'consumable':
-            badge.textContent = 'Consumable';
-            badge.className +=
+        case 'recent':
+          badge.textContent = 'Recent';
+          badge.className += ' bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+          break;
+        case 'product':
+          badge.textContent = 'Product';
+          badge.className += ' bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+          break;
+        case 'consumable':
+          badge.textContent = 'Consumable';
+          badge.className +=
               ' bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-            break;
-          case 'filter':
-            badge.textContent = 'Filter';
-            badge.className +=
+          break;
+        case 'filter':
+          badge.textContent = 'Filter';
+          badge.className +=
               ' bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-            break;
+          break;
         }
         item.appendChild(badge);
 

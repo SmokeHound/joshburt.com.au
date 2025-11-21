@@ -20,7 +20,7 @@ describe('Order Submission Authentication', () => {
 
     // Verify that the order submission uses authFetch
     expect(htmlContent).toContain('window.authFetch(`${FN_BASE}/orders`');
-    expect(htmlContent).toContain("method: 'POST'");
+    expect(htmlContent).toContain('method: \'POST\'');
   });
 
   test('should use authFetch for products API', () => {
@@ -51,7 +51,7 @@ describe('Orders Review Authentication', () => {
 
     // Verify order updates use authFetch with PATCH method
     expect(htmlContent).toContain('window.authFetch(`${FN_BASE}/orders`');
-    expect(htmlContent).toContain("method: 'PATCH'");
+    expect(htmlContent).toContain('method: \'PATCH\'');
   });
 });
 
@@ -61,7 +61,7 @@ describe('Consumables Page Authentication', () => {
 
     // Verify order submission uses authFetch
     expect(htmlContent).toContain('window.authFetch(`${FN_BASE}/orders`');
-    expect(htmlContent).toContain("method: 'POST'");
+    expect(htmlContent).toContain('method: \'POST\'');
   });
 
   test('should use authFetch for settings API', () => {

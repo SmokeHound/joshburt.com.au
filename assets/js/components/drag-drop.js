@@ -1,7 +1,7 @@
 /**
  * Drag and Drop Component
  * Wrapper around SortableJS for drag-and-drop functionality
- * 
+ *
  * Usage:
  * const dragDrop = new DragDrop('list-id', {
  *   onSort: (event) => console.log('Item moved'),
@@ -29,7 +29,7 @@ class DragDrop {
       onStart: options.onStart || null,
       onEnd: options.onEnd || null,
       onAdd: options.onAdd || null,
-      onRemove: options.onRemove || null,
+      onRemove: options.onRemove || null
     };
 
     this.sortable = null;
@@ -105,7 +105,7 @@ class DragDrop {
         if (this.options.onRemove) {
           this.options.onRemove(event);
         }
-      },
+      }
     };
 
     if (this.options.handle) {
@@ -140,19 +140,19 @@ class DragDrop {
   }
 
   getOrder() {
-    if (!this.sortable) return [];
+    if (!this.sortable) {return [];}
     return this.sortable.toArray();
   }
 
   setOrder(order) {
-    if (!this.sortable) return;
+    if (!this.sortable) {return;}
     this.sortable.sort(order);
   }
 }
 
 // Utility function to add default drag-drop styles
 DragDrop.addDefaultStyles = function() {
-  if (document.getElementById('drag-drop-styles')) return;
+  if (document.getElementById('drag-drop-styles')) {return;}
 
   const style = document.createElement('style');
   style.id = 'drag-drop-styles';

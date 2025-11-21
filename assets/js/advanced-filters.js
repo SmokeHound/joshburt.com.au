@@ -170,18 +170,18 @@
       content.className = 'filter-content mt-2';
 
       switch (filter.type) {
-        case 'checkbox':
-          content.appendChild(this.renderCheckboxFilter(filter));
-          break;
-        case 'range':
-          content.appendChild(this.renderRangeFilter(filter));
-          break;
-        case 'select':
-          content.appendChild(this.renderSelectFilter(filter));
-          break;
-        case 'radio':
-          content.appendChild(this.renderRadioFilter(filter));
-          break;
+      case 'checkbox':
+        content.appendChild(this.renderCheckboxFilter(filter));
+        break;
+      case 'range':
+        content.appendChild(this.renderRangeFilter(filter));
+        break;
+      case 'select':
+        content.appendChild(this.renderSelectFilter(filter));
+        break;
+      case 'radio':
+        content.appendChild(this.renderRadioFilter(filter));
+        break;
       }
 
       section.appendChild(content);

@@ -4,9 +4,9 @@
  * Part of Phase 6: Security Enhancements
  */
 
-const crypto = require('crypto');
 const { Pool } = require('../config/database');
 const { logSecurityEvent, EVENT_TYPES, SEVERITY, getClientIp } = require('./security-monitor');
+const cryptoModule = require('crypto');
 
 /**
  * Generate a new API key
@@ -16,7 +16,7 @@ const { logSecurityEvent, EVENT_TYPES, SEVERITY, getClientIp } = require('./secu
  */
 function generateApiKey(environment = 'live') {
   const prefix = `sk_${environment}_`;
-  const randomBytes = crypto.randomBytes(24).toString('hex'); // 48 hex chars
+  const randomBytes = cryptoModule.randomBytes(24).toString('hex'); // 48 hex chars
   return prefix + randomBytes;
 }
 
@@ -26,7 +26,7 @@ function generateApiKey(environment = 'live') {
  * @returns {string} - SHA-256 hash of the API key
  */
 function hashApiKey(apiKey) {
-  return crypto.createHash('sha256').update(apiKey).digest('hex');
+  return cryptoModule.createHash('sha256').update(apiKey).digest('hex');
 }
 
 /**
@@ -45,7 +45,7 @@ function getKeyPrefix(apiKey) {
  * @returns {boolean} - True if valid format
  */
 function isValidApiKeyFormat(apiKey) {
-  if (!apiKey || typeof apiKey !== 'string') return false;
+  if (!apiKey || typeof apiKey !== 'string') {return false;}
 
   // Must start with sk_live_ or sk_test_
   if (!apiKey.startsWith('sk_live_') && !apiKey.startsWith('sk_test_')) {

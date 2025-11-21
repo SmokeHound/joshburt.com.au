@@ -1,9 +1,11 @@
 // Test setup file
 
-// Add TextEncoder and TextDecoder for pg library
-const { TextEncoder, TextDecoder } = require('util');
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
+// Add TextEncoder and TextDecoder for pg library (only if not already defined)
+if (typeof global.TextEncoder === 'undefined') {
+  const { TextEncoder, TextDecoder } = require('util');
+  global.TextEncoder = TextEncoder;
+  global.TextDecoder = TextDecoder;
+}
 
 // Mock localStorage
 // Mock localStorage (override JSDOM's Storage with Jest mocks and a backing store)
