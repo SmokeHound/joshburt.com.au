@@ -6,7 +6,8 @@
     try {
       const host =
         (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
-      if (host.endsWith('netlify.app') || host === 'localhost') {
+      // Local development: localhost, 127.0.0.1, or netlify.app
+      if (host.endsWith('netlify.app') || host === 'localhost' || host === '127.0.0.1' || host.startsWith('localhost') || host.startsWith('127.0.0.1')) {
         window.FN_BASE = defaultBase;
       } else {
         window.FN_BASE = 'https://joshburt.netlify.app/.netlify/functions';
