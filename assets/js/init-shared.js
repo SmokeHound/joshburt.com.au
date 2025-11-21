@@ -350,7 +350,6 @@
       const timeSinceLogin = Date.now() - parseInt(freshLoginTimestamp, 10);
       // If login happened within the last 5 seconds, trust the tokens and skip validation
       if (timeSinceLogin < 5000) {
-        localStorage.removeItem('freshLogin'); // Clear flag after first page load
         return;
       }
       // If it's been more than 5 seconds, clear the flag and proceed with validation
