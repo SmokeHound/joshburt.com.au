@@ -235,84 +235,94 @@ exports.handler = withHandler(async function (event) {
 
   // Get aggregated statistics
   async function getAggregatedStats(params) {
-    const { date_from, date_to, group_by = 'day' } = params;
+    try {
+      const { date_from, date_to, group_by = 'day' } = params;
 
-    const endDate = date_to || new Date().toISOString().split('T')[0];
-    const startDate =
-      date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const endDate = date_to || new Date().toISOString().split('T')[0];
+      const startDate =
+        date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    // Get stats by event type
-    const eventTypeQuery = `
-      SELECT 
-        event_type,
-        COUNT(*) as count,
-        COUNT(DISTINCT user_id) as unique_users,
-        COUNT(DISTINCT session_id) as unique_sessions
-      FROM analytics_events
-      WHERE timestamp BETWEEN $1 AND $2
-      GROUP BY event_type
-      ORDER BY count DESC
-    `;
-    const eventTypeResult = await database.query(eventTypeQuery, [startDate, endDate]);
+      // Get stats by event type
+      const eventTypeQuery = `
+        SELECT 
+          event_type,
+          COUNT(*) as count,
+          COUNT(DISTINCT user_id) as unique_users,
+          COUNT(DISTINCT session_id) as unique_sessions
+        FROM analytics_events
+        WHERE timestamp BETWEEN $1 AND $2
+        GROUP BY event_type
+        ORDER BY count DESC
+      `;
+      const eventTypeResult = await database.query(eventTypeQuery, [startDate, endDate]);
 
-    // Get daily/hourly trends
-    let timeFormat;
-    switch (group_by) {
-      case 'hour':
-        timeFormat = "DATE_TRUNC('hour', timestamp)";
-        break;
-      case 'day':
-      default:
-        timeFormat = 'DATE(timestamp)';
+      // Get daily/hourly trends
+      let timeFormat;
+      switch (group_by) {
+        case 'hour':
+          timeFormat = "DATE_TRUNC('hour', timestamp)";
+          break;
+        case 'day':
+        default:
+          timeFormat = 'DATE(timestamp)';
+      }
+
+      const trendsQuery = `
+        SELECT 
+          ${timeFormat} as period,
+          event_type,
+          COUNT(*) as count,
+          COUNT(DISTINCT user_id) as unique_users,
+          COUNT(DISTINCT session_id) as unique_sessions
+        FROM analytics_events
+        WHERE timestamp BETWEEN $1 AND $2
+        GROUP BY period, event_type
+        ORDER BY period DESC, event_type
+      `;
+      const trendsResult = await database.query(trendsQuery, [startDate, endDate]);
+
+      // Get session statistics
+      const sessionQuery = `
+        SELECT 
+          COUNT(*) as total_sessions,
+          AVG(duration_seconds) as avg_duration,
+          AVG(page_views) as avg_page_views,
+          COUNT(DISTINCT user_id) as unique_users
+        FROM analytics_sessions
+        WHERE started_at BETWEEN $1 AND $2
+      `;
+      const sessionResult = await database.query(sessionQuery, [startDate, endDate]);
+
+      // Get top pages
+      const topPagesQuery = `
+        SELECT 
+          page_url,
+          COUNT(*) as views,
+          COUNT(DISTINCT session_id) as unique_sessions
+        FROM analytics_events
+        WHERE event_type = 'page_view' AND timestamp BETWEEN $1 AND $2
+        GROUP BY page_url
+        ORDER BY views DESC
+        LIMIT 20
+      `;
+      const topPagesResult = await database.query(topPagesQuery, [startDate, endDate]);
+
+      return ok({
+        date_range: { start: startDate, end: endDate },
+        event_types: eventTypeResult.rows,
+        trends: trendsResult.rows,
+        sessions: sessionResult.rows[0] || {
+          total_sessions: 0,
+          avg_duration: 0,
+          avg_page_views: 0,
+          unique_users: 0
+        },
+        top_pages: topPagesResult.rows
+      });
+    } catch (e) {
+      console.error('Error getting aggregated stats:', e);
+      return error(500, `Failed to get aggregated stats: ${e.message}`);
     }
-
-    const trendsQuery = `
-      SELECT 
-        ${timeFormat} as period,
-        event_type,
-        COUNT(*) as count,
-        COUNT(DISTINCT user_id) as unique_users,
-        COUNT(DISTINCT session_id) as unique_sessions
-      FROM analytics_events
-      WHERE timestamp BETWEEN $1 AND $2
-      GROUP BY period, event_type
-      ORDER BY period DESC, event_type
-    `;
-    const trendsResult = await database.query(trendsQuery, [startDate, endDate]);
-
-    // Get session statistics
-    const sessionQuery = `
-      SELECT 
-        COUNT(*) as total_sessions,
-        AVG(duration_seconds) as avg_duration,
-        AVG(page_views) as avg_page_views,
-        COUNT(DISTINCT user_id) as unique_users
-      FROM analytics_sessions
-      WHERE started_at BETWEEN $1 AND $2
-    `;
-    const sessionResult = await database.query(sessionQuery, [startDate, endDate]);
-
-    // Get top pages
-    const topPagesQuery = `
-      SELECT 
-        page_url,
-        COUNT(*) as views,
-        COUNT(DISTINCT session_id) as unique_sessions
-      FROM analytics_events
-      WHERE event_type = 'page_view' AND timestamp BETWEEN $1 AND $2
-      GROUP BY page_url
-      ORDER BY views DESC
-      LIMIT 20
-    `;
-    const topPagesResult = await database.query(topPagesQuery, [startDate, endDate]);
-
-    return ok({
-      date_range: { start: startDate, end: endDate },
-      event_types: eventTypeResult.rows,
-      trends: trendsResult.rows,
-      sessions: sessionResult.rows[0],
-      top_pages: topPagesResult.rows
-    });
   }
 
   // Clean up old events (data retention)

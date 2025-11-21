@@ -166,9 +166,9 @@
       const endDate = new Date().toISOString().split('T')[0];
       const startDate = new Date(Date.now() - parseInt(dateRange) * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        window.location.href = '/login.html';
+      if (!window.authFetch) {
+        console.warn('authFetch not ready, retrying...');
+        setTimeout(loadAnalytics, 100);
         return;
       }
 
@@ -177,12 +177,12 @@
         url += `&event_type=${eventType}`;
       }
 
-      const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await window.authFetch(url);
 
       if (!response.ok) {
-        throw new Error('Failed to load analytics');
+        const errorText = await response.text();
+        console.error('Analytics API error:', response.status, errorText);
+        throw new Error(`Failed to load analytics: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -194,7 +194,21 @@
 
     } catch (error) {
       console.error('Error loading analytics:', error);
-      alert('Failed to load analytics data');
+      
+      // Show user-friendly error message
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4';
+      errorDiv.innerHTML = `
+        <p class="text-red-800 dark:text-red-200 font-semibold">Failed to load analytics data</p>
+        <p class="text-sm text-red-600 dark:text-red-400 mt-2">${error.message}</p>
+        <p class="text-xs text-red-500 dark:text-red-500 mt-1">Check browser console for details</p>
+      `;
+      
+      // Insert error at top of main content area
+      const mainContent = document.querySelector('main');
+      if (mainContent) {
+        mainContent.insertBefore(errorDiv, mainContent.firstChild);
+      }
     }
   }
 
@@ -319,13 +333,18 @@
 
   async function loadSessions() {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/analytics-events?aggregate=false&per_page=10`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      if (!window.authFetch) {
+        console.warn('authFetch not ready, retrying...');
+        setTimeout(loadSessions, 100);
+        return;
+      }
+
+      const response = await window.authFetch(`${FN_BASE}/analytics-events?aggregate=false&per_page=10`);
 
       if (!response.ok) {
-        throw new Error('Failed to load sessions');
+        const errorText = await response.text();
+        console.error('Sessions API error:', response.status, errorText);
+        throw new Error(`Failed to load sessions: ${response.status}`);
       }
 
       const data = await response.json();
