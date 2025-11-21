@@ -237,9 +237,33 @@ async function detectSuspiciousLogin(ipAddress, email) {
 }
 
 /**
- * Detect SQL injection attempts in query parameters
- * @param {string} input - Input string to check
- * @returns {boolean} - True if SQL injection detected
+ * Detect SQL injection attempts in input
+ *
+ * ⚠️ WARNING: This function may produce false positives!
+ *
+ * False Positive Examples:
+ * - "SELECT a product from catalog" → flagged
+ * - "How to INSERT filters" → flagged
+ * - "-- dashed separator" → flagged
+ *
+ * Recommended Usage:
+ * 1. Only use on query parameters and URL paths, NOT POST body text
+ * 2. Log detection but don't automatically block (investigate first)
+ * 3. Implement a whitelist for known safe patterns
+ * 4. Monitor false positive rate before enabling auto-blocking
+ *
+ * Best Practice:
+ * ```javascript
+ * // Check query params only, not full text content
+ * const queryString = new URL(event.path, 'http://localhost').search;
+ * if (detectSqlInjection(queryString)) {
+ *   await logSecurityEvent(event, 'sql_injection', 'medium', { query: queryString });
+ *   // Log but don't block - review logs manually first
+ * }
+ * ```
+ *
+ * @param {string} input - Input string to check (ideally query params, not POST body)
+ * @returns {boolean} - True if SQL injection pattern detected (may be false positive)
  */
 function detectSqlInjection(input) {
   if (!input || typeof input !== 'string') {return false;}
@@ -261,8 +285,32 @@ function detectSqlInjection(input) {
 
 /**
  * Detect XSS attempts in input
+ *
+ * ⚠️ WARNING: This function may produce false positives!
+ *
+ * False Positive Examples:
+ * - "<script> tags in code examples" → flagged
+ * - "javascript: protocol documentation" → flagged
+ * - "<iframe> in HTML tutorials" → flagged
+ *
+ * Recommended Usage:
+ * 1. Only use on user-generated content that will be rendered as HTML
+ * 2. Log detection but investigate before blocking
+ * 3. Use HTML sanitization libraries (DOMPurify) instead of regex for actual protection
+ * 4. This is a detection tool, not a prevention tool
+ *
+ * Best Practice:
+ * ```javascript
+ * // For actual XSS prevention, use DOMPurify or similar
+ * // This function is for logging suspicious patterns only
+ * if (detectXss(userContent)) {
+ *   await logSecurityEvent(event, 'xss', 'medium', { content: userContent.slice(0, 100) });
+ *   // Log for review - don't rely on this for security
+ * }
+ * ```
+ *
  * @param {string} input - Input string to check
- * @returns {boolean} - True if XSS detected
+ * @returns {boolean} - True if XSS pattern detected (may be false positive)
  */
 function detectXss(input) {
   if (!input || typeof input !== 'string') {return false;}

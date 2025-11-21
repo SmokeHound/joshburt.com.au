@@ -464,11 +464,15 @@ ErrorTracker.clearErrorLog();
 ## ⚠️ Important Notes
 
 1. **Always validate changes** with `npm run validate` before committing
-2. **Never commit** `.env` files or database credentials
-3. **Test locally** with `netlify dev` before deploying
-4. **Review audit logs** in `audit-logs.html` after admin actions
-5. **Run migrations** on staging before production
-6. **Use feature flags** in `settings.html` to toggle experimental features
+2. **Version bump required** - After completing any changes, run the appropriate version script:
+   - `npm run version:patch` - Bug fixes and minor changes
+   - `npm run version:minor` - New features (backward compatible)
+   - `npm run version:major` - Breaking changes
+3. **Never commit** `.env` files or database credentials
+4. **Test locally** with `netlify dev` before deploying
+5. **Review audit logs** in `audit-logs.html` after admin actions
+6. **Run migrations** on staging before production
+7. **Use feature flags** in `settings.html` to toggle experimental features
 
 ---
 
