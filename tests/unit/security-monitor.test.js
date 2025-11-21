@@ -38,18 +38,18 @@ describe('Security Monitor Utilities', () => {
 
   describe('detectSqlInjection', () => {
     test('should detect SQL SELECT injection', () => {
-      expect(detectSqlInjection("1' OR '1'='1")).toBe(true);
-      expect(detectSqlInjection("admin' OR 1=1--")).toBe(true);
-      expect(detectSqlInjection("'; DROP TABLE users;--")).toBe(true);
+      expect(detectSqlInjection('1\' OR \'1\'=\'1')).toBe(true);
+      expect(detectSqlInjection('admin\' OR 1=1--')).toBe(true);
+      expect(detectSqlInjection('\'; DROP TABLE users;--')).toBe(true);
     });
 
     test('should detect UNION SELECT attacks', () => {
-      expect(detectSqlInjection("1' UNION SELECT * FROM users--")).toBe(true);
+      expect(detectSqlInjection('1\' UNION SELECT * FROM users--')).toBe(true);
       expect(detectSqlInjection('id=1 UNION SELECT password')).toBe(true);
     });
 
     test('should detect SQL comments', () => {
-      expect(detectSqlInjection("admin'--")).toBe(true);
+      expect(detectSqlInjection('admin\'--')).toBe(true);
       expect(detectSqlInjection('value=1; /* comment */')).toBe(true);
     });
 

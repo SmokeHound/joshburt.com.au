@@ -159,8 +159,8 @@ class MetricsCollector {
         avgDuration:
           recentPerformance.length > 0
             ? Math.round(
-                recentPerformance.reduce((sum, p) => sum + p.duration, 0) / recentPerformance.length
-              )
+              recentPerformance.reduce((sum, p) => sum + p.duration, 0) / recentPerformance.length
+            )
             : 0
       }
     };

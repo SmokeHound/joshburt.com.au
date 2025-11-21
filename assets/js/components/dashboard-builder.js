@@ -1,7 +1,7 @@
 /**
  * Dashboard Builder Component
  * Provides customizable dashboard with drag-and-drop widget management
- * 
+ *
  * Usage:
  * const dashboard = new DashboardBuilder('dashboard-container', {
  *   widgets: [...],
@@ -26,13 +26,13 @@ class DashboardBuilder {
       onWidgetAdd: options.onWidgetAdd || null,
       onWidgetRemove: options.onWidgetRemove || null,
       onLayoutChange: options.onLayoutChange || null,
-      storageKey: options.storageKey || 'dashboard-layout',
+      storageKey: options.storageKey || 'dashboard-layout'
     };
 
     this.state = {
       editMode: false,
       widgets: [...this.options.widgets],
-      layout: [],
+      layout: []
     };
 
     this.dragDrop = null;
@@ -50,22 +50,22 @@ class DashboardBuilder {
       if (saved) {
         const parsed = JSON.parse(saved);
         this.state.layout = parsed.layout || [];
-        
+
         // Restore widget order if layout exists
         if (this.state.layout.length > 0) {
           const orderedWidgets = [];
           this.state.layout.forEach(widgetId => {
             const widget = this.state.widgets.find(w => w.id === widgetId);
-            if (widget) orderedWidgets.push(widget);
+            if (widget) {orderedWidgets.push(widget);}
           });
-          
+
           // Add any new widgets not in saved layout
           this.state.widgets.forEach(widget => {
             if (!orderedWidgets.find(w => w.id === widget.id)) {
               orderedWidgets.push(widget);
             }
           });
-          
+
           this.state.widgets = orderedWidgets;
         }
       }
@@ -78,15 +78,15 @@ class DashboardBuilder {
     try {
       const layout = {
         layout: this.state.widgets.map(w => w.id),
-        timestamp: Date.now(),
+        timestamp: Date.now()
       };
-      
+
       localStorage.setItem(this.options.storageKey, JSON.stringify(layout));
-      
+
       if (this.options.onSave) {
         this.options.onSave(layout);
       }
-      
+
       return true;
     } catch (error) {
       console.error('Failed to save dashboard layout:', error);
@@ -116,10 +116,10 @@ class DashboardBuilder {
     if (!widget.id) {
       widget.id = `widget-${Date.now()}`;
     }
-    
+
     this.state.widgets.push(widget);
     this.render();
-    
+
     if (this.options.onWidgetAdd) {
       this.options.onWidgetAdd(widget);
     }
@@ -130,7 +130,7 @@ class DashboardBuilder {
     if (index > -1) {
       const removed = this.state.widgets.splice(index, 1)[0];
       this.render();
-      
+
       if (this.options.onWidgetRemove) {
         this.options.onWidgetRemove(removed);
       }
@@ -151,7 +151,7 @@ class DashboardBuilder {
       1: 'grid-cols-1',
       2: 'grid-cols-1 lg:grid-cols-2',
       3: 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3',
-      4: 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4',
+      4: 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4'
     };
 
     const gridClass = gridCols[this.options.columns] || gridCols[3];
@@ -167,14 +167,14 @@ class DashboardBuilder {
     `;
 
     this.attachEventListeners();
-    
+
     if (this.state.editMode && this.options.editable) {
       this.initializeDragDrop();
     }
   }
 
   renderToolbar() {
-    if (!this.options.editable) return '';
+    if (!this.options.editable) {return '';}
 
     return `
       <div class="dashboard-toolbar flex items-center justify-between mb-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
@@ -279,7 +279,7 @@ class DashboardBuilder {
 
   async initializeDragDrop() {
     const grid = document.getElementById('dashboard-grid');
-    if (!grid) return;
+    if (!grid) {return;}
 
     // Load DragDrop component if not already loaded
     if (typeof DragDrop === 'undefined') {
@@ -302,17 +302,17 @@ class DashboardBuilder {
         if (this.options.onLayoutChange) {
           this.options.onLayoutChange(this.getWidgets());
         }
-      },
+      }
     });
   }
 
   updateWidgetOrder() {
     const grid = document.getElementById('dashboard-grid');
-    if (!grid) return;
+    if (!grid) {return;}
 
     const widgetElements = grid.querySelectorAll('.dashboard-widget');
     const newOrder = [];
-    
+
     widgetElements.forEach(el => {
       const widgetId = el.getAttribute('data-widget-id');
       const widget = this.state.widgets.find(w => w.id === widgetId);
@@ -343,7 +343,7 @@ class DashboardBuilder {
 
 // Utility function to add dashboard styles
 DashboardBuilder.addDefaultStyles = function() {
-  if (document.getElementById('dashboard-builder-styles')) return;
+  if (document.getElementById('dashboard-builder-styles')) {return;}
 
   const style = document.createElement('style');
   style.id = 'dashboard-builder-styles';

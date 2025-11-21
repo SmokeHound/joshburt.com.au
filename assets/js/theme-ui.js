@@ -342,16 +342,16 @@
         <p class="text-sm text-gray-400 mb-4">Set a specific theme for this page: <code class="text-blue-400">${currentPage}</code></p>
         
         ${
-          currentOverride
-            ? `
+  currentOverride
+    ? `
           <div class="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
             <p class="text-sm text-blue-400">
               Current override: <strong class="capitalize">${currentOverride}</strong>
             </p>
           </div>
         `
-            : ''
-        }
+    : ''
+  }
         
         <div class="space-y-3">
           <select id="page-override-select" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700">

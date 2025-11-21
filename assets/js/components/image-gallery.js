@@ -1,7 +1,7 @@
 /**
  * Image Gallery Component
  * Provides a responsive image gallery with lightbox functionality
- * 
+ *
  * Usage:
  * const gallery = new ImageGallery('gallery-container', {
  *   images: [{url: '...', alt: '...', caption: '...'}],
@@ -25,12 +25,12 @@ class ImageGallery {
       lightbox: options.lightbox !== false,
       lazy: options.lazy !== false,
       onClick: options.onClick || null,
-      className: options.className || '',
+      className: options.className || ''
     };
 
     this.state = {
       currentImageIndex: 0,
-      lightboxOpen: false,
+      lightboxOpen: false
     };
 
     this.init();
@@ -64,8 +64,8 @@ class ImageGallery {
   }
 
   openLightbox(index) {
-    if (!this.options.lightbox) return;
-    
+    if (!this.options.lightbox) {return;}
+
     this.state.currentImageIndex = index;
     this.state.lightboxOpen = true;
     this.renderLightbox();
@@ -96,7 +96,7 @@ class ImageGallery {
       3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
       4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
       5: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5',
-      6: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6',
+      6: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'
     };
 
     const gridClass = gridCols[this.options.columns] || gridCols[3];
@@ -112,8 +112,8 @@ class ImageGallery {
   }
 
   renderImage(image, index) {
-    const aspectRatioStyle = this.options.aspectRatio 
-      ? `aspect-ratio: ${this.options.aspectRatio};` 
+    const aspectRatioStyle = this.options.aspectRatio
+      ? `aspect-ratio: ${this.options.aspectRatio};`
       : '';
 
     return `
@@ -143,10 +143,10 @@ class ImageGallery {
 
   renderLightbox() {
     const existing = document.getElementById('image-gallery-lightbox');
-    if (existing) existing.remove();
+    if (existing) {existing.remove();}
 
     const image = this.options.images[this.state.currentImageIndex];
-    if (!image) return;
+    if (!image) {return;}
 
     const lightbox = document.createElement('div');
     lightbox.id = 'image-gallery-lightbox';
@@ -224,15 +224,15 @@ class ImageGallery {
 
   attachEventListeners() {
     const galleryItems = this.container.querySelectorAll('.gallery-item');
-    
+
     galleryItems.forEach(item => {
       item.addEventListener('click', () => {
         const index = parseInt(item.getAttribute('data-index'), 10);
-        
+
         if (this.options.onClick) {
           this.options.onClick(this.options.images[index], index);
         }
-        
+
         if (this.options.lightbox) {
           this.openLightbox(index);
         }
@@ -248,7 +248,7 @@ class ImageGallery {
 
 // Utility function to add default gallery styles
 ImageGallery.addDefaultStyles = function() {
-  if (document.getElementById('image-gallery-styles')) return;
+  if (document.getElementById('image-gallery-styles')) {return;}
 
   const style = document.createElement('style');
   style.id = 'image-gallery-styles';

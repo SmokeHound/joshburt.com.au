@@ -398,7 +398,7 @@ self.addEventListener('push', event => {
       console.error('Failed to parse notification data:', err);
     }
   }
-  event.waitUntil(self.registration.showNotification("Josh's App", options));
+  event.waitUntil(self.registration.showNotification('Josh\'s App', options));
 });
 
 // Handle notification clicks

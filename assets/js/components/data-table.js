@@ -1,7 +1,7 @@
 /**
  * Data Table Component
  * Provides sorting, filtering, and pagination for tabular data
- * 
+ *
  * Usage:
  * const table = new DataTable('table-id', {
  *   data: [...],
@@ -29,7 +29,7 @@ class DataTable {
       selectable: options.selectable || false,
       onRowClick: options.onRowClick || null,
       onSelectionChange: options.onSelectionChange || null,
-      className: options.className || '',
+      className: options.className || ''
     };
 
     this.state = {
@@ -37,7 +37,7 @@ class DataTable {
       sortColumn: null,
       sortDirection: 'asc',
       filterText: '',
-      selectedRows: new Set(),
+      selectedRows: new Set()
     };
 
     this.init();
@@ -68,7 +68,7 @@ class DataTable {
   }
 
   filterData(data) {
-    if (!this.state.filterText) return data;
+    if (!this.state.filterText) {return data;}
 
     const filterLower = this.state.filterText.toLowerCase();
     return data.filter(row => {
@@ -80,15 +80,15 @@ class DataTable {
   }
 
   sortData(data) {
-    if (!this.state.sortColumn) return data;
+    if (!this.state.sortColumn) {return data;}
 
     const sorted = [...data].sort((a, b) => {
       const aVal = this.getCellValue(a, this.state.sortColumn);
       const bVal = this.getCellValue(b, this.state.sortColumn);
 
-      if (aVal === bVal) return 0;
-      if (aVal === null || aVal === undefined) return 1;
-      if (bVal === null || bVal === undefined) return -1;
+      if (aVal === bVal) {return 0;}
+      if (aVal === null || aVal === undefined) {return 1;}
+      if (bVal === null || bVal === undefined) {return -1;}
 
       const comparison = aVal < bVal ? -1 : 1;
       return this.state.sortDirection === 'asc' ? comparison : -comparison;
@@ -98,7 +98,7 @@ class DataTable {
   }
 
   paginateData(data) {
-    if (!this.options.paginated) return data;
+    if (!this.options.paginated) {return data;}
 
     const start = (this.state.currentPage - 1) * this.options.pageSize;
     const end = start + this.options.pageSize;
@@ -113,8 +113,8 @@ class DataTable {
   }
 
   handleSort(column) {
-    if (!column.sortable && column.sortable !== undefined) return;
-    if (!this.options.sortable) return;
+    if (!column.sortable && column.sortable !== undefined) {return;}
+    if (!this.options.sortable) {return;}
 
     if (this.state.sortColumn === column) {
       this.state.sortDirection = this.state.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -144,7 +144,7 @@ class DataTable {
       this.state.selectedRows.add(originalIndex);
     }
     this.render();
-    
+
     if (this.options.onSelectionChange) {
       this.options.onSelectionChange(this.getSelectedRows());
     }
@@ -179,7 +179,7 @@ class DataTable {
   }
 
   renderFilter() {
-    if (!this.options.filterable) return '';
+    if (!this.options.filterable) {return '';}
 
     return `
       <div class="mb-4">
@@ -195,7 +195,7 @@ class DataTable {
 
   renderTable(data, allFilteredData) {
     const tableClass = `data-table w-full border-collapse ${this.options.selectable ? 'selectable' : ''}`;
-    
+
     return `
       <table class="${tableClass}">
         <thead>
@@ -205,10 +205,10 @@ class DataTable {
           </tr>
         </thead>
         <tbody>
-          ${data.length > 0 
-            ? data.map((row, idx) => this.renderRow(row, idx, allFilteredData)).join('')
-            : `<tr><td colspan="${this.options.columns.length + (this.options.selectable ? 1 : 0)}" class="p-8 text-center text-gray-400">No data available</td></tr>`
-          }
+          ${data.length > 0
+    ? data.map((row, idx) => this.renderRow(row, idx, allFilteredData)).join('')
+    : `<tr><td colspan="${this.options.columns.length + (this.options.selectable ? 1 : 0)}" class="p-8 text-center text-gray-400">No data available</td></tr>`
+}
         </tbody>
       </table>
     `;
@@ -217,7 +217,7 @@ class DataTable {
   renderHeaderCell(column) {
     const sortable = this.options.sortable && (column.sortable !== false);
     const isSorted = this.state.sortColumn === column;
-    const sortIcon = isSorted 
+    const sortIcon = isSorted
       ? (this.state.sortDirection === 'asc' ? '↑' : '↓')
       : '';
 
@@ -267,11 +267,11 @@ class DataTable {
   }
 
   renderPagination(totalPages, totalItems) {
-    if (!this.options.paginated || totalPages <= 1) return '';
+    if (!this.options.paginated || totalPages <= 1) {return '';}
 
     const maxButtons = 5;
     let startPage = Math.max(1, this.state.currentPage - Math.floor(maxButtons / 2));
-    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+    const endPage = Math.min(totalPages, startPage + maxButtons - 1);
 
     if (endPage - startPage < maxButtons - 1) {
       startPage = Math.max(1, endPage - maxButtons + 1);
@@ -297,9 +297,9 @@ class DataTable {
           </button>
           ${pages.map(page => `
             <button
-              class="pagination-btn px-3 py-1 border rounded ${page === this.state.currentPage 
-                ? 'bg-blue-600 border-blue-600 text-white' 
-                : 'bg-gray-800 border-gray-600 hover:bg-gray-700'}"
+              class="pagination-btn px-3 py-1 border rounded ${page === this.state.currentPage
+    ? 'bg-blue-600 border-blue-600 text-white'
+    : 'bg-gray-800 border-gray-600 hover:bg-gray-700'}"
               data-page="${page}"
             >
               ${page}
@@ -330,7 +330,7 @@ class DataTable {
       header.addEventListener('click', () => {
         const field = header.getAttribute('data-sort-field');
         const column = this.options.columns.find(col => col.field === field);
-        if (column) this.handleSort(column);
+        if (column) {this.handleSort(column);}
       });
     });
 
@@ -363,8 +363,8 @@ class DataTable {
     rows.forEach(row => {
       row.addEventListener('click', (e) => {
         // Don't trigger if clicking checkbox
-        if (e.target.type === 'checkbox') return;
-        
+        if (e.target.type === 'checkbox') {return;}
+
         const index = parseInt(row.getAttribute('data-row-index'), 10);
         const filtered = this.filterData(this.options.data);
         const sorted = this.sortData(filtered);

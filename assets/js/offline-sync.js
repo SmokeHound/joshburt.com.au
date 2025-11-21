@@ -177,20 +177,20 @@ class OfflineSyncManager {
     const { type, data } = item;
 
     switch (type) {
-      case 'create_order':
-        return this.syncCreateOrder(data);
+    case 'create_order':
+      return this.syncCreateOrder(data);
 
-      case 'update_order':
-        return this.syncUpdateOrder(data);
+    case 'update_order':
+      return this.syncUpdateOrder(data);
 
-      case 'create_product':
-        return this.syncCreateProduct(data);
+    case 'create_product':
+      return this.syncCreateProduct(data);
 
-      case 'update_product':
-        return this.syncUpdateProduct(data);
+    case 'update_product':
+      return this.syncUpdateProduct(data);
 
-      default:
-        throw new Error(`Unknown sync type: ${type}`);
+    default:
+      throw new Error(`Unknown sync type: ${type}`);
     }
   }
 
@@ -200,7 +200,7 @@ class OfflineSyncManager {
    */
   async syncCreateOrder(orderData) {
     const token = localStorage.getItem('accessToken');
-    if (!token) throw new Error('Not authenticated');
+    if (!token) {throw new Error('Not authenticated');}
 
     const response = await fetch(`${this.FN_BASE}/orders`, {
       method: 'POST',
@@ -241,7 +241,7 @@ class OfflineSyncManager {
    */
   async syncUpdateOrder(orderData) {
     const token = localStorage.getItem('accessToken');
-    if (!token) throw new Error('Not authenticated');
+    if (!token) {throw new Error('Not authenticated');}
 
     const response = await fetch(`${this.FN_BASE}/orders`, {
       method: 'PUT',
@@ -266,7 +266,7 @@ class OfflineSyncManager {
    */
   async syncCreateProduct(productData) {
     const token = localStorage.getItem('accessToken');
-    if (!token) throw new Error('Not authenticated');
+    if (!token) {throw new Error('Not authenticated');}
 
     const response = await fetch(`${this.FN_BASE}/products`, {
       method: 'POST',
@@ -291,7 +291,7 @@ class OfflineSyncManager {
    */
   async syncUpdateProduct(productData) {
     const token = localStorage.getItem('accessToken');
-    if (!token) throw new Error('Not authenticated');
+    if (!token) {throw new Error('Not authenticated');}
 
     const response = await fetch(`${this.FN_BASE}/products`, {
       method: 'PUT',

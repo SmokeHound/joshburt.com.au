@@ -67,7 +67,7 @@ async function generateSQLBackup(tables = [], compression = 'gzip') {
       }
 
       try {
-        let finalData = output;
+        const finalData = output;
 
         if (compression === 'gzip') {
           const compressed = await gzip(Buffer.from(output));
@@ -171,7 +171,7 @@ async function generateCSVBackup(pool, tables = [], compression = 'none') {
   for (const table of tablesToBackup) {
     const result = await pool.query(`SELECT * FROM ${table}`);
 
-    if (result.rows.length === 0) continue;
+    if (result.rows.length === 0) {continue;}
 
     const headers = Object.keys(result.rows[0]);
     const csvRows = [headers.join(',')];
@@ -179,8 +179,8 @@ async function generateCSVBackup(pool, tables = [], compression = 'none') {
     for (const row of result.rows) {
       const values = headers.map(h => {
         const value = row[h];
-        if (value === null) return '';
-        if (typeof value === 'object') return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
+        if (value === null) {return '';}
+        if (typeof value === 'object') {return `"${JSON.stringify(value).replace(/"/g, '""')}"`;}
         return `"${String(value).replace(/"/g, '""')}"`;
       });
       csvRows.push(values.join(','));
@@ -253,7 +253,7 @@ async function createBackup(backupConfig) {
 
     return result;
   } catch (error) {
-    console.error(`Backup failed:`, error.message);
+    console.error('Backup failed:', error.message);
 
     // Update backup record with error
     await pool.query(

@@ -10,31 +10,31 @@ const DB_TYPE = 'postgres';
 const DATABASE_URL = process.env.DATABASE_URL || null;
 const pgConfig = DATABASE_URL
   ? {
-      connectionString: DATABASE_URL,
-      ssl: true,
-      max: parseInt(process.env.DB_POOL_MAX) || 20, // Increased for better concurrency
-      min: parseInt(process.env.DB_POOL_MIN) || 2, // Maintain minimum connections
-      idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
-      connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
-      // Query timeout to prevent long-running queries
-      query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
-      // Enable statement timeout for PostgreSQL
-      statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
-    }
+    connectionString: DATABASE_URL,
+    ssl: true,
+    max: parseInt(process.env.DB_POOL_MAX) || 20, // Increased for better concurrency
+    min: parseInt(process.env.DB_POOL_MIN) || 2, // Maintain minimum connections
+    idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
+    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
+    // Query timeout to prevent long-running queries
+    query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
+    // Enable statement timeout for PostgreSQL
+    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
+  }
   : {
-      user: process.env.DB_USER,
-      host: process.env.DB_HOST,
-      database: process.env.DB_NAME,
-      password: process.env.DB_PASSWORD,
-      port: process.env.DB_PORT || 5432,
-      ssl: { rejectUnauthorized: true },
-      max: parseInt(process.env.DB_POOL_MAX) || 20,
-      min: parseInt(process.env.DB_POOL_MIN) || 2,
-      idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
-      connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
-      query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
-      statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
-    };
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT || 5432,
+    ssl: { rejectUnauthorized: true },
+    max: parseInt(process.env.DB_POOL_MAX) || 20,
+    min: parseInt(process.env.DB_POOL_MIN) || 2,
+    idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
+    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 3000,
+    query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 10000,
+    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT) || 10000
+  };
 
 class Database {
   constructor() {
@@ -254,16 +254,16 @@ async function createPostgreSQLTables() {
 
   // Backfill missing columns for legacy deployments (safe no-ops with IF NOT EXISTS)
   await database.run(
-    "ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_by VARCHAR(255) DEFAULT 'mechanic'"
+    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_by VARCHAR(255) DEFAULT \'mechanic\''
   );
   await database.run(
     'ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_items INTEGER NOT NULL DEFAULT 0'
   );
   await database.run(
-    "ALTER TABLE orders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending'"
+    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT \'pending\''
   );
   await database.run(
-    "ALTER TABLE orders ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT 'normal'"
+    'ALTER TABLE orders ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT \'normal\''
   );
   await database.run('ALTER TABLE orders ADD COLUMN IF NOT EXISTS notes TEXT');
   await database.run(
@@ -427,13 +427,13 @@ async function createPostgreSQLTables() {
   // Expression indexes on common JSON fields in details for faster filtering (PostgreSQL)
   // Use partial indexes guarded to rows where details appears to be JSON to avoid cast errors on legacy text rows
   await database.run(
-    "CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs ((details::json->>'path')) WHERE substring(details from 1 for 1) IN ('{','[')"
+    'CREATE INDEX IF NOT EXISTS idx_audit_details_path ON audit_logs ((details::json->>\'path\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')'
   );
   await database.run(
-    "CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs ((details::json->>'method')) WHERE substring(details from 1 for 1) IN ('{','[')"
+    'CREATE INDEX IF NOT EXISTS idx_audit_details_method ON audit_logs ((details::json->>\'method\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')'
   );
   await database.run(
-    "CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs ((details::json->>'requestId')) WHERE substring(details from 1 for 1) IN ('{','[')"
+    'CREATE INDEX IF NOT EXISTS idx_audit_details_request_id ON audit_logs ((details::json->>\'requestId\')) WHERE substring(details from 1 for 1) IN (\'{\',\'[\')'
   );
   await database.run(
     'CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip_address, created_at)'
