@@ -1,6 +1,6 @@
 {
   "name": "joshburt-website",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Static website for joshburt.com.au with Netlify Functions and Neon DB integration",
   "main": "index.html",
   "scripts": {
