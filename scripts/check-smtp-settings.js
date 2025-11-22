@@ -1,39 +1,24 @@
-// Check SMTP settings in database
+// Check SMTP settings in database using shared database wrapper
 require('dotenv').config();
-const { Pool } = require('pg');
-
-// Use DATABASE_URL if available, otherwise individual params
-const DATABASE_URL = process.env.DATABASE_URL || null;
-const pgConfig = DATABASE_URL
-  ? {
-    connectionString: DATABASE_URL,
-    ssl: true
-  }
-  : {
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT || 5432,
-    ssl: { rejectUnauthorized: true }
-  };
-
-const pool = new Pool(pgConfig);
+const { database } = require('../config/database');
 
 async function checkSMTPSettings() {
   try {
+    await database.connect();
+
     // Check SMTP settings
-    const res = await pool.query(
-      'SELECT key, value, is_sensitive FROM settings WHERE key LIKE \'smtp%\' ORDER BY key'
+    const res = await database.all(
+      'SELECT key, value, is_sensitive FROM settings WHERE key LIKE ? ORDER BY key',
+      ['smtp%']
     );
 
     console.log('SMTP Settings in Database:');
     console.log('===========================');
 
-    if (res.rows.length === 0) {
+    if (!res || res.length === 0) {
       console.log('No SMTP settings found!');
     } else {
-      res.rows.forEach(r => {
+      res.forEach(r => {
         const displayValue = r.is_sensitive ? '***REDACTED***' : r.value || '(null)';
         console.log(`  ${r.key} = ${displayValue}`);
       });
@@ -42,17 +27,17 @@ async function checkSMTPSettings() {
     console.log('\n');
 
     // Check feature flags
-    const ffRes = await pool.query(
-      'SELECT key, value, data_type FROM settings WHERE key = \'featureFlags\''
+    const ffRes = await database.all(
+      'SELECT key, value, data_type FROM settings WHERE key = ?',[ 'featureFlags' ]
     );
 
     console.log('Feature Flags Setting:');
     console.log('======================');
 
-    if (ffRes.rows.length === 0) {
+    if (!ffRes || ffRes.length === 0) {
       console.log('No featureFlags setting found!');
     } else {
-      ffRes.rows.forEach(r => {
+      ffRes.forEach(r => {
         console.log(`  ${r.key} (${r.data_type}) = ${r.value || '(null)'}`);
         if (r.value) {
           try {
@@ -65,10 +50,12 @@ async function checkSMTPSettings() {
       });
     }
 
-    await pool.end();
+    await database.close();
   } catch (e) {
     console.error('Error:', e.message);
-    await pool.end();
+    try {
+      await database.close();
+    } catch (_) {}
     process.exit(1);
   }
 }

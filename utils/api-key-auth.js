@@ -4,7 +4,7 @@
  * Part of Phase 6: Security Enhancements
  */
 
-const { Pool } = require('../config/database');
+const { database } = require('../config/database');
 const { logSecurityEvent, EVENT_TYPES, SEVERITY, getClientIp } = require('./security-monitor');
 const cryptoModule = require('crypto');
 
@@ -67,7 +67,8 @@ function isValidApiKeyFormat(apiKey) {
  * @returns {Promise<object>} - { valid: boolean, userId: number, keyId: number, error: string }
  */
 async function authenticateApiKey(apiKey, requiredPermission = null) {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
 
   try {
     // Validate format first
@@ -179,7 +180,8 @@ async function logApiKeyUsage({
   responseStatus,
   responseTimeMs
 }) {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
 
   try {
     const keyHash = hashApiKey(apiKey);
@@ -311,7 +313,8 @@ function withApiKeyAuth(handler, requiredPermission = null) {
  * @returns {Promise<object>} - { allowed: boolean, remaining: number, resetAt: Date }
  */
 async function checkApiKeyRateLimit(apiKey, limit) {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
   const keyHash = hashApiKey(apiKey);
 
   try {

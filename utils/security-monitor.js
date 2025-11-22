@@ -4,7 +4,7 @@
  * Part of Phase 6: Security Enhancements
  */
 
-const { Pool } = require('../config/database');
+const { database } = require('../config/database');
 
 /**
  * Security event types
@@ -53,7 +53,8 @@ async function logSecurityEvent({
   description,
   metadata = {}
 }) {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
 
   try {
     const result = await pool.query(
@@ -74,7 +75,8 @@ async function logSecurityEvent({
  * @returns {Promise<boolean>} - True if blacklisted
  */
 async function isIpBlacklisted(ipAddress) {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
 
   try {
     const result = await pool.query('SELECT is_ip_blacklisted($1) as blacklisted', [ipAddress]);
@@ -96,7 +98,8 @@ async function isIpBlacklisted(ipAddress) {
  * @returns {Promise<number>} - Blacklist entry ID
  */
 async function addToBlacklist({ ipAddress, reason, addedBy, expiresAt = null }) {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
 
   try {
     const result = await pool.query(
@@ -125,7 +128,8 @@ async function addToBlacklist({ ipAddress, reason, addedBy, expiresAt = null }) 
  * @returns {Promise<boolean>} - True if removed
  */
 async function removeFromBlacklist(ipAddress) {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
 
   try {
     await pool.query('UPDATE ip_blacklist SET is_active = FALSE WHERE ip_address = $1', [
@@ -147,7 +151,8 @@ async function removeFromBlacklist(ipAddress) {
  * @returns {Promise<object>} - { allowed: boolean, count: number, resetAt: Date }
  */
 async function trackRateLimit(identifier, endpoint, limit, windowMs) {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
   const windowSeconds = Math.floor(windowMs / 1000);
 
   try {
@@ -190,7 +195,8 @@ async function trackRateLimit(identifier, endpoint, limit, windowMs) {
  * @returns {Promise<object>} - { suspicious: boolean, reason: string }
  */
 async function detectSuspiciousLogin(ipAddress, email) {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
 
   try {
     // Check for multiple failed login attempts from same IP

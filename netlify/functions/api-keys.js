@@ -4,7 +4,7 @@
  * Part of Phase 6: Security Enhancements
  */
 
-const { Pool } = require('../../config/database');
+const { database } = require('../../config/database');
 const { withHandler } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
 const { logAudit } = require('../../utils/audit');
@@ -373,7 +373,8 @@ async function revokeApiKey(event, pool) {
  * Main handler
  */
 const handler = withHandler(async event => {
-  const pool = Pool();
+  await database.connect();
+  const pool = database.pool;
   const path = event.path;
   const method = event.httpMethod;
 
