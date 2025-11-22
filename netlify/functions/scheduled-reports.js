@@ -94,7 +94,7 @@ exports.handler = withHandler(async function (event) {
       query += ` ORDER BY sr.created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
       queryParams.push(limit, offset);
 
-      const result = await database.query(query, queryParams);
+      const reports = await database.all(query, queryParams);
 
       // Get total count
       let countQuery = 'SELECT COUNT(*) FROM scheduled_reports WHERE 1=1';
@@ -108,11 +108,11 @@ exports.handler = withHandler(async function (event) {
         countQuery += ` AND report_type = $${countParamIndex++}`;
       }
 
-      const countResult = await database.query(countQuery, countParams);
-      const total = parseInt(countResult.rows[0].count, 10);
+      const countResult = await database.get(countQuery, countParams);
+      const total = parseInt(countResult.count, 10);
 
       return ok({
-        reports: result.rows,
+        reports: reports,
         pagination: {
           page: parseInt(page, 10),
           per_page: limit,
@@ -140,13 +140,13 @@ exports.handler = withHandler(async function (event) {
         LEFT JOIN users u ON sr.created_by = u.id
         WHERE sr.id = $1
       `;
-      const result = await database.query(query, [parseInt(reportId, 10)]);
+      const report = await database.get(query, [parseInt(reportId, 10)]);
 
-      if (result.rows.length === 0) {
+      if (!report) {
         return error(404, 'Report not found');
       }
 
-      return ok({ report: result.rows[0] });
+      return ok({ report: report });
     } catch (e) {
       console.error('Error getting report:', e);
       return error(500, 'Failed to get report');
@@ -194,7 +194,7 @@ exports.handler = withHandler(async function (event) {
         RETURNING *
       `;
 
-      const result = await database.query(insertQuery, [
+      const result = await database.run(insertQuery, [
         name,
         report_type,
         frequency,
@@ -202,13 +202,13 @@ exports.handler = withHandler(async function (event) {
         JSON.stringify(filters),
         format,
         next_run,
-        user.userId
+        user.id
       ]);
 
       return ok(
         {
           message: 'Scheduled report created successfully',
-          report: result.rows[0]
+          report: result.rows && result.rows[0] ? result.rows[0] : { id: result.id }
         },
         201
       );
@@ -268,9 +268,9 @@ exports.handler = withHandler(async function (event) {
         RETURNING *
       `;
 
-      const result = await database.query(query, params);
+      const result = await database.run(query, params);
 
-      if (result.rows.length === 0) {
+      if (!result.rows || result.rows.length === 0) {
         return error(404, 'Report not found');
       }
 
@@ -288,9 +288,9 @@ exports.handler = withHandler(async function (event) {
   async function deleteReport(reportId) {
     try {
       const query = 'DELETE FROM scheduled_reports WHERE id = $1 RETURNING *';
-      const result = await database.query(query, [parseInt(reportId, 10)]);
+      const result = await database.run(query, [parseInt(reportId, 10)]);
 
-      if (result.rows.length === 0) {
+      if (!result.rows || result.rows.length === 0) {
         return error(404, 'Report not found');
       }
 
@@ -316,13 +316,12 @@ exports.handler = withHandler(async function (event) {
       if (report_id) {
         // Generate from scheduled report
         const query = 'SELECT * FROM scheduled_reports WHERE id = $1';
-        const result = await database.query(query, [parseInt(report_id, 10)]);
+        const reportConfig = await database.get(query, [parseInt(report_id, 10)]);
 
-        if (result.rows.length === 0) {
+        if (!reportConfig) {
           return error(404, 'Scheduled report not found');
         }
 
-        reportConfig = result.rows[0];
         reportName = reportConfig.name;
       } else if (report_type) {
         // Ad-hoc report generation
@@ -349,20 +348,20 @@ exports.handler = withHandler(async function (event) {
         RETURNING *
       `;
 
-      const historyResult = await database.query(historyQuery, [
+      const historyResult = await database.run(historyQuery, [
         report_id || null,
         reportName,
         reportConfig.report_type,
         formattedReport.length,
         'success',
         JSON.stringify({ row_count: reportData.length, filters: reportConfig.filters || filters }),
-        user.userId
+        user.id
       ]);
 
       return ok({
         message: 'Report generated successfully',
         report: formattedReport,
-        history: historyResult.rows[0]
+        history: historyResult.rows && historyResult.rows[0] ? historyResult.rows[0] : { id: historyResult.id }
       });
     } catch (e) {
       console.error('Error generating report:', e);
@@ -414,8 +413,8 @@ exports.handler = withHandler(async function (event) {
       ORDER BY o.created_at DESC
     `;
 
-    const result = await database.query(query, [startDate, endDate]);
-    return result.rows;
+    const result = await database.all(query, [startDate, endDate]);
+    return result;
   }
 
   // Generate inventory report
@@ -434,8 +433,8 @@ exports.handler = withHandler(async function (event) {
       ORDER BY p.stock_quantity ASC
     `;
 
-    const result = await database.query(query);
-    return result.rows;
+    const result = await database.all(query);
+    return result;
   }
 
   // Generate users report
@@ -454,8 +453,8 @@ exports.handler = withHandler(async function (event) {
       ORDER BY u.created_at DESC
     `;
 
-    const result = await database.query(query, [startDate, endDate]);
-    return result.rows;
+    const result = await database.all(query, [startDate, endDate]);
+    return result;
   }
 
   // Generate analytics report
@@ -473,8 +472,8 @@ exports.handler = withHandler(async function (event) {
       ORDER BY date DESC, event_type
     `;
 
-    const result = await database.query(query, [startDate, endDate]);
-    return result.rows;
+    const result = await database.all(query, [startDate, endDate]);
+    return result;
   }
 
   // Format report as CSV
