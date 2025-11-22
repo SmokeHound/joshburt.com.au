@@ -3,7 +3,6 @@
  * Provides demand predictions and forecasting data
  */
 
-const { Pool } = require('pg');
 const { withHandler, error } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
 const {
@@ -11,15 +10,12 @@ const {
   storeForecasts,
   getLowStockAlerts
 } = require('../../scripts/forecast-calculator');
+const { database } = require('../../config/database');
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 5432,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: process.env.DB_SSL !== 'false' ? { rejectUnauthorized: false } : false
-});
+async function getPool() {
+  if (!database.pool) await database.connect();
+  return database.pool;
+}
 
 /**
  * GET /inventory-forecast
@@ -40,7 +36,7 @@ async function getForecasts(event) {
   const days = params.days ? parseInt(params.days) : 30;
   const minConfidence = params.min_confidence ? parseFloat(params.min_confidence) : 0;
 
-  const client = await pool.connect();
+    const client = await (await getPool()).connect();
 
   try {
     let query = `
@@ -253,7 +249,7 @@ async function getSummary(event) {
       GROUP BY item_type
     `;
 
-    const result = await client.query(summaryQuery);
+      const result = await client.query(summaryQuery);
 
     // Get low stock count
     const alerts = await getLowStockAlerts(7);

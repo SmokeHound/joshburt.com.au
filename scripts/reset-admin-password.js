@@ -1,25 +1,21 @@
 #!/usr/bin/env node
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true
-});
+const { database } = require('../config/database');
 
 async function resetAdminPassword() {
   try {
+    await database.connect();
     const newHash = await bcrypt.hash('Admin123!', 12);
-    const result = await pool.query(
-      'UPDATE users SET password_hash = $1 WHERE email = \'admin@joshburt.com.au\' RETURNING email',
-      [newHash]
+    const result = await database.run(
+      'UPDATE users SET password_hash = ? WHERE email = ?',
+      [newHash, 'admin@joshburt.com.au']
     );
-    console.log('✅ Password reset for:', result.rows[0].email);
+    console.log('✅ Password reset for: admin@joshburt.com.au');
   } catch (error) {
     console.error('Error:', error.message);
   } finally {
-    await pool.end();
+    await database.close();
   }
 }
 

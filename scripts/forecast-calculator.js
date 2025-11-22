@@ -6,17 +6,14 @@
  * Uses simple statistical methods: moving averages, trend analysis, seasonality
  */
 
-const { Pool } = require('pg');
 require('dotenv').config();
+const { database } = require('../config/database');
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 5432,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: process.env.DB_SSL !== 'false' ? { rejectUnauthorized: false } : false
-});
+// Helper to get a connected client from the shared database wrapper
+async function getClient() {
+  await database.connect();
+  return await database.pool.connect();
+}
 
 /**
  * Calculate moving average for demand smoothing
@@ -358,11 +355,11 @@ if (require.main === module) {
         await calculateAllForecasts();
       }
 
-      await pool.end();
+      await database.close();
       process.exit(0);
     } catch (error) {
       console.error('❌ Error:', error);
-      await pool.end();
+      await database.close();
       process.exit(1);
     }
   })();

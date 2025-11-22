@@ -1,23 +1,19 @@
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  connectionString: 'postgresql://neondb_owner:npg_RCwEhZ2pm6vx@ep-broad-term-a75jcieo-pooler.ap-southeast-2.aws.neon.tech:5432/neondb',
-  ssl: true
-});
+const { database } = require('./config/database');
 
 async function checkTable() {
   try {
-    const result = await pool.query(`
+    await database.connect();
+    const result = await database.get(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
         WHERE table_name = 'customer_purchase_patterns'
-      );
+      ) as exists
     `);
-    console.log('customer_purchase_patterns table exists:', result.rows[0].exists);
+    console.log('customer_purchase_patterns table exists:', result.exists);
   } catch (error) {
     console.error('Error:', error.message);
   } finally {
-    await pool.end();
+    await database.close();
   }
 }
 

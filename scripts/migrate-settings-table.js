@@ -6,29 +6,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const { Pool } = require('pg');
 require('dotenv').config();
-
-// Create database pool directly
-const DATABASE_URL = process.env.DATABASE_URL;
-const pool = new Pool(
-  DATABASE_URL
-    ? {
-      connectionString: DATABASE_URL,
-      ssl: true
-    }
-    : {
-      user: process.env.DB_USER,
-      host: process.env.DB_HOST,
-      database: process.env.DB_NAME,
-      password: process.env.DB_PASSWORD,
-      port: process.env.DB_PORT || 5432,
-      ssl: { rejectUnauthorized: true }
-    }
-);
+const { database } = require('../config/database');
 
 async function runMigration() {
-  const client = await pool.connect();
+  await database.connect();
+  const client = await database.pool.connect();
 
   try {
     console.log('🔄 Starting settings table migration...\n');
@@ -108,7 +91,7 @@ async function runMigration() {
     process.exit(1);
   } finally {
     client.release();
-    await pool.end();
+    await database.close();
   }
 }
 

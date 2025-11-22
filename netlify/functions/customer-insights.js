@@ -3,18 +3,14 @@
  * Provides customer segmentation, purchase patterns, and recommendations
  */
 
-const { Pool } = require('pg');
 const { withHandler, error } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
+const { database } = require('../../config/database');
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 5432,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: process.env.DB_SSL !== 'false' ? { rejectUnauthorized: false } : false
-});
+async function getPool() {
+  if (!database.pool) await database.connect();
+  return database.pool;
+}
 
 /**
  * GET /customer-insights?action=patterns
@@ -28,7 +24,7 @@ async function getPurchasePatterns(event) {
   const userId = params.user_id ? parseInt(params.user_id) : null;
   const limit = params.limit ? parseInt(params.limit) : 50;
 
-  const client = await pool.connect();
+  const client = await (await getPool()).connect();
 
   try {
     let query = `
@@ -91,7 +87,7 @@ async function getCustomerSegmentation(event) {
   const { user, response: authResponse } = await requirePermission(event, 'insights', 'read');
   if (authResponse) return authResponse;
 
-  const client = await pool.connect();
+  const client = await (await getPool()).connect();
 
   try {
     const query = `
@@ -182,7 +178,7 @@ async function getProductAffinity(event) {
   const minScore = params.min_score ? parseFloat(params.min_score) : 0.3;
   const limit = params.limit ? parseInt(params.limit) : 50;
 
-  const client = await pool.connect();
+  const client = await (await getPool()).connect();
 
   try {
     let query = `
@@ -248,7 +244,7 @@ async function calculatePurchasePatterns(event) {
   const { user, response: authResponse } = await requirePermission(event, 'insights', 'create');
   if (authResponse) return authResponse;
 
-  const client = await pool.connect();
+  const client = await (await getPool()).connect();
 
   try {
     await client.query('BEGIN');
@@ -312,7 +308,7 @@ async function calculateProductAffinity(event) {
   const { user, response: authResponse } = await requirePermission(event, 'insights', 'create');
   if (authResponse) return authResponse;
 
-  const client = await pool.connect();
+  const client = await (await getPool()).connect();
 
   try {
     await client.query('BEGIN');
@@ -378,7 +374,7 @@ async function getRecommendations(event) {
     return error(400, 'user_id is required');
   }
 
-  const client = await pool.connect();
+  const client = await (await getPool()).connect();
 
   try {
     // Get recommendations based on purchase patterns and affinity

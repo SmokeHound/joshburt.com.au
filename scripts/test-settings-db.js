@@ -4,29 +4,25 @@
  */
 
 require('dotenv').config();
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true
-});
+const { database } = require('../config/database');
 
 async function testSettingsQuery() {
   console.log('📖 Testing settings table query...\n');
 
   try {
+    await database.connect();
     // Test: Get all settings
     console.log('1. Get all settings:');
-    const allSettings = await pool.query(`
+    const allSettings = await database.all(`
       SELECT key, value, category, data_type 
       FROM settings 
       ORDER BY category, key
     `);
-    console.log(`Found ${allSettings.rows.length} settings\n`);
+    console.log(`Found ${allSettings.length} settings\n`);
 
     // Transform to object format
     const settings = {};
-    for (const row of allSettings.rows) {
+    for (const row of allSettings) {
       let value = row.value;
 
       if (row.data_type === 'boolean') {
@@ -50,47 +46,47 @@ async function testSettingsQuery() {
 
     // Test: Get by category
     console.log('2. Get theme settings:');
-    const themeSettings = await pool.query(`
+    const themeSettings = await database.all(`
       SELECT key, value, data_type 
       FROM settings 
       WHERE category = 'theme'
     `);
-    console.log(`Found ${themeSettings.rows.length} theme settings:`);
-    console.log(themeSettings.rows);
+    console.log(`Found ${themeSettings.length} theme settings:`);
+    console.log(themeSettings);
     console.log();
 
     // Test: Get specific keys
     console.log('3. Get specific keys (siteTitle, maintenanceMode):');
-    const specificSettings = await pool.query(`
+    const specificSettings = await database.all(`
       SELECT key, value, data_type 
       FROM settings 
       WHERE key IN ('siteTitle', 'maintenanceMode')
     `);
-    console.log(specificSettings.rows);
+    console.log(specificSettings);
     console.log();
 
     // Test: Update a setting
     console.log('4. Update siteTitle:');
     const testTitle = `Test ${Date.now()}`;
-    await pool.query(
+    await database.run(
       `
       UPDATE settings 
-      SET value = $1, updated_at = CURRENT_TIMESTAMP 
+      SET value = ?, updated_at = CURRENT_TIMESTAMP 
       WHERE key = 'siteTitle'
     `,
       [testTitle]
     );
 
-    const updated = await pool.query(`
+    const updated = await database.get(`
       SELECT value FROM settings WHERE key = 'siteTitle'
     `);
-    console.log(`Updated siteTitle to: "${updated.rows[0].value}"`);
+    console.log(`Updated siteTitle to: "${updated.value}"`);
 
     // Restore original
-    await pool.query(
+    await database.run(
       `
       UPDATE settings 
-      SET value = $1, updated_at = CURRENT_TIMESTAMP 
+      SET value = ?, updated_at = CURRENT_TIMESTAMP 
       WHERE key = 'siteTitle'
     `,
       ['']
@@ -102,7 +98,7 @@ async function testSettingsQuery() {
     console.error('❌ Error:', error.message);
     throw error;
   } finally {
-    await pool.end();
+    await database.close();
   }
 }
 

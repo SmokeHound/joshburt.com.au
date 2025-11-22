@@ -4,7 +4,7 @@
  * Part of Phase 4: Data Management
  */
 
-const { Pool } = require('../../config/database');
+const { database } = require('../../config/database');
 const { withHandler } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
 const { logAudit } = require('../../utils/audit');
@@ -375,7 +375,8 @@ async function exportData(event, pool) {
  * Main handler
  */
 exports.handler = withHandler(async event => {
-  const pool = new Pool();
+  await database.connect();
+  const pool = database.pool;
 
   try {
     const method = event.httpMethod;
@@ -406,6 +407,6 @@ exports.handler = withHandler(async event => {
       body: JSON.stringify({ error: 'Not found' })
     };
   } finally {
-    await pool.end();
+    // keep shared pool open
   }
 });

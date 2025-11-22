@@ -6,7 +6,7 @@
  * Part of Phase 4: Data Management
  */
 
-const { Pool } = require('../config/database');
+const { database } = require('../config/database');
 const { spawn } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
@@ -211,7 +211,7 @@ async function generateCSVBackup(pool, tables = [], compression = 'none') {
  * Create backup based on configuration
  */
 async function createBackup(backupConfig) {
-  const pool = new Pool();
+  const pool = await (async () => { await database.connect(); return database.pool; })();
 
   try {
     const { id, backup_type, format, compression, tables } = backupConfig;
@@ -265,7 +265,7 @@ async function createBackup(backupConfig) {
 
     throw error;
   } finally {
-    await pool.end();
+    // do not close shared pool here; caller manages lifecycle
   }
 }
 
@@ -273,8 +273,7 @@ async function createBackup(backupConfig) {
  * Process pending backups
  */
 async function processPendingBackups() {
-  const pool = new Pool();
-
+  const pool = await (async () => { await database.connect(); return database.pool; })();
   try {
     // Get pending backups
     const result = await pool.query(
@@ -299,7 +298,7 @@ async function processPendingBackups() {
 
     console.log('All pending backups processed');
   } finally {
-    await pool.end();
+    // do not close shared pool here; caller manages lifecycle
   }
 }
 
@@ -344,6 +343,15 @@ if (require.main === module) {
     process.exit(1);
   });
 }
+
+// Ensure DB pool closed on exit
+process.on('beforeExit', async () => {
+  try {
+    await database.close();
+  } catch (e) {
+    // ignore
+  }
+});
 
 module.exports = {
   createBackup,
