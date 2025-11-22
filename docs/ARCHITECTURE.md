@@ -294,7 +294,7 @@ assets/#### Static Assets
 
 <!-- Include in all pages -->
 
-<div id="shared-nav-container"></div>1. **Authentication** (`auth.js`)
+<div id="main-nav"></div>1. **Authentication** (`auth.js`)
 
 <script src="/shared-nav.html"></script>   - Register, login, logout, refresh token
 

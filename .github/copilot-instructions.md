@@ -284,7 +284,7 @@ Include these HTML fragments in your pages:
 
 ```html
 <!-- Navigation sidebar -->
-<div id="shared-nav-container"></div>
+<div id="main-nav"></div>
 <script src="/shared-nav.html"></script>
 
 <!-- Theme manager (dark/light/system/neon/ocean/high-contrast) -->

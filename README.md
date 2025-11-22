@@ -235,7 +235,7 @@ curl -X POST '/.netlify/functions/auth?action=login' \
 
 ```html
 <!-- Include in all pages -->
-<div id="shared-nav-container"></div>
+<div id="main-nav"></div>
 <script src="/shared-nav.html"></script>
 <script src="/shared-theme.html"></script>
 <script src="/shared-config.html"></script>
@@ -460,23 +460,23 @@ curl http://localhost:8888/.netlify/functions/my-function
 
 ### Database Migration
 
-````bash
-### Database Schema
+```html
+<!-- Include in all pages -->
+<div id="main-nav"></div>
+<script src="/shared-nav.html"></script>
 
-The complete database schema is in `database-schema.sql`. Apply it to a fresh PostgreSQL database:
+<!-- Theme manager (dark/light/system/neon/ocean/high-contrast) -->
+<script src="/shared-theme.html"></script>
 
-```bash
-# Apply complete schema
-psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f database-schema.sql
-````
+<!-- TailwindCSS config + common utilities -->
+<script src="/shared-config.html"></script>
 
+<!-- Modals (confirmation, info, error) -->
+<script src="/shared-modals.html"></script>
+
+<!-- Notifications toast -->
+<script src="/shared-notifications.html"></script>
 ```
-
----
-
-## 📊 Browser Support
-
-- ✅ Chrome/Chromium 90+
 - ✅ Firefox 88+
 - ✅ Safari 14+
 - ✅ Edge 90+
