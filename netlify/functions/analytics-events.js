@@ -178,14 +178,14 @@ exports.handler = withHandler(async function (event) {
       }
 
       if (date_from) {
-        query += ` AND timestamp >= $${paramCount}`;
-        queryParams.push(date_from);
+        query += ` AND timestamp >= $${paramCount}::timestamp`;
+        queryParams.push(`${date_from} 00:00:00`);
         paramCount++;
       }
 
       if (date_to) {
-        query += ` AND timestamp <= $${paramCount}`;
-        queryParams.push(date_to);
+        query += ` AND timestamp <= $${paramCount}::timestamp`;
+        queryParams.push(`${date_to} 23:59:59`);
         paramCount++;
       }
 
@@ -209,10 +209,10 @@ exports.handler = withHandler(async function (event) {
         countQuery += ` AND session_id = $${countParamIndex++}`;
       }
       if (date_from) {
-        countQuery += ` AND timestamp >= $${countParamIndex++}`;
+        countQuery += ` AND timestamp >= $${countParamIndex++}::timestamp`;
       }
       if (date_to) {
-        countQuery += ` AND timestamp <= $${countParamIndex++}`;
+        countQuery += ` AND timestamp <= $${countParamIndex++}::timestamp`;
       }
 
       const countResult = await database.query(countQuery, countParams);
@@ -242,6 +242,10 @@ exports.handler = withHandler(async function (event) {
       const startDate =
         date_from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
+      // Ensure dates are properly formatted for PostgreSQL
+      const startTimestamp = `${startDate} 00:00:00`;
+      const endTimestamp = `${endDate} 23:59:59`;
+
       // Get stats by event type
       const eventTypeQuery = `
         SELECT 
@@ -250,11 +254,11 @@ exports.handler = withHandler(async function (event) {
           COUNT(DISTINCT user_id) as unique_users,
           COUNT(DISTINCT session_id) as unique_sessions
         FROM analytics_events
-        WHERE timestamp BETWEEN $1 AND $2
+        WHERE timestamp >= $1::timestamp AND timestamp <= $2::timestamp
         GROUP BY event_type
         ORDER BY count DESC
       `;
-      const eventTypeResult = await database.query(eventTypeQuery, [startDate, endDate]);
+      const eventTypeResult = await database.query(eventTypeQuery, [startTimestamp, endTimestamp]);
 
       // Get daily/hourly trends
       let timeFormat;
@@ -275,23 +279,23 @@ exports.handler = withHandler(async function (event) {
           COUNT(DISTINCT user_id) as unique_users,
           COUNT(DISTINCT session_id) as unique_sessions
         FROM analytics_events
-        WHERE timestamp BETWEEN $1 AND $2
+        WHERE timestamp >= $1::timestamp AND timestamp <= $2::timestamp
         GROUP BY period, event_type
         ORDER BY period DESC, event_type
       `;
-      const trendsResult = await database.query(trendsQuery, [startDate, endDate]);
+      const trendsResult = await database.query(trendsQuery, [startTimestamp, endTimestamp]);
 
       // Get session statistics
       const sessionQuery = `
         SELECT 
           COUNT(*) as total_sessions,
-          AVG(duration_seconds) as avg_duration,
-          AVG(page_views) as avg_page_views,
+          COALESCE(AVG(duration_seconds), 0) as avg_duration,
+          COALESCE(AVG(page_views), 0) as avg_page_views,
           COUNT(DISTINCT user_id) as unique_users
         FROM analytics_sessions
-        WHERE started_at BETWEEN $1 AND $2
+        WHERE started_at >= $1::timestamp AND started_at <= $2::timestamp
       `;
-      const sessionResult = await database.query(sessionQuery, [startDate, endDate]);
+      const sessionResult = await database.query(sessionQuery, [startTimestamp, endTimestamp]);
 
       // Get top pages
       const topPagesQuery = `
@@ -300,12 +304,14 @@ exports.handler = withHandler(async function (event) {
           COUNT(*) as views,
           COUNT(DISTINCT session_id) as unique_sessions
         FROM analytics_events
-        WHERE event_type = 'page_view' AND timestamp BETWEEN $1 AND $2
+        WHERE event_type = 'page_view' 
+          AND timestamp >= $1::timestamp 
+          AND timestamp <= $2::timestamp
         GROUP BY page_url
         ORDER BY views DESC
         LIMIT 20
       `;
-      const topPagesResult = await database.query(topPagesQuery, [startDate, endDate]);
+      const topPagesResult = await database.query(topPagesQuery, [startTimestamp, endTimestamp]);
 
       return ok({
         date_range: { start: startDate, end: endDate },
@@ -321,6 +327,7 @@ exports.handler = withHandler(async function (event) {
       });
     } catch (e) {
       console.error('Error getting aggregated stats:', e);
+      console.error('Stack trace:', e.stack);
       return error(500, `Failed to get aggregated stats: ${e.message}`);
     }
   }
