@@ -480,11 +480,16 @@
       loadHistory();
     });
 
-    // Initialize
-    loadHistory();
-
-    // Auto-refresh every 60 seconds
-    setInterval(loadHistory, 60000);
+    // Initialize after deferred shared scripts (ensures window.authFetch is available)
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        loadHistory();
+        // Auto-refresh every 60 seconds
+        setInterval(loadHistory, 60000);
+      } catch (e) {
+        console.error('Failed to initialize data history:', e);
+      }
+    });
   </script>
 </body>
 </html>
