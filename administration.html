@@ -1,254 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Admin Dashboard</title>
-    <link rel="manifest" href="./manifest.json" />
-    <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
-    <link rel="stylesheet" href="./assets/css/styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
     <script src="./assets/js/init-shared.js" defer></script>
     <script src="./assets/js/audit.js" defer></script>
     <script src="./assets/js/feature-flags.js" defer></script>
-    <link rel="stylesheet" href="./assets/css/accessibility.css" />
-    <script src="./assets/js/accessibility.js" defer></script>
-    <style>
-        .sidebar{transition:transform .3s ease-in-out}
-    </style>
+  <style>
+    .sidebar{transition:transform .3s ease-in-out}
+  </style>
+  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <script src="./assets/js/accessibility.js" defer></script>
 </head>
 <body class="dark">
+  
 
+    <!-- Toast Notification -->
+    
     <!-- Mobile Menu Toggle -->
     <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-secondary" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
-
     <div class="flex flex-col md:flex-row min-h-screen">
-        <!-- Sidebar placeholder -->
+        <!-- Sidebar -->
+        <!-- Shared Navigation Placeholder -->
         <div id="main-nav"></div>
+        <!-- Load shared navigation dynamically -->
         <script>
             fetch('shared-nav.html')
                 .then(r => r.text())
                 .then(html => {
                     document.getElementById('main-nav').innerHTML = html;
+                    // Call the function to highlight the active nav link after insertion
                     if (window.setActiveNavLink) window.setActiveNavLink();
                 });
         </script>
+        <!-- Main Content -->
+    <!-- Main Content -->
+    <main id="main-content" class="ml-0 lg:ml-64 p-6 flex-1" role="main">
+        <!-- Sticky Header -->
+    <header class="page-header card border flex items-center justify-between">
+            <div>
+                <h2 class="text-3xl font-bold text-white" id="welcome-message">Welcome, Admin!</h2>
+                <p class="text-lg mt-2 nav-link-muted">Administrative Dashboard & Controls</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="settings.html" class="px-4 py-2 rounded bg-white text-black hover:opacity-95">Settings</a>
+            </div>
+        </header>
 
-        <main id="main-content" class="ml-0 lg:ml-64 p-6 flex-1" role="main">
-            <header class="page-header card border flex items-center justify-between">
-                <div>
-                    <h2 class="text-3xl font-bold text-white" id="welcome-message">Welcome, Admin!</h2>
-                    <p class="text-lg mt-2 nav-link-muted">Administrative Dashboard & Controls</p>
+        <!-- Content Section -->
+        <section aria-label="Administrative functions" class="space-y-6">
+            <p class="mb-6 leading-relaxed nav-link-muted">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
+
+            <!-- Admin Cards Grid with More Than 3 Colors -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
+                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-blue-600 to-blue-800" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z" fill="currentColor"></path><path d="M4 20c0-3.314 2.686-6 6-6h4c3.314 0 6 2.686 6 6v1H4v-1z" fill="currentColor"></path></svg>User Management</h3>
+                    <p class="mb-4 nav-link-muted">Manage user accounts and permissions.</p>
+                    <a href="users.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Manage Users</a>
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="settings.html" class="px-4 py-2 rounded bg-white text-black hover:opacity-95">Settings</a>
+                <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-green-600 to-green-800" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v2H3V3zM6 7h3v10H6V7zm5 0h3v14h-3V7zm5 0h3v6h-3V7z" fill="currentColor"></path></svg>Analytics</h3>
+                    <p class="mb-4 nav-link-muted">View site statistics and user engagement.</p>
+                    <a href="analytics.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">View Analytics</a>
                 </div>
-            </header>
-
-            <section aria-label="Administrative functions" class="space-y-6 mt-6">
-                <p class="mb-6 leading-relaxed nav-link-muted">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
-                    <div class="card widget-primary p-6 rounded-lg shadow-md bg-gradient-to-r from-blue-600 to-blue-800" tabindex="0" role="article">
-                        <h3 class="text-xl font-semibold mb-3 text-white">User Management</h3>
-                        <p class="mb-4 nav-link-muted">Manage user accounts and permissions.</p>
-                        <a href="users.html" class="w-full block p-3 rounded-lg text-center font-semibold bg-white text-black hover:opacity-95">Manage Users</a>
-                    </div>
-                    <div class="card widget-secondary p-6 rounded-lg shadow-md bg-gradient-to-r from-green-600 to-green-800" tabindex="0" role="article">
-                        <h3 class="text-xl font-semibold mb-3 text-white">Analytics</h3>
-                        <p class="mb-4 nav-link-muted">View site statistics and user engagement.</p>
-                        <a href="analytics.html" class="w-full block p-3 rounded-lg text-center font-semibold bg-white text-black hover:opacity-95">View Analytics</a>
-                    </div>
-                    <div class="card widget-accent p-6 rounded-lg shadow-md bg-gradient-to-r from-purple-600 to-purple-800" tabindex="0" role="article">
-                        <h3 class="text-xl font-semibold mb-3 text-white">Site Settings</h3>
-                        <p class="mb-4 nav-link-muted">Configure website settings and preferences.</p>
-                        <a href="settings.html" class="w-full block p-3 rounded-lg text-center font-semibold bg-white text-black hover:opacity-95">Site Settings</a>
-                    </div>
+                <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-purple-600 to-purple-800" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 8a4 4 0 100 8 4 4 0 000-8z" fill="currentColor"></path><path d="M19.4 15a7.963 7.963 0 00.6-3 7.963 7.963 0 00-.6-3l2.1-1.6-2-3.4-2.5 1A8.03 8.03 0 0012 4a8.03 8.03 0 00-5.5 1.5l-2.5-1L2 8l2.1 1.6A7.963 7.963 0 004.6 13c0 1 .2 2 .6 3L3.1 17.6 5.1 21l2.5-1A8.03 8.03 0 0012 20a8.03 8.03 0 005.5-1.5l2.5 1 2-3.4-2.6-1.1z" fill="currentColor"></path></svg>Site Settings</h3>
+                    <p class="mb-4 nav-link-muted">Configure website settings and preferences.</p>
+                    <a href="settings.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Site Settings</a>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8" role="region" aria-label="Product and Order Management">
-                    <div class="card widget-primary p-6 rounded-lg shadow-md bg-gradient-to-r from-cyan-600 to-cyan-800" tabindex="0" role="article">
-                        <h3 class="text-xl font-semibold mb-3 text-white">Oil Product Management</h3>
-                        <p class="mb-4 nav-link-muted">Add, edit, and manage oil product inventory and details.</p>
-                        <a href="oil-products-mgmt.html" class="w-full block p-3 rounded-lg text-center font-semibold bg-white text-black hover:opacity-95">Oil Products</a>
-                    </div>
-                    <div class="card widget-secondary p-6 rounded-lg shadow-md bg-gradient-to-r from-orange-600 to-orange-800" tabindex="0" role="article">
-                        <h3 class="text-xl font-semibold mb-3 text-white">Consumables Management</h3>
-                        <p class="mb-4 nav-link-muted">Manage consumables inventory, categories, and stock levels.</p>
-                        <a href="consumables-mgmt.html" class="w-full block p-3 rounded-lg text-center font-semibold bg-white text-black hover:opacity-95">Consumables Management</a>
-                    </div>
-                    <div class="card widget-red p-6 rounded-lg shadow-md bg-gradient-to-r from-red-600 to-red-800" tabindex="0" role="article">
-                        <h3 class="text-xl font-semibold mb-3 text-white">Filters Management</h3>
-                        <p class="mb-4 nav-link-muted">Manage oil filters, air filters, and other filtration products.</p>
-                        <a href="filters-mgmt.html" class="w-full block p-3 rounded-lg text-center font-semibold bg-white text-black hover:opacity-95">Manage Filters</a>
-                    </div>
+                <div class="card widget-pink p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-pink-600 to-pink-800" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 5h18v2H3V5zm2 4h14v10H5V9z" fill="currentColor"></path></svg>Audit Logs</h3>
+                    <p class="mb-4 nav-link-muted">View and review all admin actions and changes.</p>
+                    <a href="audit-logs.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Audit Logs</a>
                 </div>
+            </div>
+            <!-- Additional Management Cards Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8" role="region" aria-label="Product and Order Management">
+                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-800" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 6h18v2H3V6zm2 4h14v8H5v-8z" fill="currentColor"></path></svg>Oil Product Management</h3>
+                    <p class="mb-4 nav-link-muted">Add, edit, and manage oil product inventory and details.</p>
+                    <a href="oil-products-mgmt.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Oil Products</a>
+                </div>
+                <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-orange-600 to-orange-800" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l4 4h-3v6H11V6H8l4-4zM6 14h12v6H6v-6z" fill="currentColor"></path></svg>Consumables Management</h3>
+                    <p class="mb-4 nav-link-muted">Manage consumables inventory, categories, and stock levels.</p>
+                    <a href="consumables-mgmt.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Consumables Management</a>
+                </div>
+                <div class="card widget-red p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-red-600 to-red-800" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 4h18v2H3V4zm4 6h10v10H7V10z" fill="currentColor"></path></svg>Filters Management</h3>
+                    <p class="mb-4 nav-link-muted">Manage oil filters, air filters, and other filtration products.</p>
+                    <a href="filters-mgmt.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Manage Filters</a>
+                </div>
+                <div class="card widget-indigo p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-indigo-600 to-indigo-800" tabindex="0" role="article">
+                    <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v2H3V3zm2 6h14v12H5V9z" fill="currentColor"></path></svg>Order Review</h3>
+                    <p class="mb-4 nav-link-muted">Review, approve, and track oil and consumables orders.</p>
+                    <a href="orders-review.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Review Orders</a>
+                </div>
+                
+            </div>
 
-                <!-- Upgrades: compact section with badges and reordered tiles -->
-                <div id="upgrade-pages" class="mt-8 card p-6 rounded-lg bg-gray-800 border">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <h4 class="text-lg font-semibold text-white">Upgrades</h4>
-                            <span class="text-xs bg-gray-700 text-gray-200 px-2 py-0.5 rounded">14</span>
+            <!-- Upgrade Pages (Phase 1 - 10) -->
+            <div id="upgrade-pages" class="mt-8 card p-6 rounded-lg bg-gray-800 border">
+                <h3 class="text-xl font-semibold mb-4 text-white">Upgrade Pages (Phase 1 - 10)</h3>
+                <p class="text-sm text-gray-300 mb-4">Administrative pages introduced during the upgrade are grouped here for easier access.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="list">
+                    <a role="listitem" href="error-monitoring.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Error Monitoring</div>
+                                <div class="text-sm text-gray-300">View recent errors and alert trends.</div>
+                            </div>
                         </div>
-                        <div class="text-sm text-gray-400">Reordered for quick access · badges show status</div>
-                    </div>
+                    </a>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="list">
-                        <a role="listitem" href="error-monitoring.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">Error Monitoring</div>
-                                    <div class="text-sm text-gray-300">View recent errors and alert trends.</div>
-                                </div>
+                    <a role="listitem" href="email-monitoring.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 8v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Email Queue</div>
+                                <div class="text-sm text-gray-300">Inspect outgoing email queue and failures.</div>
                             </div>
-                        </a>
-
-                        <a role="listitem" href="customer-insights.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2a7 7 0 100 14 7 7 0 000-14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9v4l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">Customer Insights <span class="ml-2 inline-block text-xs bg-yellow-400 text-black px-2 py-0.5 rounded">BETA</span></div>
-                                    <div class="text-sm text-gray-300">Customer behaviour and cohort analysis.</div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a role="listitem" href="analytics-advanced.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 9l-5 5-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">Advanced Analytics <span class="ml-2 inline-block text-xs bg-blue-500 text-white px-2 py-0.5 rounded">NEW</span></div>
-                                    <div class="text-sm text-gray-300">Drill-down reports and segments.</div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a role="listitem" href="database-performance.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13l3-3 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">DB Performance</div>
-                                    <div class="text-sm text-gray-300">Query performance and slow logs.</div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a role="listitem" href="backups.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">Database Backups</div>
-                                    <div class="text-sm text-gray-300">Create or download database snapshots.</div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a role="listitem" href="bulk-import.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 7h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">Bulk Operations</div>
-                                    <div class="text-sm text-gray-300">Import or process records in batches.</div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a role="listitem" href="data-history.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">Data History</div>
-                                    <div class="text-sm text-gray-300">Audit and historical data exploration.</div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a role="listitem" href="audit-logs.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">Audit Logs</div>
-                                    <div class="text-sm text-gray-300">Security and activity audit trail.</div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a role="listitem" href="orders-review.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M7 11h10M9 15h6"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">Order Review</div>
-                                    <div class="text-sm text-gray-300">Review and manage recent orders.</div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a role="listitem" href="api-docs.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">API Documentation</div>
-                                    <div class="text-sm text-gray-300">Reference for serverless endpoints.</div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a role="listitem" href="dev-dashboard.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v18H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div>
-                                    <div class="text-white font-semibold">Dev Dashboard <span class="ml-2 inline-block text-xs bg-indigo-500 text-white px-2 py-0.5 rounded">DEV</span></div>
-                                    <div class="text-sm text-gray-300">Developer tools and diagnostics.</div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Beta Features Section (Feature Flag Gated) -->
-                <div id="beta-features-section" class="hidden mt-8" role="region" aria-label="Beta Features">
-                    <h3 class="text-xl font-semibold mb-4 text-yellow-400 flex items-center gap-2"><span>⚡</span> Beta Features <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded">BETA</span></h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="card widget-yellow p-6 rounded-lg shadow-md border-2 border-yellow-500/30" tabindex="0" role="article">
-                            <h4 class="text-lg font-semibold mb-3 text-white">AI-Powered Insights</h4>
-                            <p class="mb-4 nav-link-muted text-sm">Get intelligent recommendations based on your data patterns.</p>
-                            <button class="w-full p-3 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400 font-semibold" onclick="window.showBetaFeatureNotification('AI Insights')">Try AI Insights</button>
                         </div>
-                        <div class="card widget-yellow p-6 rounded-lg shadow-md border-2 border-yellow-500/30" tabindex="0" role="article">
-                            <h4 class="text-lg font-semibold mb-3 text-white">Predictive Analytics</h4>
-                            <p class="mb-4 nav-link-muted text-sm">Forecast future trends and prepare in advance.</p>
-                            <button class="w-full p-3 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400 font-semibold" onclick="window.showBetaFeatureNotification('Predictive Analytics')">Explore Predictions</button>
+                    </a>
+
+                    <a role="listitem" href="email-templates.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 8h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Email Templates</div>
+                                <div class="text-sm text-gray-300">Manage transactional templates.</div>
+                            </div>
                         </div>
-                        <div class="card widget-yellow p-6 rounded-lg shadow-md border-2 border-yellow-500/30" tabindex="0" role="article">
-                            <h4 class="text-lg font-semibold mb-3 text-white">Advanced Automation</h4>
-                            <p class="mb-4 nav-link-muted text-sm">Automate complex workflows and save time.</p>
-                            <button class="w-full p-3 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400 font-semibold" onclick="window.showBetaFeatureNotification('Advanced Automation')">Setup Automation</button>
+                    </a>
+
+                    <a role="listitem" href="analytics-advanced.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 9l-5 5-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Advanced Analytics</div>
+                                <div class="text-sm text-gray-300">Drill-down reports and segments.</div>
+                            </div>
                         </div>
-                    </div>
-                    <p class="mt-4 text-sm text-gray-400 italic">Note: Beta features are experimental and may change. Provide feedback to help us improve!</p>
+                    </a>
+
+                    <a role="listitem" href="scheduled-reports.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Scheduled Reports</div>
+                                <div class="text-sm text-gray-300">Configure automated report deliveries.</div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a role="listitem" href="inventory-forecast.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v6H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13h10v8H7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Inventory Forecast</div>
+                                <div class="text-sm text-gray-300">Predict stock needs and trends.</div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a role="listitem" href="customer-insights.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2a7 7 0 100 14 7 7 0 000-14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9v4l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Customer Insights</div>
+                                <div class="text-sm text-gray-300">Customer behaviour and cohort analysis.</div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a role="listitem" href="backups.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Database Backups</div>
+                                <div class="text-sm text-gray-300">Create or download database snapshots.</div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a role="listitem" href="bulk-import.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 7h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Bulk Operations</div>
+                                <div class="text-sm text-gray-300">Import or process records in batches.</div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a role="listitem" href="data-history.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Data History</div>
+                                <div class="text-sm text-gray-300">Audit and historical data exploration.</div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a role="listitem" href="cache-monitor.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="3" width="18" height="6" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="15" width="18" height="6" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Cache Monitor</div>
+                                <div class="text-sm text-gray-300">Inspect cache hits and invalidations.</div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a role="listitem" href="database-performance.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13l3-3 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">DB Performance</div>
+                                <div class="text-sm text-gray-300">Query performance and slow logs.</div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a role="listitem" href="api-docs.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">API Documentation</div>
+                                <div class="text-sm text-gray-300">Reference for serverless endpoints.</div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a role="listitem" href="dev-dashboard.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v18H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div>
+                                <div class="text-white font-semibold">Dev Dashboard</div>
+                                <div class="text-sm text-gray-300">Developer tools and diagnostics.</div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
+            </div>
 
-                <!-- New Dashboard Section (Feature Flag Gated) -->
-                <div id="new-dashboard-section" class="hidden mt-8" role="region" aria-label="New Dashboard">
-                    <h3 class="text-xl font-semibold mb-4 text-blue-400 flex items-center gap-2"><span>🎨</span> New Dashboard Experience <span class="text-xs bg-blue-500 text-white px-2 py-1 rounded">NEW</span></h3>
-                    <div class="card widget-primary p-6 rounded-lg shadow-md border-2 border-blue-500/30">
-                        <p class="mb-4">Experience our redesigned dashboard with enhanced visualization and better user experience.</p>
-                        <a href="shared-dashboards.html" class="inline-block px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-semibold">Launch New Dashboard</a>
-                    </div>
+            <!-- New Dashboard Section (Feature Flag Gated) -->
+            <div id="new-dashboard-section" class="hidden mt-8" role="region" aria-label="New Dashboard">
+                <h3 class="text-xl font-semibold mb-4 text-blue-400 flex items-center gap-2">
+                    <span>🎨</span> New Dashboard Experience
+                    <span class="text-xs bg-blue-500 text-white px-2 py-1 rounded">NEW</span>
+                </h3>
+                <div class="card widget-primary p-6 rounded-lg shadow-md border-2 border-blue-500/30">
+                    <p class="mb-4">Experience our redesigned dashboard with enhanced visualization and better user experience.</p>
+                    <a href="shared-dashboards.html" class="inline-block px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-semibold">Launch New Dashboard</a>
                 </div>
-            </section>
-        </main>
+            </div>
+        </section>
+    </main>
 
-    </div>
-
-    <!-- Load shared theme fragment at end of body -->
+    <!-- Load shared theme functionality -->
     <script>
         fetch('shared-theme.html')
-            .then(r => r.text())
-            .then(html => document.body.insertAdjacentHTML('beforeend', html))
-            .catch(() => {});
+            .then(response => response.text())
+            .then(html => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const scripts = tempDiv.getElementsByTagName('script');
+                for (let script of scripts) {
+                    const newScript = document.createElement('script');
+                    newScript.textContent = script.textContent;
+                    document.body.appendChild(newScript);
+                }
+            });
     </script>
+    </div>
+                    <script>
+                        // Load and apply site settings
+                        function loadAndApplySettings() {
+                            const settings = JSON.parse(localStorage.getItem('siteSettings')) || {};
+                            // Apply site title if set
+                            if (settings['site-title']) {
+                                const brandingElements = document.querySelectorAll('h1');
+                                brandingElements.forEach(el => el.textContent = settings['site-title']);
+                            }
+                        }
+                        loadAndApplySettings();
+
+                        // Sidebar toggle for mobile
+                        function wireMenu() {
+                            const menuToggle = document.getElementById('menu-toggle');
+                            const sidebar = document.getElementById('sidebar');
+                            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+                            if (!(menuToggle && sidebar)) return;
+                            // Check if already wired to prevent duplicate listeners
+                            if (menuToggle.dataset.wired === 'true') return;
+                            menuToggle.dataset.wired = 'true';
+                            
+                            menuToggle.addEventListener('click', function() {
+                                const isOpen = sidebar.classList.toggle('open');
+                                this.setAttribute('aria-expanded', String(isOpen));
+                                if (sidebarBackdrop) {
+                                    if (isOpen) { sidebarBackdrop.classList.remove('hidden'); }
+                                    else { sidebarBackdrop.classList.add('hidden'); }
+                                }
+                            });
+                            if (sidebarBackdrop) {
+                                sidebarBackdrop.addEventListener('click', function() {
+                                    if (sidebar.classList.contains('open')) {
+                                        sidebar.classList.remove('open');
+                                        sidebarBackdrop.classList.add('hidden');
+                                        menuToggle.setAttribute('aria-expanded', 'false');
+                                    }
+                                });
+                            }
+                        }
+                        wireMenu();
+                        setTimeout(wireMenu, 250);
+                        // Toast notifications use the global adapter (init-shared.js)
+
+                        // Beta feature notification helper
+                        window.showBetaFeatureNotification = function(featureName) {
+                            showToast(`${featureName} is coming soon! This is a beta preview.`);
+                        };
+
+                                                // Initialize feature flags on page load and show sign-in CTA if needed
+                        document.addEventListener('DOMContentLoaded', async function() {
+                                                        const AUTH_DISABLED = window.AUTH_DISABLED === true;
+                            const token = (window.getToken && window.getToken()) || null;
+                                                        if (!token && !AUTH_DISABLED) {
+                                                                showSignInCTA();
+                                                                return;
+                                                        }
+                                                        if (window.FeatureFlags) {
+                                                                await window.FeatureFlags.toggleElements('#beta-features-section', 'betaFeatures');
+                                                                await window.FeatureFlags.toggleElements('#new-dashboard-section', 'newDashboard');
+                                                        }
+                                                });
+
+                                                function showSignInCTA(){
+                                                    try {
+                                                        const main = document.getElementById('main-content');
+                                                        if (!main) return;
+                                                        // Hide content sections
+                                                        Array.from(main.children).forEach(c => c.classList.add('hidden'));
+                                                        let cta = document.getElementById('signin-cta');
+                                                        if (!cta) {
+                                                            cta = document.createElement('div');
+                                                            cta.id = 'signin-cta';
+                                                            cta.className = 'mt-6 p-6 border border-gray-700 rounded-lg text-center';
+                                                            const msg = document.createElement('p');
+                                                            msg.className = 'mb-4 text-gray-300';
+                                                            msg.textContent = 'Please sign in to access the Administration dashboard.';
+                                                            const btn = document.createElement('button');
+                                                            btn.className = 'btn-neon-blue px-4 py-2 rounded';
+                                                            btn.textContent = 'Sign in';
+                                                            btn.addEventListener('click', function(){
+                                                                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                                                                window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`;
+                                                            });
+                                                            cta.appendChild(msg);
+                                                            cta.appendChild(btn);
+                                                            main.appendChild(cta);
+                                                        }
+                                                        cta.classList.remove('hidden');
+                                                    } catch(_) { /* noop */ }
+                                                }
+                    </script>
 </body>
 </html>
