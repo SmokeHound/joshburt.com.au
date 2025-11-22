@@ -42,8 +42,7 @@ async function runScheduledReports() {
       ORDER BY next_run ASC
     `;
 
-    const result = await database.query(query);
-    const reports = result.rows;
+    const reports = await database.all(query);
 
     console.log(`Found ${reports.length} reports to generate`);
 
@@ -136,8 +135,8 @@ async function generateSalesReport(startDate, endDate) {
     ORDER BY o.created_at DESC
   `;
 
-  const result = await database.query(query, [startDate, endDate]);
-  return result.rows;
+  const rows = await database.all(query, [startDate, endDate]);
+  return rows;
 }
 
 /**
@@ -158,8 +157,8 @@ async function generateInventoryReport() {
     ORDER BY p.stock_quantity ASC
   `;
 
-  const result = await database.query(query);
-  return result.rows;
+  const rows = await database.all(query);
+  return rows;
 }
 
 /**
@@ -178,8 +177,8 @@ async function generateUsersReport(startDate, endDate) {
     ORDER BY u.created_at DESC
   `;
 
-  const result = await database.query(query, [startDate, endDate]);
-  return result.rows;
+  const rows = await database.all(query, [startDate, endDate]);
+  return rows;
 }
 
 /**
@@ -199,8 +198,8 @@ async function generateAnalyticsReport(startDate, endDate) {
     ORDER BY date DESC, event_type
   `;
 
-  const result = await database.query(query, [startDate, endDate]);
-  return result.rows;
+  const rows = await database.all(query, [startDate, endDate]);
+  return rows;
 }
 
 /**
@@ -305,7 +304,7 @@ async function recordReportHistory(reportConfig, status, fileSize, errorMessage)
       VALUES ($1, $2, $3, NOW(), $4, $5, $6, $7, $8)
     `;
 
-    await database.query(query, [
+    await database.run(query, [
       reportConfig.id,
       reportConfig.name,
       reportConfig.report_type,
@@ -324,7 +323,7 @@ async function recordReportHistory(reportConfig, status, fileSize, errorMessage)
         SET last_run = NOW(), next_run = $1
         WHERE id = $2
       `;
-      await database.query(updateQuery, [nextRun, reportConfig.id]);
+      await database.run(updateQuery, [nextRun, reportConfig.id]);
     }
   } catch (e) {
     console.error('Failed to record report history:', e);

@@ -13,7 +13,8 @@ const { logAudit } = require('../../utils/audit');
  * List backups with pagination and filtering
  */
 async function listBackups(event, pool) {
-  await requirePermission(event, 'backups', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'backups', 'read');
+  if (authResponse) return authResponse;
 
   const { status, backup_type, limit = 50, offset = 0 } = event.queryStringParameters || {};
 
@@ -66,7 +67,8 @@ async function listBackups(event, pool) {
  * Get specific backup details
  */
 async function getBackup(event, pool) {
-  await requirePermission(event, 'backups', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'backups', 'read');
+  if (authResponse) return authResponse;
 
   const backupId = event.path.split('/').pop();
   const result = await pool.query('SELECT * FROM backups WHERE id = $1', [backupId]);
@@ -88,7 +90,8 @@ async function getBackup(event, pool) {
  * Create new backup
  */
 async function createBackup(event, pool) {
-  const user = await requirePermission(event, 'backups', 'create');
+  const { user, response: authResponse } = await requirePermission(event, 'backups', 'create');
+  if (authResponse) return authResponse;
 
   const {
     backup_type,
@@ -157,7 +160,8 @@ async function createBackup(event, pool) {
  * Update backup status (used by backup worker)
  */
 async function updateBackup(event, pool) {
-  const user = await requirePermission(event, 'backups', 'update');
+  const { user, response: authResponse } = await requirePermission(event, 'backups', 'update');
+  if (authResponse) return authResponse;
 
   const backupId = event.path.split('/').pop();
   const { status, file_path, file_size, error_message, completed_at, metadata } = JSON.parse(
@@ -238,7 +242,8 @@ async function updateBackup(event, pool) {
  * Delete backup record
  */
 async function deleteBackup(event, pool) {
-  const user = await requirePermission(event, 'backups', 'delete');
+  const { user, response: authResponse } = await requirePermission(event, 'backups', 'delete');
+  if (authResponse) return authResponse;
 
   const backupId = event.path.split('/').pop();
 
@@ -277,7 +282,8 @@ async function deleteBackup(event, pool) {
  * Get backup statistics
  */
 async function getBackupStats(event, pool) {
-  await requirePermission(event, 'backups', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'backups', 'read');
+  if (authResponse) return authResponse;
 
   const stats = await pool.query(`
     SELECT 

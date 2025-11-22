@@ -13,7 +13,8 @@ const { logAudit } = require('../../utils/audit');
  * Get history for a specific record
  */
 async function getRecordHistory(event, pool) {
-  await requirePermission(event, 'data_history', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'data_history', 'read');
+  if (authResponse) return authResponse;
 
   const { table_name, record_id, limit = 50, offset = 0 } = event.queryStringParameters || {};
 
@@ -59,7 +60,8 @@ async function getRecordHistory(event, pool) {
  * Get all history with filters
  */
 async function getAllHistory(event, pool) {
-  await requirePermission(event, 'data_history', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'data_history', 'read');
+  if (authResponse) return authResponse;
 
   const {
     table_name,
@@ -161,7 +163,8 @@ async function getAllHistory(event, pool) {
  * Compare two versions of a record
  */
 async function compareVersions(event, pool) {
-  await requirePermission(event, 'data_history', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'data_history', 'read');
+  if (authResponse) return authResponse;
 
   const { history_id_1, history_id_2 } = event.queryStringParameters || {};
 
@@ -217,7 +220,8 @@ async function compareVersions(event, pool) {
  * Restore a previous version
  */
 async function restoreVersion(event, pool) {
-  const user = await requirePermission(event, 'data_history', 'update');
+  const { user, response: authResponse } = await requirePermission(event, 'data_history', 'update');
+  if (authResponse) return authResponse;
 
   const historyId = event.path.split('/').pop();
 
@@ -281,7 +285,8 @@ async function restoreVersion(event, pool) {
  * Get change statistics
  */
 async function getStats(event, pool) {
-  await requirePermission(event, 'data_history', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'data_history', 'read');
+  if (authResponse) return authResponse;
 
   const { table_name, days = 30 } = event.queryStringParameters || {};
 
@@ -333,7 +338,8 @@ async function getStats(event, pool) {
  * Enable tracking for a table
  */
 async function enableTracking(event, pool) {
-  const user = await requirePermission(event, 'data_history', 'create');
+  const { user, response: authResponse } = await requirePermission(event, 'data_history', 'create');
+  if (authResponse) return authResponse;
 
   const { table_name } = JSON.parse(event.body || '{}');
 

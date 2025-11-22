@@ -31,7 +31,8 @@ const pool = new Pool({
  *   - min_confidence: minimum confidence level (default: 0)
  */
 async function getForecasts(event) {
-  await requirePermission(event, 'forecast', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'forecast', 'read');
+  if (authResponse) return authResponse;
 
   const params = event.queryStringParameters || {};
   const itemType = params.item_type;
@@ -111,7 +112,8 @@ async function getForecasts(event) {
  *   - days: number of days to forecast (default: 30)
  */
 async function generateForecast(event) {
-  await requirePermission(event, 'forecast', 'create');
+  const { user, response: authResponse } = await requirePermission(event, 'forecast', 'create');
+  if (authResponse) return authResponse;
 
   const body = JSON.parse(event.body || '{}');
   const { item_type, item_id, days = 30 } = body;
@@ -149,7 +151,8 @@ async function generateForecast(event) {
  * Generate forecasts for all items
  */
 async function generateAllForecasts(event) {
-  await requirePermission(event, 'forecast', 'create');
+  const { user, response: authResponse } = await requirePermission(event, 'forecast', 'create');
+  if (authResponse) return authResponse;
 
   const client = await pool.connect();
 
@@ -202,7 +205,8 @@ async function generateAllForecasts(event) {
  * Get low stock alerts based on forecasts
  */
 async function getAlerts(event) {
-  await requirePermission(event, 'forecast', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'forecast', 'read');
+  if (authResponse) return authResponse;
 
   const params = event.queryStringParameters || {};
   const days = params.days ? parseInt(params.days) : 7;
@@ -229,7 +233,8 @@ async function getAlerts(event) {
  * Get forecast summary statistics
  */
 async function getSummary(event) {
-  await requirePermission(event, 'forecast', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'forecast', 'read');
+  if (authResponse) return authResponse;
 
   const client = await pool.connect();
 

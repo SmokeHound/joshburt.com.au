@@ -62,7 +62,8 @@ async function validateRow(pool, tableName, row, rowIndex) {
  * List bulk operations
  */
 async function listOperations(event, pool) {
-  await requirePermission(event, 'bulk_operations', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'bulk_operations', 'read');
+  if (authResponse) return authResponse;
 
   const { status, target_table, limit = 50, offset = 0 } = event.queryStringParameters || {};
 
@@ -105,7 +106,8 @@ async function listOperations(event, pool) {
  * Create bulk import operation
  */
 async function createImport(event, pool) {
-  const user = await requirePermission(event, 'bulk_operations', 'create');
+  const { user, response: authResponse } = await requirePermission(event, 'bulk_operations', 'create');
+  if (authResponse) return authResponse;
 
   const { target_table, format, data, validate_only = false } = JSON.parse(event.body || '{}');
 
@@ -198,7 +200,8 @@ async function createImport(event, pool) {
  * Execute bulk operation
  */
 async function executeOperation(event, pool) {
-  const user = await requirePermission(event, 'bulk_operations', 'update');
+  const { user, response: authResponse } = await requirePermission(event, 'bulk_operations', 'update');
+  if (authResponse) return authResponse;
 
   const operationId = event.path.split('/').pop();
   const { data } = JSON.parse(event.body || '{}');
@@ -302,7 +305,8 @@ async function executeOperation(event, pool) {
  * Export data
  */
 async function exportData(event, pool) {
-  await requirePermission(event, 'bulk_operations', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'bulk_operations', 'read');
+  if (authResponse) return authResponse;
 
   const { target_table, format = 'csv', filters = {} } = event.queryStringParameters || {};
 

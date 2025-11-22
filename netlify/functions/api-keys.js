@@ -15,7 +15,8 @@ const { generateApiKey, hashApiKey, getKeyPrefix } = require('../../utils/api-ke
  * List API keys for a user
  */
 async function listApiKeys(event, pool) {
-  await requirePermission(event, 'api_keys', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'api_keys', 'read');
+  if (authResponse) return authResponse;
 
   const userId = event.user?.id;
   const { include_all } = event.queryStringParameters || {};
@@ -48,7 +49,8 @@ async function listApiKeys(event, pool) {
  * Get specific API key details
  */
 async function getApiKey(event, pool) {
-  await requirePermission(event, 'api_keys', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'api_keys', 'read');
+  if (authResponse) return authResponse;
 
   const keyId = event.path.split('/').pop();
   const userId = event.user?.id;
@@ -83,7 +85,8 @@ async function getApiKey(event, pool) {
  * Get API key usage statistics
  */
 async function getApiKeyStats(event, pool) {
-  await requirePermission(event, 'api_keys', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'api_keys', 'read');
+  if (authResponse) return authResponse;
 
   const keyId = event.path.split('/')[event.path.split('/').length - 2];
   const userId = event.user?.id;
@@ -157,7 +160,8 @@ async function getApiKeyStats(event, pool) {
  * Create new API key
  */
 async function createApiKey(event, pool) {
-  await requirePermission(event, 'api_keys', 'write');
+  const { user, response: authResponse } = await requirePermission(event, 'api_keys', 'write');
+  if (authResponse) return authResponse;
 
   const body = JSON.parse(event.body || '{}');
   const userId = event.user?.id;
@@ -238,7 +242,8 @@ async function createApiKey(event, pool) {
  * Update API key
  */
 async function updateApiKey(event, pool) {
-  await requirePermission(event, 'api_keys', 'write');
+  const { user, response: authResponse } = await requirePermission(event, 'api_keys', 'write');
+  if (authResponse) return authResponse;
 
   const keyId = event.path.split('/').pop();
   const userId = event.user?.id;
@@ -324,7 +329,8 @@ async function updateApiKey(event, pool) {
  * Revoke (delete) API key
  */
 async function revokeApiKey(event, pool) {
-  await requirePermission(event, 'api_keys', 'delete');
+  const { user, response: authResponse } = await requirePermission(event, 'api_keys', 'delete');
+  if (authResponse) return authResponse;
 
   const keyId = event.path.split('/').pop();
   const userId = event.user?.id;

@@ -22,7 +22,8 @@ const {
  * List security events with pagination and filtering
  */
 async function listEvents(event, pool) {
-  await requirePermission(event, 'security', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'security', 'read');
+  if (authResponse) return authResponse;
 
   const {
     event_type,
@@ -123,7 +124,8 @@ async function listEvents(event, pool) {
  * Get specific security event
  */
 async function getEvent(event, pool) {
-  await requirePermission(event, 'security', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'security', 'read');
+  if (authResponse) return authResponse;
 
   const eventId = event.path.split('/').pop();
   const result = await pool.query('SELECT * FROM security_events WHERE id = $1', [eventId]);
@@ -145,7 +147,8 @@ async function getEvent(event, pool) {
  * Get security statistics
  */
 async function getStats(event, pool) {
-  await requirePermission(event, 'security', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'security', 'read');
+  if (authResponse) return authResponse;
 
   const { days = 7 } = event.queryStringParameters || {};
 
@@ -260,7 +263,8 @@ async function createEvent(event, pool) {
  * Resolve security event
  */
 async function resolveEvent(event, pool) {
-  await requirePermission(event, 'security', 'write');
+  const { user, response: authResponse } = await requirePermission(event, 'security', 'write');
+  if (authResponse) return authResponse;
 
   const eventId = event.path.split('/')[event.path.split('/').length - 2];
   const body = JSON.parse(event.body || '{}');
@@ -303,7 +307,8 @@ async function resolveEvent(event, pool) {
  * List IP blacklist
  */
 async function listBlacklist(event, pool) {
-  await requirePermission(event, 'security', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'security', 'read');
+  if (authResponse) return authResponse;
 
   const { active_only = 'true', limit = 50, offset = 0 } = event.queryStringParameters || {};
 
@@ -344,7 +349,8 @@ async function listBlacklist(event, pool) {
  * Add IP to blacklist
  */
 async function addBlacklist(event, pool) {
-  await requirePermission(event, 'security', 'write');
+  const { user, response: authResponse } = await requirePermission(event, 'security', 'write');
+  if (authResponse) return authResponse;
 
   const body = JSON.parse(event.body || '{}');
   const { ip_address, reason, expires_at } = body;
@@ -388,7 +394,8 @@ async function addBlacklist(event, pool) {
  * Remove IP from blacklist
  */
 async function removeBlacklist(event, pool) {
-  await requirePermission(event, 'security', 'write');
+  const { user, response: authResponse } = await requirePermission(event, 'security', 'write');
+  if (authResponse) return authResponse;
 
   const ipAddress = event.path.split('/').pop();
   const userId = event.user?.id;
