@@ -80,6 +80,9 @@ class Database {
   async run(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
     // PostgreSQL
+    if (!this.pool) {
+      this.pool = new Pool(pgConfig);
+    }
     const client = await this.pool.connect();
     try {
       const result = await client.query(preparedSql, preparedParams);
@@ -98,6 +101,9 @@ class Database {
   async get(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
     // PostgreSQL
+    if (!this.pool) {
+      this.pool = new Pool(pgConfig);
+    }
     const client = await this.pool.connect();
     try {
       const result = await client.query(preparedSql, preparedParams);
@@ -112,6 +118,9 @@ class Database {
   async all(sql, params = []) {
     const { sql: preparedSql, params: preparedParams } = this._prepareQuery(sql, params);
     // PostgreSQL
+    if (!this.pool) {
+      this.pool = new Pool(pgConfig);
+    }
     const client = await this.pool.connect();
     try {
       const result = await client.query(preparedSql, preparedParams);
