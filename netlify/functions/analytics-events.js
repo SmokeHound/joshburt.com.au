@@ -73,7 +73,7 @@ exports.handler = withHandler(async function (event) {
         RETURNING *
       `;
 
-      const eventResult = await database.query(insertEventQuery, [
+      const eventResult = await database.run(insertEventQuery, [
         event_type,
         user_id,
         session_id,
@@ -87,7 +87,7 @@ exports.handler = withHandler(async function (event) {
 
       return ok({
         message: 'Event tracked successfully',
-        event: eventResult.rows[0]
+        event: eventResult.rows && eventResult.rows[0] ? eventResult.rows[0] : { id: eventResult.id }
       });
     } catch (e) {
       console.error('Error tracking event:', e);
@@ -99,16 +99,16 @@ exports.handler = withHandler(async function (event) {
   async function updateSession(session_id, user_id, ip_address, user_agent, page_url, event_type) {
     // Check if session exists
     const sessionQuery = 'SELECT * FROM analytics_sessions WHERE session_id = $1';
-    const sessionResult = await database.query(sessionQuery, [session_id]);
+    const session = await database.get(sessionQuery, [session_id]);
 
-    if (sessionResult.rows.length === 0) {
+    if (!session) {
       // Create new session
       const insertSessionQuery = `
         INSERT INTO analytics_sessions 
         (session_id, user_id, ip_address, user_agent, started_at, last_activity, page_views, entry_page)
         VALUES ($1, $2, $3, $4, NOW(), NOW(), 1, $5)
       `;
-      await database.query(insertSessionQuery, [
+      await database.run(insertSessionQuery, [
         session_id,
         user_id,
         ip_address,
@@ -117,7 +117,6 @@ exports.handler = withHandler(async function (event) {
       ]);
     } else {
       // Update existing session
-      const session = sessionResult.rows[0];
       const updateSessionQuery = `
         UPDATE analytics_sessions
         SET 
@@ -127,7 +126,7 @@ exports.handler = withHandler(async function (event) {
           duration_seconds = EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER
         WHERE session_id = $3
       `;
-      await database.query(updateSessionQuery, [event_type, page_url, session_id]);
+      await database.run(updateSessionQuery, [event_type, page_url, session_id]);
     }
   }
 
@@ -192,7 +191,7 @@ exports.handler = withHandler(async function (event) {
       query += ` ORDER BY timestamp DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
       queryParams.push(limit, offset);
 
-      const result = await database.query(query, queryParams);
+      const events = await database.all(query, queryParams);
 
       // Get total count
       let countQuery = 'SELECT COUNT(*) FROM analytics_events WHERE 1=1';
@@ -215,11 +214,11 @@ exports.handler = withHandler(async function (event) {
         countQuery += ` AND timestamp <= $${countParamIndex++}::timestamp`;
       }
 
-      const countResult = await database.query(countQuery, countParams);
-      const total = parseInt(countResult.rows[0].count, 10);
+      const countResult = await database.get(countQuery, countParams);
+      const total = parseInt(countResult.count, 10);
 
       return ok({
-        events: result.rows,
+        events: events,
         pagination: {
           page: parseInt(page, 10),
           per_page: limit,
@@ -258,7 +257,7 @@ exports.handler = withHandler(async function (event) {
         GROUP BY event_type
         ORDER BY count DESC
       `;
-      const eventTypeResult = await database.query(eventTypeQuery, [startTimestamp, endTimestamp]);
+      const eventTypeResult = await database.all(eventTypeQuery, [startTimestamp, endTimestamp]);
 
       // Get daily/hourly trends
       let timeFormat;
@@ -283,7 +282,7 @@ exports.handler = withHandler(async function (event) {
         GROUP BY period, event_type
         ORDER BY period DESC, event_type
       `;
-      const trendsResult = await database.query(trendsQuery, [startTimestamp, endTimestamp]);
+      const trendsResult = await database.all(trendsQuery, [startTimestamp, endTimestamp]);
 
       // Get session statistics
       const sessionQuery = `
@@ -295,7 +294,7 @@ exports.handler = withHandler(async function (event) {
         FROM analytics_sessions
         WHERE started_at >= $1::timestamp AND started_at <= $2::timestamp
       `;
-      const sessionResult = await database.query(sessionQuery, [startTimestamp, endTimestamp]);
+      const sessionStats = await database.get(sessionQuery, [startTimestamp, endTimestamp]);
 
       // Get top pages
       const topPagesQuery = `
@@ -311,19 +310,19 @@ exports.handler = withHandler(async function (event) {
         ORDER BY views DESC
         LIMIT 20
       `;
-      const topPagesResult = await database.query(topPagesQuery, [startTimestamp, endTimestamp]);
+      const topPagesResult = await database.all(topPagesQuery, [startTimestamp, endTimestamp]);
 
       return ok({
         date_range: { start: startDate, end: endDate },
-        event_types: eventTypeResult.rows,
-        trends: trendsResult.rows,
-        sessions: sessionResult.rows[0] || {
+        event_types: eventTypeResult,
+        trends: trendsResult,
+        sessions: sessionStats || {
           total_sessions: 0,
           avg_duration: 0,
           avg_page_views: 0,
           unique_users: 0
         },
-        top_pages: topPagesResult.rows
+        top_pages: topPagesResult
       });
     } catch (e) {
       console.error('Error getting aggregated stats:', e);
@@ -345,19 +344,19 @@ exports.handler = withHandler(async function (event) {
         DELETE FROM analytics_events
         WHERE timestamp < $1
       `;
-      const eventsResult = await database.query(deleteEventsQuery, [cutoffDate]);
+      const eventsResult = await database.run(deleteEventsQuery, [cutoffDate]);
 
       // Delete old sessions
       const deleteSessionsQuery = `
         DELETE FROM analytics_sessions
         WHERE started_at < $1
       `;
-      const sessionsResult = await database.query(deleteSessionsQuery, [cutoffDate]);
+      const sessionsResult = await database.run(deleteSessionsQuery, [cutoffDate]);
 
       return ok({
         message: 'Cleanup completed',
-        events_deleted: eventsResult.rowCount,
-        sessions_deleted: sessionsResult.rowCount,
+        events_deleted: eventsResult.changes,
+        sessions_deleted: sessionsResult.changes,
         cutoff_date: cutoffDate
       });
     } catch (e) {
