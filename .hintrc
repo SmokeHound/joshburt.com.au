@@ -20,7 +20,9 @@
     ],
     "axe/language": "off",
     "axe/text-alternatives": "off",
-    "meta-viewport": "off"
+    "meta-viewport": "off",
+    "meta-charset-utf-8": "off",
+    "apple-touch-icons": "off"
   },
   "browserslist": [
     "defaults",
