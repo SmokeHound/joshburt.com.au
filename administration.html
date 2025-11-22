@@ -40,11 +40,17 @@
         </script>
         <!-- Main Content -->
     <!-- Main Content -->
-    <main id="main-content" class="flex-1 p-4" role="main">
+    <main id="main-content" class="ml-0 lg:ml-64 p-6 flex-1" role="main">
         <!-- Sticky Header -->
-    <header class="page-header card border">
-            <h2 class="text-3xl font-bold text-white" id="welcome-message">Welcome, Admin!</h2>
-            <p class="text-lg mt-2 nav-link-muted">Administrative Dashboard & Controls</p>
+    <header class="page-header card border flex items-center justify-between">
+            <div>
+                <h2 class="text-3xl font-bold text-white" id="welcome-message">Welcome, Admin!</h2>
+                <p class="text-lg mt-2 nav-link-muted">Administrative Dashboard & Controls</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="users.html" class="btn-neon-blue px-4 py-2 rounded font-semibold">Create User</a>
+                <a href="settings.html" class="btn-neon-gray px-4 py-2 rounded">Settings</a>
+            </div>
         </header>
 
         <!-- Content Section -->
