@@ -540,6 +540,50 @@
       return null;
     };
   }
+
+  // Minimal fallback for showNotification so pages don't throw if the
+  // centralized notifications fragment hasn't loaded yet. When the full
+  // notification system loads it may replace this no-op with a richer UI.
+  if (typeof window.showNotification !== 'function') {
+    window.showNotification = function (message, type) {
+      try {
+        // Use an ephemeral toast element as a simple fallback display
+        const id = 'cb-fallback-notification';
+        let el = document.getElementById(id);
+        if (!el) {
+          el = document.createElement('div');
+          el.id = id;
+          el.style.position = 'fixed';
+          el.style.right = '1rem';
+          el.style.bottom = '1rem';
+          el.style.padding = '0.75rem 1rem';
+          el.style.borderRadius = '0.375rem';
+          el.style.background = type === 'error' ? '#b91c1c' : '#111827';
+          el.style.color = '#fff';
+          el.style.zIndex = 9999;
+          el.style.boxShadow = '0 6px 18px rgba(0,0,0,0.2)';
+          document.body.appendChild(el);
+        }
+        el.textContent = String(message || '');
+        el.style.background = type === 'error' ? '#b91c1c' : '#111827';
+        el.style.display = 'block';
+        setTimeout(function () {
+          try {
+            el.style.display = 'none';
+          } catch (_) {
+            /* noop */
+          }
+        }, 4000);
+      } catch (_) {
+        try {
+          console[type === 'error' ? 'error' : 'log'](message);
+        } catch (_) {
+          /* noop */
+        }
+      }
+      return null;
+    };
+  }
 })();
 
 // Ensure shared navigation is injected on pages that didn't execute the inline loader
