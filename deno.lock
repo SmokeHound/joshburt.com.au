@@ -36,8 +36,11 @@
         "npm:postcss@^8.5.6",
         "npm:prettier@^3.6.2",
         "npm:qrcode@^1.5.4",
+        "npm:quill@^2.0.3",
+        "npm:sortablejs@^1.15.6",
         "npm:speakeasy@2",
-        "npm:tailwindcss@^4.1.16"
+        "npm:tailwindcss@^4.1.16",
+        "npm:web-push@^3.6.7"
       ]
     }
   }

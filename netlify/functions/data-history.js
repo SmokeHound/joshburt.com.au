@@ -389,7 +389,15 @@ async function enableTracking(event, pool) {
  * Main handler
  */
 exports.handler = withHandler(async event => {
-  await database.connect();
+  try {
+    await database.connect();
+  } catch (err) {
+    console.error('data-history: failed to connect to database', err);
+    return {
+      statusCode: 503,
+      body: JSON.stringify({ error: 'Database unavailable' })
+    };
+  }
   const pool = database.pool;
 
   try {
