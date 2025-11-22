@@ -21,7 +21,8 @@ const pool = new Pool({
  * Get customer purchase patterns
  */
 async function getPurchasePatterns(event) {
-  await requirePermission(event, 'insights', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'insights', 'read');
+  if (authResponse) return authResponse;
 
   const params = event.queryStringParameters || {};
   const userId = params.user_id ? parseInt(params.user_id) : null;
@@ -87,7 +88,8 @@ async function getPurchasePatterns(event) {
  * Get customer segmentation (RFM analysis)
  */
 async function getCustomerSegmentation(event) {
-  await requirePermission(event, 'insights', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'insights', 'read');
+  if (authResponse) return authResponse;
 
   const client = await pool.connect();
 
@@ -171,7 +173,8 @@ async function getCustomerSegmentation(event) {
  * Get product affinity (items frequently bought together)
  */
 async function getProductAffinity(event) {
-  await requirePermission(event, 'insights', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'insights', 'read');
+  if (authResponse) return authResponse;
 
   const params = event.queryStringParameters || {};
   const itemType = params.item_type;
@@ -242,7 +245,8 @@ async function getProductAffinity(event) {
  * Calculate purchase patterns from order history
  */
 async function calculatePurchasePatterns(event) {
-  await requirePermission(event, 'insights', 'create');
+  const { user, response: authResponse } = await requirePermission(event, 'insights', 'create');
+  if (authResponse) return authResponse;
 
   const client = await pool.connect();
 
@@ -305,7 +309,8 @@ async function calculatePurchasePatterns(event) {
  * Calculate product affinity from order history
  */
 async function calculateProductAffinity(event) {
-  await requirePermission(event, 'insights', 'create');
+  const { user, response: authResponse } = await requirePermission(event, 'insights', 'create');
+  if (authResponse) return authResponse;
 
   const client = await pool.connect();
 
@@ -363,7 +368,8 @@ async function calculateProductAffinity(event) {
  * Get personalized recommendations for a user
  */
 async function getRecommendations(event) {
-  await requirePermission(event, 'insights', 'read');
+  const { user, response: authResponse } = await requirePermission(event, 'insights', 'read');
+  if (authResponse) return authResponse;
 
   const params = event.queryStringParameters || {};
   const userId = params.user_id ? parseInt(params.user_id) : null;
