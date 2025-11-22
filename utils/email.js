@@ -532,4 +532,7 @@ module.exports = {
 
   // Feature flag check
   isEmailQueueEnabled
+  ,
+  // Expose transporter getter for queue worker
+  getTransporter
 };

@@ -4,7 +4,8 @@
  */
 
 const { database } = require('../config/database');
-const nodemailer = require('nodemailer');
+// Reuse the shared transporter logic which can read SMTP from env or DB
+const { getTransporter } = require('./email');
 
 /**
  * Template variable substitution
@@ -169,25 +170,9 @@ async function getPendingEmails(limit = 10) {
  */
 async function sendEmail(email) {
   try {
-    // Validate SMTP configuration
-    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      throw new Error(
-        'SMTP configuration missing. Please set SMTP_HOST, SMTP_USER, and SMTP_PASS environment variables.'
-      );
-    }
+    // Use shared transporter which can load SMTP from env OR from DB settings
+    const transporter = await getTransporter();
 
-    // Create transporter
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_PORT === '465',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
-    });
-
-    // Send email
     const info = await transporter.sendMail({
       from: email.from_address,
       to: email.to_address,
@@ -204,7 +189,7 @@ async function sendEmail(email) {
   } catch (err) {
     return {
       success: false,
-      error: err.message
+      error: err && err.message ? err.message : String(err)
     };
   }
 }

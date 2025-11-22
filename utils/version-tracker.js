@@ -168,7 +168,7 @@ async function getChangeTimeline(pool, tableName, recordId) {
       h.changed_at,
       h.changed_fields,
       u.email as changed_by_email,
-      u.full_name as changed_by_name
+      u.name as changed_by_name
     FROM data_history h
     LEFT JOIN users u ON h.changed_by = u.id
     WHERE h.table_name = $1 AND h.record_id = $2
