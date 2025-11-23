@@ -22,6 +22,8 @@ const { logAudit } = require('../../utils/audit');
 
 exports.handler = withHandler(async event => {
   const method = event.httpMethod;
+  const reqPath = event.path || '';
+  const templatePathMatch = reqPath.match(/email-queue\/template(?:\/(.*))?$/);
 
   // GET - Get queue status and emails
   if (method === 'GET') {
@@ -29,7 +31,13 @@ exports.handler = withHandler(async event => {
     if (authResponse) return authResponse;
 
     const qs = event.queryStringParameters || {};
-    const { status, limit = 50, offset = 0, stats = 'false' } = qs;
+    const { status, limit = 50, offset = 0, stats = 'false', templates = 'false' } = qs;
+
+    // If templates requested, return email templates
+    if (templates === 'true') {
+      const templatesRows = await database.all('SELECT id, name, subject, body_html, body_text, variables, description, updated_at FROM email_templates ORDER BY updated_at DESC');
+      return ok({ templates: templatesRows || [] });
+    }
 
     // If stats requested, return queue statistics
     if (stats === 'true') {
@@ -72,6 +80,24 @@ exports.handler = withHandler(async event => {
 
   // POST - Enqueue email or process queue
   if (method === 'POST') {
+    // Handle create template: POST /.netlify/functions/email-queue/template
+    if (templatePathMatch && !templatePathMatch[1]) {
+      const { user, response: authResponse } = await requirePermission(event, 'email-queue', 'create');
+      if (authResponse) return authResponse;
+
+      const body = parseBody(event);
+      const { name, subject, body_html, body_text, variables, description } = body;
+
+      if (!name || !subject) return badRequest('Template name and subject are required');
+
+      await database.run(
+        `INSERT INTO email_templates (name, subject, body_html, body_text, variables, description, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+        [name, subject, body_html || null, body_text || null, JSON.stringify(variables || []), description || null]
+      );
+
+      return ok({ name }, 201);
+    }
     const { user, response: authResponse } = await requirePermission(
       event,
       'email-queue',
@@ -145,8 +171,37 @@ exports.handler = withHandler(async event => {
     return ok(result, 201);
   }
 
+  // PUT - Update template (/.netlify/functions/email-queue/template/:name)
+  if (method === 'PUT') {
+    if (templatePathMatch && templatePathMatch[1]) {
+      const { user, response: authResponse } = await requirePermission(event, 'email-queue', 'update');
+      if (authResponse) return authResponse;
+
+      const templateName = decodeURIComponent(templatePathMatch[1]);
+      const body = parseBody(event);
+      const { subject, body_html, body_text, variables, description } = body;
+
+      await database.run(
+        `UPDATE email_templates SET subject = ?, body_html = ?, body_text = ?, variables = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE name = ?`,
+        [subject, body_html || null, body_text || null, JSON.stringify(variables || []), description || null, templateName]
+      );
+
+      return ok({ name: templateName });
+    }
+  }
+
   // DELETE - Cancel email
   if (method === 'DELETE') {
+    // Handle delete template by name: DELETE /.netlify/functions/email-queue/template/:name
+    if (templatePathMatch && templatePathMatch[1]) {
+      const { user, response: authResponse } = await requirePermission(event, 'email-queue', 'delete');
+      if (authResponse) return authResponse;
+
+      const templateName = decodeURIComponent(templatePathMatch[1]);
+      await database.run('DELETE FROM email_templates WHERE name = ?', [templateName]);
+      return ok({ success: true, name: templateName });
+    }
+
     const { user, response: authResponse } = await requirePermission(
       event,
       'email-queue',
