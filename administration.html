@@ -108,148 +108,207 @@
 
             <!-- Additional Pages Links -->
             <div id="additional-pages" class="mt-8 card p-6 rounded-lg bg-gray-800 border">
-                <h3 class="text-xl font-semibold mb-4 text-white">Additional administrative pages</h3>
-                <p class="text-sm text-gray-300 mb-4">Pages are grouped here for easier access.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="list">
-                    <a role="listitem" href="error-monitoring.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Error Monitoring</div>
-                                <div class="text-sm text-gray-300">View recent errors and alert trends.</div>
-                            </div>
-                        </div>
-                    </a>
+                <h3 class="text-xl font-semibold mb-6 text-white">Additional administrative pages</h3>
+                <p class="text-sm text-gray-300 mb-6">Pages are grouped by function for easier access.</p>
 
-                    <a role="listitem" href="email-monitoring.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 8v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Email Queue</div>
-                                <div class="text-sm text-gray-300">Inspect outgoing email queue and failures.</div>
+                <!-- Monitoring & Diagnostics -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-semibold mb-4 text-blue-400 flex items-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 20h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Monitoring & Diagnostics
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" role="list">
+                        <a role="listitem" href="error-monitoring.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Error Monitoring</div>
+                                    <div class="text-sm text-gray-300">View recent errors and alert trends.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
 
-                    <a role="listitem" href="email-templates.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 8h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Email Templates</div>
-                                <div class="text-sm text-gray-300">Manage transactional templates.</div>
+                        <a role="listitem" href="cache-monitor.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="3" width="18" height="6" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="15" width="18" height="6" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Cache Monitor</div>
+                                    <div class="text-sm text-gray-300">Inspect cache hits and invalidations.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
 
-                    <a role="listitem" href="analytics-advanced.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 9l-5 5-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Advanced Analytics</div>
-                                <div class="text-sm text-gray-300">Drill-down reports and segments.</div>
+                        <a role="listitem" href="database-performance.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13l3-3 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">DB Performance</div>
+                                    <div class="text-sm text-gray-300">Query performance and slow logs.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
+                </div>
 
-                    <a role="listitem" href="scheduled-reports.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Scheduled Reports</div>
-                                <div class="text-sm text-gray-300">Configure automated report deliveries.</div>
+                <!-- Email & Communications -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-semibold mb-4 text-green-400 flex items-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 8l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 8v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Email & Communications
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" role="list">
+                        <a role="listitem" href="email-monitoring.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 8v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Email Queue</div>
+                                    <div class="text-sm text-gray-300">Inspect outgoing email queue and failures.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
 
-                    <a role="listitem" href="inventory-forecast.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v6H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13h10v8H7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Inventory Forecast</div>
-                                <div class="text-sm text-gray-300">Predict stock needs and trends.</div>
+                        <a role="listitem" href="email-templates.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 8h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Email Templates</div>
+                                    <div class="text-sm text-gray-300">Manage transactional templates.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
+                </div>
 
-                    <a role="listitem" href="customer-insights.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2a7 7 0 100 14 7 7 0 000-14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9v4l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Customer Insights</div>
-                                <div class="text-sm text-gray-300">Customer behaviour and cohort analysis.</div>
+                <!-- Analytics & Reporting -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-semibold mb-4 text-purple-400 flex items-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18 9l-5 5-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Analytics & Reporting
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" role="list">
+                        <a role="listitem" href="analytics-advanced.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 9l-5 5-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Advanced Analytics</div>
+                                    <div class="text-sm text-gray-300">Drill-down reports and segments.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
 
-                    <a role="listitem" href="backups.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Database Backups</div>
-                                <div class="text-sm text-gray-300">Create or download database snapshots.</div>
+                        <a role="listitem" href="scheduled-reports.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Scheduled Reports</div>
+                                    <div class="text-sm text-gray-300">Configure automated report deliveries.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
 
-                    <a role="listitem" href="bulk-import.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 7h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Bulk Operations</div>
-                                <div class="text-sm text-gray-300">Import or process records in batches.</div>
+                        <a role="listitem" href="customer-insights.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2a7 7 0 100 14 7 7 0 000-14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9v4l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Customer Insights</div>
+                                    <div class="text-sm text-gray-300">Customer behaviour and cohort analysis.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
+                </div>
 
-                    <a role="listitem" href="data-history.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Data History</div>
-                                <div class="text-sm text-gray-300">Audit and historical data exploration.</div>
+                <!-- Data Management -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-semibold mb-4 text-orange-400 flex items-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3h18v6H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 13h10v8H7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Data Management
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" role="list">
+                        <a role="listitem" href="inventory-forecast.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v6H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13h10v8H7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Inventory Forecast</div>
+                                    <div class="text-sm text-gray-300">Predict stock needs and trends.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
 
-                    <a role="listitem" href="cache-monitor.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="3" width="18" height="6" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="15" width="18" height="6" rx="1" stroke="currentColor" stroke-width="2"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Cache Monitor</div>
-                                <div class="text-sm text-gray-300">Inspect cache hits and invalidations.</div>
+                        <a role="listitem" href="backups.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Database Backups</div>
+                                    <div class="text-sm text-gray-300">Create or download database snapshots.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
 
-                    <a role="listitem" href="database-performance.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13l3-3 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">DB Performance</div>
-                                <div class="text-sm text-gray-300">Query performance and slow logs.</div>
+                        <a role="listitem" href="bulk-import.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 7h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Bulk Operations</div>
+                                    <div class="text-sm text-gray-300">Import or process records in batches.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
 
-                    <a role="listitem" href="api-docs.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">API Documentation</div>
-                                <div class="text-sm text-gray-300">Reference for serverless endpoints.</div>
+                        <a role="listitem" href="data-history.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Data History</div>
+                                    <div class="text-sm text-gray-300">Audit and historical data exploration.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
+                </div>
 
-                    <a role="listitem" href="dev-dashboard.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v18H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>
-                                <div class="text-white font-semibold">Dev Dashboard</div>
-                                <div class="text-sm text-gray-300">Developer tools and diagnostics.</div>
+                <!-- Development & API -->
+                <div class="mb-0">
+                    <h4 class="text-lg font-semibold mb-4 text-cyan-400 flex items-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3h18v18H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Development & API
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" role="list">
+                        <a role="listitem" href="api-docs.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">API Documentation</div>
+                                    <div class="text-sm text-gray-300">Reference for serverless endpoints.</div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+
+                        <a role="listitem" href="dev-dashboard.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v18H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div>
+                                    <div class="text-white font-semibold">Dev Dashboard</div>
+                                    <div class="text-sm text-gray-300">Developer tools and diagnostics.</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
 
