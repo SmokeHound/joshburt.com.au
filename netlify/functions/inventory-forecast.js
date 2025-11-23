@@ -13,8 +13,13 @@ const {
 const { database } = require('../../config/database');
 
 async function getPool() {
-  if (!database.pool) await database.connect();
-  return database.pool;
+  try {
+    if (!database.pool) await database.connect();
+    return database.pool;
+  } catch (err) {
+    console.error('Database connect failed in inventory-forecast:', err);
+    throw err;
+  }
 }
 
 /**
@@ -36,7 +41,13 @@ async function getForecasts(event) {
   const days = params.days ? parseInt(params.days) : 30;
   const minConfidence = params.min_confidence ? parseFloat(params.min_confidence) : 0;
 
-    const client = await (await getPool()).connect();
+    let pool;
+    try {
+      pool = await getPool();
+    } catch (err) {
+      return error(503, 'Database unavailable');
+    }
+    const client = await pool.connect();
 
   try {
     let query = `
@@ -64,7 +75,7 @@ async function getForecasts(event) {
       LEFT JOIN consumables c ON f.item_type = 'consumable' AND f.item_id = c.id
       LEFT JOIN filters fi ON f.item_type = 'filter' AND f.item_id = fi.id
       WHERE f.forecast_date >= CURRENT_DATE
-        AND f.forecast_date <= CURRENT_DATE + $1
+        AND f.forecast_date <= (CURRENT_DATE + ($1 * INTERVAL '1 day'))
         AND f.confidence_level >= $2
     `;
 
@@ -150,7 +161,13 @@ async function generateAllForecasts(event) {
   const { user, response: authResponse } = await requirePermission(event, 'forecast', 'create');
   if (authResponse) return authResponse;
 
-  const client = await (await getPool()).connect();
+  let pool;
+  try {
+    pool = await getPool();
+  } catch (err) {
+    return error(503, 'Database unavailable');
+  }
+  const client = await pool.connect();
 
   try {
     // Get all active items
@@ -232,7 +249,13 @@ async function getSummary(event) {
   const { user, response: authResponse } = await requirePermission(event, 'forecast', 'read');
   if (authResponse) return authResponse;
 
-  const client = await (await getPool()).connect();
+  let pool;
+  try {
+    pool = await getPool();
+  } catch (err) {
+    return error(503, 'Database unavailable');
+  }
+  const client = await pool.connect();
 
   try {
     const summaryQuery = `

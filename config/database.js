@@ -44,7 +44,9 @@ class Database {
 
   async connect() {
     try {
-      this.pool = new Pool(pgConfig);
+      if (!this.pool) {
+        this.pool = new Pool(pgConfig);
+      }
       // Test the connection
       const client = await this.pool.connect();
       await client.query('SELECT NOW()');

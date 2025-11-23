@@ -298,9 +298,9 @@ async function getLowStockAlerts(daysAhead = 7) {
           WHEN 'filter' THEN fi.name
         END as item_name,
         CASE f.item_type
-          WHEN 'product' THEN p.stock_quantity
-          WHEN 'consumable' THEN c.soh
-          WHEN 'filter' THEN fi.stock_quantity
+          WHEN 'product' THEN COALESCE(p.stock_quantity::numeric, 0)
+          WHEN 'consumable' THEN COALESCE(c.soh::numeric, 0)
+          WHEN 'filter' THEN COALESCE(fi.stock_quantity::numeric, 0)
         END as current_stock,
         SUM(f.predicted_demand) as predicted_demand_week,
         AVG(f.confidence_level) as avg_confidence
@@ -308,17 +308,17 @@ async function getLowStockAlerts(daysAhead = 7) {
       LEFT JOIN products p ON f.item_type = 'product' AND f.item_id = p.id
       LEFT JOIN consumables c ON f.item_type = 'consumable' AND f.item_id = c.id
       LEFT JOIN filters fi ON f.item_type = 'filter' AND f.item_id = fi.id
-      WHERE f.forecast_date BETWEEN CURRENT_DATE AND CURRENT_DATE + $1
+      WHERE f.forecast_date BETWEEN CURRENT_DATE AND (CURRENT_DATE + ($1 * INTERVAL '1 day'))
       GROUP BY f.item_type, f.item_id, item_name, current_stock
       HAVING SUM(f.predicted_demand) > CASE f.item_type
-          WHEN 'product' THEN p.stock_quantity
-          WHEN 'consumable' THEN c.soh
-          WHEN 'filter' THEN fi.stock_quantity
+          WHEN 'product' THEN COALESCE(p.stock_quantity::numeric, 0)
+          WHEN 'consumable' THEN COALESCE(c.soh::numeric, 0)
+          WHEN 'filter' THEN COALESCE(fi.stock_quantity::numeric, 0)
         END
       ORDER BY (SUM(f.predicted_demand) - CASE f.item_type
-          WHEN 'product' THEN p.stock_quantity
-          WHEN 'consumable' THEN c.soh
-          WHEN 'filter' THEN fi.stock_quantity
+          WHEN 'product' THEN COALESCE(p.stock_quantity::numeric, 0)
+          WHEN 'consumable' THEN COALESCE(c.soh::numeric, 0)
+          WHEN 'filter' THEN COALESCE(fi.stock_quantity::numeric, 0)
         END) DESC
     `;
 
