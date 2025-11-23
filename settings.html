@@ -258,44 +258,48 @@
                     </div>
                   </div>
                   <fieldset class="space-y-4">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Feature Flags -->
-                    <label class="flex items-center gap-2 p-4 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Feature Flags (compact layout matching maintenance-mode alignment) -->
+                    <div class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
                       <input type="checkbox" id="feature-beta-features" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
-                      <div class="flex-1">
-                        <span class="text-xs font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable Beta Features</span>
-                        <p class="text-xs text-gray-500 mt-0.5">Access experimental functionality</p>
+                      <div>
+                        <label for="feature-beta-features" class="font-bold text-gray-200 cursor-pointer">Enable Beta Features</label>
+                        <p class="text-xs text-gray-500 mt-1">Access experimental functionality</p>
                       </div>
-                    </label>
-                    <label class="flex items-center gap-2 p-4 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                    </div>
+
+                    <div class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
                       <input type="checkbox" id="feature-new-dashboard" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
-                      <div class="flex-1">
-                        <span class="text-xs font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable New Dashboard</span>
-                        <p class="text-xs text-gray-500 mt-0.5">Try the redesigned interface</p>
+                      <div>
+                        <label for="feature-new-dashboard" class="font-bold text-gray-200 cursor-pointer">Enable New Dashboard</label>
+                        <p class="text-xs text-gray-500 mt-1">Try the redesigned interface</p>
                       </div>
-                    </label>
-                    <label class="flex items-center gap-2 p-4 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                    </div>
+
+                    <div class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
                       <input type="checkbox" id="feature-advanced-reports" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
-                      <div class="flex-1">
-                        <span class="text-xs font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable Advanced Reports</span>
-                        <p class="text-xs text-gray-500 mt-0.5">Detailed analytics and insights</p>
+                      <div>
+                        <label for="feature-advanced-reports" class="font-bold text-gray-200 cursor-pointer">Enable Advanced Reports</label>
+                        <p class="text-xs text-gray-500 mt-1">Detailed analytics and insights</p>
                       </div>
-                    </label>
+                    </div>
+
                     <!-- Feature Toggles (moved here) -->
-                    <label class="flex items-center gap-2 p-4 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                    <div class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
                       <input type="checkbox" id="enable-registration" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
-                      <div class="flex-1">
-                        <span class="text-xs font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable User Registration</span>
-                        <p class="text-xs text-gray-500 mt-0.5">Allow new users to sign up</p>
+                      <div>
+                        <label for="enable-registration" class="font-bold text-gray-200 cursor-pointer">Enable User Registration</label>
+                        <p class="text-xs text-gray-500 mt-1">Allow new users to sign up</p>
                       </div>
-                    </label>
-                    <label class="flex items-center gap-2 p-4 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group">
+                    </div>
+
+                    <div class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
                       <input type="checkbox" id="enable-guest-checkout" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
-                      <div class="flex-1">
-                        <span class="text-xs font-bold text-gray-200 group-hover:text-yellow-300 transition-colors">Enable Guest Checkout</span>
-                        <p class="text-xs text-gray-500 mt-0.5">Purchase without account</p>
+                      <div>
+                        <label for="enable-guest-checkout" class="font-bold text-gray-200 cursor-pointer">Enable Guest Checkout</label>
+                        <p class="text-xs text-gray-500 mt-1">Purchase without account</p>
                       </div>
-                    </label>
+                    </div>
                   </div>
                   </fieldset>
                 </div>
