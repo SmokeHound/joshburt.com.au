@@ -6,6 +6,9 @@
  * Part of Phase 4: Data Management
  */
 
+// Load .env for local development
+require('dotenv').config();
+
 const { database } = require('../config/database');
 const { spawn } = require('child_process');
 const fs = require('fs').promises;
@@ -31,8 +34,9 @@ async function generateSQLBackup(tables = [], compression = 'gzip') {
       process.env.DB_PORT || '5432',
       '-U',
       process.env.DB_USER,
-      '-d',
-      process.env.DB_NAME,
+        '-d',
+        // Prefer full DATABASE_URL when available, otherwise DB_NAME or DB_DATABASE
+        (process.env.DATABASE_URL || process.env.DB_NAME || process.env.DB_DATABASE),
       '--no-password',
       '--clean',
       '--if-exists'
@@ -45,8 +49,18 @@ async function generateSQLBackup(tables = [], compression = 'gzip') {
       });
     }
 
-    const pgDump = spawn('pg_dump', args, {
-      env: { ...process.env, PGPASSWORD: process.env.DB_PASSWORD }
+    let pgDump;
+    try {
+      pgDump = spawn('pg_dump', args, {
+        env: { ...process.env, PGPASSWORD: process.env.DB_PASSWORD }
+      });
+    } catch (spawnErr) {
+      reject(new Error('pg_dump not found on PATH. Install PostgreSQL client tools or ensure pg_dump is available.'));
+      return;
+    }
+
+    pgDump.on('error', err => {
+      reject(new Error('pg_dump execution failed: ' + err.message));
     });
 
     let output = '';

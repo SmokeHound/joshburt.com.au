@@ -44,14 +44,28 @@ class Database {
 
   async connect() {
     try {
+      // Create pool only once. Run a lightweight connection test only when pool is newly created.
       if (!this.pool) {
         this.pool = new Pool(pgConfig);
+        // Attach a pool-level error handler to avoid unhandled 'error' events
+        this.pool.on('error', err => {
+          console.error('PostgreSQL pool error (unhandled client error):', err);
+          // Do not throw here - let callers handle connection/query errors.
+        });
+        try {
+          const client = await this.pool.connect();
+          await client.query('SELECT NOW()');
+          client.release();
+          console.log('📚 Connected to PostgreSQL database');
+        } catch (innerErr) {
+          // If the initial test fails, destroy the pool to allow retry semantics later
+          try {
+            await this.pool.end();
+          } catch (e) {}
+          this.pool = null;
+          throw innerErr;
+        }
       }
-      // Test the connection
-      const client = await this.pool.connect();
-      await client.query('SELECT NOW()');
-      client.release();
-      console.log('📚 Connected to PostgreSQL database');
     } catch (error) {
       console.error('Database connection failed:', error);
       throw error;
