@@ -104,6 +104,75 @@ const THEME_CARDS_CONFIG = [
       'from-sky-400 to-sky-500 shadow-sky-400/50'
     ]
   }
+  ,
+  {
+    id: 'cyberpunk',
+    name: 'Cyberpunk',
+    description: 'Bold magentas and cyans with electric highlights',
+    badge: 'New',
+    badgeColor: 'cyan',
+    icon: 'lightning',
+    bg: 'bg-black',
+    textColor: 'text-pink-300',
+    hoverBorder: 'hover:border-pink-400',
+    hoverShadow: 'hover:shadow-pink-400/30',
+    colors: [
+      'from-pink-500 to-pink-600 shadow-pink-500/40',
+      'from-cyan-400 to-cyan-500 shadow-cyan-400/40',
+      'from-purple-400 to-purple-500 shadow-purple-400/40'
+    ]
+  },
+  {
+    id: 'pastel',
+    name: 'Pastel',
+    description: 'Soft pastel tones for a gentle UI',
+    badge: 'Soft',
+    badgeColor: 'yellow',
+    icon: 'sun',
+    bg: 'bg-white',
+    textColor: 'text-gray-800',
+    hoverBorder: 'hover:border-yellow-300',
+    hoverShadow: 'hover:shadow-yellow-300/20',
+    colors: [
+      'from-pink-100 to-pink-200',
+      'from-sky-100 to-sky-200',
+      'from-lime-100 to-lime-200'
+    ]
+  },
+  {
+    id: 'solar',
+    name: 'Solar',
+    description: 'Warm solar tones with high legibility',
+    badge: 'Warm',
+    badgeColor: 'indigo',
+    icon: 'sun',
+    bg: 'bg-gradient-to-br from-yellow-50 to-orange-50',
+    textColor: 'text-amber-800',
+    hoverBorder: 'hover:border-amber-400',
+    hoverShadow: 'hover:shadow-amber-400/20',
+    colors: [
+      'from-amber-400 to-amber-500',
+      'from-orange-400 to-orange-500',
+      'from-yellow-300 to-yellow-400'
+    ]
+  },
+  {
+    id: 'midnight',
+    name: 'Midnight',
+    description: 'Deep, muted tones for focused work at night',
+    badge: 'Calm',
+    badgeColor: 'blue',
+    icon: 'moon',
+    bg: 'bg-gradient-to-br from-slate-900 to-slate-800',
+    textColor: 'text-slate-200',
+    hoverBorder: 'hover:border-slate-500',
+    hoverShadow: 'hover:shadow-slate-500/20',
+    colors: [
+      'from-slate-800 to-slate-900',
+      'from-slate-700 to-slate-800',
+      'from-slate-600 to-slate-700'
+    ]
+  }
 ];
 
 const ICONS = {

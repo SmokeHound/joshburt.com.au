@@ -8,6 +8,45 @@
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
   <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <style>
+    /* Compact mode for Settings page: reduce paddings, gaps and font-sizes */
+    #main-content { padding: 0.5rem !important; }
+    #main-content .page-header { padding: 0.5rem !important; }
+    #main-content .page-header .w-16 { width:48px !important; height:48px !important; }
+    #main-content .page-header h2 { font-size:1.125rem !important; }
+    #main-content .page-header p { font-size:0.75rem !important; margin-top:0.25rem !important; }
+
+    /* Cards and widgets */
+    #main-content .card, #main-content .widget-primary, #main-content .widget-secondary { padding:0.6rem !important; border-radius:0.5rem !important; }
+    #main-content .p-8 { padding:0.6rem !important; }
+    #main-content .p-6 { padding:0.5rem !important; }
+    #main-content .p-4 { padding:0.375rem !important; }
+
+    /* Inputs and controls */
+    #main-content input, #main-content textarea, #main-content select { padding:0.5rem !important; font-size:0.9rem !important; }
+    #main-content .w-12.h-12, #main-content .w-10.h-10 { width:36px !important; height:36px !important; }
+
+    /* Typography and spacing */
+    #main-content .text-2xl { font-size:1.125rem !important; }
+    #main-content .text-lg { font-size:1rem !important; }
+    #main-content .text-sm, #main-content .text-xs { font-size:0.75rem !important; }
+    #main-content .gap-4, #main-content .gap-6 { gap:0.5rem !important; }
+    #main-content .mb-6, #main-content .mb-8 { margin-bottom:0.5rem !important; }
+
+    /* Theme cards/grid */
+    #theme-cards-container { gap:0.5rem !important; }
+    #main-content .theme-card { font-size:0.85rem; }
+    #main-content .theme-card .p-4 { padding:0.5rem !important; }
+
+    /* Buttons */
+    #main-content .btn-neon-blue, #main-content .btn-neon-green { padding:0.45rem 0.75rem !important; font-size:0.875rem !important; }
+    #main-content .px-10 { padding-left:0.9rem !important; padding-right:0.9rem !important; }
+    #main-content .py-5 { padding-top:0.5rem !important; padding-bottom:0.5rem !important; }
+
+    /* Reduce preview/input heights where used */
+    #main-content .h-12 { height:36px !important; }
+    #main-content .h-16 { height:48px !important; }
+  </style>
   <script src="./assets/js/init-shared.js" defer></script>
   <script src="./assets/js/feature-flags.js" defer></script>
   <script src="./assets/js/accessibility.js" defer></script>
