@@ -150,7 +150,7 @@ async function generateAllForecasts(event) {
   const { user, response: authResponse } = await requirePermission(event, 'forecast', 'create');
   if (authResponse) return authResponse;
 
-  const client = await pool.connect();
+  const client = await (await getPool()).connect();
 
   try {
     // Get all active items
@@ -232,7 +232,7 @@ async function getSummary(event) {
   const { user, response: authResponse } = await requirePermission(event, 'forecast', 'read');
   if (authResponse) return authResponse;
 
-  const client = await pool.connect();
+  const client = await (await getPool()).connect();
 
   try {
     const summaryQuery = `

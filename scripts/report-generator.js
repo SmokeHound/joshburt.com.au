@@ -6,6 +6,9 @@
  * Can be run manually or via cron/scheduled task
  */
 
+// Load environment variables from .env for local development
+require('dotenv').config();
+
 const { database } = require('../config/database');
 
 // Check if running in cron mode

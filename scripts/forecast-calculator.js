@@ -82,7 +82,7 @@ function detectSeasonality(historicalData) {
  * Calculate forecast for a specific item
  */
 async function calculateForecast(itemType, itemId, forecastDays = 30) {
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     // Get historical order data (last 90 days)
@@ -191,7 +191,7 @@ async function calculateForecast(itemType, itemId, forecastDays = 30) {
  * Store forecasts in the database
  */
 async function storeForecasts(itemType, itemId, forecasts, factors) {
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     await client.query('BEGIN');
@@ -232,7 +232,7 @@ async function storeForecasts(itemType, itemId, forecasts, factors) {
  * Calculate forecasts for all active items
  */
 async function calculateAllForecasts() {
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     console.log('🔮 Starting inventory forecast calculation...\n');
@@ -285,7 +285,7 @@ async function calculateAllForecasts() {
  * Get low stock alerts based on forecasts
  */
 async function getLowStockAlerts(daysAhead = 7) {
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     const query = `
