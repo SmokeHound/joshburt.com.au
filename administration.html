@@ -15,6 +15,8 @@
   </style>
   <link rel="stylesheet" href="./assets/css/accessibility.css" />
   <script src="./assets/js/accessibility.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
 </head>
 <body class="dark">
   
@@ -57,7 +59,7 @@
             <p class="mb-6 leading-relaxed nav-link-muted">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
 
             <!-- Admin Cards Grid with More Than 3 Colors -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
+            <div id="admin-functions-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
                 <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-blue-600 to-blue-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z" fill="currentColor"></path><path d="M4 20c0-3.314 2.686-6 6-6h4c3.314 0 6 2.686 6 6v1H4v-1z" fill="currentColor"></path></svg>User Management</h3>
                     <p class="mb-4 nav-link-muted">Manage user accounts and permissions.</p>
@@ -80,7 +82,7 @@
                 </div>
             </div>
             <!-- Additional Management Cards Row -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8" role="region" aria-label="Product and Order Management">
+            <div id="product-management-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8" role="region" aria-label="Product and Order Management">
                 <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 6h18v2H3V6zm2 4h14v8H5v-8z" fill="currentColor"></path></svg>Oil Product Management</h3>
                     <p class="mb-4 nav-link-muted">Add, edit, and manage oil product inventory and details.</p>
@@ -351,6 +353,37 @@
                                                         if (window.FeatureFlags) {
                                                                 await window.FeatureFlags.toggleElements('#beta-features-section', 'betaFeatures');
                                                                 await window.FeatureFlags.toggleElements('#new-dashboard-section', 'newDashboard');
+                                                        }
+
+                                                        // Initialize sortable grids
+                                                        if (typeof Sortable !== 'undefined') {
+                                                            // Admin functions grid
+                                                            const adminGrid = document.getElementById('admin-functions-grid');
+                                                            if (adminGrid) {
+                                                                Sortable.create(adminGrid, {
+                                                                    animation: 150,
+                                                                    handle: '.card',
+                                                                    onEnd: function(evt) {
+                                                                        // Optionally save order to localStorage
+                                                                        const order = Array.from(adminGrid.children).map(card => card.querySelector('h3').textContent.trim());
+                                                                        localStorage.setItem('admin-functions-order', JSON.stringify(order));
+                                                                    }
+                                                                });
+                                                            }
+
+                                                            // Product management grid
+                                                            const productGrid = document.getElementById('product-management-grid');
+                                                            if (productGrid) {
+                                                                Sortable.create(productGrid, {
+                                                                    animation: 150,
+                                                                    handle: '.card',
+                                                                    onEnd: function(evt) {
+                                                                        // Optionally save order to localStorage
+                                                                        const order = Array.from(productGrid.children).map(card => card.querySelector('h3').textContent.trim());
+                                                                        localStorage.setItem('product-management-order', JSON.stringify(order));
+                                                                    }
+                                                                });
+                                                            }
                                                         }
                                                 });
 
