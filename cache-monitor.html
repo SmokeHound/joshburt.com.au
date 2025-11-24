@@ -197,9 +197,29 @@
       async function loadCacheStats() {
         try {
           const response = await authFetch(`${FN_BASE}/cache-management`);
+
+          // If unauthorized or forbidden, show a helpful message instead of silently failing
+          if (!response.ok) {
+            if (response.status === 401) {
+              window.showNotification('You must be signed in to view cache statistics.', 'error');
+            } else if (response.status === 403) {
+              window.showNotification('Insufficient permissions to view cache statistics. Admin role required.', 'error');
+            } else {
+              window.showNotification('Failed to load cache statistics (status: ' + response.status + ').', 'error');
+            }
+            // Clear values to indicate no data
+            document.getElementById('cache-size').textContent = '-';
+            document.getElementById('hit-rate').textContent = '-';
+            document.getElementById('total-hits').textContent = '-';
+            document.getElementById('total-misses').textContent = '-';
+            document.getElementById('total-sets').textContent = '-';
+            document.getElementById('total-deletes').textContent = '-';
+            return;
+          }
+
           const data = await response.json();
 
-          if (response.ok && data.stats) {
+          if (data && data.stats) {
             document.getElementById('cache-size').textContent = data.stats.size || 0;
             document.getElementById('hit-rate').textContent = data.stats.hitRate || '0%';
             document.getElementById('total-hits').textContent = data.stats.hits || 0;
@@ -207,10 +227,18 @@
             document.getElementById('total-sets').textContent = data.stats.sets || 0;
             document.getElementById('total-deletes').textContent = data.stats.deletes || 0;
             document.getElementById('cache-type').textContent = data.cacheType || 'In-Memory';
+          } else {
+            window.showNotification('Cache statistics response contained no data.', 'error');
           }
         } catch (error) {
           console.error('Error loading cache stats:', error);
-          window.showToast?.('Failed to load cache statistics', 'error');
+          window.showNotification('Failed to load cache statistics', 'error');
+          document.getElementById('cache-size').textContent = '-';
+          document.getElementById('hit-rate').textContent = '-';
+          document.getElementById('total-hits').textContent = '-';
+          document.getElementById('total-misses').textContent = '-';
+          document.getElementById('total-sets').textContent = '-';
+          document.getElementById('total-deletes').textContent = '-';
         }
       }
 
