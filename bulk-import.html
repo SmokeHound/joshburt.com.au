@@ -502,66 +502,126 @@ Product 2,PROD002,oil,50</pre>
       return new Date(dateString).toLocaleString();
     }
 
-    // Event listeners
-    document.getElementById('import-btn').addEventListener('click', () => {
-      document.getElementById('import-modal').classList.remove('hidden');
-    });
-
-    document.getElementById('export-btn').addEventListener('click', () => {
-      document.getElementById('export-modal').classList.remove('hidden');
-    });
-
-    document.getElementById('cancel-import-btn').addEventListener('click', () => {
-      document.getElementById('import-modal').classList.add('hidden');
-      document.getElementById('import-form').reset();
-      document.getElementById('import-step-1').classList.remove('hidden');
-      document.getElementById('import-step-2').classList.add('hidden');
-    });
-
-    document.getElementById('cancel-export-btn').addEventListener('click', () => {
-      document.getElementById('export-modal').classList.add('hidden');
-      document.getElementById('export-form').reset();
-    });
-
-    document.getElementById('close-details-btn').addEventListener('click', () => {
-      document.getElementById('operation-details-modal').classList.add('hidden');
-    });
-
-    document.getElementById('upload-file-btn').addEventListener('click', () => {
-      document.getElementById('file-input').click();
-    });
-
-    document.getElementById('file-input').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const text = await file.text();
-        document.getElementById('import-data').value = text;
+    // Event and modal helpers
+    (function() {
+      function ensureBackdrop() {
+        let backdrop = document.getElementById('modal-backdrop');
+        if (!backdrop) {
+          backdrop = document.createElement('div');
+          backdrop.id = 'modal-backdrop';
+          backdrop.className = 'fixed inset-0 bg-black bg-opacity-50 z-40 hidden';
+          document.body.appendChild(backdrop);
+        }
+        return backdrop;
       }
-    });
 
-    document.getElementById('paste-data-btn').addEventListener('click', async () => {
-      try {
-        const text = await navigator.clipboard.readText();
-        document.getElementById('import-data').value = text;
-        showNotification('Data pasted from clipboard', 'success');
-      } catch (err) {
-        showNotification('Failed to read clipboard', 'error');
+      function showModal(id) {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        const backdrop = ensureBackdrop();
+        backdrop.classList.remove('hidden');
+        backdrop.classList.add('block');
+        modal.classList.remove('hidden');
+        modal.classList.add('z-50');
+        document.body.style.overflow = 'hidden';
+        // focus first focusable element
+        const focusable = modal.querySelector('select, input, button, textarea');
+        if (focusable) focusable.focus();
+        // attach backdrop click to close
+        backdrop.onclick = () => hideModal(id);
+        // esc to close
+        document.addEventListener('keydown', escHandler);
       }
-    });
 
-    document.getElementById('validate-btn').addEventListener('click', validateImportData);
+      function hideModal(id) {
+        const modal = document.getElementById(id);
+        const backdrop = document.getElementById('modal-backdrop');
+        if (modal) modal.classList.add('hidden');
+        if (backdrop) {
+          backdrop.classList.add('hidden');
+          backdrop.classList.remove('block');
+        }
+        document.body.style.overflow = '';
+        document.removeEventListener('keydown', escHandler);
+      }
 
-    document.getElementById('back-to-step1-btn').addEventListener('click', () => {
-      document.getElementById('import-step-1').classList.remove('hidden');
-      document.getElementById('import-step-2').classList.add('hidden');
-    });
+      function escHandler(e) {
+        if (e.key === 'Escape') {
+          // hide any open modal
+          ['import-modal','export-modal','operation-details-modal'].forEach(id => {
+            const m = document.getElementById(id);
+            if (m && !m.classList.contains('hidden')) hideModal(id);
+          });
+        }
+      }
 
-    document.getElementById('import-form').addEventListener('submit', executeImport);
-    document.getElementById('export-form').addEventListener('submit', executeExport);
-    document.getElementById('refresh-btn').addEventListener('click', loadOperations);
+      // Wire buttons
+      const importBtn = document.getElementById('import-btn');
+      const exportBtn = document.getElementById('export-btn');
+      const cancelImportBtn = document.getElementById('cancel-import-btn');
+      const cancelExportBtn = document.getElementById('cancel-export-btn');
+      const closeDetailsBtn = document.getElementById('close-details-btn');
 
-    // Initialize
-    loadOperations();
+      if (importBtn) importBtn.addEventListener('click', () => showModal('import-modal'));
+      if (exportBtn) exportBtn.addEventListener('click', () => showModal('export-modal'));
+      if (cancelImportBtn) cancelImportBtn.addEventListener('click', () => {
+        hideModal('import-modal');
+        document.getElementById('import-form').reset();
+        document.getElementById('import-step-1').classList.remove('hidden');
+        document.getElementById('import-step-2').classList.add('hidden');
+      });
+      if (cancelExportBtn) cancelExportBtn.addEventListener('click', () => {
+        hideModal('export-modal');
+        document.getElementById('export-form').reset();
+      });
+      if (closeDetailsBtn) closeDetailsBtn.addEventListener('click', () => hideModal('operation-details-modal'));
+
+      // other ui wiring
+      const uploadFileBtn = document.getElementById('upload-file-btn');
+      if (uploadFileBtn) uploadFileBtn.addEventListener('click', () => document.getElementById('file-input').click());
+
+      const fileInput = document.getElementById('file-input');
+      if (fileInput) fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const text = await file.text();
+          document.getElementById('import-data').value = text;
+        }
+      });
+
+      const pasteBtn = document.getElementById('paste-data-btn');
+      if (pasteBtn) pasteBtn.addEventListener('click', async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          document.getElementById('import-data').value = text;
+          showNotification('Data pasted from clipboard', 'success');
+        } catch (err) {
+          showNotification('Failed to read clipboard', 'error');
+        }
+      });
+
+      const validateBtn = document.getElementById('validate-btn');
+      if (validateBtn) validateBtn.addEventListener('click', validateImportData);
+
+      const backBtn = document.getElementById('back-to-step1-btn');
+      if (backBtn) backBtn.addEventListener('click', () => {
+        document.getElementById('import-step-1').classList.remove('hidden');
+        document.getElementById('import-step-2').classList.add('hidden');
+      });
+
+      const importForm = document.getElementById('import-form');
+      if (importForm) importForm.addEventListener('submit', executeImport);
+      const exportForm = document.getElementById('export-form');
+      if (exportForm) exportForm.addEventListener('submit', executeExport);
+
+      const refreshBtn = document.getElementById('refresh-btn');
+      if (refreshBtn) refreshBtn.addEventListener('click', loadOperations);
+
+      // ensure backdrop exists but hidden
+      ensureBackdrop();
+      // Initialize
+      loadOperations();
+    })();
   </script>
 </body>
 </html>
