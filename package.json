@@ -53,7 +53,7 @@
     "@netlify/functions": "^5.0.1",
     "@netlify/zip-it-and-ship-it": "^14.1.11",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/node": "^10.22.0",
+    "@sentry/node": "^10.27.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.2",
     "glob": "^13.0.0",
