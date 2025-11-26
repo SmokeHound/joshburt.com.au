@@ -8,9 +8,10 @@
   <script src="/assets/js/init-shared.js" defer></script>
   </head>
   <body class="bg-gray-50 dark:bg-gray-900">
-    <div id="main-nav"></div>
+    <div class="flex flex-col md:flex-row min-h-screen">
+      <div id="main-nav"></div>
 
-    <main class="ml-0 lg:ml-64 p-6 transition-all duration-300">
+      <main class="ml-0 lg:ml-64 p-6 flex-1 transition-all duration-300">
       <!-- Page Header -->
       <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Database Performance</h1>
@@ -190,7 +191,8 @@
           </table>
         </div>
       </div>
-    </main>
+      </main>
+    </div>
 
     <!-- Shared Components loaded by init-shared.js -->
 
