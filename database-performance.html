@@ -13,12 +13,16 @@
 
       <main class="ml-0 lg:ml-64 p-6 flex-1 transition-all duration-300">
       <!-- Page Header -->
-      <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Database Performance</h1>
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Monitor database query performance and identify bottlenecks
-        </p>
-      </div>
+      <header class="page-header card border flex items-center justify-between mb-6" role="banner">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white" id="page-title">Database Performance</h1>
+          <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Monitor database query performance and identify bottlenecks</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="last-updated" class="text-sm text-gray-500 dark:text-gray-400">Last updated: —</span>
+          <button id="header-refresh-btn" class="px-3 py-1 bg-white text-black rounded hover:opacity-95 text-sm">Refresh</button>
+        </div>
+      </header>
 
       <!-- Summary Statistics -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -284,9 +288,13 @@
         }
       }
 
-      // Load all data
+      // Load all data and update last-updated indicator
       async function loadAll() {
         await Promise.all([loadSummary(), loadSlowQueries()]);
+        try {
+          const el = document.getElementById('last-updated');
+          if (el) el.textContent = 'Last updated: ' + new Date().toLocaleString();
+        } catch (_) {}
       }
 
       // Helper function to escape HTML
@@ -299,6 +307,8 @@
       // Event listeners
       document.getElementById('refresh-btn').addEventListener('click', loadAll);
       document.getElementById('reset-metrics-btn').addEventListener('click', resetMetrics);
+      const headerRefresh = document.getElementById('header-refresh-btn');
+      if (headerRefresh) headerRefresh.addEventListener('click', loadAll);
 
       // Initial load - wait for authFetch to be available
       if (window.authFetch) {
