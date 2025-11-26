@@ -70,7 +70,8 @@
       <!-- Toast -->
 
       <!-- Shared Navigation Loader -->
-      <div id="main-nav"></div>
+      <div class="flex flex-col md:flex-row min-h-screen">
+        <div id="main-nav"></div>
       <script>
         // Dynamically load shared navigation and execute any inline scripts
         fetch('shared-nav.html')
@@ -112,6 +113,15 @@
             <div>
               <h2 class="text-2xl font-bold text-white bg-clip-text">Site Settings</h2>
               <p class="text-xs mt-2 text-gray-300">Configure your site's appearance, features, and behavior</p>
+            </div>
+            <div class="ml-auto flex items-center gap-4">
+              <div class="text-right text-xs text-gray-300">
+                <div id="last-updated" class="text-xs text-gray-300">Last updated: —</div>
+                <div class="text-[10px] text-gray-500">Settings</div>
+              </div>
+              <button id="header-refresh-btn" class="btn-neon-blue px-3 py-2 rounded-md text-xs" title="Refresh settings" aria-label="Refresh settings">
+                <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6"/></svg>
+              </button>
             </div>
           </div>
         </header>
@@ -657,6 +667,7 @@
 
         </section>
     </main>
+    </div>
 
     <!-- 2FA Setup Modal -->
     <div id="2fa-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
@@ -903,9 +914,14 @@
                 }
                 // Security
                 if (settings.sessionTimeout) document.getElementById('session-timeout').value = settings.sessionTimeout;
-                if (settings.maxLoginAttempts) document.getElementById('max-login-attempts').value = settings.maxLoginAttempts;
-                if (settings.enable2FA !== undefined) document.getElementById('enable-2fa').checked = settings.enable2FA;
-                if (settings.auditAllActions !== undefined) document.getElementById('audit-all-actions').checked = settings.auditAllActions;
+                  if (settings.maxLoginAttempts) document.getElementById('max-login-attempts').value = settings.maxLoginAttempts;
+                  if (settings.enable2FA !== undefined) document.getElementById('enable-2fa').checked = settings.enable2FA;
+                  if (settings.auditAllActions !== undefined) document.getElementById('audit-all-actions').checked = settings.auditAllActions;
+                  // Update last-updated indicator
+                  try {
+                    const lu = document.getElementById('last-updated');
+                    if (lu) lu.textContent = 'Last updated: ' + new Date().toLocaleString();
+                  } catch (e) {}
       } catch (e) {
         showToast('Failed to load settings from server', 'error');
       }
@@ -1520,7 +1536,7 @@
             if (active.colors.buttonSecondary) document.documentElement.style.setProperty('--btn-secondary-bg', active.colors.buttonSecondary);
             if (active.colors.buttonDanger) document.documentElement.style.setProperty('--btn-danger-bg', active.colors.buttonDanger);
             if (active.colors.buttonSuccess) document.documentElement.style.setProperty('--btn-success-bg', active.colors.buttonSuccess);
-            
+
             // Apply preview box backgrounds
             const previewPrimary = document.querySelector('.preview-box-primary');
             const previewSecondary = document.querySelector('.preview-box-secondary');
@@ -1529,7 +1545,7 @@
             const previewBtnSecondary = document.querySelector('.preview-box-btn-secondary');
             const previewBtnDanger = document.querySelector('.preview-box-btn-danger');
             const previewBtnSuccess = document.querySelector('.preview-box-btn-success');
-            
+
             if (previewPrimary) previewPrimary.style.backgroundColor = active.colors.primary;
             if (previewSecondary) previewSecondary.style.backgroundColor = active.colors.secondary;
             if (previewAccent) previewAccent.style.backgroundColor = active.colors.accent;
@@ -1541,6 +1557,19 @@
         }
       } catch (e) {}
       // Update previews when site settings change
+          // Header refresh control wiring
+          const hdrRefresh = document.getElementById('header-refresh-btn');
+          if (hdrRefresh) {
+            hdrRefresh.addEventListener('click', async () => {
+              try {
+                showToast('Refreshing settings...');
+                await loadSettings();
+                showToast('Settings refreshed', 'success');
+              } catch (e) {
+                showToast('Failed to refresh settings', 'error');
+              }
+            });
+          }
       window.addEventListener('siteSettingsUpdated', (evt) => {
         try {
           const detail = (evt && evt.detail) || (window.Theme ? window.Theme.getActiveTheme().colors : null);
