@@ -105,8 +105,21 @@ DB_USER=your-username
 DB_PASSWORD=your-password
 DB_NAME=your-database
 
+# Neon (Postgres) for Netlify Functions
+DATABASE_URL=postgres://<username>:<password>@<host>/<database>?sslmode=require
+
+# Database Connection Pool (PostgreSQL)
+DB_POOL_MAX=20
+DB_POOL_MIN=2
+DB_IDLE_TIMEOUT=30000
+DB_CONNECTION_TIMEOUT=3000
+DB_QUERY_TIMEOUT=10000
+DB_STATEMENT_TIMEOUT=10000
+
 # Authentication (required)
 JWT_SECRET=your-secret-key-min-32-chars
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_EXPIRES_IN=30d
 
 # Auth0 (optional - enables OAuth)
 AUTH0_DOMAIN=your-tenant.auth0.com
@@ -117,7 +130,31 @@ AUTH0_AUDIENCE=https://your-api-identifier
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER=your-email@example.com
-SMTP_PASSWORD=your-smtp-password
+SMTP_PASS=your-smtp-password
+FROM_EMAIL=noreply@joshburt.com.au
+
+# Security
+BCRYPT_ROUNDS=12
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Self-Hosted Error Tracking
+ERROR_TRACKING_ENABLED=true
+
+# Email Queue System
+EMAIL_QUEUE_ENABLED=false
+EMAIL_WORKER_BATCH_SIZE=10
+EMAIL_WORKER_POLL_INTERVAL=60000
+EMAIL_WORKER_MAX_TIME=300000
+
+# Push Notifications (Web Push)
+# Generate VAPID keys with: npx web-push generate-vapid-keys
+VAPID_PUBLIC_KEY=your-vapid-public-key
+VAPID_PRIVATE_KEY=your-vapid-private-key
+VAPID_SUBJECT=mailto:admin@joshburt.com.au
+
+# Logging
+DEBUG=false
 ```
 
 ---
