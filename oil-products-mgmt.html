@@ -165,7 +165,8 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                products = Array.isArray(data) ? data : [];
+                // Handle both array and object responses (API returns { products, pagination })
+                products = Array.isArray(data) ? data : (data.products || []);
                 renderProducts();
                 showToast(`Loaded ${products.length} products from database`, 'success');
             } catch (error) {
@@ -382,7 +383,7 @@
         // Delete product
         async function deleteProduct(productId) {
             // Find product details for confirmation
-            const product = productsData.find(p => p.id === productId);
+            const product = products.find(p => p.id === productId);
             const productName = product ? `${product.name} (${product.code})` : 'this product';
             
             const confirmed = await window.ModalUtils.confirm({
@@ -413,10 +414,12 @@
                 const response = await fetch(`${FN_BASE}/products`);
                 if (!response.ok) throw new Error('Failed to fetch products for export');
                 const data = await response.json();
+                // Handle both array and object responses (API returns { products, pagination })
+                const productsList = Array.isArray(data) ? data : (data.products || []);
                 const headers = ['Code', 'Name', 'Type', 'Current Stock', 'Reorder Point', 'Specs', 'Description', 'Image URL'];
                 const csvContent = [
                     headers.join(','),
-                    ...data.map(product => [
+                    ...productsList.map(product => [
                         `"${product.code}"`,
                         `"${product.name}"`,
                         `"${product.type}"`,
