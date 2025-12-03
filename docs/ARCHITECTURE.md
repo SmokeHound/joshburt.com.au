@@ -864,7 +864,7 @@ const verifyPassword = async (password, hash) => {- Weekly performance reports
 
 - **Database**: Managed service with auto-scaling
 
-**Implementation**: TOTP (Time-based One-Time Password) via `speakeasy` library
+**Implementation**: TOTP (Time-based One-Time Password) via `otplib` library
 
 ### Future Improvements
 

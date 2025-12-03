@@ -1,5 +1,5 @@
 // Two-Factor Authentication (2FA) utilities using TOTP
-const speakeasy = require('speakeasy');
+const { authenticator } = require('otplib');
 const QRCode = require('qrcode');
 const nodeCrypto = require('crypto');
 
@@ -10,15 +10,12 @@ const nodeCrypto = require('crypto');
  * @returns {object} - { secret: string, otpauthUrl: string }
  */
 function generateTOTPSecret(email, issuer = 'JoshBurt.com.au') {
-  const secret = speakeasy.generateSecret({
-    name: `${issuer} (${email})`,
-    issuer: issuer,
-    length: 32
-  });
+  const secret = authenticator.generateSecret(32);
+  const otpauthUrl = authenticator.keyuri(email, issuer, secret);
 
   return {
-    secret: secret.base32,
-    otpauthUrl: secret.otpauth_url
+    secret: secret,
+    otpauthUrl: otpauthUrl
   };
 }
 
@@ -35,12 +32,12 @@ function verifyTOTPToken(token, secret, options = {}) {
   }
 
   try {
-    return speakeasy.totp.verify({
-      secret: secret,
-      encoding: 'base32',
-      token: token,
-      window: options.window || 1 // Allow 1 time step before/after for clock drift
-    });
+    // Configure window for clock drift tolerance (default 1 step = 30 seconds)
+    const originalWindow = authenticator.options.window;
+    authenticator.options = { ...authenticator.options, window: options.window || 1 };
+    const isValid = authenticator.check(token, secret);
+    authenticator.options = { ...authenticator.options, window: originalWindow };
+    return isValid;
   } catch (e) {
     console.error('TOTP verification error:', e);
     return false;

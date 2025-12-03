@@ -416,7 +416,7 @@ exports.handler = withHandler(async event => {
 
 ### TOTP Implementation
 
-**Library**: `speakeasy` (Time-based One-Time Password)
+**Library**: `otplib` (Time-based One-Time Password)
 
 **Authenticator Apps**: Google Authenticator, Authy, 1Password, etc.
 
@@ -429,22 +429,21 @@ exports.handler = withHandler(async event => {
 **Backend**:
 
 ```javascript
-const speakeasy = require('speakeasy');
+const { authenticator } = require('otplib');
 const qrcode = require('qrcode');
 
 // Generate secret
-const secret = speakeasy.generateSecret({
-  name: 'Josh Burt Workshop (user@example.com)'
-});
+const secret = authenticator.generateSecret(32);
+const otpauthUrl = authenticator.keyuri('user@example.com', 'Josh Burt Workshop', secret);
 
 // Generate QR code
-const qrCodeDataURL = await qrcode.toDataURL(secret.otpauth_url);
+const qrCodeDataURL = await qrcode.toDataURL(otpauthUrl);
 
 // Store secret temporarily (not enabled yet)
-await pool.query('UPDATE users SET totp_secret = $1 WHERE id = $2', [secret.base32, userId]);
+await pool.query('UPDATE users SET totp_secret = $1 WHERE id = $2', [secret, userId]);
 
 return {
-  secret: secret.base32,
+  secret: secret,
   qrCode: qrCodeDataURL
 };
 ```
@@ -477,14 +476,9 @@ User scans QR code with authenticator app, which generates 6-digit codes every 3
 **Backend Verification**:
 
 ```javascript
-const verified = speakeasy.totp.verify({
-  secret: user.totp_secret,
-  encoding: 'base32',
-  token: totpCode,
-  window: 1 // Allow 30s window for clock drift
-});
+const isValid = authenticator.check(totpCode, user.totp_secret);
 
-if (!verified) {
+if (!isValid) {
   throw new Error('Invalid TOTP code');
 }
 
@@ -509,7 +503,7 @@ await pool.query('UPDATE users SET totp_enabled = TRUE WHERE id = $1', [userId])
 2. Backend verifies credentials
 3. Backend checks if totp_enabled = TRUE
 4. If TRUE, require totpCode in request
-5. Verify TOTP code with speakeasy
+5. Verify TOTP code with otplib
 6. If valid, generate tokens
 7. Return tokens
 ```

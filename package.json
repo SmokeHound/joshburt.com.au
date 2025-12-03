@@ -48,24 +48,22 @@
     "url": "https://github.com/SmokeHound/joshburt.com.au"
   },
   "dependencies": {
-    "@auth0/auth0-spa-js": "^2.7.0",
+    "@auth0/auth0-spa-js": "^2.10.0",
     "@neondatabase/serverless": "^1.0.1",
     "@netlify/functions": "^5.0.1",
     "@netlify/zip-it-and-ship-it": "^14.1.11",
-    "@sentry/integrations": "^7.114.0",
-    "@sentry/node": "^10.22.0",
+    "@sentry/node": "^10.28.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.2",
     "glob": "^13.0.0",
-    "help": "^3.0.2",
     "js-yaml": "^4.1.1",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.10",
     "pg": "^8.11.3",
+    "otplib": "^12.0.1",
     "qrcode": "^1.5.4",
     "quill": "^2.0.3",
     "sortablejs": "^1.15.6",
-    "speakeasy": "^2.0.0",
     "web-push": "^3.6.7"
   },
   "author": "Josh Burt",
@@ -81,7 +79,7 @@
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8.5.6",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.4",
     "tailwindcss": "^4.1.16"
   }
 }
