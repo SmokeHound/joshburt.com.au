@@ -493,6 +493,86 @@ BEFORE UPDATE ON product_variants
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
+-- Phase 1.1: Error Tracking System (migrations/007_add_error_tracking.sql)
+-- Self-hosted error tracking to replace external services like Sentry
+CREATE TABLE IF NOT EXISTS error_logs (
+  id SERIAL PRIMARY KEY,
+  timestamp TIMESTAMP DEFAULT NOW(),
+  level VARCHAR(20) NOT NULL CHECK (level IN ('error', 'warning', 'info', 'critical')),
+  message TEXT NOT NULL,
+  stack_trace TEXT,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  url TEXT,
+  user_agent TEXT,
+  ip_address INET,
+  environment VARCHAR(50),
+  metadata JSONB,
+  resolved BOOLEAN DEFAULT FALSE,
+  resolved_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  resolved_at TIMESTAMP,
+  occurrences INTEGER DEFAULT 1,
+  first_seen TIMESTAMP DEFAULT NOW(),
+  last_seen TIMESTAMP DEFAULT NOW(),
+  fingerprint VARCHAR(64) UNIQUE
+);
+
+CREATE INDEX IF NOT EXISTS idx_error_logs_timestamp ON error_logs(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_error_logs_fingerprint ON error_logs(fingerprint);
+CREATE INDEX IF NOT EXISTS idx_error_logs_resolved ON error_logs(resolved);
+CREATE INDEX IF NOT EXISTS idx_error_logs_level ON error_logs(level);
+CREATE INDEX IF NOT EXISTS idx_error_logs_user_id ON error_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_error_logs_environment ON error_logs(environment);
+CREATE INDEX IF NOT EXISTS idx_error_logs_resolved_timestamp ON error_logs(resolved, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_error_logs_level_timestamp ON error_logs(level, timestamp DESC);
+
+COMMENT ON TABLE error_logs IS 'Self-hosted error tracking system - replaces Sentry';
+COMMENT ON COLUMN error_logs.fingerprint IS 'SHA256 hash of error signature for grouping similar errors';
+COMMENT ON COLUMN error_logs.occurrences IS 'Number of times this error has occurred';
+
+-- Phase 1.2: Email Queue System (migrations/008_add_email_queue.sql)
+-- Database-backed email queue with retry logic
+CREATE TABLE IF NOT EXISTS email_queue (
+  id SERIAL PRIMARY KEY,
+  to_address VARCHAR(255) NOT NULL,
+  from_address VARCHAR(255) NOT NULL,
+  subject VARCHAR(500) NOT NULL,
+  body_html TEXT,
+  body_text TEXT,
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'sending', 'sent', 'failed', 'cancelled')),
+  priority INTEGER DEFAULT 5 CHECK (priority >= 1 AND priority <= 10),
+  attempts INTEGER DEFAULT 0,
+  max_attempts INTEGER DEFAULT 3,
+  scheduled_for TIMESTAMP DEFAULT NOW(),
+  sent_at TIMESTAMP,
+  failed_at TIMESTAMP,
+  error_message TEXT,
+  metadata JSONB,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_email_queue_status ON email_queue(status);
+CREATE INDEX IF NOT EXISTS idx_email_queue_scheduled ON email_queue(scheduled_for) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_email_queue_priority ON email_queue(priority, scheduled_for) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_email_queue_created_at ON email_queue(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_email_queue_worker ON email_queue(status, priority, scheduled_for) 
+  WHERE status IN ('pending', 'failed');
+
+CREATE TABLE IF NOT EXISTS email_templates (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) UNIQUE NOT NULL,
+  subject VARCHAR(500) NOT NULL,
+  body_html TEXT NOT NULL,
+  body_text TEXT,
+  variables JSONB,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+COMMENT ON TABLE email_queue IS 'Database-backed email queue with retry logic';
+COMMENT ON TABLE email_templates IS 'Reusable email templates with variable substitution';
+
 -- Phase 2: Advanced Analytics & Reporting Tables
 -- Analytics events table for tracking user interactions (from migration 009)
 CREATE TABLE IF NOT EXISTS analytics_events (

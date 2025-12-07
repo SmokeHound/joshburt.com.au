@@ -368,16 +368,27 @@
   // Make function global for onclick
   window.showErrorDetail = showErrorDetail;
 
-  // Load initial data after init-shared.js is ready
-  if (window.authFetch) {
-    loadErrors();
-  } else {
-    // Wait for init-shared.js to load
-    window.addEventListener('DOMContentLoaded', () => {
-      // Give deferred scripts a moment to execute
-      setTimeout(loadErrors, 100);
-    });
+  // Helper to wait for authFetch to be available
+  function waitForAuthFetch(callback, maxWait = 5000) {
+    const start = Date.now();
+    function check() {
+      if (window.authFetch) {
+        callback();
+      } else if (Date.now() - start < maxWait) {
+        setTimeout(check, 50);
+      } else {
+        console.error('authFetch not available after waiting');
+        document.getElementById('errors-table').innerHTML = 
+          '<tr><td colspan="7" class="py-4 text-center text-red-400">Authentication not initialized. Please refresh the page.</td></tr>';
+      }
+    }
+    check();
   }
+
+  // Load initial data after init-shared.js is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    waitForAuthFetch(loadErrors);
+  });
 </script>
 
 </body>

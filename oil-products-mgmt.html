@@ -163,7 +163,7 @@
         async function loadProducts() {
             try {
                 showToast('Loading products...', 'info');
-                const response = await fetch(`${FN_BASE}/products`);
+                const response = await (window.authFetch ? window.authFetch(`${FN_BASE}/products`) : fetch(`${FN_BASE}/products`));
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
