@@ -6,9 +6,18 @@
     <title>Cache Monitor - joshburt.com.au</title>
     <link rel="stylesheet" href="/assets/css/styles.css" />
     <script src="/assets/js/init-shared.js" defer></script>
+    <script>
+      fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
+      fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
+      fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>document.head.appendChild(c.cloneNode(true)));});
+    </script>
+    <link rel="stylesheet" href="./assets/css/accessibility.css" />
+    <script src="./assets/js/accessibility.js" defer></script>
   </head>
   <body class="bg-gray-50 dark:bg-gray-900">
+    <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
     <div id="main-nav"></div>
+    <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
 
     <main class="ml-0 lg:ml-64 p-6 transition-all duration-300">
       <!-- Page Header -->
@@ -188,15 +197,13 @@
     <!-- Shared Components loaded by init-shared.js -->
 
     <!-- Page Script -->
-    <script type="module">
-      import { authFetch } from '/assets/js/auth.js';
-
+    <script>
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
 
       // Load cache statistics
       async function loadCacheStats() {
         try {
-          const response = await authFetch(`${FN_BASE}/cache-management`);
+          const response = await (window.authFetch ? window.authFetch(`${FN_BASE}/cache-management`) : fetch(`${FN_BASE}/cache-management`));
 
           // If unauthorized or forbidden, show a helpful message instead of silently failing
           if (!response.ok) {
@@ -247,11 +254,15 @@
         if (!confirm('Are you sure you want to reset cache statistics?')) return;
 
         try {
-          const response = await authFetch(`${FN_BASE}/cache-management`, {
+          const response = await (window.authFetch ? window.authFetch(`${FN_BASE}/cache-management`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'reset-stats' })
-          });
+          }) : fetch(`${FN_BASE}/cache-management`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'reset-stats' })
+          }));
 
           if (response.ok) {
             window.showToast?.('Cache statistics reset successfully', 'success');
@@ -275,11 +286,15 @@
           return;
 
         try {
-          const response = await authFetch(`${FN_BASE}/cache-management`, {
+          const response = await (window.authFetch ? window.authFetch(`${FN_BASE}/cache-management`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({})
-          });
+          }) : fetch(`${FN_BASE}/cache-management`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+          }));
 
           if (response.ok) {
             window.showToast?.('All cache cleared successfully', 'success');
@@ -298,14 +313,26 @@
       document.getElementById('reset-stats-btn').addEventListener('click', resetStats);
       document.getElementById('clear-all-btn').addEventListener('click', clearAllCache);
 
-      // Initial load - wait for authFetch to be available
-      if (window.authFetch) {
-        loadCacheStats();
-      } else {
-        window.addEventListener('DOMContentLoaded', () => {
-          setTimeout(loadCacheStats, 100);
-        });
+      // Helper to wait for authFetch to be available
+      function waitForAuthFetch(callback, maxWait = 5000) {
+        const start = Date.now();
+        function check() {
+          if (window.authFetch) {
+            callback();
+          } else if (Date.now() - start < maxWait) {
+            setTimeout(check, 50);
+          } else {
+            console.error('authFetch not available after waiting');
+            window.showNotification?.('Authentication not initialized. Please refresh the page.', 'error');
+          }
+        }
+        check();
       }
+
+      // Initial load - wait for authFetch to be available
+      document.addEventListener('DOMContentLoaded', () => {
+        waitForAuthFetch(loadCacheStats);
+      });
 
       // Auto-refresh every 30 seconds
       setInterval(loadCacheStats, 30000);
