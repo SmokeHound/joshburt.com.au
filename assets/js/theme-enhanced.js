@@ -6,11 +6,25 @@
 (function () {
   'use strict';
 
-  // Wait for base ThemeManager to be available
-  if (typeof window.Theme === 'undefined') {
-    console.warn('Theme manager not loaded, enhanced features disabled');
-    return;
-  }
+  // Wait for base ThemeManager to be available with retry logic
+  function initEnhancedTheme() {
+    if (typeof window.Theme === 'undefined') {
+      // Retry after a short delay to allow shared-theme.html to load
+      if (!window._themeEnhancedRetryCount) {
+        window._themeEnhancedRetryCount = 0;
+      }
+      if (window._themeEnhancedRetryCount < 20) {
+        window._themeEnhancedRetryCount++;
+        setTimeout(initEnhancedTheme, 100);
+        return;
+      } else {
+        console.warn('Theme manager not loaded after retries, enhanced features disabled');
+        return;
+      }
+    }
+
+    // Theme manager is now available, proceed with initialization
+    delete window._themeEnhancedRetryCount;
 
   /**
    * Theme Preview Component
@@ -528,4 +542,8 @@
   };
 
   console.log('Enhanced theme system loaded');
+  }
+
+  // Start initialization (will retry if Theme manager not ready)
+  initEnhancedTheme();
 })();
