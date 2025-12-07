@@ -24,6 +24,19 @@
     /* Page-specific styles only */
     .oil-item {transition:all .2s ease;background:#111;border:1px solid #333}
     .oil-item:hover {background:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
+    /* Ensure Quill dropdowns appear above modal content */
+    .ql-toolbar .ql-picker-options { z-index: 350 !important; }
+    .ql-tooltip { z-index: 350 !important; }
+    /* Fix Quill editor dark theme styling */
+    .ql-toolbar.ql-snow { background: #374151; border-color: #4b5563 !important; }
+    .ql-container.ql-snow { border-color: #4b5563 !important; }
+    .ql-editor { min-height: 100px; color: #fff; }
+    .ql-editor.ql-blank::before { color: #9ca3af; }
+    .ql-snow .ql-stroke { stroke: #9ca3af; }
+    .ql-snow .ql-fill { fill: #9ca3af; }
+    .ql-snow .ql-picker { color: #9ca3af; }
+    .ql-snow .ql-picker-options { background: #1f2937; }
+    .ql-snow .ql-picker-item:hover { color: #00d4ff; }
   </style>
   <link rel="stylesheet" href="./assets/css/accessibility.css" />
   <script src="./assets/js/accessibility.js" defer></script>
@@ -91,8 +104,8 @@
         </main>
         </div>
                 <!-- Product Modal (dialog) -->
-                        <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop">
-                            <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl p-6 relative border-2 border-accent modal-panel">
+                        <div id="productModal" class="fixed inset-0 z-[300] flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop p-4">
+                            <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl p-6 relative border-2 border-accent modal-panel max-h-[90vh] overflow-y-auto">
                         <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold" aria-label="Close">&times;</button>
                         <h3 class="text-xl font-bold text-accent mb-4" id="form-title">Add New Product</h3>
                         <form id="product-form" class="space-y-4">
