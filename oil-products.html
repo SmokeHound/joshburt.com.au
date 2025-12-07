@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
   <link rel="stylesheet" href="./assets/css/styles.css">
   <script src="./assets/js/init-shared.js" defer></script>
+  <script src="./assets/js/components/drag-drop.js" defer></script>
   <script>
     // Purge legacy role demo key to avoid stale UI state
     try { localStorage.removeItem('currentUser'); } catch (_) {}
@@ -21,6 +22,11 @@
     /* Page-specific styles only (global theme and neon styles are in assets/css/styles.css) */
     .oil-item {transition:all .2s ease;background-color:#111;border:1px solid #333}
     .oil-item:hover {background-color:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
+    /* Drag-drop order item styles */
+    .order-item { cursor: grab; transition: all 0.2s ease; }
+    .order-item:active { cursor: grabbing; }
+    .order-item .drag-handle { opacity: 0.5; transition: opacity 0.2s; }
+    .order-item:hover .drag-handle { opacity: 1; }
   </style>
   <link rel="stylesheet" href="./assets/css/accessibility.css" />
   <script src="./assets/js/accessibility.js" defer></script>
@@ -152,7 +158,7 @@
             <h2 class="text-xl font-semibold text-gray-100">Order List</h2>
             <span id="orderCount" class="bg-primary text-white px-3 py-1 rounded-full text-sm">0 items</span>
           </div>
-          <p class="text-sm text-gray-400 mt-1">Items to be ordered</p>
+          <p class="text-sm text-gray-400 mt-1">Drag items to reorder • Click on oils to add</p>
         </div>
         
         <div id="orderList" class="max-h-96 overflow-y-auto">
@@ -203,6 +209,7 @@
       const orderItems = [];
       let products = [];
       let filteredProducts = [];
+      let orderListDragDrop = null; // DragDrop instance for order list
 
       
       // DOM elements
@@ -275,6 +282,12 @@
         orderCount.textContent = `${itemCount} items`;
         totalOrderItems.textContent = totalQty;
         
+        // Destroy existing DragDrop instance before re-rendering
+        if (orderListDragDrop) {
+          orderListDragDrop.destroy();
+          orderListDragDrop = null;
+        }
+        
         if (itemCount === 0) {
           orderList.innerHTML = `
             <div class="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -285,12 +298,19 @@
           return;
         }
         
-        const orderHTML = orderItems.map(item => `
-          <div class="p-4 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
+        const orderHTML = orderItems.map((item, index) => `
+          <div class="order-item p-4 border-b border-gray-200 dark:border-gray-600 last:border-b-0" data-id="${item.id}" data-index="${index}">
             <div class="flex justify-between items-start mb-3">
-              <div class="flex-1 min-w-0">
-                <h4 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(item.name)}</h4>
-                <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(item.type)} • Code: ${escapeHtml(item.code)}</p>
+              <div class="flex items-start gap-2 flex-1 min-w-0">
+                <span class="drag-handle text-gray-400 mt-1 cursor-grab no-print" title="Drag to reorder">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+                  </svg>
+                </span>
+                <div>
+                  <h4 class="font-medium text-gray-900 dark:text-gray-100">${escapeHtml(item.name)}</h4>
+                  <p class="text-sm text-gray-600 dark:text-gray-300">${escapeHtml(item.type)} • Code: ${escapeHtml(item.code)}</p>
+                </div>
               </div>
               <button onclick="removeFromOrder(${item.id})" class="text-red-500 hover:text-red-700 p-1 no-print" title="Remove item">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -329,6 +349,26 @@
         `).join('');
         
         orderList.innerHTML = orderHTML;
+        
+        // Initialize DragDrop for order list reordering
+        if (typeof DragDrop !== 'undefined' && itemCount > 1) {
+          orderListDragDrop = new DragDrop('orderList', {
+            handle: '.drag-handle',
+            animation: 150,
+            onSort: (event) => {
+              // Reorder the orderItems array based on new DOM order
+              const newOrder = [];
+              orderList.querySelectorAll('.order-item').forEach(el => {
+                const id = parseInt(el.dataset.id, 10);
+                const item = orderItems.find(i => i.id === id);
+                if (item) newOrder.push(item);
+              });
+              // Replace orderItems contents with new order
+              orderItems.length = 0;
+              newOrder.forEach(item => orderItems.push(item));
+            }
+          });
+        }
       }
       
       // Product loading and display

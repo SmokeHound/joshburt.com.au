@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
     <script src="./assets/js/init-shared.js" defer></script>
+    <script src="./assets/js/components/rich-editor.js" defer></script>
     <script>
         // Purge legacy role demo key to avoid stale UI state
         try { localStorage.removeItem('currentUser'); } catch (_) {}
@@ -131,7 +132,8 @@
                             </div>
                             <div>
                                 <label for="product-description" class="block mb-2 font-medium">Description</label>
-                                <textarea id="product-description" name="product-description" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Enter detailed product description"></textarea>
+                                <div id="product-description-editor" class="rich-editor-container min-h-[150px] rounded bg-gray-800 border border-gray-600"></div>
+                                <input type="hidden" id="product-description" name="product-description">
                             </div>
                             <div>
                                 <label for="product-image" class="block mb-2 font-medium">Image URL</label>
@@ -153,6 +155,7 @@
     let productModalEl, closeProductModalBtn, addProductBtn, cancelEditBtn;
     let lastFocusedEl = null;
     let modalKeydownHandler = null;
+    let descriptionEditor = null; // RichEditor instance for product description
 
         // No localStorage fallback or default products: all data is from API
 
@@ -261,7 +264,8 @@
             const currentStockRaw = formData.get('product-current-stock');
             const reorderPointRaw = formData.get('product-reorder-point');
             const specs = formData.get('product-specs').trim();
-            const description = formData.get('product-description').trim();
+            // Get description from RichEditor (synced to hidden input) or fallback to hidden input value
+            const description = descriptionEditor ? descriptionEditor.getContent('html').trim() : formData.get('product-description').trim();
             const image = formData.get('product-image').trim();
             
             if (!code || !name || !type || !specs) {
@@ -309,9 +313,18 @@
             document.getElementById('product-current-stock').value = ((product.soh ?? product.currentStock) ?? '') === '' ? '' : (product.soh ?? product.currentStock);
             document.getElementById('product-reorder-point').value = (product.model_qty ?? '') === '' ? '' : product.model_qty;
             document.getElementById('product-specs').value = product.specs;
-            document.getElementById('product-description').value = product.description || '';
+            // Set description in RichEditor after modal opens
+            const descriptionContent = product.description || '';
+            document.getElementById('product-description').value = descriptionContent;
             document.getElementById('product-image').value = product.image || '';
             editingProductId = productId;
+            
+            // Defer RichEditor content setting to after modal opens
+            setTimeout(() => {
+                if (descriptionEditor) {
+                    descriptionEditor.setContent(descriptionContent, 'html');
+                }
+            }, 100);
             form.querySelector('button[type="submit"]').textContent = 'Update Product';
             document.getElementById('form-title').textContent = 'Edit Product';
             renderProducts(); // Highlight the row being edited
@@ -329,6 +342,19 @@
             if (!productModalEl) return;
                         lastFocusedEl = document.activeElement;
             productModalEl.classList.remove('hidden');
+            
+            // Initialize RichEditor for description if not already created
+            if (!descriptionEditor && typeof RichEditor !== 'undefined') {
+                descriptionEditor = new RichEditor('product-description-editor', {
+                    placeholder: 'Enter detailed product description...',
+                    theme: 'snow',
+                    onChange: (content) => {
+                        // Sync content to hidden input for form submission
+                        document.getElementById('product-description').value = content;
+                    }
+                });
+            }
+            
             // basic focus management
                         setTimeout(() => {
                             const first = document.getElementById('product-code');
@@ -367,6 +393,10 @@
             const form = document.getElementById('product-form');
             productModalEl.classList.add('hidden');
             form.reset();
+            // Clear RichEditor content
+            if (descriptionEditor) {
+                descriptionEditor.clear();
+            }
             editingProductId = null;
             form.querySelector('button[type="submit"]').textContent = 'Add Product';
             document.getElementById('form-title').textContent = 'Add New Product';

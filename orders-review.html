@@ -14,6 +14,7 @@
     
     <link rel="stylesheet" href="./assets/css/styles.css">
     <script src="./assets/js/init-shared.js" defer></script>
+    <script src="./assets/js/components/data-table.js" defer></script>
     
     <!-- Inline Modal Utilities (critical for order details) -->
     <style>
@@ -145,7 +146,7 @@
                 </header>
                 <section>
                     <div class="card widget-primary rounded-lg shadow-md p-6" id="orders-container">
-                        <div id="orders-list">
+                        <div id="orders-table">
                             <div class="text-center text-gray-500 dark:text-gray-400">Loading orders...</div>
                         </div>
                     </div>
@@ -154,10 +155,88 @@
         </div>
 
     <script>
-    // Order Review Script (copied from administration.html)
+    // Order Review Script (using DataTable component)
         document.addEventListener('DOMContentLoaded', function() {
-            const ordersList = document.getElementById('orders-list');
             let ordersState = [];
+            let ordersTable = null;
+
+            // Status badge renderer
+            function renderStatusBadge(status) {
+                const statusClasses = {
+                    'pending': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+                    'approved': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                    'rejected': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                };
+                const classes = statusClasses[status] || statusClasses['pending'];
+                return `<span class="px-2 py-0.5 rounded-full text-xs ${classes}">${status}</span>`;
+            }
+
+            // Priority badge renderer
+            function renderPriorityBadge(priority) {
+                const priorityClasses = {
+                    'urgent': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                    'normal': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                    'low': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                };
+                const classes = priorityClasses[priority] || priorityClasses['normal'];
+                return `<span class="px-2 py-0.5 rounded-full text-xs ${classes}">${priority || 'normal'}</span>`;
+            }
+
+            // Action buttons renderer
+            function renderActions(value, row) {
+                return `
+                    <button class="px-3 py-1.5 rounded text-xs text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 border border-blue-500/40 shadow-sm transition-colors" onclick="showOrderDetailsModal(${row.id})">
+                        View Details
+                    </button>
+                `;
+            }
+
+            // DataTable column configuration
+            const columns = [
+                { 
+                    field: 'id', 
+                    label: 'Order #', 
+                    sortable: true,
+                    render: (value) => `<span class="font-semibold text-gray-100">#${value}</span>`
+                },
+                { 
+                    field: 'created_at', 
+                    label: 'Date', 
+                    sortable: true,
+                    render: (value) => `<span class="text-xs text-gray-400">${new Date(value).toLocaleString()}</span>`
+                },
+                { 
+                    field: 'status', 
+                    label: 'Status', 
+                    sortable: true,
+                    render: (value) => renderStatusBadge(value)
+                },
+                { 
+                    field: 'created_by', 
+                    label: 'Requested By', 
+                    sortable: true,
+                    render: (value) => `<span class="text-gray-200">${value || 'mechanic'}</span>`
+                },
+                { 
+                    field: 'total_items', 
+                    label: 'Items', 
+                    sortable: true,
+                    render: (value) => `<span class="text-gray-300">${value || '?'}</span>`
+                },
+                { 
+                    field: 'priority', 
+                    label: 'Priority', 
+                    sortable: true,
+                    render: (value) => renderPriorityBadge(value)
+                },
+                { 
+                    field: 'id', 
+                    label: 'Actions', 
+                    sortable: false,
+                    render: renderActions
+                }
+            ];
+
             async function loadOrders() {
                 try {
                     const FN_BASE = window.FN_BASE || '/.netlify/functions';
@@ -165,37 +244,23 @@
                     if (!res.ok) throw new Error('Failed to fetch orders');
                     const orders = await res.json();
                     ordersState = Array.isArray(orders) ? orders : [];
-                    if (!Array.isArray(ordersState) || ordersState.length === 0) {
-                        ordersList.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">No orders found.</div>';
-                        return;
+                    
+                    // Initialize or update DataTable
+                    if (!ordersTable) {
+                        ordersTable = new DataTable('orders-table', {
+                            data: ordersState,
+                            columns: columns,
+                            pageSize: 10,
+                            sortable: true,
+                            filterable: true,
+                            paginated: true,
+                            onRowClick: (row) => showOrderDetailsModal(row.id)
+                        });
+                    } else {
+                        ordersTable.setData(ordersState);
                     }
-                    ordersList.innerHTML = ordersState.map((order, idx) => `
-                        <div class="mb-3 p-3 border-b border-gray-200 dark:border-gray-600">
-                            <div class="flex justify-between items-center mb-1">
-                                <div>
-                                    <span class="font-semibold text-gray-900 dark:text-white">Order #${order.id}</span>
-                                    <span class="ml-2 text-xs text-gray-500">${new Date(order.created_at).toLocaleString()}</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <button class="px-3 py-1.5 rounded text-xs text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 border border-blue-500/40 shadow-sm transition-colors" onclick="showOrderDetailsModal(${order.id})">
-                                        <span>View Details</span>
-                                    </button>
-                                    <span class="px-2 py-0.5 rounded-full text-xs ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : order.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${order.status}</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2 mb-1">
-                                <div class="flex flex-wrap gap-2 text-xs">
-                                    <div class="text-gray-700 dark:text-gray-200">Requested by: <span class="font-medium">${order.created_by || 'mechanic'}</span></div>
-                                    <div class="text-gray-600 dark:text-gray-300">Total Items: <span class="font-medium">${order.total_items || '?'}</span></div>
-                                    <div class="text-gray-600 dark:text-gray-300">Priority: <span class="font-medium">${order.priority || 'normal'}</span></div>
-                                </div>
-                                <span class="hidden sm:block w-px h-4 bg-gray-300/40 dark:bg-gray-600/50 mx-2" aria-hidden="true"></span>
-                                <div class="text-gray-600 dark:text-gray-300 text-xs">Notes: <span class="font-medium">${order.notes || ''}</span></div>
-                            </div>
-                        </div>
-                    `).join('');
                 } catch (err) {
-                    ordersList.innerHTML = `<div class="text-center text-red-600 dark:text-red-400">Error loading orders: ${err.message}</div>`;
+                    document.getElementById('orders-table').innerHTML = `<div class="text-center text-red-600 dark:text-red-400">Error loading orders: ${err.message}</div>`;
                 }
             }
 
