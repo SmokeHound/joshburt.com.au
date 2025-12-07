@@ -160,7 +160,17 @@
       return;
     }
 
-    container.innerHTML = templates.map(template => `
+    container.innerHTML = templates.map(template => {
+      // Handle variables - could be array (JSONB) or string
+      let variablesArr = [];
+      if (template.variables) {
+        if (Array.isArray(template.variables)) {
+          variablesArr = template.variables;
+        } else if (typeof template.variables === 'string') {
+          try { variablesArr = JSON.parse(template.variables); } catch (_) { variablesArr = []; }
+        }
+      }
+      return `
       <div class="card p-4 border border-gray-700">
         <div class="flex justify-between items-start">
           <div class="flex-1">
@@ -168,7 +178,7 @@
             <p class="text-sm text-gray-400 mt-1">${template.description || 'No description'}</p>
             <div class="mt-2 space-y-1 text-sm text-gray-400">
               <div><span class="font-semibold">Subject:</span> ${template.subject}</div>
-              ${template.variables ? `<div><span class="font-semibold">Variables:</span> ${JSON.parse(template.variables || '[]').join(', ')}</div>` : ''}
+              ${variablesArr.length ? `<div><span class="font-semibold">Variables:</span> ${variablesArr.join(', ')}</div>` : ''}
               <div><span class="font-semibold">Updated:</span> ${new Date(template.updated_at).toLocaleString()}</div>
             </div>
           </div>
@@ -185,7 +195,7 @@
           </div>
         </div>
       </div>
-    `).join('');
+    `;}).join('');
   }
 
   function editTemplate(templateName) {

@@ -2,6 +2,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
+const queryMonitor = require('../utils/query-monitor');
 
 // Database configuration - PostgreSQL only
 const DB_TYPE = 'postgres';
@@ -100,9 +101,11 @@ class Database {
       this.pool = new Pool(pgConfig);
     }
     const client = await this.pool.connect();
+    const startTime = Date.now();
     try {
       const result = await client.query(preparedSql, preparedParams);
       client.release();
+      queryMonitor.trackQuery(sql, Date.now() - startTime, params);
       return {
         id: result.rows[0]?.id || null,
         changes: result.rowCount || 0,
@@ -110,6 +113,7 @@ class Database {
       };
     } catch (error) {
       client.release();
+      queryMonitor.trackQuery(sql, Date.now() - startTime, params);
       throw error;
     }
   }
@@ -121,12 +125,15 @@ class Database {
       this.pool = new Pool(pgConfig);
     }
     const client = await this.pool.connect();
+    const startTime = Date.now();
     try {
       const result = await client.query(preparedSql, preparedParams);
       client.release();
+      queryMonitor.trackQuery(sql, Date.now() - startTime, params);
       return result.rows[0] || null;
     } catch (error) {
       client.release();
+      queryMonitor.trackQuery(sql, Date.now() - startTime, params);
       throw error;
     }
   }
@@ -138,12 +145,15 @@ class Database {
       this.pool = new Pool(pgConfig);
     }
     const client = await this.pool.connect();
+    const startTime = Date.now();
     try {
       const result = await client.query(preparedSql, preparedParams);
       client.release();
+      queryMonitor.trackQuery(sql, Date.now() - startTime, params);
       return result.rows;
     } catch (error) {
       client.release();
+      queryMonitor.trackQuery(sql, Date.now() - startTime, params);
       throw error;
     }
   }
