@@ -875,16 +875,25 @@
       } catch (e) {}
     }
 
+    // Helper to wait for authFetch to be available
+    async function waitForAuthFetch(timeoutMs = 5000) {
+      const start = Date.now();
+      while (!window.authFetch && (Date.now() - start) < timeoutMs) {
+        await new Promise(r => setTimeout(r, 50));
+      }
+      if (!window.authFetch) {
+        throw new Error('authFetch not available - init-shared.js may not have loaded');
+      }
+      return window.authFetch;
+    }
+
     // Load settings from API
     async function loadSettings() {
       try {
+        // Wait for authFetch to be available
+        await waitForAuthFetch();
         const FN_BASE = window.FN_BASE || '/.netlify/functions';
-        const token = getAuthToken();
-        const res = await (window.authFetch 
-          ? window.authFetch(`${FN_BASE}/settings`)
-          : fetch(`${FN_BASE}/settings`, {
-              headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-            }));
+        const res = await window.authFetch(`${FN_BASE}/settings`);
         if (!res.ok) throw new Error('Failed to load settings');
         const settings = await res.json();
                 if (settings.siteTitle) document.getElementById('site-title').value = settings.siteTitle;
@@ -1111,63 +1120,6 @@
     
     // Expose for theme cards module
     window.saveSettingsQuiet = saveSettingsQuiet;
-
-    // Theme schedule functionality (save to API)
-    function initThemeSchedule() {
-      const scheduleEnabledEl = document.getElementById('schedule-enabled');
-      const darkModeStartEl = document.getElementById('dark-mode-start');
-      const lightModeStartEl = document.getElementById('light-mode-start');
-      
-      // Exit early if elements don't exist
-      if (!scheduleEnabledEl || !darkModeStartEl || !lightModeStartEl) {
-        console.warn('Theme schedule elements not found, skipping initialization');
-        return;
-      }
-      
-      function updateTimeDisplay() {
-        const now = new Date();
-        const currentTimeEl = document.getElementById('current-time');
-        const scheduledModeEl = document.getElementById('scheduled-mode');
-        const enabled = scheduleEnabledEl.checked;
-        if (currentTimeEl) {
-          currentTimeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-        if (scheduledModeEl) {
-          if (!enabled) {
-            scheduledModeEl.textContent = 'Manual';
-            scheduledModeEl.className = 'text-gray-600 dark:text-gray-400';
-          } else {
-            // Just show which mode would be active
-            const nowMins = now.getHours() * 60 + now.getMinutes();
-            const darkStart = parseInt(darkModeStartEl.value.split(':')[0]) * 60 + parseInt(darkModeStartEl.value.split(':')[1]);
-            const lightStart = parseInt(lightModeStartEl.value.split(':')[0]) * 60 + parseInt(lightModeStartEl.value.split(':')[1]);
-            let isDark = false;
-            if (darkStart > lightStart) {
-              isDark = (nowMins >= darkStart || nowMins < lightStart);
-            } else {
-              isDark = (nowMins >= darkStart && nowMins < lightStart);
-            }
-            scheduledModeEl.textContent = isDark ? 'Dark' : 'Light';
-            scheduledModeEl.className = isDark ? 'text-blue-400' : 'text-yellow-400';
-          }
-        }
-      }
-      scheduleEnabledEl.addEventListener('change', async (e) => {
-        await saveSettings();
-        const msg = `Theme scheduling ${e.target.checked ? 'enabled' : 'disabled'} via API`;
-        AuditLogger.log('theme_schedule', msg);
-        sendAudit('theme_schedule', msg);
-        showToast(e.target.checked ? 'Theme scheduling enabled' : 'Theme scheduling disabled');
-      });
-      darkModeStartEl.addEventListener('change', async (e) => {
-        await saveSettings();
-      });
-      lightModeStartEl.addEventListener('change', async (e) => {
-        await saveSettings();
-      });
-      updateTimeDisplay();
-      setInterval(updateTimeDisplay, 1000);
-    }
 
     function initSecuritySettings() {
       document.getElementById('save-security').addEventListener('click', async () => {
@@ -1516,7 +1468,6 @@
         window.initThemeCards();
       }
       
-      initThemeSchedule();
       initSecuritySettings();
       loadSettings();
       

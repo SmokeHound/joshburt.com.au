@@ -76,6 +76,9 @@
         // Ignore storage errors
       }
 
+      // Send to server for centralized monitoring
+      this.sendToServer(error);
+
       // Show user-friendly error notification for critical errors
       if (this.isCriticalError(error)) {
         this.showErrorNotification(error);
@@ -180,6 +183,50 @@
         window.location.port === '8000' ||
         window.location.port === '8888'
       );
+    },
+
+    /**
+     * Send error to server for centralized monitoring
+     */
+    sendToServer: function (error) {
+      // Don't block on this - fire and forget
+      try {
+        const FN_BASE = window.FN_BASE || '/.netlify/functions';
+        const payload = {
+          level: this.isCriticalError(error) ? 'error' : 'warning',
+          message: error.message || 'Unknown error',
+          stack: error.stack || null,
+          url: error.url || window.location.href,
+          metadata: {
+            type: error.type,
+            filename: error.filename,
+            line: error.line,
+            column: error.column,
+            source: 'client',
+            screenResolution: `${window.screen.width}x${window.screen.height}`,
+            viewport: `${window.innerWidth}x${window.innerHeight}`
+          }
+        };
+
+        // Use navigator.sendBeacon for reliability (doesn't block page unload)
+        // Fall back to fetch if sendBeacon not available
+        const url = `${FN_BASE}/error-logs`;
+        const body = JSON.stringify(payload);
+        
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+        } else {
+          // Fire-and-forget fetch
+          fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: body,
+            keepalive: true
+          }).catch(() => {});
+        }
+      } catch (e) {
+        // Silently fail - don't cause more errors trying to report errors
+      }
     },
 
     /**
