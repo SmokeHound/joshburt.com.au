@@ -172,6 +172,40 @@ const THEME_CARDS_CONFIG = [
       'from-slate-700 to-slate-800',
       'from-slate-600 to-slate-700'
     ]
+  },
+  {
+    id: 'sakura',
+    name: 'Sakura',
+    description: 'Soft cherry blossom pinks for a gentle aesthetic',
+    badge: 'Elegant',
+    badgeColor: 'yellow',
+    icon: 'sun',
+    bg: 'bg-gradient-to-br from-pink-50 to-rose-100',
+    textColor: 'text-pink-900',
+    hoverBorder: 'hover:border-pink-400',
+    hoverShadow: 'hover:shadow-pink-400/30',
+    colors: [
+      'from-pink-300 to-pink-400 shadow-pink-400/40',
+      'from-rose-300 to-rose-400 shadow-rose-400/40',
+      'from-fuchsia-200 to-fuchsia-300 shadow-fuchsia-300/40'
+    ]
+  },
+  {
+    id: 'forest',
+    name: 'Forest',
+    description: 'Natural greens and earth tones for a calm workspace',
+    badge: 'Nature',
+    badgeColor: 'indigo',
+    icon: 'sun',
+    bg: 'bg-gradient-to-br from-emerald-900 to-green-800',
+    textColor: 'text-emerald-100',
+    hoverBorder: 'hover:border-emerald-400',
+    hoverShadow: 'hover:shadow-emerald-400/30',
+    colors: [
+      'from-emerald-500 to-emerald-600 shadow-emerald-500/40',
+      'from-green-500 to-green-600 shadow-green-500/40',
+      'from-teal-400 to-teal-500 shadow-teal-400/40'
+    ]
   }
 ];
 
