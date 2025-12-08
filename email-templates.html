@@ -209,7 +209,17 @@
     document.getElementById('template-subject').value = template.subject;
     document.getElementById('template-body-html').value = template.body_html || '';
     document.getElementById('template-body-text').value = template.body_text || '';
-    document.getElementById('template-variables').value = JSON.parse(template.variables || '[]').join(', ');
+    
+    // Handle variables - could be array (JSONB) or string
+    let variablesArr = [];
+    if (template.variables) {
+      if (Array.isArray(template.variables)) {
+        variablesArr = template.variables;
+      } else if (typeof template.variables === 'string') {
+        try { variablesArr = JSON.parse(template.variables); } catch (_) { variablesArr = []; }
+      }
+    }
+    document.getElementById('template-variables').value = variablesArr.join(', ');
     document.getElementById('template-description').value = template.description || '';
 
     document.getElementById('template-modal').classList.remove('hidden');
