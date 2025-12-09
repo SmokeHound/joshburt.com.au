@@ -349,6 +349,14 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Verification Attempts Section -->
+                            <div class="border-t border-gray-700 pt-4 mt-4">
+                                <button type="button" id="view-verification-attempts-btn" class="text-sm text-indigo-400 hover:underline">View verification attempts</button>
+                                <div id="verification-attempts-section" class="mt-3 hidden">
+                                    <div id="verification-attempts-list" class="text-sm text-gray-400">Loading...</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="flex gap-3 mt-6">
                             <button type="submit" id="edit-submit" class="btn-neon-blue flex-1 p-3 rounded-lg">Update User</button>
@@ -456,8 +464,7 @@ async function loadUsers(page = 1) {
                         ${!u.email_verified ? `<button class="px-2 py-1 bg-purple-500 text-white rounded mr-2 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 verify-email-user" data-id="${u.id}" data-email="${u.email}">Verify Email</button>` : ''}
                         <button class="px-2 py-1 bg-red-500 text-white rounded mr-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 delete-user" data-id="${u.id}">Delete</button>
                         <button class="px-2 py-1 bg-yellow-500 text-white rounded mr-2 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 lock-user" data-id="${u.id}">${u.is_active ? 'Lock':'Unlock'}</button>
-                        <button class="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 reset-password-user" data-id="${u.id}">Reset PW</button>
-                        <button class="px-2 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 view-verification-attempts" data-id="${u.id}">Verify Attempts</button>
+                        <button class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 reset-password-user" data-id="${u.id}">Reset PW</button>
                     </td>`;
                 tbody.appendChild(tr);
             });
@@ -659,6 +666,11 @@ async function loadUsers(page = 1) {
             document.getElementById('change-password-section').classList.add('hidden');
             document.getElementById('edit-new-password').value = '';
             document.getElementById('edit-send-reset-email').checked = false;
+            // reset verification attempts section
+            const verifySec = document.getElementById('verification-attempts-section');
+            if (verifySec) verifySec.classList.add('hidden');
+            const verifyList = document.getElementById('verification-attempts-list');
+            if (verifyList) verifyList.innerHTML = '';
 
             usersState.editingId=id; 
             document.getElementById('edit-user-modal').classList.remove('hidden');
@@ -803,6 +815,65 @@ async function loadUsers(page = 1) {
                     setTimeout(() => { const np = document.getElementById('edit-new-password'); if (np) np.focus(); }, 50);
                 }
             });
+            
+            // Toggle verification attempts section inside modal
+            const toggleVerifyAttempts = document.getElementById('view-verification-attempts-btn');
+            if (toggleVerifyAttempts) toggleVerifyAttempts.addEventListener('click', async () => {
+                const sec = document.getElementById('verification-attempts-section');
+                const list = document.getElementById('verification-attempts-list');
+                if (!sec || !list) return;
+                const visible = !sec.classList.contains('hidden');
+                if (visible) {
+                    sec.classList.add('hidden');
+                } else {
+                    sec.classList.remove('hidden');
+                    list.innerHTML = '<p class="text-gray-400">Loading...</p>';
+                    
+                    // Fetch verification attempts for the editing user
+                    if (!usersState.editingId) {
+                        list.innerHTML = '<p class="text-red-400">No user selected</p>';
+                        return;
+                    }
+                    
+                    try {
+                        const token = (window.getToken && window.getToken()) || null;
+                        const res = await fetch(`${FN_BASE}/users/${usersState.editingId}/verification-attempts`, {
+                            headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) }
+                        });
+                        if (!res.ok) {
+                            const err = await res.json().catch(() => ({}));
+                            throw new Error(err.error || 'Failed to fetch attempts');
+                        }
+                        const data = await res.json();
+                        const attempts = data.attempts || [];
+                        
+                        if (attempts.length === 0) {
+                            list.innerHTML = '<p class="text-gray-400">No verification attempts found</p>';
+                        } else {
+                            list.innerHTML = `
+                                <div class="space-y-3 max-h-48 overflow-y-auto">
+                                    ${attempts.map(a => `
+                                        <div class="p-3 rounded border ${a.success ? 'border-green-700 bg-green-900/20' : 'border-red-700 bg-red-900/20'}">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="font-semibold text-xs">${a.attempt_type.replace(/_/g, ' ').toUpperCase()}</span>
+                                                <span class="text-xs ${a.success ? 'text-green-400' : 'text-red-400'}">${a.success ? '✓ Success' : '✗ Failed'}</span>
+                                            </div>
+                                            <div class="text-xs text-gray-400 space-y-1">
+                                                <div>IP: ${a.ip_address || 'N/A'}</div>
+                                                <div>Time: ${new Date(a.created_at).toLocaleString()}</div>
+                                                ${a.error_message ? `<div class="text-red-400">Error: ${a.error_message}</div>` : ''}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `;
+                        }
+                    } catch (err) {
+                        list.innerHTML = `<p class="text-red-400">Error: ${err.message}</p>`;
+                    }
+                }
+            });
+            
             // Close modal when clicking outside
             document.getElementById('edit-user-modal').addEventListener('click', (e) => {
                 if (e.target.id === 'edit-user-modal') closeEditModal();
@@ -909,61 +980,6 @@ async function loadUsers(page = 1) {
                         }
                         showToast(`Email verified for ${userName}`, 'success');
                         await loadUsers(usersState.pagination.page);
-                    } catch(err) {
-                        showToast('Error: ' + err.message, 'error');
-                    }
-                    return;
-                }
-                if(e.target.classList.contains('view-verification-attempts')){
-                    try {
-                        const res = await fetch(`${FN_BASE}/users/${id}/verification-attempts`, {
-                            headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) }
-                        });
-                        if(!res.ok) {
-                            const err = await res.json().catch(() => ({}));
-                            throw new Error(err.error || 'Failed to fetch attempts');
-                        }
-                        const data = await res.json();
-                        const attempts = data.attempts || [];
-                        
-                        // Show modal with attempts
-                        const overlay = document.createElement('div');
-                        overlay.className = 'modal-overlay';
-                        overlay.innerHTML = `
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h3 class="text-lg font-semibold">Email Verification Attempts</h3>
-                                    <button class="modal-close" aria-label="Close">&times;</button>
-                                </div>
-                                <div class="modal-body">
-                                    ${attempts.length === 0 ? '<p class="text-gray-400">No verification attempts found</p>' : `
-                                        <div class="space-y-3">
-                                            ${attempts.map(a => `
-                                                <div class="p-3 rounded border ${a.success ? 'border-green-700 bg-green-900/20' : 'border-red-700 bg-red-900/20'}">
-                                                    <div class="flex items-center justify-between mb-2">
-                                                        <span class="font-semibold">${a.attempt_type.replace(/_/g, ' ').toUpperCase()}</span>
-                                                        <span class="text-xs ${a.success ? 'text-green-400' : 'text-red-400'}">${a.success ? '✓ Success' : '✗ Failed'}</span>
-                                                    </div>
-                                                    <div class="text-sm text-gray-400 space-y-1">
-                                                        <div>Email: ${a.email}</div>
-                                                        <div>IP: ${a.ip_address || 'N/A'}</div>
-                                                        <div>Time: ${new Date(a.created_at).toLocaleString()}</div>
-                                                        ${a.error_message ? `<div class="text-red-400">Error: ${a.error_message}</div>` : ''}
-                                                    </div>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    `}
-                                </div>
-                            </div>
-                        `;
-                        document.body.appendChild(overlay);
-                        
-                        // Close handlers
-                        const closeBtn = overlay.querySelector('.modal-close');
-                        closeBtn.onclick = () => overlay.remove();
-                        overlay.onclick = (e) => { if(e.target === overlay) overlay.remove(); };
-                        
                     } catch(err) {
                         showToast('Error: ' + err.message, 'error');
                     }
