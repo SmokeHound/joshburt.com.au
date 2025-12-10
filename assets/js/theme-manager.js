@@ -148,6 +148,18 @@
         buttonDanger: '#ef4444',
         buttonSuccess: '#10b981'
       }
+    },
+    sakura: {
+      mode: 'light',
+      colors: {
+        primary: '#ec4899',
+        secondary: '#f472b6',
+        accent: '#fce7f3',
+        buttonPrimary: '#ec4899',
+        buttonSecondary: '#f9a8d4',
+        buttonDanger: '#f43f5e',
+        buttonSuccess: '#10b981'
+      }
     }
   };
 
