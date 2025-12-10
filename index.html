@@ -256,11 +256,15 @@
           <div class="space-y-3 text-sm">
             <div class="flex items-center justify-between">
               <span class="text-gray-400">Version</span>
-              <span class="text-gray-200 font-mono">v2.1.0</span>
+              <span id="system-version" class="text-gray-200 font-mono">
+                <div class="skeleton-loader w-16 h-5 rounded inline-block"></div>
+              </span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-gray-400">Environment</span>
-              <span class="px-2 py-0.5 bg-green-500/20 text-green-300 rounded text-xs">Production</span>
+              <span id="system-environment" class="px-2 py-0.5 bg-gray-500/20 text-gray-300 rounded text-xs">
+                <div class="skeleton-loader w-20 h-5 rounded inline-block"></div>
+              </span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-gray-400">Last Updated</span>
@@ -268,7 +272,9 @@
             </div>
             <div class="flex items-center justify-between">
               <span class="text-gray-400">Uptime</span>
-              <span id="system-uptime" class="text-gray-200">99.9%</span>
+              <span id="system-uptime" class="text-gray-200">
+                <div class="skeleton-loader w-12 h-5 rounded inline-block"></div>
+              </span>
             </div>
           </div>
         </div>
@@ -540,10 +546,15 @@
             }
           }
 
-          // 3) Health check for DB indicator
+          // 3) Health check for DB indicator and system info
+          let healthData = null;
           try {
             const res = await fetch(`${FN_BASE}/health`);
-            if (res.ok) { dbHealthy = true; apiHealthy = apiHealthy || true; }
+            if (res.ok) {
+              healthData = await res.json();
+              dbHealthy = healthData.database?.status === 'connected';
+              apiHealthy = true;
+            }
           } catch (e) {
             console.warn('Health check failed:', e);
           }
@@ -590,7 +601,7 @@
           dashboardCache.data = {
             usersCount, ordersCount, productsCount,
             auditLogs, apiHealthy, dbHealthy, serverHealthy,
-            pendingOrders, lowStock, todayActivity
+            pendingOrders, lowStock, todayActivity, healthData
           };
           dashboardCache.timestamp = Date.now();
 
@@ -604,7 +615,7 @@
     }
 
     function renderDashboardData(data) {
-      const { usersCount, ordersCount, productsCount, auditLogs, apiHealthy, dbHealthy, serverHealthy, pendingOrders, lowStock, todayActivity } = data;
+      const { usersCount, ordersCount, productsCount, auditLogs, apiHealthy, dbHealthy, serverHealthy, pendingOrders, lowStock, todayActivity, healthData } = data;
 
       // Update last updated timestamp
       const lastUpdated = document.getElementById('stats-last-updated');
@@ -662,6 +673,60 @@
         if (elPending) elPending.textContent = pendingOrders;
         if (elLowStock) elLowStock.textContent = lowStock;
         if (elTodayActivity) elTodayActivity.textContent = todayActivity;
+
+        // Update system information from health data
+        const elVersion = document.getElementById('system-version');
+        const elEnvironment = document.getElementById('system-environment');
+        const elUptime = document.getElementById('system-uptime');
+        
+        if (healthData) {
+          // Version
+          if (elVersion) {
+            elVersion.textContent = `v${healthData.version || '1.0.0'}`;
+          }
+          
+          // Environment with color coding
+          if (elEnvironment) {
+            const env = healthData.environment || 'unknown';
+            const envColors = {
+              production: 'bg-green-500/20 text-green-300',
+              development: 'bg-yellow-500/20 text-yellow-300',
+              staging: 'bg-blue-500/20 text-blue-300',
+              unknown: 'bg-gray-500/20 text-gray-300'
+            };
+            const colorClass = envColors[env.toLowerCase()] || envColors.unknown;
+            elEnvironment.className = `px-2 py-0.5 ${colorClass} rounded text-xs`;
+            elEnvironment.textContent = env.charAt(0).toUpperCase() + env.slice(1);
+          }
+          
+          // Uptime - format seconds to human-readable
+          if (elUptime && healthData.uptime) {
+            const seconds = healthData.uptime.containerSeconds || healthData.uptime.processSeconds || 0;
+            let uptimeText = '';
+            if (seconds < 60) {
+              uptimeText = `${seconds}s`;
+            } else if (seconds < 3600) {
+              uptimeText = `${Math.floor(seconds / 60)}m`;
+            } else if (seconds < 86400) {
+              const hours = Math.floor(seconds / 3600);
+              const mins = Math.floor((seconds % 3600) / 60);
+              uptimeText = mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+            } else {
+              const days = Math.floor(seconds / 86400);
+              const hours = Math.floor((seconds % 86400) / 3600);
+              uptimeText = hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+            }
+            elUptime.textContent = uptimeText;
+          }
+        } else {
+          // Fallback if no health data
+          if (elVersion) elVersion.textContent = 'v1.11.0';
+          if (elEnvironment) {
+            elEnvironment.className = 'px-2 py-0.5 bg-gray-500/20 text-gray-300 rounded text-xs';
+            elEnvironment.textContent = 'Unknown';
+          }
+          if (elUptime) elUptime.textContent = '--';
+        }
 
         // Update recent activity list
         const auditList = document.getElementById('recent-audit-log');
