@@ -1464,12 +1464,55 @@
         wireMenu();
         setTimeout(wireMenu, 250);
 
+    // Show sign-in CTA for unauthenticated users
+    function showSignInCTA() {
+      try {
+        const main = document.getElementById('main-content');
+        if (!main) return;
+        // Hide content sections
+        Array.from(main.children).forEach(c => c.classList.add('hidden'));
+        // Also hide user-profile section in nav to prevent showing login button
+        const userProfile = document.getElementById('user-profile');
+        if (userProfile) userProfile.classList.add('hidden');
+        let cta = document.getElementById('signin-cta');
+        if (!cta) {
+          cta = document.createElement('div');
+          cta.id = 'signin-cta';
+          cta.className = 'mt-6 p-6 border border-gray-700 rounded-lg text-center';
+          const msg = document.createElement('p');
+          msg.className = 'mb-4 text-gray-300';
+          msg.textContent = 'Please sign in to access Site Settings.';
+          const btn = document.createElement('button');
+          btn.className = 'btn-neon-blue px-4 py-2 rounded';
+          btn.textContent = 'Sign in';
+          btn.addEventListener('click', function() {
+            const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `login.html?message=login-required&returnUrl=${returnUrl}`;
+          });
+          cta.appendChild(msg);
+          cta.appendChild(btn);
+          main.appendChild(cta);
+        }
+        cta.classList.remove('hidden');
+      } catch(_) { /* noop */ }
+    }
+
     // Initialize all functionality when page loads
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check authentication first
+      const AUTH_DISABLED = window.AUTH_DISABLED === true;
+      const token = (window.getToken && window.getToken()) || null;
+      if (!token && !AUTH_DISABLED) {
+        showSignInCTA();
+        return;
+      }
+
       AuditLogger.log('page_access', 'Accessed Settings page');
       initTabs();
       
       // Initialize theme cards (data-driven approach)
+      // Use a small delay to ensure deferred scripts have fully initialized
+      await new Promise(r => setTimeout(r, 50));
       if (typeof window.initThemeCards === 'function') {
         window.initThemeCards();
       }
