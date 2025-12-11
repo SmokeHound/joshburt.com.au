@@ -1,6 +1,7 @@
 // Netlify Function: GET /.netlify/functions/health (service health & DB probe)
 const { database, initializeDatabase } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
+const packageJson = require('../../package.json');
 
 let dbInitialized = false;
 let startupTime = Date.now();
@@ -66,7 +67,7 @@ exports.handler = withHandler(async event => {
       status,
       timestamp: new Date().toISOString(),
       environment,
-      version: process.env.GIT_COMMIT || process.env.npm_package_version || '1.0.0',
+      version: packageJson.version || '1.11.0',
       uptime: {
         processSeconds: uptimeSeconds,
         containerSeconds: containerUptime
