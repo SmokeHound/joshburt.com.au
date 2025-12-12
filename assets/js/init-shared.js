@@ -78,6 +78,14 @@
   // Load shared notifications (styles + logic) to centralize all notification UI/styling
   injectFragment('shared-notifications.html', ['STYLE', 'SCRIPT']);
   applyColors();
+
+  // Load audit.js for page visit tracking (injected dynamically to ensure it's available everywhere)
+  (function loadAuditScript() {
+    const script = document.createElement('script');
+    script.src = './assets/js/audit.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  })();
   registerSW();
 
   // Unified token accessor (accessToken only)

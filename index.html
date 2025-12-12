@@ -773,12 +773,16 @@
         
         const actionIcon = (action) => {
           const a = String(action || '').toLowerCase();
+          if (a.includes('page.visit') || a.includes('page_visit')) return '📄';
           if (a.includes('login')) return '🔐';
           if (a.includes('logout')) return '🚪';
           if (a.includes('order')) return '🧾';
           if (a.includes('product')) return '📦';
           if (a.includes('user')) return '👤';
           if (a.includes('settings')) return '⚙️';
+          if (a.includes('filter')) return '🔧';
+          if (a.includes('consumable')) return '🛢️';
+          if (a.includes('inventory')) return '📊';
           return '•';
         };
         const methodBadge = (method) => {
@@ -843,6 +847,8 @@
                 const method = (details && typeof details === 'object' && (details.method || details.httpMethod)) || '';
                 const path = (details && typeof details === 'object' && (details.path || details.endpoint || details.url)) || '';
                 const reqId = (details && typeof details === 'object' && (details.requestId || details.request_id)) || '';
+                const pageTitle = (details && typeof details === 'object' && details.title) || '';
+                const isPageVisit = String(log.action || '').toLowerCase().includes('page.visit');
                 const who = (function(){
                   try {
                     const stored = JSON.parse(localStorage.getItem('user')||'{}');
@@ -858,7 +864,9 @@
                   const dateLabel = (()=>{ try { const d=new Date(created); return d.toLocaleDateString(); } catch(_) { return ''; } })();
                   parts.push(`<li class="mt-2 first:mt-0"><div class="text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-700 pb-1">${dateLabel || ''}</div></li>`);
                 }
-                const metaLine = [who, path].filter(Boolean).join(' · ');
+                // Build meta line - show page title for page visits, otherwise path
+                const displayPath = isPageVisit && pageTitle ? pageTitle : path;
+                const metaLine = [who, displayPath].filter(Boolean).join(' · ');
                 const link = buildLogLink(log, details);
                 parts.push(`
                   <li class="flex items-start gap-3 p-2 rounded hover:bg-gray-800/60 transition-colors">

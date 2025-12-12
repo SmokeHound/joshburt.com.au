@@ -140,6 +140,25 @@
     return pretty || action;
   }
 
+  // Get emoji icon for action type
+  function getActionIcon(action) {
+    const a = String(action || '').toLowerCase();
+    if (a.includes('page.visit') || a.includes('page_visit')) {return '📄';}
+    if (a.includes('login')) {return '🔐';}
+    if (a.includes('logout')) {return '🚪';}
+    if (a.includes('order')) {return '🧾';}
+    if (a.includes('product')) {return '📦';}
+    if (a.includes('user')) {return '👤';}
+    if (a.includes('settings')) {return '⚙️';}
+    if (a.includes('filter')) {return '🔧';}
+    if (a.includes('consumable')) {return '🛢️';}
+    if (a.includes('inventory')) {return '📊';}
+    if (a.includes('create') || a.includes('add')) {return '➕';}
+    if (a.includes('update') || a.includes('edit')) {return '✏️';}
+    if (a.includes('delete') || a.includes('remove')) {return '🗑️';}
+    return '•';
+  }
+
   async function fetchLogs() {
     state.loading = true;
     state.error = null; // Clear any previous errors
@@ -221,6 +240,7 @@
           : '';
         const action = row.action || '';
         const formattedAction = formatAction(action);
+        const actionIconEmoji = getActionIcon(action);
         const ip = row.ip_address || row.ip || '';
 
         // Build details view: parse JSON if possible
@@ -239,10 +259,18 @@
 
         // Summarize chips
         let chipsHtml = '';
+        const isPageVisit = String(action).toLowerCase().includes('page.visit');
         if (parsed) {
           const m = parsed.method ? String(parsed.method).toUpperCase() : '';
           const p = parsed.path || '';
           const rid = parsed.requestId || '';
+          const pageTitle = parsed.title || '';
+
+          // For page visits, show page title prominently
+          if (isPageVisit && pageTitle) {
+            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-blue-600 text-white mr-1" title="Page Title">${escapeHtml(pageTitle.length > 30 ? pageTitle.slice(0, 27) + '…' : pageTitle)}</span>`;
+          }
+
           if (m) {
             let methodColor = 'bg-gray-700';
             if (m === 'GET') {
@@ -328,7 +356,7 @@
         return `<tr>
         <td class="p-2 align-top whitespace-nowrap">${created}</td>
         <td class="p-2 align-top">${userHtml}</td>
-        <td class="p-2 align-top font-medium" title="${escapeHtml(action)}">${escapeHtml(formattedAction)}</td>
+        <td class="p-2 align-top font-medium" title="${escapeHtml(action)}"><span class="mr-1">${actionIconEmoji}</span>${escapeHtml(formattedAction)}</td>
         <td class="p-2 align-top max-w-sm break-words">
           ${detailsPart}
           ${hiddenPretty}
