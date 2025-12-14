@@ -425,10 +425,10 @@
                                 if (!document.getElementById('global-auth-modal')) {
                                     const modal = document.createElement('div');
                                     modal.id = 'global-auth-modal';
-                                    modal.className = 'hidden fixed inset-0 z-50 flex items-center justify-center';
+                                    modal.className = 'hidden fixed inset-0 z-[9998] flex items-center justify-center';
                                     modal.innerHTML = `
                                         <div class="absolute inset-0 bg-black bg-opacity-50" id="global-auth-backdrop"></div>
-                                        <div class="bg-gray-900 text-white rounded-lg p-6 z-60 max-w-md w-full">
+                                        <div class="bg-gray-900 text-white rounded-lg p-6 relative z-[9999] max-w-md w-full">
                                             <h3 class="text-lg font-semibold mb-2">Sign in required</h3>
                                             <p class="mb-4">You need to sign in to continue using this page.</p>
                                             <div class="flex gap-2 justify-end">
