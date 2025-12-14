@@ -62,7 +62,7 @@ class Database {
           // If the initial test fails, destroy the pool to allow retry semantics later
           try {
             await this.pool.end();
-          } catch (e) {}
+          } catch (e) { /* ignore */ }
           this.pool = null;
           throw innerErr;
         }

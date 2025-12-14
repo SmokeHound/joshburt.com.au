@@ -63,6 +63,24 @@ module.exports = defineConfig([
       'array-bracket-spacing': ['warn', 'never']
     }
   },
+  // ESM compatibility shim (must come after base config so sourceType isn't overwritten)
+  {
+    files: ['assets/js/auth.js'],
+    languageOptions: {
+      sourceType: 'module'
+    }
+  },
+  // Dashboard scripts rely on globally available libraries.
+  {
+    files: ['assets/js/init-dashboards.js'],
+    languageOptions: {
+      globals: {
+        DashboardBuilder: 'readonly',
+        DataTable: 'readonly',
+        Chart: 'readonly'
+      }
+    }
+  },
   {
     files: ['tests/**/*.js'],
     languageOptions: {

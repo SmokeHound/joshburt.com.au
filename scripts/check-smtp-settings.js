@@ -55,7 +55,7 @@ async function checkSMTPSettings() {
     console.error('Error:', e.message);
     try {
       await database.close();
-    } catch (_) {}
+    } catch (_) { /* ignore */ }
     process.exit(1);
   }
 }

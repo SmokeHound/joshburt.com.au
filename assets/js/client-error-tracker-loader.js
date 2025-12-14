@@ -22,7 +22,7 @@
       s.src = TRACKER_SRC;
       s.async = true;
       s.onload = function(){
-        try { console.debug('Client error tracker loaded'); } catch(_){}
+        try { console.debug('Client error tracker loaded'); } catch(_){ /* ignore */ }
       };
       s.onerror = function(){
         // If load fails, schedule one retry after a short delay
