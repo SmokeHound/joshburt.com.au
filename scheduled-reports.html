@@ -414,14 +414,28 @@
     if (date_to) filters.date_to = date_to;
 
     try {
-      const token = localStorage.getItem('accessToken');
       const method = reportId ? 'PUT' : 'POST';
       const url = reportId ? `${FN_BASE}/scheduled-reports/${reportId}` : `${FN_BASE}/scheduled-reports`;
 
-      const response = await fetch(url, {
+      const response = await (window.authFetch
+        ? window.authFetch(url, {
+            method,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              name,
+              report_type,
+              frequency,
+              format,
+              recipients,
+              filters
+            })
+          })
+        : fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -432,7 +446,7 @@
           recipients,
           filters
         })
-      });
+      }));
 
       if (!response.ok) {
         throw new Error('Failed to save report');

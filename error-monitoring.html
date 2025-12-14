@@ -263,10 +263,14 @@
 
   async function showErrorDetail(errorId) {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/error-logs?id=${errorId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const url = `${FN_BASE}/error-logs?id=${errorId}`;
+      const response = await (window.authFetch
+        ? window.authFetch(url)
+        : fetch(url, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken') || ''}`
+            }
+          }));
 
       if (!response.ok) {
         throw new Error('Failed to load error details');
@@ -306,15 +310,24 @@
     if (!currentError) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/error-logs/${currentError.id}`, {
+      const url = `${FN_BASE}/error-logs/${currentError.id}`;
+      const init = {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ resolved: true })
-      });
+      };
+
+      const response = await (window.authFetch
+        ? window.authFetch(url, init)
+        : fetch(url, {
+            ...init,
+            headers: {
+              ...init.headers,
+              Authorization: `Bearer ${localStorage.getItem('accessToken') || ''}`
+            }
+          }));
 
       if (!response.ok) {
         throw new Error('Failed to resolve error');
@@ -333,11 +346,16 @@
     if (!confirm('Are you sure you want to delete this error?')) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/error-logs/${currentError.id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const url = `${FN_BASE}/error-logs/${currentError.id}`;
+      const init = { method: 'DELETE' };
+      const response = await (window.authFetch
+        ? window.authFetch(url, init)
+        : fetch(url, {
+            ...init,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken') || ''}`
+            }
+          }));
 
       if (!response.ok) {
         throw new Error('Failed to delete error');

@@ -175,18 +175,33 @@ const FN_BASE = window.FN_BASE || '/.netlify/functions';
 let forecastChart = null;
 let currentForecasts = [];
 
+function getAuthToken() {
+  return (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+}
+
+async function apiFetch(url, options = {}) {
+  if (typeof window !== 'undefined' && typeof window.authFetch === 'function') {
+    return await window.authFetch(url, options);
+  }
+
+  const token = getAuthToken();
+  const headers = { ...(options.headers || {}) };
+  if (token && !headers.Authorization) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return await fetch(url, { ...options, headers });
+}
+
 // Check authentication
-const accessToken = localStorage.getItem('accessToken');
-if (!accessToken) {
+const accessToken = getAuthToken();
+if (!accessToken && window.AUTH_DISABLED !== true) {
   window.location.href = '/login.html';
 }
 
 // Load summary statistics
 async function loadSummary() {
   try {
-    const response = await fetch(`${FN_BASE}/inventory-forecast?action=summary`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    const response = await apiFetch(`${FN_BASE}/inventory-forecast?action=summary`);
     
     if (!response.ok) throw new Error('Failed to load summary');
     
@@ -219,9 +234,7 @@ async function loadSummary() {
 async function loadAlerts() {
   try {
     const days = 7;
-    const response = await fetch(`${FN_BASE}/inventory-forecast?action=alerts&days=${days}`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    const response = await apiFetch(`${FN_BASE}/inventory-forecast?action=alerts&days=${days}`);
     
     if (!response.ok) throw new Error('Failed to load alerts');
     
@@ -279,9 +292,7 @@ async function loadForecasts() {
     let url = `${FN_BASE}/inventory-forecast?days=${days}&min_confidence=${minConfidence}`;
     if (itemType) url += `&item_type=${itemType}`;
     
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    const response = await apiFetch(url);
     
     if (!response.ok) throw new Error('Failed to load forecasts');
     
@@ -344,9 +355,7 @@ async function updateChart() {
     let url = `${FN_BASE}/inventory-forecast?days=${days}&min_confidence=0.5`;
     if (itemType) url += `&item_type=${itemType}`;
     
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    const response = await apiFetch(url);
     
     if (!response.ok) throw new Error('Failed to load forecast data');
     
@@ -419,10 +428,9 @@ async function generateAllForecasts() {
   btn.textContent = '⏳ Generating...';
   
   try {
-    const response = await fetch(`${FN_BASE}/inventory-forecast?action=generate-all`, {
+    const response = await apiFetch(`${FN_BASE}/inventory-forecast?action=generate-all`, {
       method: 'POST',
       headers: { 
-        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       }
     });

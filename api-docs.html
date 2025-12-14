@@ -342,8 +342,8 @@ ${details.requestBody ? `Content-Type: application/json
 
     // Try an endpoint
     async function tryEndpoint(method, path) {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
+      const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+      if (!token && window.AUTH_DISABLED !== true) {
         alert('Please log in first to try this endpoint');
         window.location.href = '/login.html';
         return;
@@ -356,13 +356,22 @@ ${details.requestBody ? `Content-Type: application/json
       responsePre.textContent = 'Loading...';
 
       try {
-        const response = await fetch(path, {
+        const init = {
           method,
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
-        });
+        };
+
+        const response = await (window.authFetch
+          ? window.authFetch(path, init)
+          : fetch(path, {
+              ...init,
+              headers: {
+                ...init.headers,
+                Authorization: `Bearer ${token || ''}`
+              }
+            }));
 
         const data = await response.json();
         responsePre.textContent = JSON.stringify(data, null, 2);

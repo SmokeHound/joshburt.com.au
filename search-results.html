@@ -192,14 +192,14 @@
             document.getElementById('noResults').classList.add('hidden');
 
             try {
-                const response = await fetch(
-                    `${FN_BASE}/search?q=${encodeURIComponent(currentQuery)}&type=all&sort=${currentSort}&limit=${pageSize}&offset=${currentPage * pageSize}`,
-                    {
+                const url = `${FN_BASE}/search?q=${encodeURIComponent(currentQuery)}&type=all&sort=${currentSort}&limit=${pageSize}&offset=${currentPage * pageSize}`;
+                const response = await (window.authFetch
+                    ? window.authFetch(url)
+                    : fetch(url, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
                         }
-                    }
-                );
+                    }));
 
                 if (!response.ok) {
                     throw new Error('Search failed');
@@ -354,18 +354,28 @@
          */
         async function trackClick(result) {
             try {
-                await fetch(`${FN_BASE}/search`, {
+                const url = `${FN_BASE}/search`;
+                const init = {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         query: currentQuery,
                         result_id: result.id,
                         result_type: result.result_type
                     })
-                });
+                };
+
+                await (window.authFetch
+                    ? window.authFetch(url, init)
+                    : fetch(url, {
+                        ...init,
+                        headers: {
+                            ...init.headers,
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
+                        }
+                    }));
             } catch (err) {
                 console.error('Error tracking click:', err);
             }

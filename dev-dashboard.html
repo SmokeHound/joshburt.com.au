@@ -526,7 +526,7 @@
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       // Check authentication
-      const token = localStorage.getItem('accessToken');
+      const token = (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
       if (!token) {
         console.warn('No access token found - redirecting to login');
         window.location.href = '/login.html';

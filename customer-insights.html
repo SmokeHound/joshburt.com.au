@@ -205,9 +205,26 @@
 const FN_BASE = window.FN_BASE || '/.netlify/functions';
 let segmentChart = null;
 
+function getAuthToken() {
+  return (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+}
+
+async function apiFetch(url, options = {}) {
+  if (typeof window !== 'undefined' && typeof window.authFetch === 'function') {
+    return await window.authFetch(url, options);
+  }
+
+  const token = getAuthToken();
+  const headers = { ...(options.headers || {}) };
+  if (token && !headers.Authorization) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return await fetch(url, { ...options, headers });
+}
+
 // Check authentication
-const accessToken = localStorage.getItem('accessToken');
-if (!accessToken) {
+const accessToken = getAuthToken();
+if (!accessToken && window.AUTH_DISABLED !== true) {
   window.location.href = '/login.html';
 }
 
@@ -235,9 +252,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 // Load customer segmentation
 async function loadSegmentation() {
   try {
-    const response = await fetch(`${FN_BASE}/customer-insights?action=segmentation`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    const response = await apiFetch(`${FN_BASE}/customer-insights?action=segmentation`);
     
     if (!response.ok) throw new Error('Failed to load segmentation');
     
@@ -333,9 +348,7 @@ async function loadPatterns() {
     let url = `${FN_BASE}/customer-insights?action=patterns&limit=100`;
     if (userId) url += `&user_id=${userId}`;
     
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    const response = await apiFetch(url);
     
     if (!response.ok) throw new Error('Failed to load patterns');
     
@@ -379,9 +392,7 @@ async function loadAffinity() {
     
     const url = `${FN_BASE}/customer-insights?action=affinity&min_score=${minScore}&limit=${limit}`;
     
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    const response = await apiFetch(url);
     
     if (!response.ok) throw new Error('Failed to load affinity');
     
@@ -429,10 +440,9 @@ async function calculatePatterns() {
   btn.textContent = '⏳ Calculating...';
   
   try {
-    const response = await fetch(`${FN_BASE}/customer-insights?action=calculate-patterns`, {
+    const response = await apiFetch(`${FN_BASE}/customer-insights?action=calculate-patterns`, {
       method: 'POST',
       headers: { 
-        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       }
     });
@@ -460,10 +470,9 @@ async function calculateAffinity() {
   btn.textContent = '⏳ Calculating...';
   
   try {
-    const response = await fetch(`${FN_BASE}/customer-insights?action=calculate-affinity`, {
+    const response = await apiFetch(`${FN_BASE}/customer-insights?action=calculate-affinity`, {
       method: 'POST',
       headers: { 
-        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       }
     });

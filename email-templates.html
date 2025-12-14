@@ -125,17 +125,32 @@
   const FN_BASE = window.FN_BASE || '/.netlify/functions';
   let currentTemplates = [];
 
+  function getAuthToken() {
+    return (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
+  }
+
+  async function apiFetch(url, options = {}) {
+    if (typeof window !== 'undefined' && typeof window.authFetch === 'function') {
+      return await window.authFetch(url, options);
+    }
+
+    const token = getAuthToken();
+    const headers = { ...(options.headers || {}) };
+    if (token && !headers.Authorization) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    return await fetch(url, { ...options, headers });
+  }
+
   async function loadTemplates() {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
+      const token = getAuthToken();
+      if (!token && window.AUTH_DISABLED !== true) {
         window.location.href = '/login.html';
         return;
       }
 
-      const response = await fetch(`${FN_BASE}/email-queue?templates=true`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await apiFetch(`${FN_BASE}/email-queue?templates=true`);
 
       if (!response.ok) {
         throw new Error('Failed to load templates');
@@ -244,10 +259,9 @@
     if (!confirm(`Are you sure you want to delete the template "${templateName}"?`)) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${FN_BASE}/email-queue/template/${templateName}`, {
+      const response = await apiFetch(`${FN_BASE}/email-queue/template/${templateName}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {}
       });
 
       if (!response.ok) {
@@ -296,14 +310,12 @@
     const variables = variablesText.split(',').map(v => v.trim()).filter(v => v);
 
     try {
-      const token = localStorage.getItem('accessToken');
       const method = templateId ? 'PUT' : 'POST';
       const url = templateId ? `${FN_BASE}/email-queue/template/${name}` : `${FN_BASE}/email-queue/template`;
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
