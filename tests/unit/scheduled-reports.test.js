@@ -2,6 +2,31 @@
  * Unit tests for scheduled-reports function
  */
 
+// Mock pdfkit before requiring handler
+jest.mock('pdfkit', () => {
+  return jest.fn().mockImplementation(() => ({
+    on: jest.fn((event, cb) => {
+      if (event === 'end') {
+        setTimeout(cb, 0);
+      }
+      return this;
+    }),
+    rect: jest.fn().mockReturnThis(),
+    fill: jest.fn().mockReturnThis(),
+    fillColor: jest.fn().mockReturnThis(),
+    fontSize: jest.fn().mockReturnThis(),
+    text: jest.fn().mockReturnThis(),
+    font: jest.fn().mockReturnThis(),
+    moveTo: jest.fn().mockReturnThis(),
+    lineTo: jest.fn().mockReturnThis(),
+    strokeColor: jest.fn().mockReturnThis(),
+    stroke: jest.fn().mockReturnThis(),
+    addPage: jest.fn().mockReturnThis(),
+    end: jest.fn(),
+    page: { width: 595, height: 842 }
+  }));
+});
+
 const { handler } = require('../../netlify/functions/scheduled-reports');
 
 // Mock database

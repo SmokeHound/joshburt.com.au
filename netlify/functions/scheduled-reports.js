@@ -4,6 +4,7 @@
 const { database } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
+const PDFDocument = require('pdfkit');
 
 exports.handler = withHandler(async function (event) {
   await database.connect();
@@ -316,7 +317,7 @@ exports.handler = withHandler(async function (event) {
       if (report_id) {
         // Generate from scheduled report
         const query = 'SELECT * FROM scheduled_reports WHERE id = $1';
-        const reportConfig = await database.get(query, [parseInt(report_id, 10)]);
+        reportConfig = await database.get(query, [parseInt(report_id, 10)]);
 
         if (!reportConfig) {
           return error(404, 'Scheduled report not found');
@@ -332,13 +333,28 @@ exports.handler = withHandler(async function (event) {
       }
 
       // Generate the report data
+      // Parse filters if stored as string
+      let reportFilters = reportConfig.filters || filters;
+      if (typeof reportFilters === 'string') {
+        try {
+          reportFilters = JSON.parse(reportFilters);
+        } catch (e) {
+          reportFilters = {};
+        }
+      }
+
       const reportData = await generateReportData(
         reportConfig.report_type,
-        reportConfig.filters || filters
+        reportFilters
       );
 
-      // Format the report
-      const formattedReport = await formatReport(reportData, reportConfig.format || format);
+      // Format the report (pass reportConfig for PDF metadata)
+      const formattedReport = await formatReport(reportData, reportConfig.format || format, {
+        name: reportName,
+        report_type: reportConfig.report_type,
+        frequency: reportConfig.frequency,
+        filters: reportFilters
+      });
 
       // Record in history
       const historyQuery = `
@@ -354,18 +370,27 @@ exports.handler = withHandler(async function (event) {
         reportConfig.report_type,
         formattedReport.length,
         'success',
-        JSON.stringify({ row_count: reportData.length, filters: reportConfig.filters || filters }),
+        JSON.stringify({ row_count: reportData.length, filters: reportFilters }),
         user.id
       ]);
 
+      // For PDF format, return base64 encoded content
+      const reportFormat = reportConfig.format || format || 'csv';
+      const reportContent = reportFormat === 'pdf' 
+        ? formattedReport.toString('base64')
+        : formattedReport;
+
       return ok({
         message: 'Report generated successfully',
-        report: formattedReport,
+        report: reportContent,
+        format: reportFormat,
+        isBase64: reportFormat === 'pdf',
+        filename: `${reportName.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.${reportFormat === 'pdf' ? 'pdf' : 'csv'}`,
         history: historyResult.rows && historyResult.rows[0] ? historyResult.rows[0] : { id: historyResult.id }
       });
     } catch (e) {
       console.error('Error generating report:', e);
-      return error(500, 'Failed to generate report');
+      return error(500, `Failed to generate report: ${e.message}`);
     }
   }
 
@@ -476,14 +501,167 @@ exports.handler = withHandler(async function (event) {
     return result;
   }
 
-  // Format report as CSV
-  async function formatReport(data, format) {
+  // Format report as CSV or PDF
+  async function formatReport(data, format, reportConfig = {}) {
     if (format === 'csv') {
       return formatAsCSV(data);
     }
 
+    if (format === 'pdf') {
+      return formatAsPDF(data, reportConfig);
+    }
+
     // Default to JSON
     return JSON.stringify(data, null, 2);
+  }
+
+  // Format data as PDF document
+  async function formatAsPDF(data, reportConfig = {}) {
+    return new Promise((resolve, reject) => {
+      try {
+        const chunks = [];
+        const doc = new PDFDocument({
+          size: 'A4',
+          margin: 50,
+          info: {
+            Title: reportConfig.name || 'Report',
+            Author: 'joshburt.com.au',
+            Subject: `${reportConfig.report_type || 'Data'} Report`,
+            CreationDate: new Date()
+          }
+        });
+
+        // Collect PDF data chunks
+        doc.on('data', chunk => chunks.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(chunks)));
+        doc.on('error', reject);
+
+        // Colors
+        const primaryColor = '#3b82f6';
+        const headerBg = '#f1f5f9';
+        const borderColor = '#e2e8f0';
+
+        // Header
+        doc.rect(0, 0, doc.page.width, 80).fill(primaryColor);
+        doc.fillColor('#ffffff')
+          .fontSize(24)
+          .text(reportConfig.name || 'Report', 50, 25);
+        doc.fontSize(10)
+          .text(`Generated: ${new Date().toLocaleString()}`, 50, 55);
+
+        // Report metadata
+        doc.fillColor('#334155')
+          .fontSize(12)
+          .text('', 50, 100);
+
+        let yPos = 100;
+
+        if (reportConfig.report_type) {
+          doc.text(`Report Type: ${reportConfig.report_type.charAt(0).toUpperCase() + reportConfig.report_type.slice(1)}`, 50, yPos);
+          yPos += 20;
+        }
+
+        if (reportConfig.frequency) {
+          doc.text(`Frequency: ${reportConfig.frequency.charAt(0).toUpperCase() + reportConfig.frequency.slice(1)}`, 50, yPos);
+          yPos += 20;
+        }
+
+        doc.text(`Total Records: ${data.length}`, 50, yPos);
+        yPos += 30;
+
+        // Divider
+        doc.moveTo(50, yPos)
+          .lineTo(doc.page.width - 50, yPos)
+          .strokeColor(borderColor)
+          .stroke();
+        yPos += 20;
+
+        // Table
+        if (data && data.length > 0) {
+          const headers = Object.keys(data[0]);
+          const pageWidth = doc.page.width - 100;
+          const colWidth = Math.min(pageWidth / headers.length, 120);
+          const tableWidth = Math.min(colWidth * headers.length, pageWidth);
+
+          // Calculate font size based on number of columns
+          const fontSize = headers.length > 6 ? 7 : headers.length > 4 ? 8 : 9;
+          doc.fontSize(fontSize);
+
+          // Table header background
+          doc.rect(50, yPos, tableWidth, 20).fill(headerBg);
+
+          // Table headers
+          doc.fillColor(primaryColor).font('Helvetica-Bold');
+          headers.forEach((header, i) => {
+            const text = header.replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2');
+            doc.text(text.charAt(0).toUpperCase() + text.slice(1), 55 + (i * colWidth), yPos + 5, {
+              width: colWidth - 10,
+              ellipsis: true
+            });
+          });
+
+          yPos += 25;
+          doc.font('Helvetica');
+
+          // Table rows (limit to 50 for API responses)
+          let rowCount = 0;
+          const maxRows = 50;
+
+          for (const row of data) {
+            if (rowCount >= maxRows) {
+              doc.text(`... and ${data.length - maxRows} more rows`, 50, yPos);
+              break;
+            }
+
+            // Check if we need a new page
+            if (yPos > doc.page.height - 80) {
+              doc.addPage();
+              yPos = 50;
+            }
+
+            // Alternate row background
+            if (rowCount % 2 === 1) {
+              doc.rect(50, yPos - 3, tableWidth, 18).fill('#f8fafc');
+            }
+
+            // Row data
+            doc.fillColor('#334155');
+            headers.forEach((header, i) => {
+              let value = row[header];
+              if (value === null || value === undefined) {
+                value = '-';
+              } else if (typeof value === 'object') {
+                value = JSON.stringify(value);
+              }
+              doc.text(String(value).substring(0, 30), 55 + (i * colWidth), yPos, {
+                width: colWidth - 10,
+                ellipsis: true
+              });
+            });
+
+            yPos += 18;
+            rowCount++;
+          }
+        } else {
+          doc.fillColor('#64748b')
+            .fontSize(12)
+            .text('No data available for this report.', 50, yPos);
+        }
+
+        // Footer
+        const footerY = doc.page.height - 40;
+        doc.fillColor('#94a3b8')
+          .fontSize(8)
+          .text('Generated by joshburt.com.au Report System', 50, footerY, {
+            align: 'center',
+            width: doc.page.width - 100
+          });
+
+        doc.end();
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   // Convert data to CSV format

@@ -9,13 +9,13 @@
 - **Frontend**: Static HTML, TailwindCSS v4, Vanilla JavaScript
 - **Backend**: Netlify Functions (Node.js serverless)
 - **Database**: PostgreSQL (Neon or compatible)
-- **Auth**: JWT tokens + optional Auth0 OAuth
+- **Auth**: JWT tokens + optional OAuth
 - **Deployment**: Netlify (primary) + FTP mirror (optional)
 
 ### Project Status
 
 ✅ **Production-ready** - No dead code, debug logic, or unused variables  
-✅ **Fully serverless** - All APIs migrated from legacy `/api` to Netlify Functions  
+✅ **Fully serverless** - All APIs via Netlify Functions  
 ✅ **Database-driven** - All settings, users, products, orders in PostgreSQL
 
 ---
@@ -56,16 +56,11 @@ DB_NAME=your-database
 # Auth (required)
 JWT_SECRET=your-secret-key-min-32-chars
 
-# Auth0 OAuth (optional - enables social login)
-AUTH0_DOMAIN=your-tenant.auth0.com
-AUTH0_CLIENT_ID=your-client-id
-AUTH0_AUDIENCE=https://your-api-identifier
-
 # Email (optional - for password reset)
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER=your-email@example.com
-SMTP_PASSWORD=your-smtp-password
+SMTP_PASS=your-smtp-password
 
 # Schema management (optional)
 APPLY_SCHEMA_ON_START=0  # Set to 1 to auto-apply database-schema.sql on startup
@@ -228,8 +223,8 @@ Multi-action endpoint using `?action=<action>` or `{ action: "..." }` in body:
 
 ### Permission Matrix
 
-| Role         | Read                | Create             | Update              | Delete |
-| ------------ | ------------------- | ------------------ | ------------------- | ------ |
+| Role         | Read                | Create              | Update              | Delete |
+| ------------ | ------------------- | ------------------- | ------------------- | ------ |
 | **mechanic** | ✅ Products, Orders | ✅ Orders          | ❌                  | ❌     |
 | **manager**  | ✅ All              | ✅ Products, Users | ✅ Products, Orders | ❌     |
 | **admin**    | ✅ All              | ✅ All             | ✅ All              | ✅ All |

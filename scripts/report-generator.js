@@ -10,6 +10,7 @@
 require('dotenv').config();
 
 const { database } = require('../config/database');
+const PDFDocument = require('pdfkit');
 
 // Check if running in cron mode
 const isWatch = process.argv.includes('--watch');
@@ -77,8 +78,8 @@ async function generateReport(reportConfig) {
   // Get report data
   const reportData = await generateReportData(reportConfig);
 
-  // Format the report
-  const formattedReport = await formatReport(reportData, reportConfig.format);
+  // Format the report (pass reportConfig for PDF metadata)
+  const formattedReport = await formatReport(reportData, reportConfig.format, reportConfig);
 
   // Send via email if recipients are configured
   if (reportConfig.recipients && reportConfig.recipients.length > 0) {
@@ -208,23 +209,206 @@ async function generateAnalyticsReport(startDate, endDate) {
 /**
  * Format report based on requested format
  */
-function formatReport(data, format) {
+function formatReport(data, format, reportConfig = {}) {
   switch (format) {
   case 'csv':
-    return formatAsCSV(data);
+    return Promise.resolve(formatAsCSV(data));
   case 'pdf':
-    // PDF generation would require a library like pdfkit or puppeteer
-    // For now, fall back to CSV
-    console.warn('PDF format not yet implemented, using CSV');
-    return formatAsCSV(data);
+    return formatAsPDF(data, reportConfig);
   case 'excel':
     // Excel generation would require a library like exceljs
     // For now, fall back to CSV
     console.warn('Excel format not yet implemented, using CSV');
-    return formatAsCSV(data);
+    return Promise.resolve(formatAsCSV(data));
   default:
-    return formatAsCSV(data);
+    return Promise.resolve(formatAsCSV(data));
   }
+}
+
+/**
+ * Format data as PDF document
+ */
+function formatAsPDF(data, reportConfig = {}) {
+  return new Promise((resolve, reject) => {
+    try {
+      const chunks = [];
+      const doc = new PDFDocument({
+        size: 'A4',
+        margin: 50,
+        info: {
+          Title: reportConfig.name || 'Report',
+          Author: 'joshburt.com.au',
+          Subject: `${reportConfig.report_type || 'Data'} Report`,
+          CreationDate: new Date()
+        }
+      });
+
+      // Collect PDF data chunks
+      doc.on('data', chunk => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', reject);
+
+      // Colors
+      const primaryColor = '#3b82f6';
+      const headerBg = '#f1f5f9';
+      const borderColor = '#e2e8f0';
+
+      // Header
+      doc.rect(0, 0, doc.page.width, 80).fill(primaryColor);
+      doc.fillColor('#ffffff')
+        .fontSize(24)
+        .text(reportConfig.name || 'Report', 50, 25);
+      doc.fontSize(10)
+        .text(`Generated: ${new Date().toLocaleString()}`, 50, 55);
+
+      // Report metadata
+      doc.fillColor('#334155')
+        .fontSize(12)
+        .text('', 50, 100);
+
+      let yPos = 100;
+
+      if (reportConfig.report_type) {
+        doc.text(`Report Type: ${reportConfig.report_type.charAt(0).toUpperCase() + reportConfig.report_type.slice(1)}`, 50, yPos);
+        yPos += 20;
+      }
+
+      if (reportConfig.frequency) {
+        doc.text(`Frequency: ${reportConfig.frequency.charAt(0).toUpperCase() + reportConfig.frequency.slice(1)}`, 50, yPos);
+        yPos += 20;
+      }
+
+      if (reportConfig.filters) {
+        const filters = reportConfig.filters;
+        if (filters.date_from || filters.date_to) {
+          doc.text(`Date Range: ${filters.date_from || 'Start'} to ${filters.date_to || 'Present'}`, 50, yPos);
+          yPos += 20;
+        }
+      }
+
+      doc.text(`Total Records: ${data.length}`, 50, yPos);
+      yPos += 30;
+
+      // Divider
+      doc.moveTo(50, yPos)
+        .lineTo(doc.page.width - 50, yPos)
+        .strokeColor(borderColor)
+        .stroke();
+      yPos += 20;
+
+      // Table
+      if (data && data.length > 0) {
+        const headers = Object.keys(data[0]);
+        const pageWidth = doc.page.width - 100;
+        const colWidth = Math.min(pageWidth / headers.length, 120);
+        const tableWidth = Math.min(colWidth * headers.length, pageWidth);
+
+        // Calculate font size based on number of columns
+        const fontSize = headers.length > 6 ? 7 : headers.length > 4 ? 8 : 9;
+        doc.fontSize(fontSize);
+
+        // Table header background
+        doc.rect(50, yPos, tableWidth, 20).fill(headerBg);
+
+        // Table headers
+        doc.fillColor(primaryColor).font('Helvetica-Bold');
+        headers.forEach((header, i) => {
+          const text = formatHeaderText(header);
+          doc.text(text, 55 + (i * colWidth), yPos + 5, {
+            width: colWidth - 10,
+            ellipsis: true
+          });
+        });
+
+        yPos += 25;
+        doc.font('Helvetica');
+
+        // Table rows
+        let rowCount = 0;
+        const maxRows = 50; // Limit rows per page to prevent huge PDFs
+
+        for (const row of data) {
+          if (rowCount >= maxRows) {
+            doc.text(`... and ${data.length - maxRows} more rows (see CSV for full data)`, 50, yPos);
+            break;
+          }
+
+          // Check if we need a new page
+          if (yPos > doc.page.height - 80) {
+            doc.addPage();
+            yPos = 50;
+
+            // Repeat headers on new page
+            doc.rect(50, yPos, tableWidth, 20).fill(headerBg);
+            doc.fillColor(primaryColor).font('Helvetica-Bold');
+            headers.forEach((header, i) => {
+              const text = formatHeaderText(header);
+              doc.text(text, 55 + (i * colWidth), yPos + 5, {
+                width: colWidth - 10,
+                ellipsis: true
+              });
+            });
+            yPos += 25;
+            doc.font('Helvetica');
+          }
+
+          // Alternate row background
+          if (rowCount % 2 === 1) {
+            doc.rect(50, yPos - 3, tableWidth, 18).fill('#f8fafc');
+          }
+
+          // Row data
+          doc.fillColor('#334155');
+          headers.forEach((header, i) => {
+            let value = row[header];
+            if (value === null || value === undefined) {
+              value = '-';
+            } else if (typeof value === 'object') {
+              value = JSON.stringify(value);
+            } else if (value instanceof Date) {
+              value = value.toLocaleDateString();
+            }
+            doc.text(String(value).substring(0, 30), 55 + (i * colWidth), yPos, {
+              width: colWidth - 10,
+              ellipsis: true
+            });
+          });
+
+          yPos += 18;
+          rowCount++;
+        }
+      } else {
+        doc.fillColor('#64748b')
+          .fontSize(12)
+          .text('No data available for this report.', 50, yPos);
+      }
+
+      // Footer
+      const footerY = doc.page.height - 40;
+      doc.fillColor('#94a3b8')
+        .fontSize(8)
+        .text('Generated by joshburt.com.au Report System', 50, footerY, {
+          align: 'center',
+          width: doc.page.width - 100
+        });
+
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+/**
+ * Format header text for PDF display
+ */
+function formatHeaderText(header) {
+  return header
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 /**
@@ -266,6 +450,21 @@ async function sendReportEmail(reportConfig, reportContent) {
   try {
     const { queueEmail } = require('../utils/email');
 
+    // Determine file extension and content type based on format
+    const formatExtensions = {
+      pdf: 'pdf',
+      csv: 'csv',
+      excel: 'xlsx'
+    };
+    const fileExt = formatExtensions[reportConfig.format] || 'csv';
+
+    const formatMimeTypes = {
+      pdf: 'application/pdf',
+      csv: 'text/csv',
+      excel: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    };
+    const contentType = formatMimeTypes[reportConfig.format] || 'text/csv';
+
     const subject = `${reportConfig.name} - ${new Date().toLocaleDateString()}`;
     const body = `
       <h2>${reportConfig.name}</h2>
@@ -281,8 +480,9 @@ async function sendReportEmail(reportConfig, reportContent) {
         html: body,
         attachments: [
           {
-            filename: `${reportConfig.name.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.csv`,
-            content: reportContent
+            filename: `${reportConfig.name.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.${fileExt}`,
+            content: reportContent,
+            contentType: contentType
           }
         ]
       });
