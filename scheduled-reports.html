@@ -105,7 +105,7 @@
         <label class="block text-sm font-semibold mb-2">Format</label>
         <select id="report-format" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
           <option value="csv">CSV</option>
-          <option value="pdf">PDF (Coming Soon)</option>
+          <option value="pdf">PDF</option>
           <option value="excel">Excel (Coming Soon)</option>
         </select>
       </div>
@@ -207,12 +207,71 @@
 
   async function loadHistory() {
     try {
-      // For now, show placeholder since we don't have a separate history endpoint
       const historyTable = document.getElementById('history-table');
-      historyTable.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-gray-400">Report history will appear here after execution</td></tr>';
+
+      const response = await window.authFetch(`${FN_BASE}/scheduled-reports/history?per_page=10`);
+      if (!response.ok) {
+        throw new Error('Failed to load report history');
+      }
+
+      const data = await response.json();
+      const history = data.history || [];
+
+      if (history.length === 0) {
+        historyTable.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-gray-400">No executions yet</td></tr>';
+        return;
+      }
+
+      historyTable.innerHTML = history
+        .map(item => {
+          const generatedAt = item.generated_at ? new Date(item.generated_at).toLocaleString() : '-';
+          const reportName = item.report_name || 'Unnamed Report';
+          const reportType = item.report_type || '-';
+          const status = item.status || 'unknown';
+          const recipientsCount =
+            typeof item.recipient_count === 'number'
+              ? item.recipient_count
+              : Array.isArray(item.recipients)
+                ? item.recipients.length
+                : 0;
+
+          const statusClass =
+            status === 'success'
+              ? 'bg-green-600'
+              : status === 'failed'
+                ? 'bg-red-600'
+                : 'bg-gray-600';
+
+          const actions = item.scheduled_report_id
+            ? `<button onclick="generateNow(${item.scheduled_report_id})" class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">Run Again</button>`
+            : '<span class="text-gray-500">-</span>';
+
+          return `
+            <tr class="border-b border-gray-800">
+              <td class="py-3">${reportName}</td>
+              <td class="py-3">${reportType}</td>
+              <td class="py-3">${generatedAt}</td>
+              <td class="py-3"><span class="px-2 py-1 text-xs rounded ${statusClass}">${status}</span></td>
+              <td class="py-3">${recipientsCount}</td>
+              <td class="py-3">${actions}</td>
+            </tr>
+          `;
+        })
+        .join('');
     } catch (error) {
       console.error('Error loading history:', error);
+      document.getElementById('history-table').innerHTML = '<tr><td colspan="6" class="py-4 text-center text-red-400">Failed to load history</td></tr>';
     }
+  }
+
+  function base64ToUint8Array(base64) {
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
   }
 
   async function generateNow(reportId) {
@@ -234,11 +293,21 @@
 
       // Download the report
       if (data.report) {
-        const blob = new Blob([data.report], { type: 'text/csv' });
+        const format = data.format || 'csv';
+        const filename = data.filename || `report-${Date.now()}.${format === 'pdf' ? 'pdf' : 'csv'}`;
+
+        const blob =
+          data.isBase64 === true
+            ? new Blob([base64ToUint8Array(data.report)], {
+              type: format === 'pdf' ? 'application/pdf' : 'application/octet-stream'
+            })
+            : new Blob([data.report], {
+              type: format === 'csv' ? 'text/csv' : 'application/octet-stream'
+            });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `report-${Date.now()}.csv`;
+        a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
       }

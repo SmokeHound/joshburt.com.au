@@ -20,6 +20,11 @@ exports.handler = withHandler(async function (event) {
       return authResponse;
     }
 
+    // History listing endpoint: /scheduled-reports/history
+    if (reportId === 'history') {
+      return await listHistory(event);
+    }
+
     if (reportId && reportId !== 'scheduled-reports') {
       return await getReport(reportId);
     }
@@ -124,6 +129,82 @@ exports.handler = withHandler(async function (event) {
     } catch (e) {
       console.error('Error listing reports:', e);
       return error(500, 'Failed to list reports');
+    }
+  }
+
+  // List report execution history across all reports
+  async function listHistory(event) {
+    try {
+      const params = event.queryStringParameters || {};
+      const { status, report_type, page = 1, per_page = 20 } = params;
+
+      const limit = Math.min(parseInt(per_page, 10) || 20, 100);
+      const offset = (parseInt(page, 10) - 1) * limit;
+
+      let query = `
+        SELECT
+          rh.id,
+          rh.scheduled_report_id,
+          rh.report_name,
+          rh.report_type,
+          rh.generated_at,
+          rh.file_size,
+          rh.recipient_count,
+          rh.status,
+          rh.error_message,
+          rh.metadata,
+          sr.recipients
+        FROM report_history rh
+        LEFT JOIN scheduled_reports sr ON sr.id = rh.scheduled_report_id
+        WHERE 1=1
+      `;
+      const queryParams = [];
+      let paramCount = 1;
+
+      if (status) {
+        query += ` AND rh.status = $${paramCount}`;
+        queryParams.push(status);
+        paramCount++;
+      }
+
+      if (report_type) {
+        query += ` AND rh.report_type = $${paramCount}`;
+        queryParams.push(report_type);
+        paramCount++;
+      }
+
+      query += ` ORDER BY rh.generated_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+      queryParams.push(limit, offset);
+
+      const history = await database.all(query, queryParams);
+
+      // Total count
+      let countQuery = 'SELECT COUNT(*) FROM report_history rh WHERE 1=1';
+      const countParams = queryParams.slice(0, -2);
+      let countParamIndex = 1;
+
+      if (status) {
+        countQuery += ` AND rh.status = $${countParamIndex++}`;
+      }
+      if (report_type) {
+        countQuery += ` AND rh.report_type = $${countParamIndex++}`;
+      }
+
+      const countResult = await database.get(countQuery, countParams);
+      const total = parseInt(countResult.count, 10);
+
+      return ok({
+        history,
+        pagination: {
+          page: parseInt(page, 10),
+          per_page: limit,
+          total,
+          total_pages: Math.ceil(total / limit)
+        }
+      });
+    } catch (e) {
+      console.error('Error listing report history:', e);
+      return error(500, 'Failed to list report history');
     }
   }
 
