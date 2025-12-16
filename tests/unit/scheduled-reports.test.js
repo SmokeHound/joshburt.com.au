@@ -33,7 +33,9 @@ const { handler } = require('../../netlify/functions/scheduled-reports');
 jest.mock('../../config/database', () => ({
   database: {
     connect: jest.fn().mockResolvedValue(undefined),
-    query: jest.fn()
+    all: jest.fn(),
+    get: jest.fn(),
+    run: jest.fn()
   }
 }));
 
@@ -86,32 +88,28 @@ describe('scheduled-reports function', () => {
 
     it('should return paginated list of reports', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
-      database.query.mockResolvedValueOnce({
-        rows: [
-          {
-            id: 1,
-            name: 'Weekly Sales Report',
-            report_type: 'sales',
-            frequency: 'weekly',
-            is_active: true
-          },
-          {
-            id: 2,
-            name: 'Monthly Inventory Report',
-            report_type: 'inventory',
-            frequency: 'monthly',
-            is_active: true
-          }
-        ]
-      });
+      database.all.mockResolvedValueOnce([
+        {
+          id: 1,
+          name: 'Weekly Sales Report',
+          report_type: 'sales',
+          frequency: 'weekly',
+          is_active: true
+        },
+        {
+          id: 2,
+          name: 'Monthly Inventory Report',
+          report_type: 'inventory',
+          frequency: 'monthly',
+          is_active: true
+        }
+      ]);
 
-      database.query.mockResolvedValueOnce({
-        rows: [{ count: '2' }]
-      });
+      database.get.mockResolvedValueOnce({ count: '2' });
 
       const mockEvent = {
         httpMethod: 'GET',
@@ -133,21 +131,17 @@ describe('scheduled-reports function', () => {
 
     it('should get specific report details', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
-      database.query.mockResolvedValueOnce({
-        rows: [
-          {
-            id: 1,
-            name: 'Weekly Sales Report',
-            report_type: 'sales',
-            frequency: 'weekly',
-            is_active: true,
-            execution_count: 10
-          }
-        ]
+      database.get.mockResolvedValueOnce({
+        id: 1,
+        name: 'Weekly Sales Report',
+        report_type: 'sales',
+        frequency: 'weekly',
+        is_active: true,
+        execution_count: 10
       });
 
       const mockEvent = {
@@ -168,11 +162,11 @@ describe('scheduled-reports function', () => {
   describe('POST - Create Report', () => {
     it('should create a new scheduled report', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
-      database.query.mockResolvedValueOnce({
+      database.run.mockResolvedValueOnce({
         rows: [
           {
             id: 1,
@@ -206,7 +200,7 @@ describe('scheduled-reports function', () => {
 
     it('should validate required fields', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
@@ -229,7 +223,7 @@ describe('scheduled-reports function', () => {
 
     it('should validate frequency values', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
@@ -253,34 +247,28 @@ describe('scheduled-reports function', () => {
 
     it('should generate report on-demand', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
-      // Mock report config query
-      database.query.mockResolvedValueOnce({
-        rows: [
-          {
-            id: 1,
-            name: 'Sales Report',
-            report_type: 'sales',
-            frequency: 'daily',
-            format: 'csv',
-            filters: {}
-          }
-        ]
+      // Mock scheduled report config lookup
+      database.get.mockResolvedValueOnce({
+        id: 1,
+        name: 'Sales Report',
+        report_type: 'sales',
+        frequency: 'daily',
+        format: 'csv',
+        filters: {}
       });
 
-      // Mock report data query
-      database.query.mockResolvedValueOnce({
-        rows: [
-          { id: 1, created_at: '2025-11-19', status: 'approved', total_items: 5 },
-          { id: 2, created_at: '2025-11-18', status: 'pending', total_items: 3 }
-        ]
-      });
+      // Mock generated report data query (sales report)
+      database.all.mockResolvedValueOnce([
+        { id: 1, created_at: '2025-11-19', status: 'approved', total_items: 5 },
+        { id: 2, created_at: '2025-11-18', status: 'pending', total_items: 3 }
+      ]);
 
       // Mock history insert
-      database.query.mockResolvedValueOnce({
+      database.run.mockResolvedValueOnce({
         rows: [
           {
             id: 1,
@@ -312,11 +300,11 @@ describe('scheduled-reports function', () => {
   describe('PUT - Update Report', () => {
     it('should update report configuration', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
-      database.query.mockResolvedValueOnce({
+      database.run.mockResolvedValueOnce({
         rows: [
           {
             id: 1,
@@ -345,13 +333,11 @@ describe('scheduled-reports function', () => {
 
     it('should return 404 for non-existent report', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
-      database.query.mockResolvedValueOnce({
-        rows: []
-      });
+      database.run.mockResolvedValueOnce({ rows: [] });
 
       const mockEvent = {
         httpMethod: 'PUT',
@@ -371,11 +357,11 @@ describe('scheduled-reports function', () => {
   describe('DELETE - Delete Report', () => {
     it('should delete report', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
-      database.query.mockResolvedValueOnce({
+      database.run.mockResolvedValueOnce({
         rows: [
           {
             id: 1,

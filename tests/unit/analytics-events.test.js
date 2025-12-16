@@ -8,7 +8,7 @@ const { handler } = require('../../netlify/functions/analytics-events');
 jest.mock('../../config/database', () => ({
   database: {
     connect: jest.fn().mockResolvedValue(undefined),
-    query: jest.fn(),
+    run: jest.fn(),
     all: jest.fn(),
     get: jest.fn()
   }
@@ -55,7 +55,8 @@ describe('analytics-events function', () => {
         }
       };
 
-      database.query.mockResolvedValueOnce({
+      // Mock event insert
+      database.run.mockResolvedValueOnce({
         rows: [
           {
             id: 1,
@@ -65,14 +66,14 @@ describe('analytics-events function', () => {
         ]
       });
 
-      // Mock session check
-      database.query.mockResolvedValueOnce({ rows: [] }); // No existing session
-      database.query.mockResolvedValueOnce({ rows: [{ id: 1 }] }); // Insert session
+      // Mock session check + session create
+      database.get.mockResolvedValueOnce(null);
+      database.run.mockResolvedValueOnce({ changes: 1 });
 
       const response = await handler(mockEvent);
 
       expect(response.statusCode).toBe(200);
-      expect(database.query).toHaveBeenCalled();
+      expect(database.run).toHaveBeenCalled();
     });
 
     it('should return error for missing required fields', async () => {
@@ -116,20 +117,16 @@ describe('analytics-events function', () => {
 
     it('should return paginated events', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
-      database.query.mockResolvedValueOnce({
-        rows: [
-          { id: 1, event_type: 'page_view', session_id: 'sess_123' },
-          { id: 2, event_type: 'click', session_id: 'sess_123' }
-        ]
-      });
+      database.all.mockResolvedValueOnce([
+        { id: 1, event_type: 'page_view', session_id: 'sess_123' },
+        { id: 2, event_type: 'click', session_id: 'sess_123' }
+      ]);
 
-      database.query.mockResolvedValueOnce({
-        rows: [{ count: '10' }]
-      });
+      database.get.mockResolvedValueOnce({ count: '10' });
 
       const mockEvent = {
         httpMethod: 'GET',
@@ -150,28 +147,29 @@ describe('analytics-events function', () => {
 
     it('should return aggregated statistics', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
       // Mock aggregated queries
-      database.query.mockResolvedValueOnce({
-        rows: [{ event_type: 'page_view', count: '100', unique_users: '10', unique_sessions: '20' }]
+      database.all.mockResolvedValueOnce([
+        { event_type: 'page_view', count: '100', unique_users: '10', unique_sessions: '20' }
+      ]);
+
+      database.all.mockResolvedValueOnce([
+        { period: '2025-11-19', event_type: 'page_view', count: '50' }
+      ]);
+
+      database.get.mockResolvedValueOnce({
+        total_sessions: '20',
+        avg_duration: '120',
+        avg_page_views: '5',
+        unique_users: '10'
       });
 
-      database.query.mockResolvedValueOnce({
-        rows: [{ period: '2025-11-19', event_type: 'page_view', count: '50' }]
-      });
-
-      database.query.mockResolvedValueOnce({
-        rows: [
-          { total_sessions: '20', avg_duration: '120', avg_page_views: '5', unique_users: '10' }
-        ]
-      });
-
-      database.query.mockResolvedValueOnce({
-        rows: [{ page_url: '/home', views: '50', unique_sessions: '15' }]
-      });
+      database.all.mockResolvedValueOnce([
+        { page_url: '/home', views: '50', unique_sessions: '15' }
+      ]);
 
       const mockEvent = {
         httpMethod: 'GET',
@@ -217,17 +215,12 @@ describe('analytics-events function', () => {
 
     it('should delete old events successfully', async () => {
       requirePermission.mockResolvedValueOnce({
-        user: { userId: 1, role: 'admin' },
+        user: { id: 1, role: 'admin' },
         response: null
       });
 
-      database.query.mockResolvedValueOnce({
-        rowCount: 50
-      });
-
-      database.query.mockResolvedValueOnce({
-        rowCount: 10
-      });
+      database.run.mockResolvedValueOnce({ changes: 50 });
+      database.run.mockResolvedValueOnce({ changes: 10 });
 
       const mockEvent = {
         httpMethod: 'DELETE',

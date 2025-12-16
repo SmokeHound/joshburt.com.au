@@ -7,7 +7,10 @@ const { handler } = require('../../netlify/functions/bulk-operations');
 
 // Mock dependencies
 jest.mock('../../config/database', () => ({
-  Pool: jest.fn()
+  database: {
+    connect: jest.fn().mockResolvedValue(undefined),
+    pool: null
+  }
 }));
 
 jest.mock('../../utils/audit', () => ({
@@ -15,14 +18,17 @@ jest.mock('../../utils/audit', () => ({
 }));
 
 jest.mock('../../utils/http', () => ({
-  requirePermission: jest.fn().mockResolvedValue({ id: 1, email: 'admin@test.com', role: 'admin' })
+  requirePermission: jest.fn().mockResolvedValue({
+    user: { id: 1, email: 'admin@test.com', role: 'admin' },
+    response: null
+  })
 }));
 
 jest.mock('../../utils/fn', () => ({
   withHandler: fn => fn
 }));
 
-const { Pool } = require('../../config/database');
+const { database } = require('../../config/database');
 const { logAudit } = require('../../utils/audit');
 
 describe('Bulk Operations API', () => {
@@ -35,7 +41,7 @@ describe('Bulk Operations API', () => {
       query: mockQuery,
       end: jest.fn()
     };
-    Pool.mockImplementation(() => mockPool);
+    database.pool = mockPool;
     logAudit.mockResolvedValue();
   });
 
