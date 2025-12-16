@@ -6,7 +6,7 @@
 
 const http = require('http');
 
-const NETLIFY_DEV_URL = process.env.NETLIFY_DEV_URL || `${FN_BASE}` ||  'http://localhost:8888';
+const NETLIFY_DEV_URL = process.env.NETLIFY_DEV_URL || 'http://localhost:8888';
 const TIMEOUT = 5000;
 
 function checkEndpoint(path) {
