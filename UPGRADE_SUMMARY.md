@@ -159,7 +159,7 @@ Enhance joshburt.com.au with advanced features using **only free, open-source, s
 - ⬜ Security dashboard UI (security-dashboard.html)
 - ⬜ API keys management UI (api-keys.html)
 
-**Documentation**: See [PHASE_6_SUMMARY.md](PHASE_6_SUMMARY.md)
+**Documentation**: See [PHASE_6_SUMMARY.md](docs/PHASE_6_SUMMARY.md)
 
 ---
 
@@ -212,7 +212,7 @@ Enhance joshburt.com.au with advanced features using **only free, open-source, s
   - Tabbed dashboard with segment visualizations
   - Batch calculation endpoints for data refresh
 
-**Documentation**: PHASE_8_SUMMARY.md
+**Documentation**: [PHASE_8_SUMMARY.md](docs/PHASE_8_SUMMARY.md)
 
 ---
 

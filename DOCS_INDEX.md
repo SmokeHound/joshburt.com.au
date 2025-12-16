@@ -136,15 +136,15 @@ Welcome to the joshburt.com.au documentation. All technical documentation is org
 
 Project phase summaries (historical reference):
 
-- **[PHASE1_SUMMARY.md](PHASE1_SUMMARY.md)** - Phase 1 implementation
-- **[PHASE3_PERFORMANCE_SUMMARY.md](PHASE3_PERFORMANCE_SUMMARY.md)** - Phase 3 performance work
-- **[PHASE4_IMPLEMENTATION.md](PHASE4_IMPLEMENTATION.md)** - Phase 4 details
-- **[PHASE4_SUMMARY.md](PHASE4_SUMMARY.md)** - Phase 4 summary
-- **[PHASE4_QUICKSTART.md](PHASE4_QUICKSTART.md)** - Phase 4 quick start
-- **[PHASE5_IMPLEMENTATION_SUMMARY.md](PHASE5_IMPLEMENTATION_SUMMARY.md)** - Phase 5 summary
-- **[PHASE_10_SUMMARY.md](PHASE_10_SUMMARY.md)** - Phase 10 Developer Tools implementation
-- **[OPTIMIZATION-IMPLEMENTATION-SUMMARY.md](OPTIMIZATION-IMPLEMENTATION-SUMMARY.md)** - Optimization summary
-- **[FUTURE-RECOMMENDATIONS-COMPLETE.md](FUTURE-RECOMMENDATIONS-COMPLETE.md)** - Future recommendations
+- **[PHASE1_SUMMARY.md](docs/PHASE1_SUMMARY.md)** - Phase 1 implementation
+- **[PHASE3_PERFORMANCE_SUMMARY.md](docs/archive/PHASE3_PERFORMANCE_SUMMARY.md)** - Phase 3 performance work
+- **[PHASE4_IMPLEMENTATION.md](docs/archive/PHASE4_IMPLEMENTATION.md)** - Phase 4 details
+- **[PHASE4_SUMMARY.md](docs/archive/PHASE4_SUMMARY.md)** - Phase 4 summary
+- **[PHASE4_QUICKSTART.md](docs/archive/PHASE4_QUICKSTART.md)** - Phase 4 quick start
+- **[PHASE5_IMPLEMENTATION_SUMMARY.md](docs/archive/PHASE5_IMPLEMENTATION_SUMMARY.md)** - Phase 5 summary
+- **[PHASE_10_SUMMARY.md](docs/PHASE_10_SUMMARY.md)** - Phase 10 Developer Tools implementation
+- **[OPTIMIZATION-IMPLEMENTATION-SUMMARY.md](docs/archive/OPTIMIZATION-IMPLEMENTATION-SUMMARY.md)** - Optimization summary
+- **[FUTURE-RECOMMENDATIONS-COMPLETE.md](docs/archive/FUTURE-RECOMMENDATIONS-COMPLETE.md)** - Future recommendations
 
 ---
 
