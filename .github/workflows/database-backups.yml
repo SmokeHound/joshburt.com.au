@@ -1,0 +1,78 @@
+name: 🗄️ Database Backups
+
+on:
+  schedule:
+    # Daily at 03:15 UTC
+    - cron: '15 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  run-backup-worker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🐘 Install PostgreSQL client tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          pg_dump --version
+
+      - name: 🗄️ Process pending backups
+        env:
+          # Prefer DATABASE_URL if available; worker supports both styles.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: |
+          # Provide defaults at runtime
+          DB_PORT=${DB_PORT:-5432}
+          export DB_PORT
+
+          echo "🗄️ Running backup worker..."
+          npm run backup:worker
+
+      - name: 📤 Upload backup artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-backups-${{ github.run_number }}
+          path: |
+            /tmp/backup-*.sql*
+            /tmp/backup-*.json*
+            /tmp/backup-*/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: 📝 Backup summary
+        if: always()
+        run: |
+          echo "### 🗄️ Database Backups" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if ls -1 /tmp/backup-* 1>/dev/null 2>&1; then
+            echo "Generated backup files/directories:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            ls -lah /tmp/backup-* >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Backups are available in workflow artifacts." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No backups were generated (no pending backups, or worker failed before producing output)." >> $GITHUB_STEP_SUMMARY
+          fi

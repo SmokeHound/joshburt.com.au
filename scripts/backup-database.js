@@ -12,55 +12,91 @@ require('dotenv').config();
 const { database } = require('../config/database');
 const { spawn } = require('child_process');
 const fs = require('fs').promises;
+const os = require('os');
 const path = require('path');
 const zlib = require('zlib');
 const { promisify } = require('util');
 
 const gzip = promisify(zlib.gzip);
 
-/**
- * Generate SQL backup using pg_dump
- */
-async function generateSQLBackup(tables = [], compression = 'gzip') {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const fileName = `backup-${timestamp}.sql${compression === 'gzip' ? '.gz' : ''}`;
-  const filePath = path.join('/tmp', fileName);
+function resolvePgDumpCommand() {
+  return process.env.PG_DUMP_PATH || 'pg_dump';
+}
 
-  return new Promise((resolve, reject) => {
-    const args = [
+function buildPgDumpArgs(tables = []) {
+  const databaseUrl = process.env.DATABASE_URL;
+  const databaseName = process.env.DB_NAME || process.env.DB_DATABASE;
+
+  // Prefer connection string if provided (common in CI), otherwise fall back to discrete params.
+  const args = databaseUrl
+    ? ['--dbname', databaseUrl]
+    : [
       '-h',
       process.env.DB_HOST,
       '-p',
       process.env.DB_PORT || '5432',
       '-U',
       process.env.DB_USER,
-        '-d',
-        // Prefer full DATABASE_URL when available, otherwise DB_NAME or DB_DATABASE
-        (process.env.DATABASE_URL || process.env.DB_NAME || process.env.DB_DATABASE),
-      '--no-password',
-      '--clean',
-      '--if-exists'
+      '-d',
+      databaseName
     ];
 
-    // Add specific tables if requested
-    if (tables.length > 0) {
-      tables.forEach(table => {
-        args.push('-t', table);
-      });
-    }
+  args.push('--no-password', '--clean', '--if-exists');
 
-    let pgDump;
-    try {
-      pgDump = spawn('pg_dump', args, {
-        env: { ...process.env, PGPASSWORD: process.env.DB_PASSWORD }
-      });
-    } catch (spawnErr) {
-      reject(new Error('pg_dump not found on PATH. Install PostgreSQL client tools or ensure pg_dump is available.'));
-      return;
-    }
+  if (Array.isArray(tables) && tables.length > 0) {
+    tables.forEach(table => {
+      args.push('-t', table);
+    });
+  }
+
+  return args;
+}
+
+function formatPgDumpNotFoundMessage(originalMessage) {
+  const isWindows = process.platform === 'win32';
+  const isNetlify = String(process.env.NETLIFY || '').toLowerCase() === 'true';
+
+  const lines = [
+    `pg_dump not found (${originalMessage}).`,
+    'Install PostgreSQL client tools so pg_dump is available, or set PG_DUMP_PATH to the full path to pg_dump.',
+    isNetlify
+      ? 'Note: Netlify Functions typically do not ship with pg_dump. For SQL backups, run this worker in an external environment (local machine/CI) where pg_dump is installed, or use JSON/CSV backups.'
+      : null,
+    '',
+    'Examples:',
+    isWindows
+      ? '  - Windows: setx PG_DUMP_PATH "C:\\Program Files\\PostgreSQL\\16\\bin\\pg_dump.exe"'
+      : '  - macOS/Linux: export PG_DUMP_PATH=/usr/local/bin/pg_dump',
+    '  - Or add the PostgreSQL bin directory to your PATH.',
+    '',
+    'Note: you may need to restart your terminal after changing environment variables.'
+  ];
+
+  return lines.filter(Boolean).join('\n');
+}
+
+/**
+ * Generate SQL backup using pg_dump
+ */
+function generateSQLBackup(tables = [], compression = 'gzip') {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const fileName = `backup-${timestamp}.sql${compression === 'gzip' ? '.gz' : ''}`;
+  const filePath = path.join(os.tmpdir(), fileName);
+
+  return new Promise((resolve, reject) => {
+    const args = buildPgDumpArgs(tables);
+
+    const pgDump = spawn(resolvePgDumpCommand(), args, {
+      env: { ...process.env, PGPASSWORD: process.env.DB_PASSWORD }
+    });
 
     pgDump.on('error', err => {
-      reject(new Error('pg_dump execution failed: ' + err.message));
+      if (err && err.code === 'ENOENT') {
+        reject(new Error(formatPgDumpNotFoundMessage(err.message)));
+        return;
+      }
+
+      reject(new Error('pg_dump execution failed: ' + (err?.message || String(err))));
     });
 
     let output = '';
@@ -81,8 +117,6 @@ async function generateSQLBackup(tables = [], compression = 'gzip') {
       }
 
       try {
-        const finalData = output;
-
         if (compression === 'gzip') {
           const compressed = await gzip(Buffer.from(output));
           await fs.writeFile(filePath, compressed);
@@ -111,7 +145,7 @@ async function generateSQLBackup(tables = [], compression = 'gzip') {
 async function generateJSONBackup(pool, tables = [], compression = 'gzip') {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const fileName = `backup-${timestamp}.json${compression === 'gzip' ? '.gz' : ''}`;
-  const filePath = path.join('/tmp', fileName);
+  const filePath = path.join(os.tmpdir(), fileName);
 
   const backup = {
     generated_at: new Date().toISOString(),
@@ -163,9 +197,9 @@ async function generateJSONBackup(pool, tables = [], compression = 'gzip') {
 /**
  * Generate CSV backup
  */
-async function generateCSVBackup(pool, tables = [], compression = 'none') {
+async function generateCSVBackup(pool, tables = [], _compression = 'none') {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const baseDir = path.join('/tmp', `backup-${timestamp}`);
+  const baseDir = path.join(os.tmpdir(), `backup-${timestamp}`);
   await fs.mkdir(baseDir, { recursive: true });
 
   // Get list of tables to backup
@@ -228,7 +262,7 @@ async function createBackup(backupConfig) {
   const pool = await (async () => { await database.connect(); return database.pool; })();
 
   try {
-    const { id, backup_type, format, compression, tables } = backupConfig;
+    const { id, format, compression, tables } = backupConfig;
 
     // Update status to running
     await pool.query('UPDATE backups SET status = $1 WHERE id = $2', ['running', id]);

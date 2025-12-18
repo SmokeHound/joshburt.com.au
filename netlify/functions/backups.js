@@ -118,6 +118,20 @@ async function createBackup(event, pool) {
     };
   }
 
+  // Netlify Functions (and most serverless runtimes) do not include pg_dump.
+  // Allow opting in for setups that run the worker in an environment where pg_dump exists.
+  const isNetlifyRuntime = String(process.env.NETLIFY || '').toLowerCase() === 'true';
+  const allowSqlBackups = String(process.env.ALLOW_SQL_BACKUPS || '').toLowerCase() === 'true';
+  if (format === 'sql' && isNetlifyRuntime && !allowSqlBackups) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        error:
+          'SQL backups require pg_dump, which is not available in the Netlify Functions runtime. Choose JSON/CSV backups, or run the backup worker outside Netlify and set ALLOW_SQL_BACKUPS=true if you want to queue SQL backups.'
+      })
+    };
+  }
+
   // For table backups, require at least one table
   if (backup_type === 'table' && (!tables || tables.length === 0)) {
     return {
