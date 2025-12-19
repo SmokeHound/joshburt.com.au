@@ -223,7 +223,17 @@ async function restoreVersion(event, pool) {
   const { user, response: authResponse } = await requirePermission(event, 'data_history', 'update');
   if (authResponse) return authResponse;
 
-  const historyId = event.path.split('/').pop();
+  const parts = String(event.path || '').split('/').filter(Boolean);
+  // Expected: /.netlify/functions/data-history/:id/restore
+  const historyIdRaw = parts.length >= 2 ? parts[parts.length - 2] : null;
+  const historyId = parseInt(historyIdRaw, 10);
+
+  if (!historyId || Number.isNaN(historyId)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Invalid history id' })
+    };
+  }
 
   // Get the history record
   const historyResult = await pool.query('SELECT * FROM data_history WHERE id = $1', [historyId]);

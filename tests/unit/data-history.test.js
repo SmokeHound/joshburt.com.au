@@ -271,6 +271,12 @@ describe('Data History API', () => {
       const event = createMockEvent('POST', '/data-history/1/restore');
       const response = await handler(event);
 
+      expect(mockQuery).toHaveBeenNthCalledWith(
+        1,
+        'SELECT * FROM data_history WHERE id = $1',
+        [1]
+      );
+
       expect(response.statusCode).toBe(200);
       const data = JSON.parse(response.body);
       expect(data.message).toContain('restored successfully');
