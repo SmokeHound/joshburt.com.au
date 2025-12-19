@@ -161,7 +161,9 @@
                 </div>
         <script>
     const FN_BASE = window.FN_BASE || '/.netlify/functions';
-    const AUTH_DISABLED = window.AUTH_DISABLED === true;
+    function isAuthDisabled() {
+        return window.AUTH_DISABLED === true;
+    }
     let products = [];
     let editingProductId = null;
     // Modal refs and focus management
@@ -176,7 +178,24 @@
         async function loadProducts() {
             try {
                 showToast('Loading products...', 'info');
-                const response = await (window.authFetch ? window.authFetch(`${FN_BASE}/products`) : fetch(`${FN_BASE}/products`));
+
+                if (!window.authFetch) {
+                    // init-shared.js defines this; avoid unauthenticated fallback.
+                    setTimeout(loadProducts, 100);
+                    return;
+                }
+
+                const response = await window.authFetch(`${FN_BASE}/products`);
+                if (response.status === 401 && !isAuthDisabled()) {
+                    showSignInCTA();
+                    return;
+                }
+                if (response.status === 403) {
+                    showToast('You do not have permission to view products.', 'error');
+                    products = [];
+                    renderProducts();
+                    return;
+                }
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -198,13 +217,16 @@
             try {
                 const url = `${FN_BASE}/products`;
                 const method = isUpdate ? 'PUT' : 'POST';
-                const response = await (window.authFetch ? authFetch(url, {
+                if (!window.authFetch) {
+                    throw new Error('Authentication not ready');
+                }
+                const response = await window.authFetch(url, {
                     method: method,
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(product)
-                }) : fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(product) }));
+                });
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
@@ -221,11 +243,14 @@
         async function deleteProductFromAPI(productId) {
             try {
                 const url = `${FN_BASE}/products`;
-                const response = await (window.authFetch ? authFetch(url, {
+                if (!window.authFetch) {
+                    throw new Error('Authentication not ready');
+                }
+                const response = await window.authFetch(url, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: productId })
-                }) : fetch(url, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: productId }) }));
+                });
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
@@ -454,7 +479,14 @@
         // Export products to CSV (API only)
         async function exportProducts() {
             try {
-                const response = await fetch(`${FN_BASE}/products`);
+                if (!window.authFetch) {
+                    throw new Error('Authentication not ready');
+                }
+                const response = await window.authFetch(`${FN_BASE}/products`);
+                if (response.status === 401 && !isAuthDisabled()) {
+                    showSignInCTA();
+                    return;
+                }
                 if (!response.ok) throw new Error('Failed to fetch products for export');
                 const data = await response.json();
                 // Handle both array and object responses (API returns { products, pagination })
@@ -496,7 +528,18 @@
                     const csv = e.target.result;
                     // Send CSV to API for bulk import
                     const url = `${FN_BASE}/products/import`;
-                    const response = await (window.authFetch ? authFetch(url, { method: 'POST', headers: { 'Content-Type': 'text/csv' }, body: csv }) : fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/csv' }, body: csv }));
+                    if (!window.authFetch) {
+                        throw new Error('Authentication not ready');
+                    }
+                    const response = await window.authFetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/csv' },
+                        body: csv
+                    });
+                    if (response.status === 401 && !isAuthDisabled()) {
+                        showSignInCTA();
+                        return;
+                    }
                     if (!response.ok) throw new Error('Bulk import failed');
                     showToast('Products imported successfully!', 'success');
                     await loadProducts();
@@ -528,7 +571,7 @@
     document.addEventListener('DOMContentLoaded', () => {
             // Require authentication for the management page
             const token = (window.getToken && window.getToken()) || null;
-            if (!token && !AUTH_DISABLED) {
+            if (!token && !isAuthDisabled()) {
                 showSignInCTA();
                 return; // stop initializing until signed in
             }
