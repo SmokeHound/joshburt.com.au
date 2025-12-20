@@ -231,9 +231,9 @@ NPM install showed deprecation warnings for transitive dependencies.
 
 **Resolution**:
 - Updated all direct dependencies to latest versions
-- Removed unused packages: `@neondatabase/serverless`, `@netlify/functions`, `@netlify/zip-it-and-ship-it`, `glob`, `js-yaml`, `help`, `@sentry/integrations`
+- Removed unused packages: `@neondatabase/serverless`, `@netlify/functions`, `@netlify/zip-it-and-ship-it`, `glob`, `js-yaml`, `help`
 - Replaced deprecated `speakeasy` with `otplib` for TOTP
-- Updated `@sentry/node`, `jsonwebtoken`, `@auth0/auth0-spa-js`, `prettier` to latest
+- Updated `jsonwebtoken`, `@auth0/auth0-spa-js`, `prettier` to latest
 - Reduced from 730 to 553 packages audited
 - 0 vulnerabilities
 

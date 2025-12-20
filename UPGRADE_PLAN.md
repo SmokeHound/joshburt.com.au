@@ -31,7 +31,7 @@ This document outlines a comprehensive plan to upgrade and improve the joshburt.
 
 ### 1.1 Error Tracking & Monitoring (Replace Sentry)
 
-**Current**: Optional Sentry integration (`@sentry/node`)  
+**Current**: Self-hosted error tracking system (no external service)  
 **Replacement**: Self-hosted error tracking system
 
 #### Implementation

@@ -85,14 +85,6 @@ exports.handler = withHandler(async event => {
       latencyMs: Date.now() - start
     };
 
-    // Add detailed error tracking info if Sentry is configured
-    if (process.env.SENTRY_DSN) {
-      response.monitoring = {
-        errorTracking: 'enabled',
-        environment: process.env.SENTRY_ENVIRONMENT || environment
-      };
-    }
-
     // Return appropriate status code based on health
     return ok(response, status === 'healthy' ? 200 : 503);
   } catch (e) {

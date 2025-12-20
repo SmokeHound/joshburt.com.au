@@ -518,14 +518,7 @@ await enqueueTemplateEmail({
 });
 ```
 
-### From Sentry to Self-Hosted Error Tracking
-
-**Before:**
-
-```javascript
-const Sentry = require('@sentry/node');
-Sentry.captureException(error);
-```
+### From External Error Tracking to Self-Hosted Error Tracking
 
 **After:**
 

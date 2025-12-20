@@ -1,6 +1,6 @@
 /**
  * Error Tracker Utility - Self-hosted error tracking system
- * Replaces Sentry with database-backed error logging
+ * Replaces external error tracking with database-backed error logging
  */
 
 const cryptoModule = require('crypto');

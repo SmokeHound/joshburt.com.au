@@ -1,6 +1,6 @@
 /**
  * Error Logs API - Self-hosted error tracking
- * Replaces Sentry with database-backed error logging
+ * Replaces external error tracking with database-backed error logging
  *
  * Endpoints:
  * - GET    /error-logs - Get error logs (admin only)
