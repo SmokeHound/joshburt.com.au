@@ -238,7 +238,7 @@
                         Data Management
                     </h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" role="list">
-                        <a role="listitem" href="inventory-forecast.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <a role="listitem" href="inventory-forecast.html" data-ff="enableInventoryForecast" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
                             <div class="flex items-start gap-3">
                                 <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v6H3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13h10v8H7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 <div>
@@ -248,7 +248,7 @@
                             </div>
                         </a>
 
-                        <a role="listitem" href="backups.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <a role="listitem" href="backups.html" data-ff="enableDatabaseBackups" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
                             <div class="flex items-start gap-3">
                                 <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 <div>
@@ -258,7 +258,7 @@
                             </div>
                         </a>
 
-                        <a role="listitem" href="bulk-import.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <a role="listitem" href="bulk-import.html" data-ff="enableBulkOperations" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
                             <div class="flex items-start gap-3">
                                 <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 7h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 <div>
@@ -268,7 +268,7 @@
                             </div>
                         </a>
 
-                        <a role="listitem" href="data-history.html" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <a role="listitem" href="data-history.html" data-ff="enableDataHistory" class="block p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
                             <div class="flex items-start gap-3">
                                 <svg class="w-6 h-6 text-white flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 <div>
@@ -392,6 +392,11 @@
                                                         if (window.FeatureFlags) {
                                                                 await window.FeatureFlags.toggleElements('#beta-features-section', 'betaFeatures');
                                                                 await window.FeatureFlags.toggleElements('#new-dashboard-section', 'newDashboard');
+
+                                                            await window.FeatureFlags.toggleElements('[data-ff="enableInventoryForecast"]', 'enableInventoryForecast');
+                                                            await window.FeatureFlags.toggleElements('[data-ff="enableDatabaseBackups"]', 'enableDatabaseBackups');
+                                                            await window.FeatureFlags.toggleElements('[data-ff="enableBulkOperations"]', 'enableBulkOperations');
+                                                            await window.FeatureFlags.toggleElements('[data-ff="enableDataHistory"]', 'enableDataHistory');
                                                         }
 
                                                         // Initialize sortable grids

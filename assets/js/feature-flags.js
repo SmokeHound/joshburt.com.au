@@ -6,6 +6,23 @@
 (function () {
   'use strict';
 
+  const DEFAULT_FLAGS = {
+    // Existing flags
+    betaFeatures: false,
+    newDashboard: false,
+    advancedReports: false,
+
+    // Existing toggles
+    enableRegistration: true,
+    enableGuestCheckout: false,
+
+    // New (admin/data tools)
+    enableInventoryForecast: true,
+    enableDatabaseBackups: true,
+    enableBulkOperations: true,
+    enableDataHistory: true
+  };
+
   // Cache for feature flags
   let featureFlagsCache = null;
   let cacheTimestamp = 0;
@@ -40,6 +57,25 @@
     } finally {
       clearTimeout(t);
     }
+  }
+
+  function coerceBoolean(value) {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'number') {
+      return value === 1;
+    }
+    if (typeof value === 'string') {
+      const v = value.trim().toLowerCase();
+      if (v === 'true' || v === '1' || v === 'yes' || v === 'on') {
+        return true;
+      }
+      if (v === 'false' || v === '0' || v === 'no' || v === 'off') {
+        return false;
+      }
+    }
+    return undefined;
   }
 
   /**
@@ -98,22 +134,37 @@
         } else if (lastErr) {
           console.warn('Failed to fetch settings for feature flags', lastErr);
         }
-        return { betaFeatures: false, newDashboard: false, advancedReports: false };
+        return { ...DEFAULT_FLAGS };
       }
       const nestedFlags = settings.featureFlags || {};
+
+      const normalizedNested = {};
+      for (const [k, v] of Object.entries(nestedFlags || {})) {
+        const b = coerceBoolean(v);
+        if (b !== undefined) {
+          normalizedNested[k] = b;
+        }
+      }
+
       // Merge in legacy top-level toggles for backward compatibility
+      const legacyEnableRegistration =
+        normalizedNested.enableRegistration !== undefined
+          ? normalizedNested.enableRegistration
+          : coerceBoolean(settings.enableRegistration);
+      const legacyEnableGuestCheckout =
+        normalizedNested.enableGuestCheckout !== undefined
+          ? normalizedNested.enableGuestCheckout
+          : coerceBoolean(settings.enableGuestCheckout);
+
       const merged = {
-        betaFeatures: !!nestedFlags.betaFeatures,
-        newDashboard: !!nestedFlags.newDashboard,
-        advancedReports: !!nestedFlags.advancedReports,
+        ...DEFAULT_FLAGS,
+        ...normalizedNested,
         enableRegistration:
-          nestedFlags.enableRegistration !== undefined
-            ? !!nestedFlags.enableRegistration
-            : !!settings.enableRegistration,
+          legacyEnableRegistration !== undefined ? legacyEnableRegistration : DEFAULT_FLAGS.enableRegistration,
         enableGuestCheckout:
-          nestedFlags.enableGuestCheckout !== undefined
-            ? !!nestedFlags.enableGuestCheckout
-            : !!settings.enableGuestCheckout
+          legacyEnableGuestCheckout !== undefined
+            ? legacyEnableGuestCheckout
+            : DEFAULT_FLAGS.enableGuestCheckout
       };
       featureFlagsCache = merged;
       cacheTimestamp = now;
@@ -138,7 +189,7 @@
         /* ignore */
       }
       console.error('Error fetching feature flags:', error);
-      return { betaFeatures: false, newDashboard: false, advancedReports: false };
+      return { ...DEFAULT_FLAGS };
     }
   }
 
@@ -149,7 +200,13 @@
    */
   async function isFeatureEnabled(flagName) {
     const flags = await fetchFeatureFlags();
-    return flags[flagName] === true;
+    if (Object.prototype.hasOwnProperty.call(flags, flagName)) {
+      return flags[flagName] === true;
+    }
+    if (Object.prototype.hasOwnProperty.call(DEFAULT_FLAGS, flagName)) {
+      return DEFAULT_FLAGS[flagName] === true;
+    }
+    return false;
   }
 
   /**

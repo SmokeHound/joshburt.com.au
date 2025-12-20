@@ -312,6 +312,38 @@
                         <p class="text-xs text-gray-500 mt-1">Purchase without account</p>
                       </div>
                     </div>
+
+                    <div class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
+                      <input type="checkbox" id="feature-enable-inventory-forecast" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div>
+                        <label for="feature-enable-inventory-forecast" class="font-bold text-gray-200 cursor-pointer">Enable Inventory Forecast</label>
+                        <p class="text-xs text-gray-500 mt-1">Show Inventory Forecast in Administration</p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
+                      <input type="checkbox" id="feature-enable-database-backups" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div>
+                        <label for="feature-enable-database-backups" class="font-bold text-gray-200 cursor-pointer">Enable Database Backups</label>
+                        <p class="text-xs text-gray-500 mt-1">Show Backups UI in Administration</p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
+                      <input type="checkbox" id="feature-enable-bulk-operations" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div>
+                        <label for="feature-enable-bulk-operations" class="font-bold text-gray-200 cursor-pointer">Enable Bulk Operations</label>
+                        <p class="text-xs text-gray-500 mt-1">Show Bulk Operations in Administration</p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 p-5 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
+                      <input type="checkbox" id="feature-enable-data-history" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div>
+                        <label for="feature-enable-data-history" class="font-bold text-gray-200 cursor-pointer">Enable Data History</label>
+                        <p class="text-xs text-gray-500 mt-1">Show Data History in Administration</p>
+                      </div>
+                    </div>
                   </div>
                   </fieldset>
                 </div>
@@ -855,6 +887,12 @@
           // Feature toggles (migrated under featureFlags)
           enableRegistration: document.getElementById('enable-registration')?.checked || false,
           enableGuestCheckout: document.getElementById('enable-guest-checkout')?.checked || false,
+
+          // Admin / data tools
+          enableInventoryForecast: document.getElementById('feature-enable-inventory-forecast')?.checked ?? true,
+          enableDatabaseBackups: document.getElementById('feature-enable-database-backups')?.checked ?? true,
+          enableBulkOperations: document.getElementById('feature-enable-bulk-operations')?.checked ?? true,
+          enableDataHistory: document.getElementById('feature-enable-data-history')?.checked ?? true,
           
         },
         // Theme schedule
@@ -920,6 +958,12 @@
         document.getElementById('feature-beta-features').checked = !!featureFlags.betaFeatures;
         document.getElementById('feature-new-dashboard').checked = !!featureFlags.newDashboard;
         document.getElementById('feature-advanced-reports').checked = !!featureFlags.advancedReports;
+
+        // Admin / data tools default to enabled when unset
+        document.getElementById('feature-enable-inventory-forecast').checked = featureFlags.enableInventoryForecast !== false;
+        document.getElementById('feature-enable-database-backups').checked = featureFlags.enableDatabaseBackups !== false;
+        document.getElementById('feature-enable-bulk-operations').checked = featureFlags.enableBulkOperations !== false;
+        document.getElementById('feature-enable-data-history').checked = featureFlags.enableDataHistory !== false;
                 // Integrations - Use nullish coalescing to handle null/empty values
                 document.getElementById('smtp-host').value = settings.smtpHost ?? '';
                 document.getElementById('smtp-port').value = settings.smtpPort ?? '';
@@ -1401,6 +1445,11 @@
                 advancedReports: false,
                 enableRegistration: false,
                 enableGuestCheckout: false,
+
+                enableInventoryForecast: false,
+                enableDatabaseBackups: false,
+                enableBulkOperations: false,
+                enableDataHistory: false,
                 
               }
             };

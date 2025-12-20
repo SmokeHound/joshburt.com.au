@@ -14,7 +14,7 @@ Configuration system for enabling/disabling features without code deployment.
 
 ## Overview
 
-**Storage**: Database (`settings` table, JSONB field)
+**Storage**: Database (`settings` table; `featureFlags` setting stored as JSON)
 
 **Access**: Via `/settings.html` (admin only) or `/.netlify/functions/settings`
 
@@ -38,8 +38,12 @@ Configuration system for enabling/disabling features without code deployment.
 | `featureFlags.advancedReports` | boolean | `false` | Advanced reporting system   |
 | `featureFlags.auth0Enabled`    | boolean | `false` | Auth0 OAuth integration     |
 | `maintenanceMode`              | boolean | `false` | Site-wide maintenance mode  |
-| `enableRegistration`           | boolean | `true`  | Allow new user registration |
-| `enableGuestCheckout`          | boolean | `false` | Guest checkout for orders   |
+| `featureFlags.enableRegistration`           | boolean | `true`  | Allow new user registration |
+| `featureFlags.enableGuestCheckout`          | boolean | `false` | Guest checkout for orders   |
+| `featureFlags.enableInventoryForecast`      | boolean | `true`  | Show Inventory Forecast UI  |
+| `featureFlags.enableDatabaseBackups`        | boolean | `true`  | Show Backups UI             |
+| `featureFlags.enableBulkOperations`         | boolean | `true`  | Show Bulk Operations UI     |
+| `featureFlags.enableDataHistory`            | boolean | `true`  | Show Data History UI        |
 | `enable2FA`                    | boolean | `true`  | Two-factor authentication   |
 | `auditAllActions`              | boolean | `true`  | Log all user actions        |
 
