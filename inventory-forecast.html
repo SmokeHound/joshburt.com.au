@@ -171,6 +171,25 @@
 </main>
 
 <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      if (!window.FeatureFlags || typeof window.FeatureFlags.isEnabled !== 'function') return;
+      const enabled = await window.FeatureFlags.isEnabled('enableInventoryForecast');
+      if (enabled) return;
+
+      if (typeof window.showToast === 'function') {
+        window.showToast('Inventory Forecast is currently disabled.', 'warning');
+      } else {
+        alert('Inventory Forecast is currently disabled.');
+      }
+      window.location.href = 'administration.html';
+    } catch (_) {
+      // fail open
+    }
+  });
+</script>
+
+<script>
 const FN_BASE = window.FN_BASE || '/.netlify/functions';
 let forecastChart = null;
 let currentForecasts = [];

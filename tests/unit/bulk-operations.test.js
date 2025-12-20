@@ -179,6 +179,10 @@ describe('Bulk Operations API', () => {
       const response = await handler(event);
 
       expect(response.statusCode).toBe(200);
+      expect(mockQuery).toHaveBeenCalledWith(
+        'SELECT * FROM bulk_operations WHERE id = $1',
+        [1]
+      );
       const data = JSON.parse(response.body);
       expect(data).toHaveProperty('success');
       expect(data).toHaveProperty('processed');

@@ -13,7 +13,7 @@
     advancedReports: false,
 
     // Existing toggles
-    enableRegistration: true,
+    enableRegistration: false,
     enableGuestCheckout: false,
 
     // New (admin/data tools)

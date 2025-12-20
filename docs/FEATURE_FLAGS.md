@@ -14,7 +14,7 @@ Configuration system for enabling/disabling features without code deployment.
 
 ## Overview
 
-**Storage**: Database (`settings` table; `featureFlags` setting stored as JSON)
+**Storage**: Database (`settings` table; `featureFlags` stored as a JSON string in the `featureFlags` setting)
 
 **Access**: Via `/settings.html` (admin only) or `/.netlify/functions/settings`
 
@@ -36,31 +36,37 @@ Configuration system for enabling/disabling features without code deployment.
 | `featureFlags.betaFeatures`    | boolean | `false` | Enable all beta features    |
 | `featureFlags.newDashboard`    | boolean | `false` | New analytics dashboard     |
 | `featureFlags.advancedReports` | boolean | `false` | Advanced reporting system   |
-| `featureFlags.auth0Enabled`    | boolean | `false` | Auth0 OAuth integration     |
+| `featureFlags.auth0Enabled`    | boolean | `false` | (Deprecated) OAuth is env-driven via `/.netlify/functions/public-config` |
 | `maintenanceMode`              | boolean | `false` | Site-wide maintenance mode  |
-| `featureFlags.enableRegistration`           | boolean | `true`  | Allow new user registration |
+| `featureFlags.enableRegistration`           | boolean | `false` | Allow new user registration |
 | `featureFlags.enableGuestCheckout`          | boolean | `false` | Guest checkout for orders   |
 | `featureFlags.enableInventoryForecast`      | boolean | `true`  | Show Inventory Forecast UI  |
 | `featureFlags.enableDatabaseBackups`        | boolean | `true`  | Show Backups UI             |
 | `featureFlags.enableBulkOperations`         | boolean | `true`  | Show Bulk Operations UI     |
 | `featureFlags.enableDataHistory`            | boolean | `true`  | Show Data History UI        |
-| `enable2FA`                    | boolean | `true`  | Two-factor authentication   |
-| `auditAllActions`              | boolean | `true`  | Log all user actions        |
+| `enable2FA`                    | boolean | `false` | Two-factor authentication   |
+| `auditAllActions`              | boolean | `false` | Log all user actions        |
 
 ### Database Structure
 
+Settings are stored as rows in the `settings` table.
+
+- `featureFlags` is a setting row with `data_type = 'json'`
+- the `value` column contains a JSON string
+
+Example `featureFlags` value:
+
 ```json
 {
-  "maintenanceMode": false,
-  "enableRegistration": true,
-  "enable2FA": true,
-  "auditAllActions": true,
-  "featureFlags": {
-    "betaFeatures": false,
-    "newDashboard": false,
-    "advancedReports": false,
-    "auth0Enabled": false
-  }
+  "betaFeatures": false,
+  "newDashboard": false,
+  "advancedReports": false,
+  "enableRegistration": false,
+  "enableGuestCheckout": false,
+  "enableInventoryForecast": true,
+  "enableDatabaseBackups": true,
+  "enableBulkOperations": true,
+  "enableDataHistory": true
 }
 ```
 
@@ -70,48 +76,15 @@ Configuration system for enabling/disabling features without code deployment.
 
 ### Backend (Get Flags)
 
-**Endpoint**: `GET /.netlify/functions/settings`
+**Endpoint**: `GET /.netlify/functions/settings` (admin-only)
 
-```javascript
-// netlify/functions/settings.js
-const { pool } = require('../../config/database');
-
-exports.handler = async event => {
-  const result = await pool.query('SELECT data FROM settings WHERE id = 1');
-  const settings = result.rows[0]?.data || {};
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(settings)
-  };
-};
-```
+Implementation is row-based: the function reads `settings` rows and returns a flattened object, including `featureFlags` parsed into an object.
 
 ### Backend (Update Flags)
 
-**Endpoint**: `PUT /.netlify/functions/settings`
+**Endpoint**: `PUT /.netlify/functions/settings` (admin-only)
 
-**Auth**: Admin only
-
-```javascript
-exports.handler = async event => {
-  await requirePermission(event, 'settings', 'update');
-
-  const updates = JSON.parse(event.body);
-
-  await pool.query('UPDATE settings SET data = $1, updated_at = NOW() WHERE id = 1', [
-    JSON.stringify(updates)
-  ]);
-
-  // Log audit event
-  await logAudit(user.id, 'settings:update', JSON.stringify(updates));
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: 'Settings updated' })
-  };
-};
-```
+Send `featureFlags` as an object; it is stored back to the `featureFlags` row as JSON.
 
 ### Frontend (Check Flag)
 
@@ -138,25 +111,7 @@ if (window.APP_SETTINGS.featureFlags?.newDashboard) {
 
 **Endpoint**: `GET /.netlify/functions/public-config` (no auth required)
 
-Returns public flags only (e.g., `auth0Enabled`, `enableRegistration`):
-
-```javascript
-// netlify/functions/public-config.js
-exports.handler = async event => {
-  const result = await pool.query('SELECT data FROM settings WHERE id = 1');
-  const settings = result.rows[0]?.data || {};
-
-  // Return only public flags
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      auth0Enabled: settings.featureFlags?.auth0Enabled || false,
-      registrationEnabled: settings.enableRegistration || true,
-      maintenanceMode: settings.maintenanceMode || false
-    })
-  };
-};
-```
+`public-config` is **environment-driven** and returns only client-safe auth configuration (e.g. whether auth is disabled, and Auth0 config if set). It does not read feature flags from the database.
 
 ---
 
@@ -321,13 +276,12 @@ Document each flag in code:
 
 ### 1. Add to Settings
 
-```javascript
-// Update settings via admin UI or database
-UPDATE settings SET data = jsonb_set(
-  data,
-  '{featureFlags,myNewFeature}',
-  'false'
-) WHERE id = 1;
+If you need to do it in SQL, update the `featureFlags` row:
+
+```sql
+UPDATE settings
+SET value = jsonb_set(value::jsonb, '{myNewFeature}', 'false'::jsonb)::text
+WHERE key = 'featureFlags';
 ```
 
 ### 2. Document Flag

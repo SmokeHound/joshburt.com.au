@@ -13,20 +13,95 @@ const { logAudit } = require('../../utils/audit');
  * Parse CSV data
  */
 function parseCSV(csvText) {
-  const lines = csvText.split('\n').filter(line => line.trim());
-  if (lines.length === 0) return { headers: [], rows: [] };
+  if (!csvText || typeof csvText !== 'string') return { headers: [], rows: [] };
 
-  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-  const rows = lines.slice(1).map(line => {
-    const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-    const row = {};
+  // Minimal CSV parser with quotes + CRLF support.
+  const rows = [];
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+
+  const pushField = () => {
+    row.push(field);
+    field = '';
+  };
+
+  const pushRow = () => {
+    // Skip empty trailing row
+    if (row.length === 1 && row[0] === '') {
+      row = [];
+      return;
+    }
+    rows.push(row);
+    row = [];
+  };
+
+  for (let i = 0; i < csvText.length; i++) {
+    const ch = csvText[i];
+    const next = i + 1 < csvText.length ? csvText[i + 1] : '';
+
+    if (inQuotes) {
+      if (ch === '"' && next === '"') {
+        field += '"';
+        i++;
+      } else if (ch === '"') {
+        inQuotes = false;
+      } else {
+        field += ch;
+      }
+      continue;
+    }
+
+    if (ch === '"') {
+      inQuotes = true;
+      continue;
+    }
+
+    if (ch === ',') {
+      pushField();
+      continue;
+    }
+
+    if (ch === '\n') {
+      pushField();
+      pushRow();
+      continue;
+    }
+
+    if (ch === '\r') {
+      // Handle CRLF
+      if (next === '\n') {
+        continue;
+      }
+      pushField();
+      pushRow();
+      continue;
+    }
+
+    field += ch;
+  }
+
+  pushField();
+  pushRow();
+
+  if (rows.length === 0) return { headers: [], rows: [] };
+
+  const headers = rows[0].map(h => String(h || '').trim().replace(/^"|"$/g, ''));
+  const objects = [];
+
+  for (let r = 1; r < rows.length; r++) {
+    const values = rows[r];
+    if (!values || values.every(v => String(v ?? '').trim() === '')) continue;
+    const obj = {};
     headers.forEach((header, i) => {
-      row[header] = values[i] || null;
+      if (!header) return;
+      const raw = values[i] !== undefined ? String(values[i]).trim() : '';
+      obj[header] = raw === '' ? null : raw;
     });
-    return row;
-  });
+    objects.push(obj);
+  }
 
-  return { headers, rows };
+  return { headers, rows: objects };
 }
 
 /**
@@ -203,7 +278,14 @@ async function executeOperation(event, pool) {
   const { user, response: authResponse } = await requirePermission(event, 'bulk_operations', 'update');
   if (authResponse) return authResponse;
 
-  const operationId = event.path.split('/').pop();
+  const match = (event.path || '').match(/\/bulk-operations\/(\d+)\/execute$/);
+  const operationId = match ? parseInt(match[1], 10) : NaN;
+  if (!Number.isFinite(operationId)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Invalid operation id' })
+    };
+  }
   const { data } = JSON.parse(event.body || '{}');
 
   // Get operation details
@@ -219,10 +301,10 @@ async function executeOperation(event, pool) {
   const operation = opResult.rows[0];
 
   // Update status to processing
-  await pool.query('UPDATE bulk_operations SET status = $1 WHERE id = $2', [
-    'processing',
-    operationId
-  ]);
+  await pool.query(
+    'UPDATE bulk_operations SET status = $1, started_at = NOW() WHERE id = $2',
+    ['processing', operationId]
+  );
 
   // Parse data
   let rows = [];
@@ -237,18 +319,55 @@ async function executeOperation(event, pool) {
   let errorCount = 0;
   const errorLog = [];
 
+  // Allowlist columns from information_schema to prevent header-based SQL injection.
+  const schemaResult = await pool.query(
+    `
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = $1
+    `,
+    [operation.target_table]
+  );
+  const allowedColumns = new Set(schemaResult.rows.map(r => r.column_name));
+  // Never allow inserting id/system columns.
+  allowedColumns.delete('id');
+  allowedColumns.delete('created_at');
+  allowedColumns.delete('updated_at');
+
   // Execute import
   for (let i = 0; i < rows.length; i++) {
     try {
       const row = rows[i];
-      const columns = Object.keys(row).filter(k => row[k] !== null);
+      const columns = Object.keys(row)
+        .map(k => String(k).trim())
+        .filter(k => /^[a-z_][a-z0-9_]*$/i.test(k))
+        .filter(k => allowedColumns.has(k))
+        .filter(k => row[k] !== null);
+
+      if (columns.length === 0) {
+        throw new Error('No valid columns found for row');
+      }
+
       const values = columns.map(k => row[k]);
       const placeholders = columns.map((_, idx) => `$${idx + 1}`);
 
-      const query = `
-        INSERT INTO ${operation.target_table} (${columns.join(', ')})
-        VALUES (${placeholders.join(', ')})
-      `;
+      const canUpsertByCode = ['products', 'consumables', 'filters'].includes(operation.target_table);
+      const hasCode = columns.includes('code');
+
+      let query = `INSERT INTO ${operation.target_table} (${columns.join(', ')}) VALUES (${placeholders.join(', ')})`;
+
+      if (canUpsertByCode && hasCode) {
+        const updateColumns = columns.filter(c => c !== 'code');
+        if (updateColumns.length > 0) {
+          const setClause = updateColumns
+            .map(c => `${c} = EXCLUDED.${c}`)
+            .concat(allowedColumns.has('updated_at') ? ['updated_at = CURRENT_TIMESTAMP'] : [])
+            .join(', ');
+          query += ` ON CONFLICT (code) DO UPDATE SET ${setClause}`;
+        } else {
+          query += ' ON CONFLICT (code) DO NOTHING';
+        }
+      }
 
       await pool.query(query, values);
       successCount++;

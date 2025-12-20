@@ -6,6 +6,7 @@
   <title>Bulk Operations - joshburt.com.au</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/feature-flags.js" defer></script>
 </head>
 <body class="bg-gray-900 text-gray-100">
   <div id="main-nav"></div>
@@ -64,6 +65,25 @@
       </section>
     </div>
   </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (!window.FeatureFlags || typeof window.FeatureFlags.isEnabled !== 'function') return;
+        const enabled = await window.FeatureFlags.isEnabled('enableBulkOperations');
+        if (enabled) return;
+
+        if (typeof window.showToast === 'function') {
+          window.showToast('Bulk Operations is currently disabled.', 'warning');
+        } else {
+          alert('Bulk Operations is currently disabled.');
+        }
+        window.location.href = 'administration.html';
+      } catch (_) {
+        // fail open
+      }
+    });
+  </script>
 
   <!-- Import Modal -->
   <div id="import-modal" class="modal hidden">

@@ -755,7 +755,13 @@ async function createDefaultSettings() {
         newDashboard: false,
         advancedReports: false,
         enableRegistration: false,
-        enableGuestCheckout: false
+        enableGuestCheckout: false,
+
+        // Admin / data tools
+        enableInventoryForecast: true,
+        enableDatabaseBackups: true,
+        enableBulkOperations: true,
+        enableDataHistory: true
       }),
       category: 'features',
       data_type: 'json',
