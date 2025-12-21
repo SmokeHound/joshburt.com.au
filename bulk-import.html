@@ -86,8 +86,8 @@
   </script>
 
   <!-- Import Modal -->
-  <div id="import-modal" class="modal hidden">
-    <div class="modal-content max-w-4xl">
+  <div id="import-modal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="modal-content card p-6 w-full max-w-4xl">
       <h2 class="text-2xl font-bold mb-4">Import Data</h2>
       
       <form id="import-form">
@@ -162,8 +162,8 @@ Product 2,PROD002,oil,50</pre>
   </div>
 
   <!-- Export Modal -->
-  <div id="export-modal" class="modal hidden">
-    <div class="modal-content max-w-2xl">
+  <div id="export-modal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="modal-content card p-6 w-full max-w-2xl">
       <h2 class="text-2xl font-bold mb-4">Export Data</h2>
       
       <form id="export-form">
@@ -202,8 +202,8 @@ Product 2,PROD002,oil,50</pre>
   </div>
 
   <!-- Operation Details Modal -->
-  <div id="operation-details-modal" class="modal hidden">
-    <div class="modal-content max-w-3xl">
+  <div id="operation-details-modal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="modal-content card p-6 w-full max-w-3xl">
       <h2 class="text-2xl font-bold mb-4">Operation Details</h2>
       <div id="operation-details-content" class="space-y-4"></div>
       <div class="flex gap-4 mt-6">
@@ -547,8 +547,10 @@ Product 2,PROD002,oil,50</pre>
         // focus first focusable element
         const focusable = modal.querySelector('select, input, button, textarea');
         if (focusable) focusable.focus();
-        // attach backdrop click to close
-        backdrop.onclick = () => hideModal(id);
+        // attach outside-click (modal backdrop area) to close
+        modal.onclick = (e) => {
+          if (e.target === modal) hideModal(id);
+        };
         // esc to close
         document.addEventListener('keydown', escHandler);
       }
@@ -557,6 +559,7 @@ Product 2,PROD002,oil,50</pre>
         const modal = document.getElementById(id);
         const backdrop = document.getElementById('modal-backdrop');
         if (modal) modal.classList.add('hidden');
+        if (modal) modal.onclick = null;
         if (backdrop) {
           backdrop.classList.add('hidden');
           backdrop.classList.remove('block');
