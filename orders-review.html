@@ -51,8 +51,8 @@
             modal.className = 'modal-overlay';
             modal.innerHTML = `
               <div class="modal-content modal-${config.size}">
-                ${config.title ? `<div class="modal-header"><h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>${config.showClose ? '<button class="modal-close" data-action="close" aria-label="Close">&times;</button>' : ''}</div>` : ''}
-                <div class="modal-body">${config.content}</div>
+                ${config.title ? `<div class="ui-modal-header"><h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>${config.showClose ? '<button class="modal-close" data-action="close" aria-label="Close">&times;</button>' : ''}</div>` : ''}
+                <div class="ui-modal-body">${config.content}</div>
               </div>`;
             document.body.appendChild(modal);
             const close = () => { modal.remove(); if (config.onClose) config.onClose(); };
@@ -70,7 +70,7 @@
             return new Promise((resolve) => {
               const modal = document.createElement('div');
               modal.className = 'modal-overlay';
-              modal.innerHTML = `<div class="modal-content modal-sm"><div class="modal-header"><h3 class="text-xl font-semibold text-gray-100">${config.title}</h3><button class="modal-close" data-action="cancel">&times;</button></div><div class="modal-body text-center"><p class="text-gray-300">${config.message}</p></div><div class="modal-footer"><button class="btn-neon-green px-4 py-2 rounded" data-action="cancel">${config.cancelText}</button><button class="btn-neon-blue px-4 py-2 rounded" data-action="confirm">${config.confirmText}</button></div></div>`;
+              modal.innerHTML = `<div class="modal-content modal-sm"><div class="ui-modal-header"><h3 class="text-xl font-semibold text-gray-100">${config.title}</h3><button class="modal-close" data-action="cancel">&times;</button></div><div class="ui-modal-body text-center"><p class="text-gray-300">${config.message}</p></div><div class="ui-modal-footer"><button class="ui-btn ui-btn-secondary px-4 py-2 rounded" data-action="cancel">${config.cancelText}</button><button class="ui-btn ui-btn-primary px-4 py-2 rounded" data-action="confirm">${config.confirmText}</button></div></div>`;
               document.body.appendChild(modal);
               const handleAction = (action) => { modal.remove(); resolve(action === 'confirm'); };
               modal.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', (e) => handleAction(e.target.dataset.action)));
@@ -83,7 +83,7 @@
             return new Promise((resolve) => {
               const modal = document.createElement('div');
               modal.className = 'modal-overlay';
-              modal.innerHTML = `<div class="modal-content modal-sm"><div class="modal-header"><h3 class="text-xl font-semibold text-gray-100">${config.title}</h3><button class="modal-close" data-action="ok">&times;</button></div><div class="modal-body text-center"><p class="text-gray-300">${config.message}</p></div><div class="modal-footer"><button class="btn-neon-blue px-4 py-2 rounded" data-action="ok">${config.okText}</button></div></div>`;
+              modal.innerHTML = `<div class="modal-content modal-sm"><div class="ui-modal-header"><h3 class="text-xl font-semibold text-gray-100">${config.title}</h3><button class="modal-close" data-action="ok">&times;</button></div><div class="ui-modal-body text-center"><p class="text-gray-300">${config.message}</p></div><div class="ui-modal-footer"><button class="ui-btn ui-btn-primary px-4 py-2 rounded" data-action="ok">${config.okText}</button></div></div>`;
               document.body.appendChild(modal);
               const handleClose = () => { modal.remove(); resolve(); };
               modal.querySelectorAll('[data-action="ok"]').forEach(btn => btn.addEventListener('click', handleClose));
@@ -138,14 +138,14 @@
             </script>
             <!-- Main Content -->
             <main id="main-content" class="flex-1 p-4 md:p-6 ml-64 md:ml-0" role="main">
-                <header class="page-header card border mb-4" role="banner">
+                <header class="page-header ui-card border mb-4" role="banner">
                     <div>
                         <h2 class="text-2xl font-bold mb-1 text-gray-100">Workshop Orders Review</h2>
                         <p class="text-gray-400 text-xs">Review, filter and manage submitted workshop stock orders.</p>
                     </div>
                 </header>
                 <section>
-                    <div class="card widget-primary rounded-lg shadow-md p-6" id="orders-container">
+                    <div class="card ui-card ui-ui-card-primary rounded-lg shadow-md p-6" id="orders-container">
                         <div id="orders-table">
                             <div class="text-center text-gray-500 dark:text-gray-400">Loading orders...</div>
                         </div>

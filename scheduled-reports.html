@@ -19,18 +19,18 @@
 <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
 
 <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
-  <header class="page-header card border flex justify-between items-center">
+  <header class="page-header ui-card border flex justify-between items-center">
     <div>
       <h1 class="text-2xl font-bold">Scheduled Reports</h1>
       <p class="text-sm text-gray-400 mt-1">Automate report generation and delivery</p>
     </div>
-    <button id="create-report-btn" class="btn-neon-green px-4 py-2 rounded-lg">
+    <button id="create-report-btn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg">
       + Create Report
     </button>
   </header>
 
   <!-- Reports List -->
-  <section class="card p-6">
+  <section class="ui-card p-6">
     <h2 class="text-lg font-semibold mb-4">Active Reports</h2>
     <div id="reports-list" class="space-y-4">
       <div class="text-center text-gray-400 py-8">Loading...</div>
@@ -38,7 +38,7 @@
   </section>
 
   <!-- Report History -->
-  <section class="card p-6">
+  <section class="ui-card p-6">
     <h2 class="text-lg font-semibold mb-4">Recent Executions</h2>
     <div class="overflow-x-auto">
       <table class="w-full text-left">
@@ -64,7 +64,7 @@
 
 <!-- Create/Edit Report Modal -->
 <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[9998]">
-  <div class="card p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-[9999]">
+  <div class="ui-card p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-[9999]">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold" id="modal-title">Create Scheduled Report</h2>
       <button id="close-modal" class="text-gray-400 hover:text-white">×</button>
@@ -168,7 +168,7 @@
     }
 
     container.innerHTML = reports.map(report => `
-      <div class="card p-4 border border-gray-700">
+      <div class="ui-card p-4 border border-gray-700">
         <div class="flex justify-between items-start">
           <div class="flex-1">
             <div class="flex items-center gap-3">

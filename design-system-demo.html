@@ -22,7 +22,7 @@
       <div class="max-w-6xl mx-auto">
         
         <!-- Page Header Demo -->
-        <header class="page-header card border">
+        <header class="page-header ui-card border">
           <h1 class="text-3xl font-bold">Design System Demo</h1>
           <p class="subtitle">Interactive examples of all available utilities and components</p>
         </header>
@@ -38,11 +38,11 @@
         <!-- Page Header Examples -->
         <section class="mb-8">
           <h2 class="text-2xl font-bold mb-4">Page Headers</h2>
-          <div class="card widget-primary rounded-lg shadow-md p-6 mb-4">
+          <div class="card ui-card ui-ui-card-primary rounded-lg shadow-md p-6 mb-4">
             <h3 class="text-xl font-semibold mb-2">Standard Page Header</h3>
             <p class="muted mb-4">Use <code>.page-header</code> class for sticky headers</p>
             <div class="bg-gray-900 p-4 rounded">
-              <code class="text-green-400">&lt;header class="page-header card border"&gt;<br>&nbsp;&nbsp;&lt;h1&gt;Page Title&lt;/h1&gt;<br>&nbsp;&nbsp;&lt;p class="subtitle"&gt;Optional subtitle&lt;/p&gt;<br>&lt;/header&gt;</code>
+              <code class="text-green-400">&lt;header class="page-header ui-card border"&gt;<br>&nbsp;&nbsp;&lt;h1&gt;Page Title&lt;/h1&gt;<br>&nbsp;&nbsp;&lt;p class="subtitle"&gt;Optional subtitle&lt;/p&gt;<br>&lt;/header&gt;</code>
             </div>
           </div>
         </section>
@@ -52,19 +52,19 @@
           <h2 class="text-2xl font-bold mb-4">Text Utilities</h2>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="card widget-secondary rounded-lg shadow-md p-6">
+            <div class="card ui-card ui-ui-card-secondary rounded-lg shadow-md p-6">
               <h3 class="text-xl font-semibold mb-2">Subtitle</h3>
               <p class="subtitle mb-4">This is a subtitle example - small, gray text for secondary headings</p>
               <code class="text-xs">.subtitle</code>
             </div>
 
-            <div class="card widget-accent rounded-lg shadow-md p-6">
+            <div class="card ui-card ui-ui-card-accent rounded-lg shadow-md p-6">
               <h3 class="text-xl font-semibold mb-2">Muted Text</h3>
               <p class="muted mb-4">This is muted text - for less emphasized information</p>
               <code class="text-xs">.muted</code>
             </div>
 
-            <div class="card rounded-lg shadow-md p-6">
+            <div class="ui-card rounded-lg shadow-md p-6">
               <h3 class="text-xl font-semibold mb-2">Description</h3>
               <p class="description">This is description text with proper line-height and spacing for longer explanatory content.</p>
               <code class="text-xs">.description</code>
@@ -78,19 +78,19 @@
           <p class="description">Use widget variants to visually separate different types of content</p>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="card widget-primary rounded-lg shadow-md p-6">
+            <div class="card ui-card ui-ui-card-primary rounded-lg shadow-md p-6">
               <h3 class="text-xl font-semibold mb-2">Primary Widget</h3>
               <p class="subtitle mb-2">Blue-tinted background</p>
               <code class="text-xs">.card .widget-primary</code>
             </div>
 
-            <div class="card widget-secondary rounded-lg shadow-md p-6">
+            <div class="card ui-card ui-ui-card-secondary rounded-lg shadow-md p-6">
               <h3 class="text-xl font-semibold mb-2">Secondary Widget</h3>
               <p class="subtitle mb-2">Green-tinted background</p>
               <code class="text-xs">.card .widget-secondary</code>
             </div>
 
-            <div class="card widget-accent rounded-lg shadow-md p-6">
+            <div class="card ui-card ui-ui-card-accent rounded-lg shadow-md p-6">
               <h3 class="text-xl font-semibold mb-2">Accent Widget</h3>
               <p class="subtitle mb-2">Purple-tinted background</p>
               <code class="text-xs">.card .widget-accent</code>
@@ -101,12 +101,12 @@
         <!-- Buttons -->
         <section class="mb-8">
           <h2 class="text-2xl font-bold mb-4">Button Styles</h2>
-          <div class="card rounded-lg shadow-md p-6">
+          <div class="ui-card rounded-lg shadow-md p-6">
             <div class="flex flex-wrap gap-4 mb-4">
-              <button class="btn-neon-blue px-4 py-2 rounded">Neon Blue</button>
-              <button class="btn-neon-green px-4 py-2 rounded">Neon Green</button>
-              <button class="btn-neon-purple px-4 py-2 rounded">Neon Purple</button>
-              <button class="btn-neon-pink px-4 py-2 rounded">Neon Pink</button>
+              <button class="ui-btn ui-btn-primary px-4 py-2 rounded">Neon Blue</button>
+              <button class="ui-btn ui-btn-secondary px-4 py-2 rounded">Neon Green</button>
+              <button class="ui-btn ui-btn-accent px-4 py-2 rounded">Neon Purple</button>
+              <button class="ui-btn ui-btn-danger px-4 py-2 rounded">Neon Pink</button>
             </div>
             <p class="muted">All buttons have hover effects and neon glow shadows</p>
           </div>
@@ -115,22 +115,22 @@
         <!-- Error Tracker Demo -->
         <section class="mb-8">
           <h2 class="text-2xl font-bold mb-4">Error Tracking</h2>
-          <div class="card widget-primary rounded-lg shadow-md p-6">
+          <div class="card ui-card ui-ui-card-primary rounded-lg shadow-md p-6">
             <h3 class="text-xl font-semibold mb-2">ErrorTracker Utilities</h3>
             <p class="description">
               Global error tracking is automatically enabled. Use these utilities for debugging:
             </p>
             <div class="flex flex-wrap gap-3 mb-4">
-              <button onclick="ErrorTracker.getErrorLog().length > 0 ? console.table(ErrorTracker.getErrorLog()) : console.log('No errors logged')" class="btn-neon-blue px-4 py-2 rounded text-sm">
+              <button onclick="ErrorTracker.getErrorLog().length > 0 ? console.table(ErrorTracker.getErrorLog()) : console.log('No errors logged')" class="ui-btn ui-btn-primary px-4 py-2 rounded text-sm">
                 View Error Log (Console)
               </button>
-              <button onclick="ErrorTracker.exportErrorLog()" class="btn-neon-green px-4 py-2 rounded text-sm">
+              <button onclick="ErrorTracker.exportErrorLog()" class="ui-btn ui-btn-secondary px-4 py-2 rounded text-sm">
                 Export Errors (JSON)
               </button>
-              <button onclick="ErrorTracker.clearErrorLog(); alert('Error log cleared')" class="btn-neon-pink px-4 py-2 rounded text-sm">
+              <button onclick="ErrorTracker.clearErrorLog(); alert('Error log cleared')" class="ui-btn ui-btn-danger px-4 py-2 rounded text-sm">
                 Clear Error Log
               </button>
-              <button onclick="throw new Error('Test error for demonstration')" class="btn-neon-purple px-4 py-2 rounded text-sm">
+              <button onclick="throw new Error('Test error for demonstration')" class="ui-btn ui-btn-accent px-4 py-2 rounded text-sm">
                 Trigger Test Error
               </button>
             </div>
@@ -141,7 +141,7 @@
         <!-- Accessibility Features -->
         <section class="mb-8">
           <h2 class="text-2xl font-bold mb-4">Accessibility Features</h2>
-          <div class="card widget-secondary rounded-lg shadow-md p-6">
+          <div class="card ui-card ui-ui-card-secondary rounded-lg shadow-md p-6">
             <h3 class="text-xl font-semibold mb-2">Built-in A11y</h3>
             <ul class="space-y-2 ml-6 list-disc">
               <li><strong>Skip Link:</strong> Press Tab from top of page to reveal skip-to-content link</li>
@@ -156,7 +156,7 @@
         <!-- Performance -->
         <section class="mb-8">
           <h2 class="text-2xl font-bold mb-4">Performance Features</h2>
-          <div class="card widget-accent rounded-lg shadow-md p-6">
+          <div class="card ui-card ui-ui-card-accent rounded-lg shadow-md p-6">
             <h3 class="text-xl font-semibold mb-2">Optimizations</h3>
             <ul class="space-y-2 ml-6 list-disc">
               <li><strong>Preload:</strong> Critical CSS preloaded for faster initial render</li>
@@ -170,14 +170,14 @@
 
         <!-- Documentation Link -->
         <section class="mb-8">
-          <div class="card rounded-lg shadow-md p-6 text-center">
+          <div class="ui-card rounded-lg shadow-md p-6 text-center">
             <h3 class="text-xl font-semibold mb-2">Full Documentation</h3>
             <p class="description">
               For complete documentation and implementation details, see README.md and IMPROVEMENTS.md
             </p>
             <div class="flex justify-center gap-4 mt-4">
-              <a href="README.md" class="btn-neon-blue px-6 py-2 rounded inline-block">View README</a>
-              <a href="IMPROVEMENTS.md" class="btn-neon-green px-6 py-2 rounded inline-block">View Improvements</a>
+              <a href="README.md" class="ui-btn ui-btn-primary px-6 py-2 rounded inline-block">View README</a>
+              <a href="IMPROVEMENTS.md" class="ui-btn ui-btn-secondary px-6 py-2 rounded inline-block">View Improvements</a>
             </div>
           </div>
         </section>

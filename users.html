@@ -143,37 +143,37 @@
                 <!-- Main Content -->
                 <main id="main-content" class="flex-1 p-4 md:p-6 ml-64 md:ml-0" role="main">
                 <!-- Header Card -->
-                <header class="page-header card border" role="banner">
+                <header class="page-header ui-card border" role="banner">
                     <div class="flex items-center justify-between gap-4">
                         <div>
                             <h1 class="text-3xl font-bold text-white">User Management</h1>
-                            <p class="text-lg mt-2 nav-link-muted">Manage accounts, roles and access</p>
+                            <p class="text-lg mt-2 ui-link ui-link-nav-muted">Manage accounts, roles and access</p>
                         </div>
                         <div class="flex items-center gap-3">
-                            <button id="open-add-user" class="btn-neon-green px-4 py-2 rounded">Add User</button>
-                            <button id="refresh-users" class="btn-neon-blue px-4 py-2 rounded">Refresh</button>
+                            <button id="open-add-user" class="ui-btn ui-btn-secondary px-4 py-2 rounded">Add User</button>
+                            <button id="refresh-users" class="ui-btn ui-btn-primary px-4 py-2 rounded">Refresh</button>
                         </div>
                     </div>
                 </header>
 
         <!-- Stats Dashboard -->
         <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="stat-card rounded-lg p-6">
+            <div class="stat-ui-card rounded-lg p-6">
                 <div class="text-gray-400 text-sm mb-2">Total Users</div>
                 <div class="stat-value" id="stat-total">0</div>
                 <div class="text-xs text-gray-500 mt-2">All registered users</div>
             </div>
-            <div class="stat-card rounded-lg p-6">
+            <div class="stat-ui-card rounded-lg p-6">
                 <div class="text-gray-400 text-sm mb-2">Active Users</div>
                 <div class="stat-value" id="stat-active">0</div>
                 <div class="text-xs text-gray-500 mt-2">Currently enabled</div>
             </div>
-            <div class="stat-card rounded-lg p-6">
+            <div class="stat-ui-card rounded-lg p-6">
                 <div class="text-gray-400 text-sm mb-2">Admins</div>
                 <div class="stat-value" id="stat-admins">0</div>
                 <div class="text-xs text-gray-500 mt-2">Admin & Manager roles</div>
             </div>
-            <div class="stat-card rounded-lg p-6">
+            <div class="stat-ui-card rounded-lg p-6">
                 <div class="text-gray-400 text-sm mb-2">Verified Emails</div>
                 <div class="stat-value" id="stat-verified">0</div>
                 <div class="text-xs text-gray-500 mt-2">Email confirmed</div>
@@ -237,10 +237,10 @@
             <!-- Deep-link banner (shown when focusing a specific userId) -->
             <div id="user-deeplink-banner" class="hidden mb-4 p-3 rounded border border-gray-700 bg-gray-900 text-gray-200 flex items-center justify-between">
                 <div><span id="deeplink-text"></span></div>
-                <button id="deeplink-clear" class="btn-neon-blue px-3 py-1 rounded">Clear</button>
+                <button id="deeplink-clear" class="ui-btn ui-btn-primary px-3 py-1 rounded">Clear</button>
             </div>
             <!-- User Table Card (neon theme, .card + .widget-primary) -->
-            <div class="card widget-primary rounded-lg shadow-md p-6">
+            <div class="card ui-card ui-ui-card-primary rounded-lg shadow-md p-6">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left mb-6" role="table" aria-label="User accounts table">
                         <thead>
@@ -273,8 +273,8 @@
                         </select>
                     </div>
                     <div class="flex gap-4">
-                        <button type="submit" class="btn-neon-blue flex-1 p-3 rounded-lg">Add User</button>
-                        <button type="button" id="cancel-edit" class="btn-neon-green px-6 p-3 rounded-lg hidden">Cancel</button>
+                        <button type="submit" class="ui-btn ui-btn-primary flex-1 p-3 rounded-lg">Add User</button>
+                        <button type="button" id="cancel-edit" class="ui-btn ui-btn-secondary px-6 p-3 rounded-lg hidden">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -282,12 +282,12 @@
         <!-- Bulk Operations -->
         <!-- Bulk Operations (neon theme, .card + .widget-secondary) -->
         <section class="mt-6" aria-label="Bulk operations">
-            <div class="card widget-secondary rounded-lg shadow-md p-6">
+            <div class="card ui-card ui-ui-card-secondary rounded-lg shadow-md p-6">
                 <h3 class="text-xl font-semibold mb-4 text-gray-100">Bulk Operations</h3>
                 <div class="flex flex-wrap gap-4">
-                    <button id="export-users-csv" class="btn-neon-green px-4 py-2 rounded">Export Users (CSV)</button>
-                    <button id="export-users-excel" class="btn-neon-blue px-4 py-2 rounded">Export Users (Excel)</button>
-                    <label for="import-users-csv" class="btn-neon-blue px-4 py-2 rounded cursor-pointer">
+                    <button id="export-users-csv" class="ui-btn ui-btn-secondary px-4 py-2 rounded">Export Users (CSV)</button>
+                    <button id="export-users-excel" class="ui-btn ui-btn-primary px-4 py-2 rounded">Export Users (Excel)</button>
+                    <label for="import-users-csv" class="ui-btn ui-btn-primary px-4 py-2 rounded cursor-pointer">
                         Import Users (CSV)
                         <input type="file" id="import-users-csv" accept=".csv" class="hidden">
                     </label>
@@ -302,13 +302,13 @@
     </div>
 
     <!-- Edit User Modal -->
-    <div id="edit-user-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="edit-user-title">
+    <div id="edit-user-modal" class="ui-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="edit-user-title">
       <div class="modal-content">
-          <div class="modal-header">
+          <div class="ui-modal-header">
           <h3 id="edit-user-title" class="text-xl font-semibold text-gray-100">Edit User</h3>
           <button class="modal-close" id="close-modal" aria-label="Close modal">&times;</button>
         </div>
-        <div class="modal-body">
+        <div class="ui-modal-body">
                     <form id="edit-user-form">
                         <div class="space-y-4">
                             <div>
@@ -359,8 +359,8 @@
                             </div>
                         </div>
                         <div class="flex gap-3 mt-6">
-                            <button type="submit" id="edit-submit" class="btn-neon-blue flex-1 p-3 rounded-lg">Update User</button>
-                            <button type="button" id="cancel-modal" class="btn-neon-green px-6 p-3 rounded-lg">Cancel</button>
+                            <button type="submit" id="edit-submit" class="ui-btn ui-btn-primary flex-1 p-3 rounded-lg">Update User</button>
+                            <button type="button" id="cancel-modal" class="ui-btn ui-btn-secondary px-6 p-3 rounded-lg">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -528,7 +528,7 @@ async function loadUsers(page = 1) {
                     msg.textContent = message || 'Please sign in to view and manage users.';
                     const btn = document.createElement('button');
                     btn.id = 'go-to-login';
-                    btn.className = 'btn-neon-blue px-4 py-2 rounded';
+                    btn.className = 'ui-btn ui-btn-primary px-4 py-2 rounded';
                     btn.textContent = 'Sign in';
                     btn.addEventListener('click', () => {
                         const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);

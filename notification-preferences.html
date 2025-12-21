@@ -16,13 +16,13 @@
   <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
 
   <main id="main-content" class="flex-1 p-4 md:p-6 space-y-6" role="main">
-    <header class="page-header card border">
+    <header class="page-header ui-card border">
       <h1 class="text-2xl font-bold">Notification Preferences</h1>
       <p class="text-sm text-gray-400 mt-1">Manage how you receive notifications</p>
     </header>
 
     <!-- Preferences Form -->
-    <div class="card p-6">
+    <div class="ui-card p-6">
       <form id="preferences-form" class="space-y-6">
         <!-- Email Notifications -->
         <div>
@@ -110,7 +110,7 @@
     </div>
 
     <!-- Information Card -->
-    <div class="card p-6">
+    <div class="ui-card p-6">
       <h3 class="text-lg font-semibold mb-3">About Notifications</h3>
       <div class="space-y-2 text-sm text-gray-400">
         <p>• <strong>Email notifications</strong> are sent to your registered email address.</p>

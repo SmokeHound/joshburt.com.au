@@ -64,13 +64,13 @@
                         <!-- Main Content -->
                         <main id="main-content" class="flex-1 p-4 md:p-6 ml-64 md:ml-0" role="main">
                         <div class="max-w-6xl mx-auto">
-                                            <header class="page-header card border mb-6">
+                                            <header class="page-header ui-card border mb-6">
                                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                                     <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Oil Products Management</h2>
                     <div class="flex flex-wrap gap-2">
-                            <button id="addProductBtn" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
-                            <button id="export-products" class="btn-neon-green px-4 py-2 rounded font-semibold">Export Products (CSV)</button>
-                            <label for="import-products" class="btn-neon-blue px-4 py-2 rounded font-semibold cursor-pointer">
+                            <button id="addProductBtn" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Add Product</button>
+                            <button id="export-products" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Export Products (CSV)</button>
+                            <label for="import-products" class="ui-btn ui-btn-primary px-4 py-2 rounded font-semibold cursor-pointer">
                                                                 Import Products (CSV)
                                                                 <input type="file" id="import-products" accept=".csv" class="hidden">
                                                         </label>
@@ -78,7 +78,7 @@
                                 </div>
                             </header>
                         <section>
-                <div class="widget-primary rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+                <div class="ui-card ui-ui-card-primary rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left mb-6" role="table" aria-label="Oil products table">
                             <thead>
@@ -104,8 +104,8 @@
         </main>
         </div>
                 <!-- Product Modal (dialog) -->
-                        <div id="productModal" class="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop p-4">
-                            <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl p-6 relative z-[9999] border-2 border-accent modal-panel max-h-[90vh] overflow-y-auto">
+                        <div id="productModal" class="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-70 hidden ui-modal-backdrop p-4">
+                            <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl p-6 relative z-[9999] border-2 border-accent ui-modal-panel max-h-[90vh] overflow-y-auto">
                         <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold" aria-label="Close">&times;</button>
                         <h3 class="text-xl font-bold text-accent mb-4" id="form-title">Add New Product</h3>
                         <form id="product-form" class="space-y-4">
@@ -153,8 +153,8 @@
                                 <input type="url" id="product-image" name="product-image" class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter image URL">
                             </div>
                             <div class="flex justify-end gap-2 mt-2">
-                                <button type="button" id="cancelEditBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold">Cancel</button>
-                                <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
+                                <button type="button" id="cancelEditBtn" class="ui-btn ui-btn-danger px-4 py-2 rounded font-semibold">Cancel</button>
+                                <button type="submit" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Add Product</button>
                             </div>
                         </form>
                     </div>
@@ -634,7 +634,7 @@
                     msg.textContent = 'Please sign in to manage oil products.';
                     const btn = document.createElement('button');
                     btn.id = 'go-to-login';
-                    btn.className = 'btn-neon-blue px-4 py-2 rounded';
+                    btn.className = 'ui-btn ui-btn-primary px-4 py-2 rounded';
                     btn.textContent = 'Sign in';
                     btn.addEventListener('click', () => {
                         const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);

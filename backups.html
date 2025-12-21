@@ -21,30 +21,30 @@
 
       <!-- Statistics Cards -->
       <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-        <div class="card p-6">
+        <div class="ui-card p-6">
           <div class="text-gray-400 text-sm mb-2">Total Backups</div>
           <div id="stat-total" class="text-3xl font-bold">0</div>
         </div>
-        <div class="card p-6">
+        <div class="ui-card p-6">
           <div class="text-gray-400 text-sm mb-2">Completed</div>
           <div id="stat-completed" class="text-3xl font-bold text-green-500">0</div>
         </div>
-        <div class="card p-6">
+        <div class="ui-card p-6">
           <div class="text-gray-400 text-sm mb-2">Failed</div>
           <div id="stat-failed" class="text-3xl font-bold text-red-500">0</div>
         </div>
-        <div class="card p-6">
+        <div class="ui-card p-6">
           <div class="text-gray-400 text-sm mb-2">Running</div>
           <div id="stat-running" class="text-3xl font-bold text-yellow-500">0</div>
         </div>
-        <div class="card p-6">
+        <div class="ui-card p-6">
           <div class="text-gray-400 text-sm mb-2">Total Size</div>
           <div id="stat-size" class="text-3xl font-bold">0 MB</div>
         </div>
       </section>
 
       <!-- Actions -->
-      <section class="card p-6 mb-8">
+      <section class="ui-card p-6 mb-8">
         <div class="flex gap-4">
           <button id="create-backup-btn" class="btn-primary px-6 py-3">
             <span class="mr-2">📦</span> Create Backup
@@ -56,7 +56,7 @@
       </section>
 
       <!-- Filters -->
-      <section class="card p-6 mb-8">
+      <section class="ui-card p-6 mb-8">
         <h2 class="text-lg font-semibold mb-4">Filters</h2>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
@@ -95,7 +95,7 @@
       </section>
 
       <!-- Backups Table -->
-      <section class="card p-6">
+      <section class="ui-card p-6">
         <h2 class="text-lg font-semibold mb-4">Backup History</h2>
         <div class="overflow-x-auto">
           <table class="w-full text-left">
@@ -156,7 +156,7 @@
 
   <!-- Create Backup Modal -->
   <div id="create-backup-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9998] p-4">
-    <div class="card w-full max-w-2xl p-6 relative z-[9999]">
+    <div class="ui-card w-full max-w-2xl p-6 relative z-[9999]">
       <h2 class="text-2xl font-bold mb-4">Create New Backup</h2>
       
       <form id="create-backup-form">
@@ -207,7 +207,7 @@
 
   <!-- Backup Details Modal -->
   <div id="backup-details-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9998] p-4">
-    <div class="card w-full max-w-3xl p-6 relative z-[9999]">
+    <div class="ui-card w-full max-w-3xl p-6 relative z-[9999]">
       <h2 class="text-2xl font-bold mb-4">Backup Details</h2>
       <div id="backup-details-content" class="space-y-4"></div>
       <div class="flex gap-4 mt-6">

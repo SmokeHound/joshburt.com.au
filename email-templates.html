@@ -19,18 +19,18 @@
 <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
 
 <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
-  <header class="page-header card border flex justify-between items-center">
+  <header class="page-header ui-card border flex justify-between items-center">
     <div>
       <h1 class="text-2xl font-bold">Email Templates</h1>
       <p class="text-sm text-gray-400 mt-1">Manage reusable email templates with variable substitution</p>
     </div>
-    <button id="create-template-btn" class="btn-neon-green px-4 py-2 rounded-lg">
+    <button id="create-template-btn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg">
       + Create Template
     </button>
   </header>
 
   <!-- Templates List -->
-  <section class="card p-6">
+  <section class="ui-card p-6">
     <h2 class="text-lg font-semibold mb-4">Templates</h2>
     <div id="templates-list" class="space-y-4">
       <div class="text-center text-gray-400 py-8">Loading...</div>
@@ -40,7 +40,7 @@
 
 <!-- Template Editor Modal -->
 <div id="template-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[9998]">
-  <div class="card p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-[9999]">
+  <div class="ui-card p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-[9999]">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold" id="modal-title">Create Email Template</h2>
       <button id="close-modal" class="text-gray-400 hover:text-white">×</button>
@@ -96,7 +96,7 @@
 
 <!-- Preview Modal -->
 <div id="preview-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[9998]">
-  <div class="card p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-[9999]">
+  <div class="ui-card p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-[9999]">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">Template Preview</h2>
       <button id="close-preview" class="text-gray-400 hover:text-white">×</button>
@@ -186,7 +186,7 @@
         }
       }
       return `
-      <div class="card p-4 border border-gray-700">
+      <div class="ui-card p-4 border border-gray-700">
         <div class="flex justify-between items-start">
           <div class="flex-1">
             <h3 class="text-lg font-semibold">${template.name}</h3>

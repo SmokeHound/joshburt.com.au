@@ -150,19 +150,19 @@
         modal.className = 'modal-overlay';
         modal.innerHTML = `
           <div class="modal-content modal-sm">
-            <div class="modal-header">
+            <div class="ui-modal-header">
               <h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>
               <button class="modal-close" data-action="cancel" aria-label="Close">&times;</button>
             </div>
-            <div class="modal-body text-center">
+            <div class="ui-modal-body text-center">
               <div class="modal-icon modal-icon-${config.type}">
                 ${iconMap[config.type] || '?'}
               </div>
               <p class="text-gray-300">${config.message}</p>
             </div>
-            <div class="modal-footer">
-              <button class="btn-neon-green px-4 py-2 rounded" data-action="cancel">${config.cancelText}</button>
-              <button class="btn-neon-blue px-4 py-2 rounded" data-action="confirm">${config.confirmText}</button>
+            <div class="ui-modal-footer">
+              <button class="ui-btn ui-btn-secondary px-4 py-2 rounded" data-action="cancel">${config.cancelText}</button>
+              <button class="ui-btn ui-btn-primary px-4 py-2 rounded" data-action="confirm">${config.confirmText}</button>
             </div>
           </div>
         `;
@@ -228,18 +228,18 @@
         modal.className = 'modal-overlay';
         modal.innerHTML = `
           <div class="modal-content modal-sm">
-            <div class="modal-header">
+            <div class="ui-modal-header">
               <h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>
               <button class="modal-close" data-action="ok" aria-label="Close">&times;</button>
             </div>
-            <div class="modal-body text-center">
+            <div class="ui-modal-body text-center">
               <div class="modal-icon modal-icon-${config.type}">
                 ${iconMap[config.type] || 'ℹ️'}
               </div>
               <p class="text-gray-300">${config.message}</p>
             </div>
-            <div class="modal-footer">
-              <button class="btn-neon-blue px-4 py-2 rounded" data-action="ok">${config.okText}</button>
+            <div class="ui-modal-footer">
+              <button class="ui-btn ui-btn-primary px-4 py-2 rounded" data-action="ok">${config.okText}</button>
             </div>
           </div>
         `;
@@ -292,12 +292,12 @@
       modal.innerHTML = `
         <div class="modal-content modal-${config.size}">
           ${config.title ? `
-            <div class="modal-header">
+            <div class="ui-modal-header">
               <h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>
               ${config.showClose ? '<button class="modal-close" data-action="close" aria-label="Close">&times;</button>' : ''}
             </div>
           ` : ''}
-          <div class="modal-body">
+          <div class="ui-modal-body">
             ${config.content}
           </div>
         </div>

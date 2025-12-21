@@ -19,42 +19,42 @@
 <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
 
 <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
-  <header class="page-header card border flex justify-between items-center">
+  <header class="page-header ui-card border flex justify-between items-center">
     <div>
       <h1 class="text-2xl font-bold">Email Queue Monitoring</h1>
       <p class="text-sm text-gray-400 mt-1">Monitor and manage email delivery queue</p>
     </div>
-    <button id="send-test-email-btn" class="btn-neon-green px-4 py-2 rounded-lg">
+    <button id="send-test-email-btn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg">
       Send Test Email
     </button>
   </header>
 
   <!-- Stats Overview -->
   <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
-    <div class="card p-4 widget-primary rounded-lg">
+    <div class="card p-4 ui-card ui-ui-card-primary rounded-lg">
       <h3 class="text-sm font-semibold mb-1">Pending</h3>
       <div id="stat-pending" class="text-2xl font-bold text-yellow-400">-</div>
     </div>
-    <div class="card p-4 widget-secondary rounded-lg">
+    <div class="card p-4 ui-card ui-ui-card-secondary rounded-lg">
       <h3 class="text-sm font-semibold mb-1">Sending</h3>
       <div id="stat-sending" class="text-2xl font-bold text-blue-400">-</div>
     </div>
-    <div class="card p-4 widget-accent rounded-lg">
+    <div class="card p-4 ui-card ui-ui-card-accent rounded-lg">
       <h3 class="text-sm font-semibold mb-1">Sent</h3>
       <div id="stat-sent" class="text-2xl font-bold text-green-400">-</div>
     </div>
-    <div class="card p-4 widget-yellow rounded-lg">
+    <div class="ui-card p-4 widget-yellow rounded-lg">
       <h3 class="text-sm font-semibold mb-1">Failed</h3>
       <div id="stat-failed" class="text-2xl font-bold text-red-400">-</div>
     </div>
-    <div class="card p-4 widget-primary rounded-lg">
+    <div class="card p-4 ui-card ui-ui-card-primary rounded-lg">
       <h3 class="text-sm font-semibold mb-1">Total</h3>
       <div id="stat-total" class="text-2xl font-bold text-purple-400">-</div>
     </div>
   </section>
 
   <!-- Filters -->
-  <section class="card p-4">
+  <section class="ui-card p-4">
     <h2 class="text-lg font-semibold mb-4">Filters</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div>
@@ -95,7 +95,7 @@
   </section>
 
   <!-- Email Queue Table -->
-  <section class="card p-6">
+  <section class="ui-card p-6">
     <h2 class="text-lg font-semibold mb-4">Email Queue</h2>
     <div class="overflow-x-auto">
       <table class="w-full text-left">
@@ -122,7 +122,7 @@
 
 <!-- Email Detail Modal -->
 <div id="email-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[9998]">
-  <div class="card p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-[9999]">
+  <div class="ui-card p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-[9999]">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">Email Details</h2>
       <button id="close-modal" class="text-gray-400 hover:text-white">×</button>
@@ -184,7 +184,7 @@
 
 <!-- Send Test Email Modal -->
 <div id="test-email-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[9998]">
-  <div class="card p-6 max-w-2xl w-full mx-4 relative z-[9999]">
+  <div class="ui-card p-6 max-w-2xl w-full mx-4 relative z-[9999]">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">Send Test Email</h2>
       <button id="close-test-modal" class="text-gray-400 hover:text-white">×</button>
