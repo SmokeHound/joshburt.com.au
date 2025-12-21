@@ -20,7 +20,7 @@
 <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
 
 <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
-  <header class="page-header card border">
+  <header class="page-header ui-card border">
     <h1 class="text-2xl font-bold">👥 Customer Insights</h1>
     <p class="text-sm text-gray-400 mt-1">Customer segmentation, purchase patterns, and personalized recommendations</p>
   </header>
@@ -39,7 +39,7 @@
   </section>
 
   <!-- Tab Navigation -->
-  <section class="card p-2">
+  <section class="ui-card p-2">
     <div class="flex gap-2 border-b border-gray-700">
       <button class="tab-btn px-4 py-2 font-semibold rounded-t-lg bg-blue-900 text-blue-300" data-tab="segmentation">
         Customer Segmentation
@@ -55,7 +55,7 @@
 
   <!-- Segmentation Tab -->
   <section id="tab-segmentation" class="tab-content">
-    <div class="card p-6">
+    <div class="ui-card p-6">
       <h2 class="text-xl font-semibold mb-4">Customer Segmentation (RFM Analysis)</h2>
       <p class="text-sm text-gray-400 mb-4">Customers segmented by Recency, Frequency, and Monetary value</p>
       
@@ -99,7 +99,7 @@
 
   <!-- Purchase Patterns Tab -->
   <section id="tab-patterns" class="tab-content" style="display: none;">
-    <div class="card p-6">
+    <div class="ui-card p-6">
       <h2 class="text-xl font-semibold mb-4">Customer Purchase Patterns</h2>
       
       <!-- Filter -->
@@ -145,7 +145,7 @@
 
   <!-- Product Affinity Tab -->
   <section id="tab-affinity" class="tab-content" style="display: none;">
-    <div class="card p-6">
+    <div class="ui-card p-6">
       <h2 class="text-xl font-semibold mb-4">Product Affinity Analysis</h2>
       <p class="text-sm text-gray-400 mb-4">Products frequently purchased together</p>
       
@@ -295,7 +295,7 @@ async function loadSegmentation() {
     
     // Render segment summary cards
     const summaryHtml = Object.entries(segmentCounts).map(([segment, count]) => `
-      <div class="card p-4 border-l-4" style="border-color: ${segmentColors[segment]}">
+      <div class="ui-card p-4 border-l-4" style="border-color: ${segmentColors[segment]}">
         <h4 class="text-sm font-semibold text-gray-400">${segment}</h4>
         <div class="text-2xl font-bold" style="color: ${segmentColors[segment]}">${count}</div>
       </div>

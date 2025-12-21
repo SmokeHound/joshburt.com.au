@@ -41,15 +41,15 @@
     <!-- Main Content -->
     <main id="main-content" class="flex-1 p-4 md:p-6 ml-64 md:ml-0" role="main">
       <div class="max-w-6xl mx-auto">
-        <header class="page-header card border">
+        <header class="page-header ui-card border">
           <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Consumables Product Management</h2>
             <div class="flex flex-wrap gap-2">
-              <button id="addProductBtn" class="btn-neon-green px-4 py-2 rounded font-semibold">Add Product</button>
-              <button id="importBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Import CSV</button>
-              <button id="exportBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Export CSV</button>
-              <button id="syncInventoryBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Sync Inventory</button>
-              <button id="manageCategoriesBtn" class="btn-neon-blue px-4 py-2 rounded font-semibold">Categories</button>
+              <button id="addProductBtn" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Add Product</button>
+              <button id="importBtn" class="ui-btn ui-btn-primary px-4 py-2 rounded font-semibold">Import CSV</button>
+              <button id="exportBtn" class="ui-btn ui-btn-primary px-4 py-2 rounded font-semibold">Export CSV</button>
+              <button id="syncInventoryBtn" class="ui-btn ui-btn-primary px-4 py-2 rounded font-semibold">Sync Inventory</button>
+              <button id="manageCategoriesBtn" class="ui-btn ui-btn-primary px-4 py-2 rounded font-semibold">Categories</button>
             </div>
           </div>
         </header>
@@ -89,13 +89,13 @@
   </div>
 
   <!-- Category Management Modal (now direct child of body) -->
-  <div id="categoryModal" class="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop">
-    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6 relative z-[9999] border-2 border-accent modal-panel">
+  <div id="categoryModal" class="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-70 hidden ui-modal-backdrop">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6 relative z-[9999] border-2 border-accent ui-modal-panel">
       <button id="closeCategoryModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
       <h3 class="text-xl font-bold text-accent mb-4">Manage Categories</h3>
       <form id="categoryForm" class="flex gap-2 mb-4">
         <input type="text" id="newCategoryInput" class="flex-1 px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" placeholder="New category" required>
-        <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Add</button>
+        <button type="submit" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Add</button>
       </form>
       <ul id="categoryList" class="space-y-2">
         <!-- Categories will be rendered here -->
@@ -104,8 +104,8 @@
   </div>
 
   <!-- Product Modal (now direct child of body) -->
-  <div id="productModal" class="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop">
-    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6 relative z-[9999] border-2 border-accent modal-panel">
+  <div id="productModal" class="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-70 hidden ui-modal-backdrop">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6 relative z-[9999] border-2 border-accent ui-modal-panel">
       <button id="closeProductModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold">&times;</button>
       <h3 class="text-xl font-bold text-accent mb-4" id="productModalTitle">Add Product</h3>
       <form id="productForm" class="space-y-4">
@@ -143,12 +143,12 @@
             <span id="imageDropText">Click or drag image here</span>
             <input type="file" id="productImage" accept="image/*" class="w-full text-white hidden">
             <img id="productImagePreview" src="" alt="Preview" class="mt-2 max-h-24 hidden rounded border border-gray-700 mx-auto">
-            <button type="button" id="removeImageBtn" class="btn-neon-pink px-2 py-1 mt-2 rounded text-xs font-semibold hidden">Remove Image</button>
+            <button type="button" id="removeImageBtn" class="ui-btn ui-btn-danger px-2 py-1 mt-2 rounded text-xs font-semibold hidden">Remove Image</button>
           </div>
         </div>
         <div class="flex justify-end gap-2 mt-4">
-          <button type="button" id="deleteProductBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold hidden">Delete</button>
-          <button type="submit" class="btn-neon-green px-4 py-2 rounded font-semibold">Save</button>
+          <button type="button" id="deleteProductBtn" class="ui-btn ui-btn-danger px-4 py-2 rounded font-semibold hidden">Delete</button>
+          <button type="submit" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Save</button>
         </div>
       </form>
     </div>
@@ -396,20 +396,20 @@ function renderProducts() {
       <td class="p-2" data-label="Code">${p.code || ''}</td>
       <td class="p-2 whitespace-nowrap" data-label="Stock">
         <div class="inline-flex items-center gap-2">
-          <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Decrease Stock" onclick="adjustStock(${i},-1)">−</button>
+          <button class="ui-btn ui-btn-primary px-2 py-1 rounded text-xs font-bold" title="Decrease Stock" onclick="adjustStock(${i},-1)">−</button>
           <span>${p.stock ?? ''}</span>
-          <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Increase Stock" onclick="adjustStock(${i},1)">+</button>
+          <button class="ui-btn ui-btn-primary px-2 py-1 rounded text-xs font-bold" title="Increase Stock" onclick="adjustStock(${i},1)">+</button>
         </div>
       </td>
       <td class="p-2 whitespace-nowrap" data-label="Reorder">
         <div class="inline-flex items-center gap-2">
-          <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Decrease Reorder" onclick="adjustReorder(${i},-1)">−</button>
+          <button class="ui-btn ui-btn-primary px-2 py-1 rounded text-xs font-bold" title="Decrease Reorder" onclick="adjustReorder(${i},-1)">−</button>
           <span>${p.reorder ?? ''}</span>
-          <button class="btn-neon-blue px-2 py-1 rounded text-xs font-bold" title="Increase Reorder" onclick="adjustReorder(${i},1)">+</button>
+          <button class="ui-btn ui-btn-primary px-2 py-1 rounded text-xs font-bold" title="Increase Reorder" onclick="adjustReorder(${i},1)">+</button>
         </div>
       </td>
       <td class="p-2 col-actions" data-label="Actions">
-        <button class="btn-neon-blue px-2 py-1 rounded text-xs font-semibold" onclick="editProduct(${i})">Edit</button>
+        <button class="ui-btn ui-btn-primary px-2 py-1 rounded text-xs font-semibold" onclick="editProduct(${i})">Edit</button>
       </td>
     </tr>
   `).join('');
@@ -599,7 +599,7 @@ function showSignInCTA() {
       msg.textContent = 'Please sign in to manage consumables.';
       const btn = document.createElement('button');
       btn.id = 'go-to-login';
-      btn.className = 'btn-neon-blue px-4 py-2 rounded';
+      btn.className = 'ui-btn ui-btn-primary px-4 py-2 rounded';
       btn.textContent = 'Sign in';
       btn.addEventListener('click', () => {
         const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);

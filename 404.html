@@ -15,17 +15,17 @@
   <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
 
   <main id="main" class="container mx-auto p-6">
-    <header class="page-header card border">
+    <header class="page-header ui-card border">
       <h1 class="text-3xl font-bold">404 — Page Not Found</h1>
       <p class="description">Sorry, we couldn’t find the page you’re looking for. It may have been moved or deleted.</p>
       <div class="flex gap-3">
-        <a href="/index.html" class="btn-neon-blue rounded-md px-4 py-2">Go to homepage</a>
-        <a href="/design-system-demo.html" class="btn-neon-purple rounded-md px-4 py-2">Explore the design system</a>
+        <a href="/index.html" class="ui-btn ui-btn-primary rounded-md px-4 py-2">Go to homepage</a>
+        <a href="/design-system-demo.html" class="ui-btn ui-btn-accent rounded-md px-4 py-2">Explore the design system</a>
       </div>
     </header>
 
     <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="card border p-6 widget-primary">
+      <div class="card border p-6 ui-card ui-card-primary">
         <h2 class="text-xl font-semibold">Quick links</h2>
         <ul class="mt-3 list-disc pl-5 text-sm">
           <li><a href="/oil-products.html" class="text-blue-500 hover:underline">Order Castrol oils</a></li>
@@ -33,12 +33,12 @@
           <li><a href="/administration.html" class="text-blue-500 hover:underline">Administration</a></li>
         </ul>
       </div>
-      <div class="card border p-6">
+      <div class="ui-card border p-6">
         <h2 class="text-xl font-semibold">Need help?</h2>
         <p class="muted mt-2">If this error persists, export your local error log and share it with support.</p>
         <div class="mt-3 flex gap-3">
-          <button class="btn-neon-green rounded-md px-4 py-2" onclick="window.ErrorTracker && window.ErrorTracker.exportErrorLog()">Export error log</button>
-          <button class="btn-neon-pink rounded-md px-4 py-2" onclick="location.reload()">Retry</button>
+          <button class="ui-btn ui-btn-secondary rounded-md px-4 py-2" onclick="window.ErrorTracker && window.ErrorTracker.exportErrorLog()">Export error log</button>
+          <button class="ui-btn ui-btn-danger rounded-md px-4 py-2" onclick="location.reload()">Retry</button>
         </div>
       </div>
     </section>

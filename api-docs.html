@@ -77,7 +77,7 @@
     <!-- Main Content -->
     <main id="main-content" class="flex-1 p-4 md:p-6 md:ml-64" role="main">
     <!-- Header -->
-    <header class="page-header card border mb-6 shadow-xl bg-gradient-to-br from-gray-900 via-blue-900/20 to-purple-900/20">
+    <header class="page-header ui-card border mb-6 shadow-xl bg-gradient-to-br from-gray-900 via-blue-900/20 to-purple-900/20">
       <div class="flex items-center gap-4">
         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-2xl">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,7 +97,7 @@
     </div>
 
     <!-- Search and Filter -->
-    <div class="card rounded-lg shadow-md p-6 mb-6 border border-gray-700">
+    <div class="ui-card rounded-lg shadow-md p-6 mb-6 border border-gray-700">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label for="search" class="block text-sm font-medium text-gray-300 mb-2">
@@ -164,7 +164,7 @@
       } catch (error) {
         console.error('Failed to load API spec:', error);
         document.getElementById('endpoints-container').innerHTML = `
-          <div class="card border border-red-500/30 rounded-lg p-4 text-red-200">
+          <div class="ui-card border border-red-500/30 rounded-lg p-4 text-red-200">
             <p class="font-semibold">Failed to load API documentation</p>
             <p class="text-sm mt-1">Run <code class="bg-red-900/50 px-2 py-1 rounded">node scripts/generate-api-docs.js</code> to generate the documentation.</p>
           </div>
@@ -189,19 +189,19 @@
       };
 
       document.getElementById('stats').innerHTML = `
-        <div class="card rounded-lg shadow-md p-6 border border-blue-500/20 hover:border-blue-500/40 transition-all">
+        <div class="ui-card rounded-lg shadow-md p-6 border border-blue-500/20 hover:border-blue-500/40 transition-all">
           <div class="text-3xl font-bold text-blue-400">${stats.total}</div>
           <div class="text-sm text-gray-400 mt-1">Total Endpoints</div>
         </div>
-        <div class="card rounded-lg shadow-md p-6 border border-green-500/20 hover:border-green-500/40 transition-all">
+        <div class="ui-card rounded-lg shadow-md p-6 border border-green-500/20 hover:border-green-500/40 transition-all">
           <div class="text-3xl font-bold text-green-400">${stats.authenticated}</div>
           <div class="text-sm text-gray-400 mt-1">Authenticated</div>
         </div>
-        <div class="card rounded-lg shadow-md p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+        <div class="ui-card rounded-lg shadow-md p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
           <div class="text-3xl font-bold text-purple-400">${stats.public}</div>
           <div class="text-sm text-gray-400 mt-1">Public</div>
         </div>
-        <div class="card rounded-lg shadow-md p-6 border border-orange-500/20 hover:border-orange-500/40 transition-all">
+        <div class="ui-card rounded-lg shadow-md p-6 border border-orange-500/20 hover:border-orange-500/40 transition-all">
           <div class="text-3xl font-bold text-orange-400">${stats.categories}</div>
           <div class="text-sm text-gray-400 mt-1">Categories</div>
         </div>
@@ -235,7 +235,7 @@
       
       if (endpoints.length === 0) {
         container.innerHTML = `
-          <div class="card rounded-lg p-8 text-center border border-gray-700">
+          <div class="ui-card rounded-lg p-8 text-center border border-gray-700">
             <p class="text-gray-400">No endpoints found matching your filters</p>
           </div>
         `;
@@ -249,7 +249,7 @@
         const category = firstMethod.tags?.[0] || 'Other';
 
         return `
-          <div class="endpoint-card card rounded-lg shadow-md p-6 mb-4 border border-gray-700 hover:border-gray-600">
+          <div class="endpoint-card ui-card rounded-lg shadow-md p-6 mb-4 border border-gray-700 hover:border-gray-600">
             <div class="flex justify-between items-start mb-4">
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-2 flex-wrap">

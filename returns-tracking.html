@@ -43,22 +43,22 @@
   <!-- Main Content -->
   <main id="main-content" class="p-6 bg-black min-h-screen" role="main">
     <!-- Header -->
-    <header class="page-header card border mb-6">
+    <header class="page-header ui-card border mb-6">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 class="text-3xl font-bold text-white mb-2">Returns & Credits Tracking</h1>
-          <p class="nav-link-muted">Track parts returned to suppliers and monitor credit status</p>
+          <p class="text-gray-400">Track parts returned to suppliers and monitor credit status</p>
         </div>
         <div class="flex flex-wrap gap-2">
-          <button id="addReturnBtn" class="btn-neon-green px-4 py-2 rounded-lg font-semibold">+ New Return</button>
-          <button id="exportReturnsBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Export CSV</button>
+          <button id="addReturnBtn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg font-semibold">+ New Return</button>
+          <button id="exportReturnsBtn" class="ui-btn ui-btn-primary px-4 py-2 rounded-lg font-semibold">Export CSV</button>
         </div>
       </div>
     </header>
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div class="card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+      <div class="ui-card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-gray-400 text-sm">Pending Returns</p>
@@ -72,7 +72,7 @@
         </div>
       </div>
 
-      <div class="card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+      <div class="ui-card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-gray-400 text-sm">Credited</p>
@@ -86,7 +86,7 @@
         </div>
       </div>
 
-      <div class="card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+      <div class="ui-card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-gray-400 text-sm">Total Value Pending</p>
@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <div class="card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+      <div class="ui-card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-gray-400 text-sm">Avg. Processing Time</p>
@@ -116,7 +116,7 @@
     </div>
 
     <!-- Filters -->
-    <div class="card rounded-lg shadow p-4 mb-6 bg-gray-900 border border-gray-700">
+    <div class="ui-card rounded-lg shadow p-4 mb-6 bg-gray-900 border border-gray-700">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
           <label for="filterStatus" class="block text-sm font-medium text-gray-300 mb-1">Status</label>
@@ -156,7 +156,7 @@
     </div>
 
     <!-- Returns Table -->
-    <div class="card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
+    <div class="ui-card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
       <div class="overflow-x-auto">
         <table class="w-full text-left" role="table" aria-label="Returns tracking table">
           <thead>
@@ -188,8 +188,8 @@
   </main>
 
   <!-- Add/Edit Return Modal -->
-  <div id="returnModal" class="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-70 hidden modal-backdrop p-4 overflow-y-auto">
-    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-3xl my-8 relative z-[9999] border-2 border-accent modal-panel" style="max-height: calc(100vh - 4rem); display: flex; flex-direction: column;">
+  <div id="returnModal" class="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-70 hidden ui-modal-backdrop p-4 overflow-y-auto">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-3xl my-8 relative z-[9999] border-2 border-accent ui-modal-panel" style="max-height: calc(100vh - 4rem); display: flex; flex-direction: column;">
       <button id="closeReturnModal" class="absolute top-2 right-2 text-accent hover:text-white text-2xl font-bold z-10" aria-label="Close">&times;</button>
       <div class="p-6 pb-2">
         <h3 class="text-xl font-bold text-accent mb-4" id="modal-title">New Return</h3>
@@ -329,8 +329,8 @@
 
       <div class="p-6 pt-2 border-t border-gray-700 mt-4">
         <div class="flex justify-end gap-2">
-          <button type="button" id="cancelReturnBtn" class="btn-neon-pink px-4 py-2 rounded font-semibold">Cancel</button>
-          <button type="submit" form="return-form" class="btn-neon-green px-4 py-2 rounded font-semibold">Save Return</button>
+          <button type="button" id="cancelReturnBtn" class="ui-btn ui-btn-danger px-4 py-2 rounded font-semibold">Cancel</button>
+          <button type="submit" form="return-form" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Save Return</button>
         </div>
       </div>
     </div>

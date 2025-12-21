@@ -20,7 +20,7 @@
 <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
 
 <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
-  <header class="page-header card border">
+  <header class="page-header ui-card border">
     <h1 class="text-2xl font-bold">📊 Inventory Forecast</h1>
     <p class="text-sm text-gray-400 mt-1">Demand predictions and reorder recommendations based on historical data</p>
   </header>
@@ -40,26 +40,26 @@
 
   <!-- Summary Stats -->
   <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div class="card p-4 widget-primary rounded-lg">
+    <div class="card p-4 ui-card ui-card-primary rounded-lg">
       <h3 class="text-sm font-semibold mb-1">Items Forecasted</h3>
       <div id="stat-items-forecasted" class="text-2xl font-bold text-blue-400">-</div>
     </div>
-    <div class="card p-4 widget-secondary rounded-lg">
+    <div class="card p-4 ui-card ui-card-secondary rounded-lg">
       <h3 class="text-sm font-semibold mb-1">Avg Confidence</h3>
       <div id="stat-avg-confidence" class="text-2xl font-bold text-green-400">-</div>
     </div>
-    <div class="card p-4 widget-yellow rounded-lg">
+    <div class="ui-card p-4 widget-yellow rounded-lg">
       <h3 class="text-sm font-semibold mb-1">Low Stock Alerts</h3>
       <div id="stat-low-stock" class="text-2xl font-bold text-yellow-400">-</div>
     </div>
-    <div class="card p-4 widget-accent rounded-lg">
+    <div class="card p-4 ui-card ui-card-accent rounded-lg">
       <h3 class="text-sm font-semibold mb-1">Total Predicted Demand</h3>
       <div id="stat-total-demand" class="text-2xl font-bold text-purple-400">-</div>
     </div>
   </section>
 
   <!-- Low Stock Alerts Section -->
-  <section id="alerts-section" class="card p-6" style="display: none;">
+  <section id="alerts-section" class="ui-card p-6" style="display: none;">
     <h2 class="text-xl font-semibold mb-4">⚠️ Low Stock Alerts</h2>
     <div id="alerts-container" class="space-y-3">
       <p class="text-gray-400">Loading alerts...</p>
@@ -67,7 +67,7 @@
   </section>
 
   <!-- Forecast Chart -->
-  <section class="card p-6">
+  <section class="ui-card p-6">
     <h2 class="text-xl font-semibold mb-4">Demand Forecast Trend</h2>
     <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
@@ -99,7 +99,7 @@
   </section>
 
   <!-- Forecast Table -->
-  <section class="card p-6">
+  <section class="ui-card p-6">
     <h2 class="text-xl font-semibold mb-4">Detailed Forecasts</h2>
     
     <!-- Filters -->

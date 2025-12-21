@@ -39,7 +39,7 @@
     #main-content .theme-card .p-4 { padding:0.5rem !important; }
 
     /* Buttons */
-    #main-content .btn-neon-blue, #main-content .btn-neon-green { padding:0.45rem 0.75rem !important; font-size:0.875rem !important; }
+    #main-content .ui-btn { padding:0.45rem 0.75rem !important; font-size:0.875rem !important; }
     #main-content .px-10 { padding-left:0.9rem !important; padding-right:0.9rem !important; }
     #main-content .py-5 { padding-top:0.5rem !important; padding-bottom:0.5rem !important; }
 
@@ -104,7 +104,7 @@
       <!-- Main -->
       <main id="main-content" class="flex-1 p-4 md:p-6 md:ml-64" role="main">
         <!-- Page Header with Icon -->
-        <header class="page-header card border mb-6 shadow-xl bg-gradient-to-br from-gray-900 via-blue-900/20 to-purple-900/20">
+        <header class="page-header ui-card border mb-6 shadow-xl bg-gradient-to-br from-gray-900 via-blue-900/20 to-purple-900/20">
           <div class="flex items-center gap-4">
             <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-2xl">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -121,7 +121,7 @@
                 <div id="last-updated" class="text-xs text-gray-300">Last updated: —</div>
                 <div class="text-[10px] text-gray-500">Settings</div>
               </div>
-              <button id="header-refresh-btn" class="btn-neon-blue px-3 py-2 rounded-md text-xs" title="Refresh settings" aria-label="Refresh settings">
+              <button id="header-refresh-btn" class="ui-btn ui-btn-primary px-3 py-2 rounded-md text-xs" title="Refresh settings" aria-label="Refresh settings">
                 <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6"/></svg>
               </button>
             </div>
@@ -176,10 +176,10 @@
           </nav>
 
           <!-- General Settings Panel -->
-      <div id="general-tab" class="tab-panel card widget-primary rounded-xl border border-gray-700/50 shadow-2xl p-6 md:p-8 backdrop-blur-sm">
+      <div id="general-tab" class="tab-panel card ui-card ui-card-primary rounded-xl border border-gray-700/50 shadow-2xl p-6 md:p-8 backdrop-blur-sm">
         <form id="settings-form" class="space-y-8" autocomplete="off">
                 <!-- Core Identity Section -->
-                <div class="card widget-secondary p-6 rounded-xl border border-blue-500/20 shadow-xl hover:border-blue-500/40 transition-all duration-300">
+                <div class="card ui-card ui-card-secondary p-6 rounded-xl border border-blue-500/20 shadow-xl hover:border-blue-500/40 transition-all duration-300">
                   <div class="flex items-center gap-3 mb-4 border-b border-gray-700/50 pb-2">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -257,7 +257,7 @@
                 </div>
 
                 <!-- Features Section -->
-                <div class="card widget-secondary p-8 rounded-xl border border-yellow-500/20 shadow-xl hover:border-yellow-500/40 transition-all duration-300">
+                <div class="card ui-card ui-card-secondary p-8 rounded-xl border border-yellow-500/20 shadow-xl hover:border-yellow-500/40 transition-all duration-300">
                   <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-4">
                     <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center shadow-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -349,7 +349,7 @@
                 </div>
 
                 <!-- SMTP Configuration Section -->
-                <div class="card widget-secondary p-8 rounded-xl border border-green-500/20 shadow-xl hover:border-green-500/40 transition-all duration-300">
+                <div class="card ui-card ui-card-secondary p-8 rounded-xl border border-green-500/20 shadow-xl hover:border-green-500/40 transition-all duration-300">
                   <details class="group">
                     <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
@@ -405,7 +405,7 @@
                 </div>
 
                 <!-- Customization Section -->
-                <div class="card widget-secondary p-8 rounded-xl border border-purple-500/20 shadow-xl hover:border-purple-500/40 transition-all duration-300">
+                <div class="card ui-card ui-card-secondary p-8 rounded-xl border border-purple-500/20 shadow-xl hover:border-purple-500/40 transition-all duration-300">
                   <details class="group">
                     <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
@@ -447,7 +447,7 @@
                 </div>
 
                 <!-- Data Sources Section (Collapsible) -->
-                <div class="card widget-secondary p-8 rounded-xl border border-cyan-400/20 shadow-xl hover:border-cyan-400/40 transition-all duration-300">
+                <div class="card ui-card ui-card-secondary p-8 rounded-xl border border-cyan-400/20 shadow-xl hover:border-cyan-400/40 transition-all duration-300">
                   <details class="group">
                     <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-500 flex items-center justify-center shadow-lg">
@@ -495,7 +495,7 @@
                 </div>
 
                 <!-- Advanced Section -->
-                <div class="card widget-secondary p-8 rounded-xl border border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300">
+                <div class="card ui-card ui-card-secondary p-8 rounded-xl border border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300">
                   <details class="group">
                     <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg">
@@ -517,10 +517,10 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="card widget-primary p-8 rounded-xl border-2 border-blue-500/30 shadow-2xl bg-gradient-to-br from-gray-900/50 to-gray-800/50">
+                <div class="card ui-card ui-card-primary p-8 rounded-xl border-2 border-blue-500/30 shadow-2xl bg-gradient-to-br from-gray-900/50 to-gray-800/50">
                   <div class="flex flex-col md:flex-row gap-6 md:items-center md:justify-between">
                     <div class="flex gap-4 flex-wrap">
-                      <button type="button" data-action="reset-defaults" class="btn-neon-blue px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+                      <button type="button" data-action="reset-defaults" class="ui-btn ui-btn-primary px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
                         <span class="flex items-center gap-3">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -528,7 +528,7 @@
                           Reset to Defaults
                         </span>
                       </button>
-                      <button type="button" data-action="export-settings" class="btn-neon-blue px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+                      <button type="button" data-action="export-settings" class="ui-btn ui-btn-primary px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
                         <span class="flex items-center gap-3">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -537,7 +537,7 @@
                         </span>
                       </button>
                     </div>
-                    <button class="w-full md:w-auto btn-neon-green px-10 py-5 rounded-xl font-bold text-base shadow-2xl hover:shadow-[0_0_30px_rgba(0,255,136,0.6)] hover:scale-105 transition-all duration-200" type="submit">
+                    <button class="w-full md:w-auto ui-btn ui-btn-secondary px-10 py-5 rounded-xl font-bold text-base shadow-2xl hover:shadow-[0_0_30px_rgba(0,255,136,0.6)] hover:scale-105 transition-all duration-200" type="submit">
                       <span class="flex items-center justify-center gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -551,7 +551,7 @@
           </div>
 
           <!-- Theme Customization Panel -->
-          <div id="theme-tab" class="tab-panel card widget-primary rounded-lg border border-gray-700 shadow-lg p-6 md:p-8 hidden">
+          <div id="theme-tab" class="tab-panel card ui-card ui-card-primary rounded-lg border border-gray-700 shadow-lg p-6 md:p-8 hidden">
             <div class="flex items-center gap-3 mb-8">
               <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -565,7 +565,7 @@
             </div>
             <!-- Theme Selection Cards -->
             <div class="space-y-6">
-               <div class="card widget-secondary p-6 rounded-xl border border-purple-500/30 shadow-xl">
+               <div class="card ui-card ui-card-secondary p-6 rounded-xl border border-purple-500/30 shadow-xl">
                 <div class="flex items-center justify-between mb-6">
                   <div>
                     <h3 class="text-lg font-bold text-white mb-2">Choose Your Theme</h3>
@@ -603,7 +603,7 @@
                 <!-- Content dynamically populated by theme-ui.js -->
               </div>
 
-              <div id="theme-scheduler-container" class="card widget-secondary p-6 rounded-lg border border-gray-700">
+              <div id="theme-scheduler-container" class="card ui-card ui-card-secondary p-6 rounded-lg border border-gray-700">
                 <h3 class="text-lg font-bold text-white mb-4">Theme Schedule</h3>
                 <p class="text-sm text-gray-400 mb-6">Automatically switch themes based on time of day</p>
                 <!-- Content dynamically populated by theme-ui.js -->
@@ -617,7 +617,7 @@
           </div>
 
           <!-- Security Panel -->
-          <div id="security-tab" class="tab-panel card widget-primary rounded-lg border border-gray-700 shadow-lg p-6 md:p-8 hidden">
+          <div id="security-tab" class="tab-panel card ui-card ui-card-primary rounded-lg border border-gray-700 shadow-lg p-6 md:p-8 hidden">
             <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-6">
               <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -629,7 +629,7 @@
                 <p class="text-sm text-gray-400 mt-2">Manage authentication and security preferences</p>
               </div>
             </div>
-            <div class="card widget-secondary p-8 rounded-xl border-2 border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300 space-y-8">
+            <div class="card ui-card ui-card-secondary p-8 rounded-xl border-2 border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300 space-y-8">
               <!-- Session Timeout Inline Group -->
               <div class="flex items-stretch rounded-xl bg-gray-800/70 border border-red-500/30 focus-within:border-red-500/60 focus-within:ring-2 focus-within:ring-red-500/30 transition-all duration-200 overflow-hidden">
                 <div class="flex items-center justify-center px-4 bg-red-500/10 border-r border-red-500/20">
@@ -698,7 +698,7 @@
               </label>
 
               <!-- Save Button -->
-              <button id="save-security" class="w-full btn-neon-green px-8 py-5 rounded-xl font-bold text-base shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all">
+              <button id="save-security" class="w-full ui-btn ui-btn-secondary px-8 py-5 rounded-xl font-bold text-base shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all">
                 <span class="flex items-center justify-center gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -1531,7 +1531,7 @@
           msg.className = 'mb-4 text-gray-300';
           msg.textContent = 'Please sign in to access Site Settings.';
           const btn = document.createElement('button');
-          btn.className = 'btn-neon-blue px-4 py-2 rounded';
+          btn.className = 'ui-btn ui-btn-primary px-4 py-2 rounded';
           btn.textContent = 'Sign in';
           btn.addEventListener('click', function() {
             const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);

@@ -273,6 +273,87 @@ Migration tracking in `schema_migrations` table ensures idempotency.
 
 ## 🎨 Frontend Patterns
 
+### UI Primitives
+
+All UI components use standardized primitives with token-driven styling:
+
+#### Buttons
+```html
+<!-- Primary action button -->
+<button class="ui-btn ui-btn-primary">Save Changes</button>
+
+<!-- Secondary action button -->
+<button class="ui-btn ui-btn-secondary">Cancel</button>
+
+<!-- Danger/destructive action -->
+<button class="ui-btn ui-btn-danger">Delete</button>
+
+<!-- Accent button -->
+<button class="ui-btn ui-btn-accent">Special Action</button>
+
+<!-- Warning button -->
+<button class="ui-btn ui-btn-warning">Warning Action</button>
+
+<!-- Outline button -->
+<button class="ui-btn ui-btn-outline">More Options</button>
+
+<!-- Size variants -->
+<button class="ui-btn ui-btn-primary ui-btn-sm">Small</button>
+<button class="ui-btn ui-btn-primary ui-btn-lg">Large</button>
+```
+
+#### Cards
+```html
+<!-- Base card -->
+<div class="ui-card">Content</div>
+
+<!-- Themed cards -->
+<div class="ui-card ui-card-primary">Primary themed</div>
+<div class="ui-card ui-card-secondary">Secondary themed</div>
+<div class="ui-card ui-card-accent">Accent themed</div>
+
+<!-- Flat card (no hover effects) -->
+<div class="ui-card ui-card-flat">Static card</div>
+```
+
+#### Modals
+```html
+<div class="ui-modal-backdrop hidden">
+  <div class="ui-modal-panel">
+    <div class="ui-modal-header"><h2>Title</h2></div>
+    <div class="ui-modal-body">Content</div>
+    <div class="ui-modal-footer">
+      <button class="ui-btn ui-btn-primary">OK</button>
+    </div>
+  </div>
+</div>
+```
+
+#### Links
+```html
+<!-- Base link -->
+<a href="#" class="ui-link">Link</a>
+
+<!-- Variants -->
+<a href="#" class="ui-link ui-link-primary">Primary Link</a>
+<a href="#" class="ui-link ui-link-secondary">Secondary Link</a>
+<a href="#" class="ui-link ui-link-muted">Muted Link</a>
+
+<!-- Navigation link -->
+<a href="#" class="ui-link ui-link-nav">Nav Item</a>
+```
+
+#### Design Tokens
+
+All styling uses CSS custom properties defined in `src/styles.css`:
+
+- **Colors**: `--token-color-primary`, `--token-color-secondary`, etc.
+- **Spacing**: `--token-spacing-xs` through `--token-spacing-2xl`
+- **Shadows**: `--token-shadow-sm` through `--token-shadow-xl`
+- **Glows**: `--token-shadow-glow-primary`, etc.
+
+See `docs/UI_PRIMITIVES.md` for complete documentation.
+
 ### Shared Components
 
 Include these HTML fragments in your pages:

@@ -44,10 +44,10 @@
     <!-- Main Content -->
     <main id="main-content" class="ml-0 lg:ml-64 p-6 flex-1" role="main">
         <!-- Sticky Header -->
-    <header class="page-header card border flex items-center justify-between">
+    <header class="page-header ui-card border flex items-center justify-between">
             <div>
                 <h2 class="text-3xl font-bold text-white" id="welcome-message">Welcome, Admin!</h2>
-                <p class="text-lg mt-2 nav-link-muted">Administrative Dashboard & Controls</p>
+                <p class="text-lg mt-2 text-gray-400">Administrative Dashboard & Controls</p>
             </div>
             <div class="flex items-center gap-3">
                 <a href="settings.html" class="px-4 py-2 rounded bg-white text-black hover:opacity-95">Settings</a>
@@ -56,58 +56,58 @@
 
         <!-- Content Section -->
         <section aria-label="Administrative functions" class="space-y-6">
-            <p class="mb-6 leading-relaxed nav-link-muted">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
+            <p class="mb-6 leading-relaxed text-gray-400">This is your dashboard. Here you can manage users, view site analytics, and perform administrative tasks.</p>
 
             <!-- Admin Cards Grid with More Than 3 Colors -->
             <div id="admin-functions-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Admin functions">
-                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-blue-600 to-blue-800" tabindex="0" role="article">
+                <div class="card ui-card ui-card-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-blue-600 to-blue-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z" fill="currentColor"></path><path d="M4 20c0-3.314 2.686-6 6-6h4c3.314 0 6 2.686 6 6v1H4v-1z" fill="currentColor"></path></svg>User Management</h3>
-                    <p class="mb-4 nav-link-muted">Manage user accounts and permissions.</p>
+                    <p class="mb-4 text-gray-400">Manage user accounts and permissions.</p>
                     <a href="users.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Manage Users</a>
                 </div>
-                <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-green-600 to-green-800" tabindex="0" role="article">
+                <div class="card ui-card ui-card-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-green-600 to-green-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v2H3V3zM6 7h3v10H6V7zm5 0h3v14h-3V7zm5 0h3v6h-3V7z" fill="currentColor"></path></svg>Analytics</h3>
-                    <p class="mb-4 nav-link-muted">View site statistics and user engagement.</p>
+                    <p class="mb-4 text-gray-400">View site statistics and user engagement.</p>
                     <a href="analytics.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">View Analytics</a>
                 </div>
-                <div class="card widget-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-purple-600 to-purple-800" tabindex="0" role="article">
+                <div class="card ui-card ui-card-accent p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-purple-600 to-purple-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 8a4 4 0 100 8 4 4 0 000-8z" fill="currentColor"></path><path d="M19.4 15a7.963 7.963 0 00.6-3 7.963 7.963 0 00-.6-3l2.1-1.6-2-3.4-2.5 1A8.03 8.03 0 0012 4a8.03 8.03 0 00-5.5 1.5l-2.5-1L2 8l2.1 1.6A7.963 7.963 0 004.6 13c0 1 .2 2 .6 3L3.1 17.6 5.1 21l2.5-1A8.03 8.03 0 0012 20a8.03 8.03 0 005.5-1.5l2.5 1 2-3.4-2.6-1.1z" fill="currentColor"></path></svg>Site Settings</h3>
-                    <p class="mb-4 nav-link-muted">Configure website settings and preferences.</p>
+                    <p class="mb-4 text-gray-400">Configure website settings and preferences.</p>
                     <a href="settings.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Site Settings</a>
                 </div>
-                <div class="card widget-pink p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-pink-600 to-pink-800" tabindex="0" role="article">
+                <div class="ui-card widget-pink p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-pink-600 to-pink-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 5h18v2H3V5zm2 4h14v10H5V9z" fill="currentColor"></path></svg>Audit Logs</h3>
-                    <p class="mb-4 nav-link-muted">View and review all admin actions and changes.</p>
+                    <p class="mb-4 text-gray-400">View and review all admin actions and changes.</p>
                     <a href="audit-logs.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Audit Logs</a>
                 </div>
             </div>
             <!-- Additional Management Cards Row -->
             <div id="product-management-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8" role="region" aria-label="Product and Order Management">
-                <div class="card widget-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-800" tabindex="0" role="article">
+                <div class="card ui-card ui-card-primary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-cyan-600 to-cyan-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 6h18v2H3V6zm2 4h14v8H5v-8z" fill="currentColor"></path></svg>Oil Product Management</h3>
-                    <p class="mb-4 nav-link-muted">Add, edit, and manage oil product inventory and details.</p>
+                    <p class="mb-4 text-gray-400">Add, edit, and manage oil product inventory and details.</p>
                     <a href="oil-products-mgmt.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Oil Products</a>
                 </div>
-                <div class="card widget-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-orange-600 to-orange-800" tabindex="0" role="article">
+                <div class="card ui-card ui-card-secondary p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-orange-600 to-orange-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l4 4h-3v6H11V6H8l4-4zM6 14h12v6H6v-6z" fill="currentColor"></path></svg>Consumables Management</h3>
-                    <p class="mb-4 nav-link-muted">Manage consumables inventory, categories, and stock levels.</p>
+                    <p class="mb-4 text-gray-400">Manage consumables inventory, categories, and stock levels.</p>
                     <a href="consumables-mgmt.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Consumables Management</a>
                 </div>
-                <div class="card widget-red p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-red-600 to-red-800" tabindex="0" role="article">
+                <div class="ui-card widget-red p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-red-600 to-red-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 4h18v2H3V4zm4 6h10v10H7V10z" fill="currentColor"></path></svg>Filters Management</h3>
-                    <p class="mb-4 nav-link-muted">Manage oil filters, air filters, and other filtration products.</p>
+                    <p class="mb-4 text-gray-400">Manage oil filters, air filters, and other filtration products.</p>
                     <a href="filters-mgmt.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Manage Filters</a>
                 </div>
-                <div class="card widget-indigo p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-indigo-600 to-indigo-800" tabindex="0" role="article">
+                <div class="ui-card widget-indigo p-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gradient-to-r from-indigo-600 to-indigo-800" tabindex="0" role="article">
                     <h3 class="text-xl font-semibold mb-3 text-white"><svg class="inline-block w-5 h-5 mr-2 align-middle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 3h18v2H3V3zm2 6h14v12H5V9z" fill="currentColor"></path></svg>Order Review</h3>
-                    <p class="mb-4 nav-link-muted">Review, approve, and track oil and consumables orders.</p>
+                    <p class="mb-4 text-gray-400">Review, approve, and track oil and consumables orders.</p>
                     <a href="orders-review.html" class="w-full block p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 text-center transition-colors duration-200 font-semibold bg-white text-black hover:opacity-95">Review Orders</a>
                 </div>
                 
             </div>
 
             <!-- Additional Pages Links -->
-            <div id="additional-pages" class="mt-8 card p-6 rounded-lg bg-gray-800 border">
+            <div id="additional-pages" class="mt-8 ui-card p-6 rounded-lg bg-gray-800 border">
                 <h3 class="text-xl font-semibold mb-6 text-white">Additional administrative pages</h3>
                 <p class="text-sm text-gray-300 mb-6">Pages are grouped by function for easier access.</p>
 
@@ -446,7 +446,7 @@
                                                             msg.className = 'mb-4 text-gray-300';
                                                             msg.textContent = 'Please sign in to access the Administration dashboard.';
                                                             const btn = document.createElement('button');
-                                                            btn.className = 'btn-neon-blue px-4 py-2 rounded';
+                                                            btn.className = 'ui-btn ui-btn-primary px-4 py-2 rounded';
                                                             btn.textContent = 'Sign in';
                                                             btn.addEventListener('click', function(){
                                                                 const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);

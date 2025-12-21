@@ -21,13 +21,13 @@
 
       <!-- Action Cards -->
       <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="card p-6">
+        <div class="ui-card p-6">
           <h2 class="text-xl font-bold mb-4">📥 Import Data</h2>
           <p class="text-gray-400 mb-4">Import products, users, or other data from CSV or JSON files</p>
           <button id="import-btn" class="btn-primary w-full">Start Import</button>
         </div>
 
-        <div class="card p-6">
+        <div class="ui-card p-6">
           <h2 class="text-xl font-bold mb-4">📤 Export Data</h2>
           <p class="text-gray-400 mb-4">Export data to CSV or JSON format for backup or analysis</p>
           <button id="export-btn" class="btn-primary w-full">Start Export</button>
@@ -35,7 +35,7 @@
       </section>
 
       <!-- Operations History -->
-      <section class="card p-6">
+      <section class="ui-card p-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-semibold">Operations History</h2>
           <button id="refresh-btn" class="btn-secondary px-4 py-2">🔄 Refresh</button>
@@ -87,7 +87,7 @@
 
   <!-- Import Modal -->
   <div id="import-modal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="modal-content card p-6 w-full max-w-4xl">
+    <div class="modal-content ui-card p-6 w-full max-w-4xl">
       <h2 class="text-2xl font-bold mb-4">Import Data</h2>
       
       <form id="import-form">
@@ -163,7 +163,7 @@ Product 2,PROD002,oil,50</pre>
 
   <!-- Export Modal -->
   <div id="export-modal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="modal-content card p-6 w-full max-w-2xl">
+    <div class="modal-content ui-card p-6 w-full max-w-2xl">
       <h2 class="text-2xl font-bold mb-4">Export Data</h2>
       
       <form id="export-form">
@@ -203,7 +203,7 @@ Product 2,PROD002,oil,50</pre>
 
   <!-- Operation Details Modal -->
   <div id="operation-details-modal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="modal-content card p-6 w-full max-w-3xl">
+    <div class="modal-content ui-card p-6 w-full max-w-3xl">
       <h2 class="text-2xl font-bold mb-4">Operation Details</h2>
       <div id="operation-details-content" class="space-y-4"></div>
       <div class="flex gap-4 mt-6">

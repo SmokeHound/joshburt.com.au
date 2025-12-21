@@ -72,17 +72,17 @@
   <!-- Main Content -->
   <main id="main-content" class="p-6 bg-black min-h-screen" role="main">
     <!-- Header Card -->
-  <header class="page-header card border" role="banner">
+  <header class="page-header ui-card border" role="banner">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 class="text-3xl font-bold text-white mb-2">Oil Stock Order Request</h1>
-          <p class="nav-link-muted">Prepare oil inventory order list for purchasing department</p>
+          <p class="text-gray-400">Prepare oil inventory order list for purchasing department</p>
         </div>
         <div class="flex flex-wrap gap-2 mt-2 md:mt-0 no-print">
-          <button id="clearAllBtn" class="btn-neon-pink px-4 py-2 rounded-lg font-semibold">Clear All</button>
-          <button id="saveOrderBtn" class="btn-neon-green px-4 py-2 rounded-lg font-semibold">Save Draft</button>
-          <button id="manageProductsBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Manage Products</button>
-          <button id="emailOrderBtn" class="btn-neon-blue px-4 py-2 rounded-lg font-semibold">Email Order</button>
+          <button id="clearAllBtn" class="ui-btn ui-btn-danger px-4 py-2 rounded-lg font-semibold">Clear All</button>
+          <button id="saveOrderBtn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg font-semibold">Save Draft</button>
+          <button id="manageProductsBtn" class="ui-btn ui-btn-primary px-4 py-2 rounded-lg font-semibold">Manage Products</button>
+          <button id="emailOrderBtn" class="ui-btn ui-btn-primary px-4 py-2 rounded-lg font-semibold">Email Order</button>
         </div>
       </div>
       
@@ -90,7 +90,7 @@
     </header>
 
   <!-- Order Info Form (standalone card) -->
-  <section class="card rounded-lg shadow p-6 mb-6 bg-gray-900 border border-gray-700">
+  <section class="ui-card rounded-lg shadow p-6 mb-6 bg-gray-900 border border-gray-700">
       <h2 class="text-lg font-semibold text-gray-100 mb-4">Order Information</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
@@ -120,7 +120,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Available Oils -->
       <!-- Neon card for available oils -->
-  <div class="card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
+  <div class="ui-card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
         <div class="p-6 border-b border-gray-200 dark:border-gray-600">
           <h2 class="text-xl font-semibold text-gray-100">Available Oil Products</h2>
           <p class="text-sm text-gray-400 mt-1">Click on items to add to order list</p>
@@ -152,7 +152,7 @@
       
       <!-- Order List -->
       <!-- Neon card for order list -->
-  <div class="card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
+  <div class="ui-card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
         <div class="p-6 border-b border-gray-200 dark:border-gray-600">
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-semibold text-gray-100">Order List</h2>
@@ -175,7 +175,7 @@
             <span id="totalOrderItems">0</span>
           </div>
           <!-- Add submit order button for consistency with template -->
-          <button id="submitOrderBtn" class="mt-4 w-full btn-neon-green p-3 rounded-lg font-bold">Submit Order</button>
+          <button id="submitOrderBtn" class="mt-4 w-full ui-btn ui-btn-secondary p-3 rounded-lg font-bold">Submit Order</button>
           <div id="submitOrderStatus" class="mt-2 text-green-400 font-semibold"></div>
         </div>
       </div>

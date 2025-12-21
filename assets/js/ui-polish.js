@@ -89,7 +89,7 @@
             <button id="confirm-cancel" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white font-medium transition-colors" style="min-width: 100px;">
               ${cancelText}
             </button>
-            <button id="confirm-action" class="px-4 py-2 rounded-lg ${type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'btn-neon-blue'} text-white font-medium transition-colors" style="min-width: 100px;">
+            <button id="confirm-action" class="px-4 py-2 rounded-lg ${type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'ui-btn ui-btn-primary'} text-white font-medium transition-colors" style="min-width: 100px;">
               ${confirmText}
             </button>
           </div>
