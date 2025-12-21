@@ -21,8 +21,8 @@
   <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
   <style>
     /* Page-specific styles only */
-    .filter-item {transition:all .2s ease;background:#111;border:1px solid #333}
-    .filter-item:hover {background:#181818;border-color:#00d4ff;box-shadow:0 4px 20px rgba(0,212,255,.2)}
+        .filter-item {transition:all .2s ease;background:var(--token-bg-secondary);border:1px solid var(--token-border-default)}
+        .filter-item:hover {background:var(--token-bg-tertiary);border-color:var(--token-color-primary);box-shadow:0 4px 20px var(--token-color-primary-alpha-20)}
   </style>
   <link rel="stylesheet" href="./assets/css/accessibility.css" />
   <script src="./assets/js/accessibility.js" defer></script>
@@ -36,13 +36,6 @@
         <div class="flex min-h-screen">
             <!-- Shared Navigation Loader -->
             <div id="main-nav"></div>
-            <script>
-              fetch('shared-nav.html').then(r => r.text()).then(html => {
-                document.getElementById('main-nav').innerHTML = html;
-                // Call the function to highlight the active nav link after insertion
-                if (window.setActiveNavLink) window.setActiveNavLink();
-              });
-            </script>
                         <!-- Main Content -->
                         <main id="main-content" class="flex-1 p-4 md:p-6" role="main">
                         <div class="max-w-6xl mx-auto">

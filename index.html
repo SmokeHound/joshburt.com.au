@@ -26,38 +26,6 @@
   <div class="flex min-h-screen">
     <!-- Shared Navigation Loader -->
     <div id="main-nav"></div>
-    <script>
-      // Dynamically load shared navigation (inject only the sidebar, not the full HTML document)
-      (async function loadSharedNav() {
-        try {
-          const res = await fetch('shared-nav.html');
-          if (!res.ok) return;
-          const html = await res.text();
-          const container = document.getElementById('main-nav');
-          if (!container) return;
-
-          const doc = new DOMParser().parseFromString(html, 'text/html');
-          const sidebar = doc.querySelector('aside#sidebar');
-          if (sidebar) {
-            container.innerHTML = '';
-            container.appendChild(sidebar);
-          }
-
-          // Execute scripts from the shared nav after inserting the sidebar
-          doc.querySelectorAll('script').forEach(node => {
-            const s = document.createElement('script');
-            if (node.src) s.src = node.src;
-            s.type = node.type || 'text/javascript';
-            s.text = node.textContent;
-            document.body.appendChild(s);
-          });
-
-          if (window.setActiveNavLink) window.setActiveNavLink();
-        } catch (_) {
-          // no-op
-        }
-      })();
-    </script>
 
     <!-- Main Content -->
   <main id="main-content" class="flex-1 p-4 md:p-6" role="main">
