@@ -411,7 +411,17 @@ Product 2,PROD002,oil,50</pre>
           result.error_count === 0 ? 'success' : 'warning'
         );
 
-        document.getElementById('import-modal').classList.add('hidden');
+        if (window.BulkOpsModal && typeof window.BulkOpsModal.hide === 'function') {
+          window.BulkOpsModal.hide('import-modal');
+        } else {
+          document.getElementById('import-modal').classList.add('hidden');
+          const backdrop = document.getElementById('modal-backdrop');
+          if (backdrop) {
+            backdrop.classList.add('hidden');
+            backdrop.classList.remove('block');
+          }
+          document.body.style.overflow = '';
+        }
         document.getElementById('import-form').reset();
         document.getElementById('import-step-1').classList.remove('hidden');
         document.getElementById('import-step-2').classList.add('hidden');
@@ -449,7 +459,18 @@ Product 2,PROD002,oil,50</pre>
         document.body.removeChild(a);
 
         showNotification('Export downloaded successfully', 'success');
-        document.getElementById('export-modal').classList.add('hidden');
+
+        if (window.BulkOpsModal && typeof window.BulkOpsModal.hide === 'function') {
+          window.BulkOpsModal.hide('export-modal');
+        } else {
+          document.getElementById('export-modal').classList.add('hidden');
+          const backdrop = document.getElementById('modal-backdrop');
+          if (backdrop) {
+            backdrop.classList.add('hidden');
+            backdrop.classList.remove('block');
+          }
+          document.body.style.overflow = '';
+        }
         document.getElementById('export-form').reset();
 
       } catch (error) {
@@ -497,7 +518,11 @@ Product 2,PROD002,oil,50</pre>
           ` : ''}
         `;
 
-        document.getElementById('operation-details-modal').classList.remove('hidden');
+        if (window.BulkOpsModal && typeof window.BulkOpsModal.show === 'function') {
+          window.BulkOpsModal.show('operation-details-modal');
+        } else {
+          document.getElementById('operation-details-modal').classList.remove('hidden');
+        }
 
       } catch (error) {
         console.error('Error viewing operation:', error);
@@ -642,6 +667,11 @@ Product 2,PROD002,oil,50</pre>
 
       // ensure backdrop exists but hidden
       ensureBackdrop();
+
+      // expose modal helpers so import/export handlers can close cleanly
+      window.BulkOpsModal = window.BulkOpsModal || {};
+      window.BulkOpsModal.show = showModal;
+      window.BulkOpsModal.hide = hideModal;
       // Initialize
       loadOperations();
     })();
