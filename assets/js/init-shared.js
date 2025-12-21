@@ -601,13 +601,37 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!container) {
       return;
     }
-    // Only inject if container is empty (avoid double-injection)
-    if (container.children.length === 0) {
+
+    // Allow pages to opt out of nav injection (e.g., login/register screens)
+    if (container.classList.contains('hidden') || container.getAttribute('data-no-nav') === 'true') {
+      return;
+    }
+
+    // Only inject if needed (avoid double-injection)
+    // - Some pages still do inline `innerHTML = navHTML` which does NOT execute scripts.
+    //   In that case, we re-inject and replay the scripts.
+    if (container.getAttribute('data-nav-injected') === 'true') {
+      return;
+    }
+
+    const hasSidebarMarkup = !!container.querySelector('#sidebar');
+    const isNavInitialized = typeof window.setActiveNavLink === 'function';
+    const shouldInject = container.children.length === 0 || (hasSidebarMarkup && !isNavInitialized);
+
+    if (shouldInject) {
       fetch('shared-nav.html')
         .then(r => r.text())
         .then(html => {
           const t = document.createElement('div');
           t.innerHTML = html;
+
+          // Replace any partial/incorrect markup (prevents duplicates)
+          try {
+            container.innerHTML = '';
+          } catch (_) {
+            /* noop */
+          }
+
           Array.from(t.childNodes).forEach(node => {
             if (node.tagName === 'SCRIPT') {
               const s = document.createElement('script');
@@ -621,6 +645,17 @@ document.addEventListener('DOMContentLoaded', function () {
               container.appendChild(node);
             }
           });
+
+          container.setAttribute('data-nav-injected', 'true');
+
+          try {
+            if (document.getElementById('sidebar')) {
+              document.body.classList.add('has-sidebar');
+            }
+          } catch (_) {
+            /* noop */
+          }
+
           if (window.setActiveNavLink) {
             window.setActiveNavLink();
           }

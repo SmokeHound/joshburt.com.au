@@ -497,7 +497,7 @@ body {
     pointer-events: auto;
   }
   
-  main, #main-content {
+  body.has-sidebar main, body.has-sidebar #main-content {
     margin-left: var(--sidebar-width, 16rem);
     transition: margin-left var(--token-transition-slow);
   }

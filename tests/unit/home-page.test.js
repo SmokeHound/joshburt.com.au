@@ -22,8 +22,8 @@ describe('Home Page', () => {
   test('should render main content structure', () => {
     expect(document.querySelector('main')).toBeTruthy();
     expect(document.getElementById('welcome-message')).toBeTruthy();
-    // Adjust expected count if cards change
-    expect(document.querySelectorAll('.card').length).toBeGreaterThanOrEqual(1);
+    // Use ui-card primitives (token/component layer)
+    expect(document.querySelectorAll('.ui-card').length).toBeGreaterThanOrEqual(1);
   });
 
   test('should display login modal when login button is clicked', () => {
