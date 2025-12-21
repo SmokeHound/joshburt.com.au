@@ -21,24 +21,42 @@
   
   
   <!-- MOBILE MENU TOGGLE -->
-  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" style="z-index: 150;" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
   <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
   <div class="flex min-h-screen">
     <!-- Shared Navigation Loader -->
     <div id="main-nav"></div>
     <script>
-      // Dynamically load shared navigation
-      fetch('shared-nav.html')
-        .then(response => response.text())
-        .then(html => { 
+      // Dynamically load shared navigation (inject only the sidebar, not the full HTML document)
+      (async function loadSharedNav() {
+        try {
+          const res = await fetch('shared-nav.html');
+          if (!res.ok) return;
+          const html = await res.text();
           const container = document.getElementById('main-nav');
-          const t = document.createElement('div'); t.innerHTML = html;
-          Array.from(t.childNodes).forEach(node => {
-            if (node.tagName === 'SCRIPT') { const s = document.createElement('script'); if (node.src) s.src = node.src; s.type = node.type || 'text/javascript'; s.text = node.textContent; document.body.appendChild(s); } else { container.appendChild(node); }
+          if (!container) return;
+
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const sidebar = doc.querySelector('aside#sidebar');
+          if (sidebar) {
+            container.innerHTML = '';
+            container.appendChild(sidebar);
+          }
+
+          // Execute scripts from the shared nav after inserting the sidebar
+          doc.querySelectorAll('script').forEach(node => {
+            const s = document.createElement('script');
+            if (node.src) s.src = node.src;
+            s.type = node.type || 'text/javascript';
+            s.text = node.textContent;
+            document.body.appendChild(s);
           });
-          // Call the function to highlight the active nav link after insertion
+
           if (window.setActiveNavLink) window.setActiveNavLink();
-        }).catch(()=>{});
+        } catch (_) {
+          // no-op
+        }
+      })();
     </script>
 
     <!-- Main Content -->
