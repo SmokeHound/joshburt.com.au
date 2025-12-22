@@ -50,17 +50,6 @@
         <div class="flex min-h-screen">
             <!-- Shared Navigation Loader -->
             <div id="main-nav"></div>
-                        <script>
-                            fetch('shared-nav.html').then(r => r.text()).then(html => {
-                                const container = document.getElementById('main-nav');
-                                const t = document.createElement('div'); t.innerHTML = html;
-                                Array.from(t.childNodes).forEach(node => {
-                                    if (node.tagName === 'SCRIPT') { const s = document.createElement('script'); if (node.src) s.src = node.src; s.type = node.type || 'text/javascript'; s.text = node.textContent; document.body.appendChild(s); } else { container.appendChild(node); }
-                                });
-                                // Call the function to highlight the active nav link after insertion
-                                if (window.setActiveNavLink) window.setActiveNavLink();
-                            }).catch(()=>{});
-                        </script>
                         <!-- Main Content -->
                         <main id="main-content" class="flex-1 p-4 md:p-6" role="main">
                         <div class="max-w-6xl mx-auto">

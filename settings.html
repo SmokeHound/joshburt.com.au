@@ -74,32 +74,6 @@
       <!-- Shared Navigation Loader -->
       <div class="flex flex-col md:flex-row min-h-screen">
         <div id="main-nav"></div>
-      <script>
-        // Dynamically load shared navigation and execute any inline scripts
-        fetch('shared-nav.html')
-          .then(response => response.text())
-          .then(html => {
-            const container = document.getElementById('main-nav');
-            const t = document.createElement('div');
-            t.innerHTML = html;
-            // Move non-script nodes into the container and execute scripts
-            Array.from(t.childNodes).forEach(node => {
-              if (node.tagName === 'SCRIPT') {
-                const script = document.createElement('script');
-                if (node.src) script.src = node.src;
-                script.type = node.type || 'text/javascript';
-                script.text = node.textContent;
-                // Append to body so it executes in document context
-                document.body.appendChild(script);
-              } else {
-                container.appendChild(node);
-              }
-            });
-            // Call the function to highlight the active nav link after insertion
-            if (window.setActiveNavLink) window.setActiveNavLink();
-          })
-          .catch(() => {});
-      </script>
 
       <!-- Main -->
       <main id="main-content" class="flex-1 p-4 md:p-6" role="main">

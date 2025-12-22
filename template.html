@@ -36,26 +36,7 @@
         - Loads shared-config.html and shared-theme.html for theme and config JS
         - Ensures theme toggle and config are consistent across all pages
     -->
-    <script>
-        fetch('shared-config.html').then(r => r.text()).then(html => {
-            const temp = document.createElement('div');
-            temp.innerHTML = html;
-            Array.from(temp.children).forEach(child => {
-                if (child.tagName === 'LINK' || child.tagName === 'STYLE' || child.tagName === 'SCRIPT') {
-                    document.head.appendChild(child.cloneNode(true));
-                }
-            });
-        });
-        fetch('shared-theme.html').then(r => r.text()).then(html => {
-            const temp = document.createElement('div');
-            temp.innerHTML = html;
-            Array.from(temp.children).forEach(child => {
-                if (child.tagName === 'SCRIPT') {
-                    document.head.appendChild(child.cloneNode(true));
-                }
-            });
-        });
-    </script>
+    <script src="./assets/js/init-shared.js" defer></script>
     <!--
         Place custom page-specific styles here if needed (prefer external CSS)
     -->
@@ -87,13 +68,6 @@
     -->
     <!-- Shared Navigation Loader -->
     <div id="main-nav"></div>
-    <script>
-      fetch('shared-nav.html').then(r => r.text()).then(html => {
-        document.getElementById('main-nav').innerHTML = html;
-        // Call the function to highlight the active nav link after insertion
-        if (window.setActiveNavLink) window.setActiveNavLink();
-      });
-    </script>
     <!--
         MAIN CONTENT AREA
         - Contains all example UI elements

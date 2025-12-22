@@ -33,12 +33,6 @@
 
   <!-- Shared Navigation -->
   <div id="main-nav"></div>
-  <script>
-    fetch('shared-nav.html').then(r => r.text()).then(html => {
-      document.getElementById('main-nav').innerHTML = html;
-      if (window.setActiveNavLink) window.setActiveNavLink();
-    });
-  </script>
 
   <!-- Main Content -->
   <main id="main-content" class="p-6 bg-black min-h-screen" role="main">

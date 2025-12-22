@@ -4,15 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Service Unavailable — joshburt.com.au</title>
-  <script>
-    // Inject shared config (styles, theme, a11y helpers)
-    fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName))document.head.appendChild(c.cloneNode(true));});});
-  </script>
+  <script src="./assets/js/init-shared.js" defer></script>
   <link rel="icon" href="/favicon.ico" />
 </head>
 <body class="min-h-screen">
   <nav id="main-nav"></nav>
-  <script>fetch('shared-nav.html').then(r=>r.text()).then(h=>{document.getElementById('main-nav').innerHTML=h;if(window.setActiveNavLink)window.setActiveNavLink();});</script>
 
   <main id="main" class="container mx-auto p-6">
     <header class="page-header ui-card border">
