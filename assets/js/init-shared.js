@@ -1,5 +1,14 @@
 // assets/js/init-shared.js
 (function initShared() {
+  // Resolve project-relative assets consistently even when the current URL is a nested path
+  // (e.g., Netlify error pages shown at /some/missing/path).
+  function toRootPath(p) {
+    if (!p) return p;
+    if (/^https?:\/\//i.test(p)) return p;
+    const cleaned = String(p).replace(/^\.\//, '');
+    return cleaned.startsWith('/') ? cleaned : '/' + cleaned;
+  }
+
   // Compute a functions base that works on Netlify and non-Netlify hosts
   (function computeFnBase() {
     const defaultBase = '/.netlify/functions';
@@ -68,21 +77,21 @@
   function registerSW() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        navigator.serviceWorker.register(toRootPath('sw.js')).catch(() => {});
       });
     }
   }
   // Start
-  injectFragment('shared-config.html', ['LINK', 'STYLE', 'SCRIPT']).then(applyColors);
-  injectFragment('shared-theme.html', ['SCRIPT']);
+  injectFragment(toRootPath('shared-config.html'), ['LINK', 'STYLE', 'SCRIPT']).then(applyColors);
+  injectFragment(toRootPath('shared-theme.html'), ['SCRIPT']);
   // Load shared notifications (styles + logic) to centralize all notification UI/styling
-  injectFragment('shared-notifications.html', ['STYLE', 'SCRIPT']);
+  injectFragment(toRootPath('shared-notifications.html'), ['STYLE', 'SCRIPT']);
   applyColors();
 
   // Load audit.js for page visit tracking (injected dynamically to ensure it's available everywhere)
   (function loadAuditScript() {
     const script = document.createElement('script');
-    script.src = './assets/js/audit.js';
+    script.src = toRootPath('assets/js/audit.js');
     script.defer = true;
     document.head.appendChild(script);
   })();
@@ -227,7 +236,7 @@
         const ru = encodeURIComponent(
           (window.location && window.location.pathname + window.location.search) || '/'
         );
-        window.location.href = 'login.html?message=login-required&returnUrl=' + ru;
+        window.location.href = toRootPath('login.html') + '?message=login-required&returnUrl=' + ru;
       } catch (_) {
         void 0;
       }
@@ -619,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const shouldInject = container.children.length === 0 || (hasSidebarMarkup && !isNavInitialized);
 
     if (shouldInject) {
-      fetch('shared-nav.html')
+      fetch('/shared-nav.html')
         .then(r => r.text())
         .then(html => {
           const t = document.createElement('div');

@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg">
   <link rel="stylesheet" href="./assets/css/styles.css">
   <!-- Shared bootstrap: functions base, auth, notifications, and auth-aware fetch -->
-  <script src="./assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/init-shared.js" defer></script>
   <!-- Load shared modal utilities -->
   <script>
     fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='STYLE'||c.tagName==='SCRIPT'){document.head.appendChild(c.cloneNode(true));}});});

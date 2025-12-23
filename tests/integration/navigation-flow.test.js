@@ -10,12 +10,12 @@ describe('Navigation & Shared Components Integration', () => {
     document.body.innerHTML = navHTML;
 
     const expectedLinks = [
-      'index.html',
-      'administration.html',
-      'analytics.html',
-      'settings.html',
-      'oil-products.html',
-      'consumables.html'
+      '/index.html',
+      '/administration.html',
+      '/analytics.html',
+      '/settings.html',
+      '/oil-products.html',
+      '/consumables.html'
     ];
 
     expectedLinks.forEach(href => {

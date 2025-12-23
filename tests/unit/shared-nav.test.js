@@ -55,13 +55,14 @@ describe('Shared Navigation Component', () => {
 
     navLinks.forEach(link => {
       const href = link.getAttribute('href');
-      if (href === currentPage) {
+      const hrefPage = (href || '').split('/').pop();
+      if (hrefPage === currentPage) {
         link.classList.add('bg-primary', 'text-white');
         link.setAttribute('aria-current', 'page');
       }
     });
 
-    const adminLink = document.querySelector('a[href="administration.html"]');
+    const adminLink = document.querySelector('a[href="/administration.html"]');
     expect(adminLink.classList.contains('bg-primary')).toBe(true);
     expect(adminLink.getAttribute('aria-current')).toBe('page');
   });
