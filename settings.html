@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Site Settings</title>
-  <link rel="manifest" href="./manifest.json" />
-  <link rel="apple-touch-icon" href="./assets/images/logo-placeholder.svg" />
-  <link rel="stylesheet" href="./assets/css/styles.css" />
-  <link rel="stylesheet" href="./assets/css/accessibility.css" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="/assets/css/accessibility.css" />
   <style>
     /* Compact mode for Settings page: reduce paddings, gaps and font-sizes */
     #main-content { padding: 0.5rem !important; }
@@ -48,13 +48,13 @@
     #main-content .h-16 { height:48px !important; }
   </style>
   <!-- Load theme manager first to ensure window.Theme is available -->
-  <script src="./assets/js/theme-manager.js"></script>
+  <script src="/assets/js/theme-manager.js"></script>
   <script src="/assets/js/init-shared.js" defer></script>
-  <script src="./assets/js/feature-flags.js" defer></script>
-  <script src="./assets/js/accessibility.js" defer></script>
-  <script src="./assets/js/theme-enhanced.js" defer></script>
-  <script src="./assets/js/theme-ui.js" defer></script>
-  <script src="./assets/js/settings-theme-cards.js" defer></script>
+  <script src="/assets/js/feature-flags.js" defer></script>
+  <script src="/assets/js/accessibility.js" defer></script>
+  <script src="/assets/js/theme-enhanced.js" defer></script>
+  <script src="/assets/js/theme-ui.js" defer></script>
+  <script src="/assets/js/settings-theme-cards.js" defer></script>
   <script>
     // Purge legacy role demo key to avoid stale UI state
     try { localStorage.removeItem('currentUser'); } catch (_) {}
