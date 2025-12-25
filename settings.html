@@ -1123,7 +1123,26 @@
     async function saveSettingsQuiet() {
       try {
         const settings = getFormSettings();
-        const FN_BASE = window.FN_BASE || '/.netlify/functions';
+        const FN_BASE =
+          window.FN_BASE ||
+          (function resolveFnBase() {
+            const defaultBase = '/.netlify/functions';
+            try {
+              const host = (window.location && window.location.hostname) || '';
+              if (
+                host.endsWith('netlify.app') ||
+                host === 'localhost' ||
+                host === '127.0.0.1' ||
+                host.startsWith('localhost') ||
+                host.startsWith('127.0.0.1')
+              ) {
+                return defaultBase;
+              }
+              return 'https://joshburt.netlify.app/.netlify/functions';
+            } catch (_) {
+              return defaultBase;
+            }
+          })();
         const token = getAuthToken();
         
         await fetch(`${FN_BASE}/settings`, {
@@ -1137,7 +1156,15 @@
         
         markSaved();
       } catch (e) {
-        console.error('Quiet save failed:', e);
+        // Quiet save should not spam console or UI; theme/palette is still stored locally.
+        try {
+          if (!window.__quietSaveWarned) {
+            window.__quietSaveWarned = true;
+            console.warn('Quiet save skipped (settings API unreachable).', e);
+          }
+        } catch (_) {
+          /* noop */
+        }
       }
     }
     

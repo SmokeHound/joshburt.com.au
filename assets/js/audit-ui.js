@@ -66,11 +66,11 @@
           <table class="min-w-full text-sm">
             <thead class="bg-gray-100 dark:bg-gray-800 text-left">
               <tr>
-                <th class="p-2">Time</th>
-                <th class="p-2">User</th>
-                <th class="p-2">Action</th>
-                <th class="p-2">Details</th>
-                <th class="p-2">IP</th>
+                <th class="px-2 py-1">Time</th>
+                <th class="px-2 py-1">User</th>
+                <th class="px-2 py-1">Action</th>
+                <th class="px-2 py-1">Details</th>
+                <th class="px-2 py-1">IP</th>
               </tr>
             </thead>
             <tbody id="audit-tbody" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
@@ -240,7 +240,7 @@
           : '';
         const action = row.action || '';
         const formattedAction = formatAction(action);
-        const actionIconEmoji = getActionIcon(action);
+          const actionIconEmoji = getActionIcon(action);
         const ip = row.ip_address || row.ip || '';
 
         // Build details view: parse JSON if possible
@@ -268,7 +268,7 @@
 
           // For page visits, show page title prominently
           if (isPageVisit && pageTitle) {
-            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-blue-600 text-white mr-1" title="Page Title">${escapeHtml(pageTitle.length > 30 ? pageTitle.slice(0, 27) + '…' : pageTitle)}</span>`;
+            chipsHtml += `<span class="inline-block text-[10px] leading-none px-2 py-0.5 rounded bg-blue-600 text-white mr-1" title="Page Title">${escapeHtml(pageTitle.length > 30 ? pageTitle.slice(0, 27) + '…' : pageTitle)}</span>`;
           }
 
           if (m) {
@@ -284,13 +284,13 @@
             } else if (m === 'DELETE') {
               methodColor = 'bg-red-700';
             }
-            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded text-white ${methodColor} mr-1">${escapeHtml(m)}</span>`;
+            chipsHtml += `<span class="inline-block text-[10px] leading-none px-2 py-0.5 rounded text-white ${methodColor} mr-1">${escapeHtml(m)}</span>`;
           }
           if (p) {
-            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(p.length > 40 ? p.slice(0, 37) + '…' : p)}</span>`;
+            chipsHtml += `<span class="inline-block text-[10px] leading-none px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(p.length > 40 ? p.slice(0, 37) + '…' : p)}</span>`;
           }
           if (rid) {
-            chipsHtml += `<span class="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(String(rid).slice(0, 12))}</span>`;
+            chipsHtml += `<span class="inline-block text-[10px] leading-none px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mr-1">${escapeHtml(String(rid).slice(0, 12))}</span>`;
           }
         }
 
@@ -339,13 +339,13 @@
             detailsPart =
               '<div class="mb-1 flex items-center gap-1">' +
               chipsHtml +
-              '<button class="audit-open-modal px-2 py-0.5 text-[10px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400 ml-1" data-base="' +
+              '<button class="audit-open-modal inline-flex items-center text-[10px] leading-none px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400 ml-1" data-base="' +
               base +
               '">Details</button></div>';
           } else {
             // Standalone Details button
             detailsPart =
-              '<div class="mb-1"><button class="audit-open-modal px-2 py-0.5 text-[10px] rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400" data-base="' +
+              '<div class="mb-1"><button class="audit-open-modal inline-flex items-center text-[10px] leading-none px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400" data-base="' +
               base +
               '">Details</button></div>';
           }
@@ -354,15 +354,15 @@
         }
 
         return `<tr>
-        <td class="p-2 align-top whitespace-nowrap">${created}</td>
-        <td class="p-2 align-top">${userHtml}</td>
-        <td class="p-2 align-top font-medium" title="${escapeHtml(action)}"><span class="mr-1">${actionIconEmoji}</span>${escapeHtml(formattedAction)}</td>
-        <td class="p-2 align-top max-w-sm break-words">
+        <td class="px-2 py-1 align-top whitespace-nowrap">${created}</td>
+        <td class="px-2 py-1 align-top">${userHtml}</td>
+        <td class="px-2 py-1 align-top font-medium" title="${escapeHtml(action)}"><span class="mr-1">${actionIconEmoji}</span>${escapeHtml(formattedAction)}</td>
+        <td class="px-2 py-1 align-top max-w-sm break-words">
           ${detailsPart}
           ${hiddenPretty}
           ${hiddenRaw}
         </td>
-        <td class="p-2 align-top whitespace-nowrap text-xs">${ip}</td>
+        <td class="px-2 py-1 align-top whitespace-nowrap text-xs">${ip}</td>
       </tr>`;
       })
       .join('');
