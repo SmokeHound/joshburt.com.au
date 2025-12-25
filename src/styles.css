@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.js";
+@source "../*.html";
+@source "../assets/js/**/*.js";
 
 /* ============================================================================
    DESIGN TOKENS - Token-driven CSS architecture
@@ -443,7 +444,9 @@ body {
 }
 
 .ui-link-nav {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--token-spacing-sm);
   padding: var(--token-spacing-sm);
   border-radius: var(--token-radius-md);
   color: var(--token-text-secondary);
