@@ -9,9 +9,9 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "./assets/images/logo.jpeg",
+      "src": "./assets/images/icon2.png",
       "sizes": "any",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
