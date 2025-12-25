@@ -240,7 +240,7 @@
           : '';
         const action = row.action || '';
         const formattedAction = formatAction(action);
-          const actionIconEmoji = getActionIcon(action);
+        const actionIconEmoji = getActionIcon(action);
         const ip = row.ip_address || row.ip || '';
 
         // Build details view: parse JSON if possible
