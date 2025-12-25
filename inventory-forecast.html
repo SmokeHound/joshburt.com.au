@@ -391,6 +391,57 @@ async function updateChart() {
     
     const dates = Object.keys(dateMap).sort();
     const demands = dates.map(d => dateMap[d]);
+
+    function getCssVar(name, fallback) {
+      try {
+        const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        return v || fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function colorToRgba(color, alpha) {
+      if (!color) return color;
+      const c = String(color).trim();
+      const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+      const a = clamp(Number(alpha), 0, 1);
+
+      if (c.startsWith('rgba(')) {
+        const parts = c
+          .slice(5, -1)
+          .split(',')
+          .map(p => p.trim());
+        if (parts.length >= 3) {
+          return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+        }
+      }
+      if (c.startsWith('rgb(')) {
+        const parts = c
+          .slice(4, -1)
+          .split(',')
+          .map(p => p.trim());
+        if (parts.length >= 3) {
+          return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+        }
+      }
+      if (c.startsWith('#')) {
+        const raw = c.slice(1);
+        const hex = raw.length === 3 ? raw.split('').map(ch => ch + ch).join('') : raw;
+        if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+          const r = parseInt(hex.slice(0, 2), 16);
+          const g = parseInt(hex.slice(2, 4), 16);
+          const b = parseInt(hex.slice(4, 6), 16);
+          return `rgba(${r}, ${g}, ${b}, ${a})`;
+        }
+      }
+      return c;
+    }
+
+    const primary = getCssVar('--token-color-primary', 'rgb(59, 130, 246)');
+    const fill = getCssVar('--token-color-primary-alpha-10', colorToRgba(primary, 0.1));
+    const text = getCssVar('--token-text-secondary', 'rgb(209, 213, 219)');
+    const grid = getCssVar('--token-border-default', 'rgba(255, 255, 255, 0.1)');
     
     const ctx = document.getElementById('forecast-chart').getContext('2d');
     
@@ -405,8 +456,8 @@ async function updateChart() {
         datasets: [{
           label: 'Predicted Demand',
           data: demands,
-          borderColor: 'rgb(59, 130, 246)',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderColor: primary,
+          backgroundColor: fill,
           tension: 0.4,
           fill: true
         }]
@@ -417,22 +468,55 @@ async function updateChart() {
         plugins: {
           legend: {
             display: true,
-            labels: { color: 'rgb(209, 213, 219)' }
+            labels: { color: text }
           }
         },
         scales: {
           x: {
-            ticks: { color: 'rgb(209, 213, 219)' },
-            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            ticks: { color: text },
+            grid: { color: colorToRgba(grid, 0.25) }
           },
           y: {
-            ticks: { color: 'rgb(209, 213, 219)' },
-            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+            ticks: { color: text },
+            grid: { color: colorToRgba(grid, 0.25) },
             beginAtZero: true
           }
         }
       }
     });
+
+    try {
+      if (!window.__inventoryForecastThemeListener) {
+        window.__inventoryForecastThemeListener = function() {
+          try {
+            if (!forecastChart) return;
+            const p = getCssVar('--token-color-primary', 'rgb(59, 130, 246)');
+            const f = getCssVar('--token-color-primary-alpha-10', colorToRgba(p, 0.1));
+            const tx = getCssVar('--token-text-secondary', 'rgb(209, 213, 219)');
+            const gd = getCssVar('--token-border-default', 'rgba(255, 255, 255, 0.1)');
+            forecastChart.data.datasets[0].borderColor = p;
+            forecastChart.data.datasets[0].backgroundColor = f;
+            if (forecastChart.options?.plugins?.legend?.labels) {
+              forecastChart.options.plugins.legend.labels.color = tx;
+            }
+            if (forecastChart.options?.scales?.x?.ticks) {
+              forecastChart.options.scales.x.ticks.color = tx;
+            }
+            if (forecastChart.options?.scales?.y?.ticks) {
+              forecastChart.options.scales.y.ticks.color = tx;
+            }
+            if (forecastChart.options?.scales?.x?.grid) {
+              forecastChart.options.scales.x.grid.color = colorToRgba(gd, 0.25);
+            }
+            if (forecastChart.options?.scales?.y?.grid) {
+              forecastChart.options.scales.y.grid.color = colorToRgba(gd, 0.25);
+            }
+            forecastChart.update();
+          } catch (e) {}
+        };
+        window.addEventListener('theme:changed', window.__inventoryForecastThemeListener);
+      }
+    } catch (e) {}
     
   } catch (error) {
     console.error('Error updating chart:', error);

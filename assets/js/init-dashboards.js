@@ -1,5 +1,74 @@
 // Shared dashboard initialization helper
 (function(){
+  let stockTrendChart = null;
+
+  function getCssVar(name, fallback){
+    try{
+      const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return v || fallback;
+    }catch(e){
+      return fallback;
+    }
+  }
+
+  function colorToRgba(color, alpha){
+    if(!color) return color;
+    const c = String(color).trim();
+    const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+    const a = clamp(Number(alpha), 0, 1);
+
+    if(c.startsWith('rgba(')){
+      const parts = c.slice(5, -1).split(',').map(p => p.trim());
+      if(parts.length >= 3) return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+    }
+    if(c.startsWith('rgb(')){
+      const parts = c.slice(4, -1).split(',').map(p => p.trim());
+      if(parts.length >= 3) return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+    }
+    if(c.startsWith('#')){
+      const raw = c.slice(1);
+      const hex = raw.length === 3 ? raw.split('').map(ch => ch + ch).join('') : raw;
+      if(/^[0-9a-fA-F]{6}$/.test(hex)){
+        const r = parseInt(hex.slice(0,2), 16);
+        const g = parseInt(hex.slice(2,4), 16);
+        const b = parseInt(hex.slice(4,6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
+      }
+    }
+    return c;
+  }
+
+  function applyStockTrendTheme(){
+    if(!stockTrendChart) return;
+    try{
+      const primary = getCssVar('--token-color-primary', '#3b82f6');
+      const text = getCssVar('--token-text-secondary', 'rgb(209, 213, 219)');
+      const grid = getCssVar('--token-border-default', 'rgba(255,255,255,0.1)');
+
+      if(stockTrendChart.data?.datasets?.[0]){
+        stockTrendChart.data.datasets[0].backgroundColor = colorToRgba(primary, 0.7);
+        stockTrendChart.data.datasets[0].borderColor = primary;
+      }
+      if(stockTrendChart.options?.plugins?.legend?.labels){
+        stockTrendChart.options.plugins.legend.labels.color = text;
+      }
+      if(stockTrendChart.options?.scales?.x?.ticks){
+        stockTrendChart.options.scales.x.ticks.color = text;
+      }
+      if(stockTrendChart.options?.scales?.y?.ticks){
+        stockTrendChart.options.scales.y.ticks.color = text;
+      }
+      if(stockTrendChart.options?.scales?.x?.grid){
+        stockTrendChart.options.scales.x.grid.color = colorToRgba(grid, 0.25);
+      }
+      if(stockTrendChart.options?.scales?.y?.grid){
+        stockTrendChart.options.scales.y.grid.color = colorToRgba(grid, 0.25);
+      }
+      stockTrendChart.update();
+    }catch(e){
+      // ignore
+    }
+  }
   function loadScript(url){
     return new Promise((resolve, reject) => {
       if (document.querySelector(`script[src="${url}"]`)) return resolve();
@@ -88,10 +157,21 @@
           const data = low.slice(0,6).map(p => p.stock_quantity);
           const ctx = document.getElementById('stock-trend-canvas');
           if (ctx && window.Chart) {
-            new Chart(ctx.getContext('2d'), {
+            const primary = getCssVar('--token-color-primary', '#3b82f6');
+            const text = getCssVar('--token-text-secondary', 'rgb(209, 213, 219)');
+            const grid = getCssVar('--token-border-default', 'rgba(255,255,255,0.1)');
+            stockTrendChart = new Chart(ctx.getContext('2d'), {
               type: 'bar',
-              data: { labels, datasets: [{ label: 'Stock', data, backgroundColor: 'rgba(59,130,246,0.7)' }] },
-              options: { responsive: true, maintainAspectRatio: false }
+              data: { labels, datasets: [{ label: 'Stock', data, backgroundColor: colorToRgba(primary, 0.7), borderColor: primary, borderWidth: 1 }] },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: text } } },
+                scales: {
+                  x: { ticks: { color: text }, grid: { color: colorToRgba(grid, 0.25) } },
+                  y: { ticks: { color: text }, grid: { color: colorToRgba(grid, 0.25) }, beginAtZero: true }
+                }
+              }
             });
           }
         }catch(e){ console.warn('Stock trend chart init failed', e); }
@@ -120,5 +200,11 @@
   // Kick off in DOMContentLoaded
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { initAdminDashboard(); initSharedBuilder(); });
   else { initAdminDashboard(); initSharedBuilder(); }
+
+  try{
+    window.addEventListener('theme:changed', applyStockTrendTheme);
+  }catch(e){
+    // ignore
+  }
 
 })();

@@ -90,6 +90,23 @@
           body.classList.toggle('dark', theme === 'dark');
           body.classList.toggle('light', theme === 'light');
         }
+
+        try {
+          if (typeof window !== 'undefined' && window.dispatchEvent) {
+            window.dispatchEvent(
+              new CustomEvent('theme:changed', {
+                detail: {
+                  id: theme,
+                  resolvedId: theme,
+                  mode: theme === 'light' ? 'light' : 'dark',
+                  colors: { primary, secondary, accent }
+                }
+              })
+            );
+          }
+        } catch (_) {
+          /* ignore */
+        }
       } catch (e) {
         /* no-op: invalid or missing settings */
       }

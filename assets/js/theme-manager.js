@@ -338,7 +338,17 @@
     applyCSSVariables(colors);
     applyModeClass(preset.mode);
 
-    return { id: themeId, resolvedId, mode: preset.mode, colors };
+    const result = { id: themeId, resolvedId, mode: preset.mode, colors };
+
+    try {
+      if (typeof window !== 'undefined' && window.dispatchEvent) {
+        window.dispatchEvent(new CustomEvent('theme:changed', { detail: result }));
+      }
+    } catch (e) {
+      // Ignore event dispatch errors
+    }
+
+    return result;
   }
 
   // Public API

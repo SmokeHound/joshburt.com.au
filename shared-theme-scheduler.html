@@ -45,27 +45,40 @@
         const currentlyDark = body.classList.contains('dark');
 
         if (shouldBeDark !== null && shouldBeDark !== currentlyDark) {
-            if (shouldBeDark) {
-                body.classList.remove('light');
-                body.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
+            const themeName = shouldBeDark ? 'dark' : 'light';
+
+            // Prefer the central Theme API so tokens and other listeners update.
+            if (window.Theme && typeof window.Theme.setTheme === 'function') {
+                window.Theme.setTheme(themeName);
             } else {
-                body.classList.remove('dark');
-                body.classList.add('light');
-                localStorage.setItem('theme', 'light');
+                // Fallback for older pages where Theme isn't available yet.
+                if (shouldBeDark) {
+                    body.classList.remove('light');
+                    body.classList.add('dark');
+                } else {
+                    body.classList.remove('dark');
+                    body.classList.add('light');
+                }
+                localStorage.setItem('theme', themeName);
+
+                try {
+                    window.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme: themeName, source: 'scheduler' } }));
+                } catch (e) {
+                    // ignore
+                }
             }
 
             // Update theme toggle button
             const themeToggle = document.getElementById('theme-toggle');
             if (themeToggle) {
-                themeToggle.textContent = body.classList.contains('dark') ? 
+                const isDarkNow = document.body.classList.contains('dark') || document.documentElement.classList.contains('dark');
+                themeToggle.textContent = isDarkNow ? 
                     (window.t ? window.t('theme.toggle.dark') : 'Toggle Light Mode') : 
                     (window.t ? window.t('theme.toggle.light') : 'Toggle Dark Mode');
             }
 
             // Show notification about automatic theme change
             if (window.showNotification) {
-                const themeName = shouldBeDark ? 'dark' : 'light';
                 window.showNotification(
                     `Automatically switched to ${themeName} mode`, 
                     'info'

@@ -124,9 +124,9 @@ The joshburt.com.au application is a modern, serverless web application built on
 
 └─────────────────────────────┬───────────────────────────────────────┘│  │  - auth-middleware.js (JWT verification)                      │  │
 
-                              ││  │  - metrics-collector.js (Monitoring)                          │  │
+                              ││  │  - cache.js (In-memory caching)                               │  │
 
-                              ▼│  │  - log-aggregator.js (Logging)                                │  │
+                              ▼│  │  - logger.js (Request logging)                                │  │
 
 ┌─────────────────────────────────────────────────────────────────────┐│  └────────────────────────────────┬──────────────────────────────┘  │
 
@@ -366,9 +366,9 @@ const { id, mode, colors } = window.Theme.getActiveTheme();- **database.js**: Da
 
 ```- **auth-middleware.js**: JWT verification
 
-- **metrics-collector.js**: Custom metrics collection
+- **cache.js**: In-memory caching
 
-**Presets**: dark, light, system, neon, ocean, high-contrast- **log-aggregator.js**: Centralized logging
+**Presets**: dark, light, system, neon, ocean, high-contrast- **logger.js**: Request logging
 
 - **rbac.js**: Role-based access control
 

@@ -156,6 +156,135 @@
   // Initialize charts
   let eventsChart, eventTypeChart, topPagesChart;
 
+  function getCssVar(name, fallback) {
+    try {
+      const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return v || fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function colorToRgba(color, alpha) {
+    if (!color) return color;
+    const c = String(color).trim();
+    const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+    const a = clamp(Number(alpha), 0, 1);
+
+    if (c.startsWith('rgba(')) {
+      const parts = c
+        .slice(5, -1)
+        .split(',')
+        .map(p => p.trim());
+      if (parts.length >= 3) {
+        return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+      }
+    }
+
+    if (c.startsWith('rgb(')) {
+      const parts = c
+        .slice(4, -1)
+        .split(',')
+        .map(p => p.trim());
+      if (parts.length >= 3) {
+        return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+      }
+    }
+
+    if (c.startsWith('#')) {
+      const raw = c.slice(1);
+      const hex = raw.length === 3 ? raw.split('').map(ch => ch + ch).join('') : raw;
+      if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
+      }
+    }
+
+    return c;
+  }
+
+  function getChartTheme() {
+    const primary = getCssVar('--token-color-primary', '#3b82f6');
+    const secondary = getCssVar('--token-color-secondary', '#10b981');
+    const accent = getCssVar('--token-color-accent', '#8b5cf6');
+    const warning = getCssVar('--token-color-warning', '#f59e0b');
+    const danger = getCssVar('--token-color-danger', '#ef4444');
+    const text = getCssVar('--token-text-secondary', 'rgb(209, 213, 219)');
+    const grid = getCssVar('--token-border-default', 'rgba(255,255,255,0.1)');
+    return {
+      palette: [primary, secondary, accent, warning, danger],
+      text,
+      grid
+    };
+  }
+
+  function applyChartsTheme() {
+    if (!window.Chart) return;
+    const t = getChartTheme();
+
+    const styleLegend = chart => {
+      if (chart?.options?.plugins?.legend?.labels) {
+        chart.options.plugins.legend.labels.color = t.text;
+      }
+    };
+
+    const styleAxes = chart => {
+      if (!chart?.options?.scales) return;
+      ['x', 'y'].forEach(axis => {
+        if (chart.options.scales[axis]?.ticks) {
+          chart.options.scales[axis].ticks.color = t.text;
+        }
+        if (chart.options.scales[axis]?.grid) {
+          chart.options.scales[axis].grid.color = colorToRgba(t.grid, 0.25);
+        }
+      });
+    };
+
+    if (eventsChart) {
+      try {
+        eventsChart.data.datasets.forEach((ds, idx) => {
+          const c = t.palette[idx % t.palette.length];
+          ds.borderColor = c;
+          ds.backgroundColor = colorToRgba(c, 0.12);
+        });
+        styleLegend(eventsChart);
+        styleAxes(eventsChart);
+        eventsChart.update();
+      } catch (e) {}
+    }
+
+    if (eventTypeChart) {
+      try {
+        if (eventTypeChart.data?.datasets?.[0]) {
+          eventTypeChart.data.datasets[0].backgroundColor = t.palette;
+        }
+        styleLegend(eventTypeChart);
+        eventTypeChart.update();
+      } catch (e) {}
+    }
+
+    if (topPagesChart) {
+      try {
+        if (topPagesChart.data?.datasets?.[0]) {
+          topPagesChart.data.datasets[0].backgroundColor = t.palette[0];
+        }
+        styleAxes(topPagesChart);
+        topPagesChart.update();
+      } catch (e) {}
+    }
+  }
+
+  try {
+    if (!window.__analyticsAdvancedThemeListener) {
+      window.__analyticsAdvancedThemeListener = function() {
+        applyChartsTheme();
+      };
+      window.addEventListener('theme:changed', window.__analyticsAdvancedThemeListener);
+    }
+  } catch (e) {}
+
   async function loadAnalytics() {
     try {
       const dateRange = document.getElementById('date-range').value;
@@ -251,6 +380,7 @@
     }
 
     const ctx1 = document.getElementById('events-chart').getContext('2d');
+    const theme1 = getChartTheme();
     eventsChart = new Chart(ctx1, {
       type: 'line',
       data: {
@@ -258,8 +388,8 @@
         datasets: Object.keys(datasets).map((eventType, index) => ({
           label: eventType,
           data: datasets[eventType],
-          borderColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b'][index % 4],
-          backgroundColor: ['#3b82f620', '#10b98120', '#8b5cf620', '#f59e0b20'][index % 4],
+          borderColor: theme1.palette[index % theme1.palette.length],
+          backgroundColor: colorToRgba(theme1.palette[index % theme1.palette.length], 0.12),
           tension: 0.4
         }))
       },
@@ -267,10 +397,11 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'top' }
+          legend: { position: 'top', labels: { color: theme1.text } }
         },
         scales: {
-          y: { beginAtZero: true }
+          x: { ticks: { color: theme1.text }, grid: { color: colorToRgba(theme1.grid, 0.25) } },
+          y: { beginAtZero: true, ticks: { color: theme1.text }, grid: { color: colorToRgba(theme1.grid, 0.25) } }
         }
       }
     });
@@ -281,20 +412,21 @@
     }
 
     const ctx2 = document.getElementById('event-type-chart').getContext('2d');
+    const theme2 = getChartTheme();
     eventTypeChart = new Chart(ctx2, {
       type: 'doughnut',
       data: {
         labels: data.event_types.map(item => item.event_type),
         datasets: [{
           data: data.event_types.map(item => parseInt(item.count)),
-          backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444']
+          backgroundColor: theme2.palette
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'right' }
+          legend: { position: 'right', labels: { color: theme2.text } }
         }
       }
     });
@@ -306,6 +438,7 @@
 
     const topPages = (data.top_pages || []).slice(0, 10);
     const ctx3 = document.getElementById('top-pages-chart').getContext('2d');
+    const theme3 = getChartTheme();
     topPagesChart = new Chart(ctx3, {
       type: 'bar',
       data: {
@@ -313,7 +446,7 @@
         datasets: [{
           label: 'Page Views',
           data: topPages.map(item => parseInt(item.views)),
-          backgroundColor: '#3b82f6'
+          backgroundColor: theme3.palette[0]
         }]
       },
       options: {
@@ -324,10 +457,13 @@
           legend: { display: false }
         },
         scales: {
-          x: { beginAtZero: true }
+          x: { beginAtZero: true, ticks: { color: theme3.text }, grid: { color: colorToRgba(theme3.grid, 0.25) } },
+          y: { ticks: { color: theme3.text }, grid: { color: colorToRgba(theme3.grid, 0.25) } }
         }
       }
     });
+
+    applyChartsTheme();
   }
 
   async function loadSessions() {
