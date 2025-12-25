@@ -504,7 +504,7 @@ body {
   }
   
   body.has-sidebar main, body.has-sidebar #main-content {
-    margin-left: var(--sidebar-width, 16rem);
+    margin-left: calc(var(--sidebar-width, 16rem) + var(--token-spacing-lg));
     transition: margin-left var(--token-transition-slow);
   }
 }
