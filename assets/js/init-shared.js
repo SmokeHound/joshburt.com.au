@@ -3,8 +3,12 @@
   // Resolve project-relative assets consistently even when the current URL is a nested path
   // (e.g., Netlify error pages shown at /some/missing/path).
   function toRootPath(p) {
-    if (!p) return p;
-    if (/^https?:\/\//i.test(p)) return p;
+    if (!p) {
+      return p;
+    }
+    if (/^https?:\/\//i.test(p)) {
+      return p;
+    }
     const cleaned = String(p).replace(/^\.\//, '');
     return cleaned.startsWith('/') ? cleaned : '/' + cleaned;
   }
@@ -57,18 +61,35 @@
       // Fallback: apply colors directly (if ThemeManager not loaded yet)
       try {
         const s = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-        document.documentElement.style.setProperty(
-          '--tw-color-primary',
-          s.primaryColor || '#3b82f6'
-        );
-        document.documentElement.style.setProperty(
-          '--tw-color-secondary',
-          s.secondaryColor || '#10b981'
-        );
-        document.documentElement.style.setProperty('--tw-color-accent', s.accentColor || '#8b5cf6');
+        const root = document.documentElement;
+        const body = document.body;
+
+        const primary = s.primaryColor || '#3b82f6';
+        const secondary = s.secondaryColor || '#10b981';
+        const accent = s.accentColor || '#8b5cf6';
+
+        root.style.setProperty('--tw-color-primary', primary);
+        root.style.setProperty('--tw-color-secondary', secondary);
+        root.style.setProperty('--tw-color-accent', accent);
+
+        // Token-driven UI primitives
+        root.style.setProperty('--token-color-primary', primary);
+        root.style.setProperty('--token-color-primary-hover', primary);
+        root.style.setProperty('--token-color-primary-active', primary);
+        root.style.setProperty('--token-color-secondary', secondary);
+        root.style.setProperty('--token-color-secondary-hover', secondary);
+        root.style.setProperty('--token-color-secondary-active', secondary);
+        root.style.setProperty('--token-color-accent', accent);
+        root.style.setProperty('--token-color-accent-hover', accent);
+        root.style.setProperty('--token-color-accent-active', accent);
+
         const theme = s.theme || localStorage.getItem('theme') || 'dark';
-        document.documentElement.classList.toggle('dark', theme === 'dark');
-        document.documentElement.classList.toggle('light', theme === 'light');
+        root.classList.toggle('dark', theme === 'dark');
+        root.classList.toggle('light', theme === 'light');
+        if (body && body.classList) {
+          body.classList.toggle('dark', theme === 'dark');
+          body.classList.toggle('light', theme === 'light');
+        }
       } catch (e) {
         /* no-op: invalid or missing settings */
       }

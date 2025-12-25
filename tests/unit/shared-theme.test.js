@@ -57,6 +57,17 @@ describe('Theme System (Preset / Persistence)', () => {
     expect(
       getComputedStyle(document.documentElement).getPropertyValue('--tw-color-accent').trim()
     ).toBe('#ff00aa');
+
+    // Token variables (used by ui-* primitives)
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--token-color-primary').trim()
+    ).toBe('#123456');
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--token-color-secondary').trim()
+    ).toBe('#abcdef');
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--token-color-accent').trim()
+    ).toBe('#ff00aa');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 

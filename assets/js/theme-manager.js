@@ -167,7 +167,9 @@
 
   // Get system preference
   function getSystemTheme() {
-    if (typeof window === 'undefined' || !window.matchMedia) return 'dark';
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return 'dark';
+    }
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
@@ -176,11 +178,15 @@
     try {
       // Check siteSettings.theme first (new format)
       const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-      if (siteSettings.theme) return siteSettings.theme;
-      
+      if (siteSettings.theme) {
+        return siteSettings.theme;
+      }
+
       // Fallback to legacy localStorage('theme')
       const legacyTheme = localStorage.getItem('theme');
-      if (legacyTheme) return legacyTheme;
+      if (legacyTheme) {
+        return legacyTheme;
+      }
     } catch (e) {
       // Ignore parse errors
     }
@@ -216,27 +222,108 @@
   // Apply CSS variables to documentElement
   function applyCSSVariables(colors) {
     const root = document.documentElement;
-    if (colors.primary) root.style.setProperty('--tw-color-primary', colors.primary);
-    if (colors.secondary) root.style.setProperty('--tw-color-secondary', colors.secondary);
-    if (colors.accent) root.style.setProperty('--tw-color-accent', colors.accent);
-    if (colors.buttonPrimary) root.style.setProperty('--btn-primary-bg', colors.buttonPrimary);
-    if (colors.buttonSecondary) root.style.setProperty('--btn-secondary-bg', colors.buttonSecondary);
-    if (colors.buttonDanger) root.style.setProperty('--btn-danger-bg', colors.buttonDanger);
-    if (colors.buttonSuccess) root.style.setProperty('--btn-success-bg', colors.buttonSuccess);
+    const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+    const hexToRgb = hex => {
+      if (!hex) {
+        return null;
+      }
+      const raw = String(hex).trim().replace('#', '');
+      const full = raw.length === 3 ? raw.split('').map(c => c + c).join('') : raw;
+      if (!/^[0-9a-fA-F]{6}$/.test(full)) {
+        return null;
+      }
+      const r = parseInt(full.slice(0, 2), 16);
+      const g = parseInt(full.slice(2, 4), 16);
+      const b = parseInt(full.slice(4, 6), 16);
+      return { r, g, b };
+    };
+    const setAlphaVars = (baseName, hex) => {
+      const rgb = hexToRgb(hex);
+      if (!rgb) {
+        return;
+      }
+      const alphas = [10, 20, 30, 40, 60];
+      alphas.forEach(a => {
+        const alpha = clamp(a / 100, 0, 1);
+        root.style.setProperty(
+          `${baseName}-alpha-${a}`,
+          `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`
+        );
+      });
+    };
+
+    if (colors.primary) {
+      root.style.setProperty('--tw-color-primary', colors.primary);
+    }
+    if (colors.secondary) {
+      root.style.setProperty('--tw-color-secondary', colors.secondary);
+    }
+    if (colors.accent) {
+      root.style.setProperty('--tw-color-accent', colors.accent);
+    }
+    if (colors.buttonPrimary) {
+      root.style.setProperty('--btn-primary-bg', colors.buttonPrimary);
+    }
+    if (colors.buttonSecondary) {
+      root.style.setProperty('--btn-secondary-bg', colors.buttonSecondary);
+    }
+    if (colors.buttonDanger) {
+      root.style.setProperty('--btn-danger-bg', colors.buttonDanger);
+    }
+    if (colors.buttonSuccess) {
+      root.style.setProperty('--btn-success-bg', colors.buttonSuccess);
+    }
+
+    // Token-driven UI primitives (ui-btn, ui-card, ui-link)
+    if (colors.primary) {
+      root.style.setProperty('--token-color-primary', colors.primary);
+      root.style.setProperty('--token-color-primary-hover', colors.primary);
+      root.style.setProperty('--token-color-primary-active', colors.primary);
+      setAlphaVars('--token-color-primary', colors.primary);
+    }
+    if (colors.secondary) {
+      root.style.setProperty('--token-color-secondary', colors.secondary);
+      root.style.setProperty('--token-color-secondary-hover', colors.secondary);
+      root.style.setProperty('--token-color-secondary-active', colors.secondary);
+      setAlphaVars('--token-color-secondary', colors.secondary);
+    }
+    if (colors.accent) {
+      root.style.setProperty('--token-color-accent', colors.accent);
+      root.style.setProperty('--token-color-accent-hover', colors.accent);
+      root.style.setProperty('--token-color-accent-active', colors.accent);
+      setAlphaVars('--token-color-accent', colors.accent);
+    }
+    // Map button colors to semantic tokens so ui-btn-danger/ui-btn-secondary can follow settings.
+    if (colors.buttonDanger) {
+      root.style.setProperty('--token-color-danger', colors.buttonDanger);
+      root.style.setProperty('--token-color-danger-hover', colors.buttonDanger);
+      root.style.setProperty('--token-color-danger-active', colors.buttonDanger);
+      setAlphaVars('--token-color-danger', colors.buttonDanger);
+    }
+    if (colors.buttonSuccess) {
+      root.style.setProperty('--token-color-success', colors.buttonSuccess);
+      root.style.setProperty('--token-color-success-hover', colors.buttonSuccess);
+      root.style.setProperty('--token-color-success-active', colors.buttonSuccess);
+    }
   }
 
   // Apply dark/light class to documentElement
   function applyModeClass(mode) {
     const root = document.documentElement;
+    const body = document.body;
     root.classList.toggle('dark', mode === 'dark');
     root.classList.toggle('light', mode === 'light');
+    if (body && body.classList) {
+      body.classList.toggle('dark', mode === 'dark');
+      body.classList.toggle('light', mode === 'light');
+    }
   }
 
   // Apply a theme (by ID or preset)
   function applyTheme(themeId, customColors) {
     const resolvedId = resolveThemeId(themeId);
     const preset = THEME_PRESETS[resolvedId] || THEME_PRESETS[DEFAULT_THEME];
-    
+
     // Determine colors: custom overrides preset
     const colors = {
       primary: (customColors && customColors.primary) || preset.colors.primary,
@@ -247,10 +334,10 @@
       buttonDanger: (customColors && customColors.buttonDanger) || preset.colors.buttonDanger,
       buttonSuccess: (customColors && customColors.buttonSuccess) || preset.colors.buttonSuccess
     };
-    
+
     applyCSSVariables(colors);
     applyModeClass(preset.mode);
-    
+
     return { id: themeId, resolvedId, mode: preset.mode, colors };
   }
 
@@ -296,23 +383,51 @@
       if (persist !== false) {
         try {
           const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-          if (colors.primary) siteSettings.primaryColor = colors.primary;
-          if (colors.secondary) siteSettings.secondaryColor = colors.secondary;
-          if (colors.accent) siteSettings.accentColor = colors.accent;
-          if (colors.buttonPrimary) siteSettings.buttonPrimaryColor = colors.buttonPrimary;
-          if (colors.buttonSecondary) siteSettings.buttonSecondaryColor = colors.buttonSecondary;
-          if (colors.buttonDanger) siteSettings.buttonDangerColor = colors.buttonDanger;
-          if (colors.buttonSuccess) siteSettings.buttonSuccessColor = colors.buttonSuccess;
+          if (colors.primary) {
+            siteSettings.primaryColor = colors.primary;
+          }
+          if (colors.secondary) {
+            siteSettings.secondaryColor = colors.secondary;
+          }
+          if (colors.accent) {
+            siteSettings.accentColor = colors.accent;
+          }
+          if (colors.buttonPrimary) {
+            siteSettings.buttonPrimaryColor = colors.buttonPrimary;
+          }
+          if (colors.buttonSecondary) {
+            siteSettings.buttonSecondaryColor = colors.buttonSecondary;
+          }
+          if (colors.buttonDanger) {
+            siteSettings.buttonDangerColor = colors.buttonDanger;
+          }
+          if (colors.buttonSuccess) {
+            siteSettings.buttonSuccessColor = colors.buttonSuccess;
+          }
           localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
-          
+
           // Legacy compatibility
-          if (colors.primary) localStorage.setItem('primaryColor', colors.primary);
-          if (colors.secondary) localStorage.setItem('secondaryColor', colors.secondary);
-          if (colors.accent) localStorage.setItem('accentColor', colors.accent);
-          if (colors.buttonPrimary) localStorage.setItem('buttonPrimaryColor', colors.buttonPrimary);
-          if (colors.buttonSecondary) localStorage.setItem('buttonSecondaryColor', colors.buttonSecondary);
-          if (colors.buttonDanger) localStorage.setItem('buttonDangerColor', colors.buttonDanger);
-          if (colors.buttonSuccess) localStorage.setItem('buttonSuccessColor', colors.buttonSuccess);
+          if (colors.primary) {
+            localStorage.setItem('primaryColor', colors.primary);
+          }
+          if (colors.secondary) {
+            localStorage.setItem('secondaryColor', colors.secondary);
+          }
+          if (colors.accent) {
+            localStorage.setItem('accentColor', colors.accent);
+          }
+          if (colors.buttonPrimary) {
+            localStorage.setItem('buttonPrimaryColor', colors.buttonPrimary);
+          }
+          if (colors.buttonSecondary) {
+            localStorage.setItem('buttonSecondaryColor', colors.buttonSecondary);
+          }
+          if (colors.buttonDanger) {
+            localStorage.setItem('buttonDangerColor', colors.buttonDanger);
+          }
+          if (colors.buttonSuccess) {
+            localStorage.setItem('buttonSuccessColor', colors.buttonSuccess);
+          }
         } catch (e) {
           // Ignore storage errors
         }

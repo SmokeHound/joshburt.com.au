@@ -185,35 +185,35 @@ body {
 
 /* Button variants */
 .ui-btn-primary {
-  background: linear-gradient(45deg, var(--token-color-primary), #0099cc);
-  border-color: var(--token-color-primary);
+  background: linear-gradient(45deg, var(--btn-primary-bg, var(--token-color-primary)), #0099cc);
+  border-color: var(--btn-primary-bg, var(--token-color-primary));
   box-shadow: 0 0 10px var(--token-color-primary-alpha-30);
   color: var(--token-text-on-primary);
 }
 
 .ui-btn-primary:hover:not(:disabled) {
-  background: linear-gradient(45deg, var(--token-color-primary-hover), #00b8e6);
+  background: linear-gradient(45deg, var(--btn-primary-bg, var(--token-color-primary-hover)), #00b8e6);
   box-shadow: var(--token-shadow-glow-primary);
 }
 
 .ui-btn-primary:active:not(:disabled) {
-  background: linear-gradient(45deg, var(--token-color-primary-active), #0088bb);
+  background: linear-gradient(45deg, var(--btn-primary-bg, var(--token-color-primary-active)), #0088bb);
 }
 
 .ui-btn-secondary {
-  background: linear-gradient(45deg, var(--token-color-secondary), #00cc66);
-  border-color: var(--token-color-secondary);
+  background: linear-gradient(45deg, var(--btn-secondary-bg, var(--token-color-secondary)), #00cc66);
+  border-color: var(--btn-secondary-bg, var(--token-color-secondary));
   box-shadow: 0 0 10px var(--token-color-secondary-alpha-30);
   color: var(--token-text-on-secondary);
 }
 
 .ui-btn-secondary:hover:not(:disabled) {
-  background: linear-gradient(45deg, var(--token-color-secondary-hover), #00dd77);
+  background: linear-gradient(45deg, var(--btn-secondary-bg, var(--token-color-secondary-hover)), #00dd77);
   box-shadow: var(--token-shadow-glow-secondary);
 }
 
 .ui-btn-secondary:active:not(:disabled) {
-  background: linear-gradient(45deg, var(--token-color-secondary-active), #00bb66);
+  background: linear-gradient(45deg, var(--btn-secondary-bg, var(--token-color-secondary-active)), #00bb66);
 }
 
 .ui-btn-accent {
@@ -233,19 +233,35 @@ body {
 }
 
 .ui-btn-danger {
-  background: linear-gradient(45deg, var(--token-color-danger), #cc0066);
-  border-color: var(--token-color-danger);
+  background: linear-gradient(45deg, var(--btn-danger-bg, var(--token-color-danger)), #cc0066);
+  border-color: var(--btn-danger-bg, var(--token-color-danger));
   box-shadow: 0 0 10px var(--token-color-danger-alpha-30);
   color: var(--token-text-on-danger);
 }
 
 .ui-btn-danger:hover:not(:disabled) {
-  background: linear-gradient(45deg, var(--token-color-danger-hover), #dd0077);
+  background: linear-gradient(45deg, var(--btn-danger-bg, var(--token-color-danger-hover)), #dd0077);
   box-shadow: var(--token-shadow-glow-danger);
 }
 
 .ui-btn-danger:active:not(:disabled) {
-  background: linear-gradient(45deg, var(--token-color-danger-active), #bb0066);
+  background: linear-gradient(45deg, var(--btn-danger-bg, var(--token-color-danger-active)), #bb0066);
+}
+
+.ui-btn-success {
+  background: linear-gradient(45deg, var(--btn-success-bg, var(--token-color-success)), #00cc66);
+  border-color: var(--btn-success-bg, var(--token-color-success));
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+  color: var(--token-text-on-secondary);
+}
+
+.ui-btn-success:hover:not(:disabled) {
+  background: linear-gradient(45deg, var(--btn-success-bg, var(--token-color-success-hover)), #00dd77);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+}
+
+.ui-btn-success:active:not(:disabled) {
+  background: linear-gradient(45deg, var(--btn-success-bg, var(--token-color-success-active)), #00bb66);
 }
 
 .ui-btn-warning {
