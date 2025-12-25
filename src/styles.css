@@ -446,8 +446,11 @@ body {
 .ui-link-nav {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: var(--token-spacing-sm);
   padding: var(--token-spacing-sm);
+  width: 100%;
+  text-align: left;
   border-radius: var(--token-radius-md);
   color: var(--token-text-secondary);
   transition: all var(--token-transition-slow);
