@@ -408,6 +408,9 @@ FIX_SUMMARY.md
 # Local Netlify folder
 .netlify/
 
+# Netlify build artifacts
+netlify/functions/manifest.json
+
 # Runtime data and logs (keep directory structure but ignore content)
 data/logs/*.log
 data/reports/*.md
