@@ -203,6 +203,56 @@
 <script>
 const FN_BASE = window.FN_BASE || '/.netlify/functions';
 let segmentChart = null;
+let lastSegmentationData = null;
+
+function getCssVar(name, fallback) {
+  try {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return v || fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function colorToRgba(color, alpha) {
+  if (!color) return color;
+  const c = String(color).trim();
+  const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+  const a = clamp(Number(alpha), 0, 1);
+
+  if (c.startsWith('rgba(')) {
+    const parts = c.slice(5, -1).split(',').map(p => p.trim());
+    if (parts.length >= 3) return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+  }
+  if (c.startsWith('rgb(')) {
+    const parts = c.slice(4, -1).split(',').map(p => p.trim());
+    if (parts.length >= 3) return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+  }
+  if (c.startsWith('#')) {
+    const raw = c.slice(1);
+    const hex = raw.length === 3 ? raw.split('').map(ch => ch + ch).join('') : raw;
+    if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }
+  }
+  return c;
+}
+
+function getSegmentColors() {
+  const fallbackMuted = 'rgb(107, 114, 128)';
+  return {
+    'Champions': getCssVar('--token-color-success', 'rgb(34, 197, 94)'),
+    'Loyal Customers': getCssVar('--token-color-primary', 'rgb(59, 130, 246)'),
+    'Promising': getCssVar('--token-color-warning', 'rgb(251, 191, 36)'),
+    'Need Attention': getCssVar('--token-color-accent', 'rgb(249, 115, 22)'),
+    'At Risk': getCssVar('--token-color-danger', 'rgb(239, 68, 68)'),
+    'Lost': getCssVar('--token-text-muted', 'rgb(156, 163, 175)'),
+    _fallback: getCssVar('--token-text-muted', fallbackMuted)
+  };
+}
 
 function getAuthToken() {
   return (window.getToken && window.getToken()) || localStorage.getItem('accessToken');
@@ -256,28 +306,34 @@ async function loadSegmentation() {
     if (!response.ok) throw new Error('Failed to load segmentation');
     
     const data = await response.json();
+
+    lastSegmentationData = data;
+    renderSegmentation(data);
     
-    // Render segment distribution chart
-    const segmentCounts = data.segment_counts || {};
-    const segmentColors = {
-      'Champions': 'rgb(34, 197, 94)',
-      'Loyal Customers': 'rgb(59, 130, 246)',
-      'Promising': 'rgb(251, 191, 36)',
-      'Need Attention': 'rgb(249, 115, 22)',
-      'At Risk': 'rgb(239, 68, 68)',
-      'Lost': 'rgb(156, 163, 175)'
-    };
-    
-    const ctx = document.getElementById('segment-chart').getContext('2d');
+  } catch (error) {
+    console.error('Error loading segmentation:', error);
+    document.getElementById('segmentation-table-body').innerHTML = 
+      '<tr><td colspan="6" class="px-4 py-8 text-center text-red-400">Failed to load customer data</td></tr>';
+  }
+}
+
+function renderSegmentation(data) {
+  const segmentCounts = data.segment_counts || {};
+  const segmentColors = getSegmentColors();
+  const legendText = getCssVar('--token-text-secondary', 'rgb(209, 213, 219)');
+
+  // Render segment distribution chart
+  const canvas = document.getElementById('segment-chart');
+  if (canvas && window.Chart) {
+    const ctx = canvas.getContext('2d');
     if (segmentChart) segmentChart.destroy();
-    
     segmentChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: Object.keys(segmentCounts),
         datasets: [{
           data: Object.values(segmentCounts),
-          backgroundColor: Object.keys(segmentCounts).map(s => segmentColors[s] || 'rgb(107, 114, 128)')
+          backgroundColor: Object.keys(segmentCounts).map(s => segmentColors[s] || segmentColors._fallback)
         }]
       },
       options: {
@@ -286,58 +342,66 @@ async function loadSegmentation() {
         plugins: {
           legend: {
             position: 'right',
-            labels: { color: 'rgb(209, 213, 219)' }
+            labels: { color: legendText }
           }
         }
       }
     });
-    
-    // Render segment summary cards
-    const summaryHtml = Object.entries(segmentCounts).map(([segment, count]) => `
-      <div class="ui-card p-4 border-l-4" style="border-color: ${segmentColors[segment]}">
-        <h4 class="text-sm font-semibold text-gray-400">${segment}</h4>
-        <div class="text-2xl font-bold" style="color: ${segmentColors[segment]}">${count}</div>
-      </div>
-    `).join('');
-    document.getElementById('segment-summary').innerHTML = summaryHtml;
-    
-    // Render customer table
-    const tbody = document.getElementById('segmentation-table-body');
-    if (data.customers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No customer data available</td></tr>';
-    } else {
-      tbody.innerHTML = data.customers.slice(0, 50).map(c => {
-        const segmentColor = segmentColors[c.segment] || 'rgb(107, 114, 128)';
-        const daysSince = parseInt(c.recency_days);
-        
-        return `
-          <tr class="hover:bg-gray-800">
-            <td class="px-4 py-3 text-sm">${c.name || 'N/A'}</td>
-            <td class="px-4 py-3 text-sm text-gray-400">${c.email}</td>
-            <td class="px-4 py-3 text-sm">${c.order_count}</td>
-            <td class="px-4 py-3 text-sm">${daysSince} days ago</td>
-            <td class="px-4 py-3 text-sm">
-              <div class="flex gap-2">
-                <span class="px-2 py-1 text-xs bg-gray-800 rounded">R:${c.recency_score}</span>
-                <span class="px-2 py-1 text-xs bg-gray-800 rounded">F:${c.frequency_score}</span>
-                <span class="px-2 py-1 text-xs bg-gray-800 rounded">M:${c.monetary_score}</span>
-              </div>
-            </td>
-            <td class="px-4 py-3 text-sm">
-              <span class="px-2 py-1 text-xs rounded" style="background-color: ${segmentColor}30; color: ${segmentColor}">
-                ${c.segment}
-              </span>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-    
-  } catch (error) {
-    console.error('Error loading segmentation:', error);
-    document.getElementById('segmentation-table-body').innerHTML = 
-      '<tr><td colspan="6" class="px-4 py-8 text-center text-red-400">Failed to load customer data</td></tr>';
   }
+
+  // Render segment summary cards
+  const summaryHtml = Object.entries(segmentCounts).map(([segment, count]) => {
+    const c = segmentColors[segment] || segmentColors._fallback;
+    return `
+      <div class="ui-card p-4 border-l-4" style="border-color: ${c}">
+        <h4 class="text-sm font-semibold text-gray-400">${segment}</h4>
+        <div class="text-2xl font-bold" style="color: ${c}">${count}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('segment-summary').innerHTML = summaryHtml;
+
+  // Render customer table
+  const tbody = document.getElementById('segmentation-table-body');
+  if (!data.customers || data.customers.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No customer data available</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.customers.slice(0, 50).map(c => {
+    const segmentColor = segmentColors[c.segment] || segmentColors._fallback;
+    const segmentBg = colorToRgba(segmentColor, 0.18);
+    const daysSince = parseInt(c.recency_days);
+
+    return `
+      <tr class="hover:bg-gray-800">
+        <td class="px-4 py-3 text-sm">${c.name || 'N/A'}</td>
+        <td class="px-4 py-3 text-sm text-gray-400">${c.email}</td>
+        <td class="px-4 py-3 text-sm">${c.order_count}</td>
+        <td class="px-4 py-3 text-sm">${daysSince} days ago</td>
+        <td class="px-4 py-3 text-sm">
+          <div class="flex gap-2">
+            <span class="px-2 py-1 text-xs bg-gray-800 rounded">R:${c.recency_score}</span>
+            <span class="px-2 py-1 text-xs bg-gray-800 rounded">F:${c.frequency_score}</span>
+            <span class="px-2 py-1 text-xs bg-gray-800 rounded">M:${c.monetary_score}</span>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-sm">
+          <span class="px-2 py-1 text-xs rounded" style="background-color: ${segmentBg}; color: ${segmentColor}">
+            ${c.segment}
+          </span>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+try {
+  window.addEventListener('theme:changed', () => {
+    if (lastSegmentationData) renderSegmentation(lastSegmentationData);
+  });
+} catch (e) {
+  // ignore
 }
 
 // Load purchase patterns

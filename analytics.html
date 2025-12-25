@@ -192,6 +192,170 @@
   const FN_BASE=window.FN_BASE||'/.netlify/functions';
     const REFRESH_INTERVAL=60000; let autoTimer=null; const filters={dateRange:30,userType:'all'};
     let visitorChart, engagementChart, salesChart, userGrowthSparkline;
+
+    function getCssVar(name, fallback) {
+      try {
+        const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        return v || fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function colorToRgba(color, alpha) {
+      if (!color) return color;
+      const c = String(color).trim();
+      const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+      const a = clamp(Number(alpha), 0, 1);
+
+      if (c.startsWith('rgba(')) {
+        const parts = c
+          .slice(5, -1)
+          .split(',')
+          .map(p => p.trim());
+        if (parts.length >= 3) {
+          return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+        }
+      }
+
+      if (c.startsWith('rgb(')) {
+        const parts = c
+          .slice(4, -1)
+          .split(',')
+          .map(p => p.trim());
+        if (parts.length >= 3) {
+          return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+        }
+      }
+
+      if (c.startsWith('#')) {
+        const raw = c.slice(1);
+        const hex = raw.length === 3 ? raw.split('').map(ch => ch + ch).join('') : raw;
+        if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+          const r = parseInt(hex.slice(0, 2), 16);
+          const g = parseInt(hex.slice(2, 4), 16);
+          const b = parseInt(hex.slice(4, 6), 16);
+          return `rgba(${r}, ${g}, ${b}, ${a})`;
+        }
+      }
+
+      return c;
+    }
+
+    function getChartTheme() {
+      const primary = getCssVar('--token-color-primary', '#3b82f6');
+      const secondary = getCssVar('--token-color-secondary', '#10b981');
+      const accent = getCssVar('--token-color-accent', '#8b5cf6');
+      const warning = getCssVar('--token-color-warning', '#f59e0b');
+      const danger = getCssVar('--token-color-danger', '#ef4444');
+      const success = getCssVar('--token-color-success', '#10b981');
+      const textPrimary = getCssVar('--token-text-primary', '#f9fafb');
+      const textMuted = getCssVar('--token-text-muted', '#9ca3af');
+      const grid = getCssVar('--token-border-default', 'rgba(255, 255, 255, 0.1)');
+
+      return {
+        primary,
+        secondary,
+        accent,
+        warning,
+        danger,
+        success,
+        textPrimary,
+        textMuted,
+        grid,
+        primaryFill: getCssVar('--token-color-primary-alpha-10', colorToRgba(primary, 0.1))
+      };
+    }
+
+    function applyChartsTheme() {
+      if (!window.Chart) return;
+      const t = getChartTheme();
+
+      if (visitorChart) {
+        try {
+          visitorChart.data.datasets[0].borderColor = t.primary;
+          visitorChart.data.datasets[0].backgroundColor = t.primaryFill;
+          if (visitorChart.options?.plugins?.legend?.labels) {
+            visitorChart.options.plugins.legend.labels.color = t.textPrimary;
+          }
+          if (visitorChart.options?.scales?.x?.ticks) {
+            visitorChart.options.scales.x.ticks.color = t.textMuted;
+          }
+          if (visitorChart.options?.scales?.y?.ticks) {
+            visitorChart.options.scales.y.ticks.color = t.textMuted;
+          }
+          if (visitorChart.options?.scales?.x?.grid) {
+            visitorChart.options.scales.x.grid.color = colorToRgba(t.grid, 0.25);
+          }
+          if (visitorChart.options?.scales?.y?.grid) {
+            visitorChart.options.scales.y.grid.color = colorToRgba(t.grid, 0.25);
+          }
+          visitorChart.update();
+        } catch (e) {}
+      }
+
+      if (engagementChart) {
+        try {
+          if (engagementChart.data?.datasets?.[0]) {
+            engagementChart.data.datasets[0].backgroundColor = [
+              t.warning,
+              t.primary,
+              t.success,
+              t.danger,
+              t.accent
+            ];
+          }
+          if (engagementChart.options?.plugins?.legend?.labels) {
+            engagementChart.options.plugins.legend.labels.color = t.textPrimary;
+          }
+          engagementChart.update();
+        } catch (e) {}
+      }
+
+      if (salesChart) {
+        try {
+          if (salesChart.data?.datasets?.[0]) {
+            salesChart.data.datasets[0].backgroundColor = [
+              colorToRgba(t.primary, 0.8),
+              colorToRgba(t.success, 0.8),
+              colorToRgba(t.warning, 0.8),
+              colorToRgba(t.danger, 0.8),
+              colorToRgba(t.accent, 0.8)
+            ];
+          }
+          if (salesChart.options?.plugins?.legend?.labels) {
+            salesChart.options.plugins.legend.labels.color = t.textPrimary;
+          }
+          if (salesChart.options?.scales?.x?.ticks) {
+            salesChart.options.scales.x.ticks.color = t.textMuted;
+          }
+          if (salesChart.options?.scales?.y?.ticks) {
+            salesChart.options.scales.y.ticks.color = t.textMuted;
+          }
+          if (salesChart.options?.scales?.x?.grid) {
+            salesChart.options.scales.x.grid.color = colorToRgba(t.grid, 0.25);
+          }
+          if (salesChart.options?.scales?.y?.grid) {
+            salesChart.options.scales.y.grid.color = colorToRgba(t.grid, 0.25);
+          }
+          salesChart.update();
+        } catch (e) {}
+      }
+
+      if (userGrowthSparkline) {
+        try {
+          if (userGrowthSparkline.data?.datasets?.[0]) {
+            userGrowthSparkline.data.datasets[0].borderColor = t.primary;
+            userGrowthSparkline.data.datasets[0].backgroundColor = t.primaryFill;
+          }
+          userGrowthSparkline.update();
+        } catch (e) {}
+      }
+    }
+
+    window.addEventListener('theme:changed', () => {
+      applyChartsTheme();
+    });
     function setupQuickChips(){const ranges=[1,7,30,90,365]; const wrap=document.getElementById('quick-date-chips'); ranges.forEach(r=>{ const btn=document.createElement('button'); btn.className='px-3 py-1 rounded-full bg-gray-800 text-gray-200 text-xs'; btn.textContent=r===1?'Today': (r===365?'YTD': r+'d'); btn.dataset.range=r; btn.addEventListener('click',()=>{ filters.dateRange=r; document.getElementById('date-range').value=r; highlight(); updateAll();}); wrap.appendChild(btn);}); function highlight(){wrap.querySelectorAll('button').forEach(b=>{const active=parseInt(b.dataset.range)===filters.dateRange; b.classList.toggle('bg-primary',active); b.classList.toggle('text-white',active);});} highlight(); }
   async function fetchJSON(url){ 
     try{ 
@@ -336,15 +500,52 @@
       }
     };
   }
-    function ensureCharts(data){ if(!window.Chart) return; if(!visitorChart){ visitorChart=new Chart(document.getElementById('visitor-chart'), { type:'line', data:{labels:data.dailyOrders.labels,datasets:[{label:'Daily Orders',data:data.dailyOrders.data,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',tension:.4,fill:true}]}, options:{plugins:{legend:{labels:{color:'#f9fafb'}}},scales:{x:{ticks:{color:'#f9fafb'}},y:{ticks:{color:'#f9fafb'}}}}}); } else { visitorChart.data.labels=data.dailyOrders.labels; visitorChart.data.datasets[0].data=data.dailyOrders.data; visitorChart.update(); }
+    function ensureCharts(data){
+      if(!window.Chart) return;
+      const t = getChartTheme();
+      if(!visitorChart){
+        visitorChart=new Chart(document.getElementById('visitor-chart'), {
+          type:'line',
+          data:{labels:data.dailyOrders.labels,datasets:[{label:'Daily Orders',data:data.dailyOrders.data,borderColor:t.primary,backgroundColor:t.primaryFill,tension:.4,fill:true}]},
+          options:{plugins:{legend:{labels:{color:t.textPrimary}}},scales:{x:{ticks:{color:t.textMuted},grid:{color:colorToRgba(t.grid,0.25)}},y:{ticks:{color:t.textMuted},grid:{color:colorToRgba(t.grid,0.25)}}}}
+        });
+      } else {
+        visitorChart.data.labels=data.dailyOrders.labels;
+        visitorChart.data.datasets[0].data=data.dailyOrders.data;
+        visitorChart.update();
+      }
+
       const statusVals=[data.statusDistribution.pending||0,data.statusDistribution.processing||0,data.statusDistribution.completed||0,data.statusDistribution.cancelled||0,(data.statusDistribution.other||0)];
-      if(!engagementChart){ engagementChart=new Chart(document.getElementById('engagement-chart'), { type:'doughnut', data:{ labels:['Pending','Processing','Completed','Cancelled','Other'], datasets:[{ data:statusVals, backgroundColor:['rgb(245,158,11)','rgb(59,130,246)','rgb(16,185,129)','rgb(239,68,68)','rgb(139,92,246)'] }]}, options:{plugins:{legend:{labels:{color:'#f9fafb'}}}}}); } else { engagementChart.data.datasets[0].data=statusVals; engagementChart.update(); }
-      if(!salesChart){ salesChart=new Chart(document.getElementById('sales-chart'), { type:'bar', data:{ labels:data.topProducts.labels, datasets:[{ label:'Units Ordered', data:data.topProducts.data, backgroundColor:['rgba(59,130,246,0.8)','rgba(16,185,129,0.8)','rgba(245,158,11,0.8)','rgba(239,68,68,0.8)','rgba(139,92,246,0.8)']}]}, options:{plugins:{legend:{labels:{color:'#f9fafb'}}},scales:{x:{ticks:{color:'#f9fafb'}},y:{ticks:{color:'#f9fafb'}}}}}); } else { salesChart.data.labels=data.topProducts.labels; salesChart.data.datasets[0].data=data.topProducts.data; salesChart.update(); } }
+      if(!engagementChart){
+        engagementChart=new Chart(document.getElementById('engagement-chart'), {
+          type:'doughnut',
+          data:{ labels:['Pending','Processing','Completed','Cancelled','Other'], datasets:[{ data:statusVals, backgroundColor:[t.warning,t.primary,t.success,t.danger,t.accent] }]},
+          options:{plugins:{legend:{labels:{color:t.textPrimary}}}}
+        });
+      } else {
+        engagementChart.data.datasets[0].data=statusVals;
+        engagementChart.update();
+      }
+
+      if(!salesChart){
+        salesChart=new Chart(document.getElementById('sales-chart'), {
+          type:'bar',
+          data:{ labels:data.topProducts.labels, datasets:[{ label:'Units Ordered', data:data.topProducts.data, backgroundColor:[colorToRgba(t.primary,0.8),colorToRgba(t.success,0.8),colorToRgba(t.warning,0.8),colorToRgba(t.danger,0.8),colorToRgba(t.accent,0.8)]}]},
+          options:{plugins:{legend:{labels:{color:t.textPrimary}}},scales:{x:{ticks:{color:t.textMuted},grid:{color:colorToRgba(t.grid,0.25)}},y:{ticks:{color:t.textMuted},grid:{color:colorToRgba(t.grid,0.25)}}}}
+        });
+      } else {
+        salesChart.data.labels=data.topProducts.labels;
+        salesChart.data.datasets[0].data=data.topProducts.data;
+        salesChart.update();
+      }
+
+      applyChartsTheme();
+    }
     function updateStatCard(id, items){ const el=document.getElementById(id); if(!el) return; el.innerHTML=''; if(!items.length){ el.innerHTML='<li>No results</li>'; return;} items.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; el.appendChild(li); }); }
     function trendArrow(v){ if(v>50) return '↗'; if(v<20) return '↘'; return '→'; }
   async function updateAll(){ const last=document.getElementById('last-updated'); try{ const data=await generateData(); if(last) last.textContent='Last updated: '+ new Date().toLocaleTimeString(); ensureCharts(data); updateStatCard('visitor-stats',[`Total Orders (${filters.dateRange}d): ${data.summary.totalOrders}`,`Completed: ${data.statusDistribution.completed||0}`,`Pending: ${data.summary.pendingOrders}`,`Avg Value: $${data.summary.avgOrderValue.toFixed(2)}`]); updateStatCard('engagement-stats',[`Total Products: ${data.summary.totalProducts}`,`Consumables: ${data.summary.totalConsumables}`,`Filters: ${data.summary.totalFilters}`,`Low Stock: ${data.summary.lowStockItems}`]); updateStatCard('returns-stats',[`Total Returns (${filters.dateRange}d): ${data.summary.totalReturns}`,`Pending: ${data.summary.pendingReturns}`,`Returns Rate: ${data.summary.returnsRate.toFixed(1)}%`]); const fulfillment=data.summary.fulfillmentRate||0; document.getElementById('insight-conversion').textContent=fulfillment.toFixed(1)+'% '+trendArrow(fulfillment); document.getElementById('insight-retention').textContent='$'+data.summary.avgOrderValue.toFixed(2); document.getElementById('insight-top-product').textContent=data.summary.topProduct||'--'; document.getElementById('insight-returns-rate').textContent=data.summary.returnsRate.toFixed(1)+'%'; }catch(e){ console.error('Update error:', e); if(last) last.textContent='Last updated: error'; } }
   async function updateTopUser(prefetched){ try{ const usersData = prefetched && prefetched.users ? { users: prefetched.users } : await fetchJSON(`${FN_BASE}/users`); const users=(usersData && usersData.users)||[]; const userById=new Map(users.map(u=>[String(u.id||u.user_id||u.uid||u.username), u])); const logs=await fetchAuditLogs(1000); const counts={}; logs.forEach(l=>{ if(l.user_id!=null){ const k=String(l.user_id); counts[k]=(counts[k]||0)+1; } }); let topId='--', max=0; Object.entries(counts).forEach(([id,c])=>{ if(c>max){ max=c; topId=id; }}); const u=userById.get(topId); document.getElementById('insight-top-user').textContent= u? (u.username||u.name||(`User #${u.id}`)) : (topId==='--'?'--':`User #${topId}`); }catch(e){ document.getElementById('insight-top-user').textContent='--'; } }
-  async function buildUserBreakdown(){ let users=[]; try{ const u=await fetchJSON(`${FN_BASE}/users`); users=(u&&u.users)||[]; }catch(_){} const list=document.getElementById('user-breakdown-list'); if(list){ const total=users.length; const admins=users.filter(u=>u.role==='admin').length; const regular=users.filter(u=>u.role==='user').length; const locked=users.filter(u=>u.locked).length; const now=new Date(); const newUsers=users.filter(u=>u.created_at && (now-new Date(u.created_at))<7*24*60*60*1000).length; list.innerHTML=`<li>Total: <strong>${total}</strong></li><li>Admins: <strong>${admins}</strong></li><li>Regular: <strong>${regular}</strong></li><li>Locked: <strong>${locked}</strong></li><li>New (7d): <strong>${newUsers}</strong></li>`; } const growthCanvas=document.getElementById('user-growth-sparkline'); if(growthCanvas && window.Chart){ const arr=Array(30).fill(0); const now=new Date(); users.forEach(u=>{ if(u.created_at){ const daysAgo=Math.floor((now-new Date(u.created_at))/(24*60*60*1000)); if(daysAgo>=0 && daysAgo<30) arr[29-daysAgo]++; }}); if(userGrowthSparkline) userGrowthSparkline.destroy(); userGrowthSparkline=new Chart(growthCanvas.getContext('2d'),{ type:'line', data:{ labels:Array.from({length:30},(_,i)=>i+1), datasets:[{ data:arr,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',tension:.4,fill:true,pointRadius:0,borderWidth:2 }]}, options:{responsive:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}}); } const topList=document.getElementById('top-users-list'); if(topList){ const logs=await fetchAuditLogs(2000); const counts={}; logs.forEach(l=>{ if(l.user_id!=null){ const k=String(l.user_id); counts[k]=(counts[k]||0)+1; } }); const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5); topList.innerHTML= top.length? top.map(([id,c])=>{ const u=users.find(x=> String(x.id||x.user_id)===id); const name=(u&&(u.username||u.name))||`User #${id}`; return `<li class='flex items-center'><span class='inline-block w-2 h-2 rounded-full bg-blue-400 mr-2'></span><strong>${name}</strong><span class='ml-2 text-xs text-gray-400'>${c} events</span></li>`; }).join(''):'<li>N/A</li>'; } }
+  async function buildUserBreakdown(){ let users=[]; try{ const u=await fetchJSON(`${FN_BASE}/users`); users=(u&&u.users)||[]; }catch(_){} const list=document.getElementById('user-breakdown-list'); if(list){ const total=users.length; const admins=users.filter(u=>u.role==='admin').length; const regular=users.filter(u=>u.role==='user').length; const locked=users.filter(u=>u.locked).length; const now=new Date(); const newUsers=users.filter(u=>u.created_at && (now-new Date(u.created_at))<7*24*60*60*1000).length; list.innerHTML=`<li>Total: <strong>${total}</strong></li><li>Admins: <strong>${admins}</strong></li><li>Regular: <strong>${regular}</strong></li><li>Locked: <strong>${locked}</strong></li><li>New (7d): <strong>${newUsers}</strong></li>`; } const growthCanvas=document.getElementById('user-growth-sparkline'); if(growthCanvas && window.Chart){ const arr=Array(30).fill(0); const now=new Date(); users.forEach(u=>{ if(u.created_at){ const daysAgo=Math.floor((now-new Date(u.created_at))/(24*60*60*1000)); if(daysAgo>=0 && daysAgo<30) arr[29-daysAgo]++; }}); if(userGrowthSparkline) userGrowthSparkline.destroy(); const t=getChartTheme(); userGrowthSparkline=new Chart(growthCanvas.getContext('2d'),{ type:'line', data:{ labels:Array.from({length:30},(_,i)=>i+1), datasets:[{ data:arr,borderColor:t.primary,backgroundColor:t.primaryFill,tension:.4,fill:true,pointRadius:0,borderWidth:2 }]}, options:{responsive:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}}); } const topList=document.getElementById('top-users-list'); if(topList){ const logs=await fetchAuditLogs(2000); const counts={}; logs.forEach(l=>{ if(l.user_id!=null){ const k=String(l.user_id); counts[k]=(counts[k]||0)+1; } }); const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5); topList.innerHTML= top.length? top.map(([id,c])=>{ const u=users.find(x=> String(x.id||x.user_id)===id); const name=(u&&(u.username||u.name))||`User #${id}`; return `<li class='flex items-center'><span class='inline-block w-2 h-2 rounded-full bg-blue-400 mr-2'></span><strong>${name}</strong><span class='ml-2 text-xs text-gray-400'>${c} events</span></li>`; }).join(''):'<li>N/A</li>'; } }
   async function updateRealtime(){ 
     try {
       // Check user role to avoid unnecessary 401s on inventory

@@ -301,6 +301,25 @@ function initThemeCards() {
     });
   }
 
+  // Keep cards in sync if the theme is changed elsewhere (e.g., scheduler, custom builder)
+  try {
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      if (window.__themeCardsListener) {
+        window.removeEventListener('theme:changed', window.__themeCardsListener);
+      }
+      window.__themeCardsListener = function (e) {
+        const nextTheme = (e && e.detail && e.detail.id) || (themeSelect && themeSelect.value) || localStorage.getItem('theme') || 'dark';
+        if (themeSelect) {
+          themeSelect.value = nextTheme;
+        }
+        updateActiveCard(nextTheme);
+      };
+      window.addEventListener('theme:changed', window.__themeCardsListener);
+    }
+  } catch (_) {
+    /* ignore */
+  }
+
   themeCards.forEach(card => {
     card.addEventListener('click', async () => {
       const themeId = card.getAttribute('data-theme');
