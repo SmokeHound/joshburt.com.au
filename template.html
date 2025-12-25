@@ -5,11 +5,11 @@
     It demonstrates the layout, navigation, neon theme, and all major UI elements.
 
     Key conventions:
-    - Sidebar/nav markup matches index.html exactly for consistency.
-    - Neon cards require both .card and a .widget-* class for correct appearance.
-    - Use provided button, form, and table classes for consistent look.
-    - Theme toggle and mobile nav are included for reference.
-    - All custom styles should be in assets/css/styles.css, not inline.
+    - Sidebar/nav is injected via init-shared.js + shared-nav.html (pages only provide #main-nav).
+    - Layout spacing is handled via body.has-sidebar (do not hard-code per-page sidebar offsets).
+    - Prefer UI primitives (ui-card/ui-btn/ui-link) over bespoke color utilities.
+    - Avoid per-page sidebar toggle scripts; shared-nav.html owns sidebar/backdrop behavior.
+    - All custom styles should be in assets/css/styles.css (src/styles.css), not inline.
     - See comments throughout for usage and best practices.
 -->
 <!DOCTYPE html>
@@ -37,12 +37,6 @@
         - Ensures theme toggle and config are consistent across all pages
     -->
     <script src="/assets/js/init-shared.js" defer></script>
-    <!--
-        Place custom page-specific styles here if needed (prefer external CSS)
-    -->
-    <style>
-        /* ...existing code... */
-    </style>
 </head>
 <!--
     BODY CLASSES
@@ -51,66 +45,48 @@
     - Theme is persisted in localStorage
 -->
 <body class="dark">
-<!--
-    MOBILE MENU TOGGLE
-    - Shows/hides sidebar on small screens
-    - Uses #menu-toggle button and #sidebar-backdrop
--->
-<button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
-<div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
-<div class="flex min-h-screen">
-    <!--
-        SIDEBAR NAVIGATION
-        - Markup matches index.html for consistency
-        - Includes branding, user profile, nav links, and theme toggle
-        - Use .nav-link and .active for current page
-        - Update links as needed for new pages
-    -->
     <!-- Shared Navigation Loader -->
     <div id="main-nav"></div>
+
     <!--
         MAIN CONTENT AREA
-        - Contains all example UI elements
-        - Use as a reference for new dashboard pages
+        - Provide a main landmark and #main-content id for consistency
+        - Desktop spacing is applied automatically via body.has-sidebar
     -->
-    <main class="flex-1 p-4 md:p-6">
+    <main id="main-content" class="min-h-screen p-4 md:p-6 space-y-8" role="main">
         <!--
             PAGE HEADER
             - Title and description for the template page
         -->
-        <section class="mb-8">
-            <h2 class="text-3xl font-bold mb-2 text-gray-100">Template Page</h2>
-            <p class="text-gray-400 mb-4">This page demonstrates all major UI elements and layout patterns for admin dashboard pages.</p>
+        <section class="ui-card ui-card-flat">
+            <h1 class="text-3xl font-bold text-gray-100">Template Page</h1>
+            <p class="text-gray-400 mt-2">This page demonstrates major UI elements and layout patterns for admin dashboard pages.</p>
         </section>
         <!--
-            NEON CARD EXAMPLES
-            - Always use both .card and a .widget-* class (e.g., .widget-primary)
-            - .card provides background and border, .widget-* adds neon border/effects
-            - Use .rounded-lg, .shadow-md, .p-6 for consistent spacing and style
+            CARD EXAMPLES
+            - Use ui-card plus a themed variant (ui-card-primary/secondary/accent)
         -->
-        <section class="mb-8">
-            <div class="ui-card ui-card-primary rounded-lg shadow-md p-6 mb-4">
-                <h3 class="text-xl font-semibold mb-2 text-gray-100">Neon Card (Primary)</h3>
-                <p class="text-gray-300">This is a primary neon card. Use <code>.widget-primary</code> for main content blocks.</p>
+        <section class="space-y-4">
+            <div class="ui-card ui-card-primary p-6">
+                <h2 class="text-xl font-semibold text-gray-100">Card (Primary)</h2>
+                <p class="text-gray-300 mt-2">Use for main content blocks.</p>
             </div>
-            <div class="ui-card ui-card-secondary rounded-lg shadow-md p-6 mb-4">
-                <h3 class="text-xl font-semibold mb-2 text-gray-100">Neon Card (Secondary)</h3>
-                <p class="text-gray-300">This is a secondary neon card. Use <code>.widget-secondary</code> for supporting content.</p>
+            <div class="ui-card ui-card-secondary p-6">
+                <h2 class="text-xl font-semibold text-gray-100">Card (Secondary)</h2>
+                <p class="text-gray-300 mt-2">Use for supporting content.</p>
             </div>
-            <div class="ui-card ui-card-accent rounded-lg shadow-md p-6 mb-4">
-                <h3 class="text-xl font-semibold mb-2 text-gray-100">Neon Card (Accent)</h3>
-                <p class="text-gray-300">This is an accent neon card. Use <code>.widget-accent</code> for highlights.</p>
+            <div class="ui-card ui-card-accent p-6">
+                <h2 class="text-xl font-semibold text-gray-100">Card (Accent)</h2>
+                <p class="text-gray-300 mt-2">Use for highlights.</p>
             </div>
         </section>
         <!--
             TABLE EXAMPLE
-            - Always use both .card and a .widget-* class (e.g., .widget-primary) for correct neon card outline
-            - .card provides background and border, .widget-* adds neon border/effects
             - .overflow-x-auto for responsive tables
             - Use semantic <table> markup and ARIA roles
         -->
-        <section class="mb-8">
-            <div class="ui-card ui-card-primary rounded-lg shadow-md p-6">
+        <section>
+            <div class="ui-card ui-card-primary p-6">
                 <h3 class="text-xl font-semibold mb-4 text-gray-100">Table Example</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left mb-6" role="table" aria-label="Example table">
@@ -139,13 +115,11 @@
         </section>
         <!--
             FORM EXAMPLE
-            - Always use both .card and a .widget-* class (e.g., .widget-secondary) for correct neon card outline
-            - .card provides background and border, .widget-* adds neon border/effects
             - Inputs use dark mode styles and focus rings
             - Use grid for responsive layout
         -->
-        <section class="mb-8">
-            <div class="ui-card ui-card-secondary rounded-lg shadow-md p-6">
+        <section>
+            <div class="ui-card ui-card-secondary p-6">
                 <h3 class="text-xl font-semibold mb-4 text-gray-100">Form Example</h3>
                 <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" placeholder="Text Field" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
@@ -157,8 +131,8 @@
                     </select>
                     <textarea class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="3" placeholder="Textarea"></textarea>
                     <div class="col-span-2 flex gap-4 mt-4">
-                        <button type="submit" class="ui-btn ui-btn-primary flex-1 p-3 rounded-lg">Submit</button>
-                        <button type="button" class="ui-btn ui-btn-secondary flex-1 p-3 rounded-lg">Cancel</button>
+                        <button type="submit" class="ui-btn ui-btn-primary flex-1">Submit</button>
+                        <button type="button" class="ui-btn ui-btn-secondary flex-1">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -168,15 +142,15 @@
             - Use .ui-btn .ui-btn-primary, .ui-btn .ui-btn-secondary, etc. for styled buttons
             - Button variants: ui-btn-primary, ui-btn-secondary, ui-btn-accent, ui-btn-danger, ui-btn-warning
         -->
-        <section class="mb-8">
-            <div class="ui-card ui-card-accent rounded-lg shadow-md p-6">
+        <section>
+            <div class="ui-card ui-card-accent p-6">
                 <h3 class="text-xl font-semibold mb-4 text-gray-100">Button Examples</h3>
                 <div class="flex gap-4 flex-wrap">
-                    <button class="ui-btn ui-btn-primary p-3 rounded-lg">Neon Blue</button>
-                    <button class="ui-btn ui-btn-secondary p-3 rounded-lg">Neon Green</button>
-                    <button class="p-3 rounded-lg bg-primary text-white">Primary</button>
-                    <button class="p-3 rounded-lg bg-secondary text-white">Secondary</button>
-                    <button class="p-3 rounded-lg bg-accent text-white">Accent</button>
+                    <button class="ui-btn ui-btn-primary">Primary</button>
+                    <button class="ui-btn ui-btn-secondary">Secondary</button>
+                    <button class="ui-btn ui-btn-accent">Accent</button>
+                    <button class="ui-btn ui-btn-warning">Warning</button>
+                    <button class="ui-btn ui-btn-danger">Danger</button>
                 </div>
             </div>
         </section>
@@ -186,8 +160,8 @@
             - Replace with Chart.js or other chart library as needed
             - Move inline height style to external CSS for production
         -->
-        <section class="mb-8">
-            <div class="ui-card ui-card-primary rounded-lg shadow-md p-6">
+        <section>
+            <div class="ui-card ui-card-primary p-6">
                 <h3 class="text-xl font-semibold mb-4 text-gray-100">Chart Area (Placeholder)</h3>
                 <div class="bg-gray-900 rounded-lg p-8 flex items-center justify-center text-gray-400 chart-placeholder">
                     Chart.js or other chart library can be embedded here.
@@ -195,23 +169,5 @@
             </div>
         </section>
     </main>
-</div>
-<!--
-    JAVASCRIPT: THEME & NAV
-    - Handles theme toggle and mobile sidebar
-    - Theme is saved to localStorage
-    - Update as needed for new features
--->
-<script>
-
-// Mobile Menu Toggle
-const menuToggle = document.getElementById('menu-toggle');
-const sidebar = document.getElementById('sidebar');
-menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    const isOpen = sidebar.classList.contains('open');
-    menuToggle.setAttribute('aria-expanded', isOpen);
-});
-</script>
 </body>
 </html>

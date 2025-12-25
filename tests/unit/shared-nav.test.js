@@ -21,7 +21,7 @@ describe('Shared Navigation Component', () => {
       menuToggle.textContent = '\u2630';
       menuToggle.setAttribute('aria-label', 'Toggle sidebar');
       menuToggle.setAttribute('aria-expanded', 'false');
-      menuToggle.className = 'sr-only';
+      menuToggle.className = 'ui-btn ui-btn-primary ui-btn-sm md:hidden fixed top-4 left-4 z-50';
       document.body.insertBefore(menuToggle, document.body.firstChild);
     }
   });

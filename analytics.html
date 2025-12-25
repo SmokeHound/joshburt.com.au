@@ -18,7 +18,7 @@
     (async()=>{
       if(!window.Chart){ await import('https://cdn.jsdelivr.net/npm/chart.js'); }
       if(!window.jspdf || !window.jspdf.jsPDF){ await import('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'); }
-      const s=document.createElement('script'); s.src='analytics-manager.js'; s.defer=true; document.head.appendChild(s);
+      const s=document.createElement('script'); s.src='/analytics-manager.js'; s.defer=true; document.head.appendChild(s);
     })();
   </script>
   <link rel="stylesheet" href="/assets/css/accessibility.css" />
@@ -26,8 +26,6 @@
 </head>
 <body class="dark min-h-screen flex flex-col md:flex-row font-sans">
   
-
-  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
   <div id="main-nav"></div>
   <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
   <header class="page-header ui-card border">

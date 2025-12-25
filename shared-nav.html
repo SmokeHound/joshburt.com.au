@@ -90,16 +90,21 @@
         menuToggle.textContent = '\u2630';
         menuToggle.setAttribute('aria-label', 'Toggle sidebar');
         menuToggle.setAttribute('aria-expanded', 'false');
-        // Keep minimal styling to not interfere with host pages; tests only care about presence/ARIA
-        menuToggle.className = 'sr-only';
+        // Default styling for pages that don't provide their own toggle
+        menuToggle.className = 'ui-btn ui-btn-primary ui-btn-sm md:hidden fixed top-4 left-4 z-50';
         // Insert early in body so document.getElementById finds it reliably
         document.body.insertBefore(menuToggle, document.body.firstChild);
     }
     if (!sidebarBackdrop) {
         sidebarBackdrop = document.createElement('div');
         sidebarBackdrop.id = 'sidebar-backdrop';
-        sidebarBackdrop.className = 'hidden';
+        sidebarBackdrop.className = 'sidebar-backdrop hidden';
         document.body.appendChild(sidebarBackdrop);
+    }
+
+    // Normalize backdrop class for host pages that provide a custom element
+    if (sidebarBackdrop && !sidebarBackdrop.classList.contains('sidebar-backdrop')) {
+        sidebarBackdrop.classList.add('sidebar-backdrop');
     }
     
     function toggleSidebar() {
@@ -108,13 +113,19 @@
         if (isOpen) {
             // Close sidebar
             sidebar.classList.remove('open');
-            if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+            if (sidebarBackdrop) {
+                sidebarBackdrop.classList.remove('show');
+                sidebarBackdrop.classList.add('hidden');
+            }
             document.body.classList.remove('sidebar-open');
             menuToggle.setAttribute('aria-expanded', 'false');
         } else {
             // Open sidebar
             sidebar.classList.add('open');
-            if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
+            if (sidebarBackdrop) {
+                sidebarBackdrop.classList.remove('hidden');
+                sidebarBackdrop.classList.add('show');
+            }
             document.body.classList.add('sidebar-open');
             menuToggle.setAttribute('aria-expanded', 'true');
         }
