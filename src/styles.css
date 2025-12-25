@@ -501,7 +501,7 @@ body {
   transition: width var(--token-transition-slow), background-color var(--token-transition-slow), transform var(--token-transition-slow);
   z-index: 200;
   transform: translateX(-100%);
-  background-color: var(--token-bg-secondary);
+  background-color: var(--token-nav-bg, var(--token-bg-secondary));
   border-right: 1px solid var(--token-color-primary-alpha-20);
   pointer-events: none;
 }

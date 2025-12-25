@@ -280,6 +280,10 @@
       root.style.setProperty('--token-color-primary-hover', colors.primary);
       root.style.setProperty('--token-color-primary-active', colors.primary);
       setAlphaVars('--token-color-primary', colors.primary);
+
+      // Sidebar/nav background tint follows active theme primary
+      // Uses precomputed alpha tokens so it updates consistently across themes.
+      root.style.setProperty('--token-nav-bg', 'var(--token-color-primary-alpha-20)');
     }
     if (colors.secondary) {
       root.style.setProperty('--token-color-secondary', colors.secondary);
