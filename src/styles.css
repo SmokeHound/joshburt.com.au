@@ -489,6 +489,33 @@ body {
    LAYOUT COMPONENTS
    ============================================================================ */
 
+/* Mobile menu toggle + sidebar backdrop (shared across pages) */
+.mobile-menu-toggle {
+  background: var(--token-color-primary);
+  color: var(--token-text-on-primary);
+  border-radius: var(--token-radius-md);
+  box-shadow: 0 0 10px var(--token-color-primary-alpha-30);
+  transition: background var(--token-transition-base), box-shadow var(--token-transition-base);
+}
+
+.mobile-menu-toggle:hover {
+  background: var(--token-color-primary-hover);
+  box-shadow: var(--token-shadow-glow-primary);
+}
+
+.mobile-menu-toggle:active {
+  background: var(--token-color-primary-active);
+}
+
+.mobile-menu-toggle:focus-visible {
+  outline: 2px solid var(--token-color-secondary);
+  outline-offset: 2px;
+}
+
+.sidebar-backdrop {
+  background: var(--token-bg-overlay);
+}
+
 /* Sidebar styling */
 .sidebar {
   width: var(--sidebar-width, 16rem);
