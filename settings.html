@@ -9,43 +9,16 @@
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <link rel="stylesheet" href="/assets/css/accessibility.css" />
   <style>
-    /* Compact mode for Settings page: reduce paddings, gaps and font-sizes */
-    #main-content { padding: 0.5rem !important; }
-    #main-content .page-header { padding: 0.5rem !important; }
-    #main-content .page-header .w-16 { width:48px !important; height:48px !important; }
-    #main-content .page-header h2 { font-size:1.125rem !important; }
-    #main-content .page-header p { font-size:0.75rem !important; margin-top:0.25rem !important; }
+    /* Settings page helpers (token-driven, no hard-coded colors) */
+    .tab-btn-active {
+      border-color: var(--token-color-primary) !important;
+      box-shadow: var(--token-shadow-glow-primary);
+      color: var(--token-text-primary) !important;
+    }
 
-    /* Cards and widgets */
-    #main-content .card, #main-content .widget-primary, #main-content .widget-secondary { padding:0.6rem !important; border-radius:0.5rem !important; }
-    #main-content .p-8 { padding:0.6rem !important; }
-    #main-content .p-6 { padding:0.5rem !important; }
-    #main-content .p-4 { padding:0.375rem !important; }
-
-    /* Inputs and controls */
-    #main-content input, #main-content textarea, #main-content select { padding:0.5rem !important; font-size:0.9rem !important; }
-    #main-content .w-12.h-12, #main-content .w-10.h-10 { width:36px !important; height:36px !important; }
-
-    /* Typography and spacing */
-    #main-content .text-2xl { font-size:1.125rem !important; }
-    #main-content .text-lg { font-size:1rem !important; }
-    #main-content .text-sm, #main-content .text-xs { font-size:0.75rem !important; }
-    #main-content .gap-4, #main-content .gap-6 { gap:0.5rem !important; }
-    #main-content .mb-6, #main-content .mb-8 { margin-bottom:0.5rem !important; }
-
-    /* Theme cards/grid */
-    #theme-cards-container { gap:0.5rem !important; }
-    #main-content .theme-card { font-size:0.85rem; }
-    #main-content .theme-card .p-4 { padding:0.5rem !important; }
-
-    /* Buttons */
-    #main-content .ui-btn { padding:0.45rem 0.75rem !important; font-size:0.875rem !important; }
-    #main-content .px-10 { padding-left:0.9rem !important; padding-right:0.9rem !important; }
-    #main-content .py-5 { padding-top:0.5rem !important; padding-bottom:0.5rem !important; }
-
-    /* Reduce preview/input heights where used */
-    #main-content .h-12 { height:36px !important; }
-    #main-content .h-16 { height:48px !important; }
+    .settings-section--dim {
+      opacity: 0.35;
+    }
   </style>
   <!-- Load theme manager first to ensure window.Theme is available -->
   <script src="/assets/js/theme-manager.js"></script>
@@ -77,11 +50,12 @@
 
       <!-- Main -->
       <main id="main-content" class="flex-1 p-4 md:p-6" role="main">
+        <div class="mx-auto" style="max-width: 72rem;">
         <!-- Page Header with Icon -->
-        <header class="page-header ui-card border mb-6 shadow-xl bg-gradient-to-br from-gray-900 via-blue-900/20 to-purple-900/20">
+        <header class="page-header ui-card ui-card-primary border mb-6 shadow-xl">
           <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-2xl">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-16 h-16 rounded-2xl bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] flex items-center justify-center flex-shrink-0 shadow-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 text-[color:var(--token-color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -121,8 +95,8 @@
         <section class="space-y-8">
           <!-- Tabs Navigation: Enhanced with better styling -->
           <nav class="mb-8" aria-label="Settings Tabs">
-            <div class="flex flex-wrap gap-2 sm:gap-0 sm:border-b-2 sm:border-[color:var(--token-border-default)] rounded-t-lg overflow-hidden">
-              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-white bg-gradient-to-br from-blue-600 to-blue-700 border-2 sm:border-b-4 border-blue-400 rounded-lg sm:rounded-none sm:rounded-tl-lg transition-all duration-300 hover:shadow-lg hover:scale-105 sm:hover:scale-100" data-tab="general" aria-controls="general-tab">
+            <div class="flex flex-wrap gap-2">
+              <button type="button" class="tab-btn tab-btn-active flex-1 sm:flex-initial px-6 py-3 font-bold text-[color:var(--token-text-primary)] bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-color-primary)] rounded-lg transition-colors" data-tab="general" aria-controls="general-tab" aria-selected="true">
                 <span class="flex items-center justify-center gap-2 sm:gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -130,7 +104,7 @@
                   <span class="hidden sm:inline">General</span>
                 </span>
               </button>
-              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-[color:var(--token-text-secondary)] hover:text-[color:var(--token-text-primary)] hover:bg-[color:var(--token-bg-elevated)] border-2 border-transparent hover:border-[color:var(--token-border-default)] rounded-lg sm:rounded-none transition-all duration-300" data-tab="theme" aria-controls="theme-tab">
+              <button type="button" class="tab-btn flex-1 sm:flex-initial px-6 py-3 font-bold text-[color:var(--token-text-secondary)] hover:text-[color:var(--token-text-primary)] bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] hover:border-[color:var(--token-border-hover)] rounded-lg transition-colors" data-tab="theme" aria-controls="theme-tab" aria-selected="false">
                 <span class="flex items-center justify-center gap-2 sm:gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
@@ -138,7 +112,7 @@
                   <span class="hidden sm:inline">Theme</span>
                 </span>
               </button>
-              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-[color:var(--token-text-secondary)] hover:text-[color:var(--token-text-primary)] hover:bg-[color:var(--token-bg-elevated)] border-2 border-transparent hover:border-[color:var(--token-border-default)] rounded-lg sm:rounded-none sm:rounded-tr-lg transition-all duration-300" data-tab="security" aria-controls="security-tab">
+              <button type="button" class="tab-btn flex-1 sm:flex-initial px-6 py-3 font-bold text-[color:var(--token-text-secondary)] hover:text-[color:var(--token-text-primary)] bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] hover:border-[color:var(--token-border-hover)] rounded-lg transition-colors" data-tab="security" aria-controls="security-tab" aria-selected="false">
                 <span class="flex items-center justify-center gap-2 sm:gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -153,7 +127,7 @@
       <div id="general-tab" class="tab-panel ui-card ui-card-primary rounded-xl border border-[color:var(--token-border-default)] shadow-2xl p-6 md:p-8 backdrop-blur-sm">
         <form id="settings-form" class="space-y-8" autocomplete="off">
                 <!-- Core Identity Section -->
-                <div class="ui-card ui-card-secondary p-6 rounded-xl border border-blue-500/20 shadow-xl hover:border-blue-500/40 transition-all duration-300">
+                <div class="settings-section ui-card ui-card-secondary p-6 rounded-xl border border-blue-500/20 shadow-xl hover:border-blue-500/40 transition-all duration-300">
                   <div class="flex items-center gap-3 mb-4 border-b border-[color:var(--token-border-default)] pb-2">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -231,7 +205,7 @@
                 </div>
 
                 <!-- Features Section -->
-                <div class="ui-card ui-card-secondary p-8 rounded-xl border border-yellow-500/20 shadow-xl hover:border-yellow-500/40 transition-all duration-300">
+                <div class="settings-section ui-card ui-card-secondary p-8 rounded-xl border border-yellow-500/20 shadow-xl hover:border-yellow-500/40 transition-all duration-300">
                   <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-4">
                     <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center shadow-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -323,7 +297,7 @@
                 </div>
 
                 <!-- SMTP Configuration Section -->
-                <div class="ui-card ui-card-secondary p-8 rounded-xl border border-green-500/20 shadow-xl hover:border-green-500/40 transition-all duration-300">
+                <div class="settings-section ui-card ui-card-secondary p-8 rounded-xl border border-green-500/20 shadow-xl hover:border-green-500/40 transition-all duration-300">
                   <details class="group">
                     <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
@@ -379,7 +353,7 @@
                 </div>
 
                 <!-- Customization Section -->
-                <div class="ui-card ui-card-secondary p-8 rounded-xl border border-purple-500/20 shadow-xl hover:border-purple-500/40 transition-all duration-300">
+                <div class="settings-section ui-card ui-card-secondary p-8 rounded-xl border border-purple-500/20 shadow-xl hover:border-purple-500/40 transition-all duration-300">
                   <details class="group">
                     <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
@@ -421,7 +395,7 @@
                 </div>
 
                 <!-- Data Sources Section (Collapsible) -->
-                <div class="ui-card ui-card-secondary p-8 rounded-xl border border-cyan-400/20 shadow-xl hover:border-cyan-400/40 transition-all duration-300">
+                <div class="settings-section ui-card ui-card-secondary p-8 rounded-xl border border-cyan-400/20 shadow-xl hover:border-cyan-400/40 transition-all duration-300">
                   <details class="group">
                     <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-[color:var(--token-border-default)]">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-500 flex items-center justify-center shadow-lg">
@@ -469,7 +443,7 @@
                 </div>
 
                 <!-- Advanced Section -->
-                <div class="ui-card ui-card-secondary p-8 rounded-xl border border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300">
+                <div class="settings-section ui-card ui-card-secondary p-8 rounded-xl border border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300">
                   <details class="group">
                     <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-[color:var(--token-border-default)]">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg">
@@ -491,7 +465,7 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="ui-card ui-card-primary p-8 rounded-xl border-2 border-blue-500/30 shadow-2xl bg-gradient-to-br from-gray-900/50 to-gray-800/50">
+                <div class="settings-section ui-card ui-card-primary p-8 rounded-xl border-2 border-blue-500/30 shadow-2xl bg-gradient-to-br from-gray-900/50 to-gray-800/50">
                   <div class="flex flex-col md:flex-row gap-6 md:items-center md:justify-between">
                     <div class="flex gap-4 flex-wrap">
                       <button type="button" data-action="reset-defaults" class="ui-btn ui-btn-primary px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
@@ -525,7 +499,7 @@
           </div>
 
           <!-- Theme Customization Panel -->
-          <div id="theme-tab" class="tab-panel ui-card ui-card-primary rounded-lg border border-gray-700 shadow-lg p-6 md:p-8 hidden">
+          <div id="theme-tab" class="tab-panel ui-card ui-card-primary rounded-lg border border-[color:var(--token-border-default)] shadow-lg p-6 md:p-8 hidden">
             <div class="flex items-center gap-3 mb-8">
               <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -539,7 +513,7 @@
             </div>
             <!-- Theme Selection Cards -->
             <div class="space-y-6">
-               <div class="ui-card ui-card-secondary p-6 rounded-xl border border-purple-500/30 shadow-xl">
+               <div class="settings-section ui-card ui-card-secondary p-6 rounded-xl border border-purple-500/30 shadow-xl">
                 <div class="flex items-center justify-between mb-6">
                   <div>
                     <h3 class="text-lg font-bold text-white mb-2">Choose Your Theme</h3>
@@ -573,14 +547,14 @@
               </div>
 
               <!-- Custom Theme Builder -->
-              <div id="custom-theme-builder">
+              <div id="custom-theme-builder" class="settings-section">
                 <!-- Content dynamically populated by theme-ui.js -->
               </div>
             </div>
           </div>
 
           <!-- Security Panel -->
-          <div id="security-tab" class="tab-panel ui-card ui-card-primary rounded-lg border border-gray-700 shadow-lg p-6 md:p-8 hidden">
+          <div id="security-tab" class="tab-panel ui-card ui-card-primary rounded-lg border border-[color:var(--token-border-default)] shadow-lg p-6 md:p-8 hidden">
             <div class="flex items-center gap-4 mb-8 border-b border-gray-700/50 pb-6">
               <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -592,7 +566,7 @@
                 <p class="text-sm text-gray-400 mt-2">Manage authentication and security preferences</p>
               </div>
             </div>
-            <div class="card ui-card ui-card-secondary p-8 rounded-xl border-2 border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300 space-y-8">
+            <div class="settings-section card ui-card ui-card-secondary p-8 rounded-xl border-2 border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300 space-y-8">
               <!-- Session Timeout Inline Group -->
               <div class="flex items-stretch rounded-xl ui-field-shell-danger overflow-hidden">
                 <div class="flex items-center justify-center px-4 bg-red-500/10 border-r border-red-500/20">
@@ -673,6 +647,7 @@
           </div>
 
         </section>
+      </div>
     </main>
     </div>
 
@@ -768,15 +743,15 @@
             function switchTab(targetTab) {
                 // Remove active state from all buttons
                 tabButtons.forEach(btn => {
-                    btn.classList.remove('bg-gradient-to-br', 'from-blue-600', 'to-blue-700', 'text-white', 'border-b-4', 'border-blue-400', 'shadow-lg');
-                    btn.classList.add('text-gray-400');
+              btn.classList.remove('tab-btn-active');
+              btn.setAttribute('aria-selected', 'false');
                 });
                 
                 // Find and activate the target button
                 const targetButton = document.querySelector(`[data-tab="${targetTab}"]`);
                 if (targetButton) {
-                    targetButton.classList.add('bg-gradient-to-br', 'from-blue-600', 'to-blue-700', 'text-white', 'border-b-4', 'border-blue-400', 'shadow-lg');
-                    targetButton.classList.remove('text-gray-400');
+              targetButton.classList.add('tab-btn-active');
+              targetButton.setAttribute('aria-selected', 'true');
                 }
                 
                 // Hide all panels with fade effect
@@ -1674,6 +1649,7 @@
       const clearSearchBtn = document.getElementById('clear-settings-search');
       
       if (searchInput && clearSearchBtn) {
+          let lastNoMatchQuery = '';
           searchInput.addEventListener('input', (e) => {
               const query = e.target.value.toLowerCase().trim();
               
@@ -1684,33 +1660,32 @@
               }
               
               // Search through all settings sections
-              const sections = document.querySelectorAll('.card.widget-secondary');
+            const sections = document.querySelectorAll('.settings-section');
               let matchCount = 0;
               
               sections.forEach(section => {
                   const text = section.textContent.toLowerCase();
-                  if (text.includes(query) || !query) {
-                      section.style.display = '';
-                      section.style.opacity = '1';
-                      if (query) matchCount++;
-                  } else {
-                      section.style.opacity = '0.3';
-                  }
+              const isMatch = !query || text.includes(query);
+              section.classList.toggle('settings-section--dim', !isMatch);
+              if (query && isMatch) matchCount++;
               });
               
               // Show result count
-              if (query && matchCount === 0) {
-                  showToast(`No settings found for "${query}"`, 'info');
+            if (query && matchCount === 0 && lastNoMatchQuery !== query) {
+              lastNoMatchQuery = query;
+              showToast(`No settings found for "${query}"`, 'info');
+            }
+            if (!query) {
+              lastNoMatchQuery = '';
               }
           });
           
           clearSearchBtn.addEventListener('click', () => {
               searchInput.value = '';
               clearSearchBtn.classList.add('hidden');
-              const sections = document.querySelectorAll('.card.widget-secondary');
+            const sections = document.querySelectorAll('.settings-section');
               sections.forEach(section => {
-                  section.style.display = '';
-                  section.style.opacity = '1';
+              section.classList.remove('settings-section--dim');
               });
           });
       }
