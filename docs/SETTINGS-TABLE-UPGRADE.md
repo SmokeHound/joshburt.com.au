@@ -48,7 +48,7 @@ CREATE INDEX idx_settings_category ON settings(category);
 CREATE INDEX idx_settings_updated_at ON settings(updated_at);
 ```
 
-### Migrated Settings (28 total)
+### Migrated Settings (27 total)
 
 #### General Settings (10)
 
@@ -63,7 +63,7 @@ CREATE INDEX idx_settings_updated_at ON settings(updated_at);
 - `customCss` - Custom CSS
 - `customJs` - Custom JavaScript
 
-#### Theme Settings (10)
+#### Theme Settings (9)
 
 - `theme` - Active theme (dark/light/etc)
 - `primaryColor` - Primary theme color (#f59e42)
@@ -74,7 +74,7 @@ CREATE INDEX idx_settings_updated_at ON settings(updated_at);
 - `buttonSuccessColor` - Success button color (#10b981)
 - `buttonDangerColor` - Danger button color (#ef4444)
 - `customCss` - Custom CSS overrides
-- `themeSchedule` - Theme scheduling config (JSON)
+
 
 #### Integrations (4)
 

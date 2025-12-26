@@ -42,13 +42,6 @@ describe('Settings API Integration', () => {
           category: 'features',
           data_type: 'json',
           description: 'Feature flags'
-        },
-        {
-          key: 'themeSchedule',
-          value: '{"enabled":true,"darkModeStart":"18:00","lightModeStart":"06:00"}',
-          category: 'theme',
-          data_type: 'json',
-          description: 'Theme schedule'
         }
       ];
 
@@ -79,11 +72,6 @@ describe('Settings API Integration', () => {
       expect(settings.sessionTimeout).toBe(60);
       expect(settings.primaryColor).toBe('#3b82f6');
       expect(settings.featureFlags).toEqual({ betaFeatures: true, newDashboard: false });
-      expect(settings.themeSchedule).toEqual({
-        enabled: true,
-        darkModeStart: '18:00',
-        lightModeStart: '06:00'
-      });
     });
 
     test('should handle different data types correctly', () => {
@@ -148,8 +136,7 @@ describe('Settings API Integration', () => {
         maintenanceMode: true,
         sessionTimeout: 120,
         primaryColor: '#ff0000',
-        featureFlags: { betaFeatures: true, newDashboard: true },
-        themeSchedule: { enabled: false, darkModeStart: '20:00', lightModeStart: '08:00' }
+        featureFlags: { betaFeatures: true, newDashboard: true }
       };
 
       // Mock data types from database
@@ -158,8 +145,7 @@ describe('Settings API Integration', () => {
         maintenanceMode: 'boolean',
         sessionTimeout: 'number',
         primaryColor: 'string',
-        featureFlags: 'json',
-        themeSchedule: 'json'
+        featureFlags: 'json'
       };
 
       // Simulate conversion logic from settings.js
@@ -187,9 +173,6 @@ describe('Settings API Integration', () => {
       expect(dbValues.sessionTimeout).toBe('120');
       expect(dbValues.primaryColor).toBe('#ff0000');
       expect(dbValues.featureFlags).toBe('{"betaFeatures":true,"newDashboard":true}');
-      expect(dbValues.themeSchedule).toBe(
-        '{"enabled":false,"darkModeStart":"20:00","lightModeStart":"08:00"}'
-      );
     });
 
     test('should handle all data types in conversion', () => {
@@ -247,7 +230,6 @@ describe('Settings API Integration', () => {
         'buttonSecondaryColor',
         'buttonDangerColor',
         'buttonSuccessColor',
-        'themeSchedule',
         'sessionTimeout',
         'maxLoginAttempts',
         'enable2FA',

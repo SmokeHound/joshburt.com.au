@@ -28,8 +28,7 @@ describe('Settings Table Schema', () => {
         'buttonSecondaryColor',
         'buttonDangerColor',
         'buttonSuccessColor',
-        'customCss',
-        'themeSchedule'
+        'customCss'
       ];
       const securityKeys = ['sessionTimeout', 'maxLoginAttempts', 'enable2FA', 'auditAllActions'];
       const integrationKeys = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpPassword'];
@@ -82,22 +81,6 @@ describe('Settings Table Schema', () => {
       expect(parsed).toHaveProperty('enableRegistration');
       expect(parsed).toHaveProperty('enableGuestCheckout');
       expect(typeof parsed.betaFeatures).toBe('boolean');
-    });
-
-    test('theme schedule is stored as JSON with correct structure', () => {
-      const themeScheduleValue = JSON.stringify({
-        enabled: false,
-        darkModeStart: '18:00',
-        lightModeStart: '06:00'
-      });
-
-      const parsed = JSON.parse(themeScheduleValue);
-      expect(parsed).toHaveProperty('enabled');
-      expect(parsed).toHaveProperty('darkModeStart');
-      expect(parsed).toHaveProperty('lightModeStart');
-      expect(typeof parsed.enabled).toBe('boolean');
-      expect(parsed.darkModeStart).toMatch(/^\d{2}:\d{2}$/);
-      expect(parsed.lightModeStart).toMatch(/^\d{2}:\d{2}$/);
     });
 
     test('boolean settings have correct string representation', () => {

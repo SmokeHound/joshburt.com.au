@@ -675,13 +675,6 @@ async function createDefaultSettings() {
       data_type: 'string',
       description: 'Custom CSS code'
     },
-    {
-      key: 'themeSchedule',
-      value: JSON.stringify({ enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' }),
-      category: 'theme',
-      data_type: 'json',
-      description: 'Automatic theme scheduling'
-    },
 
     // Security settings
     {
