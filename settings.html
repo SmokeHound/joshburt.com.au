@@ -105,7 +105,7 @@
         <!-- Quick Search -->
         <div class="mb-6">
           <div class="relative">
-            <input type="text" id="settings-search" placeholder="Search settings..." class="w-full p-4 pl-12 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <input type="text" id="settings-search" placeholder="Search settings..." class="w-full p-4 pl-12 rounded-lg bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] text-[color:var(--token-text-primary)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]" />
             <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
@@ -172,7 +172,7 @@
                         <span>Site Title</span>
                         <span class="text-xs text-gray-500 font-normal" id="site-title-count"></span>
                       </label>
-                      <div class="rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/30 transition-all duration-200 hover:border-gray-600">
+                      <div class="rounded-lg ui-field-shell">
                         <input id="site-title" class="w-full p-3 text-sm bg-transparent focus:outline-none" maxlength="100" placeholder="Josh's App" />
                       </div>
                     </div>
@@ -180,7 +180,7 @@
                       <label for="contact-email" class="mb-1 font-bold text-gray-300 inline-flex items-center gap-2 whitespace-nowrap">
                         <span>Contact Email</span>
                       </label>
-                      <div class="rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/30 transition-all duration-200 hover:border-gray-600">
+                      <div class="rounded-lg ui-field-shell">
                         <input id="contact-email" type="email" class="w-full p-3 text-sm bg-transparent focus:outline-none" placeholder="admin@example.com" />
                       </div>
                     </div>
@@ -189,7 +189,7 @@
                         <span>Site Description</span>
                         <span class="text-xs text-gray-500 font-normal" id="site-description-count"></span>
                       </label>
-                      <div class="rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/30 transition-all duration-200 hover:border-gray-600">
+                      <div class="rounded-lg ui-field-shell">
                         <textarea id="site-description" class="w-full p-3 text-sm bg-transparent focus:outline-none resize-none" rows="3" maxlength="500" placeholder="Responsive website template with admin features"></textarea>
                       </div>
                     </div>
@@ -197,11 +197,11 @@
                       <label for="logo-url" class="mb-1 font-bold text-gray-300 inline-flex items-center gap-2 whitespace-nowrap">
                         <span>Logo URL</span>
                       </label>
-                      <div class="rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/30 transition-all duration-200 hover:border-gray-600">
+                      <div class="rounded-lg ui-field-shell">
                         <input id="logo-url" class="w-full p-3 text-sm bg-transparent focus:outline-none" maxlength="300" placeholder="https://example.com/logo.png" />
                       </div>
                       <div class="mt-2 h-10 flex items-center gap-4" id="logo-preview-wrapper">
-                        <img id="logo-preview" alt="Logo preview" class="h-12 w-auto hidden border-2 border-gray-700 rounded-lg p-1 bg-gray-900/50" />
+                        <img id="logo-preview" alt="Logo preview" class="h-12 w-auto hidden border-2 border-[color:var(--token-border-default)] rounded-lg p-1 bg-[color:var(--token-bg-elevated)]" />
                         <button type="button" id="logo-test" class="text-xs px-5 py-2.5 rounded-lg bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 border border-gray-600 transition-all duration-200 font-medium shadow-md hover:shadow-lg">Preview</button>
                       </div>
                     </div>
@@ -209,11 +209,11 @@
                       <label for="favicon-url" class="mb-1 font-bold text-gray-300 inline-flex items-center gap-2 whitespace-nowrap">
                         <span>Favicon URL</span>
                       </label>
-                      <div class="rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/30 transition-all duration-200 hover:border-gray-600">
+                      <div class="rounded-lg ui-field-shell">
                         <input id="favicon-url" class="w-full p-3 text-sm bg-transparent focus:outline-none" maxlength="300" placeholder="https://example.com/favicon.ico" />
                       </div>
                       <div class="mt-2 flex items-center gap-4" id="favicon-preview-wrapper">
-                        <img id="favicon-preview" alt="Favicon preview" class="h-10 w-10 hidden border-2 border-gray-700 rounded-lg p-1 bg-gray-900/50" />
+                        <img id="favicon-preview" alt="Favicon preview" class="h-10 w-10 hidden border-2 border-[color:var(--token-border-default)] rounded-lg p-1 bg-[color:var(--token-bg-elevated)]" />
                         <button type="button" id="favicon-test" class="text-xs px-5 py-2.5 rounded-lg bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 border border-gray-600 transition-all duration-200 font-medium shadow-md hover:shadow-lg">Preview</button>
                       </div>
                     </div>
@@ -345,7 +345,7 @@
                         <label for="smtp-host" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
                           <span>SMTP Host</span>
                         </label>
-                        <div class="rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-500/30 transition-all duration-200 hover:border-gray-600">
+                        <div class="rounded-lg ui-field-shell">
                           <input id="smtp-host" type="text" class="w-full p-4 bg-transparent text-white focus:outline-none" maxlength="100" placeholder="smtp.example.com" />
                         </div>
                       </div>
@@ -353,7 +353,7 @@
                         <label for="smtp-port" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
                           <span>SMTP Port</span>
                         </label>
-                        <div class="rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-500/30 transition-all duration-200 hover:border-gray-600">
+                        <div class="rounded-lg ui-field-shell">
                           <input id="smtp-port" type="number" class="w-full p-4 bg-transparent text-white focus:outline-none" maxlength="10" placeholder="587" />
                         </div>
                       </div>
@@ -361,7 +361,7 @@
                         <label for="smtp-user" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
                           <span>SMTP User</span>
                         </label>
-                        <div class="rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-500/30 transition-all duration-200 hover:border-gray-600">
+                        <div class="rounded-lg ui-field-shell">
                           <input id="smtp-user" type="email" class="w-full p-4 bg-transparent text-white focus:outline-none" maxlength="100" placeholder="user@example.com" />
                         </div>
                       </div>
@@ -369,7 +369,7 @@
                         <label for="smtp-password" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
                           <span>SMTP Password</span>
                         </label>
-                        <div class="rounded-lg bg-gray-800/70 border-2 border-gray-700/50 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-500/30 transition-all duration-200 hover:border-gray-600">
+                        <div class="rounded-lg ui-field-shell">
                           <input id="smtp-password" type="password" class="w-full p-4 bg-transparent text-white focus:outline-none" maxlength="100" placeholder="••••••••" />
                         </div>
                       </div>
@@ -402,7 +402,7 @@
                           <span>Custom CSS</span>
                           <span class="text-xs text-gray-500 font-normal" id="custom-css-count"></span>
                         </label>
-                        <div class="rounded-lg bg-gray-900/70 border-2 border-gray-700/50 focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-500/30 transition-all duration-200 hover:border-gray-600">
+                        <div class="rounded-lg ui-field-shell">
                           <textarea id="custom-css" class="w-full p-4 bg-transparent focus:outline-none font-mono text-xs resize-none" rows="6" maxlength="2000" placeholder="/* Custom CSS rules... */&#10;.my-class {&#10;  color: #3B82F6;&#10;}"></textarea>
                         </div>
                       </div>
@@ -411,7 +411,7 @@
                           <span>Custom JavaScript</span>
                           <span class="text-xs text-gray-500 font-normal" id="custom-js-count"></span>
                         </label>
-                        <div class="rounded-lg bg-gray-900/70 border-2 border-gray-700/50 focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-500/30 transition-all duration-200 hover:border-gray-600">
+                        <div class="rounded-lg ui-field-shell">
                           <textarea id="custom-js" class="w-full p-4 bg-transparent focus:outline-none font-mono text-xs resize-none" rows="6" maxlength="2000" placeholder="// Custom JavaScript...&#10;console.log('Hello!');"></textarea>
                         </div>
                       </div>

@@ -516,6 +516,18 @@ body {
   background: var(--token-bg-overlay);
 }
 
+/* Token-driven form field shell (wrapper around inputs/textarea/select) */
+.ui-field-shell {
+  background: var(--token-bg-elevated);
+  border: 2px solid var(--token-border-default);
+  transition: border-color var(--token-transition-base), box-shadow var(--token-transition-base);
+}
+
+.ui-field-shell:focus-within {
+  border-color: var(--token-color-primary);
+  box-shadow: var(--token-shadow-glow-primary);
+}
+
 /* Sidebar styling */
 .sidebar {
   width: var(--sidebar-width, 16rem);
