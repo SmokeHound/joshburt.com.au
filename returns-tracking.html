@@ -35,13 +35,13 @@
   <div id="main-nav"></div>
 
   <!-- Main Content -->
-  <main id="main-content" class="p-6 bg-black min-h-screen" role="main">
+  <main id="main-content" class="p-6 min-h-screen" role="main">
     <!-- Header -->
     <header class="page-header ui-card border mb-6">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Returns & Credits Tracking</h1>
-          <p class="text-gray-400">Track parts returned to suppliers and monitor credit status</p>
+          <h1 class="text-3xl font-bold text-[color:var(--token-text-primary)] mb-2">Returns & Credits Tracking</h1>
+          <p class="text-[color:var(--token-text-secondary)]">Track parts returned to suppliers and monitor credit status</p>
         </div>
         <div class="flex flex-wrap gap-2">
           <button id="addReturnBtn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg font-semibold">+ New Return</button>
@@ -52,10 +52,10 @@
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div class="ui-card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+      <div class="ui-card ui-card-flat p-4">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-gray-400 text-sm">Pending Returns</p>
+            <p class="text-[color:var(--token-text-secondary)] text-sm">Pending Returns</p>
             <p class="text-2xl font-bold text-yellow-400" id="pendingCount">0</p>
           </div>
           <div class="text-yellow-400">
@@ -66,10 +66,10 @@
         </div>
       </div>
 
-      <div class="ui-card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+      <div class="ui-card ui-card-flat p-4">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-gray-400 text-sm">Credited</p>
+            <p class="text-[color:var(--token-text-secondary)] text-sm">Credited</p>
             <p class="text-2xl font-bold text-green-400" id="creditedCount">0</p>
           </div>
           <div class="text-green-400">
@@ -80,11 +80,11 @@
         </div>
       </div>
 
-      <div class="ui-card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+      <div class="ui-card ui-card-flat p-4">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-gray-400 text-sm">Total Value Pending</p>
-            <p class="text-2xl font-bold text-white" id="totalPendingValue">$0.00</p>
+            <p class="text-[color:var(--token-text-secondary)] text-sm">Total Value Pending</p>
+            <p class="text-2xl font-bold text-[color:var(--token-text-primary)]" id="totalPendingValue">$0.00</p>
           </div>
           <div class="text-blue-400">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,11 +94,11 @@
         </div>
       </div>
 
-      <div class="ui-card rounded-lg shadow p-4 bg-gray-900 border border-gray-700">
+      <div class="ui-card ui-card-flat p-4">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-gray-400 text-sm">Avg. Processing Time</p>
-            <p class="text-2xl font-bold text-white" id="avgProcessingTime">0 days</p>
+            <p class="text-[color:var(--token-text-secondary)] text-sm">Avg. Processing Time</p>
+            <p class="text-2xl font-bold text-[color:var(--token-text-primary)]" id="avgProcessingTime">0 days</p>
           </div>
           <div class="text-purple-400">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,7 +110,7 @@
     </div>
 
     <!-- Filters -->
-    <div class="ui-card rounded-lg shadow p-4 mb-6 bg-gray-900 border border-gray-700">
+    <div class="ui-card ui-card-flat p-4 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
           <label for="filterStatus" class="block text-sm font-medium text-gray-300 mb-1">Status</label>
@@ -150,26 +150,26 @@
     </div>
 
     <!-- Returns Table -->
-    <div class="ui-card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
+    <div class="ui-card ui-card-flat p-0 mb-6">
       <div class="overflow-x-auto">
         <table class="w-full text-left" role="table" aria-label="Returns tracking table">
           <thead>
-            <tr class="border-b-2 border-gray-600">
-              <th class="py-2 px-4 text-gray-100 font-semibold">Return Date</th>
-              <th class="py-2 px-3 text-gray-100 font-semibold">Part Code</th>
-              <th class="py-2 px-3 text-gray-100 font-semibold">Part Name</th>
-              <th class="py-2 px-3 text-gray-100 font-semibold">Supplier</th>
-              <th class="py-2 px-3 text-gray-100 font-semibold">Inv #</th>
-              <th class="py-2 px-3 text-gray-100 font-semibold">Qty</th>
-              <th class="py-2 px-3 text-gray-100 font-semibold">Value</th>
-              <th class="py-2 px-3 text-gray-100 font-semibold">Status</th>
-              <th class="py-2 px-3 text-gray-100 font-semibold">Days Pending</th>
-              <th class="py-2 px-3 text-gray-100 font-semibold">Actions</th>
+            <tr class="border-b-2 border-[color:var(--token-border-default)]">
+              <th class="py-2 px-4 text-[color:var(--token-text-primary)] font-semibold">Return Date</th>
+              <th class="py-2 px-3 text-[color:var(--token-text-primary)] font-semibold">Part Code</th>
+              <th class="py-2 px-3 text-[color:var(--token-text-primary)] font-semibold">Part Name</th>
+              <th class="py-2 px-3 text-[color:var(--token-text-primary)] font-semibold">Supplier</th>
+              <th class="py-2 px-3 text-[color:var(--token-text-primary)] font-semibold">Inv #</th>
+              <th class="py-2 px-3 text-[color:var(--token-text-primary)] font-semibold">Qty</th>
+              <th class="py-2 px-3 text-[color:var(--token-text-primary)] font-semibold">Value</th>
+              <th class="py-2 px-3 text-[color:var(--token-text-primary)] font-semibold">Status</th>
+              <th class="py-2 px-3 text-[color:var(--token-text-primary)] font-semibold">Days Pending</th>
+              <th class="py-2 px-3 text-[color:var(--token-text-primary)] font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody id="returnsTableBody">
             <tr>
-              <td colspan="10" class="py-8 text-center text-gray-400">
+              <td colspan="10" class="py-8 text-center text-[color:var(--token-text-muted)]">
                 <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
                 <p>Loading returns...</p>
               </td>

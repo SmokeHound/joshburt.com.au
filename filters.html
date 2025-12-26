@@ -47,13 +47,13 @@
   <div id="main-nav"></div>
 
   <!-- Main Content -->
-  <main id="main-content" class="p-6 bg-black min-h-screen" role="main">
+  <main id="main-content" class="p-6 min-h-screen" role="main">
     <!-- Header Card -->
   <header class="page-header ui-card border" role="banner">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Filters Order Request</h1>
-          <p class="text-gray-400">Prepare filter inventory order list for purchasing department</p>
+          <h1 class="text-3xl font-bold text-[color:var(--token-text-primary)] mb-2">Filters Order Request</h1>
+          <p class="text-[color:var(--token-text-secondary)]">Prepare filter inventory order list for purchasing department</p>
         </div>
         <div class="flex flex-wrap gap-2 mt-2 md:mt-0 no-print">
           <button id="clearAllBtn" class="ui-btn ui-btn-danger px-4 py-2 rounded-lg font-semibold">Clear All</button>
@@ -67,8 +67,8 @@
     </header>
 
   <!-- Order Info Form (standalone card) -->
-  <section class="ui-card rounded-lg shadow p-6 mb-6 bg-gray-900 border border-gray-700">
-      <h2 class="text-lg font-semibold text-gray-100 mb-4">Order Information</h2>
+    <section class="ui-card ui-card-flat p-6 mb-6">
+      <h2 class="text-lg font-semibold text-[color:var(--token-text-primary)] mb-4">Order Information</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label for="requestedBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requested By</label>
@@ -97,14 +97,14 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Available Filters -->
       <!-- Neon card for available filters -->
-  <div class="ui-card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
-        <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-          <h2 class="text-xl font-semibold text-gray-100">Available Filters</h2>
-          <p class="text-sm text-gray-400 mt-1">Click on filters to add to order list</p>
+  <div class="ui-card ui-card-flat p-0 mb-6">
+        <div class="p-6 border-b border-[color:var(--token-border-default)]">
+          <h2 class="text-xl font-semibold text-[color:var(--token-text-primary)]">Available Filters</h2>
+          <p class="text-sm text-[color:var(--token-text-secondary)] mt-1">Click on filters to add to order list</p>
         </div>
 
         <!-- Search and Filter -->
-        <div class="p-4 border-b border-gray-200 dark:border-gray-600 no-print">
+        <div class="p-4 border-b border-[color:var(--token-border-default)] no-print">
           <div class="flex flex-col sm:flex-row gap-2">
             <input type="text" id="searchFilters" placeholder="Search filters..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
             <select id="filterType" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-600 dark:border-gray-500 dark:text-white">
@@ -123,32 +123,32 @@
           <!-- Filter items will be loaded here -->
           <div class="p-6 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
-            <p class="text-gray-600 dark:text-gray-300">Loading filters...</p>
+            <p class="text-[color:var(--token-text-muted)]">Loading filters...</p>
           </div>
         </div>
       </div>
       
       <!-- Order List -->
       <!-- Neon card for order list -->
-  <div class="ui-card rounded-lg shadow-md p-0 mb-6 bg-gray-900 border border-gray-700">
-        <div class="p-6 border-b border-gray-200 dark:border-gray-600">
+  <div class="ui-card ui-card-flat p-0 mb-6">
+        <div class="p-6 border-b border-[color:var(--token-border-default)]">
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-100">Order List</h2>
-            <span id="orderCount" class="bg-primary text-white px-3 py-1 rounded-full text-sm">0 items</span>
+            <h2 class="text-xl font-semibold text-[color:var(--token-text-primary)]">Order List</h2>
+            <span id="orderCount" class="bg-[color:var(--token-color-primary)] text-[color:var(--token-text-on-primary)] px-3 py-1 rounded-full text-sm">0 items</span>
           </div>
-          <p class="text-sm text-gray-400 mt-1">Items to be ordered</p>
+          <p class="text-sm text-[color:var(--token-text-secondary)] mt-1">Items to be ordered</p>
         </div>
         
         <div id="orderList" class="max-h-96 overflow-y-auto">
-          <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+          <div class="p-8 text-center text-[color:var(--token-text-muted)]">
             <p>No items added to order yet</p>
             <p class="text-sm mt-1">Click on filters from the left panel to add them</p>
           </div>
         </div>
         
         <!-- Order Summary -->
-        <div class="p-6 border-t border-gray-200 dark:border-gray-600 bg-gray-900 rounded-b-lg">
-          <div class="flex justify-between items-center text-lg font-semibold text-gray-100">
+        <div class="p-6 border-t border-[color:var(--token-border-default)]">
+          <div class="flex justify-between items-center text-lg font-semibold text-[color:var(--token-text-primary)]">
             <span>Total Items:</span>
             <span id="totalOrderItems">0</span>
           </div>

@@ -18,13 +18,13 @@
         <div id="main-nav"></div>
 
         <!-- Main Content -->
-        <main class="flex-1 p-4 md:p-6 bg-black min-h-screen">
+        <main class="flex-1 p-4 md:p-6 min-h-screen">
             <!-- Header Card -->
             <header class="page-header ui-card border">
                 <div class="flex items-center justify-between gap-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-white" data-dashboard-title>Dashboards</h1>
-                        <p class="text-gray-400">Role-based, customizable dashboards</p>
+                        <h1 class="text-3xl font-bold text-[color:var(--token-text-primary)]" data-dashboard-title>Dashboards</h1>
+                        <p class="text-[color:var(--token-text-secondary)]">Role-based, customizable dashboards</p>
                     </div>
                     <div id="role-switcher" class="hidden"></div>
                 </div>
@@ -35,8 +35,8 @@
             
                 <!-- Saved Layouts / DashboardBuilder Container -->
                 <section id="dashboard-builder-section" class="mt-6">
-                    <h3 class="text-lg font-semibold text-white mb-3">Saved Layouts</h3>
-                    <div id="dashboard-builder-container" class="ui-card p-4 rounded-lg bg-gray-900 border border-gray-800">
+                    <h3 class="text-lg font-semibold text-[color:var(--token-text-primary)] mb-3">Saved Layouts</h3>
+                    <div id="dashboard-builder-container" class="ui-card ui-card-flat p-4">
                         <!-- DashboardBuilder will render saved layouts here -->
                     </div>
                 </section>
