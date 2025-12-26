@@ -2,17 +2,112 @@
 <!-- Real-time Notifications Framework -->
 <style>
 /* Centralized notification styles */
+.notification-bell {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -0.25rem;
+    right: -0.25rem;
+    background: var(--token-color-danger);
+    color: var(--token-text-on-danger);
+    font-size: 0.75rem;
+    line-height: 1;
+    border-radius: 9999px;
+    height: 1.25rem;
+    min-width: 1.25rem;
+    padding: 0 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-dropdown {
+    background: var(--token-bg-secondary);
+    border: 1px solid var(--token-border-default);
+    border-radius: var(--token-radius-lg);
+    box-shadow: var(--token-shadow-xl);
+    overflow: hidden;
+}
+
+.notification-divider {
+    border-color: var(--token-border-default);
+}
+
+.notification-clear-link {
+    background: transparent;
+    border: none;
+    color: var(--token-color-primary);
+    cursor: pointer;
+    padding: 0;
+    font: inherit;
+}
+
+.notification-clear-link:hover {
+    color: var(--token-color-primary-hover);
+}
+
+.notification-item {
+    border-bottom: 1px solid var(--token-border-default);
+    transition: background-color var(--token-transition-base);
+}
+
+.notification-item:hover {
+    background: var(--token-bg-tertiary);
+}
+
+.notification-item--unread {
+    background: var(--token-color-primary-alpha-10);
+}
+
+.notification-muted {
+    color: var(--token-text-muted);
+}
+
 .toast {
     position: fixed;
     z-index: 9999; /* ensure above other UI */
     right: 1rem;
     bottom: 1rem;
     padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.35);
-    background-color: #111827; /* neutral dark fallback */
-    color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: var(--token-shadow-xl);
+    background-color: var(--token-bg-secondary);
+    border: 1px solid var(--token-border-default);
+    border-left: 4px solid var(--token-color-info);
+    color: var(--token-text-primary);
     max-width: 22rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+}
+
+.toast.toast--info { border-left-color: var(--token-color-info); }
+.toast.toast--success { border-left-color: var(--token-color-success); }
+.toast.toast--warning { border-left-color: var(--token-color-warning); }
+.toast.toast--error { border-left-color: var(--token-color-danger); }
+
+.toast.toast--show { transform: translateX(0); }
+.toast.toast--hide { transform: translateX(120%); }
+
+.toast-close {
+    background: transparent;
+    border: none;
+    color: var(--token-text-muted);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.toast-close:hover {
+    color: var(--token-text-primary);
+}
+
+.toast {
+    /* overridden above with token-driven styles; kept for backwards compatibility */
 }
 </style>
 <script>
@@ -21,23 +116,19 @@
     const notificationTypes = {
         info: {
             icon: 'ℹ️',
-            bgColor: 'bg-blue-600',
-            borderColor: 'border-blue-500'
+            toastClass: 'toast--info'
         },
         success: {
             icon: '✅',
-            bgColor: 'bg-green-600',
-            borderColor: 'border-green-500'
+            toastClass: 'toast--success'
         },
         warning: {
             icon: '⚠️',
-            bgColor: 'bg-yellow-600',
-            borderColor: 'border-yellow-500'
+            toastClass: 'toast--warning'
         },
         error: {
             icon: '❌',
-            bgColor: 'bg-red-600',
-            borderColor: 'border-red-500'
+            toastClass: 'toast--error'
         }
     };
 
@@ -50,10 +141,10 @@
         // Create notification bell button
         const bellButton = document.createElement('button');
         bellButton.id = 'notification-bell';
-        bellButton.className = 'relative p-2 text-white hover:bg-primary-600 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary';
+        bellButton.className = 'notification-bell ui-btn ui-btn-outline ui-btn-sm';
         bellButton.innerHTML = `
             🔔
-            <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">
+            <span id="notification-badge" class="notification-badge hidden">
                 0
             </span>
         `;
@@ -62,16 +153,16 @@
         // Create notification dropdown
         const dropdown = document.createElement('div');
         dropdown.id = 'notification-dropdown';
-        dropdown.className = 'hidden absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50';
+        dropdown.className = 'notification-dropdown hidden absolute right-0 top-full mt-2 w-80 z-50';
         dropdown.innerHTML = `
-            <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="p-4 border-b notification-divider">
                 <h3 class="text-lg font-semibold" data-i18n="notifications.title">Notifications</h3>
             </div>
             <div id="notification-list" class="max-h-96 overflow-y-auto">
                 <!-- Notifications will be inserted here -->
             </div>
-            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-                <button id="clear-all-notifications" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+            <div class="p-4 border-t notification-divider">
+                <button id="clear-all-notifications" class="text-sm notification-clear-link">
                     Clear All
                 </button>
             </div>
@@ -126,23 +217,23 @@
         const toast = document.createElement('div');
         const config = notificationTypes[notification.type];
         
-        toast.className = `fixed bottom-4 right-4 p-4 ${config.bgColor} text-white rounded-lg shadow-lg flex items-center gap-3 transform translate-x-full transition-transform duration-300 z-50`;
+        toast.className = `toast ${config.toastClass || 'toast--info'}`;
         toast.innerHTML = `
             <span class="text-xl">${config.icon}</span>
             <span class="flex-1">${notification.message}</span>
-            <button class="text-white hover:text-gray-200 text-xl font-bold" onclick="this.parentElement.remove()">&times;</button>
+            <button class="toast-close" aria-label="Dismiss notification" onclick="this.parentElement.remove()">&times;</button>
         `;
 
         document.body.appendChild(toast);
 
         // Animate in
         setTimeout(() => {
-            toast.classList.remove('translate-x-full');
+            toast.classList.add('toast--show');
         }, 100);
 
         // Auto remove after 5 seconds
         setTimeout(() => {
-            toast.classList.add('translate-x-full');
+            toast.classList.add('toast--hide');
             setTimeout(() => {
                 if (toast.parentElement) {
                     toast.remove();
@@ -171,7 +262,7 @@
         // Update notification list
         if (notifications.length === 0) {
             notificationList.innerHTML = `
-                <div class="p-4 text-center text-gray-500 dark:text-gray-400" data-i18n="notifications.empty">
+                <div class="p-4 text-center notification-muted" data-i18n="notifications.empty">
                     No new notifications
                 </div>
             `;
@@ -181,14 +272,14 @@
                 const timeAgo = getTimeAgo(notification.timestamp);
                 
                 return `
-                    <div class="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${!notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''}">
+                    <div class="p-4 notification-item ${!notification.read ? 'notification-item--unread' : ''}">
                         <div class="flex items-start gap-3">
                             <span class="text-lg">${config.icon}</span>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm ${!notification.read ? 'font-semibold' : ''}">${notification.message}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${timeAgo}</p>
+                                <p class="text-xs notification-muted mt-1">${timeAgo}</p>
                             </div>
-                            <button onclick="window.removeNotification(${notification.id})" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm">
+                            <button onclick="window.removeNotification(${notification.id})" class="notification-muted text-sm leading-none" aria-label="Remove notification">
                                 ×
                             </button>
                         </div>

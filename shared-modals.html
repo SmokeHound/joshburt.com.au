@@ -4,7 +4,7 @@
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
+    background: var(--token-bg-overlay);
     z-index: 9998;
     display: flex;
     align-items: center;
@@ -16,14 +16,14 @@
     display: none;
   }
   .modal-content {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 0.5rem;
+    background: var(--token-bg-elevated);
+    border: 1px solid var(--token-border-default);
+    border-radius: var(--token-radius-lg);
     max-width: 600px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(157, 0, 255, 0.3);
+    box-shadow: var(--token-shadow-xl);
     z-index: 9999;
     animation: slideUp 0.3s ease-out;
   }
@@ -38,7 +38,7 @@
   }
   .modal-header {
     padding: 1.5rem;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--token-border-default);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -48,7 +48,7 @@
   }
   .modal-footer {
     padding: 1.5rem;
-    border-top: 1px solid #333;
+    border-top: 1px solid var(--token-border-default);
     display: flex;
     gap: 0.75rem;
     justify-content: flex-end;
@@ -56,7 +56,7 @@
   .modal-close {
     background: transparent;
     border: none;
-    color: #999;
+    color: var(--token-text-muted);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0;
@@ -65,12 +65,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.25rem;
+    border-radius: var(--token-radius-sm);
     transition: all 0.2s;
   }
   .modal-close:hover {
-    background: #333;
-    color: #fff;
+    background: var(--token-bg-tertiary);
+    color: var(--token-text-primary);
+  }
+
+  .modal-title {
+    color: var(--token-text-primary);
+  }
+
+  .modal-message {
+    color: var(--token-text-secondary);
   }
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -99,20 +107,20 @@
     font-size: 1.5rem;
   }
   .modal-icon-danger {
-    background: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
+    background: var(--token-color-danger-alpha-20);
+    color: var(--token-color-danger);
   }
   .modal-icon-warning {
-    background: rgba(251, 191, 36, 0.2);
-    color: #fbbf24;
+    background: rgba(255, 102, 0, 0.2);
+    color: var(--token-color-warning);
   }
   .modal-icon-info {
-    background: rgba(59, 130, 246, 0.2);
-    color: #3b82f6;
+    background: var(--token-color-primary-alpha-20);
+    color: var(--token-color-primary);
   }
   .modal-icon-success {
-    background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
+    background: var(--token-color-secondary-alpha-20);
+    color: var(--token-color-success);
   }
 </style>
 
@@ -151,14 +159,14 @@
         modal.innerHTML = `
           <div class="modal-content modal-sm">
             <div class="ui-modal-header">
-              <h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>
+              <h3 class="text-xl font-semibold modal-title">${config.title}</h3>
               <button class="modal-close" data-action="cancel" aria-label="Close">&times;</button>
             </div>
             <div class="ui-modal-body text-center">
               <div class="modal-icon modal-icon-${config.type}">
                 ${iconMap[config.type] || '?'}
               </div>
-              <p class="text-gray-300">${config.message}</p>
+              <p class="modal-message">${config.message}</p>
             </div>
             <div class="ui-modal-footer">
               <button class="ui-btn ui-btn-secondary px-4 py-2 rounded" data-action="cancel">${config.cancelText}</button>
@@ -229,14 +237,14 @@
         modal.innerHTML = `
           <div class="modal-content modal-sm">
             <div class="ui-modal-header">
-              <h3 class="text-xl font-semibold text-gray-100">${config.title}</h3>
+              <h3 class="text-xl font-semibold modal-title">${config.title}</h3>
               <button class="modal-close" data-action="ok" aria-label="Close">&times;</button>
             </div>
             <div class="ui-modal-body text-center">
               <div class="modal-icon modal-icon-${config.type}">
                 ${iconMap[config.type] || 'ℹ️'}
               </div>
-              <p class="text-gray-300">${config.message}</p>
+              <p class="modal-message">${config.message}</p>
             </div>
             <div class="ui-modal-footer">
               <button class="ui-btn ui-btn-primary px-4 py-2 rounded" data-action="ok">${config.okText}</button>
