@@ -202,28 +202,28 @@
       <!-- Additional Insights Section -->
       <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Quick Stats -->
-        <div class="ui-card p-6 rounded-lg shadow-md border border-gray-700">
-          <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <div class="ui-card p-6 rounded-lg shadow-md border border-[color:var(--token-border-default)]">
+          <h3 class="text-lg font-semibold text-[color:var(--token-text-primary)] mb-4 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             Quick Insights
           </h3>
           <div class="space-y-3">
-            <div class="flex items-center justify-between p-3 rounded bg-gray-800/50 hover:bg-gray-800 transition-colors">
-              <span class="text-sm text-gray-300">Pending Orders</span>
+            <div class="flex items-center justify-between p-3 rounded bg-[color:var(--token-bg-elevated)] hover:bg-[color:var(--token-bg-elevated)] transition-colors border border-[color:var(--token-border-default)]">
+              <span class="text-sm text-[color:var(--token-text-secondary)]">Pending Orders</span>
               <span id="insight-pending-orders" class="text-yellow-400 font-semibold">
                 <div class="skeleton-loader w-8 h-5 rounded inline-block"></div>
               </span>
             </div>
-            <div class="flex items-center justify-between p-3 rounded bg-gray-800/50 hover:bg-gray-800 transition-colors">
-              <span class="text-sm text-gray-300">Low Stock Items</span>
+            <div class="flex items-center justify-between p-3 rounded bg-[color:var(--token-bg-elevated)] hover:bg-[color:var(--token-bg-elevated)] transition-colors border border-[color:var(--token-border-default)]">
+              <span class="text-sm text-[color:var(--token-text-secondary)]">Low Stock Items</span>
               <span id="insight-low-stock" class="text-red-400 font-semibold">
                 <div class="skeleton-loader w-8 h-5 rounded inline-block"></div>
               </span>
             </div>
-            <div class="flex items-center justify-between p-3 rounded bg-gray-800/50 hover:bg-gray-800 transition-colors">
-              <span class="text-sm text-gray-300">Today's Activity</span>
+            <div class="flex items-center justify-between p-3 rounded bg-[color:var(--token-bg-elevated)] hover:bg-[color:var(--token-bg-elevated)] transition-colors border border-[color:var(--token-border-default)]">
+              <span class="text-sm text-[color:var(--token-text-secondary)]">Today's Activity</span>
               <span id="insight-today-activity" class="text-green-400 font-semibold">
                 <div class="skeleton-loader w-8 h-5 rounded inline-block"></div>
               </span>
@@ -232,8 +232,8 @@
         </div>
 
         <!-- System Info -->
-        <div class="ui-card p-6 rounded-lg shadow-md border border-gray-700">
-          <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <div class="ui-card p-6 rounded-lg shadow-md border border-[color:var(--token-border-default)]">
+          <h3 class="text-lg font-semibold text-[color:var(--token-text-primary)] mb-4 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -241,24 +241,24 @@
           </h3>
           <div class="space-y-3 text-sm">
             <div class="flex items-center justify-between">
-              <span class="text-gray-400">Version</span>
-              <span id="system-version" class="text-gray-200 font-mono">
+              <span class="text-[color:var(--token-text-muted)]">Version</span>
+              <span id="system-version" class="text-[color:var(--token-text-primary)] font-mono">
                 <div class="skeleton-loader w-16 h-5 rounded inline-block"></div>
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-gray-400">Environment</span>
-              <span id="system-environment" class="px-2 py-0.5 bg-gray-500/20 text-gray-300 rounded text-xs">
+              <span class="text-[color:var(--token-text-muted)]">Environment</span>
+              <span id="system-environment" class="px-2 py-0.5 bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-secondary)] border border-[color:var(--token-border-default)] rounded text-xs">
                 <div class="skeleton-loader w-20 h-5 rounded inline-block"></div>
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-gray-400">Last Updated</span>
-              <span id="system-last-updated" class="text-gray-200">Just now</span>
+              <span class="text-[color:var(--token-text-muted)]">Last Updated</span>
+              <span id="system-last-updated" class="text-[color:var(--token-text-primary)]">Just now</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-gray-400">Uptime</span>
-              <span id="system-uptime" class="text-gray-200">
+              <span class="text-[color:var(--token-text-muted)]">Uptime</span>
+              <span id="system-uptime" class="text-[color:var(--token-text-primary)]">
                 <div class="skeleton-loader w-12 h-5 rounded inline-block"></div>
               </span>
             </div>
@@ -268,10 +268,10 @@
 
       <!-- Recent Activity -->
       <div class="mt-8">
-        <div class="card ui-card ui-card-secondary p-6 rounded-lg shadow-md border border-gray-700 hover:border-gray-600 transition-all duration-300">
+        <div class="card ui-card ui-card-secondary p-6 rounded-lg shadow-md border border-[color:var(--token-border-default)] hover:border-[color:var(--token-color-primary)] transition-all duration-300">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
-              <h3 class="text-lg font-semibold text-white">Recent Activity</h3>
+              <h3 class="text-lg font-semibold text-[color:var(--token-text-primary)]">Recent Activity</h3>
               <span id="activity-count-badge" class="hidden px-2 py-0.5 text-xs bg-cyan-500/20 text-cyan-300 rounded-full"></span>
             </div>
             <div class="flex items-center gap-2">
@@ -307,7 +307,7 @@
               </div>
             </li>
           </ul>
-          <div id="recent-activity-actions" class="mt-4 pt-3 border-t border-gray-700 hidden">
+          <div id="recent-activity-actions" class="mt-4 pt-3 border-t border-[color:var(--token-border-default)] hidden">
             <button id="recent-activity-toggle" class="text-xs text-cyan-300 hover:text-cyan-200 underline">Show more</button>
           </div>
         </div>

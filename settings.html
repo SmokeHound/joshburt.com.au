@@ -106,10 +106,10 @@
         <div class="mb-6">
           <div class="relative">
             <input type="text" id="settings-search" placeholder="Search settings..." class="w-full p-4 pl-12 rounded-lg bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] text-[color:var(--token-text-primary)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]" />
-            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[color:var(--token-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
-            <button id="clear-settings-search" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white hidden" aria-label="Clear search" title="Clear search">
+            <button id="clear-settings-search" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-[color:var(--token-text-muted)] hover:text-[color:var(--token-text-primary)] hidden" aria-label="Clear search" title="Clear search">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -121,7 +121,7 @@
         <section class="space-y-8">
           <!-- Tabs Navigation: Enhanced with better styling -->
           <nav class="mb-8" aria-label="Settings Tabs">
-            <div class="flex flex-wrap gap-2 sm:gap-0 sm:border-b-2 sm:border-gray-700/50 rounded-t-lg overflow-hidden">
+            <div class="flex flex-wrap gap-2 sm:gap-0 sm:border-b-2 sm:border-[color:var(--token-border-default)] rounded-t-lg overflow-hidden">
               <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-white bg-gradient-to-br from-blue-600 to-blue-700 border-2 sm:border-b-4 border-blue-400 rounded-lg sm:rounded-none sm:rounded-tl-lg transition-all duration-300 hover:shadow-lg hover:scale-105 sm:hover:scale-100" data-tab="general" aria-controls="general-tab">
                 <span class="flex items-center justify-center gap-2 sm:gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -130,7 +130,7 @@
                   <span class="hidden sm:inline">General</span>
                 </span>
               </button>
-              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-gray-400 hover:text-white hover:bg-gray-800/50 border-2 border-transparent hover:border-gray-600 rounded-lg sm:rounded-none transition-all duration-300" data-tab="theme" aria-controls="theme-tab">
+              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-[color:var(--token-text-secondary)] hover:text-[color:var(--token-text-primary)] hover:bg-[color:var(--token-bg-elevated)] border-2 border-transparent hover:border-[color:var(--token-border-default)] rounded-lg sm:rounded-none transition-all duration-300" data-tab="theme" aria-controls="theme-tab">
                 <span class="flex items-center justify-center gap-2 sm:gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
@@ -138,7 +138,7 @@
                   <span class="hidden sm:inline">Theme</span>
                 </span>
               </button>
-              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-gray-400 hover:text-white hover:bg-gray-800/50 border-2 border-transparent hover:border-gray-600 rounded-lg sm:rounded-none sm:rounded-tr-lg transition-all duration-300" data-tab="security" aria-controls="security-tab">
+              <button class="tab-btn flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 font-bold text-[color:var(--token-text-secondary)] hover:text-[color:var(--token-text-primary)] hover:bg-[color:var(--token-bg-elevated)] border-2 border-transparent hover:border-[color:var(--token-border-default)] rounded-lg sm:rounded-none sm:rounded-tr-lg transition-all duration-300" data-tab="security" aria-controls="security-tab">
                 <span class="flex items-center justify-center gap-2 sm:gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -150,11 +150,11 @@
           </nav>
 
           <!-- General Settings Panel -->
-      <div id="general-tab" class="tab-panel ui-card ui-card-primary rounded-xl border border-gray-700/50 shadow-2xl p-6 md:p-8 backdrop-blur-sm">
+      <div id="general-tab" class="tab-panel ui-card ui-card-primary rounded-xl border border-[color:var(--token-border-default)] shadow-2xl p-6 md:p-8 backdrop-blur-sm">
         <form id="settings-form" class="space-y-8" autocomplete="off">
                 <!-- Core Identity Section -->
                 <div class="ui-card ui-card-secondary p-6 rounded-xl border border-blue-500/20 shadow-xl hover:border-blue-500/40 transition-all duration-300">
-                  <div class="flex items-center gap-3 mb-4 border-b border-gray-700/50 pb-2">
+                  <div class="flex items-center gap-3 mb-4 border-b border-[color:var(--token-border-default)] pb-2">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -423,7 +423,7 @@
                 <!-- Data Sources Section (Collapsible) -->
                 <div class="ui-card ui-card-secondary p-8 rounded-xl border border-cyan-400/20 shadow-xl hover:border-cyan-400/40 transition-all duration-300">
                   <details class="group">
-                    <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
+                    <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-[color:var(--token-border-default)]">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-500 flex items-center justify-center shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
@@ -439,11 +439,11 @@
                     </summary>
                   <fieldset class="space-y-4 mt-6">
                   <div class="grid gap-6 md:grid-cols-2">
-                    <div class="p-6 rounded-xl bg-gray-800/30 border border-gray-700/50">
+                    <div class="p-6 rounded-xl bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)]">
                       <label for="oil-data-source" class="flex items-center gap-2 mb-3 font-bold text-gray-300">
                         <span>Oil Products Data Source</span>
                       </label>
-                      <div class="rounded-lg bg-gray-900/50 border border-gray-700/50 focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-400/50 transition-all duration-200">
+                      <div class="rounded-lg ui-field-shell">
                         <select id="oil-data-source" class="w-full p-4 bg-transparent focus:outline-none">
                           <option value="api">API (Online)</option>
                           <option value="local">JSON (Local)</option>
@@ -451,11 +451,11 @@
                       </div>
                       <p class="text-xs text-gray-500 mt-3">Controls where the Oil page loads its products from.</p>
                     </div>
-                    <div class="p-6 rounded-xl bg-gray-800/30 border border-gray-700/50">
+                    <div class="p-6 rounded-xl bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)]">
                       <label for="consumables-data-source" class="flex items-center gap-2 mb-3 font-bold text-gray-300">
                         <span>Consumables Data Source</span>
                       </label>
-                      <div class="rounded-lg bg-gray-900/50 border border-gray-700/50 focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-400/50 transition-all duration-200">
+                      <div class="rounded-lg ui-field-shell">
                         <select id="consumables-data-source" class="w-full p-4 bg-transparent focus:outline-none">
                           <option value="api">API (Online)</option>
                           <option value="local">JSON (Local)</option>
@@ -471,7 +471,7 @@
                 <!-- Advanced Section -->
                 <div class="ui-card ui-card-secondary p-8 rounded-xl border border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300">
                   <details class="group">
-                    <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-gray-700/50">
+                    <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-blue-400 transition-colors pb-4 border-b border-[color:var(--token-border-default)]">
                       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -481,11 +481,11 @@
                         <span>Advanced</span>
                         <p class="text-xs text-gray-400 font-normal mt-1">Advanced configuration options</p>
                       </div>
-                      <span class="text-xs px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 group-open:hidden">Optional</span>
+                      <span class="text-xs px-4 py-2 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-secondary)] group-open:hidden">Optional</span>
                       <span class="text-xs px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hidden group-open:inline">Expanded</span>
                     </summary>
-                    <div class="mt-6 p-6 rounded-xl bg-gray-800/30 border border-gray-700/50">
-                      <p class="text-gray-400">No advanced options currently. Reserved for future expansion (API keys, webhooks, etc.).</p>
+                    <div class="mt-6 p-6 rounded-xl bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)]">
+                      <p class="text-[color:var(--token-text-secondary)]">No advanced options currently. Reserved for future expansion (API keys, webhooks, etc.).</p>
                     </div>
                   </details>
                 </div>
@@ -605,7 +605,7 @@
             </div>
             <div class="card ui-card ui-card-secondary p-8 rounded-xl border-2 border-red-500/20 shadow-xl hover:border-red-500/40 transition-all duration-300 space-y-8">
               <!-- Session Timeout Inline Group -->
-              <div class="flex items-stretch rounded-xl bg-gray-800/70 border border-red-500/30 focus-within:border-red-500/60 focus-within:ring-2 focus-within:ring-red-500/30 transition-all duration-200 overflow-hidden">
+              <div class="flex items-stretch rounded-xl ui-field-shell-danger overflow-hidden">
                 <div class="flex items-center justify-center px-4 bg-red-500/10 border-r border-red-500/20">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -613,7 +613,7 @@
                 </div>
                 <div class="flex-1 p-4">
                   <label for="session-timeout" class="block text-xs font-bold text-gray-300 tracking-wide mb-2">Session Timeout (minutes)</label>
-                  <select id="session-timeout" class="w-full bg-transparent text-sm p-2 rounded-lg border border-gray-700/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 transition-all duration-200">
+                  <select id="session-timeout" class="w-full bg-transparent text-sm p-2 rounded-lg border border-[color:var(--token-border-default)] focus:outline-none">
                     <option value="30">30 minutes</option>
                     <option value="60" selected>60 minutes (1 hour)</option>
                     <option value="120">120 minutes (2 hours)</option>
@@ -623,7 +623,7 @@
               </div>
 
               <!-- Max Login Attempts Inline Group -->
-              <div class="flex items-stretch rounded-xl bg-gray-800/70 border border-red-500/30 focus-within:border-red-500/60 focus-within:ring-2 focus-within:ring-red-500/30 transition-all duration-200 overflow-hidden">
+              <div class="flex items-stretch rounded-xl ui-field-shell-danger overflow-hidden">
                 <div class="flex items-center justify-center px-4 bg-red-500/10 border-r border-red-500/20">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -631,13 +631,13 @@
                 </div>
                 <div class="flex-1 p-4">
                   <label for="max-login-attempts" class="block text-xs font-bold text-gray-300 tracking-wide mb-2">Max Login Attempts</label>
-                  <input id="max-login-attempts" type="number" min="3" max="10" value="5" class="w-full bg-transparent text-sm p-2 rounded-lg border border-gray-700/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 transition-all duration-200" />
+                  <input id="max-login-attempts" type="number" min="3" max="10" value="5" class="w-full bg-transparent text-sm p-2 rounded-lg border border-[color:var(--token-border-default)] focus:outline-none" />
                   <p class="text-[10px] text-gray-500 mt-2">Number of failed attempts before account lockout</p>
                 </div>
               </div>
 
               <!-- Two Factor Authentication Inline Group -->
-              <div class="rounded-xl bg-gradient-to-br from-gray-800/70 to-gray-900/50 border border-red-500/30 p-0 overflow-hidden focus-within:border-red-500/60 focus-within:ring-2 focus-within:ring-red-500/30 transition-all">
+              <div class="rounded-xl bg-gradient-to-br from-gray-800/70 to-gray-900/50 border border-[color:var(--token-color-danger-alpha-30)] p-0 overflow-hidden focus-within:border-[color:var(--token-color-danger)] focus-within:shadow-[var(--token-shadow-glow-danger)] transition-all">
                 <div class="flex items-stretch">
                   <div class="flex items-center justify-center px-4 bg-red-500/10 border-r border-red-500/20">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -663,7 +663,7 @@
               </div>
 
               <!-- Audit Logging Checkbox Inline Group -->
-              <label class="flex items-center gap-3 p-4 rounded-xl bg-gray-800/70 border border-red-500/30 hover:border-red-500/50 transition-all duration-200 cursor-pointer group">
+              <label class="flex items-center gap-3 p-4 rounded-xl bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-color-danger-alpha-30)] hover:border-[color:var(--token-color-danger-alpha-60)] transition-all duration-200 cursor-pointer group">
                 <div class="flex-1">
                   <span class="text-xs font-bold text-gray-200 group-hover:text-red-300 transition-colors">Log all administrative actions</span>
                   <p class="text-[10px] text-gray-500 mt-0.5">Capture a full audit trail of privileged operations</p>

@@ -64,8 +64,8 @@
           </svg>
         </div>
         <div>
-          <h1 class="text-2xl font-bold text-white">API Documentation</h1>
-          <p class="text-xs mt-2 text-gray-300">Interactive documentation for all API endpoints</p>
+          <h1 class="text-2xl font-bold text-[color:var(--token-text-primary)]">API Documentation</h1>
+          <p class="text-xs mt-2 text-[color:var(--token-text-secondary)]">Interactive documentation for all API endpoints</p>
         </div>
       </div>
     </header>
@@ -76,37 +76,37 @@
     </div>
 
     <!-- Search and Filter -->
-    <div class="ui-card rounded-lg shadow-md p-6 mb-6 border border-gray-700">
+    <div class="ui-card rounded-lg shadow-md p-6 mb-6 border border-[color:var(--token-border-default)]">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label for="search" class="block text-sm font-medium text-gray-300 mb-2">
+          <label for="search" class="block text-sm font-medium text-[color:var(--token-text-secondary)] mb-2">
             Search Endpoints
           </label>
           <input
             type="text"
             id="search"
             placeholder="Search by name or description..."
-            class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-[color:var(--token-border-default)] rounded-md bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] placeholder:text-[color:var(--token-text-muted)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]"
           >
         </div>
         <div>
-          <label for="category-filter" class="block text-sm font-medium text-gray-300 mb-2">
+          <label for="category-filter" class="block text-sm font-medium text-[color:var(--token-text-secondary)] mb-2">
             Category
           </label>
           <select
             id="category-filter"
-            class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-[color:var(--token-border-default)] rounded-md bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]"
           >
             <option value="">All Categories</option>
           </select>
         </div>
         <div>
-          <label for="method-filter" class="block text-sm font-medium text-gray-300 mb-2">
+          <label for="method-filter" class="block text-sm font-medium text-[color:var(--token-text-secondary)] mb-2">
             Method
           </label>
           <select
             id="method-filter"
-            class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-[color:var(--token-border-default)] rounded-md bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]"
           >
             <option value="">All Methods</option>
             <option value="GET">GET</option>
@@ -214,8 +214,8 @@
       
       if (endpoints.length === 0) {
         container.innerHTML = `
-          <div class="ui-card rounded-lg p-8 text-center border border-gray-700">
-            <p class="text-gray-400">No endpoints found matching your filters</p>
+          <div class="ui-card rounded-lg p-8 text-center border border-[color:var(--token-border-default)]">
+            <p class="text-[color:var(--token-text-muted)]">No endpoints found matching your filters</p>
           </div>
         `;
         return;
@@ -228,16 +228,16 @@
         const category = firstMethod.tags?.[0] || 'Other';
 
         return `
-          <div class="endpoint-card ui-card rounded-lg shadow-md p-6 mb-4 border border-gray-700 hover:border-gray-600">
+          <div class="endpoint-card ui-card rounded-lg shadow-md p-6 mb-4 border border-[color:var(--token-border-default)] hover:border-[color:var(--token-color-primary)]">
             <div class="flex justify-between items-start mb-4">
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-2 flex-wrap">
                   ${allMethods.map(m => `<span class="method-badge method-${m.toLowerCase()}">${m}</span>`).join('')}
                   ${requiresAuth ? '<span class="text-xs bg-yellow-900/50 text-yellow-200 px-2 py-1 rounded border border-yellow-700">🔒 Auth Required</span>' : ''}
                 </div>
-                <h3 class="text-lg font-semibold text-white font-mono">${path}</h3>
-                <p class="text-sm text-gray-400 mt-1">${firstMethod.summary || 'No description'}</p>
-                <span class="inline-block mt-2 text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">${category}</span>
+                <h3 class="text-lg font-semibold text-[color:var(--token-text-primary)] font-mono">${path}</h3>
+                <p class="text-sm text-[color:var(--token-text-muted)] mt-1">${firstMethod.summary || 'No description'}</p>
+                <span class="inline-block mt-2 text-xs bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-secondary)] px-2 py-1 rounded border border-[color:var(--token-border-default)]">${category}</span>
               </div>
               <button onclick="toggleDetails('${path.replace(/[^a-zA-Z0-9]/g, '_')}')" class="text-blue-400 hover:text-blue-300 text-sm ml-4">
                 Details
@@ -261,7 +261,7 @@
         const exampleUrl = `${baseUrl}${path}${details.parameters?.length ? '?' + details.parameters.map(p => `${p.name}=value`).join('&') : ''}`;
         
         return `
-          <div class="mb-6 pb-6 border-b border-gray-700 last:border-0">
+          <div class="mb-6 pb-6 border-b border-[color:var(--token-border-default)] last:border-0">
             <h4 class="font-semibold text-white mb-3">
               <span class="method-badge method-${method.toLowerCase()}">${method}</span>
               ${details.summary}

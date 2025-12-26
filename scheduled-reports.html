@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/assets/css/accessibility.css" />
   <script src="/assets/js/accessibility.js" defer></script>
 </head>
-<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+<body class="min-h-screen flex flex-col md:flex-row font-sans">
 
 <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 mobile-menu-toggle" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
 <div id="main-nav"></div>
@@ -21,7 +21,7 @@
   <header class="page-header ui-card border flex justify-between items-center">
     <div>
       <h1 class="text-2xl font-bold">Scheduled Reports</h1>
-      <p class="text-sm text-gray-400 mt-1">Automate report generation and delivery</p>
+      <p class="text-sm text-[color:var(--token-text-muted)] mt-1">Automate report generation and delivery</p>
     </div>
     <button id="create-report-btn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg">
       + Create Report
@@ -32,7 +32,7 @@
   <section class="ui-card p-6">
     <h2 class="text-lg font-semibold mb-4">Active Reports</h2>
     <div id="reports-list" class="space-y-4">
-      <div class="text-center text-gray-400 py-8">Loading...</div>
+      <div class="text-center text-[color:var(--token-text-muted)] py-8">Loading...</div>
     </div>
   </section>
 
@@ -42,7 +42,7 @@
     <div class="overflow-x-auto">
       <table class="w-full text-left">
         <thead>
-          <tr class="border-b border-gray-700">
+          <tr class="border-b border-[color:var(--token-border-default)]">
             <th class="pb-3">Report Name</th>
             <th class="pb-3">Type</th>
             <th class="pb-3">Generated</th>
@@ -53,7 +53,7 @@
         </thead>
         <tbody id="history-table">
           <tr>
-            <td colspan="6" class="py-4 text-center text-gray-400">Loading...</td>
+            <td colspan="6" class="py-4 text-center text-[color:var(--token-text-muted)]">Loading...</td>
           </tr>
         </tbody>
       </table>
@@ -62,11 +62,11 @@
 </main>
 
 <!-- Create/Edit Report Modal -->
-<div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[9998]">
+<div id="report-modal" class="fixed inset-0 bg-[color:var(--token-bg-overlay)] hidden flex items-center justify-center z-[9998]">
   <div class="ui-card p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-[9999]">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold" id="modal-title">Create Scheduled Report</h2>
-      <button id="close-modal" class="text-gray-400 hover:text-white">×</button>
+      <button id="close-modal" class="text-[color:var(--token-text-muted)] hover:text-[color:var(--token-text-primary)]">×</button>
     </div>
 
     <form id="report-form" class="space-y-4">
@@ -74,13 +74,13 @@
 
       <div>
         <label class="block text-sm font-semibold mb-2">Report Name</label>
-        <input type="text" id="report-name" required class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" placeholder="Weekly Sales Report" />
+        <input type="text" id="report-name" required class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] placeholder:text-[color:var(--token-text-muted)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]" placeholder="Weekly Sales Report" />
       </div>
 
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-semibold mb-2">Report Type</label>
-          <select id="report-type" required class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <select id="report-type" required class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]">
             <option value="">Select type...</option>
             <option value="sales">Sales Report</option>
             <option value="inventory">Inventory Report</option>
@@ -91,7 +91,7 @@
 
         <div>
           <label class="block text-sm font-semibold mb-2">Frequency</label>
-          <select id="report-frequency" required class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <select id="report-frequency" required class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]">
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
@@ -102,7 +102,7 @@
 
       <div>
         <label class="block text-sm font-semibold mb-2">Format</label>
-        <select id="report-format" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+        <select id="report-format" class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]">
           <option value="csv">CSV</option>
           <option value="pdf">PDF</option>
           <option value="excel">Excel (Coming Soon)</option>
@@ -111,22 +111,22 @@
 
       <div>
         <label class="block text-sm font-semibold mb-2">Recipients (one email per line)</label>
-        <textarea id="report-recipients" rows="3" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" placeholder="email@example.com"></textarea>
+        <textarea id="report-recipients" rows="3" class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] placeholder:text-[color:var(--token-text-muted)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]" placeholder="email@example.com"></textarea>
       </div>
 
       <div>
         <label class="block text-sm font-semibold mb-2">Date Range (optional)</label>
         <div class="grid grid-cols-2 gap-4">
-          <input type="date" id="report-date-from" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" />
-          <input type="date" id="report-date-to" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700" />
+          <input type="date" id="report-date-from" class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]" />
+          <input type="date" id="report-date-to" class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]" />
         </div>
       </div>
 
       <div class="flex justify-end gap-2 pt-4">
-        <button type="button" id="cancel-btn" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">
+        <button type="button" id="cancel-btn" class="ui-btn ui-btn-outline px-4 py-2 rounded-lg">
           Cancel
         </button>
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <button type="submit" class="ui-btn ui-btn-primary px-4 py-2 rounded-lg">
           Save Report
         </button>
       </div>
@@ -162,12 +162,12 @@
     const container = document.getElementById('reports-list');
 
     if (reports.length === 0) {
-      container.innerHTML = '<div class="text-center text-gray-400 py-8">No scheduled reports yet. Create one to get started!</div>';
+      container.innerHTML = '<div class="text-center text-[color:var(--token-text-muted)] py-8">No scheduled reports yet. Create one to get started!</div>';
       return;
     }
 
     container.innerHTML = reports.map(report => `
-      <div class="ui-card p-4 border border-gray-700">
+      <div class="ui-card p-4 border border-[color:var(--token-border-default)]">
         <div class="flex justify-between items-start">
           <div class="flex-1">
             <div class="flex items-center gap-3">
@@ -176,26 +176,26 @@
                 ${report.is_active ? 'Active' : 'Inactive'}
               </span>
             </div>
-            <div class="mt-2 space-y-1 text-sm text-gray-400">
-              <div>Type: <span class="text-gray-300">${report.report_type}</span></div>
-              <div>Frequency: <span class="text-gray-300">${report.frequency}</span></div>
-              <div>Format: <span class="text-gray-300">${report.format}</span></div>
-              ${report.recipients ? `<div>Recipients: <span class="text-gray-300">${report.recipients.length}</span></div>` : ''}
-              ${report.last_run ? `<div>Last Run: <span class="text-gray-300">${new Date(report.last_run).toLocaleString()}</span></div>` : ''}
-              ${report.next_run ? `<div>Next Run: <span class="text-gray-300">${new Date(report.next_run).toLocaleString()}</span></div>` : ''}
+            <div class="mt-2 space-y-1 text-sm text-[color:var(--token-text-muted)]">
+              <div>Type: <span class="text-[color:var(--token-text-secondary)]">${report.report_type}</span></div>
+              <div>Frequency: <span class="text-[color:var(--token-text-secondary)]">${report.frequency}</span></div>
+              <div>Format: <span class="text-[color:var(--token-text-secondary)]">${report.format}</span></div>
+              ${report.recipients ? `<div>Recipients: <span class="text-[color:var(--token-text-secondary)]">${report.recipients.length}</span></div>` : ''}
+              ${report.last_run ? `<div>Last Run: <span class="text-[color:var(--token-text-secondary)]">${new Date(report.last_run).toLocaleString()}</span></div>` : ''}
+              ${report.next_run ? `<div>Next Run: <span class="text-[color:var(--token-text-secondary)]">${new Date(report.next_run).toLocaleString()}</span></div>` : ''}
             </div>
           </div>
           <div class="flex gap-2">
-            <button onclick="generateNow(${report.id})" class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+            <button onclick="generateNow(${report.id})" class="ui-btn ui-btn-primary px-3 py-1 text-sm rounded">
               Run Now
             </button>
-            <button onclick="editReport(${report.id})" class="px-3 py-1 text-sm bg-gray-700 text-white rounded hover:bg-gray-600">
+            <button onclick="editReport(${report.id})" class="ui-btn ui-btn-outline px-3 py-1 text-sm rounded">
               Edit
             </button>
             <button onclick="toggleReportStatus(${report.id}, ${!report.is_active})" class="px-3 py-1 text-sm ${report.is_active ? 'bg-yellow-600' : 'bg-green-600'} text-white rounded hover:opacity-80">
               ${report.is_active ? 'Pause' : 'Activate'}
             </button>
-            <button onclick="deleteReport(${report.id})" class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700">
+            <button onclick="deleteReport(${report.id})" class="ui-btn ui-btn-danger px-3 py-1 text-sm rounded">
               Delete
             </button>
           </div>
@@ -217,7 +217,7 @@
       const history = data.history || [];
 
       if (history.length === 0) {
-        historyTable.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-gray-400">No executions yet</td></tr>';
+        historyTable.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-[color:var(--token-text-muted)]">No executions yet</td></tr>';
         return;
       }
 
@@ -246,7 +246,7 @@
             : '<span class="text-gray-500">-</span>';
 
           return `
-            <tr class="border-b border-gray-800">
+            <tr class="border-b border-[color:var(--token-border-default)]">
               <td class="py-3">${reportName}</td>
               <td class="py-3">${reportType}</td>
               <td class="py-3">${generatedAt}</td>

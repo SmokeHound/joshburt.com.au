@@ -528,6 +528,21 @@ body {
   box-shadow: var(--token-shadow-glow-primary);
 }
 
+.ui-field-shell-danger {
+  background: var(--token-bg-elevated);
+  border: 1px solid var(--token-color-danger-alpha-30);
+  transition: border-color var(--token-transition-base), box-shadow var(--token-transition-base);
+}
+
+.ui-field-shell-danger:hover {
+  border-color: var(--token-color-danger-alpha-60);
+}
+
+.ui-field-shell-danger:focus-within {
+  border-color: var(--token-color-danger);
+  box-shadow: var(--token-shadow-glow-danger);
+}
+
 /* Sidebar styling */
 .sidebar {
   width: var(--sidebar-width, 16rem);

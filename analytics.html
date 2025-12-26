@@ -24,20 +24,20 @@
   <link rel="stylesheet" href="/assets/css/accessibility.css" />
   <script src="/assets/js/accessibility.js" defer></script>
 </head>
-<body class="dark min-h-screen flex flex-col md:flex-row font-sans">
+<body class="min-h-screen flex flex-col md:flex-row font-sans">
   
   <div id="main-nav"></div>
   <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
   <header class="page-header ui-card border">
       <h1 class="text-2xl font-bold">Analytics Dashboard</h1>
-  <p class="text-sm text-gray-400 mt-1">Business metrics, orders, inventory & returns overview</p>
+  <p class="text-sm text-[color:var(--token-text-muted)] mt-1">Business metrics, orders, inventory & returns overview</p>
     </header>
     <section class="space-y-4">
       <div class="flex flex-wrap gap-2" id="quick-date-chips"></div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
           <label class="block text-sm font-semibold mb-2">Date Range</label>
-          <select id="date-range" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <select id="date-range" class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]">
             <option value="7">Last 7 days</option>
             <option value="30" selected>Last 30 days</option>
             <option value="90">Last 90 days</option>
@@ -46,7 +46,7 @@
         </div>
         <div>
           <label class="block text-sm font-semibold mb-2">User Type</label>
-          <select id="user-type" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+          <select id="user-type" class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]">
             <option value="all" selected>All Users</option>
             <option value="admin">Admin Users</option>
             <option value="user">Regular Users</option>
@@ -61,20 +61,20 @@
           </div>
         </div>
       </div>
-      <div class="w-full text-center text-xs text-gray-400 flex items-center justify-center gap-2">
+      <div class="w-full text-center text-xs text-[color:var(--token-text-muted)] flex items-center justify-center gap-2">
         <span id="last-updated">Last updated: --</span>
-        <button id="refresh-btn" class="ml-2 px-2 py-1 rounded bg-gray-800 text-white text-xs hover:bg-gray-700">⟳ Refresh</button>
-        <span class="text-gray-500 text-xs ml-2" id="auto-refresh-label">(auto every 60s)</span>
+        <button id="refresh-btn" class="ml-2 ui-btn ui-btn-outline px-2 py-1 rounded text-xs">⟳ Refresh</button>
+        <span class="text-[color:var(--token-text-muted)] text-xs ml-2" id="auto-refresh-label">(auto every 60s)</span>
       </div>
     </section>
     <section class="mb-2">
       <div class="card ui-card ui-card-secondary rounded-lg shadow-md p-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center"><span class="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></span>Business Overview</h2>
+        <h2 class="text-lg font-semibold mb-4 flex items-center"><span class="w-3 h-3 bg-[color:var(--token-color-success)] rounded-full animate-pulse mr-3"></span>Business Overview</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="text-center"><div class="text-2xl font-bold text-green-400" id="total-orders">-</div><div class="text-xs text-gray-400">Total Orders</div></div>
-          <div class="text-center"><div class="text-2xl font-bold text-blue-400" id="pending-orders">-</div><div class="text-xs text-gray-400">Pending Orders</div></div>
-          <div class="text-center"><div class="text-2xl font-bold text-yellow-400" id="low-stock-items">-</div><div class="text-xs text-gray-400">Low Stock Items</div></div>
-          <div class="text-center"><div class="text-2xl font-bold text-purple-400" id="pending-returns">-</div><div class="text-xs text-gray-400">Pending Returns</div></div>
+          <div class="text-center"><div class="text-2xl font-bold text-[color:var(--token-color-success)]" id="total-orders">-</div><div class="text-xs text-[color:var(--token-text-muted)]">Total Orders</div></div>
+          <div class="text-center"><div class="text-2xl font-bold text-[color:var(--token-color-primary)]" id="pending-orders">-</div><div class="text-xs text-[color:var(--token-text-muted)]">Pending Orders</div></div>
+          <div class="text-center"><div class="text-2xl font-bold text-[color:var(--token-color-warning)]" id="low-stock-items">-</div><div class="text-xs text-[color:var(--token-text-muted)]">Low Stock Items</div></div>
+          <div class="text-center"><div class="text-2xl font-bold text-[color:var(--token-color-accent)]" id="pending-returns">-</div><div class="text-xs text-[color:var(--token-text-muted)]">Pending Returns</div></div>
         </div>
       </div>
     </section>
@@ -85,35 +85,35 @@
       <div class="ui-card p-4 widget-yellow rounded-lg"><h3 class="text-sm font-semibold mb-1">Returns Rate</h3><div id="insight-returns-rate" class="text-xl font-bold">--%</div></div>
     </section>
     <div id="status-bar" class="w-full flex flex-wrap items-center justify-center gap-4 py-2 px-4 ui-card text-sm">
-      <span id="status-api" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>API: <span class="ml-1">Checking...</span></span>
-      <span id="status-db" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>Database: <span class="ml-1">Checking...</span></span>
-      <span id="status-server" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-gray-500"></span>Server: <span class="ml-1">Checking...</span></span>
+      <span id="status-api" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-[color:var(--token-text-muted)]"></span>API: <span class="ml-1">Checking...</span></span>
+      <span id="status-db" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-[color:var(--token-text-muted)]"></span>Database: <span class="ml-1">Checking...</span></span>
+      <span id="status-server" class="inline-flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-[color:var(--token-text-muted)]"></span>Server: <span class="ml-1">Checking...</span></span>
     </div>
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-  <div class="card ui-card ui-card-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>Daily Orders</h3><div class="h-72"><canvas id="visitor-chart"></canvas></div></div>
-  <div class="card ui-card ui-card-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-green-400 rounded-full"></span>Order Status Distribution</h3><div class="h-72"><canvas id="engagement-chart"></canvas></div></div>
-  <div class="card ui-card ui-card-accent p-6 rounded-lg shadow-md lg:col-span-2"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>Top Products by Orders</h3><div class="h-80"><canvas id="sales-chart"></canvas></div></div>
+  <div class="card ui-card ui-card-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-[color:var(--token-color-primary)] rounded-full"></span>Daily Orders</h3><div class="h-72"><canvas id="visitor-chart"></canvas></div></div>
+  <div class="card ui-card ui-card-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-[color:var(--token-color-success)] rounded-full"></span>Order Status Distribution</h3><div class="h-72"><canvas id="engagement-chart"></canvas></div></div>
+  <div class="card ui-card ui-card-accent p-6 rounded-lg shadow-md lg:col-span-2"><h3 class="text-base font-semibold mb-4 flex items-center gap-2"><span class="inline-block w-2 h-2 bg-[color:var(--token-color-accent)] rounded-full"></span>Top Products by Orders</h3><div class="h-80"><canvas id="sales-chart"></canvas></div></div>
     </section>
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="card ui-card ui-card-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">Order Statistics</h3><ul id="visitor-stats" class="list-disc pl-5 space-y-1 text-gray-300"><li>Loading...</li></ul></div>
-      <div class="card ui-card ui-card-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">Inventory Summary</h3><ul id="engagement-stats" class="list-disc pl-5 space-y-1 text-gray-300"><li>Loading...</li></ul></div>
-      <div class="card ui-card ui-card-accent p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">Returns Overview</h3><ul id="returns-stats" class="list-disc pl-5 space-y-1 text-gray-300"><li>Loading...</li></ul></div>
+      <div class="card ui-card ui-card-primary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">Order Statistics</h3><ul id="visitor-stats" class="list-disc pl-5 space-y-1 text-[color:var(--token-text-secondary)]"><li>Loading...</li></ul></div>
+      <div class="card ui-card ui-card-secondary p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">Inventory Summary</h3><ul id="engagement-stats" class="list-disc pl-5 space-y-1 text-[color:var(--token-text-secondary)]"><li>Loading...</li></ul></div>
+      <div class="card ui-card ui-card-accent p-6 rounded-lg shadow-md"><h3 class="text-base font-semibold mb-2">Returns Overview</h3><ul id="returns-stats" class="list-disc pl-5 space-y-1 text-[color:var(--token-text-secondary)]"><li>Loading...</li></ul></div>
     </section>
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="ui-card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">User Breakdown</h3><ul id="user-breakdown-list" class="space-y-1 text-sm"></ul></div>
       <div class="ui-card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">User Growth (30d)</h3><canvas id="user-growth-sparkline" width="180" height="60"></canvas></div>
-      <div class="ui-card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">Top Users</h3><ul id="top-users-list" class="flex flex-col gap-1 text-sm"></ul><div class="mt-3 flex gap-2 items-center text-xs"><label for="user-role-filter">Role:</label><select id="user-role-filter" class="bg-gray-800 text-white rounded px-2 py-1 text-xs"><option value="all">All</option><option value="admin">Admin</option><option value="user">User</option><option value="locked">Locked</option></select></div><div class="mt-2 flex gap-2 items-center text-xs"><label for="user-date-filter">Since:</label><input type="date" id="user-date-filter" class="bg-gray-800 text-white rounded px-2 py-1 text-xs" /></div><button id="export-user-analytics" class="mt-3 w-full px-2 py-1 rounded bg-gray-800 text-white text-xs hover:bg-gray-700">Export Users CSV</button></div>
+      <div class="ui-card p-4 rounded-lg"><h3 class="text-sm font-semibold mb-2">Top Users</h3><ul id="top-users-list" class="flex flex-col gap-1 text-sm"></ul><div class="mt-3 flex gap-2 items-center text-xs"><label for="user-role-filter">Role:</label><select id="user-role-filter" class="rounded px-2 py-1 text-xs bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]"><option value="all">All</option><option value="admin">Admin</option><option value="user">User</option><option value="locked">Locked</option></select></div><div class="mt-2 flex gap-2 items-center text-xs"><label for="user-date-filter">Since:</label><input type="date" id="user-date-filter" class="rounded px-2 py-1 text-xs bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]" /></div><button id="export-user-analytics" class="mt-3 w-full ui-btn ui-btn-outline ui-btn-sm">Export Users CSV</button></div>
     </section>
 
     <!-- Advanced Reports Section (Feature Flag Gated) -->
     <section id="advanced-reports-section" class="hidden mt-8">
-      <div class="ui-card p-6 rounded-lg border-2 border-purple-500/30">
+      <div class="ui-card p-6 rounded-lg border-2 border-[color:var(--token-color-accent)]">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <h2 class="text-xl font-bold text-purple-400">📊 Advanced Reports</h2>
-            <span class="text-xs bg-purple-500 text-white px-2 py-1 rounded">PREMIUM</span>
+            <h2 class="text-xl font-bold text-[color:var(--token-color-accent)]">📊 Advanced Reports</h2>
+            <span class="text-xs bg-[color:var(--token-color-accent)] text-[color:var(--token-text-on-accent)] px-2 py-1 rounded">PREMIUM</span>
           </div>
-          <button id="generate-advanced-report" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+          <button id="generate-advanced-report" class="ui-btn ui-btn-accent">
             Generate Report
           </button>
         </div>
@@ -122,7 +122,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div>
             <label class="block text-sm font-semibold mb-2">Report Type</label>
-            <select id="report-type" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+            <select id="report-type" class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]">
               <option value="comprehensive">Comprehensive Analysis</option>
               <option value="predictive">Predictive Analytics</option>
               <option value="comparative">Comparative Report</option>
@@ -132,7 +132,7 @@
           </div>
           <div>
             <label class="block text-sm font-semibold mb-2">Time Period</label>
-            <select id="report-period" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+            <select id="report-period" class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]">
               <option value="7">Last 7 days</option>
               <option value="30">Last 30 days</option>
               <option value="90">Last 90 days</option>
@@ -142,7 +142,7 @@
           </div>
           <div>
             <label class="block text-sm font-semibold mb-2">Export Format</label>
-            <select id="report-format" class="w-full p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700">
+            <select id="report-format" class="w-full p-3 rounded-lg bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]">
               <option value="pdf">PDF Report</option>
               <option value="excel">Excel Spreadsheet</option>
               <option value="json">JSON Data</option>
@@ -153,31 +153,31 @@
 
         <!-- Advanced Metrics Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div class="bg-gray-800/50 p-4 rounded-lg text-center">
-            <div class="text-xs text-gray-400 mb-1">Customer Lifetime Value</div>
-            <div class="text-2xl font-bold text-purple-400">$2,456</div>
-            <div class="text-xs text-green-400 mt-1">↗ +12.5%</div>
+          <div class="bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] p-4 rounded-lg text-center">
+            <div class="text-xs text-[color:var(--token-text-muted)] mb-1">Customer Lifetime Value</div>
+            <div class="text-2xl font-bold text-[color:var(--token-color-accent)]">$2,456</div>
+            <div class="text-xs text-[color:var(--token-color-success)] mt-1">↗ +12.5%</div>
           </div>
-          <div class="bg-gray-800/50 p-4 rounded-lg text-center">
-            <div class="text-xs text-gray-400 mb-1">Churn Rate</div>
-            <div class="text-2xl font-bold text-purple-400">8.3%</div>
-            <div class="text-xs text-green-400 mt-1">↘ -2.1%</div>
+          <div class="bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] p-4 rounded-lg text-center">
+            <div class="text-xs text-[color:var(--token-text-muted)] mb-1">Churn Rate</div>
+            <div class="text-2xl font-bold text-[color:var(--token-color-accent)]">8.3%</div>
+            <div class="text-xs text-[color:var(--token-color-success)] mt-1">↘ -2.1%</div>
           </div>
-          <div class="bg-gray-800/50 p-4 rounded-lg text-center">
-            <div class="text-xs text-gray-400 mb-1">Customer Acquisition Cost</div>
-            <div class="text-2xl font-bold text-purple-400">$127</div>
-            <div class="text-xs text-red-400 mt-1">↗ +5.3%</div>
+          <div class="bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] p-4 rounded-lg text-center">
+            <div class="text-xs text-[color:var(--token-text-muted)] mb-1">Customer Acquisition Cost</div>
+            <div class="text-2xl font-bold text-[color:var(--token-color-accent)]">$127</div>
+            <div class="text-xs text-[color:var(--token-color-danger)] mt-1">↗ +5.3%</div>
           </div>
-          <div class="bg-gray-800/50 p-4 rounded-lg text-center">
-            <div class="text-xs text-gray-400 mb-1">Revenue Per User</div>
-            <div class="text-2xl font-bold text-purple-400">$182</div>
-            <div class="text-xs text-green-400 mt-1">↗ +8.7%</div>
+          <div class="bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] p-4 rounded-lg text-center">
+            <div class="text-xs text-[color:var(--token-text-muted)] mb-1">Revenue Per User</div>
+            <div class="text-2xl font-bold text-[color:var(--token-color-accent)]">$182</div>
+            <div class="text-xs text-[color:var(--token-color-success)] mt-1">↗ +8.7%</div>
           </div>
         </div>
 
         <!-- Report Preview Area -->
-        <div id="report-preview" class="bg-gray-800/30 p-6 rounded-lg border border-gray-700">
-          <div class="text-center text-gray-400">
+        <div id="report-preview" class="bg-[color:var(--token-bg-elevated)] p-6 rounded-lg border border-[color:var(--token-border-default)]">
+          <div class="text-center text-[color:var(--token-text-muted)]">
             <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
@@ -356,7 +356,7 @@
     window.addEventListener('theme:changed', () => {
       applyChartsTheme();
     });
-    function setupQuickChips(){const ranges=[1,7,30,90,365]; const wrap=document.getElementById('quick-date-chips'); ranges.forEach(r=>{ const btn=document.createElement('button'); btn.className='px-3 py-1 rounded-full bg-gray-800 text-gray-200 text-xs'; btn.textContent=r===1?'Today': (r===365?'YTD': r+'d'); btn.dataset.range=r; btn.addEventListener('click',()=>{ filters.dateRange=r; document.getElementById('date-range').value=r; highlight(); updateAll();}); wrap.appendChild(btn);}); function highlight(){wrap.querySelectorAll('button').forEach(b=>{const active=parseInt(b.dataset.range)===filters.dateRange; b.classList.toggle('bg-primary',active); b.classList.toggle('text-white',active);});} highlight(); }
+    function setupQuickChips(){const ranges=[1,7,30,90,365]; const wrap=document.getElementById('quick-date-chips'); ranges.forEach(r=>{ const btn=document.createElement('button'); btn.className='ui-btn ui-btn-outline ui-btn-sm rounded-full'; btn.textContent=r===1?'Today': (r===365?'YTD': r+'d'); btn.dataset.range=r; btn.addEventListener('click',()=>{ filters.dateRange=r; document.getElementById('date-range').value=r; highlight(); updateAll();}); wrap.appendChild(btn);}); function highlight(){wrap.querySelectorAll('button').forEach(b=>{const active=parseInt(b.dataset.range)===filters.dateRange; b.classList.toggle('ui-btn-primary',active); b.classList.toggle('ui-btn-outline',!active);});} highlight(); }
   async function fetchJSON(url){ 
     try{ 
       const r = await (window.authFetch ? window.authFetch(url) : fetch(url)); 
@@ -545,7 +545,7 @@
     function trendArrow(v){ if(v>50) return '↗'; if(v<20) return '↘'; return '→'; }
   async function updateAll(){ const last=document.getElementById('last-updated'); try{ const data=await generateData(); if(last) last.textContent='Last updated: '+ new Date().toLocaleTimeString(); ensureCharts(data); updateStatCard('visitor-stats',[`Total Orders (${filters.dateRange}d): ${data.summary.totalOrders}`,`Completed: ${data.statusDistribution.completed||0}`,`Pending: ${data.summary.pendingOrders}`,`Avg Value: $${data.summary.avgOrderValue.toFixed(2)}`]); updateStatCard('engagement-stats',[`Total Products: ${data.summary.totalProducts}`,`Consumables: ${data.summary.totalConsumables}`,`Filters: ${data.summary.totalFilters}`,`Low Stock: ${data.summary.lowStockItems}`]); updateStatCard('returns-stats',[`Total Returns (${filters.dateRange}d): ${data.summary.totalReturns}`,`Pending: ${data.summary.pendingReturns}`,`Returns Rate: ${data.summary.returnsRate.toFixed(1)}%`]); const fulfillment=data.summary.fulfillmentRate||0; document.getElementById('insight-conversion').textContent=fulfillment.toFixed(1)+'% '+trendArrow(fulfillment); document.getElementById('insight-retention').textContent='$'+data.summary.avgOrderValue.toFixed(2); document.getElementById('insight-top-product').textContent=data.summary.topProduct||'--'; document.getElementById('insight-returns-rate').textContent=data.summary.returnsRate.toFixed(1)+'%'; }catch(e){ console.error('Update error:', e); if(last) last.textContent='Last updated: error'; } }
   async function updateTopUser(prefetched){ try{ const usersData = prefetched && prefetched.users ? { users: prefetched.users } : await fetchJSON(`${FN_BASE}/users`); const users=(usersData && usersData.users)||[]; const userById=new Map(users.map(u=>[String(u.id||u.user_id||u.uid||u.username), u])); const logs=await fetchAuditLogs(1000); const counts={}; logs.forEach(l=>{ if(l.user_id!=null){ const k=String(l.user_id); counts[k]=(counts[k]||0)+1; } }); let topId='--', max=0; Object.entries(counts).forEach(([id,c])=>{ if(c>max){ max=c; topId=id; }}); const u=userById.get(topId); document.getElementById('insight-top-user').textContent= u? (u.username||u.name||(`User #${u.id}`)) : (topId==='--'?'--':`User #${topId}`); }catch(e){ document.getElementById('insight-top-user').textContent='--'; } }
-  async function buildUserBreakdown(){ let users=[]; try{ const u=await fetchJSON(`${FN_BASE}/users`); users=(u&&u.users)||[]; }catch(_){} const list=document.getElementById('user-breakdown-list'); if(list){ const total=users.length; const admins=users.filter(u=>u.role==='admin').length; const regular=users.filter(u=>u.role==='user').length; const locked=users.filter(u=>u.locked).length; const now=new Date(); const newUsers=users.filter(u=>u.created_at && (now-new Date(u.created_at))<7*24*60*60*1000).length; list.innerHTML=`<li>Total: <strong>${total}</strong></li><li>Admins: <strong>${admins}</strong></li><li>Regular: <strong>${regular}</strong></li><li>Locked: <strong>${locked}</strong></li><li>New (7d): <strong>${newUsers}</strong></li>`; } const growthCanvas=document.getElementById('user-growth-sparkline'); if(growthCanvas && window.Chart){ const arr=Array(30).fill(0); const now=new Date(); users.forEach(u=>{ if(u.created_at){ const daysAgo=Math.floor((now-new Date(u.created_at))/(24*60*60*1000)); if(daysAgo>=0 && daysAgo<30) arr[29-daysAgo]++; }}); if(userGrowthSparkline) userGrowthSparkline.destroy(); const t=getChartTheme(); userGrowthSparkline=new Chart(growthCanvas.getContext('2d'),{ type:'line', data:{ labels:Array.from({length:30},(_,i)=>i+1), datasets:[{ data:arr,borderColor:t.primary,backgroundColor:t.primaryFill,tension:.4,fill:true,pointRadius:0,borderWidth:2 }]}, options:{responsive:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}}); } const topList=document.getElementById('top-users-list'); if(topList){ const logs=await fetchAuditLogs(2000); const counts={}; logs.forEach(l=>{ if(l.user_id!=null){ const k=String(l.user_id); counts[k]=(counts[k]||0)+1; } }); const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5); topList.innerHTML= top.length? top.map(([id,c])=>{ const u=users.find(x=> String(x.id||x.user_id)===id); const name=(u&&(u.username||u.name))||`User #${id}`; return `<li class='flex items-center'><span class='inline-block w-2 h-2 rounded-full bg-blue-400 mr-2'></span><strong>${name}</strong><span class='ml-2 text-xs text-gray-400'>${c} events</span></li>`; }).join(''):'<li>N/A</li>'; } }
+  async function buildUserBreakdown(){ let users=[]; try{ const u=await fetchJSON(`${FN_BASE}/users`); users=(u&&u.users)||[]; }catch(_){} const list=document.getElementById('user-breakdown-list'); if(list){ const total=users.length; const admins=users.filter(u=>u.role==='admin').length; const regular=users.filter(u=>u.role==='user').length; const locked=users.filter(u=>u.locked).length; const now=new Date(); const newUsers=users.filter(u=>u.created_at && (now-new Date(u.created_at))<7*24*60*60*1000).length; list.innerHTML=`<li>Total: <strong>${total}</strong></li><li>Admins: <strong>${admins}</strong></li><li>Regular: <strong>${regular}</strong></li><li>Locked: <strong>${locked}</strong></li><li>New (7d): <strong>${newUsers}</strong></li>`; } const growthCanvas=document.getElementById('user-growth-sparkline'); if(growthCanvas && window.Chart){ const arr=Array(30).fill(0); const now=new Date(); users.forEach(u=>{ if(u.created_at){ const daysAgo=Math.floor((now-new Date(u.created_at))/(24*60*60*1000)); if(daysAgo>=0 && daysAgo<30) arr[29-daysAgo]++; }}); if(userGrowthSparkline) userGrowthSparkline.destroy(); const t=getChartTheme(); userGrowthSparkline=new Chart(growthCanvas.getContext('2d'),{ type:'line', data:{ labels:Array.from({length:30},(_,i)=>i+1), datasets:[{ data:arr,borderColor:t.primary,backgroundColor:t.primaryFill,tension:.4,fill:true,pointRadius:0,borderWidth:2 }]}, options:{responsive:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}}); } const topList=document.getElementById('top-users-list'); if(topList){ const logs=await fetchAuditLogs(2000); const counts={}; logs.forEach(l=>{ if(l.user_id!=null){ const k=String(l.user_id); counts[k]=(counts[k]||0)+1; } }); const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5); topList.innerHTML= top.length? top.map(([id,c])=>{ const u=users.find(x=> String(x.id||x.user_id)===id); const name=(u&&(u.username||u.name))||`User #${id}`; return `<li class='flex items-center'><span class='inline-block w-2 h-2 rounded-full bg-[color:var(--token-color-primary)] mr-2'></span><strong>${name}</strong><span class='ml-2 text-xs text-[color:var(--token-text-muted)]'>${c} events</span></li>`; }).join(''):'<li>N/A</li>'; } }
   async function updateRealtime(){ 
     try {
       // Check user role to avoid unnecessary 401s on inventory
@@ -622,9 +622,9 @@
         if (preview) {
           preview.innerHTML = `
             <div class="text-center">
-              <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mb-4"></div>
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[color:var(--token-color-accent)] border-t-transparent mb-4"></div>
               <p class="font-semibold">Generating ${reportType} report...</p>
-              <p class="text-sm text-gray-400 mt-2">Analyzing ${reportPeriod} days of data</p>
+              <p class="text-sm text-[color:var(--token-text-muted)] mt-2">Analyzing ${reportPeriod} days of data</p>
             </div>
           `;
           
@@ -632,18 +632,18 @@
           setTimeout(() => {
             preview.innerHTML = `
               <div class="space-y-4">
-                <div class="flex items-center justify-between pb-4 border-b border-gray-700">
+                <div class="flex items-center justify-between pb-4 border-b border-[color:var(--token-border-default)]">
                   <div>
                     <h4 class="font-bold text-lg">${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report</h4>
-                    <p class="text-sm text-gray-400">Generated: ${new Date().toLocaleString()}</p>
+                    <p class="text-sm text-[color:var(--token-text-muted)]">Generated: ${new Date().toLocaleString()}</p>
                   </div>
-                  <button class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600" onclick="showToast('Report downloaded as ${reportFormat.toUpperCase()}')">
+                  <button class="ui-btn ui-btn-accent" onclick="showToast('Report downloaded as ${reportFormat.toUpperCase()}')">
                     Download ${reportFormat.toUpperCase()}
                   </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div class="bg-gray-900/50 p-4 rounded">
-                    <h5 class="font-semibold mb-2 text-purple-400">Key Insights</h5>
+                  <div class="bg-[color:var(--token-bg-elevated)] p-4 rounded">
+                    <h5 class="font-semibold mb-2 text-[color:var(--token-color-accent)]">Key Insights</h5>
                     <ul class="space-y-2 text-sm">
                       <li>✓ User engagement increased 23% over period</li>
                       <li>✓ Conversion rate improved by 15%</li>
@@ -651,8 +651,8 @@
                       <li>✓ Peak activity time: 2-4 PM</li>
                     </ul>
                   </div>
-                  <div class="bg-gray-900/50 p-4 rounded">
-                    <h5 class="font-semibold mb-2 text-purple-400">Recommendations</h5>
+                  <div class="bg-[color:var(--token-bg-elevated)] p-4 rounded">
+                    <h5 class="font-semibold mb-2 text-[color:var(--token-color-accent)]">Recommendations</h5>
                     <ul class="space-y-2 text-sm">
                       <li>→ Focus marketing on high-engagement hours</li>
                       <li>→ Expand inventory for top products</li>
@@ -661,7 +661,7 @@
                     </ul>
                   </div>
                 </div>
-                <div class="text-xs text-gray-500 text-center pt-4 border-t border-gray-700">
+                <div class="text-xs text-[color:var(--token-text-muted)] text-center pt-4 border-t border-[color:var(--token-border-default)]">
                   This is a preview. Full report available in ${reportFormat.toUpperCase()} format.
                 </div>
               </div>
