@@ -55,7 +55,7 @@
     </div>
 
     <!-- Health Status -->
-    <div id="health-status" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+    <div id="health-status" class="bg-[color:var(--token-bg-elevated)] rounded-lg shadow-md p-6 mb-6">
       <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">System Health</h2>
       <div id="health-content" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Health info will be populated here -->
@@ -68,7 +68,7 @@
     </div>
 
     <!-- Tabs -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6">
+    <div class="bg-[color:var(--token-bg-elevated)] rounded-lg shadow-md mb-6">
       <div class="border-b border-gray-200 dark:border-gray-700">
         <nav class="flex -mb-px">
           <button onclick="switchTab('function-logs')" class="tab-btn active px-6 py-3 border-b-2 border-blue-600 text-blue-600 font-medium">
@@ -204,25 +204,25 @@
     // Render metrics
     function renderMetrics(health) {
       document.getElementById('metrics-grid').innerHTML = `
-        <div class="metric-ui-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div class="metric-ui-card bg-[color:var(--token-bg-elevated)] rounded-lg shadow-md p-6">
           <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">DB Latency</div>
           <div class="text-2xl font-bold ${health.database?.latencyMs < 30 ? 'text-green-600' : 'text-yellow-600'} dark:text-white">
             ${health.database?.latencyMs || 0}ms
           </div>
         </div>
-        <div class="metric-ui-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div class="metric-ui-card bg-[color:var(--token-bg-elevated)] rounded-lg shadow-md p-6">
           <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Memory Usage</div>
           <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
             ${health.memory?.heapUsed || 0}MB
           </div>
         </div>
-        <div class="metric-ui-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div class="metric-ui-card bg-[color:var(--token-bg-elevated)] rounded-lg shadow-md p-6">
           <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Response Time</div>
           <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
             ${health.latencyMs || 0}ms
           </div>
         </div>
-        <div class="metric-ui-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div class="metric-ui-card bg-[color:var(--token-bg-elevated)] rounded-lg shadow-md p-6">
           <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Uptime</div>
           <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
             ${Math.floor((health.uptime?.containerSeconds || 0) / 60)}m

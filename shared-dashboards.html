@@ -174,7 +174,7 @@
                 
             case 'stats':
                 content = `
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="bg-[color:var(--token-bg-elevated)] p-6 rounded-lg shadow-sm border border-[color:var(--token-border-default)]">
                         <h3 class="text-lg font-semibold mb-4">${widget.title}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             ${Object.entries(widget.data).map(([key, value]) => `
@@ -193,7 +193,7 @@
             case 'personal-activity':
             case 'system-status':
                 content = `
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="bg-[color:var(--token-bg-elevated)] p-6 rounded-lg shadow-sm border border-[color:var(--token-border-default)]">
                         <h3 class="text-lg font-semibold mb-4">${widget.title}</h3>
                         <div class="space-y-3">
                             ${widget.items.map(item => `
@@ -209,7 +209,7 @@
                 
             case 'quick-actions':
                 content = `
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="bg-[color:var(--token-bg-elevated)] p-6 rounded-lg shadow-sm border border-[color:var(--token-border-default)]">
                         <h3 class="text-lg font-semibold mb-4">${widget.title}</h3>
                         <div class="grid grid-cols-2 gap-3">
                             ${widget.actions.map(action => `
@@ -224,7 +224,7 @@
                 
             default:
                 content = `
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="bg-[color:var(--token-bg-elevated)] p-6 rounded-lg shadow-sm border border-[color:var(--token-border-default)]">
                         <h3 class="text-lg font-semibold">${widget.title}</h3>
                         <p class="text-gray-600 dark:text-gray-400">${widget.content || 'No content available'}</p>
                     </div>
@@ -264,7 +264,7 @@
                 <div class="flex items-center justify-between">
                     <h2 class="text-2xl font-bold">${dashboard.icon} ${dashboard.name}</h2>
                     <div class="flex items-center gap-3">
-                        <select id="dashboard-selector" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm">
+                        <select id="dashboard-selector" class="px-3 py-1 border border-[color:var(--token-border-default)] rounded bg-[color:var(--token-bg-elevated)] text-sm">
                             ${role.availableDashboards.map(dbKey => {
                                 const db = dashboardConfigs[dbKey];
                                 return `<option value="${dbKey}" ${dbKey === dashboardKey ? 'selected' : ''}>${db.icon} ${db.name}</option>`;
@@ -303,7 +303,7 @@
         if (!container) return;
 
         container.innerHTML = `
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+            <div class="bg-[color:var(--token-bg-elevated)] rounded-lg p-4 shadow-sm border border-[color:var(--token-border-default)]">
                 <h4 class="font-semibold mb-3">Switch Role (Demo)</h4>
                 <div class="grid grid-cols-2 gap-2">
                     ${Object.entries(userRoles).map(([roleKey, role]) => `

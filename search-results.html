@@ -24,7 +24,7 @@
                     <input 
                         type="text" 
                         id="searchInput"
-                        class="w-full px-4 py-3 pl-12 pr-4 text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        class="w-full px-4 py-3 pl-12 pr-4 text-[color:var(--token-text-primary)] bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Search products, consumables, filters..."
                         autocomplete="off"
                     >
@@ -74,7 +74,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <label class="text-sm text-gray-600 dark:text-gray-400">Sort by:</label>
-                        <select id="sortSelect" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                        <select id="sortSelect" class="px-3 py-1 rounded-lg border border-[color:var(--token-border-default)] bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)]">
                             <option value="relevance">Relevance</option>
                             <option value="name">Name</option>
                             <option value="recent">Most Recent</option>
@@ -277,7 +277,7 @@
          */
         function createResultCard(result) {
             const card = document.createElement('div');
-            card.className = 'bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer';
+            card.className = 'bg-[color:var(--token-bg-elevated)] rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer';
             
             // Determine link based on type
             let link = '#';
