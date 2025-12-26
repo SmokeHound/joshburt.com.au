@@ -534,7 +534,7 @@
               </div>
               <div>
                 <h2 class="text-lg font-bold text-white">Theme Customization</h2>
-                <p class="text-xs text-gray-400 mt-1">Customize colors, presets and scheduling</p>
+                <p class="text-xs text-gray-400 mt-1">Customize colors and presets</p>
               </div>
             </div>
             <!-- Theme Selection Cards -->
@@ -574,17 +574,6 @@
 
               <!-- Custom Theme Builder -->
               <div id="custom-theme-builder">
-                <!-- Content dynamically populated by theme-ui.js -->
-              </div>
-
-              <div id="theme-scheduler-container" class="ui-card ui-card-secondary p-6 rounded-lg border border-gray-700">
-                <h3 class="text-lg font-bold text-white mb-4">Theme Schedule</h3>
-                <p class="text-sm text-gray-400 mb-6">Automatically switch themes based on time of day</p>
-                <!-- Content dynamically populated by theme-ui.js -->
-              </div>
-
-              <!-- Page Theme Override -->
-              <div id="page-theme-override">
                 <!-- Content dynamically populated by theme-ui.js -->
               </div>
             </div>
@@ -869,12 +858,6 @@
           enableDataHistory: document.getElementById('feature-enable-data-history')?.checked ?? true,
           
         },
-        // Theme schedule
-        themeSchedule: {
-          enabled: document.getElementById('schedule-enabled')?.checked || false,
-          darkModeStart: document.getElementById('dark-mode-start')?.value || '18:00',
-          lightModeStart: document.getElementById('light-mode-start')?.value || '06:00'
-        },
         // Security
         sessionTimeout: parseInt(document.getElementById('session-timeout')?.value) || 60,
         maxLoginAttempts: parseInt(document.getElementById('max-login-attempts')?.value) || 5,
@@ -945,12 +928,6 @@
                 document.getElementById('smtp-password').value = settings.smtpPassword ?? '';
                 if (settings.customCss) document.getElementById('custom-css').value = settings.customCss;
                 if (settings.customJs) document.getElementById('custom-js').value = settings.customJs;
-                // Theme schedule
-                if (settings.themeSchedule) {
-                    document.getElementById('schedule-enabled').checked = settings.themeSchedule.enabled;
-                    document.getElementById('dark-mode-start').value = settings.themeSchedule.darkModeStart;
-                    document.getElementById('light-mode-start').value = settings.themeSchedule.lightModeStart;
-                }
                 // Security
                 if (settings.sessionTimeout) document.getElementById('session-timeout').value = settings.sessionTimeout;
                   if (settings.maxLoginAttempts) document.getElementById('max-login-attempts').value = settings.maxLoginAttempts;
@@ -1434,7 +1411,6 @@
               // Data sources
               oilDataSource: 'api',
               consumablesDataSource: 'api',
-              themeSchedule: { enabled: false, darkModeStart: '18:00', lightModeStart: '06:00' },
               sessionTimeout: '60',
               maxLoginAttempts: '5',
               enable2FA: false,
