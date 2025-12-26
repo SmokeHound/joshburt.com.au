@@ -202,6 +202,33 @@
     let currentFilters = {};
     let currentHistoryId = null;
 
+    function showNotification(message, type = 'info') {
+      try {
+        if (typeof window.showToast === 'function') {
+          window.showToast(String(message || ''), type);
+          return;
+        }
+      } catch (_) {
+        // ignore
+      }
+      try {
+        alert(String(message || ''));
+      } catch (_) {
+        // ignore
+      }
+    }
+
+    async function readErrorMessage(res, fallbackMessage) {
+      try {
+        const json = await res.json().catch(() => ({}));
+        const msg = (json && (json.error || json.message)) || '';
+        if (msg) return msg;
+      } catch (_) {
+        // ignore
+      }
+      return `${fallbackMessage}${res && typeof res.status === 'number' ? ` (${res.status})` : ''}`;
+    }
+
     // Load history with filters and pagination
     async function loadHistory() {
       if (!window.authFetch) {
@@ -219,7 +246,9 @@
 
         const response = await window.authFetch(`${FN_BASE}/data-history?${params}`);
 
-        if (!response.ok) throw new Error('Failed to load history');
+        if (!response.ok) {
+          throw new Error(await readErrorMessage(response, 'Failed to load history'));
+        }
 
         const data = await response.json();
         displayHistory(data.history);
@@ -230,7 +259,7 @@
 
       } catch (error) {
         console.error('Error loading history:', error);
-        showNotification('Failed to load history', 'error');
+        showNotification(error && error.message ? error.message : 'Failed to load history', 'error');
       }
     }
 
@@ -270,7 +299,9 @@
       try {
         const response = await window.authFetch(`${FN_BASE}/data-history/stats`);
 
-        if (!response.ok) throw new Error('Failed to load stats');
+        if (!response.ok) {
+          throw new Error(await readErrorMessage(response, 'Failed to load stats'));
+        }
 
         const data = await response.json();
         
@@ -297,7 +328,9 @@
         const params = new URLSearchParams({ limit: 1000 });
         const response = await window.authFetch(`${FN_BASE}/data-history?${params}`);
 
-        if (!response.ok) throw new Error('Failed to load change details');
+        if (!response.ok) {
+          throw new Error(await readErrorMessage(response, 'Failed to load change details'));
+        }
 
         const data = await response.json();
         const change = data.history.find(h => h.id === id);
@@ -371,7 +404,7 @@
 
       } catch (error) {
         console.error('Error viewing change:', error);
-        showNotification('Failed to load change details', 'error');
+        showNotification(error && error.message ? error.message : 'Failed to load change details', 'error');
       }
     }
 
@@ -388,7 +421,9 @@
           method: 'POST'
         });
 
-        if (!response.ok) throw new Error('Failed to restore version');
+        if (!response.ok) {
+          throw new Error(await readErrorMessage(response, 'Failed to restore version'));
+        }
 
         showNotification('Version restored successfully', 'success');
         document.getElementById('change-details-modal').classList.add('hidden');
@@ -396,7 +431,7 @@
 
       } catch (error) {
         console.error('Error restoring version:', error);
-        showNotification('Failed to restore version', 'error');
+        showNotification(error && error.message ? error.message : 'Failed to restore version', 'error');
       }
     }
 
