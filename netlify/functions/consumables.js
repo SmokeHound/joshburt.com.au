@@ -14,6 +14,34 @@ exports.handler = withHandler(async function (event) {
   if (method === 'DELETE') return handleDelete(event);
   return error(405, 'Method Not Allowed');
 
+  function toInt(val, fallback = 0) {
+    if (val === null || val === undefined || val === '') return fallback;
+    const n = Number.parseInt(String(val), 10);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function normalizeStockFields(body) {
+    const soh =
+      body.soh !== undefined
+        ? toInt(body.soh, 0)
+        : body.stock !== undefined
+          ? toInt(body.stock, 0)
+          : body.currentStock !== undefined
+            ? toInt(body.currentStock, 0)
+            : 0;
+
+    const modelQty =
+      body.model_qty !== undefined
+        ? toInt(body.model_qty, 0)
+        : body.reorder !== undefined
+          ? toInt(body.reorder, 0)
+          : body.modelStock !== undefined
+            ? toInt(body.modelStock, 0)
+            : 0;
+
+    return { soh, model_qty: modelQty };
+  }
+
   async function handleGet(event) {
     try {
       // Optional filters
@@ -80,19 +108,20 @@ exports.handler = withHandler(async function (event) {
 
       const body = parseBody(event);
       const { name, code, type, category, description } = body;
-      if (!name || !type || !category) {
-        return error(400, 'Missing required fields: name, type, category');
+      const { soh, model_qty } = normalizeStockFields(body);
+      if (!name || !code || !type || !category) {
+        return error(400, 'Missing required fields: name, code, type, category');
       }
       const query = `
-        INSERT INTO consumables (name, code, type, category, description)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO consumables (name, code, type, category, description, model_qty, soh)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
-      const params = [name, code || '', type, category, description || ''];
+      const params = [name, code, type, category, description || '', model_qty, soh];
       const result = await database.run(query, params);
       await logAudit(event, {
         action: 'consumable.create',
         userId: user && user.id,
-        details: { id: result.id, name, code, type, category }
+        details: { id: result.id, name, code, type, category, model_qty, soh }
       });
 
       // Invalidate consumables cache on create
@@ -102,7 +131,7 @@ exports.handler = withHandler(async function (event) {
         {
           id: result.id,
           message: 'Consumable created successfully',
-          consumable: { id: result.id, name, code, type, category, description }
+          consumable: { id: result.id, name, code, type, category, description, model_qty, soh }
         },
         201
       );
@@ -126,21 +155,22 @@ exports.handler = withHandler(async function (event) {
 
       const body = parseBody(event);
       const { id, name, code, type, category, description } = body;
-      if (!id || !name || !type || !category) {
-        return error(400, 'Missing required fields: id, name, type, category');
+      const { soh, model_qty } = normalizeStockFields(body);
+      if (!id || !name || !code || !type || !category) {
+        return error(400, 'Missing required fields: id, name, code, type, category');
       }
       const query = `
         UPDATE consumables 
-        SET name = ?, code = ?, type = ?, category = ?, description = ?, updated_at = CURRENT_TIMESTAMP
+        SET name = ?, code = ?, type = ?, category = ?, description = ?, model_qty = ?, soh = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `;
-      const params = [name, code || '', type, category, description || '', id];
+      const params = [name, code, type, category, description || '', model_qty, soh, id];
       const result = await database.run(query, params);
       if (result.changes === 0) return error(404, 'Consumable not found');
       await logAudit(event, {
         action: 'consumable.update',
         userId: user && user.id,
-        details: { id, name, code, type, category }
+        details: { id, name, code, type, category, model_qty, soh }
       });
 
       // Invalidate consumables cache on update
@@ -148,7 +178,7 @@ exports.handler = withHandler(async function (event) {
 
       return ok({
         message: 'Consumable updated successfully',
-        consumable: { id, name, code, type, category, description }
+        consumable: { id, name, code, type, category, description, model_qty, soh }
       });
     } catch (e) {
       console.error('PUT /consumables error:', e);

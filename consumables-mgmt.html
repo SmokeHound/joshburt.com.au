@@ -118,7 +118,7 @@
         </div>
         <div>
           <label for="productCode" class="block text-sm font-medium mb-1">Code</label>
-          <input type="text" id="productCode" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white">
+          <input type="text" id="productCode" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white" required>
         </div>
         <div class="flex gap-4">
           <div class="flex-1">
@@ -194,6 +194,7 @@ closeCategoryModal.onclick = function() {
 <script>
 // --- Product CRUD Logic (Consumables Only) ---
 let products = [];
+const FN_BASE = window.FN_BASE || '/.netlify/functions';
 const productTableBody = document.getElementById('productTableBody');
 const productModal = document.getElementById('productModal');
 const productForm = document.getElementById('productForm');
@@ -214,6 +215,116 @@ const productImagePreview = document.getElementById('productImagePreview');
 const imageDropZone = document.getElementById('imageDropZone');
 const imageDropText = document.getElementById('imageDropText');
 const removeImageBtn = document.getElementById('removeImageBtn');
+
+function isAuthDisabled() {
+  return window.AUTH_DISABLED === true;
+}
+
+function showToastSafe(message, type = 'info') {
+  try {
+    if (typeof window.showToast === 'function') {
+      window.showToast(message, type);
+    }
+  } catch (_) {
+    // noop
+  }
+}
+
+function normalizeProduct(raw) {
+  const p = raw && typeof raw === 'object' ? raw : {};
+  const soh = Number.parseInt(String(p.soh ?? p.stock ?? p.currentStock ?? 0), 10);
+  const modelQty = Number.parseInt(String(p.model_qty ?? p.reorder ?? p.modelStock ?? 0), 10);
+  return {
+    id: p.id ?? null,
+    name: p.name || '',
+    type: p.type || '',
+    category: p.category || '',
+    code: p.code || '',
+    soh: Number.isFinite(soh) ? Math.max(0, soh) : 0,
+    model_qty: Number.isFinite(modelQty) ? Math.max(0, modelQty) : 0,
+    description: p.description || '',
+    image: p.image || ''
+  };
+}
+
+async function fetchJSON(url, options) {
+  const response = window.authFetch ? await window.authFetch(url, options) : await fetch(url, options);
+  let data = null;
+  try {
+    data = await response.json();
+  } catch (_) {
+    // ignore
+  }
+  return { response, data };
+}
+
+async function loadProductsFromAPI({ requireAuth = true } = {}) {
+  if (requireAuth && !window.authFetch && !isAuthDisabled()) {
+    throw new Error('Authentication not ready');
+  }
+  const { response, data } = await fetchJSON(`${FN_BASE}/consumables`);
+  if (response.status === 401 && !isAuthDisabled()) {
+    showSignInCTA();
+    return [];
+  }
+  if (response.status === 403) {
+    showToastSafe('You do not have permission to view consumables.', 'error');
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error((data && data.error) || `HTTP error! status: ${response.status}`);
+  }
+  const list = Array.isArray(data) ? data : [];
+  return list.map(normalizeProduct);
+}
+
+async function saveConsumableToAPI(consumable, isUpdate) {
+  if (!window.authFetch && !isAuthDisabled()) {
+    throw new Error('Authentication not ready');
+  }
+  const payload = {
+    ...(isUpdate ? { id: consumable.id } : null),
+    name: consumable.name,
+    code: consumable.code,
+    type: consumable.type,
+    category: consumable.category,
+    description: consumable.description || '',
+    soh: consumable.soh || 0,
+    model_qty: consumable.model_qty || 0
+  };
+  const { response, data } = await fetchJSON(`${FN_BASE}/consumables`, {
+    method: isUpdate ? 'PUT' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (response.status === 401 && !isAuthDisabled()) {
+    showSignInCTA();
+    throw new Error('Please sign in.');
+  }
+  if (!response.ok) {
+    throw new Error((data && data.error) || `HTTP error! status: ${response.status}`);
+  }
+  return data;
+}
+
+async function deleteConsumableFromAPI(id) {
+  if (!window.authFetch && !isAuthDisabled()) {
+    throw new Error('Authentication not ready');
+  }
+  const { response, data } = await fetchJSON(`${FN_BASE}/consumables`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id })
+  });
+  if (response.status === 401 && !isAuthDisabled()) {
+    showSignInCTA();
+    throw new Error('Please sign in.');
+  }
+  if (!response.ok) {
+    throw new Error((data && data.error) || `HTTP error! status: ${response.status}`);
+  }
+  return data;
+}
 
 productImageInput.onchange = function(e) {
   const file = e.target.files[0];
@@ -264,20 +375,7 @@ syncInventoryBtn.onclick = async function() {
   syncInventoryBtn.disabled = true;
   syncInventoryBtn.textContent = 'Syncing...';
   try {
-    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/consumables`);
-    if (!res.ok) throw new Error('API error');
-    const data = await res.json();
-    if (!Array.isArray(data)) throw new Error('Invalid data');
-    // Map backend fields to frontend model
-    products = data.map(p => ({
-      name: p.name || '',
-      type: p.type || '',
-      category: p.category || '',
-      code: p.code || '',
-      stock: parseInt(p.stock, 10) || 0,
-      reorder: parseInt(p.reorder, 10) || 0,
-      image: p.image || ''
-    }));
+    products = await loadProductsFromAPI({ requireAuth: false });
     saveProducts();
     renderProducts();
     await addAuditLog('Sync', null, `Synced ${products.length} consumables from database`);
@@ -374,7 +472,8 @@ importBtn.onclick = function() {
 
 function loadProducts() {
   const data = localStorage.getItem('consumablesMgmtProducts');
-  products = data ? JSON.parse(data) : [];
+  const parsed = data ? JSON.parse(data) : [];
+  products = Array.isArray(parsed) ? parsed.map(normalizeProduct) : [];
 }
 function saveProducts() {
   localStorage.setItem('consumablesMgmtProducts', JSON.stringify(products));
@@ -390,14 +489,14 @@ function renderProducts() {
       <td class="p-2 whitespace-nowrap" data-label="Stock">
         <div class="inline-flex items-center gap-2">
           <button class="ui-btn ui-btn-primary px-2 py-1 rounded text-xs font-bold" title="Decrease Stock" onclick="adjustStock(${i},-1)">−</button>
-          <span>${p.stock ?? ''}</span>
+          <span>${p.soh ?? ''}</span>
           <button class="ui-btn ui-btn-primary px-2 py-1 rounded text-xs font-bold" title="Increase Stock" onclick="adjustStock(${i},1)">+</button>
         </div>
       </td>
       <td class="p-2 whitespace-nowrap" data-label="Reorder">
         <div class="inline-flex items-center gap-2">
           <button class="ui-btn ui-btn-primary px-2 py-1 rounded text-xs font-bold" title="Decrease Reorder" onclick="adjustReorder(${i},-1)">−</button>
-          <span>${p.reorder ?? ''}</span>
+          <span>${p.model_qty ?? ''}</span>
           <button class="ui-btn ui-btn-primary px-2 py-1 rounded text-xs font-bold" title="Increase Reorder" onclick="adjustReorder(${i},1)">+</button>
         </div>
       </td>
@@ -408,27 +507,45 @@ function renderProducts() {
   `).join('');
 }
 
-window.adjustStock = function(idx, delta) {
+window.adjustStock = async function(idx, delta) {
   if (products[idx]) {
-    let oldStock = parseInt(products[idx].stock, 10) || 0;
+    let oldStock = parseInt(products[idx].soh, 10) || 0;
     let newStock = oldStock + delta;
     if (newStock < 0) newStock = 0;
-    products[idx].stock = newStock;
+    products[idx].soh = newStock;
     saveProducts();
     renderProducts();
     addAuditLog('Stock Adjust', products[idx], `Stock: ${oldStock} → ${newStock}`);
+
+    // Best-effort persistence
+    try {
+      if (products[idx].id) {
+        await saveConsumableToAPI(products[idx], true);
+      }
+    } catch (e) {
+      showToastSafe(`Failed to save stock: ${e.message}`, 'error');
+    }
   }
 };
 
-window.adjustReorder = function(idx, delta) {
+window.adjustReorder = async function(idx, delta) {
   if (products[idx]) {
-    let oldReorder = parseInt(products[idx].reorder, 10) || 0;
+    let oldReorder = parseInt(products[idx].model_qty, 10) || 0;
     let newReorder = oldReorder + delta;
     if (newReorder < 0) newReorder = 0;
-    products[idx].reorder = newReorder;
+    products[idx].model_qty = newReorder;
     saveProducts();
     renderProducts();
     addAuditLog('Reorder Adjust', products[idx], `Reorder: ${oldReorder} → ${newReorder}`);
+
+    // Best-effort persistence
+    try {
+      if (products[idx].id) {
+        await saveConsumableToAPI(products[idx], true);
+      }
+    } catch (e) {
+      showToastSafe(`Failed to save reorder: ${e.message}`, 'error');
+    }
   }
 };
 async function renderCategoryDatalist() {
@@ -448,13 +565,13 @@ function openProductModal(editIdx) {
   if (typeof editIdx === 'number') {
     const p = products[editIdx];
     productModalTitle.textContent = 'Edit Product';
-    productIdInput.value = editIdx;
+    productIdInput.value = p.id || '';
     productNameInput.value = p.name;
     productTypeInput.value = p.type || '';
     productCategoryInput.value = p.category || '';
     productCodeInput.value = p.code || '';
-    productStockInput.value = p.stock ?? '';
-    productReorderInput.value = p.reorder ?? '';
+    productStockInput.value = p.soh ?? '';
+    productReorderInput.value = p.model_qty ?? '';
     if (p.image) {
       productImagePreview.src = p.image;
       productImagePreview.classList.remove('hidden');
@@ -484,39 +601,54 @@ productImageInput.onchange = function(e) {
     reader.readAsDataURL(file);
   }
 };
-productForm.onsubmit = function(e) {
+productForm.onsubmit = async function(e) {
   e.preventDefault();
-  const idx = productIdInput.value;
-  const prod = {
+  const id = productIdInput.value ? parseInt(productIdInput.value, 10) : null;
+  const prod = normalizeProduct({
+    id,
     name: productNameInput.value,
     type: productTypeInput.value,
     category: productCategoryInput.value,
     code: productCodeInput.value,
-    stock: parseInt(productStockInput.value, 10) || 0,
-    reorder: parseInt(productReorderInput.value, 10) || 0,
+    soh: parseInt(productStockInput.value, 10) || 0,
+    model_qty: parseInt(productReorderInput.value, 10) || 0,
     image: productImagePreview.src && !productImagePreview.classList.contains('hidden') ? productImagePreview.src : ''
-  };
-  if (idx !== '') {
-    const old = products[idx];
-    products[idx] = prod;
-    addAuditLog('Edit', prod, `Edited consumable. Old: ${JSON.stringify(old)}${old.image !== prod.image ? ' (Image changed)' : ''}`);
-  } else {
-    products.push(prod);
-    addAuditLog('Add', prod, 'Added new consumable' + (prod.image ? ' (Image uploaded)' : ''));
-  }
-  saveProducts();
-  renderProducts();
-  closeModal();
-};
-deleteProductBtn.onclick = function() {
-  const idx = productIdInput.value;
-  if (idx !== '') {
-    const prod = products[idx];
-    products.splice(idx, 1);
+  });
+
+  try {
+    const isUpdate = Boolean(prod.id);
+    await saveConsumableToAPI(prod, isUpdate);
+    await addAuditLog(isUpdate ? 'Edit' : 'Add', prod, isUpdate ? 'Updated consumable in database' : 'Created consumable in database');
+    products = await loadProductsFromAPI({ requireAuth: false });
     saveProducts();
     renderProducts();
-    addAuditLog('Delete', prod, 'Deleted consumable');
     closeModal();
+    showToastSafe(isUpdate ? 'Consumable updated' : 'Consumable created', 'success');
+  } catch (err) {
+    await window.ModalUtils.alert({
+      title: 'Save Failed',
+      message: err.message || String(err),
+      type: 'danger'
+    });
+  }
+};
+deleteProductBtn.onclick = async function() {
+  const id = productIdInput.value ? parseInt(productIdInput.value, 10) : null;
+  if (!id) return;
+  try {
+    await deleteConsumableFromAPI(id);
+    await addAuditLog('Delete', { id }, 'Deleted consumable from database');
+    products = await loadProductsFromAPI({ requireAuth: false });
+    saveProducts();
+    renderProducts();
+    closeModal();
+    showToastSafe('Consumable deleted', 'success');
+  } catch (err) {
+    await window.ModalUtils.alert({
+      title: 'Delete Failed',
+      message: err.message || String(err),
+      type: 'danger'
+    });
   }
 };
 window.addEventListener('DOMContentLoaded', async () => {
@@ -528,27 +660,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   try {
-    // Try to load from backend first
-    const res = await fetch(`${window.FN_BASE || '/.netlify/functions'}/consumables`);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        products = data.map(p => ({
-          name: p.name || '',
-          type: p.type || '',
-          category: p.category || '',
-          code: p.code || '',
-          stock: parseInt(p.stock, 10) || 0,
-          reorder: parseInt(p.reorder, 10) || 0,
-          image: p.image || ''
-        }));
-        saveProducts();
-      } else {
-        loadProducts();
-      }
-    } else {
-      loadProducts();
-    }
+    products = await loadProductsFromAPI({ requireAuth: false });
+    saveProducts();
   } catch (err) {
     loadProducts();
   }
