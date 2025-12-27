@@ -361,20 +361,20 @@
     applyFromStorage: function() {
       const storedTheme = getStoredTheme() || DEFAULT_THEME;
       const storedColors = getStoredColors();
-      
+
       // Only apply custom colors if at least one is set
-      const hasCustomColors = storedColors.primary || storedColors.secondary || storedColors.accent || 
-                              storedColors.buttonPrimary || storedColors.buttonSecondary || 
+      const hasCustomColors = storedColors.primary || storedColors.secondary || storedColors.accent ||
+                              storedColors.buttonPrimary || storedColors.buttonSecondary ||
                               storedColors.buttonDanger || storedColors.buttonSuccess;
       const customColors = hasCustomColors ? storedColors : null;
-      
+
       return applyTheme(storedTheme, customColors);
     },
 
     // Set theme by ID (optionally persist to localStorage)
     setTheme: function(themeId, persist) {
       const result = applyTheme(themeId, null);
-      
+
       if (persist !== false) {
         try {
           const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
@@ -385,7 +385,7 @@
           // Ignore storage errors
         }
       }
-      
+
       return result;
     },
 
@@ -393,7 +393,7 @@
     setPalette: function(colors, persist) {
       const currentTheme = getStoredTheme() || DEFAULT_THEME;
       const result = applyTheme(currentTheme, colors);
-      
+
       if (persist !== false) {
         try {
           const siteSettings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
@@ -446,7 +446,7 @@
           // Ignore storage errors
         }
       }
-      
+
       return result;
     },
 
@@ -456,7 +456,7 @@
       const storedColors = getStoredColors();
       const resolvedId = resolveThemeId(storedTheme);
       const preset = THEME_PRESETS[resolvedId] || THEME_PRESETS[DEFAULT_THEME];
-      
+
       return {
         id: storedTheme,
         resolvedId: resolvedId,
@@ -488,7 +488,7 @@
         ThemeManager.applyFromStorage();
       }
     };
-    
+
     // Modern browsers
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', handleSystemThemeChange);

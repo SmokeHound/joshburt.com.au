@@ -212,7 +212,7 @@
         // Fall back to fetch if sendBeacon not available
         const url = `${FN_BASE}/error-logs`;
         const body = JSON.stringify(payload);
-        
+
         if (navigator.sendBeacon) {
           navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
         } else {

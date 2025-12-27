@@ -1,34 +1,34 @@
 // Shared dashboard initialization helper
-(function(){
+(function() {
   let stockTrendChart = null;
 
-  function getCssVar(name, fallback){
-    try{
+  function getCssVar(name, fallback) {
+    try {
       const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
       return v || fallback;
-    }catch(e){
+    } catch (e) {
       return fallback;
     }
   }
 
-  function colorToRgba(color, alpha){
-    if(!color) return color;
+  function colorToRgba(color, alpha) {
+    if (!color) {return color;}
     const c = String(color).trim();
     const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
     const a = clamp(Number(alpha), 0, 1);
 
-    if(c.startsWith('rgba(')){
+    if (c.startsWith('rgba(')) {
       const parts = c.slice(5, -1).split(',').map(p => p.trim());
-      if(parts.length >= 3) return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+      if (parts.length >= 3) {return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;}
     }
-    if(c.startsWith('rgb(')){
+    if (c.startsWith('rgb(')) {
       const parts = c.slice(4, -1).split(',').map(p => p.trim());
-      if(parts.length >= 3) return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;
+      if (parts.length >= 3) {return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${a})`;}
     }
-    if(c.startsWith('#')){
+    if (c.startsWith('#')) {
       const raw = c.slice(1);
       const hex = raw.length === 3 ? raw.split('').map(ch => ch + ch).join('') : raw;
-      if(/^[0-9a-fA-F]{6}$/.test(hex)){
+      if (/^[0-9a-fA-F]{6}$/.test(hex)) {
         const r = parseInt(hex.slice(0,2), 16);
         const g = parseInt(hex.slice(2,4), 16);
         const b = parseInt(hex.slice(4,6), 16);
@@ -38,40 +38,40 @@
     return c;
   }
 
-  function applyStockTrendTheme(){
-    if(!stockTrendChart) return;
-    try{
+  function applyStockTrendTheme() {
+    if (!stockTrendChart) {return;}
+    try {
       const primary = getCssVar('--token-color-primary', '#3b82f6');
       const text = getCssVar('--token-text-secondary', 'rgb(209, 213, 219)');
       const grid = getCssVar('--token-border-default', 'rgba(255,255,255,0.1)');
 
-      if(stockTrendChart.data?.datasets?.[0]){
+      if (stockTrendChart.data?.datasets?.[0]) {
         stockTrendChart.data.datasets[0].backgroundColor = colorToRgba(primary, 0.7);
         stockTrendChart.data.datasets[0].borderColor = primary;
       }
-      if(stockTrendChart.options?.plugins?.legend?.labels){
+      if (stockTrendChart.options?.plugins?.legend?.labels) {
         stockTrendChart.options.plugins.legend.labels.color = text;
       }
-      if(stockTrendChart.options?.scales?.x?.ticks){
+      if (stockTrendChart.options?.scales?.x?.ticks) {
         stockTrendChart.options.scales.x.ticks.color = text;
       }
-      if(stockTrendChart.options?.scales?.y?.ticks){
+      if (stockTrendChart.options?.scales?.y?.ticks) {
         stockTrendChart.options.scales.y.ticks.color = text;
       }
-      if(stockTrendChart.options?.scales?.x?.grid){
+      if (stockTrendChart.options?.scales?.x?.grid) {
         stockTrendChart.options.scales.x.grid.color = colorToRgba(grid, 0.25);
       }
-      if(stockTrendChart.options?.scales?.y?.grid){
+      if (stockTrendChart.options?.scales?.y?.grid) {
         stockTrendChart.options.scales.y.grid.color = colorToRgba(grid, 0.25);
       }
       stockTrendChart.update();
-    }catch(e){
+    } catch (e) {
       // ignore
     }
   }
-  function loadScript(url){
+  function loadScript(url) {
     return new Promise((resolve, reject) => {
-      if (document.querySelector(`script[src="${url}"]`)) return resolve();
+      if (document.querySelector(`script[src="${url}"]`)) {return resolve();}
       const s = document.createElement('script');
       s.src = url;
       s.defer = true;
@@ -81,25 +81,25 @@
     });
   }
 
-  async function fetchJson(path){
-    try{
+  async function fetchJson(path) {
+    try {
       const res = await fetch(path);
-      if (!res.ok) return null;
+      if (!res.ok) {return null;}
       return await res.json();
-    }catch(e){ return null; }
+    } catch (e) { return null; }
   }
 
-  function renderList(items){
-    if (!items || !items.length) return '<div class="text-sm text-gray-400">No items</div>';
+  function renderList(items) {
+    if (!items || !items.length) {return '<div class="text-sm text-gray-400">No items</div>';}
     return '<ul class="space-y-2">' + items.map(it => `<li class="p-2 bg-gray-800 rounded">${typeof it === 'string' ? it : JSON.stringify(it)}</li>`).join('') + '</ul>';
   }
 
-  async function initAdminDashboard(){
+  async function initAdminDashboard() {
     const container = document.getElementById('admin-dashboard');
-    if (!container) return;
-    try{
+    if (!container) {return;}
+    try {
       await loadScript('/assets/js/components/dashboard-builder.js');
-    }catch(e){ console.warn(e); return; }
+    } catch (e) { console.warn(e); return; }
 
     const stats = await fetchJson('/.netlify/functions/public-stats') || { users: 0, orders: 0, products: 0 };
     const recent = await fetchJson('/.netlify/functions/audit-logs?limit=5') || [];
@@ -128,13 +128,13 @@
         </div>` }
     ];
 
-    try{
+    try {
       const db = new DashboardBuilder('admin-dashboard', { widgets, columns: 3, editable: true, storageKey: 'admin-dashboard-layout' });
 
       // Initialize richer widgets after a short delay to allow DashboardBuilder to render DOM
       setTimeout(async () => {
         // Low-stock table
-        try{
+        try {
           await loadScript('/assets/js/components/data-table.js');
           const low = await fetchJson('/.netlify/functions/low-stock?threshold=10') || [];
           const table = new DataTable('low-stock-table', {
@@ -147,10 +147,10 @@
             filterable: true,
             paginated: true
           });
-        }catch(e){ console.warn('Low-stock table init failed', e); }
+        } catch (e) { console.warn('Low-stock table init failed', e); }
 
         // Stock trend chart (top low-stock items)
-        try{
+        try {
           await loadScript('https://cdn.jsdelivr.net/npm/chart.js');
           const low = await fetchJson('/.netlify/functions/low-stock?threshold=50') || [];
           const labels = low.slice(0,6).map(p => p.name);
@@ -174,17 +174,17 @@
               }
             });
           }
-        }catch(e){ console.warn('Stock trend chart init failed', e); }
+        } catch (e) { console.warn('Stock trend chart init failed', e); }
 
       }, 300);
 
-    }catch(e){ console.warn('Failed to init admin dashboard', e); }
+    } catch (e) { console.warn('Failed to init admin dashboard', e); }
   }
 
-  async function initSharedBuilder(){
+  async function initSharedBuilder() {
     const container = document.getElementById('dashboard-builder-container');
-    if (!container) return;
-    try{ await loadScript('/assets/js/components/dashboard-builder.js'); }catch(e){ console.warn(e); return; }
+    if (!container) {return;}
+    try { await loadScript('/assets/js/components/dashboard-builder.js'); } catch (e) { console.warn(e); return; }
 
     const stats = await fetchJson('/.netlify/functions/public-stats') || { users: 0, orders: 0, products: 0 };
 
@@ -193,17 +193,15 @@
       { id: 'w-alerts', title: 'Alerts', content: '<div class="p-3">No alerts</div>' }
     ];
 
-    try{ new DashboardBuilder('dashboard-builder-container', { widgets, columns: 2, editable: true, storageKey: 'shared-dashboards-layout' }); }
-    catch(e){ console.warn('Failed to init shared dashboards', e); }
+    try { new DashboardBuilder('dashboard-builder-container', { widgets, columns: 2, editable: true, storageKey: 'shared-dashboards-layout' }); } catch (e) { console.warn('Failed to init shared dashboards', e); }
   }
 
   // Kick off in DOMContentLoaded
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { initAdminDashboard(); initSharedBuilder(); });
-  else { initAdminDashboard(); initSharedBuilder(); }
+  if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', () => { initAdminDashboard(); initSharedBuilder(); });} else { initAdminDashboard(); initSharedBuilder(); }
 
-  try{
+  try {
     window.addEventListener('theme:changed', applyStockTrendTheme);
-  }catch(e){
+  } catch (e) {
     // ignore
   }
 
