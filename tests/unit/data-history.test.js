@@ -226,6 +226,9 @@ describe('Data History API', () => {
           ]
         })
         .mockResolvedValueOnce({
+          rows: [{ total_changes: '10', tables_tracked: '1', active_users: '2' }]
+        })
+        .mockResolvedValueOnce({
           rows: [{ change_date: '2024-01-01', total_changes: '5' }]
         });
 
@@ -239,7 +242,10 @@ describe('Data History API', () => {
     });
 
     it('should filter stats by table', async () => {
-      mockQuery.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [] });
+      mockQuery
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [{ total_changes: '0', tables_tracked: '0', active_users: '0' }] })
+        .mockResolvedValueOnce({ rows: [] });
 
       const event = createMockEvent('GET', '/data-history/stats', null, {
         table_name: 'products',
