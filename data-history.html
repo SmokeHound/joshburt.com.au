@@ -81,7 +81,10 @@
       <section class="ui-card p-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-semibold">Change History</h2>
-          <button id="refresh-btn" class="btn-secondary px-4 py-2">🔄 Refresh</button>
+          <div class="flex gap-2">
+            <button id="open-tracking-btn" class="btn-secondary px-4 py-2">⚙ Enable Tracking</button>
+            <button id="refresh-btn" class="btn-secondary px-4 py-2">🔄 Refresh</button>
+          </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -304,18 +307,39 @@
         }
 
         const data = await response.json();
-        
-        // Calculate totals
-        const totalChanges = data.statistics.reduce((sum, stat) => sum + parseInt(stat.change_count), 0);
-        const uniqueTables = new Set(data.statistics.map(stat => stat.table_name)).size;
-        const uniqueUsers = Math.max(...data.statistics.map(stat => parseInt(stat.unique_users) || 0), 0);
 
-        document.getElementById('stat-total').textContent = totalChanges;
-        document.getElementById('stat-tables').textContent = uniqueTables;
-        document.getElementById('stat-users').textContent = uniqueUsers;
+        const totalEl = document.getElementById('stat-total');
+        const tablesEl = document.getElementById('stat-tables');
+        const usersEl = document.getElementById('stat-users');
+
+        if (data && data.summary) {
+          totalEl.textContent = Number(data.summary.totalChanges || 0);
+          tablesEl.textContent = Number(data.summary.tablesTracked || 0);
+          usersEl.textContent = Number(data.summary.activeUsers || 0);
+          return;
+        }
+
+        const statsArr = data && Array.isArray(data.statistics) ? data.statistics : [];
+        // Calculate totals (fallback)
+        const totalChanges = statsArr.reduce((sum, stat) => sum + (parseInt(stat.change_count, 10) || 0), 0);
+        const uniqueTables = new Set(statsArr.map(stat => stat.table_name).filter(Boolean)).size;
+        const uniqueUsers = Math.max(...statsArr.map(stat => parseInt(stat.unique_users, 10) || 0), 0);
+
+        totalEl.textContent = totalChanges;
+        tablesEl.textContent = uniqueTables;
+        usersEl.textContent = uniqueUsers;
 
       } catch (error) {
         console.error('Error loading stats:', error);
+        showNotification(error && error.message ? error.message : 'Failed to load stats', 'error');
+        // Indicate unknown rather than misleading 0
+        try {
+          document.getElementById('stat-total').textContent = '-';
+          document.getElementById('stat-tables').textContent = '-';
+          document.getElementById('stat-users').textContent = '-';
+        } catch (_) {
+          // ignore
+        }
       }
     }
 
@@ -505,6 +529,10 @@
     });
 
     document.getElementById('refresh-btn').addEventListener('click', loadHistory);
+
+    document.getElementById('open-tracking-btn').addEventListener('click', () => {
+      document.getElementById('enable-tracking-modal').classList.remove('hidden');
+    });
 
     document.getElementById('close-details-btn').addEventListener('click', () => {
       document.getElementById('change-details-modal').classList.add('hidden');

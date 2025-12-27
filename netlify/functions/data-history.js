@@ -321,6 +321,25 @@ async function getStats(event, pool) {
 
   const result = await pool.query(query, params);
 
+  // Summary totals (used by the UI stat cards)
+  let summaryQuery = `
+    SELECT
+      COUNT(*)::BIGINT as total_changes,
+      COUNT(DISTINCT table_name)::BIGINT as tables_tracked,
+      COUNT(DISTINCT changed_by)::BIGINT as active_users
+    FROM data_history
+    WHERE changed_at >= NOW() - INTERVAL '${parseInt(days)} days'
+  `;
+
+  const summaryParams = [];
+  if (table_name) {
+    summaryParams.push(table_name);
+    summaryQuery += ` AND table_name = $${summaryParams.length}`;
+  }
+
+  const summaryResult = await pool.query(summaryQuery, summaryParams);
+  const summaryRow = (summaryResult.rows && summaryResult.rows[0]) ? summaryResult.rows[0] : {};
+
   // Also get daily trend
   const trendQuery = `
     SELECT 
@@ -338,6 +357,11 @@ async function getStats(event, pool) {
   return {
     statusCode: 200,
     body: JSON.stringify({
+      summary: {
+        totalChanges: Number(summaryRow.total_changes) || 0,
+        tablesTracked: Number(summaryRow.tables_tracked) || 0,
+        activeUsers: Number(summaryRow.active_users) || 0
+      },
       statistics: result.rows,
       daily_trend: trendResult.rows
     })
