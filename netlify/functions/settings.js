@@ -26,12 +26,14 @@ exports.handler = withHandler(async function (event) {
 
     // Try cache first (5 minute TTL)
     const cached = cache.get('settings', cacheKey);
+    const cachedLastUpdated = cache.get('settings', `${cacheKey}:meta:lastUpdated`);
     if (cached) {
       return {
         statusCode: 200,
         headers: {
           'Content-Type': 'application/json',
           'X-Cache': 'HIT',
+          ...(cachedLastUpdated ? { 'X-Settings-Last-Updated': cachedLastUpdated } : {}),
           ...require('../../utils/http').corsHeaders
         },
         body: cached
@@ -39,7 +41,7 @@ exports.handler = withHandler(async function (event) {
     }
 
     // Build query based on filters
-    let query = 'SELECT key, value, category, data_type, description FROM settings';
+    let query = 'SELECT key, value, category, data_type, description, updated_at FROM settings';
     const queryParams = [];
     const whereClauses = [];
 
@@ -63,8 +65,21 @@ exports.handler = withHandler(async function (event) {
 
     // Transform to key-value object for backward compatibility
     const settings = {};
+    let lastUpdatedMs = null;
     for (const row of rows) {
       let value = row.value;
+
+      // Track last updated timestamp (best-effort)
+      try {
+        if (row.updated_at) {
+          const ms = new Date(row.updated_at).getTime();
+          if (!Number.isNaN(ms) && (lastUpdatedMs === null || ms > lastUpdatedMs)) {
+            lastUpdatedMs = ms;
+          }
+        }
+      } catch (_) {
+        // ignore
+      }
 
       // Parse value based on data type
       if (row.data_type === 'boolean') {
@@ -82,15 +97,21 @@ exports.handler = withHandler(async function (event) {
       settings[row.key] = value;
     }
 
+    const lastUpdatedIso = lastUpdatedMs ? new Date(lastUpdatedMs).toISOString() : '';
+
     // Cache the result for 5 minutes (300 seconds)
     const dataString = JSON.stringify(settings);
     cache.set('settings', cacheKey, dataString, 300);
+    if (lastUpdatedIso) {
+      cache.set('settings', `${cacheKey}:meta:lastUpdated`, lastUpdatedIso, 300);
+    }
 
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
         'X-Cache': 'MISS',
+        ...(lastUpdatedIso ? { 'X-Settings-Last-Updated': lastUpdatedIso } : {}),
         ...require('../../utils/http').corsHeaders
       },
       body: dataString

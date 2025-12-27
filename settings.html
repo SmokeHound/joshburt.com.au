@@ -78,16 +78,18 @@
 
         <!-- Quick Search -->
         <div class="mb-6">
-          <div class="relative">
-            <input type="text" id="settings-search" placeholder="Search settings..." class="w-full p-4 pl-12 rounded-lg bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] text-[color:var(--token-text-primary)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]" />
-            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[color:var(--token-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[color:var(--token-text-muted)] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
-            <button id="clear-settings-search" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-[color:var(--token-text-muted)] hover:text-[color:var(--token-text-primary)] hidden" aria-label="Clear search" title="Clear search">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
+            <div class="relative flex-1">
+              <input type="text" id="settings-search" placeholder="Search settings..." class="w-full p-4 pr-12 rounded-lg bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] text-[color:var(--token-text-primary)] focus:outline-none focus:border-[color:var(--token-color-primary)] focus:shadow-[var(--token-shadow-glow-primary)]" />
+              <button id="clear-settings-search" class="absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--token-text-muted)] hover:text-[color:var(--token-text-primary)] hidden" aria-label="Clear search" title="Clear search">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -865,12 +867,32 @@
     // Load settings from API
     async function loadSettings() {
       try {
+        // Update the page header 'Last updated' display (best-effort)
+        function setLastUpdatedLabel(dateLike) {
+          try {
+            const el = document.getElementById('last-updated');
+            if (!el) return;
+            const d = dateLike ? new Date(dateLike) : new Date();
+            if (Number.isNaN(d.getTime())) return;
+            el.textContent = 'Last updated: ' + d.toLocaleString();
+          } catch (_) {}
+        }
+
         // Wait for authFetch to be available
         await waitForAuthFetch();
         const FN_BASE = window.FN_BASE || '/.netlify/functions';
         const res = await window.authFetch(`${FN_BASE}/settings`);
         if (!res.ok) throw new Error('Failed to load settings');
+
+        // Prefer server timestamp if provided
+        const serverLastUpdated = res.headers && res.headers.get ? res.headers.get('X-Settings-Last-Updated') : null;
+        if (serverLastUpdated) setLastUpdatedLabel(serverLastUpdated);
+
         const settings = await res.json();
+
+        // Fallback to client time (only if header missing)
+        if (!serverLastUpdated) setLastUpdatedLabel();
+
                 if (settings.siteTitle) document.getElementById('site-title').value = settings.siteTitle;
                 if (settings.siteDescription) document.getElementById('site-description').value = settings.siteDescription;
                 if (settings.theme) document.getElementById('theme-select').value = settings.theme;
@@ -908,11 +930,6 @@
                   if (settings.maxLoginAttempts) document.getElementById('max-login-attempts').value = settings.maxLoginAttempts;
                   if (settings.enable2FA !== undefined) document.getElementById('enable-2fa').checked = settings.enable2FA;
                   if (settings.auditAllActions !== undefined) document.getElementById('audit-all-actions').checked = settings.auditAllActions;
-                  // Update last-updated indicator
-                  try {
-                    const lu = document.getElementById('last-updated');
-                    if (lu) lu.textContent = 'Last updated: ' + new Date().toLocaleString();
-                  } catch (e) {}
       } catch (e) {
         showToast('Failed to load settings from server', 'error');
       }
