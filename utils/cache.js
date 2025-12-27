@@ -14,6 +14,80 @@ const stats = {
   deletes: 0
 };
 
+// Best-effort persistence of cache stats to Postgres.
+// In serverless environments, in-memory cache is per-function-instance, so persisting counters
+// is the only reliable way for the Cache Monitor page to show meaningful values.
+const _persist = {
+  pending: { hits: 0, misses: 0, sets: 0, deletes: 0 },
+  flushTimer: null,
+  lastErrorAt: 0
+};
+
+function _queuePersist(delta) {
+  try {
+    _persist.pending.hits += delta.hits || 0;
+    _persist.pending.misses += delta.misses || 0;
+    _persist.pending.sets += delta.sets || 0;
+    _persist.pending.deletes += delta.deletes || 0;
+
+    if (_persist.flushTimer) {
+      return;
+    }
+    const delayMs = Math.max(500, parseInt(process.env.CACHE_STATS_FLUSH_MS || '5000', 10) || 5000);
+    _persist.flushTimer = setTimeout(_flushPersistedStats, delayMs);
+    // Allow process to exit without waiting on the timer (Node only)
+    if (_persist.flushTimer && typeof _persist.flushTimer.unref === 'function') {
+      _persist.flushTimer.unref();
+    }
+  } catch (_) {
+    // no-op
+  }
+}
+
+async function _flushPersistedStats() {
+  const delta = _persist.pending;
+  _persist.pending = { hits: 0, misses: 0, sets: 0, deletes: 0 };
+  _persist.flushTimer = null;
+
+  if (!delta.hits && !delta.misses && !delta.sets && !delta.deletes) {
+    return;
+  }
+
+  try {
+    // Lazy import to avoid pulling DB into non-server contexts.
+    const { database } = require('../config/database');
+    try {
+      // Best-effort connect (connect is idempotent)
+      await database.connect();
+    } catch (_) {
+      return;
+    }
+
+    if (!database.pool) {
+      return;
+    }
+
+    await database.pool.query(
+      `INSERT INTO cache_stats (id, hits, misses, sets, deletes, updated_at)
+       VALUES (1, $1, $2, $3, $4, CURRENT_TIMESTAMP)
+       ON CONFLICT (id) DO UPDATE SET
+         hits = cache_stats.hits + EXCLUDED.hits,
+         misses = cache_stats.misses + EXCLUDED.misses,
+         sets = cache_stats.sets + EXCLUDED.sets,
+         deletes = cache_stats.deletes + EXCLUDED.deletes,
+         updated_at = CURRENT_TIMESTAMP`,
+      [delta.hits, delta.misses, delta.sets, delta.deletes]
+    );
+  } catch (e) {
+    // Avoid noisy logs on every request if schema isn't migrated yet.
+    const now = Date.now();
+    if (now - _persist.lastErrorAt > 60_000) {
+      _persist.lastErrorAt = now;
+      console.warn('Cache stats persistence skipped:', e && e.message ? e.message : e);
+    }
+  }
+}
+
 /**
  * Generate cache key from components
  * @param {string} namespace - Cache namespace (e.g., 'products', 'settings')
@@ -37,6 +111,7 @@ function get(namespace, key) {
 
   if (!entry) {
     stats.misses++;
+    _queuePersist({ misses: 1 });
     return null;
   }
 
@@ -44,10 +119,12 @@ function get(namespace, key) {
   if (entry.expiresAt && Date.now() > entry.expiresAt) {
     cache.delete(cacheKey);
     stats.misses++;
+    _queuePersist({ misses: 1, deletes: 1 });
     return null;
   }
 
   stats.hits++;
+  _queuePersist({ hits: 1 });
   return entry.value;
 }
 
@@ -68,6 +145,7 @@ function set(namespace, key, value, ttl = null) {
 
   cache.set(cacheKey, entry);
   stats.sets++;
+  _queuePersist({ sets: 1 });
 }
 
 /**
@@ -81,6 +159,7 @@ function del(namespace, key) {
   const deleted = cache.delete(cacheKey);
   if (deleted) {
     stats.deletes++;
+    _queuePersist({ deletes: 1 });
   }
   return deleted;
 }
@@ -102,6 +181,9 @@ function clearNamespace(namespace) {
   }
 
   stats.deletes += count;
+  if (count) {
+    _queuePersist({ deletes: count });
+  }
   return count;
 }
 
@@ -112,6 +194,9 @@ function clearAll() {
   const size = cache.size;
   cache.clear();
   stats.deletes += size;
+  if (size) {
+    _queuePersist({ deletes: size });
+  }
 }
 
 /**

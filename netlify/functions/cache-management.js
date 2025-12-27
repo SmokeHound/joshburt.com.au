@@ -2,6 +2,7 @@
 const { withHandler, ok, error, parseBody } = require('../../utils/fn');
 const { requirePermission } = require('../../utils/http');
 const cache = require('../../utils/cache');
+const { database } = require('../../config/database');
 
 exports.handler = withHandler(async function (event) {
   const method = event.httpMethod;
@@ -18,12 +19,43 @@ exports.handler = withHandler(async function (event) {
     if (authResponse) return authResponse;
 
     try {
-      // Get cache statistics
-      const stats = cache.getStats();
+      const localStats = cache.getStats();
+
+      // Prefer Postgres-aggregated counters (works across serverless function instances)
+      let aggregated = null;
+      try {
+        await database.connect();
+        if (database.pool) {
+          const res = await database.pool.query(
+            'SELECT hits, misses, sets, deletes, updated_at FROM cache_stats WHERE id = 1'
+          );
+          if (res.rows && res.rows[0]) {
+            const row = res.rows[0];
+            const hits = Number(row.hits) || 0;
+            const misses = Number(row.misses) || 0;
+            const sets = Number(row.sets) || 0;
+            const deletes = Number(row.deletes) || 0;
+            const hitRate = hits + misses > 0 ? ((hits / (hits + misses)) * 100).toFixed(2) + '%' : '0%';
+            aggregated = {
+              hits,
+              misses,
+              sets,
+              deletes,
+              // Size cannot be meaningfully aggregated for in-memory per-instance caches
+              size: null,
+              hitRate,
+              updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null
+            };
+          }
+        }
+      } catch (_) {
+        // ignore - fall back to local stats
+      }
 
       return ok({
-        stats,
-        cacheType: 'in-memory',
+        stats: aggregated || localStats,
+        cacheType: aggregated ? 'aggregated-counters' : 'in-memory',
+        localStats,
         message: 'Cache statistics retrieved successfully'
       });
     } catch (e) {

@@ -212,13 +212,26 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Login attempts table (for rate limiting / security)
 CREATE TABLE IF NOT EXISTS login_attempts (
     id SERIAL PRIMARY KEY,
     ip_address VARCHAR(45) NOT NULL,
     email VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Cache monitoring (aggregate counters across serverless instances)
+CREATE TABLE IF NOT EXISTS cache_stats (
+  id SMALLINT PRIMARY KEY DEFAULT 1,
+  hits BIGINT NOT NULL DEFAULT 0,
+  misses BIGINT NOT NULL DEFAULT 0,
+  sets BIGINT NOT NULL DEFAULT 0,
+  deletes BIGINT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Ensure singleton row exists (idempotent)
+INSERT INTO cache_stats (id) VALUES (1)
+ON CONFLICT (id) DO NOTHING;
 
 -- Email verification attempts table (migrations/005_add_email_verification_tracking.sql)
 CREATE TABLE IF NOT EXISTS email_verification_attempts (

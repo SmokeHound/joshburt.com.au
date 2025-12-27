@@ -35,15 +35,15 @@
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-              >
+                    const notify = window.showNotification || window.showToast || ((message) => console.warn(message));
+
                 <path
                   stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                      notify('You must be signed in to view cache statistics.', 'error');
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
+                        notify('Insufficient permissions to view cache statistics. Admin role required.', 'error');
               </svg>
-            </div>
+                        notify('Failed to load cache statistics (status: ' + response.status + ').', 'error');
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Cache Size</p>
               <p id="cache-size" class="text-2xl font-semibold text-gray-900 dark:text-white">
@@ -66,7 +66,7 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      document.getElementById('cache-type').textContent = data.cacheType || 'In-Memory';
                 />
               </svg>
             </div>
@@ -76,11 +76,12 @@
             </div>
           </div>
         </div>
-
+                      notify('Cache statistics response contained no data.', 'error');
         <div class="bg-[color:var(--token-bg-elevated)] p-6 rounded-lg shadow">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <svg
+                    const notify = window.showNotification || window.showToast || ((message) => console.warn(message));
+                    notify('Error loading cache statistics', 'error');
                 class="h-8 w-8 text-purple-500"
                 fill="none"
                 stroke="currentColor"
@@ -200,16 +201,17 @@
       // Load cache statistics
       async function loadCacheStats() {
         try {
+          const notify = window.showNotification || window.showToast || ((message) => console.warn(message));
           const response = await (window.authFetch ? window.authFetch(`${FN_BASE}/cache-management`) : fetch(`${FN_BASE}/cache-management`));
 
           // If unauthorized or forbidden, show a helpful message instead of silently failing
           if (!response.ok) {
             if (response.status === 401) {
-              window.showNotification('You must be signed in to view cache statistics.', 'error');
+              notify('You must be signed in to view cache statistics.', 'error');
             } else if (response.status === 403) {
-              window.showNotification('Insufficient permissions to view cache statistics. Admin role required.', 'error');
+              notify('Insufficient permissions to view cache statistics. Admin role required.', 'error');
             } else {
-              window.showNotification('Failed to load cache statistics (status: ' + response.status + ').', 'error');
+              notify('Failed to load cache statistics (status: ' + response.status + ').', 'error');
             }
             // Clear values to indicate no data
             document.getElementById('cache-size').textContent = '-';
@@ -224,19 +226,30 @@
           const data = await response.json();
 
           if (data && data.stats) {
-            document.getElementById('cache-size').textContent = data.stats.size || 0;
+            const sizeVal = data.stats.size;
+            const sizeText = (typeof sizeVal === 'number' && Number.isFinite(sizeVal)) ? String(sizeVal) : '-';
+            document.getElementById('cache-size').textContent = sizeText;
             document.getElementById('hit-rate').textContent = data.stats.hitRate || '0%';
-            document.getElementById('total-hits').textContent = data.stats.hits || 0;
-            document.getElementById('total-misses').textContent = data.stats.misses || 0;
-            document.getElementById('total-sets').textContent = data.stats.sets || 0;
-            document.getElementById('total-deletes').textContent = data.stats.deletes || 0;
+            document.getElementById('total-hits').textContent = (data.stats.hits ?? 0);
+            document.getElementById('total-misses').textContent = (data.stats.misses ?? 0);
+            document.getElementById('total-sets').textContent = (data.stats.sets ?? 0);
+            document.getElementById('total-deletes').textContent = (data.stats.deletes ?? 0);
             document.getElementById('cache-type').textContent = data.cacheType || 'In-Memory';
+
+            // Optional: show when stats were last updated (if available)
+            try {
+              if (data.stats.updatedAt) {
+                const el = document.getElementById('last-updated');
+                if (el) el.textContent = 'Last updated: ' + new Date(data.stats.updatedAt).toLocaleString();
+              }
+            } catch (_) {}
           } else {
-            window.showNotification('Cache statistics response contained no data.', 'error');
+            notify('Cache statistics response contained no data.', 'error');
           }
         } catch (error) {
           console.error('Error loading cache stats:', error);
-          window.showNotification('Failed to load cache statistics', 'error');
+          const notify = window.showNotification || window.showToast || ((message) => console.warn(message));
+          notify('Failed to load cache statistics', 'error');
           document.getElementById('cache-size').textContent = '-';
           document.getElementById('hit-rate').textContent = '-';
           document.getElementById('total-hits').textContent = '-';
