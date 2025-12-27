@@ -304,7 +304,7 @@ SMTP_PORT=587```
 
 SMTP_USER=your-email@example.com# FTP Deployment
 
-SMTP_PASSWORD=your-smtp-passwordFTP_SERVER=ftp.yourserver.com
+SMTP_PASS=your-smtp-passwordFTP_SERVER=ftp.yourserver.com
 
 ```FTP_USERNAME=your-username
 
@@ -557,7 +557,7 @@ Auto-deploys on push to `main` branch (same as Netlify).
 
 | `SMTP_USER` | ❌ | - | SMTP username |# Endpoint-specific metrics
 
-| `SMTP_PASSWORD` | ❌ | - | SMTP password |curl https://joshburt.com.au/.netlify/functions/metrics?action=endpoint&endpoint=/users
+| `SMTP_PASS` | ❌ | - | SMTP password |curl https://joshburt.com.au/.netlify/functions/metrics?action=endpoint&endpoint=/users
 
 | `BCRYPT_ROUNDS` | ❌ | `12` | Password hashing rounds |```
 

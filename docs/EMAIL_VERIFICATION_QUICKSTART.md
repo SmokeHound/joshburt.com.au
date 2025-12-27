@@ -46,7 +46,7 @@ Add to `.env`:
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER=your-email@example.com
-SMTP_PASSWORD=your-smtp-password
+SMTP_PASS=your-smtp-password
 SMTP_FROM_EMAIL=noreply@joshburt.com.au
 ```
 
