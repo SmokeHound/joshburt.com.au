@@ -57,27 +57,24 @@ window.Audit = {
         timestamp: new Date().toISOString()
       };
 
-      // Get user info for context
-      let userId = null;
-      try {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        userId = user.id || null;
-      } catch (_) {
-        /* ignore */
+      const url = `${base}/audit-logs`;
+      const payload = { action: 'page.visit', details: pageInfo };
+      if (window.authFetch) {
+        await window.authFetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } else {
+        await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : ''
+          },
+          body: JSON.stringify(payload)
+        });
       }
-
-      await fetch(`${base}/audit-logs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token ? `Bearer ${token}` : ''
-        },
-        body: JSON.stringify({
-          action: 'page.visit',
-          userId,
-          details: pageInfo
-        })
-      });
 
       // Store last visit to prevent duplicates
       sessionStorage.setItem(

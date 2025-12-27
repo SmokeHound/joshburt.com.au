@@ -2,7 +2,7 @@
 // Enhancements: pagination (page,limit), free-text search (q across action/details/user_id), CSV export, delete with cutoff.
 const { database } = require('../../config/database');
 const { withHandler, ok, error, parseBody, getPagination } = require('../../utils/fn');
-const { corsHeaders, requirePermission } = require('../../utils/http');
+const { corsHeaders, requirePermission, requireAuth } = require('../../utils/http');
 
 exports.handler = withHandler(async function (event) {
   try {
@@ -18,15 +18,29 @@ exports.handler = withHandler(async function (event) {
   return handleGet(event);
 
   async function handlePost(event) {
-    // Only admins can create audit logs manually (normally auto-created)
-    const { user, response: authResponse } = await requirePermission(event, 'auditLogs', 'read');
-    if (authResponse) return authResponse;
-
     try {
       const body = parseBody(event);
       const action = body.action || '';
       if (!action) return error(400, 'Missing action');
-      const user_id = body.userId || null;
+
+      // Allow authenticated users to log page visits for themselves.
+      // Keep all other manual audit log creation admin-only.
+      const isPageVisit = String(action).toLowerCase() === 'page.visit';
+      let authedUser = null;
+      if (isPageVisit) {
+        const { user, response: authResponse } = await requireAuth(event);
+        if (authResponse) return authResponse;
+        authedUser = user;
+      } else {
+        // Only admins can create audit logs manually (normally auto-created)
+        const { user, response: authResponse } = await requirePermission(event, 'auditLogs', 'read');
+        if (authResponse) return authResponse;
+        authedUser = user;
+      }
+
+      // Never trust client-supplied userId for page visits; use authenticated user.
+      // For admin-created manual events, allow explicit userId override.
+      const user_id = isPageVisit ? (authedUser && authedUser.id) : (body.userId || null);
       const details = body.details || '';
       const ip_address =
         body.ip_address ||
