@@ -225,7 +225,7 @@ The application uses PostgreSQL exclusively through `config/database.js`. Databa
 DB_TYPE=postgres
 DB_HOST=your-host
 DB_USER=your-user
-DB_PASSWORD=your-password
+DB_PASS=your-password
 DB_NAME=your-database
 DB_PORT=5432
 ```

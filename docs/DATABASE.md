@@ -40,7 +40,7 @@ Complete guide to the PostgreSQL database schema and operations for joshburt.com
 DB_HOST=your-db-host.neon.tech
 DB_PORT=5432
 DB_USER=your-username
-DB_PASSWORD=your-password
+DB_PASS=your-password
 DB_NAME=your-database
 DB_SSL=true
 
@@ -57,7 +57,7 @@ const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT || 5432,
   user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
   max: 20, // Max connections in pool

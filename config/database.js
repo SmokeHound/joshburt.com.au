@@ -26,7 +26,7 @@ const pgConfig = DATABASE_URL
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
     database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
+    password: process.env.DB_PASS,
     port: process.env.DB_PORT || 5432,
     ssl: { rejectUnauthorized: true },
     max: parseInt(process.env.DB_POOL_MAX) || 20,

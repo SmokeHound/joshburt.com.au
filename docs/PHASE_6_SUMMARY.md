@@ -256,7 +256,7 @@ SELECT has_api_permission(key_hash, 'products:read');
 
 No new environment variables required. Uses existing:
 
-- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` - Database connection
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` - Database connection
 
 ### Database Setup
 

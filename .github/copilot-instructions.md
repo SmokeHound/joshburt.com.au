@@ -50,7 +50,7 @@ Create `.env` file in project root:
 DB_HOST=your-db-host.neon.tech
 DB_PORT=5432
 DB_USER=your-username
-DB_PASSWORD=your-password
+DB_PASS=your-password
 DB_NAME=your-database
 
 # Auth (required)

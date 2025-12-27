@@ -252,7 +252,7 @@ npm run build:css     # CSS compilation1. **Connect Repository**
 
    - **Publish directory**: `.` (root)DB_TYPE=postgres
 
-   - **Functions directory**: `netlify/functions`# PostgreSQL credentials required: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+   - **Functions directory**: `netlify/functions`# PostgreSQL credentials required: DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME
 
 ````
 
@@ -274,7 +274,7 @@ DB_PORT=5432GOOGLE_CLIENT_ID=...
 
 DB_USER=your-usernameGOOGLE_CLIENT_SECRET=...
 
-DB_PASSWORD=your-passwordGITHUB_CLIENT_ID=...
+DB_PASS=your-passwordGITHUB_CLIENT_ID=...
 
 DB_NAME=your-databaseGITHUB_CLIENT_SECRET=...
 
@@ -531,7 +531,7 @@ Auto-deploys on push to `main` branch (same as Netlify).
 
 | `DB_USER` | ✅ | - | Database username |  }
 
-| `DB_PASSWORD` | ✅ | - | Database password |}
+| `DB_PASS` | ✅ | - | Database password |}
 
 | `DB_NAME` | ✅ | - | Database name |```
 
@@ -979,7 +979,7 @@ npm install @netlify/functions- `GITHUB_CLIENT_SECRET`: GitHub OAuth client secr
 
 
 
-**Solution**: Verify environment variables in Netlify dashboard (DB_HOST, DB_USER, DB_PASSWORD, etc.)How it works:
+**Solution**: Verify environment variables in Netlify dashboard (DB_HOST, DB_USER, DB_PASS, etc.)How it works:
 
 - The client presents a gallery of predetermined avatar URLs (examples use DiceBear-generated avatars).
 

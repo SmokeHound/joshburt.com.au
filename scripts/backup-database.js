@@ -87,7 +87,7 @@ function generateSQLBackup(tables = [], compression = 'gzip') {
     const args = buildPgDumpArgs(tables);
 
     const pgDump = spawn(resolvePgDumpCommand(), args, {
-      env: { ...process.env, PGPASSWORD: process.env.DB_PASSWORD }
+      env: { ...process.env, PGPASSWORD: process.env.DB_PASS }
     });
 
     pgDump.on('error', err => {

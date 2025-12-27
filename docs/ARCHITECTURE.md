@@ -698,7 +698,7 @@ const pool = new Pool({│  ├─ Searchable audit trail                       
 
   user: process.env.DB_USER,```
 
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASS,
 
   database: process.env.DB_NAME,### Data Security
 
@@ -996,7 +996,7 @@ jobs:
 
 **Required**:
 
-- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME`
 - `JWT_SECRET`
 
 **Optional**:

@@ -184,7 +184,7 @@ All Phase 4 features from the roadmap have been successfully implemented with pr
 DB_TYPE=postgres
 DB_HOST=your-host
 DB_USER=your-user
-DB_PASSWORD=your-password
+DB_PASS=your-password
 DB_NAME=your-database
 DB_PORT=5432
 
