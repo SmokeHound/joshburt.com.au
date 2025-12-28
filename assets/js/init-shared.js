@@ -285,6 +285,46 @@
     }
   };
 
+  // Best-effort: cache safe, user-visible site settings for shared UI (e.g., nav branding).
+  // This uses a restricted keys=siteTitle read which is allowed for any authenticated user.
+  (async function cacheSafeSiteSettings() {
+    try {
+      if (window.AUTH_DISABLED === true) return;
+      const token = (window.getToken && window.getToken()) || null;
+      if (!token) return;
+
+      const FN_BASE = window.FN_BASE || '/.netlify/functions';
+      const res = await window.authFetch(FN_BASE + '/settings?keys=siteTitle');
+      if (!res || !res.ok) return;
+
+      const safe = await res.json().catch(() => null);
+      if (!safe || typeof safe !== 'object') return;
+
+      const next = (function mergeCachedSettings() {
+        try {
+          const prev = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+          return Object.assign({}, prev && typeof prev === 'object' ? prev : {}, safe);
+        } catch (_) {
+          return Object.assign({}, safe);
+        }
+      })();
+
+      try {
+        localStorage.setItem('siteSettings', JSON.stringify(next));
+      } catch (_) {
+        /* ignore storage errors */
+      }
+
+      try {
+        window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: next }));
+      } catch (_) {
+        /* ignore */
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  })();
+
   // Auth-aware nav wiring (profile, login/logout)
   document.addEventListener('DOMContentLoaded', function () {
     try {

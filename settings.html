@@ -1062,6 +1062,30 @@
                 }
                 showToast('Settings saved successfully!', 'success');
                 markSaved();
+
+                // Cache safe, user-visible settings for shared UI (theme + nav branding).
+                // Avoid storing sensitive settings (SMTP password, etc.) in localStorage.
+                try {
+                  const prev = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+                  const safe = {
+                    siteTitle: settings.siteTitle || prev.siteTitle || '',
+                    siteDescription: settings.siteDescription || prev.siteDescription || '',
+                    theme: settings.theme || prev.theme || '',
+                    primaryColor: settings.primaryColor || prev.primaryColor || '',
+                    secondaryColor: settings.secondaryColor || prev.secondaryColor || '',
+                    accentColor: settings.accentColor || prev.accentColor || '',
+                    buttonPrimaryColor: settings.buttonPrimaryColor || prev.buttonPrimaryColor || '',
+                    buttonSecondaryColor: settings.buttonSecondaryColor || prev.buttonSecondaryColor || '',
+                    buttonDangerColor: settings.buttonDangerColor || prev.buttonDangerColor || '',
+                    buttonSuccessColor: settings.buttonSuccessColor || prev.buttonSuccessColor || '',
+                    logoUrl: settings.logoUrl || prev.logoUrl || '',
+                    faviconUrl: settings.faviconUrl || prev.faviconUrl || '',
+                    featureFlags: settings.featureFlags || prev.featureFlags || {}
+                  };
+                  localStorage.setItem('siteSettings', JSON.stringify(Object.assign({}, prev, safe)));
+                } catch (e) {
+                  /* ignore */
+                }
                 
                 // Visual success feedback
                 if (saveBtn) {

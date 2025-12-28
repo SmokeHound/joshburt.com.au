@@ -1,7 +1,7 @@
 // Netlify Function: Site Settings CRUD /.netlify/functions/settings
 const { database } = require('../../config/database');
 const { withHandler, ok, error } = require('../../utils/fn');
-const { requirePermission } = require('../../utils/http');
+const { requireAuth, requirePermission } = require('../../utils/http');
 const cache = require('../../utils/cache');
 
 exports.handler = withHandler(async function (event) {
@@ -12,14 +12,27 @@ exports.handler = withHandler(async function (event) {
   return error(405, 'Method Not Allowed');
 
   async function handleGet(event) {
-    // Only admins can view settings
-    const { user, response: authResponse } = await requirePermission(event, 'settings', 'read');
-    if (authResponse) return authResponse;
-
     // Parse query parameters for filtering
     const params = event.queryStringParameters || {};
     const category = params.category;
     const keys = params.keys ? params.keys.split(',') : null;
+
+    // Allow authenticated users to read a safe subset of settings by key.
+    // This keeps sensitive settings (SMTP creds, security, etc) admin-only.
+    const SAFE_USER_READ_KEYS = ['siteTitle'];
+    const isSafeKeysRequest =
+      Array.isArray(keys) &&
+      keys.length > 0 &&
+      keys.every(k => SAFE_USER_READ_KEYS.includes(String(k).trim()));
+
+    if (isSafeKeysRequest) {
+      const { response: authResponse } = await requireAuth(event);
+      if (authResponse) return authResponse;
+    } else {
+      // Only admins can view settings (full or broad queries)
+      const { response: permResponse } = await requirePermission(event, 'settings', 'read');
+      if (permResponse) return permResponse;
+    }
 
     // Generate cache key based on filters
     const cacheKey = `config:${category || 'all'}:${keys ? keys.join(',') : 'all'}`;

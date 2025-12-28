@@ -3,7 +3,7 @@
     <!-- (Desktop collapse feature removed) -->
     
     <!-- App Branding -->
-    <h1 class="text-2xl font-bold mb-6 text-[color:var(--token-color-primary)]">Josh's App</h1>
+    <h1 id="nav-site-title" class="text-2xl font-bold mb-6 text-[color:var(--token-color-primary)]">Josh's App</h1>
 
     <!-- User Profile Section (for pages that support it) -->
     <div id="user-profile" class="mb-6 hidden" role="region" aria-label="User profile">
@@ -54,6 +54,51 @@
     } catch (_) {
         /* noop */
     }
+
+    function readSiteTitleFromCache() {
+        try {
+            const raw = localStorage.getItem('siteSettings');
+            if (!raw) return null;
+            const s = JSON.parse(raw);
+            return (s && (s.siteTitle || s['site-title'])) ? String(s.siteTitle || s['site-title']).trim() : null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function applyNavBrandingTitle(explicitTitle) {
+        const el = document.getElementById('nav-site-title');
+        if (!el) return;
+
+        const fallback = (el.getAttribute('data-default-title') || el.textContent || "Josh's App").trim();
+        if (!el.getAttribute('data-default-title')) {
+            el.setAttribute('data-default-title', fallback);
+        }
+
+        const t = (explicitTitle || readSiteTitleFromCache() || '').trim();
+        el.textContent = t || fallback;
+    }
+
+    // Apply immediately from cached settings (if present)
+    applyNavBrandingTitle();
+
+    // React to settings saves (settings.html dispatches this)
+    window.addEventListener('siteSettingsUpdated', function(evt) {
+        try {
+            const d = evt && evt.detail;
+            const title = d && (d.siteTitle || d['site-title']);
+            applyNavBrandingTitle(title ? String(title) : null);
+        } catch (_) {
+            applyNavBrandingTitle();
+        }
+    });
+
+    // Cross-tab updates
+    window.addEventListener('storage', function(e) {
+        if (e && e.key === 'siteSettings') {
+            applyNavBrandingTitle();
+        }
+    });
 
     // Function to set active navigation link based on current page
     function setActiveNavLink() {
