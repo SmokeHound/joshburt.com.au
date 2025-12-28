@@ -1,5 +1,77 @@
 // assets/js/init-shared.js
 (function initShared() {
+  // Apply siteTitle to document.title without losing per-page context.
+  const DEFAULT_BRAND_TOKENS = ['joshburt.com.au', 'Josh Burt', 'Josh\'s App'];
+  const baseTitle = (typeof document !== 'undefined' && document.title) ? String(document.title) : '';
+
+  function stripKnownBrandSuffix(title) {
+    try {
+      const t = String(title || '').trim();
+      if (!t) {
+        return '';
+      }
+      const m = t.match(/^(.*?)(\s*(?:—|-)\s*)([^—-]+)\s*$/);
+      if (m && m[3] && DEFAULT_BRAND_TOKENS.some(b => String(m[3]).trim().toLowerCase() === b.toLowerCase())) {
+        return String(m[1]).trim();
+      }
+      return t;
+    } catch (_) {
+      return String(title || '');
+    }
+  }
+
+  function readSiteTitleFromCache() {
+    try {
+      const raw = localStorage.getItem('siteSettings');
+      if (!raw) {
+        return '';
+      }
+      const s = JSON.parse(raw);
+      const v = (s && (s.siteTitle || s['site-title'])) ? String(s.siteTitle || s['site-title']).trim() : '';
+      return v;
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function applyDocumentTitle(siteTitle) {
+    try {
+      if (typeof document === 'undefined') {
+        return;
+      }
+      const t = String(siteTitle || '').trim();
+      if (!t) {
+        return;
+      }
+
+      const core = stripKnownBrandSuffix(baseTitle);
+      document.title = core ? `${core} — ${t}` : t;
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  // Apply immediately from cached settings (if present)
+  applyDocumentTitle(readSiteTitleFromCache());
+
+  // React to settings changes (save in settings.html and init-shared cache)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('siteSettingsUpdated', function (evt) {
+      try {
+        const d = evt && evt.detail;
+        applyDocumentTitle(d && (d.siteTitle || d['site-title']));
+      } catch (_) {
+        applyDocumentTitle(readSiteTitleFromCache());
+      }
+    });
+
+    window.addEventListener('storage', function (e) {
+      if (e && e.key === 'siteSettings') {
+        applyDocumentTitle(readSiteTitleFromCache());
+      }
+    });
+  }
+
   // Resolve project-relative assets consistently even when the current URL is a nested path
   // (e.g., Netlify error pages shown at /some/missing/path).
   function toRootPath(p) {
@@ -289,16 +361,24 @@
   // This uses a restricted keys=siteTitle read which is allowed for any authenticated user.
   (async function cacheSafeSiteSettings() {
     try {
-      if (window.AUTH_DISABLED === true) return;
+      if (window.AUTH_DISABLED === true) {
+        return;
+      }
       const token = (window.getToken && window.getToken()) || null;
-      if (!token) return;
+      if (!token) {
+        return;
+      }
 
       const FN_BASE = window.FN_BASE || '/.netlify/functions';
       const res = await window.authFetch(FN_BASE + '/settings?keys=siteTitle');
-      if (!res || !res.ok) return;
+      if (!res || !res.ok) {
+        return;
+      }
 
       const safe = await res.json().catch(() => null);
-      if (!safe || typeof safe !== 'object') return;
+      if (!safe || typeof safe !== 'object') {
+        return;
+      }
 
       const next = (function mergeCachedSettings() {
         try {
