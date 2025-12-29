@@ -557,6 +557,90 @@
               <div id="custom-theme-builder" class="settings-section">
                 <!-- Content dynamically populated by theme-ui.js -->
               </div>
+
+              <!-- Theme Palette & Button Colors -->
+              <div class="settings-section ui-card ui-card-secondary p-6 rounded-xl border border-purple-500/20 shadow-xl">
+                <div class="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 class="text-lg font-bold text-white mb-2">Palette & Buttons</h3>
+                    <p class="text-xs text-gray-400">Edit core palette and button colors</p>
+                  </div>
+                </div>
+
+                <div class="grid gap-6 md:grid-cols-2">
+                  <div>
+                    <label for="primary-color" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
+                      <span>Primary Color</span>
+                    </label>
+                    <div class="flex items-center gap-3 rounded-lg ui-field-shell p-3">
+                      <input id="primary-color" type="color" class="h-10 w-10 bg-transparent border-0 p-0" />
+                      <input id="primary-color-text" type="text" class="flex-1 text-sm bg-transparent focus:outline-none" maxlength="20" placeholder="#3b82f6" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="secondary-color" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
+                      <span>Secondary Color</span>
+                    </label>
+                    <div class="flex items-center gap-3 rounded-lg ui-field-shell p-3">
+                      <input id="secondary-color" type="color" class="h-10 w-10 bg-transparent border-0 p-0" />
+                      <input id="secondary-color-text" type="text" class="flex-1 text-sm bg-transparent focus:outline-none" maxlength="20" placeholder="#10b981" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="accent-color" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
+                      <span>Accent Color</span>
+                    </label>
+                    <div class="flex items-center gap-3 rounded-lg ui-field-shell p-3">
+                      <input id="accent-color" type="color" class="h-10 w-10 bg-transparent border-0 p-0" />
+                      <input id="accent-color-text" type="text" class="flex-1 text-sm bg-transparent focus:outline-none" maxlength="20" placeholder="#8b5cf6" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="button-primary-color" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
+                      <span>Button Primary</span>
+                    </label>
+                    <div class="flex items-center gap-3 rounded-lg ui-field-shell p-3">
+                      <input id="button-primary-color" type="color" class="h-10 w-10 bg-transparent border-0 p-0" />
+                      <input id="button-primary-color-text" type="text" class="flex-1 text-sm bg-transparent focus:outline-none" maxlength="20" placeholder="#3b82f6" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="button-secondary-color" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
+                      <span>Button Secondary</span>
+                    </label>
+                    <div class="flex items-center gap-3 rounded-lg ui-field-shell p-3">
+                      <input id="button-secondary-color" type="color" class="h-10 w-10 bg-transparent border-0 p-0" />
+                      <input id="button-secondary-color-text" type="text" class="flex-1 text-sm bg-transparent focus:outline-none" maxlength="20" placeholder="#10b981" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="button-danger-color" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
+                      <span>Button Danger</span>
+                    </label>
+                    <div class="flex items-center gap-3 rounded-lg ui-field-shell p-3">
+                      <input id="button-danger-color" type="color" class="h-10 w-10 bg-transparent border-0 p-0" />
+                      <input id="button-danger-color-text" type="text" class="flex-1 text-sm bg-transparent focus:outline-none" maxlength="20" placeholder="#ef4444" />
+                    </div>
+                  </div>
+
+                  <div class="md:col-span-2">
+                    <label for="button-success-color" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
+                      <span>Button Success</span>
+                    </label>
+                    <div class="flex items-center gap-3 rounded-lg ui-field-shell p-3">
+                      <input id="button-success-color" type="color" class="h-10 w-10 bg-transparent border-0 p-0" />
+                      <input id="button-success-color-text" type="text" class="flex-1 text-sm bg-transparent focus:outline-none" maxlength="20" placeholder="#10b981" />
+                    </div>
+                  </div>
+                </div>
+
+                <p class="text-[10px] text-gray-500 mt-4">Tip: you can paste hex values into the text fields.</p>
+              </div>
             </div>
           </div>
 
@@ -605,6 +689,15 @@
                   <p class="text-[10px] text-gray-500 mt-2">Number of failed attempts before account lockout</p>
                 </div>
               </div>
+
+              <!-- Enable 2FA (global toggle) -->
+              <label class="flex items-center gap-3 p-4 rounded-xl bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-color-danger-alpha-30)] hover:border-[color:var(--token-color-danger-alpha-60)] transition-all duration-200 cursor-pointer group">
+                <div class="flex-1">
+                  <span class="text-xs font-bold text-gray-200 group-hover:text-red-300 transition-colors">Allow two-factor authentication (2FA)</span>
+                  <p class="text-[10px] text-gray-500 mt-0.5">When disabled, users cannot set up 2FA</p>
+                </div>
+                <input id="enable-2fa" type="checkbox" class="w-5 h-5 rounded border-2 border-red-500 text-red-500 focus:ring-2 focus:ring-red-500/30 ml-auto" />
+              </label>
 
               <!-- Two Factor Authentication Inline Group -->
               <div class="rounded-xl bg-gradient-to-br from-gray-800/70 to-gray-900/50 border border-[color:var(--token-color-danger-alpha-30)] p-0 overflow-hidden focus-within:border-[color:var(--token-color-danger)] focus-within:shadow-[var(--token-shadow-glow-danger)] transition-all">
@@ -804,7 +897,7 @@
 
     // Get form settings (all panels)
     function getFormSettings() {
-      return {
+      const settings = {
         siteTitle: document.getElementById('site-title')?.value || '',
         siteDescription: document.getElementById('site-description')?.value || '',
         theme: document.getElementById('theme-select')?.value || 'dark',
@@ -846,6 +939,25 @@
         enable2FA: document.getElementById('enable-2fa')?.checked || false,
         auditAllActions: document.getElementById('audit-all-actions')?.checked || false
       };
+
+      // Theme palette/button colors (optional but DB-backed). Only include when present and non-empty.
+      const primaryColor = document.getElementById('primary-color')?.value;
+      const secondaryColor = document.getElementById('secondary-color')?.value;
+      const accentColor = document.getElementById('accent-color')?.value;
+      const buttonPrimaryColor = document.getElementById('button-primary-color')?.value;
+      const buttonSecondaryColor = document.getElementById('button-secondary-color')?.value;
+      const buttonDangerColor = document.getElementById('button-danger-color')?.value;
+      const buttonSuccessColor = document.getElementById('button-success-color')?.value;
+
+      if (primaryColor) settings.primaryColor = primaryColor;
+      if (secondaryColor) settings.secondaryColor = secondaryColor;
+      if (accentColor) settings.accentColor = accentColor;
+      if (buttonPrimaryColor) settings.buttonPrimaryColor = buttonPrimaryColor;
+      if (buttonSecondaryColor) settings.buttonSecondaryColor = buttonSecondaryColor;
+      if (buttonDangerColor) settings.buttonDangerColor = buttonDangerColor;
+      if (buttonSuccessColor) settings.buttonSuccessColor = buttonSuccessColor;
+
+      return settings;
     }
 
     // Small helper to pulse preview boxes
@@ -903,6 +1015,35 @@
                 if (settings.theme) document.getElementById('theme-select').value = settings.theme;
                 if (settings.contactEmail) document.getElementById('contact-email').value = settings.contactEmail;
                 if (settings.maintenanceMode !== undefined) document.getElementById('maintenance-mode').checked = settings.maintenanceMode;
+                // Theme palette/button colors
+                if (document.getElementById('primary-color') && settings.primaryColor) {
+                  document.getElementById('primary-color').value = settings.primaryColor;
+                  if (document.getElementById('primary-color-text')) document.getElementById('primary-color-text').value = settings.primaryColor;
+                }
+                if (document.getElementById('secondary-color') && settings.secondaryColor) {
+                  document.getElementById('secondary-color').value = settings.secondaryColor;
+                  if (document.getElementById('secondary-color-text')) document.getElementById('secondary-color-text').value = settings.secondaryColor;
+                }
+                if (document.getElementById('accent-color') && settings.accentColor) {
+                  document.getElementById('accent-color').value = settings.accentColor;
+                  if (document.getElementById('accent-color-text')) document.getElementById('accent-color-text').value = settings.accentColor;
+                }
+                if (document.getElementById('button-primary-color') && settings.buttonPrimaryColor) {
+                  document.getElementById('button-primary-color').value = settings.buttonPrimaryColor;
+                  if (document.getElementById('button-primary-color-text')) document.getElementById('button-primary-color-text').value = settings.buttonPrimaryColor;
+                }
+                if (document.getElementById('button-secondary-color') && settings.buttonSecondaryColor) {
+                  document.getElementById('button-secondary-color').value = settings.buttonSecondaryColor;
+                  if (document.getElementById('button-secondary-color-text')) document.getElementById('button-secondary-color-text').value = settings.buttonSecondaryColor;
+                }
+                if (document.getElementById('button-danger-color') && settings.buttonDangerColor) {
+                  document.getElementById('button-danger-color').value = settings.buttonDangerColor;
+                  if (document.getElementById('button-danger-color-text')) document.getElementById('button-danger-color-text').value = settings.buttonDangerColor;
+                }
+                if (document.getElementById('button-success-color') && settings.buttonSuccessColor) {
+                  document.getElementById('button-success-color').value = settings.buttonSuccessColor;
+                  if (document.getElementById('button-success-color-text')) document.getElementById('button-success-color-text').value = settings.buttonSuccessColor;
+                }
     // Data sources
     if (settings.oilDataSource) document.getElementById('oil-data-source').value = settings.oilDataSource;
                 if (settings.consumablesDataSource) document.getElementById('consumables-data-source').value = settings.consumablesDataSource;
@@ -935,6 +1076,10 @@
                   if (settings.maxLoginAttempts) document.getElementById('max-login-attempts').value = settings.maxLoginAttempts;
                   if (settings.enable2FA !== undefined) document.getElementById('enable-2fa').checked = settings.enable2FA;
                   if (settings.auditAllActions !== undefined) document.getElementById('audit-all-actions').checked = settings.auditAllActions;
+                  try {
+                    const t = document.getElementById('enable-2fa');
+                    if (t) t.dispatchEvent(new Event('change'));
+                  } catch (_) {}
       } catch (e) {
         showToast('Failed to load settings from server', 'error');
       }
@@ -1179,6 +1324,7 @@
       });
 
       // 2FA Management
+      const enable2FASetting = document.getElementById('enable-2fa');
       const toggle2FABtn = document.getElementById('toggle-2fa');
       const modal2FA = document.getElementById('2fa-modal');
       const closeModalBtn = document.getElementById('close-2fa-modal');
@@ -1216,9 +1362,33 @@
         }
       }
 
-      check2FAStatus();
+      function applyGlobal2FAUi() {
+        try {
+          if (!enable2FASetting || !toggle2FABtn) return;
+          const enabled = enable2FASetting.checked === true;
+          toggle2FABtn.disabled = !enabled;
+          if (!enabled) {
+            toggle2FABtn.classList.add('opacity-60', 'cursor-not-allowed');
+            document.getElementById('2fa-status-text').textContent = 'Status: Disabled by admin';
+            document.getElementById('2fa-status-text').className = 'text-xs font-medium text-gray-300';
+            toggle2FABtn.textContent = '2FA Disabled';
+          } else {
+            toggle2FABtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            toggle2FABtn.textContent = 'Setup 2FA';
+            check2FAStatus();
+          }
+        } catch (_) {}
+      }
+
+      applyGlobal2FAUi();
+      if (enable2FASetting) {
+        enable2FASetting.addEventListener('change', applyGlobal2FAUi);
+      }
 
       toggle2FABtn.addEventListener('click', async () => {
+        if (toggle2FABtn.disabled) {
+          return;
+        }
         const isEnabled = toggle2FABtn.textContent === 'Disable 2FA';
         modal2FA.classList.remove('hidden');
         errorDiv.classList.add('hidden');
@@ -1427,6 +1597,13 @@
               siteTitle: '',
               siteDescription: '',
               theme: 'dark',
+              primaryColor: '#3b82f6',
+              secondaryColor: '#10b981',
+              accentColor: '#8b5cf6',
+              buttonPrimaryColor: '#3b82f6',
+              buttonSecondaryColor: '#10b981',
+              buttonDangerColor: '#ef4444',
+              buttonSuccessColor: '#10b981',
               contactEmail: '',
               maintenanceMode: false,
               // Data sources
@@ -1564,7 +1741,54 @@
       }
       
       initSecuritySettings();
-      loadSettings();
+      await loadSettings();
+
+      // Sync color pickers <-> hex text inputs
+      function normalizeHex(v) {
+        const s = String(v || '').trim();
+        if (!/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(s)) return '';
+        if (s.length === 4) {
+          return (
+            '#' +
+            s
+              .slice(1)
+              .split('')
+              .map(ch => ch + ch)
+              .join('')
+          ).toLowerCase();
+        }
+        return s.toLowerCase();
+      }
+      function attachColorPair(colorId, textId) {
+        const colorEl = document.getElementById(colorId);
+        const textEl = document.getElementById(textId);
+        if (!colorEl || !textEl) return;
+        function syncFromColor() {
+          try {
+            textEl.value = String(colorEl.value || '').toLowerCase();
+          } catch (_) {}
+        }
+        function syncFromText() {
+          const n = normalizeHex(textEl.value);
+          if (n) {
+            try {
+              colorEl.value = n;
+              textEl.value = n;
+            } catch (_) {}
+          }
+        }
+        colorEl.addEventListener('input', syncFromColor);
+        colorEl.addEventListener('change', syncFromColor);
+        textEl.addEventListener('input', syncFromText);
+        syncFromColor();
+      }
+      attachColorPair('primary-color', 'primary-color-text');
+      attachColorPair('secondary-color', 'secondary-color-text');
+      attachColorPair('accent-color', 'accent-color-text');
+      attachColorPair('button-primary-color', 'button-primary-color-text');
+      attachColorPair('button-secondary-color', 'button-secondary-color-text');
+      attachColorPair('button-danger-color', 'button-danger-color-text');
+      attachColorPair('button-success-color', 'button-success-color-text');
       
       // Track changes to form inputs
       const settingsForm = document.getElementById('settings-form');
@@ -1628,13 +1852,23 @@
           const detail = (evt && evt.detail) || (window.Theme ? window.Theme.getActiveTheme().colors : null);
           if (detail) {
             const c = detail.colors || detail;
-            if (c.primary) document.documentElement.style.setProperty('--preview-primary', c.primary);
-            if (c.secondary) document.documentElement.style.setProperty('--preview-secondary', c.secondary);
-            if (c.accent) document.documentElement.style.setProperty('--preview-accent', c.accent);
-            if (c.buttonPrimary) document.documentElement.style.setProperty('--btn-primary-bg', c.buttonPrimary);
-            if (c.buttonSecondary) document.documentElement.style.setProperty('--btn-secondary-bg', c.buttonSecondary);
-            if (c.buttonDanger) document.documentElement.style.setProperty('--btn-danger-bg', c.buttonDanger);
-            if (c.buttonSuccess) document.documentElement.style.setProperty('--btn-success-bg', c.buttonSuccess);
+            const palette = {
+              primary: c.primary || detail.primary || detail.primaryColor,
+              secondary: c.secondary || detail.secondary || detail.secondaryColor,
+              accent: c.accent || detail.accent || detail.accentColor,
+              buttonPrimary: c.buttonPrimary || detail.buttonPrimary || detail.buttonPrimaryColor,
+              buttonSecondary: c.buttonSecondary || detail.buttonSecondary || detail.buttonSecondaryColor,
+              buttonDanger: c.buttonDanger || detail.buttonDanger || detail.buttonDangerColor,
+              buttonSuccess: c.buttonSuccess || detail.buttonSuccess || detail.buttonSuccessColor
+            };
+
+            if (palette.primary) document.documentElement.style.setProperty('--preview-primary', palette.primary);
+            if (palette.secondary) document.documentElement.style.setProperty('--preview-secondary', palette.secondary);
+            if (palette.accent) document.documentElement.style.setProperty('--preview-accent', palette.accent);
+            if (palette.buttonPrimary) document.documentElement.style.setProperty('--btn-primary-bg', palette.buttonPrimary);
+            if (palette.buttonSecondary) document.documentElement.style.setProperty('--btn-secondary-bg', palette.buttonSecondary);
+            if (palette.buttonDanger) document.documentElement.style.setProperty('--btn-danger-bg', palette.buttonDanger);
+            if (palette.buttonSuccess) document.documentElement.style.setProperty('--btn-success-bg', palette.buttonSuccess);
             
             // Update preview box backgrounds
             const previewBtnPrimary = document.querySelector('.preview-box-btn-primary');
@@ -1642,10 +1876,10 @@
             const previewBtnDanger = document.querySelector('.preview-box-btn-danger');
             const previewBtnSuccess = document.querySelector('.preview-box-btn-success');
             
-            if (previewBtnPrimary && c.buttonPrimary) previewBtnPrimary.style.backgroundColor = c.buttonPrimary;
-            if (previewBtnSecondary && c.buttonSecondary) previewBtnSecondary.style.backgroundColor = c.buttonSecondary;
-            if (previewBtnDanger && c.buttonDanger) previewBtnDanger.style.backgroundColor = c.buttonDanger;
-            if (previewBtnSuccess && c.buttonSuccess) previewBtnSuccess.style.backgroundColor = c.buttonSuccess;
+            if (previewBtnPrimary && palette.buttonPrimary) previewBtnPrimary.style.backgroundColor = palette.buttonPrimary;
+            if (previewBtnSecondary && palette.buttonSecondary) previewBtnSecondary.style.backgroundColor = palette.buttonSecondary;
+            if (previewBtnDanger && palette.buttonDanger) previewBtnDanger.style.backgroundColor = palette.buttonDanger;
+            if (previewBtnSuccess && palette.buttonSuccess) previewBtnSuccess.style.backgroundColor = palette.buttonSuccess;
           }
         } catch (e) {}
       });
