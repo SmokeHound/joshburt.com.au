@@ -823,7 +823,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span class="font-bold text-white text-sm sm:text-base">${escapeHtml(formatAction(log.action))}</span>
                   <span class="flex-shrink-0 text-xs font-medium text-gray-400 bg-gray-800/50 px-2 py-1 rounded">${timeAgo}</span>
                 </div>
-                ${log.details ? `<p class="text-sm text-gray-400 mt-2 leading-relaxed">${escapeHtml(log.details)}</p>` : ''}
+                ${log.details ? `
+                  <details class="mt-2">
+                    <summary class="text-xs text-gray-500 cursor-pointer select-none hover:text-gray-300 transition-colors">Details</summary>
+                    <p class="text-sm text-gray-400 mt-2 leading-relaxed">${escapeHtml(log.details)}</p>
+                  </details>
+                ` : ''}
                 <div class="text-xs text-gray-500 mt-2">${date.toLocaleString()}</div>
               </div>
             </div>
