@@ -397,6 +397,16 @@ exports.handler = withHandler(async event => {
         }
       });
 
+      // Track sign-in history (best effort)
+      try {
+        await database.run('INSERT INTO login_attempts (ip_address, email) VALUES (?, ?)', [
+          ip || 'unknown',
+          user.email
+        ]);
+      } catch (e) {
+        console.warn('Login attempt tracking failed:', e.message);
+      }
+
       return jsonResponse(200, {
         message: 'Login successful',
         user: {
@@ -470,6 +480,26 @@ exports.handler = withHandler(async event => {
       });
 
       return jsonResponse(200, { message: 'Logged out successfully' });
+    }
+
+    // LOGOUT ALL DEVICES (revoke all refresh tokens)
+    if (action === 'logout-all') {
+      const user = await authenticate(event);
+      if (!user) return errorResponse(401, 'Authentication required');
+
+      const result = await database.run('DELETE FROM refresh_tokens WHERE user_id = ?', [user.id]);
+
+      // Log logout-all
+      await logAudit(event, {
+        action: 'auth.logout_all',
+        userId: user.id,
+        details: { revoked: result && (result.changes || result.rowCount || null) }
+      });
+
+      return jsonResponse(200, {
+        message: 'All sessions revoked',
+        revoked: result && (result.changes || result.rowCount || 0)
+      });
     }
 
     // FORGOT PASSWORD (always 200)
@@ -546,8 +576,90 @@ exports.handler = withHandler(async event => {
           emailVerified: user.email_verified,
           totpEnabled: user.totp_enabled || false,
           createdAt: user.created_at,
+          updatedAt: user.updated_at,
           lastLogin: user.last_login,
           avatarUrl: user.avatar_url
+        }
+      });
+    }
+
+    // PROFILE METRICS (sessions, sign-ins, order stats)
+    if (action === 'profile-metrics') {
+      const requester = await authenticate(event);
+      if (!requester) return errorResponse(401, 'Authentication required');
+
+      const qsUserId = event.queryStringParameters && event.queryStringParameters.userId;
+      const targetUserId = qsUserId ? parseInt(qsUserId, 10) : requester.id;
+      if (!targetUserId || Number.isNaN(targetUserId)) {
+        return errorResponse(400, 'Invalid userId');
+      }
+
+      // Only self or admin can fetch profile metrics
+      if (targetUserId !== requester.id && requester.role !== 'admin') {
+        return errorResponse(403, 'Insufficient permissions');
+      }
+
+      const target = await database.get('SELECT id, email, created_at, updated_at FROM users WHERE id = ?', [
+        targetUserId
+      ]);
+      if (!target) {
+        return errorResponse(404, 'User not found');
+      }
+
+      const nowIso = new Date().toISOString();
+      const tokenCountRow = await database.get(
+        'SELECT COUNT(*) as count FROM refresh_tokens WHERE user_id = ? AND expires_at > ?',
+        [targetUserId, nowIso]
+      );
+      const refreshTokenCount =
+        (tokenCountRow &&
+          (tokenCountRow.count || tokenCountRow['COUNT(*)'] || tokenCountRow['count(*)'])) ||
+        0;
+
+      const recentSignIns = await database.all(
+        'SELECT ip_address, created_at FROM login_attempts WHERE email = ? ORDER BY created_at DESC LIMIT 5',
+        [target.email]
+      );
+
+      const ordersCreatedRow = await database.get(
+        "SELECT COUNT(*) as count FROM order_status_history WHERE changed_by = ? AND old_status IS NULL AND new_status = 'pending'",
+        [targetUserId]
+      );
+      const ordersCreatedCount =
+        (ordersCreatedRow &&
+          (ordersCreatedRow.count || ordersCreatedRow['COUNT(*)'] || ordersCreatedRow['count(*)'])) ||
+        0;
+
+      const ordersApprovedRow = await database.get(
+        "SELECT COUNT(*) as count FROM order_status_history WHERE changed_by = ? AND new_status = 'approved'",
+        [targetUserId]
+      );
+      const ordersApprovedCount =
+        (ordersApprovedRow &&
+          (ordersApprovedRow.count || ordersApprovedRow['COUNT(*)'] || ordersApprovedRow['count(*)'])) ||
+        0;
+
+      const inventoryRow = await database.get(
+        "SELECT COUNT(*) as count FROM audit_logs WHERE user_id = ? AND (action LIKE 'inventory:%' OR action LIKE 'inventory.%' OR action LIKE 'inventory%')",
+        [targetUserId]
+      );
+      const inventoryActionsCount =
+        (inventoryRow &&
+          (inventoryRow.count || inventoryRow['COUNT(*)'] || inventoryRow['count(*)'])) ||
+        0;
+
+      return jsonResponse(200, {
+        user: {
+          id: target.id,
+          createdAt: target.created_at,
+          updatedAt: target.updated_at
+        },
+        metrics: {
+          refreshTokenCount,
+          recentSignIns,
+          ordersCreatedCount,
+          ordersApprovedCount,
+          inventoryActionsCount
         }
       });
     }

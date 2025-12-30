@@ -91,6 +91,106 @@
         </div>
       </div>
 
+      <!-- Account & Security -->
+      <section class="card ui-card ui-card-primary rounded-lg shadow-md p-6 mb-6">
+        <h3 class="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Account &amp; Security</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="ui-card ui-card-flat rounded-lg p-4">
+            <div class="text-sm font-semibold text-gray-300 mb-2">User ID</div>
+            <div class="flex items-center justify-between gap-3">
+              <div id="profile-user-id" class="text-sm text-gray-200">--</div>
+              <button type="button" id="copy-user-id" class="ui-btn ui-btn-outline ui-btn-sm">Copy</button>
+            </div>
+          </div>
+
+          <div class="ui-card ui-card-flat rounded-lg p-4">
+            <div class="text-sm font-semibold text-gray-300 mb-2">Email Verification</div>
+            <div class="flex items-center justify-between gap-3">
+              <div id="profile-email-verification" class="text-sm text-gray-200">--</div>
+              <a
+                id="profile-resend-verification-link"
+                href="/resend-verification.html"
+                class="ui-link ui-link-primary text-sm hidden"
+                >Resend</a
+              >
+            </div>
+          </div>
+
+          <div class="ui-card ui-card-flat rounded-lg p-4">
+            <div class="text-sm font-semibold text-gray-300 mb-2">Two-Factor Authentication (2FA)</div>
+            <div class="flex items-center justify-between gap-3">
+              <div id="profile-2fa-status" class="text-sm text-gray-200">--</div>
+              <button type="button" id="profile-2fa-toggle" class="ui-btn ui-btn-secondary ui-btn-sm">Manage</button>
+            </div>
+            <div id="twofa-setup" class="mt-4 hidden">
+              <div class="text-sm text-gray-300 mb-3">
+                Scan the QR code with an authenticator app, then enter the 6-digit code to enable 2FA.
+              </div>
+              <div class="flex flex-col md:flex-row gap-4 items-start">
+                <img
+                  id="twofa-qr"
+                  alt="2FA QR code"
+                  class="w-40 h-40 rounded border border-gray-700 bg-gray-900"
+                />
+                <div class="flex-1">
+                  <div class="text-xs text-gray-400 mb-1">Secret</div>
+                  <div id="twofa-secret" class="text-sm text-gray-200 font-mono break-all">--</div>
+                  <label class="flex flex-col gap-2 mt-4">
+                    <span class="text-sm font-semibold text-gray-300">Authenticator Code</span>
+                    <input
+                      type="text"
+                      id="twofa-code"
+                      inputmode="numeric"
+                      autocomplete="one-time-code"
+                      class="w-full p-3 rounded border border-gray-600 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      placeholder="123456"
+                    />
+                  </label>
+                  <div class="flex gap-3 mt-4">
+                    <button type="button" id="twofa-confirm" class="ui-btn ui-btn-primary ui-btn-sm">Enable 2FA</button>
+                    <button type="button" id="twofa-cancel" class="ui-btn ui-btn-outline ui-btn-sm">Cancel</button>
+                  </div>
+                  <div id="twofa-backup-codes" class="mt-4 hidden">
+                    <div class="text-sm font-semibold text-gray-200 mb-2">Backup Codes</div>
+                    <pre class="text-xs bg-gray-900 border border-gray-700 rounded p-3 overflow-x-auto"></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ui-card ui-card-flat rounded-lg p-4">
+            <div class="text-sm font-semibold text-gray-300 mb-2">Active Sessions</div>
+            <div class="flex items-center justify-between gap-3">
+              <div id="profile-sessions" class="text-sm text-gray-200">--</div>
+              <button type="button" id="profile-signout-all" class="ui-btn ui-btn-danger ui-btn-sm">Sign out all</button>
+            </div>
+          </div>
+
+          <div class="ui-card ui-card-flat rounded-lg p-4">
+            <div class="text-sm font-semibold text-gray-300 mb-2">Created</div>
+            <div id="profile-created-at" class="text-sm text-gray-200">--</div>
+          </div>
+
+          <div class="ui-card ui-card-flat rounded-lg p-4">
+            <div class="text-sm font-semibold text-gray-300 mb-2">Updated</div>
+            <div id="profile-updated-at" class="text-sm text-gray-200">--</div>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <h4 class="text-lg font-semibold text-gray-200 mb-2">Recent Sign-ins</h4>
+          <div id="profile-signin-history" class="text-sm text-gray-300">Loading...</div>
+        </div>
+
+        <div class="mt-6">
+          <h4 class="text-lg font-semibold text-gray-200 mb-2">Role &amp; Permissions</h4>
+          <div id="profile-role-description" class="text-sm text-gray-300 mb-3">--</div>
+          <div id="profile-permissions-summary" class="text-sm text-gray-300">--</div>
+        </div>
+      </section>
+
       <!-- Profile Edit Form -->
       <form
         id="profile-form"
@@ -234,6 +334,22 @@
         <div class="ui-card rounded-lg shadow-md p-4 text-center">
           <div class="text-3xl font-bold text-purple-500" id="stats-activities">0</div>
           <div class="text-sm text-gray-400">Activities</div>
+        </div>
+      </div>
+
+      <!-- Additional Statistics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="ui-card rounded-lg shadow-md p-4 text-center">
+          <div class="text-3xl font-bold text-blue-500" id="stats-orders-created">0</div>
+          <div class="text-sm text-gray-400">Orders Created</div>
+        </div>
+        <div class="ui-card rounded-lg shadow-md p-4 text-center">
+          <div class="text-3xl font-bold text-green-500" id="stats-orders-approved">0</div>
+          <div class="text-sm text-gray-400">Orders Approved</div>
+        </div>
+        <div class="ui-card rounded-lg shadow-md p-4 text-center">
+          <div class="text-3xl font-bold text-purple-500" id="stats-inventory-actions">0</div>
+          <div class="text-sm text-gray-400">Inventory Actions</div>
         </div>
       </div>
 

@@ -131,6 +131,393 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  function formatDateTime(value) {
+    if (!value) {
+      return null;
+    }
+    try {
+      const date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return null;
+      }
+      return date.toLocaleString();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Account & Security - basic fields
+  const userIdEl = document.getElementById('profile-user-id');
+  if (userIdEl) {
+    userIdEl.textContent = String(user.id ?? '--');
+  }
+
+  const copyUserIdBtn = document.getElementById('copy-user-id');
+  if (copyUserIdBtn) {
+    copyUserIdBtn.onclick = async () => {
+      const value = String(user.id ?? '');
+      if (!value) {
+        return;
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(value);
+          if (window.showNotification) {
+            window.showNotification('User ID copied', 'success');
+          }
+        } else {
+          window.prompt('Copy User ID:', value);
+        }
+      } catch (err) {
+        console.warn('Copy user id failed:', err);
+        window.prompt('Copy User ID:', value);
+      }
+    };
+  }
+
+  const emailVerified =
+    user.emailVerified === true ||
+    user.emailVerified === 1 ||
+    user.email_verified === true ||
+    user.email_verified === 1;
+  const emailVerificationEl = document.getElementById('profile-email-verification');
+  if (emailVerificationEl) {
+    emailVerificationEl.textContent = emailVerified ? 'Verified' : 'Pending';
+  }
+  const resendVerificationLink = document.getElementById('profile-resend-verification-link');
+  if (resendVerificationLink) {
+    if (!emailVerified && isSelf) {
+      resendVerificationLink.classList.remove('hidden');
+    } else {
+      resendVerificationLink.classList.add('hidden');
+    }
+  }
+
+  const createdAtDetail = document.getElementById('profile-created-at');
+  if (createdAtDetail) {
+    const createdAtStr = formatDateTime(createdAt);
+    createdAtDetail.textContent = createdAtStr || '--';
+  }
+  const updatedAtDetail = document.getElementById('profile-updated-at');
+  if (updatedAtDetail) {
+    const updatedAt = user.updatedAt || user.updated_at;
+    const updatedAtStr = formatDateTime(updatedAt);
+    updatedAtDetail.textContent = updatedAtStr || '--';
+  }
+
+  // Role description / permissions summary
+  function getRoleSummary(roleValue) {
+    const roleName = String(roleValue || 'user').toLowerCase();
+    if (roleName === 'admin') {
+      return {
+        description: 'Admin: full access to all areas and actions.',
+        permissionsHtml:
+          '<ul class="list-disc list-inside space-y-1">' +
+          '<li>Read, create, update, delete: users, products, orders, settings, audit logs</li>' +
+          '<li>Approve/reject orders</li>' +
+          '</ul>'
+      };
+    }
+    if (roleName === 'manager') {
+      return {
+        description: 'Manager: broad access for day-to-day operations.',
+        permissionsHtml:
+          '<ul class="list-disc list-inside space-y-1">' +
+          '<li>Read: all</li>' +
+          '<li>Create: products, users, orders</li>' +
+          '<li>Update: products, orders</li>' +
+          '<li>Approve/reject orders</li>' +
+          '</ul>'
+      };
+    }
+    if (roleName === 'mechanic') {
+      return {
+        description: 'Mechanic: core ordering access.',
+        permissionsHtml:
+          '<ul class="list-disc list-inside space-y-1">' +
+          '<li>Read: products, orders</li>' +
+          '<li>Create: orders</li>' +
+          '</ul>'
+      };
+    }
+    return {
+      description: 'User: basic access.',
+      permissionsHtml:
+        '<ul class="list-disc list-inside space-y-1">' +
+        '<li>Read: products and your own profile</li>' +
+        '</ul>'
+    };
+  }
+
+  const roleDescEl = document.getElementById('profile-role-description');
+  const rolePermsEl = document.getElementById('profile-permissions-summary');
+  const summary = getRoleSummary(user.role);
+  if (roleDescEl) {
+    roleDescEl.textContent = summary.description;
+  }
+  if (rolePermsEl) {
+    rolePermsEl.innerHTML = summary.permissionsHtml;
+  }
+
+  // 2FA management
+  const twoFaStatusEl = document.getElementById('profile-2fa-status');
+  const twoFaToggleBtn = document.getElementById('profile-2fa-toggle');
+  const twoFaSetupEl = document.getElementById('twofa-setup');
+  const twoFaQrEl = document.getElementById('twofa-qr');
+  const twoFaSecretEl = document.getElementById('twofa-secret');
+  const twoFaCodeEl = document.getElementById('twofa-code');
+  const twoFaConfirmBtn = document.getElementById('twofa-confirm');
+  const twoFaCancelBtn = document.getElementById('twofa-cancel');
+  const twoFaBackupCodesEl = document.getElementById('twofa-backup-codes');
+
+  function setTwoFaUi(enabled) {
+    if (twoFaStatusEl) {
+      twoFaStatusEl.textContent = enabled ? 'Enabled' : 'Disabled';
+    }
+    if (twoFaToggleBtn) {
+      twoFaToggleBtn.textContent = enabled ? 'Disable' : 'Enable';
+      twoFaToggleBtn.disabled = !isSelf;
+      twoFaToggleBtn.className =
+        enabled
+          ? 'ui-btn ui-btn-danger ui-btn-sm'
+          : 'ui-btn ui-btn-secondary ui-btn-sm';
+    }
+    if (twoFaSetupEl) {
+      twoFaSetupEl.classList.add('hidden');
+    }
+    if (twoFaBackupCodesEl) {
+      twoFaBackupCodesEl.classList.add('hidden');
+    }
+    if (twoFaCodeEl) {
+      twoFaCodeEl.value = '';
+    }
+  }
+
+  let twoFaEnabled = !!(user.totpEnabled || user.totp_enabled);
+  setTwoFaUi(twoFaEnabled);
+
+  async function authPost(url, body) {
+    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+    const res = await (window.authFetch
+      ? window.authFetch(url, { method: 'POST', headers, body: JSON.stringify(body || {}) })
+      : fetch(url, { method: 'POST', headers, body: JSON.stringify(body || {}) }));
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      const msg = (data && (data.error || data.message)) || 'Request failed';
+      throw new Error(msg);
+    }
+    return data;
+  }
+
+  if (twoFaToggleBtn) {
+    twoFaToggleBtn.onclick = async () => {
+      if (!isSelf) {
+        if (window.showNotification) {
+          window.showNotification('2FA can only be managed by the user', 'error');
+        } else {
+          alert('2FA can only be managed by the user');
+        }
+        return;
+      }
+
+      if (twoFaEnabled) {
+        const password = window.prompt('Enter your password to disable 2FA:');
+        if (!password) {
+          return;
+        }
+        try {
+          await authPost(`${FN_BASE}/auth?action=2fa-disable`, { password });
+          twoFaEnabled = false;
+          setTwoFaUi(false);
+          if (window.showNotification) {
+            window.showNotification('2FA disabled', 'success');
+          }
+        } catch (err) {
+          if (window.showNotification) {
+            window.showNotification(err.message || 'Failed to disable 2FA', 'error');
+          } else {
+            alert(err.message || 'Failed to disable 2FA');
+          }
+        }
+        return;
+      }
+
+      // Enable flow
+      try {
+        const data = await authPost(`${FN_BASE}/auth?action=2fa-setup`, {});
+        if (twoFaQrEl) {
+          twoFaQrEl.src = data.qrCode || '';
+        }
+        if (twoFaSecretEl) {
+          twoFaSecretEl.textContent = data.secret || '--';
+        }
+        if (twoFaSetupEl) {
+          twoFaSetupEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        if (window.showNotification) {
+          window.showNotification(err.message || 'Failed to start 2FA setup', 'error');
+        } else {
+          alert(err.message || 'Failed to start 2FA setup');
+        }
+      }
+    };
+  }
+
+  if (twoFaCancelBtn) {
+    twoFaCancelBtn.onclick = () => {
+      if (twoFaSetupEl) {
+        twoFaSetupEl.classList.add('hidden');
+      }
+      if (twoFaBackupCodesEl) {
+        twoFaBackupCodesEl.classList.add('hidden');
+      }
+      if (twoFaCodeEl) {
+        twoFaCodeEl.value = '';
+      }
+    };
+  }
+
+  if (twoFaConfirmBtn) {
+    twoFaConfirmBtn.onclick = async () => {
+      const totpToken = (twoFaCodeEl && twoFaCodeEl.value ? twoFaCodeEl.value : '').trim();
+      if (!totpToken) {
+        if (window.showNotification) {
+          window.showNotification('Enter your authenticator code', 'error');
+        } else {
+          alert('Enter your authenticator code');
+        }
+        return;
+      }
+      try {
+        const data = await authPost(`${FN_BASE}/auth?action=2fa-enable`, { totpToken });
+        twoFaEnabled = true;
+        setTwoFaUi(true);
+
+        // Show backup codes once
+        if (data && Array.isArray(data.backupCodes) && twoFaBackupCodesEl) {
+          const pre = twoFaBackupCodesEl.querySelector('pre');
+          if (pre) {
+            pre.textContent = data.backupCodes.join('\n');
+          }
+          twoFaBackupCodesEl.classList.remove('hidden');
+        }
+
+        if (window.showNotification) {
+          window.showNotification('2FA enabled', 'success');
+        }
+      } catch (err) {
+        if (window.showNotification) {
+          window.showNotification(err.message || 'Failed to enable 2FA', 'error');
+        } else {
+          alert(err.message || 'Failed to enable 2FA');
+        }
+      }
+    };
+  }
+
+  // Load profile metrics (sessions, sign-ins, order counts)
+  const sessionsEl = document.getElementById('profile-sessions');
+  const signoutAllBtn = document.getElementById('profile-signout-all');
+  const signInHistoryEl = document.getElementById('profile-signin-history');
+
+  async function loadProfileMetrics() {
+    try {
+      const res = await (window.authFetch
+        ? window.authFetch(`${FN_BASE}/auth?action=profile-metrics&userId=${encodeURIComponent(user.id)}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        : fetch(`${FN_BASE}/auth?action=profile-metrics&userId=${encodeURIComponent(user.id)}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }));
+      if (!res.ok) {
+        throw new Error('Failed to load profile metrics');
+      }
+      const data = await res.json();
+      const metrics = data && data.metrics ? data.metrics : null;
+      if (!metrics) {
+        return;
+      }
+
+      if (sessionsEl) {
+        sessionsEl.textContent = `${metrics.refreshTokenCount || 0}`;
+      }
+      if (signoutAllBtn) {
+        signoutAllBtn.disabled = !isSelf;
+      }
+
+      const ordersCreatedEl = document.getElementById('stats-orders-created');
+      if (ordersCreatedEl) {
+        ordersCreatedEl.textContent = metrics.ordersCreatedCount || 0;
+      }
+      const ordersApprovedEl = document.getElementById('stats-orders-approved');
+      if (ordersApprovedEl) {
+        ordersApprovedEl.textContent = metrics.ordersApprovedCount || 0;
+      }
+      const inventoryActionsEl = document.getElementById('stats-inventory-actions');
+      if (inventoryActionsEl) {
+        inventoryActionsEl.textContent = metrics.inventoryActionsCount || 0;
+      }
+
+      if (signInHistoryEl) {
+        if (Array.isArray(metrics.recentSignIns) && metrics.recentSignIns.length > 0) {
+          signInHistoryEl.innerHTML =
+            '<ul class="space-y-1">' +
+            metrics.recentSignIns
+              .map(s => {
+                const ip = s.ip_address || s.ip || 'unknown';
+                const dt = formatDateTime(s.created_at || s.createdAt) || '--';
+                return `<li><span class="font-mono text-gray-200">${escapeHtml(String(ip))}</span> <span class="text-gray-400">(${escapeHtml(String(dt))})</span></li>`;
+              })
+              .join('') +
+            '</ul>';
+        } else {
+          signInHistoryEl.textContent = 'No sign-ins recorded yet.';
+        }
+      }
+    } catch (err) {
+      console.warn('Profile metrics load failed:', err);
+      if (sessionsEl) {
+        sessionsEl.textContent = '--';
+      }
+      if (signInHistoryEl) {
+        signInHistoryEl.textContent = 'Sign-in history unavailable.';
+      }
+    }
+  }
+
+  await loadProfileMetrics();
+
+  if (signoutAllBtn) {
+    signoutAllBtn.onclick = async () => {
+      if (!isSelf) {
+        return;
+      }
+      const okConfirm = window.confirm('Sign out all devices? You will be signed out here too.');
+      if (!okConfirm) {
+        return;
+      }
+      try {
+        await authPost(`${FN_BASE}/auth?action=logout-all`, {});
+      } catch (err) {
+        if (window.showNotification) {
+          window.showNotification(err.message || 'Failed to sign out all devices', 'error');
+        } else {
+          alert(err.message || 'Failed to sign out all devices');
+        }
+        return;
+      }
+
+      try {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      } catch (_) {
+        // ignore
+      }
+      window.location.href = 'login.html';
+    };
+  }
+
   // Populate form
   document.getElementById('profile-name').value = user.name || '';
   document.getElementById('profile-email').value = user.email || '';
