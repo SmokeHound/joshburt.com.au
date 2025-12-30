@@ -113,7 +113,7 @@ Functions are optimized for fast cold starts:
 - Minimal dependencies per function
 - Shared utilities via `config/database.js`
 - Connection pooling for database (PostgreSQL)
-- SQLite fallback for read-only operations
+- PostgreSQL connection pooling for read-heavy operations
 
 **Measured cold start times**:
 

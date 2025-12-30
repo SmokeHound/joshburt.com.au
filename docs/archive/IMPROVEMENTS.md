@@ -152,7 +152,7 @@ npm run lint && npm run build:css && npm run test:all
   - New page-header tests (10 tests)
   - Existing unit tests (home, nav, theme)
   - Integration tests (navigation flow)
-- ✅ Function Handler Tests: PASS (SQLite fallback)
+- ✅ Function Handler Tests: PASS
 - ⚠️ Network Smoke Tests: Skipped (requires `netlify dev` running)
 
 ## 🚀 Impact

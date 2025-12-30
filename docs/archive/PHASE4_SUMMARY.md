@@ -387,7 +387,7 @@ setInterval(loadNotifications, 60000);
 ### Dependencies
 
 - Node.js 18+
-- PostgreSQL 12+ or SQLite 3+
+- PostgreSQL 12+
 - Netlify Functions runtime
 - SMTP server for email
 

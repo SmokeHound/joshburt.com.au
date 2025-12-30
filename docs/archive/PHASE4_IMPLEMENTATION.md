@@ -401,7 +401,6 @@ If issues arise after deployment:
 **Search not working**
 
 - Ensure PostgreSQL full-text search index created
-- For SQLite, search uses LIKE (slower but functional)
 
 ## Documentation
 

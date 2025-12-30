@@ -32,7 +32,6 @@ jobs:
 
       - name: Run Jest
         env:
-          DB_TYPE: sqlite
           JWT_SECRET: test-secret
           BCRYPT_ROUNDS: 6
         run: npm run test:coverage
@@ -61,7 +60,6 @@ jobs:
 
       - name: Start Netlify dev (background)
         env:
-          DB_TYPE: sqlite
           JWT_SECRET: test-secret
           BCRYPT_ROUNDS: 6
         run: |
@@ -72,7 +70,6 @@ jobs:
       - name: Run function smoke tests
         env:
           BASE_URL: http://localhost:8888
-          DB_TYPE: sqlite
           JWT_SECRET: test-secret
           BCRYPT_ROUNDS: 6
         run: npm run test:functions

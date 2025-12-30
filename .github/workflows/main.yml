@@ -47,7 +47,6 @@ jobs:
       id: migrate-prod
       if: success() && steps.deploy.outcome == 'success'
       env:
-        DB_TYPE: ${{ secrets.DB_TYPE || 'sqlite' }}
         DB_HOST: ${{ secrets.DB_HOST }}
         DB_PORT: ${{ secrets.DB_PORT }}
         DB_USER: ${{ secrets.DB_USER }}

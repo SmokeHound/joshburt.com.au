@@ -21,7 +21,7 @@ This document maps the recommendations from Issue #XXX to the actual implementat
 | -------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
 | Return only required fields in API responses       | ✅ Complete | Field selection already implemented in all API endpoints (see `netlify/functions/*.js`). |
 | Enable Gzip/Brotli compression                     | ✅ Complete | Automatic compression provided by Netlify CDN.                                           |
-| Use 'keep-alive' strategies for critical functions | ✅ Complete | Connection pooling implemented for PostgreSQL. SQLite fallback for resilience.           |
+| Use 'keep-alive' strategies for critical functions | ✅ Complete | Connection pooling implemented for PostgreSQL.                                          |
 | Bundle functions efficiently                       | ✅ Complete | Lightweight function bundles with shared database utilities. Cold start: 200-800ms.      |
 | Add indexes to frequently queried fields           | ✅ Complete | 20+ database indexes added in `database-schema.sql`.                                     |
 | Refactor/optimize SQL queries                      | ✅ Complete | All queries use prepared statements, pagination, and field selection.                    |
@@ -59,7 +59,7 @@ This document maps the recommendations from Issue #XXX to the actual implementat
 
 | Feature                         | Status      | Notes                                                                          |
 | ------------------------------- | ----------- | ------------------------------------------------------------------------------ |
-| Transition SQLite to PostgreSQL | ✅ Complete | Primary database is PostgreSQL (Neon). SQLite used as fallback for resilience. |
+| Transition to PostgreSQL | ✅ Complete | Primary database is PostgreSQL (Neon).                                      |
 | Add Data Integrity Constraints  | ✅ Complete | Foreign keys, unique constraints, and check constraints implemented in schema. |
 
 ### Testing Updates
@@ -67,7 +67,7 @@ This document maps the recommendations from Issue #XXX to the actual implementat
 | Feature                                     | Status      | Notes                                                                             |
 | ------------------------------------------- | ----------- | --------------------------------------------------------------------------------- |
 | Automated Unit & E2E Testing (Jest/Cypress) | ✅ Complete | Jest testing suite with 42 passing tests. Unit and integration tests implemented. |
-| Mock Database for Local Testing             | ✅ Complete | SQLite fallback serves as local testing database.                                 |
+| Mock Database for Local Testing             | ✅ Complete | Tests use mocks/stubs; production database is PostgreSQL.                         |
 | Load Testing for APIs                       | 📋 Future   | Documented in OPTIMIZATIONS.md as future enhancement.                             |
 
 ### Maintenance Recommendations
