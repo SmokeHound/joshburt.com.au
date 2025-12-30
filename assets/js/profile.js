@@ -110,6 +110,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     memberSince.textContent = 'Member since: Unknown';
   }
 
+  // Set last login date
+  const lastLoginBadge = document.getElementById('profile-last-login');
+  if (lastLoginBadge) {
+    const lastLogin = user.lastLogin || user.last_login; // Support both camelCase and snake_case
+    if (lastLogin) {
+      try {
+        const date = new Date(lastLogin);
+        if (!isNaN(date.getTime())) {
+          lastLoginBadge.textContent = `Last login: ${date.toLocaleString()}`;
+        } else {
+          lastLoginBadge.textContent = 'Last login: Unknown';
+        }
+      } catch (err) {
+        console.error('Error parsing last login date:', err);
+        lastLoginBadge.textContent = 'Last login: Unknown';
+      }
+    } else {
+      lastLoginBadge.textContent = 'Last login: --';
+    }
+  }
+
   // Populate form
   document.getElementById('profile-name').value = user.name || '';
   document.getElementById('profile-email').value = user.email || '';
