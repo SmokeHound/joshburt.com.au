@@ -146,6 +146,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  function formatDateDMY(value) {
+    if (!value) {
+      return null;
+    }
+    try {
+      const date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return null;
+      }
+      const dd = String(date.getDate()).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const yyyy = String(date.getFullYear());
+      return `${dd}/${mm}/${yyyy}`;
+    } catch (_) {
+      return null;
+    }
+  }
+
   // Account & Security - basic fields
   const userIdEl = document.getElementById('profile-user-id');
   if (userIdEl) {
@@ -195,13 +213,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const createdAtDetail = document.getElementById('profile-created-at');
   if (createdAtDetail) {
-    const createdAtStr = formatDateTime(createdAt);
+    const createdAtStr = formatDateDMY(createdAt);
     createdAtDetail.textContent = createdAtStr || '--';
   }
   const updatedAtDetail = document.getElementById('profile-updated-at');
   if (updatedAtDetail) {
     const updatedAt = user.updatedAt || user.updated_at;
-    const updatedAtStr = formatDateTime(updatedAt);
+    const updatedAtStr = formatDateDMY(updatedAt);
     updatedAtDetail.textContent = updatedAtStr || '--';
   }
 
