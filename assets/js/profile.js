@@ -176,9 +176,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const dd = String(date.getDate()).padStart(2, '0');
       const mm = String(date.getMonth() + 1).padStart(2, '0');
       const yyyy = String(date.getFullYear());
-      const hh = String(date.getHours()).padStart(2, '0');
+      const hours24 = date.getHours();
+      const ampm = hours24 >= 12 ? 'PM' : 'AM';
+      const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
       const min = String(date.getMinutes()).padStart(2, '0');
-      return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+      return `${dd}/${mm}/${yyyy} ${hours12}:${min} ${ampm}`;
     } catch (_) {
       return null;
     }
