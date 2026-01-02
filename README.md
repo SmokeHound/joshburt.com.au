@@ -97,6 +97,9 @@ npm run dev:functions
 
 ### Environment Variables
 
+SMTP can be configured via a provider (simplest) or by running your own mail server.
+For the self-hosted route, see [docs/SMTP_SELF_HOSTED.md](docs/SMTP_SELF_HOSTED.md).
+
 ```env
 # Database (required)
 DB_HOST=your-db-host.neon.tech
@@ -179,6 +182,22 @@ npm run lint:html     # HTML only
 # Health check
 npm run health        # Verify database connectivity
 ```
+
+---
+
+## 🏷️ Versioning & Releases
+
+This repo supports automatic version bumps and GitHub releases via `semantic-release`.
+
+- Trigger: push/merge to `main`
+- Logic: version is derived from commit messages (Conventional Commits)
+- Output: creates a Git tag `vX.Y.Z`, updates `package.json` + `package-lock.json`, and appends to `CHANGELOG.md`
+
+Commit examples:
+
+- `fix: correct order status email text` → patch bump
+- `feat: add email queue templates` → minor bump
+- `feat!: change auth token format` (or `BREAKING CHANGE:` in body) → major bump
 
 ---
 
