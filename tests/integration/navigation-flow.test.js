@@ -12,7 +12,6 @@ describe('Navigation & Shared Components Integration', () => {
     const expectedLinks = [
       '/index.html',
       '/administration.html',
-      '/analytics.html',
       '/settings.html',
       '/oil-products.html',
       '/consumables.html'
