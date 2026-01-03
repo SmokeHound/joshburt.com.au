@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.1.0...v1.2.0) (2026-01-03)
+
+### Features
+
+* add system info page with health and public configuration details ([7a74fa4](https://github.com/SmokeHound/joshburt.com.au/commit/7a74fa40d4bcf80bf78f03d86332574cc73fa00f))
+
 ## [1.1.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.0.0...v1.1.0) (2026-01-03)
 
 ### Features
