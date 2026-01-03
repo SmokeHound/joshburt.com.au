@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/SmokeHound/joshburt.com.au/compare/v1.3.0...v1.3.1) (2026-01-03)
+
+### Bug Fixes
+
+* remove outdated link to analytics.html from navigation tests ([343096c](https://github.com/SmokeHound/joshburt.com.au/commit/343096c282c88d79643fc00cf4a3a63e2ba9cfdc))
+
 ## [1.3.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.2.0...v1.3.0) (2026-01-03)
 
 ### Features
