@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Info - joshburt.com.au</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/system-info.js" defer></script>
+</head>
+<body>
+  <div id="main-nav"></div>
+
+  <main id="main-content" class="min-h-screen p-4 md:p-6 space-y-6" role="main">
+    <section class="ui-card ui-card-flat">
+      <h1 class="text-3xl font-bold text-[color:var(--token-text-primary)]">System Info</h1>
+      <p class="mt-2 text-[color:var(--token-text-muted)]">Runtime health and public configuration.</p>
+      <p id="sysinfo-last-updated" class="mt-2 text-sm text-[color:var(--token-text-muted)]" aria-live="polite"></p>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="ui-card ui-card-primary p-6">
+        <div class="flex items-center justify-between gap-4">
+          <h2 class="text-xl font-semibold text-[color:var(--token-text-primary)]">Service Health</h2>
+          <span id="sysinfo-health-status" class="text-sm text-[color:var(--token-text-muted)]">Loading…</span>
+        </div>
+        <div id="sysinfo-health" class="mt-4 space-y-3" aria-label="Service health details"></div>
+        <details class="mt-4">
+          <summary class="ui-link ui-link-muted cursor-pointer">Raw JSON</summary>
+          <pre id="sysinfo-health-raw" class="mt-3 p-3 rounded bg-[color:var(--token-bg-subtle)] overflow-x-auto text-xs"></pre>
+        </details>
+      </div>
+
+      <div class="ui-card ui-card-secondary p-6">
+        <div class="flex items-center justify-between gap-4">
+          <h2 class="text-xl font-semibold text-[color:var(--token-text-primary)]">Public Config</h2>
+          <span id="sysinfo-config-status" class="text-sm text-[color:var(--token-text-muted)]">Loading…</span>
+        </div>
+        <div id="sysinfo-config" class="mt-4 space-y-3" aria-label="Public configuration details"></div>
+        <details class="mt-4">
+          <summary class="ui-link ui-link-muted cursor-pointer">Raw JSON</summary>
+          <pre id="sysinfo-config-raw" class="mt-3 p-3 rounded bg-[color:var(--token-bg-subtle)] overflow-x-auto text-xs"></pre>
+        </details>
+      </div>
+    </section>
+
+    <section class="ui-card ui-card-accent p-6">
+      <h2 class="text-xl font-semibold text-[color:var(--token-text-primary)]">Client</h2>
+      <div id="sysinfo-client" class="mt-4 space-y-3" aria-label="Client details"></div>
+    </section>
+  </main>
+</body>
+</html>
