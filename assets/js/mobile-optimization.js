@@ -358,7 +358,7 @@
       enhanceMobileInputs();
 
       // Initialize pull-to-refresh on data pages
-      const dataPages = ['index.html', 'users.html', 'orders-review.html', 'analytics.html'];
+      const dataPages = ['index.html', 'users.html', 'orders-review.html'];
       const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
       if (dataPages.includes(currentPage)) {
