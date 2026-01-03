@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.0.0...v1.1.0) (2026-01-03)
+
+### Features
+
+* remove analytics page from mobile optimization and navigation ([6f29e69](https://github.com/SmokeHound/joshburt.com.au/commit/6f29e69ebbe53ee616fbc59dfba7e292c8792350))
+
 ## 1.0.0 (2026-01-03)
 
 ### ⚠ BREAKING CHANGES
