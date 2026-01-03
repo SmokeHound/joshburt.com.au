@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.2.0...v1.3.0) (2026-01-03)
+
+### Features
+
+* add link to System Info page in navigation and update index.html ([e163822](https://github.com/SmokeHound/joshburt.com.au/commit/e16382214ca637078cde2f7c4fea3786ba6dbc45))
+
 ## [1.2.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.1.0...v1.2.0) (2026-01-03)
 
 ### Features
