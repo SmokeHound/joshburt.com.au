@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
 
       - name: Install
@@ -33,12 +33,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           npx -y
-          -p semantic-release@21.1.2
-          -p @semantic-release/commit-analyzer@9.0.2
-          -p @semantic-release/release-notes-generator@10.0.3
-          -p conventional-changelog-conventionalcommits@8.0.0
-          -p @semantic-release/changelog@6.0.3
-          -p @semantic-release/exec@6.0.3
-          -p @semantic-release/git@10.0.1
-          -p @semantic-release/github@9.2.6
+          -p semantic-release@latest
+          -p @semantic-release/commit-analyzer@latest
+          -p @semantic-release/release-notes-generator@latest
+          -p conventional-changelog-conventionalcommits@latest
+          -p @semantic-release/changelog@latest
+          -p @semantic-release/exec@latest
+          -p @semantic-release/git@latest
+          -p @semantic-release/github@latest
           semantic-release

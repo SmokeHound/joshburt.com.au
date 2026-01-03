@@ -193,6 +193,8 @@ This repo supports automatic version bumps and GitHub releases via `semantic-rel
 - Logic: version is derived from commit messages (Conventional Commits)
 - Output: creates a Git tag `vX.Y.Z`, updates `package.json` + `package-lock.json`, and appends to `CHANGELOG.md`
 
+Note: the application code (Netlify Functions) is CommonJS today (uses `require`). We keep the repo as CommonJS to avoid breaking the runtime, and run `semantic-release` in GitHub Actions with Node 20+ (ESM-compatible).
+
 Commit examples:
 
 - `fix: correct order status email text` → patch bump
