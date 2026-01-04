@@ -146,24 +146,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function formatDateDMY(value) {
-    if (!value) {
-      return null;
-    }
-    try {
-      const date = new Date(value);
-      if (isNaN(date.getTime())) {
-        return null;
-      }
-      const dd = String(date.getDate()).padStart(2, '0');
-      const mm = String(date.getMonth() + 1).padStart(2, '0');
-      const yyyy = String(date.getFullYear());
-      return `${dd}/${mm}/${yyyy}`;
-    } catch (_) {
-      return null;
-    }
-  }
-
   function formatDateTimeDMY(value) {
     if (!value) {
       return null;
@@ -1268,7 +1250,10 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-start justify-between gap-2 mb-1">
-                  <span class="font-bold text-white text-sm sm:text-base">${escapeHtml(formatAction(log.action))}</span>
+                  <div class="min-w-0 flex items-baseline gap-2">
+                    <span class="font-bold text-white text-sm sm:text-base">${escapeHtml(formatAction(log.action))}</span>
+                    <span class="text-xs text-gray-500">${escapeHtml(date.toLocaleString())}</span>
+                  </div>
                   <span class="flex-shrink-0 text-xs font-medium text-gray-400 bg-gray-800/50 px-2 py-1 rounded">${timeAgo}</span>
                 </div>
                 ${log.details ? `
@@ -1277,7 +1262,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <p class="text-sm text-gray-400 mt-2 leading-relaxed">${escapeHtml(log.details)}</p>
                   </details>
                 ` : ''}
-                <div class="text-xs text-gray-500 mt-2">${date.toLocaleString()}</div>
               </div>
             </div>
           `;
