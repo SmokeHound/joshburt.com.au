@@ -24,13 +24,13 @@
         <div class="ui-card p-6">
           <h2 class="text-xl font-bold mb-4">📥 Import Data</h2>
           <p class="text-gray-400 mb-4">Import products, users, or other data from CSV or JSON files</p>
-          <button id="import-btn" class="btn-primary w-full">Start Import</button>
+          <button id="import-btn" class="ui-btn ui-btn-primary w-full">Start Import</button>
         </div>
 
         <div class="ui-card p-6">
           <h2 class="text-xl font-bold mb-4">📤 Export Data</h2>
           <p class="text-gray-400 mb-4">Export data to CSV or JSON format for backup or analysis</p>
-          <button id="export-btn" class="btn-primary w-full">Start Export</button>
+          <button id="export-btn" class="ui-btn ui-btn-primary w-full">Start Export</button>
         </div>
       </section>
 
@@ -38,7 +38,7 @@
       <section class="ui-card p-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-semibold">Operations History</h2>
-          <button id="refresh-btn" class="btn-secondary px-4 py-2">🔄 Refresh</button>
+          <button id="refresh-btn" class="ui-btn ui-btn-secondary px-4 py-2">🔄 Refresh</button>
         </div>
 
         <div class="overflow-x-auto">
@@ -115,8 +115,8 @@
           <div>
             <label class="block text-sm font-semibold mb-2">Upload File or Paste Data</label>
             <div class="flex gap-4 mb-2">
-              <button type="button" id="upload-file-btn" class="btn-secondary flex-1">📁 Upload File</button>
-              <button type="button" id="paste-data-btn" class="btn-secondary flex-1">📋 Paste Data</button>
+              <button type="button" id="upload-file-btn" class="ui-btn ui-btn-secondary flex-1">📁 Upload File</button>
+              <button type="button" id="paste-data-btn" class="ui-btn ui-btn-secondary flex-1">📋 Paste Data</button>
             </div>
             <input type="file" id="file-input" accept=".csv,.json" class="hidden">
             <textarea id="import-data" class="w-full h-64 p-3 bg-gray-800 text-gray-100 rounded-lg border border-gray-700 font-mono text-sm" placeholder="Paste your CSV or JSON data here..." required></textarea>
@@ -130,8 +130,8 @@ Product 2,PROD002,oil,50</pre>
           </div>
 
           <div class="flex gap-4 mt-6">
-            <button type="button" id="validate-btn" class="btn-primary flex-1">Validate Data</button>
-            <button type="button" id="cancel-import-btn" class="btn-secondary flex-1">Cancel</button>
+            <button type="button" id="validate-btn" class="ui-btn ui-btn-primary flex-1">Validate Data</button>
+            <button type="button" id="cancel-import-btn" class="ui-btn ui-btn-secondary flex-1">Cancel</button>
           </div>
         </div>
 
@@ -153,8 +153,8 @@ Product 2,PROD002,oil,50</pre>
           </div>
 
           <div class="flex gap-4 mt-6">
-            <button type="submit" id="execute-import-btn" class="btn-primary flex-1">Execute Import</button>
-            <button type="button" id="back-to-step1-btn" class="btn-secondary flex-1">Back</button>
+            <button type="submit" id="execute-import-btn" class="ui-btn ui-btn-primary flex-1">Execute Import</button>
+            <button type="button" id="back-to-step1-btn" class="ui-btn ui-btn-secondary flex-1">Back</button>
           </div>
         </div>
       </form>
@@ -193,8 +193,8 @@ Product 2,PROD002,oil,50</pre>
           </div>
 
           <div class="flex gap-4 mt-6">
-            <button type="submit" class="btn-primary flex-1">Download Export</button>
-            <button type="button" id="cancel-export-btn" class="btn-secondary flex-1">Cancel</button>
+            <button type="submit" class="ui-btn ui-btn-primary flex-1">Download Export</button>
+            <button type="button" id="cancel-export-btn" class="ui-btn ui-btn-secondary flex-1">Cancel</button>
           </div>
         </div>
       </form>
@@ -207,7 +207,7 @@ Product 2,PROD002,oil,50</pre>
       <h2 class="text-2xl font-bold mb-4">Operation Details</h2>
       <div id="operation-details-content" class="space-y-4"></div>
       <div class="flex gap-4 mt-6">
-        <button id="close-details-btn" class="btn-secondary flex-1">Close</button>
+        <button id="close-details-btn" class="ui-btn ui-btn-secondary flex-1">Close</button>
       </div>
     </div>
   </div>

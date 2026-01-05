@@ -56,9 +56,9 @@
             <button id="audit-chip-clear" class="px-2 py-1 text-xs rounded bg-gray-800">Clear</button>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button id="audit-export-json" class="btn-neon-blue px-3 py-1 rounded text-sm">Export JSON</button>
-            <button id="audit-export-csv" class="btn-neon-blue px-3 py-1 rounded text-sm">Export CSV</button>
-            <button id="audit-clear" class="btn-neon-pink px-3 py-1 rounded text-sm">Clear</button>
+            <button id="audit-export-json" class="ui-btn ui-btn-secondary px-3 py-1 rounded text-sm">Export JSON</button>
+            <button id="audit-export-csv" class="ui-btn ui-btn-secondary px-3 py-1 rounded text-sm">Export CSV</button>
+            <button id="audit-clear" class="ui-btn ui-btn-danger px-3 py-1 rounded text-sm">Clear</button>
           </div>
         </div>
         <div id="audit-summary" class="text-xs text-gray-400"></div>
@@ -85,9 +85,9 @@
           <div class="modal-header">
             <h3 class="text-lg font-semibold text-gray-100">Audit Detail</h3>
             <div class="flex gap-2">
-              <button id="audit-modal-mode" class="btn-neon-blue px-3 py-1 rounded text-sm">Raw</button>
-              <button id="audit-modal-copy" class="btn-neon-blue px-3 py-1 rounded text-sm">Copy</button>
-              <button id="audit-modal-close" class="btn-neon-pink px-3 py-1 rounded text-sm">Close</button>
+              <button id="audit-modal-mode" class="ui-btn ui-btn-outline px-3 py-1 rounded text-sm">Raw</button>
+              <button id="audit-modal-copy" class="ui-btn ui-btn-outline px-3 py-1 rounded text-sm">Copy</button>
+              <button id="audit-modal-close" class="ui-btn ui-btn-danger px-3 py-1 rounded text-sm">Close</button>
             </div>
           </div>
           <div class="modal-body">

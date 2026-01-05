@@ -70,8 +70,8 @@
           <h3 class="text-xl font-bold mb-2">Sample Card</h3>
           <p class="text-gray-400 mb-4">This is how your content will look with this theme.</p>
           <div class="flex gap-3 mb-4">
-            <button class="btn-neon-blue px-4 py-2 rounded-lg">Primary Button</button>
-            <button class="btn-neon-green px-4 py-2 rounded-lg">Secondary Button</button>
+            <button class="ui-btn ui-btn-primary px-4 py-2 rounded-lg">Primary Button</button>
+            <button class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg">Secondary Button</button>
           </div>
           <div class="space-y-2">
             <div class="flex items-center gap-2">
@@ -92,8 +92,8 @@
         const actions = document.createElement('div');
         actions.className = 'flex gap-3 justify-end';
         actions.innerHTML = `
-          <button id="preview-cancel" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 transition-colors">Cancel</button>
-          <button id="preview-apply" class="px-4 py-2 rounded-lg btn-neon-blue">Apply Theme</button>
+          <button id="preview-cancel" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg">Cancel</button>
+          <button id="preview-apply" class="ui-btn ui-btn-primary px-4 py-2 rounded-lg">Apply Theme</button>
         `;
 
         container.appendChild(title);

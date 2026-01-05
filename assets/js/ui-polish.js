@@ -86,10 +86,10 @@
             </div>
           </div>
           <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
-            <button id="confirm-cancel" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white font-medium transition-colors" style="min-width: 100px;">
+            <button id="confirm-cancel" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg" style="min-width: 100px;">
               ${cancelText}
             </button>
-            <button id="confirm-action" class="px-4 py-2 rounded-lg ${type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'ui-btn ui-btn-primary'} text-white font-medium transition-colors" style="min-width: 100px;">
+            <button id="confirm-action" class="ui-btn ${type === 'danger' ? 'ui-btn-danger' : 'ui-btn-primary'} px-4 py-2 rounded-lg" style="min-width: 100px;">
               ${confirmText}
             </button>
           </div>
@@ -476,7 +476,7 @@
         const confirmed = await showConfirmationDialog({
           title: 'Confirm Action',
           message: message || 'Are you sure?',
-          type: element.classList.contains('btn-danger') ? 'danger' : 'warning'
+          type: element.classList.contains('ui-btn-danger') || element.classList.contains('btn-danger') ? 'danger' : 'warning'
         });
 
         if (confirmed) {
