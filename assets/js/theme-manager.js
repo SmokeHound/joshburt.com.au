@@ -283,7 +283,7 @@
 
       // Sidebar/nav background tint follows active theme primary
       // Uses precomputed alpha tokens so it updates consistently across themes.
-      root.style.setProperty('--token-nav-bg', 'var(--token-color-primary-alpha-30)');
+      root.style.setProperty('--token-nav-bg', 'var(--token-color-primary-alpha-40)');
     }
     if (colors.secondary) {
       root.style.setProperty('--token-color-secondary', colors.secondary);
