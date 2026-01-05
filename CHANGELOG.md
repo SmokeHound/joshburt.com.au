@@ -1,3 +1,9 @@
+## [1.3.4](https://github.com/SmokeHound/joshburt.com.au/compare/v1.3.3...v1.3.4) (2026-01-05)
+
+### Bug Fixes
+
+* update sidebar/nav background tint to use a darker alpha for improved visibility ([29ca8bb](https://github.com/SmokeHound/joshburt.com.au/commit/29ca8bbd03b4a6da4d8450f45528e180e757f89b))
+
 ## [1.3.3](https://github.com/SmokeHound/joshburt.com.au/compare/v1.3.2...v1.3.3) (2026-01-05)
 
 ### Bug Fixes
