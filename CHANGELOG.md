@@ -1,3 +1,9 @@
+## [1.3.3](https://github.com/SmokeHound/joshburt.com.au/compare/v1.3.2...v1.3.3) (2026-01-05)
+
+### Bug Fixes
+
+* adjust log display alignment for improved readability ([0f23c20](https://github.com/SmokeHound/joshburt.com.au/commit/0f23c20f1f114e39e4a3daacb21c89c523b7e47e))
+
 ## [1.3.2](https://github.com/SmokeHound/joshburt.com.au/compare/v1.3.1...v1.3.2) (2026-01-04)
 
 ### Bug Fixes
