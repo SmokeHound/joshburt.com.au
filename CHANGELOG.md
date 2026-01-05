@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.3.4...v1.4.0) (2026-01-05)
+
+### Features
+
+* enable manual triggering of release workflow ([b3acde3](https://github.com/SmokeHound/joshburt.com.au/commit/b3acde35e5b3288d15d14d622c863569686748f7))
+
 ## [1.3.4](https://github.com/SmokeHound/joshburt.com.au/compare/v1.3.3...v1.3.4) (2026-01-05)
 
 ### Bug Fixes
