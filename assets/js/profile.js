@@ -1250,7 +1250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-start justify-between gap-2 mb-1">
-                  <div class="min-w-0 flex items-baseline gap-2">
+                  <div class="min-w-0 flex items-end gap-2">
                     <span class="font-bold text-white text-sm sm:text-base">${escapeHtml(formatAction(log.action))}</span>
                     <span class="text-xs text-gray-500">${escapeHtml(date.toLocaleString())}</span>
                   </div>
