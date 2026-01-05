@@ -317,7 +317,7 @@ class OfflineSyncManager {
   async cacheData(type) {
     if (!this.isOnline) {
       console.log('[OfflineSync] Cannot cache - offline');
-      return;
+      return 0;
     }
 
     try {

@@ -80,7 +80,7 @@
   /**
    * Report error to backend
    */
-  async function reportError({ level = 'error', message, stack, url, metadata = {} }) {
+  function reportError({ level = 'error', message, stack, url, metadata = {} }) {
     if (!shouldReportError(message)) {
       return;
     }

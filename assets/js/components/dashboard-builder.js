@@ -277,7 +277,7 @@ class DashboardBuilder {
     });
   }
 
-  async initializeDragDrop() {
+  initializeDragDrop() {
     const grid = document.getElementById('dashboard-grid');
     if (!grid) {return;}
 

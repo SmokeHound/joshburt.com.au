@@ -42,7 +42,7 @@ class RichEditor {
     this.createEditor();
   }
 
-  async loadQuill() {
+  loadQuill() {
     return new Promise((resolve, reject) => {
       // Check if already loading
       if (window.__quillLoading) {

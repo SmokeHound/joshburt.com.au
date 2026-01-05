@@ -7,7 +7,7 @@ async function resetAdminPassword() {
   try {
     await database.connect();
     const newHash = await bcrypt.hash('Admin123!', 12);
-    const result = await database.run(
+    await database.run(
       'UPDATE users SET password_hash = ? WHERE email = ?',
       [newHash, 'admin@joshburt.com.au']
     );

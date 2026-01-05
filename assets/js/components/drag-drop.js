@@ -45,7 +45,7 @@ class DragDrop {
     this.createSortable();
   }
 
-  async loadSortableJS() {
+  loadSortableJS() {
     return new Promise((resolve, reject) => {
       // Check if already loading
       if (window.__sortableJSLoading) {

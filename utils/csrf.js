@@ -141,7 +141,7 @@ function getSessionId(event) {
 function withCSRFProtection(handler, options = {}) {
   const methods = options.methods || ['POST', 'PUT', 'PATCH', 'DELETE'];
 
-  return async (event, context) => {
+  return (event, context) => {
     const method = event.httpMethod;
 
     // Skip CSRF check for safe methods

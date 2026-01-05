@@ -4,7 +4,29 @@
 
 const { parseFunction, generateOpenAPISpec, getCategoryFromName } = require('../../scripts/generate-api-docs');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+
+function createTempJsFile(fileName, content) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'api-docs-test-'));
+  const filePath = path.join(dir, fileName);
+  fs.writeFileSync(filePath, content);
+  return { dir, filePath };
+}
+
+function cleanupTempDir(dir) {
+  if (!dir) {return;}
+  try {
+    fs.rmSync(dir, { recursive: true, force: true });
+  } catch {
+    // Older Node fallback
+    try {
+      fs.rmdirSync(dir, { recursive: true });
+    } catch {
+      // Ignore cleanup failures
+    }
+  }
+}
 
 describe('API Documentation Generator', () => {
   describe('getCategoryFromName', () => {
@@ -56,18 +78,15 @@ describe('API Documentation Generator', () => {
         });
       `;
 
-      // Create a temporary file
-      const tempFile = path.join(__dirname, 'temp-test.js');
-      fs.writeFileSync(tempFile, mockContent);
+      const { dir, filePath } = createTempJsFile('temp-test.js', mockContent);
 
-      const result = parseFunction(tempFile, 'temp-test.js');
+      const result = parseFunction(filePath, 'temp-test.js');
 
       expect(result.name).toBe('temp-test');
       expect(result.endpoint).toBe('/.netlify/functions/temp-test');
       expect(result.methods).toContain('GET');
 
-      // Clean up
-      fs.unlinkSync(tempFile);
+      cleanupTempDir(dir);
     });
 
     test('should detect authentication requirement', () => {
@@ -78,14 +97,12 @@ describe('API Documentation Generator', () => {
         };
       `;
 
-      const tempFile = path.join(__dirname, 'temp-auth-test.js');
-      fs.writeFileSync(tempFile, mockContent);
+  const { dir, filePath } = createTempJsFile('temp-auth-test.js', mockContent);
 
-      const result = parseFunction(tempFile, 'temp-auth-test.js');
+  const result = parseFunction(filePath, 'temp-auth-test.js');
 
       expect(result.requiresAuth).toBe(true);
-
-      fs.unlinkSync(tempFile);
+      cleanupTempDir(dir);
     });
 
     test('should detect multiple HTTP methods', () => {
@@ -97,16 +114,14 @@ describe('API Documentation Generator', () => {
         };
       `;
 
-      const tempFile = path.join(__dirname, 'temp-methods-test.js');
-      fs.writeFileSync(tempFile, mockContent);
+  const { dir, filePath } = createTempJsFile('temp-methods-test.js', mockContent);
 
-      const result = parseFunction(tempFile, 'temp-methods-test.js');
+  const result = parseFunction(filePath, 'temp-methods-test.js');
 
       expect(result.methods).toContain('GET');
       expect(result.methods).toContain('POST');
       expect(result.methods).toContain('DELETE');
-
-      fs.unlinkSync(tempFile);
+      cleanupTempDir(dir);
     });
 
     test('should detect pagination support', () => {
@@ -117,14 +132,12 @@ describe('API Documentation Generator', () => {
         };
       `;
 
-      const tempFile = path.join(__dirname, 'temp-pagination-test.js');
-      fs.writeFileSync(tempFile, mockContent);
+  const { dir, filePath } = createTempJsFile('temp-pagination-test.js', mockContent);
 
-      const result = parseFunction(tempFile, 'temp-pagination-test.js');
+  const result = parseFunction(filePath, 'temp-pagination-test.js');
 
       expect(result.supportsPagination).toBe(true);
-
-      fs.unlinkSync(tempFile);
+      cleanupTempDir(dir);
     });
   });
 

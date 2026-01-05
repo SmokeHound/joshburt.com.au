@@ -139,7 +139,7 @@ async function logError({
  * @param {string} [level='error'] - Error level
  * @returns {Promise<Object>} - Logged error result
  */
-async function logServerError(error, event, level = 'error') {
+function logServerError(error, event, level = 'error') {
   const url = event.path || event.rawUrl || 'unknown';
   const userAgent = event.headers && (event.headers['user-agent'] || event.headers['User-Agent']);
   const ipAddress =
@@ -151,7 +151,7 @@ async function logServerError(error, event, level = 'error') {
     userId = event.requestContext.user.id;
   }
 
-  return await logError({
+  return logError({
     level,
     message: error.message || String(error),
     stack: extractStackTrace(error),

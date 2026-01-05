@@ -11,7 +11,7 @@ const buildAndSend = async mailOptions => {
 };
 
 // Send email verification email
-const sendVerificationEmail = async (email, name, verificationUrl) => {
+const sendVerificationEmail = (email, name, verificationUrl) => {
   const mailOptions = {
     from: process.env.FROM_EMAIL || 'noreply@joshburt.com.au',
     to: email,
@@ -57,7 +57,7 @@ const sendVerificationEmail = async (email, name, verificationUrl) => {
       \nThank you for registering on the Josh Burt website.\n\nVerify your email: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\n© 2025 Josh Burt. All rights reserved.
     `
   };
-  return await buildAndSend(mailOptions);
+  return buildAndSend(mailOptions);
 };
 const nodemailer = require('nodemailer');
 
@@ -67,7 +67,7 @@ let _transporterPromise = null;
 const createTransporter = async () => {
   if (process.env.NODE_ENV === 'test') {
     return {
-      sendMail: async _mailOptions => ({ messageId: 'dev-mode-' + Date.now() })
+      sendMail: _mailOptions => ({ messageId: 'dev-mode-' + Date.now() })
     };
   }
 
@@ -110,7 +110,7 @@ const createTransporter = async () => {
   if (!host || !port || !user || !pass) {
     // Return a transporter that throws a clear error when used
     return {
-      sendMail: async _opts => {
+      sendMail: _opts => {
         const missing = [];
         if (!host) {
           missing.push('SMTP_HOST');
@@ -145,7 +145,7 @@ const createTransporter = async () => {
   return nodemailer.createTransport(transportOptions);
 };
 
-const getTransporter = async () => {
+const getTransporter = () => {
   if (!_transporterPromise) {
     _transporterPromise = createTransporter();
   }
@@ -153,7 +153,7 @@ const getTransporter = async () => {
 };
 
 // Send password reset email
-const sendResetEmail = async (email, name, resetUrl) => {
+const sendResetEmail = (email, name, resetUrl) => {
   const mailOptions = {
     from: process.env.FROM_EMAIL || 'noreply@joshburt.com.au',
     to: email,
@@ -210,7 +210,7 @@ const sendResetEmail = async (email, name, resetUrl) => {
     `
   };
 
-  return await buildAndSend(mailOptions);
+  return buildAndSend(mailOptions);
 };
 
 // Send welcome email

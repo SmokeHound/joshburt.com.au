@@ -152,7 +152,7 @@ describe('Cache Utility', () => {
   describe('Wrap function', () => {
     test('should cache function results', async () => {
       let callCount = 0;
-      const fn = async () => {
+      const fn = () => {
         callCount++;
         return 'result';
       };

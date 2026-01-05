@@ -23,9 +23,7 @@ const {
 describe('Function Utilities (utils/fn.js)', () => {
   describe('withHandler', () => {
     test('should handle OPTIONS requests with 204 status', async () => {
-      const handler = withHandler(async () => {
-        return { statusCode: 200, body: 'OK' };
-      });
+      const handler = withHandler(() => ({ statusCode: 200, body: 'OK' }));
 
       const event = { httpMethod: 'OPTIONS' };
       const result = await handler(event, {});
@@ -35,7 +33,7 @@ describe('Function Utilities (utils/fn.js)', () => {
     });
 
     test('should call the wrapped handler for non-OPTIONS requests', async () => {
-      const mockHandler = jest.fn(async () => ({ statusCode: 200, body: 'OK' }));
+      const mockHandler = jest.fn(() => ({ statusCode: 200, body: 'OK' }));
       const handler = withHandler(mockHandler);
 
       const event = { httpMethod: 'GET' };
@@ -46,7 +44,7 @@ describe('Function Utilities (utils/fn.js)', () => {
     });
 
     test('should catch errors and return 500 response', async () => {
-      const handler = withHandler(async () => {
+      const handler = withHandler(() => {
         throw new Error('Test error');
       });
 
@@ -59,7 +57,7 @@ describe('Function Utilities (utils/fn.js)', () => {
 
     test('should pass through successful responses', async () => {
       const expectedResponse = { statusCode: 200, body: JSON.stringify({ data: 'test' }) };
-      const handler = withHandler(async () => expectedResponse);
+      const handler = withHandler(() => expectedResponse);
 
       const event = { httpMethod: 'POST' };
       const result = await handler(event, {});

@@ -12,7 +12,7 @@ const { database } = require('../config/database');
 // Helper to get a connected client from the shared database wrapper
 async function getClient() {
   await database.connect();
-  return await database.pool.connect();
+  return database.pool.connect();
 }
 
 /**

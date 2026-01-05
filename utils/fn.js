@@ -9,7 +9,8 @@ function withHandler(handler) {
       if (event.httpMethod === 'OPTIONS') {
         return { statusCode: 204, headers: corsHeaders };
       }
-      return await handler(event, context);
+      const result = await handler(event, context);
+      return result;
     } catch (err) {
       console.error('Function error', err);
       return error(500, 'Internal server error');

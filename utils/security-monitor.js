@@ -153,7 +153,7 @@ async function removeFromBlacklist(ipAddress) {
 async function trackRateLimit(identifier, endpoint, limit, windowMs) {
   await database.connect();
   const pool = database.pool;
-  const windowSeconds = Math.floor(windowMs / 1000);
+  const _windowSeconds = Math.floor(windowMs / 1000);
 
   try {
     // Clean up old entries first
@@ -194,7 +194,7 @@ async function trackRateLimit(identifier, endpoint, limit, windowMs) {
  * @param {string} email - Email being used for login
  * @returns {Promise<object>} - { suspicious: boolean, reason: string }
  */
-async function detectSuspiciousLogin(ipAddress, email) {
+async function detectSuspiciousLogin(ipAddress, _email) {
   await database.connect();
   const pool = database.pool;
 

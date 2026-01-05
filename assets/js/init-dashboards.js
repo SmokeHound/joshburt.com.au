@@ -71,12 +71,15 @@
   }
   function loadScript(url) {
     return new Promise((resolve, reject) => {
-      if (document.querySelector(`script[src="${url}"]`)) {return resolve();}
+      if (document.querySelector(`script[src="${url}"]`)) {
+        resolve();
+        return;
+      }
       const s = document.createElement('script');
       s.src = url;
       s.defer = true;
       s.onload = () => resolve();
-      s.onerror = (e) => reject(new Error('Failed to load ' + url));
+      s.onerror = (_e) => reject(new Error('Failed to load ' + url));
       document.head.appendChild(s);
     });
   }
@@ -129,7 +132,7 @@
     ];
 
     try {
-      const db = new DashboardBuilder('admin-dashboard', { widgets, columns: 3, editable: true, storageKey: 'admin-dashboard-layout' });
+      new DashboardBuilder('admin-dashboard', { widgets, columns: 3, editable: true, storageKey: 'admin-dashboard-layout' });
 
       // Initialize richer widgets after a short delay to allow DashboardBuilder to render DOM
       setTimeout(async () => {
@@ -137,7 +140,7 @@
         try {
           await loadScript('/assets/js/components/data-table.js');
           const low = await fetchJson('/.netlify/functions/low-stock?threshold=10') || [];
-          const table = new DataTable('low-stock-table', {
+          new DataTable('low-stock-table', {
             data: low,
             columns: [
               { field: 'name', label: 'Product' },
