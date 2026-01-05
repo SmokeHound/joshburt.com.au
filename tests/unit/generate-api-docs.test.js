@@ -97,9 +97,9 @@ describe('API Documentation Generator', () => {
         };
       `;
 
-  const { dir, filePath } = createTempJsFile('temp-auth-test.js', mockContent);
+      const { dir, filePath } = createTempJsFile('temp-auth-test.js', mockContent);
 
-  const result = parseFunction(filePath, 'temp-auth-test.js');
+      const result = parseFunction(filePath, 'temp-auth-test.js');
 
       expect(result.requiresAuth).toBe(true);
       cleanupTempDir(dir);
@@ -114,9 +114,9 @@ describe('API Documentation Generator', () => {
         };
       `;
 
-  const { dir, filePath } = createTempJsFile('temp-methods-test.js', mockContent);
+      const { dir, filePath } = createTempJsFile('temp-methods-test.js', mockContent);
 
-  const result = parseFunction(filePath, 'temp-methods-test.js');
+      const result = parseFunction(filePath, 'temp-methods-test.js');
 
       expect(result.methods).toContain('GET');
       expect(result.methods).toContain('POST');
@@ -132,9 +132,9 @@ describe('API Documentation Generator', () => {
         };
       `;
 
-  const { dir, filePath } = createTempJsFile('temp-pagination-test.js', mockContent);
+      const { dir, filePath } = createTempJsFile('temp-pagination-test.js', mockContent);
 
-  const result = parseFunction(filePath, 'temp-pagination-test.js');
+      const result = parseFunction(filePath, 'temp-pagination-test.js');
 
       expect(result.supportsPagination).toBe(true);
       cleanupTempDir(dir);
