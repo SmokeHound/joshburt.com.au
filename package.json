@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "python3 -m http.server 8000",
-    "dev:functions": "netlify dev",
+    "dev:functions": "npx -y -p netlify-cli netlify dev",
     "dev:all": "echo Run 'npm run dev' in one terminal and 'npm run dev:functions' in another for full stack development",
     "health": "node scripts/health-check.js",
     "build:css": "npx @tailwindcss/cli -i ./src/styles.css -o ./assets/css/styles.css -m",
@@ -37,10 +37,7 @@
     "lint": "echo Linting JS && npm run lint:js && echo Linting HTML && npm run lint:html",
     "format": "prettier --write \"**/*.{js,json,md}\"",
     "format:check": "prettier --check \"**/*.{js,json,md}\"",
-    "validate": "echo Lint + Build + Tests start && npm run lint && echo Build CSS && npm run build:css && echo Run tests && npm run test:all",
-    "version:patch": "npm version patch -m \"chore: bump version to %s\"",
-    "version:minor": "npm version minor -m \"feat: bump version to %s\"",
-    "version:major": "npm version major -m \"feat!: bump version to %s (breaking changes)\""
+    "validate": "echo Lint + Build + Tests start && npm run lint && echo Build CSS && npm run build:css && echo Run tests && npm run test:all"
   },
   "repository": {
     "type": "git",
