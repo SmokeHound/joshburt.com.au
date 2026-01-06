@@ -1,3 +1,9 @@
+## [1.4.1](https://github.com/SmokeHound/joshburt.com.au/compare/v1.4.0...v1.4.1) (2026-01-06)
+
+### Bug Fixes
+
+* update netlify dev command to use npx for consistency ([2f65f73](https://github.com/SmokeHound/joshburt.com.au/commit/2f65f73b9f93c53c608af64b84c4c2868e573627))
+
 ## [1.4.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.3.4...v1.4.0) (2026-01-05)
 
 ### Features
