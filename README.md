@@ -59,7 +59,7 @@ Modern full-stack application with:
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+ (recommended; CI uses Node 22)
 - PostgreSQL database (Neon recommended)
 - Netlify account (for deployment)
 
@@ -86,9 +86,13 @@ psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f database-schema.sql
 npm run dev
 # Visit http://localhost:8000
 
+Note (Windows): `npm run dev` uses `python3 -m http.server 8000`. If `python3` is not available on your PATH, install Python 3 and run `python -m http.server 8000`, or add a `python3` alias.
+
 # Option B: Full-stack (static + serverless)
 npm run dev:functions
 # Visit http://localhost:8888
+
+Note: `npm run dev:functions` uses `npx` to run the Netlify CLI. The first run may take longer (downloads `netlify-cli`).
 
 # Option C: Both (recommended)
 # Terminal 1: npm run dev
@@ -193,7 +197,9 @@ This repo supports automatic version bumps and GitHub releases via `semantic-rel
 - Logic: version is derived from commit messages (Conventional Commits)
 - Output: creates a Git tag `vX.Y.Z`, updates `package.json` + `package-lock.json`, and appends to `CHANGELOG.md`
 
-Note: the application code (Netlify Functions) is CommonJS today (uses `require`). We keep the repo as CommonJS to avoid breaking the runtime, and run `semantic-release` in GitHub Actions with Node 20+ (ESM-compatible).
+The GitHub Actions “Release” workflow can also be triggered manually from the Actions UI.
+
+Note: the application code (Netlify Functions) is CommonJS today (uses `require`). We keep the repo as CommonJS to avoid breaking the runtime, and run `semantic-release` in GitHub Actions with Node 22 (ESM-compatible).
 
 Commit examples:
 
@@ -345,6 +351,9 @@ The database uses a single master schema file for all tables and indexes.
 ```bash
 # Apply complete schema
 psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f database-schema.sql
+
+# Alternative (often easiest cross-platform):
+psql "$DATABASE_URL" -f database-schema.sql
 
 # Health check
 npm run health
@@ -512,29 +521,29 @@ exports.handler = withHandler(async (event) => {
 });
 
 # 3. Test locally
-netlify dev
+npm run dev:functions
 curl http://localhost:8888/.netlify/functions/my-function
 ```
 
 ### Database Migration
 
-```html
-<!-- Include in all pages -->
-<div id="main-nav"></div>
-<script src="/shared-nav.html"></script>
+```bash
+# 1. Create a new migration in migrations/ (next number)
+# Example: migrations/005_add_my_table.sql
 
-<!-- Theme manager (dark/light/system/neon/ocean/high-contrast) -->
-<script src="/shared-theme.html"></script>
+# 2. Update database-schema.sql to match
 
-<!-- TailwindCSS config + common utilities -->
-<script src="/shared-config.html"></script>
+# 3. Apply migrations
+npm run migrate
 
-<!-- Modals (confirmation, info, error) -->
-<script src="/shared-modals.html"></script>
-
-<!-- Notifications toast -->
-<script src="/shared-notifications.html"></script>
+# Optional: dry run
+node scripts/run-migrations.js --dry-run
 ```
+
+---
+
+## 🌐 Browser Support
+
 - ✅ Firefox 88+
 - ✅ Safari 14+
 - ✅ Edge 90+
