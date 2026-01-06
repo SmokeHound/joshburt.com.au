@@ -41,6 +41,8 @@ npm run dev:functions
 # Terminal 2: npm run dev:functions
 ```
 
+Note (Windows): `npm run dev` uses `python3 -m http.server 8000`. If `python3` is not available on your PATH, install Python 3 and run `python -m http.server 8000`, or add a `python3` alias.
+
 ### Environment Variables Required
 
 Create `.env` file in project root:
@@ -540,10 +542,11 @@ ErrorTracker.clearErrorLog();
 ## ⚠️ Important Notes
 
 1. **Always validate changes** with `npm run validate` before committing
-2. **Version bump required** - After completing any changes, run the appropriate version script:
-   - `npm run version:patch` - Bug fixes and minor changes
-   - `npm run version:minor` - New features (backward compatible)
-   - `npm run version:major` - Breaking changes
+2. **Releases are automated (semantic-release)**
+  - Use Conventional Commits (e.g., `fix: ...`, `feat: ...`, `chore: ...`) so versioning is computed automatically
+  - Avoid using `[skip ci]` in normal commits (it prevents GitHub Actions from running)
+  - Do not manually run `npm version ...` unless explicitly doing a manual hotfix outside the normal release process
+  - The GitHub Actions “Release” workflow runs on pushes to `main` and can also be triggered manually from the Actions UI
 3. **Never commit** `.env` files or database credentials
 4. **Test locally** with `netlify dev` before deploying
 5. **Review audit logs** in `audit-logs.html` after admin actions
