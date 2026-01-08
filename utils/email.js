@@ -10,10 +10,60 @@ const buildAndSend = async mailOptions => {
   }
 };
 
+let _fromAddressPromise = null;
+
+// Resolve a default From header from env, or fall back to DB settings.
+const getFromAddress = () => {
+  if (_fromAddressPromise) {
+    return _fromAddressPromise;
+  }
+
+  _fromAddressPromise = (async () => {
+    // Tests should not depend on DB connectivity
+    if (process.env.NODE_ENV === 'test') {
+      return process.env.FROM_EMAIL || 'noreply@joshburt.com.au';
+    }
+
+    let fromEmail = process.env.FROM_EMAIL || null;
+    let fromName = process.env.FROM_NAME || null;
+
+    // If either missing, try DB-backed settings
+    if (!fromEmail || !fromName) {
+      try {
+        const { database } = require('../config/database');
+        const rows = await database.all('SELECT key, value FROM settings WHERE key IN (?, ?)', [
+          'fromEmail',
+          'fromName'
+        ]);
+        rows.forEach(r => {
+          if (r.key === 'fromEmail' && r.value) {
+            fromEmail = fromEmail || String(r.value);
+          }
+          if (r.key === 'fromName' && r.value) {
+            fromName = fromName || String(r.value);
+          }
+        });
+      } catch (e) {
+        console.warn('Could not read From identity settings from database:', e && e.message);
+      }
+    }
+
+    const email = (fromEmail || 'noreply@joshburt.com.au').trim();
+    const name = (fromName || '').trim();
+    if (name) {
+      return `${name} <${email}>`;
+    }
+    return email;
+  })();
+
+  return _fromAddressPromise;
+};
+
 // Send email verification email
-const sendVerificationEmail = (email, name, verificationUrl) => {
+const sendVerificationEmail = async (email, name, verificationUrl) => {
+  const from = await getFromAddress();
   const mailOptions = {
-    from: process.env.FROM_EMAIL || 'noreply@joshburt.com.au',
+    from,
     to: email,
     subject: 'Verify Your Email - Josh Burt Website',
     html: `
@@ -153,9 +203,10 @@ const getTransporter = () => {
 };
 
 // Send password reset email
-const sendResetEmail = (email, name, resetUrl) => {
+const sendResetEmail = async (email, name, resetUrl) => {
+  const from = await getFromAddress();
   const mailOptions = {
-    from: process.env.FROM_EMAIL || 'noreply@joshburt.com.au',
+    from,
     to: email,
     subject: 'Password Reset Request - Josh Burt Website',
     html: `
@@ -215,8 +266,9 @@ const sendResetEmail = (email, name, resetUrl) => {
 
 // Send welcome email
 const sendWelcomeEmail = async (email, name) => {
+  const from = await getFromAddress();
   const mailOptions = {
-    from: process.env.FROM_EMAIL || 'noreply@joshburt.com.au',
+    from,
     to: email,
     subject: 'Welcome to Josh Burt Website',
     html: `

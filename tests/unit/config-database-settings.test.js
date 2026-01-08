@@ -13,6 +13,7 @@ describe('Settings Table Schema', () => {
         'siteDescription',
         'contactEmail',
         'maintenanceMode',
+        'maintenanceMessage',
         'logoUrl',
         'faviconUrl',
         'oilDataSource',
@@ -31,7 +32,7 @@ describe('Settings Table Schema', () => {
         'customCss'
       ];
       const securityKeys = ['sessionTimeout', 'maxLoginAttempts', 'enable2FA', 'auditAllActions'];
-      const integrationKeys = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpPassword'];
+      const integrationKeys = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpPassword', 'fromEmail', 'fromName'];
       const featureKeys = ['featureFlags'];
 
       expect(generalKeys.length).toBeGreaterThan(0);

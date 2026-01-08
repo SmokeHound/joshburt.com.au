@@ -61,6 +61,25 @@
     </div>
   </section>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (!window.FeatureFlags || typeof window.FeatureFlags.isEnabled !== 'function') return;
+        const enabled = await window.FeatureFlags.isEnabled('enableAdvancedAnalytics');
+        if (enabled) return;
+
+        if (typeof window.showToast === 'function') {
+          window.showToast('Advanced Analytics is currently disabled.', 'warning');
+        } else {
+          alert('Advanced Analytics is currently disabled.');
+        }
+        window.location.href = 'administration.html';
+      } catch (_) {
+        // fail open
+      }
+    });
+  </script>
+
   <!-- Overview Stats -->
   <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
     <div class="card p-4 ui-card ui-card-primary rounded-lg">

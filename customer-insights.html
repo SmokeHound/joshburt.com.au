@@ -24,6 +24,25 @@
     <p class="text-sm text-gray-400 mt-1">Customer segmentation, purchase patterns, and personalized recommendations</p>
   </header>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (!window.FeatureFlags || typeof window.FeatureFlags.isEnabled !== 'function') return;
+        const enabled = await window.FeatureFlags.isEnabled('enableCustomerInsights');
+        if (enabled) return;
+
+        if (typeof window.showToast === 'function') {
+          window.showToast('Customer Insights is currently disabled.', 'warning');
+        } else {
+          alert('Customer Insights is currently disabled.');
+        }
+        window.location.href = 'administration.html';
+      } catch (_) {
+        // fail open
+      }
+    });
+  </script>
+
   <!-- Action Buttons -->
   <section class="flex gap-4 flex-wrap">
     <button id="calculate-patterns-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-400">

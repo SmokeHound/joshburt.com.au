@@ -20,7 +20,12 @@
     enableInventoryForecast: true,
     enableDatabaseBackups: true,
     enableBulkOperations: true,
-    enableDataHistory: true
+    enableDataHistory: true,
+
+    // New (admin/analytics tools)
+    enableAdvancedAnalytics: true,
+    enableScheduledReports: true,
+    enableCustomerInsights: true
   };
 
   // Cache for feature flags

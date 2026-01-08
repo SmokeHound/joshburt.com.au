@@ -216,6 +216,30 @@
                         <p class="text-xs text-gray-500 leading-tight mt-0">Show Data History in Administration</p>
                       </div>
                     </div>
+
+                    <div class="flex items-center gap-2 p-3 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
+                      <input type="checkbox" id="feature-enable-advanced-analytics" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div>
+                        <label for="feature-enable-advanced-analytics" class="font-bold text-gray-200 cursor-pointer leading-tight">Enable Advanced Analytics</label>
+                        <p class="text-xs text-gray-500 leading-tight mt-0">Show Advanced Analytics in Administration</p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 p-3 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
+                      <input type="checkbox" id="feature-enable-scheduled-reports" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div>
+                        <label for="feature-enable-scheduled-reports" class="font-bold text-gray-200 cursor-pointer leading-tight">Enable Scheduled Reports</label>
+                        <p class="text-xs text-gray-500 leading-tight mt-0">Show Scheduled Reports in Administration</p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 p-3 rounded-lg bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-yellow-500/60 transition-all">
+                      <input type="checkbox" id="feature-enable-customer-insights" class="w-5 h-5 rounded border-2 border-yellow-500 text-yellow-500 focus:ring-2 focus:ring-yellow-500/30" />
+                      <div>
+                        <label for="feature-enable-customer-insights" class="font-bold text-gray-200 cursor-pointer leading-tight">Enable Customer Insights</label>
+                        <p class="text-xs text-gray-500 leading-tight mt-0">Show Customer Insights in Administration</p>
+                      </div>
+                    </div>
                   </div>
                   </fieldset>
                 </div>
@@ -298,6 +322,16 @@
                             <p class="text-xs text-orange-300/70 mt-1">Visitors will see a maintenance page</p>
                           </div>
                         </div>
+
+                        <div class="col-span-2">
+                          <label for="maintenance-message" class="mb-1 font-bold text-gray-300 inline-flex items-center gap-2 whitespace-nowrap">
+                            <span>Maintenance Message</span>
+                          </label>
+                          <div class="rounded-lg ui-field-shell">
+                            <textarea id="maintenance-message" class="w-full p-3 text-sm bg-transparent focus:outline-none resize-none" rows="2" maxlength="300" placeholder="We'll be back shortly."></textarea>
+                          </div>
+                          <p class="text-xs text-gray-500 mt-1">Shown to visitors when maintenance mode is enabled.</p>
+                        </div>
                       </div>
                     </fieldset>
                   </details>
@@ -352,6 +386,22 @@
                         </label>
                         <div class="rounded-lg ui-field-shell">
                           <input id="smtp-password" type="password" class="w-full p-4 bg-transparent text-white focus:outline-none" maxlength="100" placeholder="••••••••" />
+                        </div>
+                      </div>
+                      <div>
+                        <label for="from-email" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
+                          <span>From Email</span>
+                        </label>
+                        <div class="rounded-lg ui-field-shell">
+                          <input id="from-email" type="email" class="w-full p-4 bg-transparent text-white focus:outline-none" maxlength="160" placeholder="noreply@example.com" />
+                        </div>
+                      </div>
+                      <div>
+                        <label for="from-name" class="inline-flex mb-2 font-bold text-gray-300 items-center gap-2">
+                          <span>From Name</span>
+                        </label>
+                        <div class="rounded-lg ui-field-shell">
+                          <input id="from-name" type="text" class="w-full p-4 bg-transparent text-white focus:outline-none" maxlength="160" placeholder="Josh Burt" />
                         </div>
                       </div>
                     </div>
@@ -903,6 +953,7 @@
         theme: document.getElementById('theme-select')?.value || 'dark',
         contactEmail: document.getElementById('contact-email')?.value || '',
         maintenanceMode: document.getElementById('maintenance-mode')?.checked || false,
+        maintenanceMessage: document.getElementById('maintenance-message')?.value || '',
         // Data sources
         oilDataSource: document.getElementById('oil-data-source')?.value || 'api',
   consumablesDataSource: document.getElementById('consumables-data-source')?.value || 'api',
@@ -914,6 +965,8 @@
         smtpPort: parseInt(document.getElementById('smtp-port')?.value) || 587,
         smtpUser: document.getElementById('smtp-user')?.value || '',
         smtpPassword: document.getElementById('smtp-password')?.value || '',
+        fromEmail: document.getElementById('from-email')?.value || '',
+        fromName: document.getElementById('from-name')?.value || '',
         customCss: document.getElementById('custom-css')?.value || '',
         customJs: document.getElementById('custom-js')?.value || '',
         featureFlags: {
@@ -931,6 +984,11 @@
           enableDatabaseBackups: document.getElementById('feature-enable-database-backups')?.checked ?? true,
           enableBulkOperations: document.getElementById('feature-enable-bulk-operations')?.checked ?? true,
           enableDataHistory: document.getElementById('feature-enable-data-history')?.checked ?? true,
+
+          // Admin / analytics tools
+          enableAdvancedAnalytics: document.getElementById('feature-enable-advanced-analytics')?.checked ?? true,
+          enableScheduledReports: document.getElementById('feature-enable-scheduled-reports')?.checked ?? true,
+          enableCustomerInsights: document.getElementById('feature-enable-customer-insights')?.checked ?? true,
           
         },
         // Security
@@ -1015,6 +1073,9 @@
                 if (settings.theme) document.getElementById('theme-select').value = settings.theme;
                 if (settings.contactEmail) document.getElementById('contact-email').value = settings.contactEmail;
                 if (settings.maintenanceMode !== undefined) document.getElementById('maintenance-mode').checked = settings.maintenanceMode;
+                if (document.getElementById('maintenance-message')) {
+                  document.getElementById('maintenance-message').value = settings.maintenanceMessage ?? '';
+                }
                 // Theme palette/button colors
                 if (document.getElementById('primary-color') && settings.primaryColor) {
                   document.getElementById('primary-color').value = settings.primaryColor;
@@ -1064,11 +1125,27 @@
         document.getElementById('feature-enable-database-backups').checked = featureFlags.enableDatabaseBackups !== false;
         document.getElementById('feature-enable-bulk-operations').checked = featureFlags.enableBulkOperations !== false;
         document.getElementById('feature-enable-data-history').checked = featureFlags.enableDataHistory !== false;
+
+        // Admin / analytics tools default to enabled when unset
+        if (document.getElementById('feature-enable-advanced-analytics')) {
+          document.getElementById('feature-enable-advanced-analytics').checked =
+            featureFlags.enableAdvancedAnalytics !== false;
+        }
+        if (document.getElementById('feature-enable-scheduled-reports')) {
+          document.getElementById('feature-enable-scheduled-reports').checked =
+            featureFlags.enableScheduledReports !== false;
+        }
+        if (document.getElementById('feature-enable-customer-insights')) {
+          document.getElementById('feature-enable-customer-insights').checked =
+            featureFlags.enableCustomerInsights !== false;
+        }
                 // Integrations - Use nullish coalescing to handle null/empty values
                 document.getElementById('smtp-host').value = settings.smtpHost ?? '';
                 document.getElementById('smtp-port').value = settings.smtpPort ?? '';
                 document.getElementById('smtp-user').value = settings.smtpUser ?? '';
                 document.getElementById('smtp-password').value = settings.smtpPassword ?? '';
+                if (document.getElementById('from-email')) document.getElementById('from-email').value = settings.fromEmail ?? '';
+                if (document.getElementById('from-name')) document.getElementById('from-name').value = settings.fromName ?? '';
                 if (settings.customCss) document.getElementById('custom-css').value = settings.customCss;
                 if (settings.customJs) document.getElementById('custom-js').value = settings.customJs;
                 // Security
@@ -1625,6 +1702,10 @@
                 enableDatabaseBackups: true,
                 enableBulkOperations: true,
                 enableDataHistory: true,
+
+                enableAdvancedAnalytics: true,
+                enableScheduledReports: true,
+                enableCustomerInsights: true,
                 
               }
             };

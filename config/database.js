@@ -576,6 +576,13 @@ async function createDefaultSettings() {
       description: 'Enable maintenance mode'
     },
     {
+      key: 'maintenanceMessage',
+      value: '',
+      category: 'general',
+      data_type: 'string',
+      description: 'Maintenance mode message'
+    },
+    {
       key: 'logoUrl',
       value: '',
       category: 'general',
@@ -739,6 +746,22 @@ async function createDefaultSettings() {
       is_sensitive: true,
       description: 'SMTP password'
     },
+    {
+      key: 'fromEmail',
+      value: '',
+      category: 'integrations',
+      data_type: 'string',
+      is_sensitive: false,
+      description: 'Default From email address for outgoing emails'
+    },
+    {
+      key: 'fromName',
+      value: '',
+      category: 'integrations',
+      data_type: 'string',
+      is_sensitive: false,
+      description: 'Default From name for outgoing emails'
+    },
 
     // Feature flags
     {
@@ -754,7 +777,12 @@ async function createDefaultSettings() {
         enableInventoryForecast: true,
         enableDatabaseBackups: true,
         enableBulkOperations: true,
-        enableDataHistory: true
+        enableDataHistory: true,
+
+        // Admin / analytics tools
+        enableAdvancedAnalytics: true,
+        enableScheduledReports: true,
+        enableCustomerInsights: true
       }),
       category: 'features',
       data_type: 'json',

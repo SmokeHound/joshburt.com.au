@@ -44,6 +44,9 @@ Configuration system for enabling/disabling features without code deployment.
 | `featureFlags.enableDatabaseBackups`        | boolean | `true`  | Show Backups UI             |
 | `featureFlags.enableBulkOperations`         | boolean | `true`  | Show Bulk Operations UI     |
 | `featureFlags.enableDataHistory`            | boolean | `true`  | Show Data History UI        |
+| `featureFlags.enableAdvancedAnalytics`      | boolean | `true`  | Show Advanced Analytics UI  |
+| `featureFlags.enableScheduledReports`       | boolean | `true`  | Show Scheduled Reports UI   |
+| `featureFlags.enableCustomerInsights`       | boolean | `true`  | Show Customer Insights UI   |
 | `enable2FA`                    | boolean | `false` | Two-factor authentication   |
 | `auditAllActions`              | boolean | `false` | Log all user actions        |
 
@@ -66,7 +69,10 @@ Example `featureFlags` value:
   "enableInventoryForecast": true,
   "enableDatabaseBackups": true,
   "enableBulkOperations": true,
-  "enableDataHistory": true
+  "enableDataHistory": true,
+  "enableAdvancedAnalytics": true,
+  "enableScheduledReports": true,
+  "enableCustomerInsights": true
 }
 ```
 

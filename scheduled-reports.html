@@ -36,6 +36,25 @@
     </div>
   </section>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (!window.FeatureFlags || typeof window.FeatureFlags.isEnabled !== 'function') return;
+        const enabled = await window.FeatureFlags.isEnabled('enableScheduledReports');
+        if (enabled) return;
+
+        if (typeof window.showToast === 'function') {
+          window.showToast('Scheduled Reports is currently disabled.', 'warning');
+        } else {
+          alert('Scheduled Reports is currently disabled.');
+        }
+        window.location.href = 'administration.html';
+      } catch (_) {
+        // fail open
+      }
+    });
+  </script>
+
   <!-- Report History -->
   <section class="ui-card p-6">
     <h2 class="text-lg font-semibold mb-4">Recent Executions</h2>
