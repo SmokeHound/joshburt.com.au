@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.4.1...v1.5.0) (2026-01-08)
+
+### Features
+
+* add feature flags for advanced analytics, scheduled reports, and customer insights; update settings and UI accordingly ([62dd14d](https://github.com/SmokeHound/joshburt.com.au/commit/62dd14de100683b3da20d2d10be8cd8f622d2ae1))
+
 ## [1.4.1](https://github.com/SmokeHound/joshburt.com.au/compare/v1.4.0...v1.4.1) (2026-01-06)
 
 ### Bug Fixes
