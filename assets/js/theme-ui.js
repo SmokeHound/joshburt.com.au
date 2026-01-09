@@ -45,9 +45,13 @@
     const customTheme = window.ThemeEnhanced.customBuilder.getTheme();
 
     const rgbToHex = (value) => {
-      if (!value) return null;
+      if (!value) {
+        return null;
+      }
       const v = String(value).trim();
-      if (/^#[0-9A-Fa-f]{6}$/.test(v)) return v;
+      if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+        return v;
+      }
       if (/^#[0-9A-Fa-f]{3}$/.test(v)) {
         return (
           '#' +
@@ -59,7 +63,9 @@
         );
       }
       const m = v.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i);
-      if (!m) return null;
+      if (!m) {
+        return null;
+      }
       const toHex = (n) => {
         const clamped = Math.max(0, Math.min(255, parseInt(n, 10)));
         return clamped.toString(16).padStart(2, '0');
