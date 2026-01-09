@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.6.0...v1.7.0) (2026-01-09)
+
+### Features
+
+* update custom theme builder layout to use a responsive grid system ([00e90c5](https://github.com/SmokeHound/joshburt.com.au/commit/00e90c5f6e192023315dcf4ba1c2114691700ae0))
+
 ## [1.6.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.5.0...v1.6.0) (2026-01-09)
 
 ### Features
