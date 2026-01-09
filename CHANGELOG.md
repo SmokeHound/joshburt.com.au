@@ -1,3 +1,9 @@
+## [1.6.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.5.0...v1.6.0) (2026-01-09)
+
+### Features
+
+* add navigation background and text color customization ([401f83b](https://github.com/SmokeHound/joshburt.com.au/commit/401f83b30a74b20b3961b91ef450fd64657ef082))
+
 ## [1.5.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.4.1...v1.5.0) (2026-01-08)
 
 ### Features
