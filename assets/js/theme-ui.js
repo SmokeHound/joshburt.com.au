@@ -216,11 +216,11 @@
             </div>
           </div>
           
-          <div class="flex gap-3 pt-4 md:col-span-2">
-            <button id="apply-custom-theme" class="flex-1 ui-btn ui-btn-primary px-4 py-3 rounded-lg">
+          <div class="flex flex-col md:flex-row gap-3 pt-4 md:col-span-2">
+            <button id="apply-custom-theme" class="w-full md:flex-1 ui-btn ui-btn-primary px-4 py-3 rounded-lg">
               Apply Custom Theme
             </button>
-            <button id="reset-custom-theme" class="ui-btn ui-btn-secondary px-4 py-3 rounded-lg">
+            <button id="reset-custom-theme" class="w-full md:w-auto ui-btn ui-btn-secondary px-4 py-3 rounded-lg">
               Reset
             </button>
           </div>
