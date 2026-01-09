@@ -94,7 +94,7 @@
         <h3 class="text-lg font-bold text-white mb-4">Custom Theme Builder</h3>
         <p class="text-sm text-gray-400 mb-6">Create your own color palette</p>
         
-        <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label for="custom-primary" class="block text-sm font-medium text-gray-300 mb-2">
               Primary Color
@@ -134,7 +134,7 @@
             </div>
           </div>
 
-          <div class="pt-2 border-t border-gray-700/60"></div>
+          <div class="pt-2 border-t border-gray-700/60 md:col-span-2"></div>
 
           <div>
             <label for="custom-navBg" class="block text-sm font-medium text-gray-300 mb-2">
@@ -162,7 +162,7 @@
             </div>
           </div>
 
-          <div class="pt-2 border-t border-gray-700/60"></div>
+          <div class="pt-2 border-t border-gray-700/60 md:col-span-2"></div>
 
           <div>
             <label for="custom-buttonPrimary" class="block text-sm font-medium text-gray-300 mb-2">
@@ -216,7 +216,7 @@
             </div>
           </div>
           
-          <div class="flex gap-3 pt-4">
+          <div class="flex gap-3 pt-4 md:col-span-2">
             <button id="apply-custom-theme" class="flex-1 ui-btn ui-btn-primary px-4 py-3 rounded-lg">
               Apply Custom Theme
             </button>
