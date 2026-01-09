@@ -44,6 +44,45 @@
 
     const customTheme = window.ThemeEnhanced.customBuilder.getTheme();
 
+    const rgbToHex = (value) => {
+      if (!value) return null;
+      const v = String(value).trim();
+      if (/^#[0-9A-Fa-f]{6}$/.test(v)) return v;
+      if (/^#[0-9A-Fa-f]{3}$/.test(v)) {
+        return (
+          '#' +
+          v
+            .replace('#', '')
+            .split('')
+            .map(c => c + c)
+            .join('')
+        );
+      }
+      const m = v.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i);
+      if (!m) return null;
+      const toHex = (n) => {
+        const clamped = Math.max(0, Math.min(255, parseInt(n, 10)));
+        return clamped.toString(16).padStart(2, '0');
+      };
+      return `#${toHex(m[1])}${toHex(m[2])}${toHex(m[3])}`;
+    };
+
+    const getCssVarHex = (name) => {
+      try {
+        return rgbToHex(getComputedStyle(document.documentElement).getPropertyValue(name));
+      } catch (_) {
+        return null;
+      }
+    };
+
+    const navBgDefault =
+      customTheme.colors.navBg || getCssVarHex('--token-nav-bg') || customTheme.colors.primary;
+    const navTextDefault =
+      customTheme.colors.navText ||
+      getCssVarHex('--token-nav-text') ||
+      getCssVarHex('--token-text-secondary') ||
+      '#cccccc';
+
     builderContainer.innerHTML = `
       <div class="card p-6 border border-gray-700">
         <h3 class="text-lg font-bold text-white mb-4">Custom Theme Builder</h3>
@@ -84,6 +123,34 @@
               <input type="color" id="custom-accent" value="${customTheme.colors.accent}" 
                 class="w-16 h-16 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-accent-text" value="${customTheme.colors.accent}" 
+                class="flex-1 p-3 rounded-lg bg-gray-800 border border-gray-700 font-mono text-sm" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-gray-700/60"></div>
+
+          <div>
+            <label for="custom-navBg" class="block text-sm font-medium text-gray-300 mb-2">
+              Nav Background
+            </label>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-navBg" value="${navBgDefault}" 
+                class="w-16 h-16 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-navBg-text" value="${navBgDefault}" 
+                class="flex-1 p-3 rounded-lg bg-gray-800 border border-gray-700 font-mono text-sm" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div>
+            <label for="custom-navText" class="block text-sm font-medium text-gray-300 mb-2">
+              Nav Text
+            </label>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-navText" value="${navTextDefault}" 
+                class="w-16 h-16 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-navText-text" value="${navTextDefault}" 
                 class="flex-1 p-3 rounded-lg bg-gray-800 border border-gray-700 font-mono text-sm" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
@@ -156,7 +223,7 @@
     `;
 
     // Sync color picker and text input
-    ['primary', 'secondary', 'accent', 'buttonPrimary', 'buttonSecondary', 'buttonDanger', 'buttonSuccess'].forEach(colorType => {
+    ['primary', 'secondary', 'accent', 'navBg', 'navText', 'buttonPrimary', 'buttonSecondary', 'buttonDanger', 'buttonSuccess'].forEach(colorType => {
       const colorInput = document.getElementById(`custom-${colorType}`);
       const textInput = document.getElementById(`custom-${colorType}-text`);
 
@@ -181,6 +248,8 @@
         primary: document.getElementById('custom-primary').value,
         secondary: document.getElementById('custom-secondary').value,
         accent: document.getElementById('custom-accent').value,
+        navBg: document.getElementById('custom-navBg').value,
+        navText: document.getElementById('custom-navText').value,
         buttonPrimary: document.getElementById('custom-buttonPrimary').value,
         buttonSecondary: document.getElementById('custom-buttonSecondary').value,
         buttonDanger: document.getElementById('custom-buttonDanger').value,

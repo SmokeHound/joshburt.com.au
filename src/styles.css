@@ -468,7 +468,7 @@ body {
   width: 100%;
   text-align: left;
   border-radius: var(--token-radius-md);
-  color: var(--token-text-secondary);
+  color: var(--token-nav-text, var(--token-text-secondary));
   transition: all var(--token-transition-slow);
   position: relative;
   white-space: nowrap;

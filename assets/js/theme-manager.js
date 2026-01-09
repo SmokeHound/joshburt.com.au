@@ -201,13 +201,15 @@
         primary: siteSettings.primaryColor || localStorage.getItem('primaryColor') || null,
         secondary: siteSettings.secondaryColor || localStorage.getItem('secondaryColor') || null,
         accent: siteSettings.accentColor || localStorage.getItem('accentColor') || null,
+        navBg: siteSettings.navBgColor || localStorage.getItem('navBgColor') || null,
+        navText: siteSettings.navTextColor || localStorage.getItem('navTextColor') || null,
         buttonPrimary: siteSettings.buttonPrimaryColor || localStorage.getItem('buttonPrimaryColor') || null,
         buttonSecondary: siteSettings.buttonSecondaryColor || localStorage.getItem('buttonSecondaryColor') || null,
         buttonDanger: siteSettings.buttonDangerColor || localStorage.getItem('buttonDangerColor') || null,
         buttonSuccess: siteSettings.buttonSuccessColor || localStorage.getItem('buttonSuccessColor') || null
       };
     } catch (e) {
-      return { primary: null, secondary: null, accent: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null };
+      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null };
     }
   }
 
@@ -280,10 +282,6 @@
       root.style.setProperty('--token-color-primary-hover', colors.primary);
       root.style.setProperty('--token-color-primary-active', colors.primary);
       setAlphaVars('--token-color-primary', colors.primary);
-
-      // Sidebar/nav background tint follows active theme primary
-      // Uses precomputed alpha tokens so it updates consistently across themes.
-      root.style.setProperty('--token-nav-bg', 'var(--token-color-primary-alpha-40)');
     }
     if (colors.secondary) {
       root.style.setProperty('--token-color-secondary', colors.secondary);
@@ -309,6 +307,23 @@
       root.style.setProperty('--token-color-success-hover', colors.buttonSuccess);
       root.style.setProperty('--token-color-success-active', colors.buttonSuccess);
     }
+
+    // Nav customization
+    if (colors.navText) {
+      root.style.setProperty('--token-nav-text', colors.navText);
+    } else {
+      root.style.removeProperty('--token-nav-text');
+    }
+
+    if (colors.navBg) {
+      root.style.setProperty('--token-nav-bg', colors.navBg);
+    } else if (colors.primary) {
+      // Default: sidebar/nav background tint follows active theme primary
+      // Uses precomputed alpha tokens so it updates consistently across themes.
+      root.style.setProperty('--token-nav-bg', 'var(--token-color-primary-alpha-40)');
+    } else {
+      root.style.removeProperty('--token-nav-bg');
+    }
   }
 
   // Apply dark/light class to documentElement
@@ -333,6 +348,8 @@
       primary: (customColors && customColors.primary) || preset.colors.primary,
       secondary: (customColors && customColors.secondary) || preset.colors.secondary,
       accent: (customColors && customColors.accent) || preset.colors.accent,
+      navBg: (customColors && customColors.navBg) || null,
+      navText: (customColors && customColors.navText) || null,
       buttonPrimary: (customColors && customColors.buttonPrimary) || preset.colors.buttonPrimary,
       buttonSecondary: (customColors && customColors.buttonSecondary) || preset.colors.buttonSecondary,
       buttonDanger: (customColors && customColors.buttonDanger) || preset.colors.buttonDanger,
@@ -364,6 +381,7 @@
 
       // Only apply custom colors if at least one is set
       const hasCustomColors = storedColors.primary || storedColors.secondary || storedColors.accent ||
+              storedColors.navBg || storedColors.navText ||
                               storedColors.buttonPrimary || storedColors.buttonSecondary ||
                               storedColors.buttonDanger || storedColors.buttonSuccess;
       const customColors = hasCustomColors ? storedColors : null;
@@ -406,6 +424,12 @@
           if (colors.accent) {
             siteSettings.accentColor = colors.accent;
           }
+          if (colors.navBg) {
+            siteSettings.navBgColor = colors.navBg;
+          }
+          if (colors.navText) {
+            siteSettings.navTextColor = colors.navText;
+          }
           if (colors.buttonPrimary) {
             siteSettings.buttonPrimaryColor = colors.buttonPrimary;
           }
@@ -429,6 +453,12 @@
           }
           if (colors.accent) {
             localStorage.setItem('accentColor', colors.accent);
+          }
+          if (colors.navBg) {
+            localStorage.setItem('navBgColor', colors.navBg);
+          }
+          if (colors.navText) {
+            localStorage.setItem('navTextColor', colors.navText);
           }
           if (colors.buttonPrimary) {
             localStorage.setItem('buttonPrimaryColor', colors.buttonPrimary);
@@ -465,6 +495,8 @@
           primary: storedColors.primary || preset.colors.primary,
           secondary: storedColors.secondary || preset.colors.secondary,
           accent: storedColors.accent || preset.colors.accent,
+          navBg: storedColors.navBg || null,
+          navText: storedColors.navText || null,
           buttonPrimary: storedColors.buttonPrimary || preset.colors.buttonPrimary,
           buttonSecondary: storedColors.buttonSecondary || preset.colors.buttonSecondary,
           buttonDanger: storedColors.buttonDanger || preset.colors.buttonDanger,

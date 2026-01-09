@@ -128,7 +128,9 @@ describe('Theme System (Preset / Persistence)', () => {
     const customColors = {
       primary: '#ff0000',
       secondary: '#00ff00',
-      accent: '#0000ff'
+      accent: '#0000ff',
+      navBg: '#101010',
+      navText: '#fafafa'
     };
     window.Theme.setPalette(customColors, false);
     expect(
@@ -140,5 +142,12 @@ describe('Theme System (Preset / Persistence)', () => {
     expect(
       getComputedStyle(document.documentElement).getPropertyValue('--tw-color-accent').trim()
     ).toBe('#0000ff');
+
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--token-nav-bg').trim()
+    ).toBe('#101010');
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--token-nav-text').trim()
+    ).toBe('#fafafa');
   });
 });

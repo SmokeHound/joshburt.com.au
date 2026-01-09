@@ -206,6 +206,8 @@
           delete siteSettings.primaryColor;
           delete siteSettings.secondaryColor;
           delete siteSettings.accentColor;
+          delete siteSettings.navBgColor;
+          delete siteSettings.navTextColor;
           delete siteSettings.buttonPrimaryColor;
           delete siteSettings.buttonSecondaryColor;
           delete siteSettings.buttonDangerColor;
@@ -215,6 +217,8 @@
           localStorage.removeItem('primaryColor');
           localStorage.removeItem('secondaryColor');
           localStorage.removeItem('accentColor');
+          localStorage.removeItem('navBgColor');
+          localStorage.removeItem('navTextColor');
           localStorage.removeItem('buttonPrimaryColor');
           localStorage.removeItem('buttonSecondaryColor');
           localStorage.removeItem('buttonDangerColor');
