@@ -1,3 +1,9 @@
+## [1.8.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.7.0...v1.8.0) (2026-01-09)
+
+### Features
+
+* enhance custom theme builder layout for improved responsiveness ([0677c67](https://github.com/SmokeHound/joshburt.com.au/commit/0677c67f9b490cc2e2ddaa1cf6f667dd60248c67))
+
 ## [1.7.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.6.0...v1.7.0) (2026-01-09)
 
 ### Features
