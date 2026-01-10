@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/assets/css/styles.css">
   <!-- Shared bootstrap: functions base, auth, notifications, and auth-aware fetch -->
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   <!-- Load shared modal utilities -->
   <script>
     fetch('shared-modals.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='STYLE'||c.tagName==='SCRIPT'){document.head.appendChild(c.cloneNode(true));}});});
@@ -52,9 +53,12 @@
   <!-- Shared Navigation Loader -->
   <div id="main-nav"></div>
   <main id="main-content" class="flex-1 p-4 md:p-6" role="main">
-  <header class="page-header ui-card border">
-      <h2 class="text-2xl font-bold">Audit Log</h2>
-      <p class="text-gray-600 dark:text-gray-300">Review all administrative actions and changes</p>
+  <header class="page-header ui-card border flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold">Audit Log</h2>
+        <p class="text-gray-600 dark:text-gray-300">Review all administrative actions and changes</p>
+      </div>
+      <div id="notification-bell-wrapper" class="relative"></div>
     </header>
     <section class="space-y-8">
       <!-- Modular Audit Log Root (auto-initialized by assets/js/audit-ui.js) -->
