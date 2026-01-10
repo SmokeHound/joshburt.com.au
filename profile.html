@@ -8,6 +8,7 @@
     <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg" />
     <link rel="stylesheet" href="/assets/css/styles.css" />
     <script src="/assets/js/init-shared.js" defer></script>
+    <script src="/assets/js/notifications.js" defer></script>
     <link rel="stylesheet" href="/assets/css/accessibility.css" />
     <script src="/assets/js/accessibility.js" defer></script>
   </head>
@@ -23,7 +24,7 @@
     </button>
     <div id="main-nav"></div>
     <main id="main-content" class="max-w-4xl mx-auto p-6" role="main">
-      <header class="page-header ui-card border mb-6">
+      <header class="page-header ui-card border mb-6 flex items-center justify-between">
         <h1 class="text-3xl font-bold flex items-center gap-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -42,6 +43,7 @@
           </svg>
           My Profile
         </h1>
+        <div id="notification-bell-wrapper" class="relative"></div>
       </header>
 
       <!-- Profile Overview Card -->

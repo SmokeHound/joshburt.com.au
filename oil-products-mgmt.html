@@ -8,6 +8,7 @@
     <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg" />
     <link rel="stylesheet" href="/assets/css/styles.css" />
     <script src="/assets/js/init-shared.js" defer></script>
+    <script src="/assets/js/notifications.js" defer></script>
     <script src="/assets/js/components/rich-editor.js" defer></script>
     <script>
         // Purge legacy role demo key to avoid stale UI state
@@ -57,6 +58,7 @@
                                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                                     <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Oil Products Management</h2>
                     <div class="flex flex-wrap gap-2">
+                            <div id="notification-bell-wrapper" class="relative"></div>
                             <button id="addProductBtn" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Add Product</button>
                             <button id="export-products" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Export Products (CSV)</button>
                             <label for="import-products" class="ui-btn ui-btn-primary px-4 py-2 rounded font-semibold cursor-pointer">

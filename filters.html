@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg">
   <link rel="stylesheet" href="/assets/css/styles.css">
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   <script>
     // Purge legacy role demo key to avoid stale UI state
     try { localStorage.removeItem('currentUser'); } catch (_) {}
@@ -56,6 +57,7 @@
           <p class="text-[color:var(--token-text-secondary)]">Prepare filter inventory order list for purchasing department</p>
         </div>
         <div class="flex flex-wrap gap-2 mt-2 md:mt-0 no-print">
+          <div id="notification-bell-wrapper" class="relative"></div>
           <button id="clearAllBtn" class="ui-btn ui-btn-danger px-4 py-2 rounded-lg font-semibold">Clear All</button>
           <button id="saveOrderBtn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg font-semibold">Save Draft</button>
           <button id="manageProductsBtn" class="ui-btn ui-btn-primary px-4 py-2 rounded-lg font-semibold" onclick="window.location.href='filters-mgmt.html'">Manage Filters</button>

@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   <script>
     try { localStorage.removeItem('currentUser'); } catch (_) {}
   </script>
@@ -44,6 +45,7 @@
           <p class="text-[color:var(--token-text-secondary)]">Track parts returned to suppliers and monitor credit status</p>
         </div>
         <div class="flex flex-wrap gap-2">
+          <div id="notification-bell-wrapper" class="relative"></div>
           <button id="addReturnBtn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg font-semibold">+ New Return</button>
           <button id="exportReturnsBtn" class="ui-btn ui-btn-primary px-4 py-2 rounded-lg font-semibold">Export CSV</button>
         </div>

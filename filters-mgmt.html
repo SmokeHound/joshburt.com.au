@@ -8,6 +8,7 @@
     <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg" />
     <link rel="stylesheet" href="/assets/css/styles.css" />
     <script src="/assets/js/init-shared.js" defer></script>
+    <script src="/assets/js/notifications.js" defer></script>
     <script>
         // Purge legacy role demo key to avoid stale UI state
         try { localStorage.removeItem('currentUser'); } catch (_) {}
@@ -43,6 +44,7 @@
                                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                                     <h2 class="text-2xl font-bold text-accent mb-4 md:mb-0">Filters Management</h2>
                     <div class="flex flex-wrap gap-2">
+                            <div id="notification-bell-wrapper" class="relative"></div>
                             <button id="addProductBtn" class="ui-btn ui-btn-secondary px-4 py-2 rounded font-semibold">Add New Filter</button>
                             <button id="export-products" class="ui-btn ui-btn-warning px-4 py-2 rounded font-semibold">Export Filters (CSV)</button>
                             <label for="import-products" class="ui-btn ui-btn-primary px-4 py-2 rounded font-semibold cursor-pointer">

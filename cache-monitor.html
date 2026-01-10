@@ -6,6 +6,7 @@
     <title>Cache Monitor - joshburt.com.au</title>
     <link rel="stylesheet" href="/assets/css/styles.css" />
     <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
     <script>
       fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
       fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
@@ -20,9 +21,12 @@
 
     <main class="p-6 transition-all duration-300">
       <!-- Page Header -->
-      <header class="page-header ui-card border" role="banner">
-        <h1 class="text-3xl font-bold text-[color:var(--token-text-primary)]">Cache Monitor</h1>
-        <p class="subtitle">Monitor cache performance and manage cache entries</p>
+      <header class="page-header ui-card border flex items-center justify-between" role="banner">
+        <div>
+          <h1 class="text-3xl font-bold text-[color:var(--token-text-primary)]">Cache Monitor</h1>
+          <p class="subtitle">Monitor cache performance and manage cache entries</p>
+        </div>
+        <div id="notification-bell-wrapper" class="relative"></div>
       </header>
 
       <!-- Cache Statistics -->

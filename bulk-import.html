@@ -6,6 +6,7 @@
   <title>Bulk Operations - joshburt.com.au</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   <script src="/assets/js/feature-flags.js" defer></script>
 </head>
 <body class="bg-gray-900 text-gray-100">
@@ -14,9 +15,12 @@
   <main class="p-6">
     <div class="max-w-7xl mx-auto">
       <!-- Page Header -->
-      <header class="page-header ui-card border" role="banner">
-        <h1 class="text-3xl font-bold text-[color:var(--token-text-primary)]">Bulk Operations</h1>
-        <p class="subtitle">Import, export, and manage data in bulk</p>
+      <header class="page-header ui-card border flex items-center justify-between" role="banner">
+        <div>
+          <h1 class="text-3xl font-bold text-[color:var(--token-text-primary)]">Bulk Operations</h1>
+          <p class="subtitle">Import, export, and manage data in bulk</p>
+        </div>
+        <div id="notification-bell-wrapper" class="relative"></div>
       </header>
 
       <!-- Action Cards -->

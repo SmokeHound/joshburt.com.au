@@ -6,6 +6,7 @@
   <title>API Documentation - joshburt.com.au</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   <style>
     .endpoint-card {
       transition: all 0.3s ease;
@@ -56,7 +57,7 @@
     <!-- Main Content -->
     <main id="main-content" class="flex-1 p-4 md:p-6" role="main">
     <!-- Header -->
-    <header class="page-header ui-card border">
+    <header class="page-header ui-card border flex items-center justify-between">
       <div class="flex items-center gap-4">
         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-2xl">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,6 +69,7 @@
           <p class="text-xs mt-2 text-[color:var(--token-text-secondary)]">Interactive documentation for all API endpoints</p>
         </div>
       </div>
+      <div id="notification-bell-wrapper" class="relative"></div>
     </header>
 
     <!-- Stats Summary -->

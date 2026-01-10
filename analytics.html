@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   <script src="/assets/js/feature-flags.js" defer></script>
   <script>
     // Purge legacy role demo key to avoid stale UI state
@@ -28,9 +29,12 @@
   
   <div id="main-nav"></div>
   <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
-  <header class="page-header ui-card border">
-      <h1 class="text-2xl font-bold">Analytics Dashboard</h1>
-  <p class="text-sm text-[color:var(--token-text-muted)] mt-1">Business metrics, orders, inventory & returns overview</p>
+  <header class="page-header ui-card border flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold">Analytics Dashboard</h1>
+        <p class="text-sm text-[color:var(--token-text-muted)] mt-1">Business metrics, orders, inventory & returns overview</p>
+      </div>
+      <div id="notification-bell-wrapper" class="relative"></div>
     </header>
     <section class="space-y-4">
       <div class="flex flex-wrap gap-2" id="quick-date-chips"></div>

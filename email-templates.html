@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   <script src="/assets/js/feature-flags.js" defer></script>
   <link rel="stylesheet" href="/assets/css/accessibility.css" />
   <script src="/assets/js/accessibility.js" defer></script>
@@ -23,9 +24,12 @@
       <h1 class="text-2xl font-bold">Email Templates</h1>
       <p class="text-sm text-gray-400 mt-1">Manage reusable email templates with variable substitution</p>
     </div>
-    <button id="create-template-btn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg">
-      + Create Template
-    </button>
+    <div class="flex items-center gap-3">
+      <div id="notification-bell-wrapper" class="relative"></div>
+      <button id="create-template-btn" class="ui-btn ui-btn-secondary px-4 py-2 rounded-lg">
+        + Create Template
+      </button>
+    </div>
   </header>
 
   <!-- Templates List -->

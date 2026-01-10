@@ -6,6 +6,7 @@
   <title>Database Performance - joshburt.com.au</title>
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   <script>
     fetch('shared-config.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(['LINK','STYLE','SCRIPT'].includes(c.tagName)) document.head.appendChild(c.cloneNode(true));});});
     fetch('shared-theme.html').then(r=>r.text()).then(html=>{const t=document.createElement('div');t.innerHTML=html;Array.from(t.children).forEach(c=>{if(c.tagName==='SCRIPT') document.head.appendChild(c.cloneNode(true));});});
@@ -27,6 +28,7 @@
           <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Monitor database query performance and identify bottlenecks</p>
         </div>
         <div class="flex items-center gap-3">
+          <div id="notification-bell-wrapper" class="relative"></div>
           <span id="last-updated" class="text-sm text-gray-500 dark:text-gray-400">Last updated: —</span>
           <button id="header-refresh-btn" class="px-3 py-1 bg-[color:var(--token-bg-elevated)] text-[color:var(--token-text-primary)] border border-[color:var(--token-border-default)] rounded hover:border-[color:var(--token-border-hover)] text-sm">Refresh</button>
         </div>

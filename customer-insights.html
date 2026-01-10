@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   <script src="/assets/js/feature-flags.js" defer></script>
   <link rel="stylesheet" href="/assets/css/accessibility.css" />
   <script src="/assets/js/accessibility.js" defer></script>
@@ -19,9 +20,12 @@
 <div id="main-nav"></div>
 
 <main id="main-content" class="flex-1 p-4 space-y-6" role="main">
-  <header class="page-header ui-card border">
-    <h1 class="text-2xl font-bold">👥 Customer Insights</h1>
-    <p class="text-sm text-gray-400 mt-1">Customer segmentation, purchase patterns, and personalized recommendations</p>
+  <header class="page-header ui-card border flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">👥 Customer Insights</h1>
+      <p class="text-sm text-gray-400 mt-1">Customer segmentation, purchase patterns, and personalized recommendations</p>
+    </div>
+    <div id="notification-bell-wrapper" class="relative"></div>
   </header>
 
   <script>
