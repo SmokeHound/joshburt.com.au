@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Shared Header Demo</title>
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <script src="/assets/js/init-shared.js" defer></script>
+</head>
+<body>
+  <!-- Mobile Menu Toggle -->
+  <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 mobile-menu-toggle" aria-label="Toggle sidebar" aria-expanded="false">☰</button>
+  <div id="sidebar-backdrop" class="fixed inset-0 sidebar-backdrop z-40 hidden"></div>
+  
+  <div class="flex min-h-screen">
+    <!-- Shared Navigation Loader -->
+    <div id="main-nav"></div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="flex-1 p-4 md:p-6" role="main">
+      <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold mb-6 text-[color:var(--token-color-primary)]">Shared Header Demo</h1>
+        <p class="text-[color:var(--token-text-secondary)] mb-8">
+          This page demonstrates the shared header component with various configurations. 
+          The shared header provides a consistent design across all pages while allowing customization.
+        </p>
+
+        <!-- Example 1: Simple Header -->
+        <section class="mb-12">
+          <h2 class="text-2xl font-bold mb-4 text-white">Example 1: Simple Header (Title Only)</h2>
+          <div id="header-simple"></div>
+        </section>
+
+        <!-- Example 2: Header with Subtitle -->
+        <section class="mb-12">
+          <h2 class="text-2xl font-bold mb-4 text-white">Example 2: Header with Subtitle</h2>
+          <div id="header-subtitle"></div>
+        </section>
+
+        <!-- Example 3: Header with Icon -->
+        <section class="mb-12">
+          <h2 class="text-2xl font-bold mb-4 text-white">Example 3: Header with Icon</h2>
+          <div id="header-icon"></div>
+        </section>
+
+        <!-- Example 4: Header with Actions -->
+        <section class="mb-12">
+          <h2 class="text-2xl font-bold mb-4 text-white">Example 4: Header with Action Buttons</h2>
+          <div id="header-actions"></div>
+        </section>
+
+        <!-- Example 5: Full Featured Header -->
+        <section class="mb-12">
+          <h2 class="text-2xl font-bold mb-4 text-white">Example 5: Full Featured Header</h2>
+          <div id="header-full"></div>
+        </section>
+
+        <!-- Example 6: Header with Gradient -->
+        <section class="mb-12">
+          <h2 class="text-2xl font-bold mb-4 text-white">Example 6: Header with Animated Gradient</h2>
+          <div id="header-gradient"></div>
+        </section>
+
+        <!-- Example 7: Header with Metadata -->
+        <section class="mb-12">
+          <h2 class="text-2xl font-bold mb-4 text-white">Example 7: Header with Metadata</h2>
+          <div id="header-metadata"></div>
+        </section>
+
+        <!-- Usage Instructions -->
+        <section class="mt-12 ui-card p-6">
+          <h2 class="text-2xl font-bold mb-4 text-white">Usage Instructions</h2>
+          
+          <h3 class="text-xl font-semibold mb-2 text-[color:var(--token-color-primary)]">1. Include the shared header component</h3>
+          <pre class="bg-gray-900 p-4 rounded mb-4 overflow-x-auto"><code class="text-sm text-gray-300">&lt;!-- In your HTML &lt;head&gt; --&gt;
+&lt;script src="/shared-header.html" defer&gt;&lt;/script&gt;</code></pre>
+
+          <h3 class="text-xl font-semibold mb-2 text-[color:var(--token-color-primary)]">2. Add a container for the header</h3>
+          <pre class="bg-gray-900 p-4 rounded mb-4 overflow-x-auto"><code class="text-sm text-gray-300">&lt;!-- In your page content --&gt;
+&lt;div id="page-header-container"&gt;&lt;/div&gt;</code></pre>
+
+          <h3 class="text-xl font-semibold mb-2 text-[color:var(--token-color-primary)]">3. Render the header with JavaScript</h3>
+          <pre class="bg-gray-900 p-4 rounded mb-4 overflow-x-auto"><code class="text-sm text-gray-300">window.PageHeader.render({
+  title: 'Your Page Title',
+  subtitle: 'Optional description',
+  icon: 'settings', // Optional icon
+  actions: [ // Optional action buttons
+    { 
+      label: 'Add New', 
+      className: 'ui-btn ui-btn-primary',
+      onClick: function() { alert('Add clicked!'); }
+    }
+  ],
+  gradient: true, // Optional animated gradient
+  metadata: { // Optional metadata
+    'Last Updated': '2 hours ago'
+  }
+});</code></pre>
+
+          <h3 class="text-xl font-semibold mb-2 text-[color:var(--token-color-primary)]">Available Icons</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">home</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">user</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">users</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">settings</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">products</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">orders</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">analytics</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">logs</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">filter</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">consumables</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">notification</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">search</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">refresh</div>
+            </div>
+            <div class="bg-gray-900 p-3 rounded text-center">
+              <div class="text-gray-400 text-sm">admin</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Load shared header component inline for demo -->
+  <script>
+    // Include shared header component inline
+    (function() {
+      'use strict';
+
+      // Icon library - SVG paths for common icons
+      const ICONS = {
+        home: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10.5L12 3l9 7.5V21a1.5 1.5 0 01-1.5 1.5H4.5A1.5 1.5 0 013 21V10.5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 22v-6h6v6"></path>',
+        user: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>',
+        users: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />',
+        settings: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />',
+        products: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />',
+        orders: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />',
+        analytics: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />',
+        logs: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />',
+        filter: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>',
+        consumables: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.5 7.5h10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.5 12.5h10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.5 17.5h10.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7.5l1.75 1.75L8 7"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 12.5l1.75 1.75L8 12"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 17.5l1.75 1.75L8 17"></path>',
+        notification: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />',
+        search: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>',
+        refresh: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />',
+        admin: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2.5l7 2.8v6.2c0 5-3.5 9.5-7 9.5s-7-4.5-7-9.5V5.3l7-2.8z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.5l2.2 2.2 4-4"></path>'
+      };
+
+      // PageHeader API
+      window.PageHeader = {
+        render: function(options) {
+          if (!options || !options.title) {
+            console.error('PageHeader.render: title is required');
+            return;
+          }
+
+          const containerId = options.containerId || 'page-header-container';
+          const container = document.getElementById(containerId);
+          
+          if (!container) {
+            console.error(`PageHeader.render: container #${containerId} not found`);
+            return;
+          }
+
+          // Build icon HTML if provided
+          let iconHtml = '';
+          if (options.icon && ICONS[options.icon]) {
+            iconHtml = `
+              <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-[color:var(--token-bg-elevated)] border border-[color:var(--token-border-default)] flex items-center justify-center flex-shrink-0 shadow-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-9 md:w-9 text-[color:var(--token-color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  ${ICONS[options.icon]}
+                </svg>
+              </div>
+            `;
+          }
+
+          // Build subtitle HTML if provided
+          let subtitleHtml = '';
+          if (options.subtitle) {
+            subtitleHtml = `<p class="text-sm md:text-base text-[color:var(--token-text-secondary)] mt-2">${this._escapeHtml(options.subtitle)}</p>`;
+          }
+
+          // Build actions HTML if provided
+          let actionsHtml = '';
+          if (options.actions && Array.isArray(options.actions) && options.actions.length > 0) {
+            const actionButtons = options.actions.map((action, index) => {
+              const id = action.id || `page-header-action-${index}`;
+              const label = this._escapeHtml(action.label || 'Action');
+              const className = action.className || 'ui-btn ui-btn-primary';
+              const ariaLabel = action.ariaLabel ? `aria-label="${this._escapeHtml(action.ariaLabel)}"` : '';
+              const title = action.title ? `title="${this._escapeHtml(action.title)}"` : '';
+              
+              return `<button id="${id}" class="${className} px-4 py-2 rounded" ${ariaLabel} ${title}>${label}</button>`;
+            }).join('');
+
+            actionsHtml = `
+              <div class="flex items-center gap-2 md:gap-3 flex-wrap">
+                ${actionButtons}
+              </div>
+            `;
+          }
+
+          // Build metadata HTML if provided
+          let metadataHtml = '';
+          if (options.metadata) {
+            const metaItems = Object.entries(options.metadata).map(([key, value]) => {
+              return `<div class="text-xs text-[color:var(--token-text-muted)]">${this._escapeHtml(key)}: <span class="text-[color:var(--token-text-secondary)]">${this._escapeHtml(value)}</span></div>`;
+            }).join('');
+            metadataHtml = `<div class="text-right">${metaItems}</div>`;
+          }
+
+          // Build gradient background if requested
+          let gradientHtml = '';
+          if (options.gradient) {
+            gradientHtml = `
+              <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-cyan-500/5 opacity-50" aria-hidden="true"></div>
+            `;
+          }
+
+          // Determine if we need relative positioning for gradient
+          const positionClass = options.gradient ? 'relative overflow-hidden' : '';
+          const contentClass = options.gradient ? 'relative z-10' : '';
+
+          // Additional custom classes
+          const customClass = options.className || '';
+
+          // Build final header HTML
+          const headerHtml = `
+            <header class="page-header ui-card border ${positionClass} ${customClass}" role="banner">
+              ${gradientHtml}
+              <div class="${contentClass} flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3 md:gap-4 flex-1">
+                  ${iconHtml}
+                  <div class="flex-1 min-w-0">
+                    <h1 class="text-2xl md:text-3xl font-bold text-[color:var(--token-text-primary)] truncate">${this._escapeHtml(options.title)}</h1>
+                    ${subtitleHtml}
+                  </div>
+                </div>
+                <div class="flex items-center gap-4 flex-wrap md:flex-nowrap">
+                  ${metadataHtml}
+                  ${actionsHtml}
+                </div>
+              </div>
+            </header>
+          `;
+
+          // Insert into container
+          container.innerHTML = headerHtml;
+
+          // Attach event handlers if provided
+          if (options.actions && Array.isArray(options.actions)) {
+            options.actions.forEach((action, index) => {
+              const id = action.id || `page-header-action-${index}`;
+              const btn = document.getElementById(id);
+              
+              if (btn && action.onClick) {
+                if (typeof action.onClick === 'function') {
+                  btn.addEventListener('click', action.onClick);
+                } else if (typeof action.onClick === 'string' && typeof window[action.onClick] === 'function') {
+                  btn.addEventListener('click', window[action.onClick]);
+                }
+              }
+            });
+          }
+        },
+
+        _escapeHtml: function(text) {
+          const div = document.createElement('div');
+          div.textContent = String(text || '');
+          return div.innerHTML;
+        }
+      };
+    })();
+  </script>
+  
+  <!-- Demo Script -->
+  <script>
+    // Wait for both DOM and PageHeader to be ready
+    function initHeaders() {
+      if (typeof window.PageHeader === 'undefined') {
+        setTimeout(initHeaders, 100);
+        return;
+      }
+      // Example 1: Simple Header
+      window.PageHeader.render({
+        title: 'Simple Page Title',
+        containerId: 'header-simple'
+      });
+
+      // Example 2: Header with Subtitle
+      window.PageHeader.render({
+        title: 'Page with Subtitle',
+        subtitle: 'This is a descriptive subtitle that explains the page purpose',
+        containerId: 'header-subtitle'
+      });
+
+      // Example 3: Header with Icon
+      window.PageHeader.render({
+        title: 'Settings Page',
+        subtitle: 'Configure your preferences',
+        icon: 'settings',
+        containerId: 'header-icon'
+      });
+
+      // Example 4: Header with Actions
+      window.PageHeader.render({
+        title: 'User Management',
+        subtitle: 'Manage user accounts and permissions',
+        icon: 'users',
+        actions: [
+          {
+            label: 'Add User',
+            className: 'ui-btn ui-btn-primary',
+            onClick: function() {
+              alert('Add User clicked!');
+            }
+          },
+          {
+            label: 'Export',
+            className: 'ui-btn ui-btn-secondary',
+            onClick: function() {
+              alert('Export clicked!');
+            }
+          }
+        ],
+        containerId: 'header-actions'
+      });
+
+      // Example 5: Full Featured Header
+      window.PageHeader.render({
+        title: 'Product Catalog',
+        subtitle: 'Browse and manage product inventory',
+        icon: 'products',
+        actions: [
+          {
+            label: 'Add Product',
+            className: 'ui-btn ui-btn-secondary',
+            onClick: function() {
+              alert('Add Product clicked!');
+            }
+          },
+          {
+            label: 'Import',
+            className: 'ui-btn ui-btn-primary',
+            onClick: function() {
+              alert('Import clicked!');
+            }
+          },
+          {
+            label: 'Export',
+            className: 'ui-btn ui-btn-outline',
+            onClick: function() {
+              alert('Export clicked!');
+            }
+          }
+        ],
+        containerId: 'header-full'
+      });
+
+      // Example 6: Header with Gradient
+      window.PageHeader.render({
+        title: 'Welcome Dashboard',
+        subtitle: 'Your personalized overview',
+        icon: 'home',
+        gradient: true,
+        actions: [
+          {
+            label: 'Refresh',
+            className: 'ui-btn ui-btn-primary',
+            onClick: function() {
+              alert('Refresh clicked!');
+            }
+          }
+        ],
+        containerId: 'header-gradient'
+      });
+
+      // Example 7: Header with Metadata
+      window.PageHeader.render({
+        title: 'Analytics Dashboard',
+        subtitle: 'View detailed statistics and insights',
+        icon: 'analytics',
+        metadata: {
+          'Last Updated': '2 hours ago',
+          'Status': 'Online'
+        },
+        actions: [
+          {
+            label: 'Refresh Data',
+            className: 'ui-btn ui-btn-primary',
+            onClick: function() {
+              alert('Refresh Data clicked!');
+            }
+          }
+        ],
+        containerId: 'header-metadata'
+      });
+    }
+    
+    // Start initialization
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHeaders);
+    } else {
+      initHeaders();
+    }
+  </script>
+</body>
+</html>
