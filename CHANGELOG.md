@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.9.2...v1.10.0) (2026-01-10)
+
+### Features
+
+* enhance theme customization options with additional color settings ([344973f](https://github.com/SmokeHound/joshburt.com.au/commit/344973f7c6a8a5c97a72e7f9e7647c090ca27ccb))
+
 ## [1.9.2](https://github.com/SmokeHound/joshburt.com.au/compare/v1.9.1...v1.9.2) (2026-01-10)
 
 ### Bug Fixes
