@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/SmokeHound/joshburt.com.au/compare/v1.9.0...v1.9.1) (2026-01-10)
+
+### Bug Fixes
+
+* repair search results HTML ([90c3443](https://github.com/SmokeHound/joshburt.com.au/commit/90c34430b565bc64e5e4db6a17c171673b61a1ba))
+* restore static audit logs header ([71f6bc3](https://github.com/SmokeHound/joshburt.com.au/commit/71f6bc3a7ea6538119f6101fe6822d2cb34db143))
+
 ## [1.9.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.8.0...v1.9.0) (2026-01-09)
 
 ### Features
