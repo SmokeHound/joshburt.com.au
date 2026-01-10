@@ -90,154 +90,154 @@
       '#cccccc';
 
     builderContainer.innerHTML = `
-      <div class="card p-6 border border-gray-700 rounded-xl bg-gray-900/20">
-        <div class="flex items-start justify-between gap-4 mb-6">
+      <div class="card p-4 border border-gray-700 rounded-xl bg-gray-900/20">
+        <div class="flex items-start justify-between gap-4 mb-4">
           <div>
-            <h3 class="text-lg font-bold text-white">Custom Theme Builder</h3>
-            <p class="text-sm text-gray-400 mt-1">Pick colors, then click Apply to preview immediately.</p>
+            <h3 class="text-base font-bold text-white">Custom Theme Builder</h3>
+            <p class="text-xs text-gray-400 mt-1">Pick colors, then click Apply to preview immediately.</p>
           </div>
-          <div class="hidden md:flex items-center gap-2 text-[11px] text-gray-400">
-            <span class="px-2 py-1 rounded-full bg-gray-800/60 border border-gray-700/60">Core</span>
-            <span class="px-2 py-1 rounded-full bg-gray-800/60 border border-gray-700/60">Nav</span>
-            <span class="px-2 py-1 rounded-full bg-gray-800/60 border border-gray-700/60">Buttons</span>
+          <div class="hidden md:flex items-center gap-2 text-[10px] text-gray-400">
+            <span class="px-2 py-0.5 rounded-full bg-gray-800/60 border border-gray-700/60">Core</span>
+            <span class="px-2 py-0.5 rounded-full bg-gray-800/60 border border-gray-700/60">Nav</span>
+            <span class="px-2 py-0.5 rounded-full bg-gray-800/60 border border-gray-700/60">Buttons</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div class="md:col-span-2">
             <h4 class="text-sm font-semibold text-gray-200">Core Palette</h4>
             <p class="text-xs text-gray-500 mt-1">Used across links, highlights, and UI accents.</p>
           </div>
 
-          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-4">
-            <label for="custom-primary" class="block text-sm font-medium text-gray-200 mb-1">Primary</label>
-            <p class="text-xs text-gray-500 mb-3">Main brand and primary actions.</p>
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-primary" class="block text-xs font-medium text-gray-200 mb-1">Primary</label>
+            <p class="text-xs text-gray-500 mb-2">Main brand and primary actions.</p>
             <div class="flex gap-3 items-center">
               <input type="color" id="custom-primary" value="${customTheme.colors.primary}" 
-                class="w-14 h-14 rounded-lg border-2 border-gray-700 cursor-pointer" />
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-primary-text" value="${customTheme.colors.primary}" 
-                class="flex-1 p-3 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-sm" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
-          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-4">
-            <label for="custom-secondary" class="block text-sm font-medium text-gray-200 mb-1">Secondary</label>
-            <p class="text-xs text-gray-500 mb-3">Supporting highlights and secondary UI.</p>
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-secondary" class="block text-xs font-medium text-gray-200 mb-1">Secondary</label>
+            <p class="text-xs text-gray-500 mb-2">Supporting highlights and secondary UI.</p>
             <div class="flex gap-3 items-center">
               <input type="color" id="custom-secondary" value="${customTheme.colors.secondary}" 
-                class="w-14 h-14 rounded-lg border-2 border-gray-700 cursor-pointer" />
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-secondary-text" value="${customTheme.colors.secondary}" 
-                class="flex-1 p-3 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-sm" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
-          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-4">
-            <label for="custom-accent" class="block text-sm font-medium text-gray-200 mb-1">Accent</label>
-            <p class="text-xs text-gray-500 mb-3">Decorative accents and subtle emphasis.</p>
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-accent" class="block text-xs font-medium text-gray-200 mb-1">Accent</label>
+            <p class="text-xs text-gray-500 mb-2">Decorative accents and subtle emphasis.</p>
             <div class="flex gap-3 items-center">
               <input type="color" id="custom-accent" value="${customTheme.colors.accent}" 
-                class="w-14 h-14 rounded-lg border-2 border-gray-700 cursor-pointer" />
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-accent-text" value="${customTheme.colors.accent}" 
-                class="flex-1 p-3 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-sm" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
-          <div class="md:col-span-2 border-t border-gray-700/60 pt-4"></div>
+          <div class="md:col-span-2 border-t border-gray-700/60 pt-3"></div>
 
           <div class="md:col-span-2">
             <h4 class="text-sm font-semibold text-gray-200">Navigation</h4>
             <p class="text-xs text-gray-500 mt-1">Sidebar background and link text.</p>
           </div>
 
-          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-4">
-            <label for="custom-navBg" class="block text-sm font-medium text-gray-200 mb-1">Nav Background</label>
-            <p class="text-xs text-gray-500 mb-3">Sidebar background color.</p>
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-navBg" class="block text-xs font-medium text-gray-200 mb-1">Nav Background</label>
+            <p class="text-xs text-gray-500 mb-2">Sidebar background color.</p>
             <div class="flex gap-3 items-center">
               <input type="color" id="custom-navBg" value="${navBgDefault}" 
-                class="w-14 h-14 rounded-lg border-2 border-gray-700 cursor-pointer" />
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-navBg-text" value="${navBgDefault}" 
-                class="flex-1 p-3 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-sm" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
-          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-4">
-            <label for="custom-navText" class="block text-sm font-medium text-gray-200 mb-1">Nav Text</label>
-            <p class="text-xs text-gray-500 mb-3">Sidebar link and label color.</p>
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-navText" class="block text-xs font-medium text-gray-200 mb-1">Nav Text</label>
+            <p class="text-xs text-gray-500 mb-2">Sidebar link and label color.</p>
             <div class="flex gap-3 items-center">
               <input type="color" id="custom-navText" value="${navTextDefault}" 
-                class="w-14 h-14 rounded-lg border-2 border-gray-700 cursor-pointer" />
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-navText-text" value="${navTextDefault}" 
-                class="flex-1 p-3 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-sm" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
-          <div class="md:col-span-2 border-t border-gray-700/60 pt-4"></div>
+          <div class="md:col-span-2 border-t border-gray-700/60 pt-3"></div>
 
           <div class="md:col-span-2">
             <h4 class="text-sm font-semibold text-gray-200">Buttons</h4>
             <p class="text-xs text-gray-500 mt-1">Primary/secondary/danger/success button backgrounds.</p>
           </div>
 
-          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-4">
-            <label for="custom-buttonPrimary" class="block text-sm font-medium text-gray-200 mb-1">Primary</label>
-            <p class="text-xs text-gray-500 mb-3">Default call-to-action button.</p>
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-buttonPrimary" class="block text-xs font-medium text-gray-200 mb-1">Primary</label>
+            <p class="text-xs text-gray-500 mb-2">Default call-to-action button.</p>
             <div class="flex gap-3 items-center">
               <input type="color" id="custom-buttonPrimary" value="${customTheme.colors.buttonPrimary}" 
-                class="w-14 h-14 rounded-lg border-2 border-gray-700 cursor-pointer" />
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-buttonPrimary-text" value="${customTheme.colors.buttonPrimary}" 
-                class="flex-1 p-3 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-sm" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
-          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-4">
-            <label for="custom-buttonSecondary" class="block text-sm font-medium text-gray-200 mb-1">Secondary</label>
-            <p class="text-xs text-gray-500 mb-3">Secondary actions and subtle buttons.</p>
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-buttonSecondary" class="block text-xs font-medium text-gray-200 mb-1">Secondary</label>
+            <p class="text-xs text-gray-500 mb-2">Secondary actions and subtle buttons.</p>
             <div class="flex gap-3 items-center">
               <input type="color" id="custom-buttonSecondary" value="${customTheme.colors.buttonSecondary}" 
-                class="w-14 h-14 rounded-lg border-2 border-gray-700 cursor-pointer" />
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-buttonSecondary-text" value="${customTheme.colors.buttonSecondary}" 
-                class="flex-1 p-3 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-sm" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
-          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-4">
-            <label for="custom-buttonDanger" class="block text-sm font-medium text-gray-200 mb-1">Danger</label>
-            <p class="text-xs text-gray-500 mb-3">Destructive actions.</p>
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-buttonDanger" class="block text-xs font-medium text-gray-200 mb-1">Danger</label>
+            <p class="text-xs text-gray-500 mb-2">Destructive actions.</p>
             <div class="flex gap-3 items-center">
               <input type="color" id="custom-buttonDanger" value="${customTheme.colors.buttonDanger}" 
-                class="w-14 h-14 rounded-lg border-2 border-gray-700 cursor-pointer" />
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-buttonDanger-text" value="${customTheme.colors.buttonDanger}" 
-                class="flex-1 p-3 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-sm" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
-          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-4">
-            <label for="custom-buttonSuccess" class="block text-sm font-medium text-gray-200 mb-1">Success</label>
-            <p class="text-xs text-gray-500 mb-3">Positive confirmations and success actions.</p>
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-buttonSuccess" class="block text-xs font-medium text-gray-200 mb-1">Success</label>
+            <p class="text-xs text-gray-500 mb-2">Positive confirmations and success actions.</p>
             <div class="flex gap-3 items-center">
               <input type="color" id="custom-buttonSuccess" value="${customTheme.colors.buttonSuccess}" 
-                class="w-14 h-14 rounded-lg border-2 border-gray-700 cursor-pointer" />
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-buttonSuccess-text" value="${customTheme.colors.buttonSuccess}" 
-                class="flex-1 p-3 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-sm" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
-          <div class="md:col-span-2 border-t border-gray-700/60 pt-4"></div>
+          <div class="md:col-span-2 border-t border-gray-700/60 pt-3"></div>
 
           <div class="flex flex-col md:flex-row gap-3 md:col-span-2">
-            <button id="apply-custom-theme" class="w-full md:flex-1 ui-btn ui-btn-primary px-4 py-3 rounded-lg">
+            <button id="apply-custom-theme" class="w-full md:flex-1 ui-btn ui-btn-primary px-4 py-2 rounded-lg text-sm">
               Apply Custom Theme
             </button>
-            <button id="reset-custom-theme" class="w-full md:w-auto ui-btn ui-btn-secondary px-4 py-3 rounded-lg">
+            <button id="reset-custom-theme" class="w-full md:w-auto ui-btn ui-btn-secondary px-4 py-2 rounded-lg text-sm">
               Reset
             </button>
           </div>
