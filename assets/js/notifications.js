@@ -326,9 +326,38 @@
   }
   function ensureBell() {
     let bell = document.getElementById('notification-bell');
-    const wrapper = document.getElementById('notification-bell-wrapper');
+    const navWrapper = document.getElementById('notification-bell-wrapper-nav');
+    const wrapper = navWrapper || document.getElementById('notification-bell-wrapper');
+
+    if (!bell && navWrapper) {
+      const legacyWrapper = document.getElementById('notification-bell-wrapper');
+      if (legacyWrapper) {
+        legacyWrapper.remove();
+      }
+    }
+
+    if (!bell && !wrapper) {
+      if (!window._notifBellRetryCount) {
+        window._notifBellRetryCount = 0;
+      }
+      if (window._notifBellRetryCount < 20) {
+        window._notifBellRetryCount++;
+        setTimeout(ensureBell, 100);
+      }
+      return;
+    }
+
     if (!bell && wrapper) {
-      wrapper.innerHTML = `<button id="notification-bell" aria-haspopup="true" aria-expanded="false" aria-controls="notification-dropdown" class="flex items-center gap-2 px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-secondary text-sm" title="Notifications"><span class="hidden sm:inline" data-i18n="notifications.title">Notifications</span><span class="relative inline-flex items-center">🔔<span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span></span></button><div id="notification-dropdown" role="dialog" aria-modal="false" aria-label="Notifications" class="hidden absolute right-0 mt-2 w-96 max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50"><div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 id="notifications-header" class="font-semibold" data-i18n="notifications.title">Notifications</h3><button id="close-notifications" class="text-xs text-gray-400 hover:text-gray-200" aria-label="Close">✕</button></div><div id="notification-list" class="max-h-80 overflow-y-auto p-2" aria-labelledby="notifications-header" aria-live="polite"></div></div>`;
+      const isNav = !!(wrapper.closest && wrapper.closest('#sidebar'));
+      const bellClass = isNav
+        ? 'nav-link ui-link ui-link-nav block w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center justify-between gap-2'
+        : 'flex items-center gap-2 px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-secondary text-sm';
+      const labelClass = isNav ? '' : 'hidden sm:inline';
+      const dropdownClass = isNav
+        ? 'hidden absolute left-full top-0 ml-3 w-96 max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50'
+        : 'hidden absolute right-0 mt-2 w-96 max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50';
+
+      wrapper.innerHTML = `<button id="notification-bell" aria-haspopup="true" aria-expanded="false" aria-controls="notification-dropdown" class="${bellClass}" title="Notifications"><span class="${labelClass}" data-i18n="notifications.title">Notifications</span><span class="relative inline-flex items-center">🔔<span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span></span></button><div id="notification-dropdown" role="dialog" aria-modal="false" aria-label="Notifications" class="${dropdownClass}"><div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 id="notifications-header" class="font-semibold" data-i18n="notifications.title">Notifications</h3><button id="close-notifications" class="text-xs text-gray-400 hover:text-gray-200" aria-label="Close">✕</button></div><div id="notification-list" class="max-h-80 overflow-y-auto p-2" aria-labelledby="notifications-header" aria-live="polite"></div></div>`;
       bell = document.getElementById('notification-bell');
       const dropdown = document.getElementById('notification-dropdown');
       const closeBtn = document.getElementById('close-notifications');
