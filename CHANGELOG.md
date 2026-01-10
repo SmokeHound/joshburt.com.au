@@ -1,3 +1,9 @@
+## [1.9.2](https://github.com/SmokeHound/joshburt.com.au/compare/v1.9.1...v1.9.2) (2026-01-10)
+
+### Bug Fixes
+
+* improve styling and layout of custom theme builder UI ([4b5de12](https://github.com/SmokeHound/joshburt.com.au/commit/4b5de1213a1720bd5be6d0e50cd64365121fe2ae))
+
 ## [1.9.1](https://github.com/SmokeHound/joshburt.com.au/compare/v1.9.0...v1.9.1) (2026-01-10)
 
 ### Bug Fixes
