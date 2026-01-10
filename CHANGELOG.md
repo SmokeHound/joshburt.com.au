@@ -1,3 +1,9 @@
+## [1.11.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.10.0...v1.11.0) (2026-01-10)
+
+### Features
+
+* add notification bell wrapper to navigation for improved accessibility and user experience ([d7cb111](https://github.com/SmokeHound/joshburt.com.au/commit/d7cb111c23e205da62c0954a08e9730ceca2f37a))
+
 ## [1.10.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.9.2...v1.10.0) (2026-01-10)
 
 ### Features
