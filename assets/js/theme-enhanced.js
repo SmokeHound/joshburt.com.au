@@ -223,6 +223,17 @@
           localStorage.removeItem('buttonSecondaryColor');
           localStorage.removeItem('buttonDangerColor');
           localStorage.removeItem('buttonSuccessColor');
+          localStorage.removeItem('bgPrimaryColor');
+          localStorage.removeItem('bgSecondaryColor');
+          localStorage.removeItem('bgElevatedColor');
+          localStorage.removeItem('borderDefaultColor');
+          localStorage.removeItem('borderHoverColor');
+          localStorage.removeItem('borderFocusColor');
+          localStorage.removeItem('textPrimaryColor');
+          localStorage.removeItem('textSecondaryColor');
+          localStorage.removeItem('textMutedColor');
+          localStorage.removeItem('warningColor');
+          localStorage.removeItem('infoColor');
         } catch (_) {
           // Ignore storage errors
         }

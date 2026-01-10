@@ -89,6 +89,32 @@
       getCssVarHex('--token-text-secondary') ||
       '#cccccc';
 
+    const bgPrimaryDefault =
+      customTheme.colors.bgPrimary || getCssVarHex('--token-bg-primary') || '#0b0b0b';
+    const bgSecondaryDefault =
+      customTheme.colors.bgSecondary || getCssVarHex('--token-bg-secondary') || '#141414';
+    const bgElevatedDefault =
+      customTheme.colors.bgElevated || getCssVarHex('--token-bg-elevated') || '#1c1c1c';
+
+    const borderDefaultDefault =
+      customTheme.colors.borderDefault || getCssVarHex('--token-border-default') || '#333333';
+    const borderHoverDefault =
+      customTheme.colors.borderHover || getCssVarHex('--token-border-hover') || customTheme.colors.primary;
+    const borderFocusDefault =
+      customTheme.colors.borderFocus || getCssVarHex('--token-border-focus') || customTheme.colors.primary;
+
+    const textPrimaryDefault =
+      customTheme.colors.textPrimary || getCssVarHex('--token-text-primary') || '#f5f5f5';
+    const textSecondaryDefault =
+      customTheme.colors.textSecondary || getCssVarHex('--token-text-secondary') || '#cccccc';
+    const textMutedDefault =
+      customTheme.colors.textMuted || getCssVarHex('--token-text-muted') || '#888888';
+
+    const warningDefault =
+      customTheme.colors.warning || getCssVarHex('--token-color-warning') || '#f59e0b';
+    const infoDefault =
+      customTheme.colors.info || getCssVarHex('--token-color-info') || customTheme.colors.primary;
+
     builderContainer.innerHTML = `
       <div class="card p-4 border border-gray-700 rounded-xl bg-gray-900/20">
         <div class="flex items-start justify-between gap-4 mb-4">
@@ -99,6 +125,9 @@
           <div class="hidden md:flex items-center gap-2 text-[10px] text-gray-400">
             <span class="px-2 py-0.5 rounded-full bg-gray-800/60 border border-gray-700/60">Core</span>
             <span class="px-2 py-0.5 rounded-full bg-gray-800/60 border border-gray-700/60">Nav</span>
+            <span class="px-2 py-0.5 rounded-full bg-gray-800/60 border border-gray-700/60">Surface</span>
+            <span class="px-2 py-0.5 rounded-full bg-gray-800/60 border border-gray-700/60">Text</span>
+            <span class="px-2 py-0.5 rounded-full bg-gray-800/60 border border-gray-700/60">Status</span>
             <span class="px-2 py-0.5 rounded-full bg-gray-800/60 border border-gray-700/60">Buttons</span>
           </div>
         </div>
@@ -179,6 +208,152 @@
           <div class="md:col-span-2 border-t border-gray-700/60 pt-3"></div>
 
           <div class="md:col-span-2">
+            <h4 class="text-sm font-semibold text-gray-200">Surfaces & Text</h4>
+            <p class="text-xs text-gray-500 mt-1">Backgrounds, borders, and text tokens used across the app.</p>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-bgPrimary" class="block text-xs font-medium text-gray-200 mb-1">Background (Primary)</label>
+            <p class="text-xs text-gray-500 mb-2">Main page background.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-bgPrimary" value="${bgPrimaryDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-bgPrimary-text" value="${bgPrimaryDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-bgSecondary" class="block text-xs font-medium text-gray-200 mb-1">Background (Secondary)</label>
+            <p class="text-xs text-gray-500 mb-2">Alternative background for sections.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-bgSecondary" value="${bgSecondaryDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-bgSecondary-text" value="${bgSecondaryDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-bgElevated" class="block text-xs font-medium text-gray-200 mb-1">Background (Elevated)</label>
+            <p class="text-xs text-gray-500 mb-2">Cards, panels, and raised surfaces.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-bgElevated" value="${bgElevatedDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-bgElevated-text" value="${bgElevatedDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-borderDefault" class="block text-xs font-medium text-gray-200 mb-1">Border (Default)</label>
+            <p class="text-xs text-gray-500 mb-2">Standard border color.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-borderDefault" value="${borderDefaultDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-borderDefault-text" value="${borderDefaultDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-borderHover" class="block text-xs font-medium text-gray-200 mb-1">Border (Hover)</label>
+            <p class="text-xs text-gray-500 mb-2">Hover-state border highlight.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-borderHover" value="${borderHoverDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-borderHover-text" value="${borderHoverDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-borderFocus" class="block text-xs font-medium text-gray-200 mb-1">Border (Focus)</label>
+            <p class="text-xs text-gray-500 mb-2">Focus ring / focus border color.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-borderFocus" value="${borderFocusDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-borderFocus-text" value="${borderFocusDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-textPrimary" class="block text-xs font-medium text-gray-200 mb-1">Text (Primary)</label>
+            <p class="text-xs text-gray-500 mb-2">Main body text color.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-textPrimary" value="${textPrimaryDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-textPrimary-text" value="${textPrimaryDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-textSecondary" class="block text-xs font-medium text-gray-200 mb-1">Text (Secondary)</label>
+            <p class="text-xs text-gray-500 mb-2">Subtext and secondary labels.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-textSecondary" value="${textSecondaryDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-textSecondary-text" value="${textSecondaryDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-textMuted" class="block text-xs font-medium text-gray-200 mb-1">Text (Muted)</label>
+            <p class="text-xs text-gray-500 mb-2">Muted UI text (hints, captions).</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-textMuted" value="${textMutedDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-textMuted-text" value="${textMutedDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="md:col-span-2 border-t border-gray-700/60 pt-3"></div>
+
+          <div class="md:col-span-2">
+            <h4 class="text-sm font-semibold text-gray-200">Status Colors</h4>
+            <p class="text-xs text-gray-500 mt-1">Used for warnings and informational UI.</p>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-warning" class="block text-xs font-medium text-gray-200 mb-1">Warning</label>
+            <p class="text-xs text-gray-500 mb-2">Warnings and attention states.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-warning" value="${warningDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-warning-text" value="${warningDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-info" class="block text-xs font-medium text-gray-200 mb-1">Info</label>
+            <p class="text-xs text-gray-500 mb-2">Informational states and badges.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-info" value="${infoDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-info-text" value="${infoDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="md:col-span-2 border-t border-gray-700/60 pt-3"></div>
+
+          <div class="md:col-span-2">
             <h4 class="text-sm font-semibold text-gray-200">Buttons</h4>
             <p class="text-xs text-gray-500 mt-1">Primary/secondary/danger/success button backgrounds.</p>
           </div>
@@ -234,7 +409,7 @@
           <div class="md:col-span-2 border-t border-gray-700/60 pt-3"></div>
 
           <div class="flex flex-col md:flex-row gap-3 md:col-span-2">
-            <button id="apply-custom-theme" class="w-full md:flex-1 ui-btn ui-btn-primary px-4 py-2 rounded-lg text-sm">
+            <button id="apply-custom-theme" class="w-full md:w-auto ui-btn ui-btn-primary px-4 py-2 rounded-lg text-sm">
               Apply Custom Theme
             </button>
             <button id="reset-custom-theme" class="w-full md:w-auto ui-btn ui-btn-secondary px-4 py-2 rounded-lg text-sm">
@@ -250,7 +425,7 @@
     `;
 
     // Sync color picker and text input
-    ['primary', 'secondary', 'accent', 'navBg', 'navText', 'buttonPrimary', 'buttonSecondary', 'buttonDanger', 'buttonSuccess'].forEach(colorType => {
+    ['primary', 'secondary', 'accent', 'navBg', 'navText', 'bgPrimary', 'bgSecondary', 'bgElevated', 'borderDefault', 'borderHover', 'borderFocus', 'textPrimary', 'textSecondary', 'textMuted', 'warning', 'info', 'buttonPrimary', 'buttonSecondary', 'buttonDanger', 'buttonSuccess'].forEach(colorType => {
       const colorInput = document.getElementById(`custom-${colorType}`);
       const textInput = document.getElementById(`custom-${colorType}-text`);
 
@@ -277,6 +452,17 @@
         accent: document.getElementById('custom-accent').value,
         navBg: document.getElementById('custom-navBg').value,
         navText: document.getElementById('custom-navText').value,
+        bgPrimary: document.getElementById('custom-bgPrimary').value,
+        bgSecondary: document.getElementById('custom-bgSecondary').value,
+        bgElevated: document.getElementById('custom-bgElevated').value,
+        borderDefault: document.getElementById('custom-borderDefault').value,
+        borderHover: document.getElementById('custom-borderHover').value,
+        borderFocus: document.getElementById('custom-borderFocus').value,
+        textPrimary: document.getElementById('custom-textPrimary').value,
+        textSecondary: document.getElementById('custom-textSecondary').value,
+        textMuted: document.getElementById('custom-textMuted').value,
+        warning: document.getElementById('custom-warning').value,
+        info: document.getElementById('custom-info').value,
         buttonPrimary: document.getElementById('custom-buttonPrimary').value,
         buttonSecondary: document.getElementById('custom-buttonSecondary').value,
         buttonDanger: document.getElementById('custom-buttonDanger').value,

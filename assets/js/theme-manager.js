@@ -206,10 +206,21 @@
         buttonPrimary: siteSettings.buttonPrimaryColor || localStorage.getItem('buttonPrimaryColor') || null,
         buttonSecondary: siteSettings.buttonSecondaryColor || localStorage.getItem('buttonSecondaryColor') || null,
         buttonDanger: siteSettings.buttonDangerColor || localStorage.getItem('buttonDangerColor') || null,
-        buttonSuccess: siteSettings.buttonSuccessColor || localStorage.getItem('buttonSuccessColor') || null
+        buttonSuccess: siteSettings.buttonSuccessColor || localStorage.getItem('buttonSuccessColor') || null,
+        bgPrimary: siteSettings.bgPrimaryColor || localStorage.getItem('bgPrimaryColor') || null,
+        bgSecondary: siteSettings.bgSecondaryColor || localStorage.getItem('bgSecondaryColor') || null,
+        bgElevated: siteSettings.bgElevatedColor || localStorage.getItem('bgElevatedColor') || null,
+        borderDefault: siteSettings.borderDefaultColor || localStorage.getItem('borderDefaultColor') || null,
+        borderHover: siteSettings.borderHoverColor || localStorage.getItem('borderHoverColor') || null,
+        borderFocus: siteSettings.borderFocusColor || localStorage.getItem('borderFocusColor') || null,
+        textPrimary: siteSettings.textPrimaryColor || localStorage.getItem('textPrimaryColor') || null,
+        textSecondary: siteSettings.textSecondaryColor || localStorage.getItem('textSecondaryColor') || null,
+        textMuted: siteSettings.textMutedColor || localStorage.getItem('textMutedColor') || null,
+        warning: siteSettings.warningColor || localStorage.getItem('warningColor') || null,
+        info: siteSettings.infoColor || localStorage.getItem('infoColor') || null
       };
     } catch (e) {
-      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null };
+      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null, bgPrimary: null, bgSecondary: null, bgElevated: null, borderDefault: null, borderHover: null, borderFocus: null, textPrimary: null, textSecondary: null, textMuted: null, warning: null, info: null };
     }
   }
 
@@ -324,6 +335,70 @@
     } else {
       root.style.removeProperty('--token-nav-bg');
     }
+
+    // Surface + text customization
+    if (colors.bgPrimary) {
+      root.style.setProperty('--token-bg-primary', colors.bgPrimary);
+    } else {
+      root.style.removeProperty('--token-bg-primary');
+    }
+    if (colors.bgSecondary) {
+      root.style.setProperty('--token-bg-secondary', colors.bgSecondary);
+    } else {
+      root.style.removeProperty('--token-bg-secondary');
+    }
+    if (colors.bgElevated) {
+      root.style.setProperty('--token-bg-elevated', colors.bgElevated);
+    } else {
+      root.style.removeProperty('--token-bg-elevated');
+    }
+
+    if (colors.borderDefault) {
+      root.style.setProperty('--token-border-default', colors.borderDefault);
+    } else {
+      root.style.removeProperty('--token-border-default');
+    }
+    if (colors.borderHover) {
+      root.style.setProperty('--token-border-hover', colors.borderHover);
+    } else {
+      root.style.removeProperty('--token-border-hover');
+    }
+    if (colors.borderFocus) {
+      root.style.setProperty('--token-border-focus', colors.borderFocus);
+    } else {
+      root.style.removeProperty('--token-border-focus');
+    }
+    if (colors.textPrimary) {
+      root.style.setProperty('--token-text-primary', colors.textPrimary);
+    } else {
+      root.style.removeProperty('--token-text-primary');
+    }
+    if (colors.textSecondary) {
+      root.style.setProperty('--token-text-secondary', colors.textSecondary);
+    } else {
+      root.style.removeProperty('--token-text-secondary');
+    }
+    if (colors.textMuted) {
+      root.style.setProperty('--token-text-muted', colors.textMuted);
+    } else {
+      root.style.removeProperty('--token-text-muted');
+    }
+
+    // Status colors
+    if (colors.warning) {
+      root.style.setProperty('--token-color-warning', colors.warning);
+      root.style.setProperty('--token-color-warning-hover', colors.warning);
+      root.style.setProperty('--token-color-warning-active', colors.warning);
+    } else {
+      root.style.removeProperty('--token-color-warning');
+      root.style.removeProperty('--token-color-warning-hover');
+      root.style.removeProperty('--token-color-warning-active');
+    }
+    if (colors.info) {
+      root.style.setProperty('--token-color-info', colors.info);
+    } else {
+      root.style.removeProperty('--token-color-info');
+    }
   }
 
   // Apply dark/light class to documentElement
@@ -353,7 +428,18 @@
       buttonPrimary: (customColors && customColors.buttonPrimary) || preset.colors.buttonPrimary,
       buttonSecondary: (customColors && customColors.buttonSecondary) || preset.colors.buttonSecondary,
       buttonDanger: (customColors && customColors.buttonDanger) || preset.colors.buttonDanger,
-      buttonSuccess: (customColors && customColors.buttonSuccess) || preset.colors.buttonSuccess
+      buttonSuccess: (customColors && customColors.buttonSuccess) || preset.colors.buttonSuccess,
+      bgPrimary: (customColors && customColors.bgPrimary) || null,
+      bgSecondary: (customColors && customColors.bgSecondary) || null,
+      bgElevated: (customColors && customColors.bgElevated) || null,
+      borderDefault: (customColors && customColors.borderDefault) || null,
+      borderHover: (customColors && customColors.borderHover) || null,
+      borderFocus: (customColors && customColors.borderFocus) || null,
+      textPrimary: (customColors && customColors.textPrimary) || null,
+      textSecondary: (customColors && customColors.textSecondary) || null,
+      textMuted: (customColors && customColors.textMuted) || null,
+      warning: (customColors && customColors.warning) || null,
+      info: (customColors && customColors.info) || null
     };
 
     applyCSSVariables(colors);
@@ -382,8 +468,11 @@
       // Only apply custom colors if at least one is set
       const hasCustomColors = storedColors.primary || storedColors.secondary || storedColors.accent ||
               storedColors.navBg || storedColors.navText ||
-                              storedColors.buttonPrimary || storedColors.buttonSecondary ||
-                              storedColors.buttonDanger || storedColors.buttonSuccess;
+                  storedColors.buttonPrimary || storedColors.buttonSecondary ||
+                  storedColors.buttonDanger || storedColors.buttonSuccess ||
+                  storedColors.bgPrimary || storedColors.bgSecondary || storedColors.bgElevated ||
+                              storedColors.borderDefault || storedColors.borderHover || storedColors.borderFocus || storedColors.textPrimary || storedColors.textSecondary ||
+                  storedColors.textMuted || storedColors.warning || storedColors.info;
       const customColors = hasCustomColors ? storedColors : null;
 
       return applyTheme(storedTheme, customColors);
@@ -442,6 +531,39 @@
           if (colors.buttonSuccess) {
             siteSettings.buttonSuccessColor = colors.buttonSuccess;
           }
+          if (colors.bgPrimary) {
+            siteSettings.bgPrimaryColor = colors.bgPrimary;
+          }
+          if (colors.bgSecondary) {
+            siteSettings.bgSecondaryColor = colors.bgSecondary;
+          }
+          if (colors.bgElevated) {
+            siteSettings.bgElevatedColor = colors.bgElevated;
+          }
+          if (colors.borderDefault) {
+            siteSettings.borderDefaultColor = colors.borderDefault;
+          }
+          if (colors.borderHover) {
+            siteSettings.borderHoverColor = colors.borderHover;
+          }
+          if (colors.borderFocus) {
+            siteSettings.borderFocusColor = colors.borderFocus;
+          }
+          if (colors.textPrimary) {
+            siteSettings.textPrimaryColor = colors.textPrimary;
+          }
+          if (colors.textSecondary) {
+            siteSettings.textSecondaryColor = colors.textSecondary;
+          }
+          if (colors.textMuted) {
+            siteSettings.textMutedColor = colors.textMuted;
+          }
+          if (colors.warning) {
+            siteSettings.warningColor = colors.warning;
+          }
+          if (colors.info) {
+            siteSettings.infoColor = colors.info;
+          }
           localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
 
           // Legacy compatibility
@@ -472,6 +594,39 @@
           if (colors.buttonSuccess) {
             localStorage.setItem('buttonSuccessColor', colors.buttonSuccess);
           }
+          if (colors.bgPrimary) {
+            localStorage.setItem('bgPrimaryColor', colors.bgPrimary);
+          }
+          if (colors.bgSecondary) {
+            localStorage.setItem('bgSecondaryColor', colors.bgSecondary);
+          }
+          if (colors.bgElevated) {
+            localStorage.setItem('bgElevatedColor', colors.bgElevated);
+          }
+          if (colors.borderDefault) {
+            localStorage.setItem('borderDefaultColor', colors.borderDefault);
+          }
+          if (colors.borderHover) {
+            localStorage.setItem('borderHoverColor', colors.borderHover);
+          }
+          if (colors.borderFocus) {
+            localStorage.setItem('borderFocusColor', colors.borderFocus);
+          }
+          if (colors.textPrimary) {
+            localStorage.setItem('textPrimaryColor', colors.textPrimary);
+          }
+          if (colors.textSecondary) {
+            localStorage.setItem('textSecondaryColor', colors.textSecondary);
+          }
+          if (colors.textMuted) {
+            localStorage.setItem('textMutedColor', colors.textMuted);
+          }
+          if (colors.warning) {
+            localStorage.setItem('warningColor', colors.warning);
+          }
+          if (colors.info) {
+            localStorage.setItem('infoColor', colors.info);
+          }
         } catch (e) {
           // Ignore storage errors
         }
@@ -500,7 +655,18 @@
           buttonPrimary: storedColors.buttonPrimary || preset.colors.buttonPrimary,
           buttonSecondary: storedColors.buttonSecondary || preset.colors.buttonSecondary,
           buttonDanger: storedColors.buttonDanger || preset.colors.buttonDanger,
-          buttonSuccess: storedColors.buttonSuccess || preset.colors.buttonSuccess
+          buttonSuccess: storedColors.buttonSuccess || preset.colors.buttonSuccess,
+          bgPrimary: storedColors.bgPrimary || null,
+          bgSecondary: storedColors.bgSecondary || null,
+          bgElevated: storedColors.bgElevated || null,
+          borderDefault: storedColors.borderDefault || null,
+          borderHover: storedColors.borderHover || null,
+          borderFocus: storedColors.borderFocus || null,
+          textPrimary: storedColors.textPrimary || null,
+          textSecondary: storedColors.textSecondary || null,
+          textMuted: storedColors.textMuted || null,
+          warning: storedColors.warning || null,
+          info: storedColors.info || null
         }
       };
     },
