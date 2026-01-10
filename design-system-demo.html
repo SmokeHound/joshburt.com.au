@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/assets/css/styles.css">
   <script src="/assets/js/error-tracker.js" defer></script>
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
 </head>
 <body class="dark min-h-screen">
   <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 p-2 mobile-menu-toggle" aria-label="Toggle sidebar">☰</button>
@@ -18,9 +19,12 @@
       <div class="max-w-6xl mx-auto">
         
         <!-- Page Header Demo -->
-        <header class="page-header ui-card border">
-          <h1 class="text-3xl font-bold">Design System Demo</h1>
-          <p class="subtitle">Interactive examples of all available utilities and components</p>
+        <header class="page-header ui-card border flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold">Design System Demo</h1>
+            <p class="subtitle">Interactive examples of all available utilities and components</p>
+          </div>
+          <div id="notification-bell-wrapper" class="relative"></div>
         </header>
 
         <!-- Introduction -->

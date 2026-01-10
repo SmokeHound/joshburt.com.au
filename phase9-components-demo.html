@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="/assets/images/logo-placeholder.svg" />
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <script src="/assets/js/init-shared.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
   
   <!-- Component Scripts -->
   <script src="/assets/js/components/data-table.js"></script>
@@ -52,9 +53,12 @@
     <!-- Main Content -->
     <main id="main-content" class="flex-1 p-4 md:p-6" role="main">
       <!-- Header -->
-      <header class="page-header ui-card border mb-6">
-        <h1 class="text-3xl font-bold text-white">Phase 9 UI Components</h1>
-        <p class="text-lg mt-2 text-gray-400">Advanced UI components demonstration</p>
+      <header class="page-header ui-card border mb-6 flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-white">Phase 9 UI Components</h1>
+          <p class="text-lg mt-2 text-gray-400">Advanced UI components demonstration</p>
+        </div>
+        <div id="notification-bell-wrapper" class="relative"></div>
       </header>
 
       <!-- Data Table Demo -->
