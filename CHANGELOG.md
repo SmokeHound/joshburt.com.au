@@ -1,3 +1,9 @@
+## [1.12.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.11.0...v1.12.0) (2026-01-11)
+
+### Features
+
+* add tertiary background and text color options to theme customization ([86ca817](https://github.com/SmokeHound/joshburt.com.au/commit/86ca817cec0612180194ef10fcb2ab25dbcc2cc2))
+
 ## [1.11.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.10.0...v1.11.0) (2026-01-10)
 
 ### Features
