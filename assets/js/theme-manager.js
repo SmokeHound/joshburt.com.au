@@ -222,10 +222,13 @@
         textOnAccent: siteSettings.textOnAccentColor || localStorage.getItem('textOnAccentColor') || null,
         textOnDanger: siteSettings.textOnDangerColor || localStorage.getItem('textOnDangerColor') || null,
         warning: siteSettings.warningColor || localStorage.getItem('warningColor') || null,
-        info: siteSettings.infoColor || localStorage.getItem('infoColor') || null
+        info: siteSettings.infoColor || localStorage.getItem('infoColor') || null,
+
+        // Non-color tokens
+        radiusMd: siteSettings.radiusMd || localStorage.getItem('radiusMd') || null
       };
     } catch (e) {
-      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null, bgPrimary: null, bgSecondary: null, bgTertiary: null, bgElevated: null, borderDefault: null, borderHover: null, borderFocus: null, textPrimary: null, textSecondary: null, textMuted: null, textOnPrimary: null, textOnSecondary: null, textOnAccent: null, textOnDanger: null, warning: null, info: null };
+      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null, bgPrimary: null, bgSecondary: null, bgTertiary: null, bgElevated: null, borderDefault: null, borderHover: null, borderFocus: null, textPrimary: null, textSecondary: null, textMuted: null, textOnPrimary: null, textOnSecondary: null, textOnAccent: null, textOnDanger: null, warning: null, info: null, radiusMd: null };
     }
   }
 
@@ -430,6 +433,48 @@
     } else {
       root.style.removeProperty('--token-color-info');
     }
+
+    // Corner radius customization (single control drives the scale)
+    const parseLengthToPx = (value) => {
+      if (value === null || value === undefined) {
+        return null;
+      }
+      const raw = String(value).trim();
+      if (!raw) {
+        return null;
+      }
+      const m = raw.match(/^(-?\d+(?:\.\d+)?)(px|rem)?$/);
+      if (!m) {
+        return null;
+      }
+      const n = parseFloat(m[1]);
+      if (!Number.isFinite(n)) {
+        return null;
+      }
+      const unit = m[2] || 'px';
+      if (unit === 'rem') {
+        return n * 16;
+      }
+      return n;
+    };
+
+    const radiusMdPx = parseLengthToPx(colors.radiusMd);
+    if (radiusMdPx !== null) {
+      const md = Math.max(0, Math.min(32, radiusMdPx));
+      const sm = Math.round(md * 0.5);
+      const lg = Math.round(md * 1.5);
+      const xl = Math.round(md * 2);
+      root.style.setProperty('--token-radius-sm', `${sm}px`);
+      root.style.setProperty('--token-radius-md', `${Math.round(md)}px`);
+      root.style.setProperty('--token-radius-lg', `${lg}px`);
+      root.style.setProperty('--token-radius-xl', `${xl}px`);
+      // Keep full as-is (typically 9999px) unless you want a separate control.
+    } else {
+      root.style.removeProperty('--token-radius-sm');
+      root.style.removeProperty('--token-radius-md');
+      root.style.removeProperty('--token-radius-lg');
+      root.style.removeProperty('--token-radius-xl');
+    }
   }
 
   // Apply dark/light class to documentElement
@@ -475,7 +520,10 @@
       textOnAccent: (customColors && customColors.textOnAccent) || null,
       textOnDanger: (customColors && customColors.textOnDanger) || null,
       warning: (customColors && customColors.warning) || null,
-      info: (customColors && customColors.info) || null
+      info: (customColors && customColors.info) || null,
+
+      // Non-color tokens
+      radiusMd: (customColors && customColors.radiusMd) || null
     };
 
     applyCSSVariables(colors);
@@ -502,13 +550,14 @@
       const storedColors = getStoredColors();
 
       // Only apply custom colors if at least one is set
-      const hasCustomColors = storedColors.primary || storedColors.secondary || storedColors.accent ||
+            const hasCustomColors = storedColors.primary || storedColors.secondary || storedColors.accent ||
               storedColors.navBg || storedColors.navText ||
                   storedColors.buttonPrimary || storedColors.buttonSecondary ||
                   storedColors.buttonDanger || storedColors.buttonSuccess ||
               storedColors.bgPrimary || storedColors.bgSecondary || storedColors.bgTertiary || storedColors.bgElevated ||
                     storedColors.borderDefault || storedColors.borderHover || storedColors.borderFocus || storedColors.textPrimary || storedColors.textSecondary ||
-              storedColors.textMuted || storedColors.textOnPrimary || storedColors.textOnSecondary || storedColors.textOnAccent || storedColors.textOnDanger || storedColors.warning || storedColors.info;
+              storedColors.textMuted || storedColors.textOnPrimary || storedColors.textOnSecondary || storedColors.textOnAccent || storedColors.textOnDanger || storedColors.warning || storedColors.info ||
+              storedColors.radiusMd;
       const customColors = hasCustomColors ? storedColors : null;
 
       return applyTheme(storedTheme, customColors);
@@ -615,6 +664,9 @@
           if (colors.info) {
             siteSettings.infoColor = colors.info;
           }
+          if (colors.radiusMd !== undefined && colors.radiusMd !== null) {
+            siteSettings.radiusMd = colors.radiusMd;
+          }
           localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
 
           // Legacy compatibility
@@ -693,6 +745,9 @@
           if (colors.info) {
             localStorage.setItem('infoColor', colors.info);
           }
+          if (colors.radiusMd !== undefined && colors.radiusMd !== null) {
+            localStorage.setItem('radiusMd', String(colors.radiusMd));
+          }
         } catch (e) {
           // Ignore storage errors
         }
@@ -737,7 +792,10 @@
           textOnAccent: storedColors.textOnAccent || null,
           textOnDanger: storedColors.textOnDanger || null,
           warning: storedColors.warning || null,
-          info: storedColors.info || null
+          info: storedColors.info || null,
+
+          // Non-color tokens
+          radiusMd: storedColors.radiusMd || null
         }
       };
     },

@@ -81,6 +81,37 @@
       }
     };
 
+    const getCssVarRaw = (name) => {
+      try {
+        return String(getComputedStyle(document.documentElement).getPropertyValue(name) || '').trim();
+      } catch (_) {
+        return '';
+      }
+    };
+
+    const parseLengthToPx = (value) => {
+      if (value === null || value === undefined) {
+        return null;
+      }
+      const raw = String(value).trim();
+      if (!raw) {
+        return null;
+      }
+      const m = raw.match(/^(-?\d+(?:\.\d+)?)(px|rem)?$/);
+      if (!m) {
+        return null;
+      }
+      const n = parseFloat(m[1]);
+      if (!Number.isFinite(n)) {
+        return null;
+      }
+      const unit = m[2] || 'px';
+      if (unit === 'rem') {
+        return n * 16;
+      }
+      return n;
+    };
+
     const navBgDefault =
       customTheme.colors.navBg || getCssVarHex('--token-nav-bg') || customTheme.colors.primary;
     const navTextDefault =
@@ -125,6 +156,18 @@
       customTheme.colors.warning || getCssVarHex('--token-color-warning') || '#f59e0b';
     const infoDefault =
       customTheme.colors.info || getCssVarHex('--token-color-info') || customTheme.colors.primary;
+
+    const radiusMdDefaultPx = (() => {
+      const fromTheme = parseLengthToPx(customTheme.colors.radiusMd);
+      if (fromTheme !== null) {
+        return Math.round(fromTheme);
+      }
+      const fromCss = parseLengthToPx(getCssVarRaw('--token-radius-md'));
+      if (fromCss !== null) {
+        return Math.round(fromCss);
+      }
+      return 8;
+    })();
 
     builderContainer.innerHTML = `
       <div class="card p-4 border border-gray-700 rounded-xl bg-gray-900/20">
@@ -186,6 +229,26 @@
           </div>
 
           <div class="md:col-span-2 border-t border-gray-700/60 pt-3"></div>
+
+          <div class="md:col-span-2">
+            <h4 class="text-sm font-semibold text-gray-200">Layout</h4>
+            <p class="text-xs text-gray-500 mt-1">Non-color design tokens like corner radius.</p>
+          </div>
+
+          <div class="md:col-span-2 rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-radiusMd" class="block text-xs font-medium text-gray-200 mb-1">Corner Radius (Medium)</label>
+            <p class="text-xs text-gray-500 mb-2">Controls rounded corners across cards/buttons (drives sm/lg/xl too).</p>
+            <div class="flex flex-col md:flex-row gap-3 md:items-center">
+              <input type="range" id="custom-radiusMd" min="0" max="24" step="1" value="${Math.max(0, Math.min(24, radiusMdDefaultPx))}"
+                class="w-full md:flex-1" />
+              <div class="flex items-center gap-2">
+                <input type="number" id="custom-radiusMd-number" min="0" max="24" step="1" value="${Math.max(0, Math.min(24, radiusMdDefaultPx))}"
+                  class="w-20 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" />
+                <span class="text-xs text-gray-400">px</span>
+              </div>
+              <div class="hidden md:block w-16 h-10 border border-gray-700/70 bg-gray-800/40" id="custom-radiusMd-preview"></div>
+            </div>
+          </div>
 
           <div class="md:col-span-2">
             <h4 class="text-sm font-semibold text-gray-200">Navigation</h4>
@@ -517,6 +580,15 @@
 
     // Apply custom theme
     document.getElementById('apply-custom-theme').addEventListener('click', () => {
+      const radiusMd = (() => {
+        const el = document.getElementById('custom-radiusMd-number');
+        const n = el ? parseInt(el.value, 10) : NaN;
+        if (!Number.isFinite(n)) {
+          return null;
+        }
+        return `${Math.max(0, Math.min(32, n))}px`;
+      })();
+
       const colors = {
         primary: document.getElementById('custom-primary').value,
         secondary: document.getElementById('custom-secondary').value,
@@ -542,7 +614,9 @@
         buttonPrimary: document.getElementById('custom-buttonPrimary').value,
         buttonSecondary: document.getElementById('custom-buttonSecondary').value,
         buttonDanger: document.getElementById('custom-buttonDanger').value,
-        buttonSuccess: document.getElementById('custom-buttonSuccess').value
+        buttonSuccess: document.getElementById('custom-buttonSuccess').value,
+
+        radiusMd
       };
 
       window.ThemeEnhanced.customBuilder.updateColors(colors);
@@ -552,6 +626,30 @@
         window.A11y.announce('Custom theme applied');
       }
     });
+
+    // Radius control sync + preview
+    const radiusRange = document.getElementById('custom-radiusMd');
+    const radiusNumber = document.getElementById('custom-radiusMd-number');
+    const radiusPreview = document.getElementById('custom-radiusMd-preview');
+    const updateRadiusPreview = (px) => {
+      if (!radiusPreview) {
+        return;
+      }
+      const n = Math.max(0, Math.min(24, parseInt(px, 10) || 0));
+      radiusPreview.style.borderRadius = `${n}px`;
+    };
+    if (radiusRange && radiusNumber) {
+      updateRadiusPreview(radiusNumber.value);
+      radiusRange.addEventListener('input', e => {
+        radiusNumber.value = e.target.value;
+        updateRadiusPreview(e.target.value);
+      });
+      radiusNumber.addEventListener('input', e => {
+        const n = Math.max(0, Math.min(24, parseInt(e.target.value, 10) || 0));
+        radiusRange.value = String(n);
+        updateRadiusPreview(n);
+      });
+    }
 
     // Reset custom theme
     document.getElementById('reset-custom-theme').addEventListener('click', () => {
