@@ -212,6 +212,22 @@
           delete siteSettings.buttonSecondaryColor;
           delete siteSettings.buttonDangerColor;
           delete siteSettings.buttonSuccessColor;
+          delete siteSettings.bgPrimaryColor;
+          delete siteSettings.bgSecondaryColor;
+          delete siteSettings.bgTertiaryColor;
+          delete siteSettings.bgElevatedColor;
+          delete siteSettings.borderDefaultColor;
+          delete siteSettings.borderHoverColor;
+          delete siteSettings.borderFocusColor;
+          delete siteSettings.textPrimaryColor;
+          delete siteSettings.textSecondaryColor;
+          delete siteSettings.textMutedColor;
+          delete siteSettings.textOnPrimaryColor;
+          delete siteSettings.textOnSecondaryColor;
+          delete siteSettings.textOnAccentColor;
+          delete siteSettings.textOnDangerColor;
+          delete siteSettings.warningColor;
+          delete siteSettings.infoColor;
           localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
 
           localStorage.removeItem('primaryColor');
@@ -225,6 +241,7 @@
           localStorage.removeItem('buttonSuccessColor');
           localStorage.removeItem('bgPrimaryColor');
           localStorage.removeItem('bgSecondaryColor');
+          localStorage.removeItem('bgTertiaryColor');
           localStorage.removeItem('bgElevatedColor');
           localStorage.removeItem('borderDefaultColor');
           localStorage.removeItem('borderHoverColor');
@@ -232,6 +249,10 @@
           localStorage.removeItem('textPrimaryColor');
           localStorage.removeItem('textSecondaryColor');
           localStorage.removeItem('textMutedColor');
+          localStorage.removeItem('textOnPrimaryColor');
+          localStorage.removeItem('textOnSecondaryColor');
+          localStorage.removeItem('textOnAccentColor');
+          localStorage.removeItem('textOnDangerColor');
           localStorage.removeItem('warningColor');
           localStorage.removeItem('infoColor');
         } catch (_) {

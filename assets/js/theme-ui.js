@@ -93,6 +93,8 @@
       customTheme.colors.bgPrimary || getCssVarHex('--token-bg-primary') || '#0b0b0b';
     const bgSecondaryDefault =
       customTheme.colors.bgSecondary || getCssVarHex('--token-bg-secondary') || '#141414';
+    const bgTertiaryDefault =
+      customTheme.colors.bgTertiary || getCssVarHex('--token-bg-tertiary') || '#1a1a1a';
     const bgElevatedDefault =
       customTheme.colors.bgElevated || getCssVarHex('--token-bg-elevated') || '#1c1c1c';
 
@@ -109,6 +111,15 @@
       customTheme.colors.textSecondary || getCssVarHex('--token-text-secondary') || '#cccccc';
     const textMutedDefault =
       customTheme.colors.textMuted || getCssVarHex('--token-text-muted') || '#888888';
+
+    const textOnPrimaryDefault =
+      customTheme.colors.textOnPrimary || getCssVarHex('--token-text-on-primary') || bgPrimaryDefault;
+    const textOnSecondaryDefault =
+      customTheme.colors.textOnSecondary || getCssVarHex('--token-text-on-secondary') || bgPrimaryDefault;
+    const textOnAccentDefault =
+      customTheme.colors.textOnAccent || getCssVarHex('--token-text-on-accent') || bgPrimaryDefault;
+    const textOnDangerDefault =
+      customTheme.colors.textOnDanger || getCssVarHex('--token-text-on-danger') || bgPrimaryDefault;
 
     const warningDefault =
       customTheme.colors.warning || getCssVarHex('--token-color-warning') || '#f59e0b';
@@ -237,6 +248,18 @@
           </div>
 
           <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-bgTertiary" class="block text-xs font-medium text-gray-200 mb-1">Background (Tertiary)</label>
+            <p class="text-xs text-gray-500 mb-2">Tertiary surface background token.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-bgTertiary" value="${bgTertiaryDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-bgTertiary-text" value="${bgTertiaryDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
             <label for="custom-bgElevated" class="block text-xs font-medium text-gray-200 mb-1">Background (Elevated)</label>
             <p class="text-xs text-gray-500 mb-2">Cards, panels, and raised surfaces.</p>
             <div class="flex gap-3 items-center">
@@ -315,6 +338,54 @@
               <input type="color" id="custom-textMuted" value="${textMutedDefault}" 
                 class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
               <input type="text" id="custom-textMuted-text" value="${textMutedDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-textOnPrimary" class="block text-xs font-medium text-gray-200 mb-1">Text on Primary</label>
+            <p class="text-xs text-gray-500 mb-2">Text used on primary-colored surfaces.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-textOnPrimary" value="${textOnPrimaryDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-textOnPrimary-text" value="${textOnPrimaryDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-textOnSecondary" class="block text-xs font-medium text-gray-200 mb-1">Text on Secondary</label>
+            <p class="text-xs text-gray-500 mb-2">Text used on secondary-colored surfaces.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-textOnSecondary" value="${textOnSecondaryDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-textOnSecondary-text" value="${textOnSecondaryDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-textOnAccent" class="block text-xs font-medium text-gray-200 mb-1">Text on Accent</label>
+            <p class="text-xs text-gray-500 mb-2">Text used on accent-colored surfaces.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-textOnAccent" value="${textOnAccentDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-textOnAccent-text" value="${textOnAccentDefault}" 
+                class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
+                pattern="^#[0-9A-Fa-f]{6}$" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-textOnDanger" class="block text-xs font-medium text-gray-200 mb-1">Text on Danger</label>
+            <p class="text-xs text-gray-500 mb-2">Text used on danger-colored surfaces.</p>
+            <div class="flex gap-3 items-center">
+              <input type="color" id="custom-textOnDanger" value="${textOnDangerDefault}" 
+                class="w-12 h-12 rounded-lg border-2 border-gray-700 cursor-pointer" />
+              <input type="text" id="custom-textOnDanger-text" value="${textOnDangerDefault}" 
                 class="flex-1 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" 
                 pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
@@ -425,7 +496,7 @@
     `;
 
     // Sync color picker and text input
-    ['primary', 'secondary', 'accent', 'navBg', 'navText', 'bgPrimary', 'bgSecondary', 'bgElevated', 'borderDefault', 'borderHover', 'borderFocus', 'textPrimary', 'textSecondary', 'textMuted', 'warning', 'info', 'buttonPrimary', 'buttonSecondary', 'buttonDanger', 'buttonSuccess'].forEach(colorType => {
+    ['primary', 'secondary', 'accent', 'navBg', 'navText', 'bgPrimary', 'bgSecondary', 'bgTertiary', 'bgElevated', 'borderDefault', 'borderHover', 'borderFocus', 'textPrimary', 'textSecondary', 'textMuted', 'textOnPrimary', 'textOnSecondary', 'textOnAccent', 'textOnDanger', 'warning', 'info', 'buttonPrimary', 'buttonSecondary', 'buttonDanger', 'buttonSuccess'].forEach(colorType => {
       const colorInput = document.getElementById(`custom-${colorType}`);
       const textInput = document.getElementById(`custom-${colorType}-text`);
 
@@ -454,6 +525,7 @@
         navText: document.getElementById('custom-navText').value,
         bgPrimary: document.getElementById('custom-bgPrimary').value,
         bgSecondary: document.getElementById('custom-bgSecondary').value,
+        bgTertiary: document.getElementById('custom-bgTertiary').value,
         bgElevated: document.getElementById('custom-bgElevated').value,
         borderDefault: document.getElementById('custom-borderDefault').value,
         borderHover: document.getElementById('custom-borderHover').value,
@@ -461,6 +533,10 @@
         textPrimary: document.getElementById('custom-textPrimary').value,
         textSecondary: document.getElementById('custom-textSecondary').value,
         textMuted: document.getElementById('custom-textMuted').value,
+        textOnPrimary: document.getElementById('custom-textOnPrimary').value,
+        textOnSecondary: document.getElementById('custom-textOnSecondary').value,
+        textOnAccent: document.getElementById('custom-textOnAccent').value,
+        textOnDanger: document.getElementById('custom-textOnDanger').value,
         warning: document.getElementById('custom-warning').value,
         info: document.getElementById('custom-info').value,
         buttonPrimary: document.getElementById('custom-buttonPrimary').value,

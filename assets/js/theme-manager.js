@@ -209,6 +209,7 @@
         buttonSuccess: siteSettings.buttonSuccessColor || localStorage.getItem('buttonSuccessColor') || null,
         bgPrimary: siteSettings.bgPrimaryColor || localStorage.getItem('bgPrimaryColor') || null,
         bgSecondary: siteSettings.bgSecondaryColor || localStorage.getItem('bgSecondaryColor') || null,
+        bgTertiary: siteSettings.bgTertiaryColor || localStorage.getItem('bgTertiaryColor') || null,
         bgElevated: siteSettings.bgElevatedColor || localStorage.getItem('bgElevatedColor') || null,
         borderDefault: siteSettings.borderDefaultColor || localStorage.getItem('borderDefaultColor') || null,
         borderHover: siteSettings.borderHoverColor || localStorage.getItem('borderHoverColor') || null,
@@ -216,11 +217,15 @@
         textPrimary: siteSettings.textPrimaryColor || localStorage.getItem('textPrimaryColor') || null,
         textSecondary: siteSettings.textSecondaryColor || localStorage.getItem('textSecondaryColor') || null,
         textMuted: siteSettings.textMutedColor || localStorage.getItem('textMutedColor') || null,
+        textOnPrimary: siteSettings.textOnPrimaryColor || localStorage.getItem('textOnPrimaryColor') || null,
+        textOnSecondary: siteSettings.textOnSecondaryColor || localStorage.getItem('textOnSecondaryColor') || null,
+        textOnAccent: siteSettings.textOnAccentColor || localStorage.getItem('textOnAccentColor') || null,
+        textOnDanger: siteSettings.textOnDangerColor || localStorage.getItem('textOnDangerColor') || null,
         warning: siteSettings.warningColor || localStorage.getItem('warningColor') || null,
         info: siteSettings.infoColor || localStorage.getItem('infoColor') || null
       };
     } catch (e) {
-      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null, bgPrimary: null, bgSecondary: null, bgElevated: null, borderDefault: null, borderHover: null, borderFocus: null, textPrimary: null, textSecondary: null, textMuted: null, warning: null, info: null };
+      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null, bgPrimary: null, bgSecondary: null, bgTertiary: null, bgElevated: null, borderDefault: null, borderHover: null, borderFocus: null, textPrimary: null, textSecondary: null, textMuted: null, textOnPrimary: null, textOnSecondary: null, textOnAccent: null, textOnDanger: null, warning: null, info: null };
     }
   }
 
@@ -347,6 +352,11 @@
     } else {
       root.style.removeProperty('--token-bg-secondary');
     }
+    if (colors.bgTertiary) {
+      root.style.setProperty('--token-bg-tertiary', colors.bgTertiary);
+    } else {
+      root.style.removeProperty('--token-bg-tertiary');
+    }
     if (colors.bgElevated) {
       root.style.setProperty('--token-bg-elevated', colors.bgElevated);
     } else {
@@ -382,6 +392,27 @@
       root.style.setProperty('--token-text-muted', colors.textMuted);
     } else {
       root.style.removeProperty('--token-text-muted');
+    }
+
+    if (colors.textOnPrimary) {
+      root.style.setProperty('--token-text-on-primary', colors.textOnPrimary);
+    } else {
+      root.style.removeProperty('--token-text-on-primary');
+    }
+    if (colors.textOnSecondary) {
+      root.style.setProperty('--token-text-on-secondary', colors.textOnSecondary);
+    } else {
+      root.style.removeProperty('--token-text-on-secondary');
+    }
+    if (colors.textOnAccent) {
+      root.style.setProperty('--token-text-on-accent', colors.textOnAccent);
+    } else {
+      root.style.removeProperty('--token-text-on-accent');
+    }
+    if (colors.textOnDanger) {
+      root.style.setProperty('--token-text-on-danger', colors.textOnDanger);
+    } else {
+      root.style.removeProperty('--token-text-on-danger');
     }
 
     // Status colors
@@ -431,6 +462,7 @@
       buttonSuccess: (customColors && customColors.buttonSuccess) || preset.colors.buttonSuccess,
       bgPrimary: (customColors && customColors.bgPrimary) || null,
       bgSecondary: (customColors && customColors.bgSecondary) || null,
+      bgTertiary: (customColors && customColors.bgTertiary) || null,
       bgElevated: (customColors && customColors.bgElevated) || null,
       borderDefault: (customColors && customColors.borderDefault) || null,
       borderHover: (customColors && customColors.borderHover) || null,
@@ -438,6 +470,10 @@
       textPrimary: (customColors && customColors.textPrimary) || null,
       textSecondary: (customColors && customColors.textSecondary) || null,
       textMuted: (customColors && customColors.textMuted) || null,
+      textOnPrimary: (customColors && customColors.textOnPrimary) || null,
+      textOnSecondary: (customColors && customColors.textOnSecondary) || null,
+      textOnAccent: (customColors && customColors.textOnAccent) || null,
+      textOnDanger: (customColors && customColors.textOnDanger) || null,
       warning: (customColors && customColors.warning) || null,
       info: (customColors && customColors.info) || null
     };
@@ -470,9 +506,9 @@
               storedColors.navBg || storedColors.navText ||
                   storedColors.buttonPrimary || storedColors.buttonSecondary ||
                   storedColors.buttonDanger || storedColors.buttonSuccess ||
-                  storedColors.bgPrimary || storedColors.bgSecondary || storedColors.bgElevated ||
-                              storedColors.borderDefault || storedColors.borderHover || storedColors.borderFocus || storedColors.textPrimary || storedColors.textSecondary ||
-                  storedColors.textMuted || storedColors.warning || storedColors.info;
+              storedColors.bgPrimary || storedColors.bgSecondary || storedColors.bgTertiary || storedColors.bgElevated ||
+                    storedColors.borderDefault || storedColors.borderHover || storedColors.borderFocus || storedColors.textPrimary || storedColors.textSecondary ||
+              storedColors.textMuted || storedColors.textOnPrimary || storedColors.textOnSecondary || storedColors.textOnAccent || storedColors.textOnDanger || storedColors.warning || storedColors.info;
       const customColors = hasCustomColors ? storedColors : null;
 
       return applyTheme(storedTheme, customColors);
@@ -537,6 +573,9 @@
           if (colors.bgSecondary) {
             siteSettings.bgSecondaryColor = colors.bgSecondary;
           }
+          if (colors.bgTertiary) {
+            siteSettings.bgTertiaryColor = colors.bgTertiary;
+          }
           if (colors.bgElevated) {
             siteSettings.bgElevatedColor = colors.bgElevated;
           }
@@ -557,6 +596,18 @@
           }
           if (colors.textMuted) {
             siteSettings.textMutedColor = colors.textMuted;
+          }
+          if (colors.textOnPrimary) {
+            siteSettings.textOnPrimaryColor = colors.textOnPrimary;
+          }
+          if (colors.textOnSecondary) {
+            siteSettings.textOnSecondaryColor = colors.textOnSecondary;
+          }
+          if (colors.textOnAccent) {
+            siteSettings.textOnAccentColor = colors.textOnAccent;
+          }
+          if (colors.textOnDanger) {
+            siteSettings.textOnDangerColor = colors.textOnDanger;
           }
           if (colors.warning) {
             siteSettings.warningColor = colors.warning;
@@ -600,6 +651,9 @@
           if (colors.bgSecondary) {
             localStorage.setItem('bgSecondaryColor', colors.bgSecondary);
           }
+          if (colors.bgTertiary) {
+            localStorage.setItem('bgTertiaryColor', colors.bgTertiary);
+          }
           if (colors.bgElevated) {
             localStorage.setItem('bgElevatedColor', colors.bgElevated);
           }
@@ -620,6 +674,18 @@
           }
           if (colors.textMuted) {
             localStorage.setItem('textMutedColor', colors.textMuted);
+          }
+          if (colors.textOnPrimary) {
+            localStorage.setItem('textOnPrimaryColor', colors.textOnPrimary);
+          }
+          if (colors.textOnSecondary) {
+            localStorage.setItem('textOnSecondaryColor', colors.textOnSecondary);
+          }
+          if (colors.textOnAccent) {
+            localStorage.setItem('textOnAccentColor', colors.textOnAccent);
+          }
+          if (colors.textOnDanger) {
+            localStorage.setItem('textOnDangerColor', colors.textOnDanger);
           }
           if (colors.warning) {
             localStorage.setItem('warningColor', colors.warning);
@@ -658,6 +724,7 @@
           buttonSuccess: storedColors.buttonSuccess || preset.colors.buttonSuccess,
           bgPrimary: storedColors.bgPrimary || null,
           bgSecondary: storedColors.bgSecondary || null,
+          bgTertiary: storedColors.bgTertiary || null,
           bgElevated: storedColors.bgElevated || null,
           borderDefault: storedColors.borderDefault || null,
           borderHover: storedColors.borderHover || null,
@@ -665,6 +732,10 @@
           textPrimary: storedColors.textPrimary || null,
           textSecondary: storedColors.textSecondary || null,
           textMuted: storedColors.textMuted || null,
+          textOnPrimary: storedColors.textOnPrimary || null,
+          textOnSecondary: storedColors.textOnSecondary || null,
+          textOnAccent: storedColors.textOnAccent || null,
+          textOnDanger: storedColors.textOnDanger || null,
           warning: storedColors.warning || null,
           info: storedColors.info || null
         }
