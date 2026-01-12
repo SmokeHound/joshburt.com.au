@@ -307,6 +307,9 @@
                   class="w-24 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" />
                 <span class="text-xs text-gray-400">×</span>
               </div>
+              <div class="hidden md:flex items-center">
+                <div class="w-40 border border-gray-700/70 bg-gray-800/40 rounded-lg p-2" id="custom-spacingScale-preview"></div>
+              </div>
             </div>
           </div>
 
@@ -320,6 +323,9 @@
                 <input type="number" id="custom-fontScale-number" min="0.75" max="1.5" step="0.05" value="${Math.max(0.75, Math.min(1.5, fontScaleDefault))}"
                   class="w-24 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" />
                 <span class="text-xs text-gray-400">×</span>
+              </div>
+              <div class="hidden md:flex items-center">
+                <div class="w-40 border border-gray-700/70 bg-gray-800/40 rounded-lg p-2" id="custom-typography-preview"></div>
               </div>
             </div>
           </div>
@@ -803,31 +809,79 @@
     // Spacing scale sync
     const spacingRange = document.getElementById('custom-spacingScale');
     const spacingNumber = document.getElementById('custom-spacingScale-number');
+    const spacingPreview = document.getElementById('custom-spacingScale-preview');
+    const updateSpacingPreview = () => {
+      if (!spacingPreview) {
+        return;
+      }
+      const n = spacingNumber ? parseFloat(String(spacingNumber.value || '').trim()) : NaN;
+      const scale = Number.isFinite(n) ? Math.max(0.5, Math.min(1.75, n)) : 1;
+      const gap = Math.round(8 * scale);
+      const pad = Math.round(8 * scale);
+
+      spacingPreview.innerHTML = `
+        <div class="flex items-center" style="gap:${gap}px; padding:${pad}px;">
+          <div class="w-3 h-3 bg-gray-300/80 rounded"></div>
+          <div class="w-3 h-3 bg-gray-300/80 rounded"></div>
+          <div class="w-3 h-3 bg-gray-300/80 rounded"></div>
+        </div>
+      `;
+    };
     if (spacingRange && spacingNumber) {
+      updateSpacingPreview();
       spacingRange.addEventListener('input', e => {
         spacingNumber.value = e.target.value;
+        updateSpacingPreview();
       });
       spacingNumber.addEventListener('input', e => {
         const n = parseFloat(String(e.target.value || '').trim());
         if (Number.isFinite(n)) {
           spacingRange.value = String(Math.max(0.5, Math.min(1.75, n)));
         }
+        updateSpacingPreview();
       });
     }
 
     // Font scale sync
     const fontRange = document.getElementById('custom-fontScale');
     const fontNumber = document.getElementById('custom-fontScale-number');
+    const weightSelect = document.getElementById('custom-baseFontWeight');
+    const typographyPreview = document.getElementById('custom-typography-preview');
+    const updateTypographyPreview = () => {
+      if (!typographyPreview) {
+        return;
+      }
+      const s = fontNumber ? parseFloat(String(fontNumber.value || '').trim()) : NaN;
+      const scale = Number.isFinite(s) ? Math.max(0.75, Math.min(1.5, s)) : 1;
+      const w = weightSelect ? parseInt(String(weightSelect.value || '').trim(), 10) : 400;
+      const weight = Number.isFinite(w) ? w : 400;
+
+      typographyPreview.innerHTML = `
+        <div style="font-size:${scale}em; font-weight:${weight}; line-height:1.2;">
+          Aa
+        </div>
+        <div class="text-[10px] text-gray-400 mt-1">
+          ${scale.toFixed(2)}× / ${weight}
+        </div>
+      `;
+    };
     if (fontRange && fontNumber) {
+      updateTypographyPreview();
       fontRange.addEventListener('input', e => {
         fontNumber.value = e.target.value;
+        updateTypographyPreview();
       });
       fontNumber.addEventListener('input', e => {
         const n = parseFloat(String(e.target.value || '').trim());
         if (Number.isFinite(n)) {
           fontRange.value = String(Math.max(0.75, Math.min(1.5, n)));
         }
+        updateTypographyPreview();
       });
+    }
+    if (weightSelect) {
+      updateTypographyPreview();
+      weightSelect.addEventListener('change', updateTypographyPreview);
     }
 
     // Reset custom theme
