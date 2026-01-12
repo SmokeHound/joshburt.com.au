@@ -1,3 +1,9 @@
+## [1.14.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.13.0...v1.14.0) (2026-01-12)
+
+### Features
+
+* refactor custom color check to use array method for improved readability ([1970a29](https://github.com/SmokeHound/joshburt.com.au/commit/1970a297efd5e2a68e34a9e923c5a41ec0e6e5ce))
+
 ## [1.13.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.12.0...v1.13.0) (2026-01-11)
 
 ### Features
