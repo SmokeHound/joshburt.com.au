@@ -324,23 +324,32 @@
         }
       });
   }
+
+  function removeLegacyHeaderHosts() {
+    try {
+      const legacy = document.getElementById('notification-bell-wrapper');
+      if (legacy) {
+        legacy.remove();
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
   function ensureBell() {
     let bell = document.getElementById('notification-bell');
     const navWrapper = document.getElementById('notification-bell-wrapper-nav');
-    const wrapper = navWrapper || document.getElementById('notification-bell-wrapper');
+    const wrapper = navWrapper;
 
-    if (!bell && navWrapper) {
-      const legacyWrapper = document.getElementById('notification-bell-wrapper');
-      if (legacyWrapper) {
-        legacyWrapper.remove();
-      }
-    }
+    // Hard requirement: bell lives in the nav menu, not page headers.
+    // Remove any legacy header mount to avoid empty gaps.
+    removeLegacyHeaderHosts();
 
     if (!bell && !wrapper) {
       if (!window._notifBellRetryCount) {
         window._notifBellRetryCount = 0;
       }
-      if (window._notifBellRetryCount < 20) {
+      if (window._notifBellRetryCount < 30) {
         window._notifBellRetryCount++;
         setTimeout(ensureBell, 100);
       }
@@ -348,14 +357,11 @@
     }
 
     if (!bell && wrapper) {
-      const isNav = !!(wrapper.closest && wrapper.closest('#sidebar'));
-      const bellClass = isNav
-        ? 'nav-link ui-link ui-link-nav block w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center justify-between gap-2'
-        : 'flex items-center gap-2 px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-secondary text-sm';
-      const labelClass = isNav ? '' : 'hidden sm:inline';
-      const dropdownClass = isNav
-        ? 'hidden absolute left-full top-0 ml-3 w-96 max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50'
-        : 'hidden absolute right-0 mt-2 w-96 max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50';
+      const bellClass =
+        'nav-link ui-link ui-link-nav block w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center justify-between gap-2';
+      const labelClass = '';
+      const dropdownClass =
+        'hidden absolute left-full top-0 ml-3 w-96 max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50';
 
       wrapper.innerHTML = `<button id="notification-bell" aria-haspopup="true" aria-expanded="false" aria-controls="notification-dropdown" class="${bellClass}" title="Notifications"><span class="${labelClass}" data-i18n="notifications.title">Notifications</span><span class="relative inline-flex items-center">🔔<span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span></span></button><div id="notification-dropdown" role="dialog" aria-modal="false" aria-label="Notifications" class="${dropdownClass}"><div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 id="notifications-header" class="font-semibold" data-i18n="notifications.title">Notifications</h3><button id="close-notifications" class="text-xs text-gray-400 hover:text-gray-200" aria-label="Close">✕</button></div><div id="notification-list" class="max-h-80 overflow-y-auto p-2" aria-labelledby="notifications-header" aria-live="polite"></div></div>`;
       bell = document.getElementById('notification-bell');
@@ -410,6 +416,8 @@
   }
   updateBadge();
   document.addEventListener('DOMContentLoaded', () => {
+    // Remove legacy header host as early as possible
+    removeLegacyHeaderHosts();
     // Initialize notifications UI without mock/demo toasts
     ensureBell();
     render();
