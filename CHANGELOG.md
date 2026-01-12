@@ -1,3 +1,9 @@
+## [1.19.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.18.0...v1.19.0) (2026-01-12)
+
+### Features
+
+* enhance notification dropdown functionality and accessibility ([e1c2d07](https://github.com/SmokeHound/joshburt.com.au/commit/e1c2d07967fb2d4d28c5da5a4d5b271c3ca9b025))
+
 ## [1.18.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.17.0...v1.18.0) (2026-01-12)
 
 ### Features
