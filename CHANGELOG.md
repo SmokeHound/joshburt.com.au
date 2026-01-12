@@ -1,3 +1,9 @@
+## [1.16.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.15.0...v1.16.0) (2026-01-12)
+
+### Features
+
+* add spacingScale, fontScale, and baseFontWeight options to theme settings and UI components ([2e036ec](https://github.com/SmokeHound/joshburt.com.au/commit/2e036ece1078df72af07cf6be60f58752862004f))
+
 ## [1.15.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.14.0...v1.15.0) (2026-01-12)
 
 ### Features
