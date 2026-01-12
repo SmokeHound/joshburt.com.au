@@ -1,3 +1,9 @@
+## [1.15.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.14.0...v1.15.0) (2026-01-12)
+
+### Features
+
+* add shadowPreset customization option to theme settings and UI components ([df52430](https://github.com/SmokeHound/joshburt.com.au/commit/df52430689d9bd7957f9760c06e2ab68a3522eb3))
+
 ## [1.14.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.13.0...v1.14.0) (2026-01-12)
 
 ### Features
