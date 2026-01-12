@@ -144,10 +144,75 @@
     const bell = document.getElementById('notification-bell');
     if (dd && !dd.classList.contains('hidden')) {
       dd.classList.add('hidden');
+      dd.setAttribute('data-open', 'false');
       if (bell) {
         bell.setAttribute('aria-expanded', 'false');
         bell.focus();
       }
+    }
+  }
+
+  function ensureDropdownPortal() {
+    let dropdown = document.getElementById('notification-dropdown');
+    if (dropdown) {
+      return dropdown;
+    }
+
+    dropdown = document.createElement('div');
+    dropdown.id = 'notification-dropdown';
+    dropdown.setAttribute('role', 'dialog');
+    dropdown.setAttribute('aria-modal', 'false');
+    dropdown.setAttribute('aria-label', 'Notifications');
+    dropdown.className =
+      'hidden fixed w-96 max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-[99999]';
+    dropdown.innerHTML =
+      '<div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">' +
+      '<h3 id="notifications-header" class="font-semibold" data-i18n="notifications.title">Notifications</h3>' +
+      '<button id="close-notifications" class="text-xs text-gray-400 hover:text-gray-200" aria-label="Close">✕</button>' +
+      '</div>' +
+      '<div id="notification-list" class="max-h-80 overflow-y-auto p-2" aria-labelledby="notifications-header" aria-live="polite"></div>';
+
+    document.body.appendChild(dropdown);
+    return dropdown;
+  }
+
+  function positionDropdown(dropdown, bell) {
+    if (!dropdown || !bell) {
+      return;
+    }
+
+    const rect = bell.getBoundingClientRect();
+
+    // Temporarily show (but hide visually) to measure size accurately
+    const wasHidden = dropdown.classList.contains('hidden');
+    dropdown.classList.remove('hidden');
+    dropdown.style.visibility = 'hidden';
+    dropdown.style.left = '0px';
+    dropdown.style.top = '0px';
+
+    const ddRect = dropdown.getBoundingClientRect();
+    const ddW = ddRect.width || 384; // fallback to ~w-96
+    const ddH = ddRect.height || 320;
+
+    const pad = 8;
+    const preferredLeft = rect.right + 12;
+    const preferredTop = rect.bottom - ddH;
+
+    let left = preferredLeft;
+    if (left + ddW + pad > window.innerWidth) {
+      left = rect.left - ddW - 12;
+    }
+    left = Math.max(pad, Math.min(left, window.innerWidth - ddW - pad));
+
+    let top = preferredTop;
+    top = Math.max(pad, Math.min(top, window.innerHeight - ddH - pad));
+
+    dropdown.style.left = Math.round(left) + 'px';
+    dropdown.style.top = Math.round(top) + 'px';
+    dropdown.style.visibility = '';
+
+    if (wasHidden) {
+      dropdown.classList.add('hidden');
     }
   }
   function render() {
@@ -360,18 +425,28 @@
       const bellClass =
         'nav-link ui-link ui-link-nav block w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center justify-between gap-2';
       const labelClass = '';
-      const dropdownClass =
-        'hidden absolute left-full top-0 ml-3 w-96 max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50';
 
-      wrapper.innerHTML = `<button id="notification-bell" aria-haspopup="true" aria-expanded="false" aria-controls="notification-dropdown" class="${bellClass}" title="Notifications"><span class="${labelClass}" data-i18n="notifications.title">Notifications</span><span class="relative inline-flex items-center">🔔<span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span></span></button><div id="notification-dropdown" role="dialog" aria-modal="false" aria-label="Notifications" class="${dropdownClass}"><div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 id="notifications-header" class="font-semibold" data-i18n="notifications.title">Notifications</h3><button id="close-notifications" class="text-xs text-gray-400 hover:text-gray-200" aria-label="Close">✕</button></div><div id="notification-list" class="max-h-80 overflow-y-auto p-2" aria-labelledby="notifications-header" aria-live="polite"></div></div>`;
+      wrapper.innerHTML = `<button id="notification-bell" aria-haspopup="true" aria-expanded="false" aria-controls="notification-dropdown" class="${bellClass}" title="Notifications"><span class="${labelClass}" data-i18n="notifications.title">Notifications</span><span class="relative inline-flex items-center">🔔<span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span></span></button>`;
       bell = document.getElementById('notification-bell');
-      const dropdown = document.getElementById('notification-dropdown');
+
+      const dropdown = ensureDropdownPortal();
       const closeBtn = document.getElementById('close-notifications');
+
+      // Keep dropdown positioned correctly even if the nav scrolls
+      positionDropdown(dropdown, bell);
+
       bell.addEventListener('click', function (e) {
         e.stopPropagation();
         const expanded = bell.getAttribute('aria-expanded') === 'true';
-        bell.setAttribute('aria-expanded', String(!expanded));
-        dropdown.classList.toggle('hidden');
+        if (expanded) {
+          closeDropdown();
+          return;
+        }
+
+        bell.setAttribute('aria-expanded', 'true');
+        positionDropdown(dropdown, bell);
+        dropdown.classList.remove('hidden');
+        dropdown.setAttribute('data-open', 'true');
         if (!dropdown.classList.contains('hidden')) {
           render();
           setTimeout(function () {
@@ -391,6 +466,16 @@
           closeDropdown();
         }
       });
+      window.addEventListener('resize', function () {
+        closeDropdown();
+      });
+      window.addEventListener(
+        'scroll',
+        function () {
+          closeDropdown();
+        },
+        true
+      );
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
           closeDropdown();
