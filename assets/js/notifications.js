@@ -423,10 +423,10 @@
 
     if (!bell && wrapper) {
       const bellClass =
-        'nav-link ui-link ui-link-nav block w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center justify-between gap-2';
+        'nav-link ui-link ui-link-nav block w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-2';
       const labelClass = '';
 
-      wrapper.innerHTML = `<button id="notification-bell" aria-haspopup="true" aria-expanded="false" aria-controls="notification-dropdown" class="${bellClass}" title="Notifications"><span class="${labelClass}" data-i18n="notifications.title">Notifications</span><span class="relative inline-flex items-center">🔔<span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span></span></button>`;
+      wrapper.innerHTML = `<button id="notification-bell" aria-haspopup="true" aria-expanded="false" aria-controls="notification-dropdown" class="${bellClass}" title="Notifications"><span class="relative inline-flex items-center">🔔<span id="notification-badge" class="bg-red-500 text-white text-[10px] rounded-full px-1 absolute -top-2 -right-2 hidden">0</span></span><span class="${labelClass}" data-i18n="notifications.title">Notifications</span></button>`;
       bell = document.getElementById('notification-bell');
 
       const dropdown = ensureDropdownPortal();
