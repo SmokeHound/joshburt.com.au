@@ -1,3 +1,9 @@
+## [1.17.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.16.0...v1.17.0) (2026-01-12)
+
+### Features
+
+* add previews for custom spacing scale and typography settings in theme builder ([f84817f](https://github.com/SmokeHound/joshburt.com.au/commit/f84817fbb382db45679e083aec5b24dbff720fb9))
+
 ## [1.16.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.15.0...v1.16.0) (2026-01-12)
 
 ### Features
