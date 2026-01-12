@@ -1,3 +1,9 @@
+## [1.19.1](https://github.com/SmokeHound/joshburt.com.au/compare/v1.19.0...v1.19.1) (2026-01-12)
+
+### Bug Fixes
+
+* adjust notification bell button layout for improved accessibility ([bf908c6](https://github.com/SmokeHound/joshburt.com.au/commit/bf908c6853463859807b377734582b15e8686f6d))
+
 ## [1.19.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.18.0...v1.19.0) (2026-01-12)
 
 ### Features
