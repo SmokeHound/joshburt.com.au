@@ -550,14 +550,34 @@
       const storedColors = getStoredColors();
 
       // Only apply custom colors if at least one is set
-            const hasCustomColors = storedColors.primary || storedColors.secondary || storedColors.accent ||
-              storedColors.navBg || storedColors.navText ||
-                  storedColors.buttonPrimary || storedColors.buttonSecondary ||
-                  storedColors.buttonDanger || storedColors.buttonSuccess ||
-              storedColors.bgPrimary || storedColors.bgSecondary || storedColors.bgTertiary || storedColors.bgElevated ||
-                    storedColors.borderDefault || storedColors.borderHover || storedColors.borderFocus || storedColors.textPrimary || storedColors.textSecondary ||
-              storedColors.textMuted || storedColors.textOnPrimary || storedColors.textOnSecondary || storedColors.textOnAccent || storedColors.textOnDanger || storedColors.warning || storedColors.info ||
-              storedColors.radiusMd;
+      const hasCustomColors = [
+        storedColors.primary,
+        storedColors.secondary,
+        storedColors.accent,
+        storedColors.navBg,
+        storedColors.navText,
+        storedColors.buttonPrimary,
+        storedColors.buttonSecondary,
+        storedColors.buttonDanger,
+        storedColors.buttonSuccess,
+        storedColors.bgPrimary,
+        storedColors.bgSecondary,
+        storedColors.bgTertiary,
+        storedColors.bgElevated,
+        storedColors.borderDefault,
+        storedColors.borderHover,
+        storedColors.borderFocus,
+        storedColors.textPrimary,
+        storedColors.textSecondary,
+        storedColors.textMuted,
+        storedColors.textOnPrimary,
+        storedColors.textOnSecondary,
+        storedColors.textOnAccent,
+        storedColors.textOnDanger,
+        storedColors.warning,
+        storedColors.info,
+        storedColors.radiusMd
+      ].some(v => v !== null && v !== undefined && v !== '');
       const customColors = hasCustomColors ? storedColors : null;
 
       return applyTheme(storedTheme, customColors);
