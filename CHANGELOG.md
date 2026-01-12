@@ -1,3 +1,9 @@
+## [1.19.2](https://github.com/SmokeHound/joshburt.com.au/compare/v1.19.1...v1.19.2) (2026-01-12)
+
+### Bug Fixes
+
+* update sidebar colors to use CSS variables for better theming support ([a7cc1cb](https://github.com/SmokeHound/joshburt.com.au/commit/a7cc1cb5fbf9b46b669480fbc4c21ca5ee4316d8))
+
 ## [1.19.1](https://github.com/SmokeHound/joshburt.com.au/compare/v1.19.0...v1.19.1) (2026-01-12)
 
 ### Bug Fixes
