@@ -246,6 +246,100 @@
                   </fieldset>
                 </div>
 
+                <!-- Interface Preferences (new) -->
+                <div class="settings-section ui-card ui-card-secondary p-8 rounded-xl border border-indigo-500/20 shadow-xl hover:border-indigo-500/40 transition-all duration-300">
+                  <details class="group">
+                    <summary class="cursor-pointer font-bold text-base flex items-center gap-4 hover:text-indigo-400 transition-colors pb-4 border-b border-gray-700/50">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                      </div>
+                      <div class="flex-1">
+                        <span>Interface Preferences</span>
+                        <p class="text-xs text-gray-400 font-normal mt-1">Quick UI comfort options (motion, spacing, typography)</p>
+                      </div>
+                      <svg class="w-6 h-6 text-gray-400 group-open:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </summary>
+
+                    <fieldset class="space-y-4 mt-6">
+                      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <label class="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-indigo-500/60 transition-all cursor-pointer">
+                          <div class="flex-1">
+                            <span class="text-xs font-bold text-gray-200">Reduce motion (force)</span>
+                            <p class="text-[10px] text-gray-500 mt-0.5">Disables animations/transitions even if OS setting is off</p>
+                          </div>
+                          <input id="reduce-motion" type="checkbox" class="w-5 h-5 rounded border-2 border-indigo-500 text-indigo-500 focus:ring-2 focus:ring-indigo-500/30 ml-auto" />
+                        </label>
+
+                        <div class="p-4 rounded-xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-indigo-500/60 transition-all">
+                          <label for="settings-font-scale" class="block text-xs font-bold text-gray-200 mb-2">Text size (Font scale)</label>
+                          <div class="flex flex-col gap-3">
+                            <input id="settings-font-scale" type="range" min="0.75" max="1.5" step="0.05" value="1" class="w-full" />
+                            <div class="flex items-center gap-3">
+                              <input id="settings-font-scale-number" type="number" min="0.75" max="1.5" step="0.05" value="1" class="w-24 bg-transparent text-sm p-2 rounded-lg border border-[color:var(--token-border-default)] focus:outline-none" />
+                              <span class="text-[10px] text-gray-500">1.00 = default</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-indigo-500/60 transition-all">
+                          <label for="settings-spacing-scale" class="block text-xs font-bold text-gray-200 mb-2">UI spacing (Spacing scale)</label>
+                          <div class="flex flex-col gap-3">
+                            <input id="settings-spacing-scale" type="range" min="0.5" max="1.75" step="0.05" value="1" class="w-full" />
+                            <div class="flex items-center gap-3">
+                              <input id="settings-spacing-scale-number" type="number" min="0.5" max="1.75" step="0.05" value="1" class="w-24 bg-transparent text-sm p-2 rounded-lg border border-[color:var(--token-border-default)] focus:outline-none" />
+                              <span class="text-[10px] text-gray-500">Lower = denser UI</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-indigo-500/60 transition-all">
+                          <label for="settings-base-font-weight" class="block text-xs font-bold text-gray-200 mb-2">Base font weight</label>
+                          <select id="settings-base-font-weight" class="w-full bg-transparent text-sm p-2 rounded-lg border border-[color:var(--token-border-default)] focus:outline-none">
+                            <option value="">Default</option>
+                            <option value="400">Normal (400)</option>
+                            <option value="500">Medium (500)</option>
+                            <option value="600">Semibold (600)</option>
+                            <option value="700">Bold (700)</option>
+                          </select>
+                          <p class="text-[10px] text-gray-500 mt-2">Adjusts default font weight tokens used across UI primitives.</p>
+                        </div>
+                      </div>
+
+                      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-indigo-500/60 transition-all">
+                          <label for="settings-radius-md" class="block text-xs font-bold text-gray-200 mb-2">Corner radius (Medium)</label>
+                          <div class="flex flex-col gap-3">
+                            <input id="settings-radius-md" type="range" min="0" max="24" step="1" value="12" class="w-full" />
+                            <div class="flex items-center gap-3">
+                              <input id="settings-radius-md-number" type="number" min="0" max="24" step="1" value="12" class="w-24 bg-transparent text-sm p-2 rounded-lg border border-[color:var(--token-border-default)] focus:outline-none" />
+                              <span class="text-[10px] text-gray-500">px</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-2 border-gray-700/50 hover:border-indigo-500/60 transition-all">
+                          <label for="settings-shadow-preset" class="block text-xs font-bold text-gray-200 mb-2">Shadow preset</label>
+                          <select id="settings-shadow-preset" class="w-full bg-transparent text-sm p-2 rounded-lg border border-[color:var(--token-border-default)] focus:outline-none">
+                            <option value="">Default</option>
+                            <option value="default">Default</option>
+                            <option value="none">None</option>
+                            <option value="soft">Soft</option>
+                            <option value="crisp">Crisp</option>
+                            <option value="deep">Deep</option>
+                          </select>
+                          <p class="text-[10px] text-gray-500 mt-2">Changes token shadows used by cards and UI components.</p>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </details>
+                </div>
+
                 <!-- Core Identity Section (collapsible) -->
                 <div class="settings-section ui-card ui-card-secondary p-8 rounded-xl border border-blue-500/20 shadow-xl hover:border-blue-500/40 transition-all duration-300">
                   <details class="group">
@@ -909,12 +1003,44 @@
           enableCustomerInsights: document.getElementById('feature-enable-customer-insights')?.checked ?? true,
           
         },
+        // Interface preferences
+        reduceMotion: document.getElementById('reduce-motion')?.checked || false,
         // Security
         sessionTimeout: parseInt(document.getElementById('session-timeout')?.value) || 60,
         maxLoginAttempts: parseInt(document.getElementById('max-login-attempts')?.value) || 5,
         enable2FA: document.getElementById('enable-2fa')?.checked || false,
         auditAllActions: document.getElementById('audit-all-actions')?.checked || false
       };
+
+      // Optional UI token values (only include when controls exist and are set)
+      try {
+        const spacingEl = document.getElementById('settings-spacing-scale');
+        const fontScaleEl = document.getElementById('settings-font-scale');
+        const baseWeightEl = document.getElementById('settings-base-font-weight');
+        const radiusEl = document.getElementById('settings-radius-md');
+        const shadowEl = document.getElementById('settings-shadow-preset');
+
+        if (spacingEl && spacingEl.value !== '') {
+          const v = parseFloat(spacingEl.value);
+          if (!Number.isNaN(v)) settings.spacingScale = v;
+        }
+        if (fontScaleEl && fontScaleEl.value !== '') {
+          const v = parseFloat(fontScaleEl.value);
+          if (!Number.isNaN(v)) settings.fontScale = v;
+        }
+        if (baseWeightEl && String(baseWeightEl.value || '').trim() !== '') {
+          settings.baseFontWeight = String(baseWeightEl.value).trim();
+        }
+        if (radiusEl && radiusEl.value !== '') {
+          const v = parseFloat(radiusEl.value);
+          if (!Number.isNaN(v)) settings.radiusMd = v;
+        }
+        if (shadowEl && String(shadowEl.value || '').trim() !== '') {
+          settings.shadowPreset = String(shadowEl.value).trim();
+        }
+      } catch (_) {
+        /* ignore */
+      }
 
       return settings;
     }
@@ -974,6 +1100,39 @@
                 // Branding & contact
                 if (settings.logoUrl) document.getElementById('logo-url').value = settings.logoUrl;
                 if (settings.faviconUrl) document.getElementById('favicon-url').value = settings.faviconUrl;
+
+                // Interface preferences
+                if (settings.reduceMotion !== undefined && document.getElementById('reduce-motion')) {
+                  document.getElementById('reduce-motion').checked = settings.reduceMotion === true;
+                }
+
+                // Optional UI tokens (if present)
+                try {
+                  const setNum = (id, n) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    if (n === undefined || n === null) return;
+                    const v = Number(n);
+                    if (Number.isNaN(v)) return;
+                    el.value = String(v);
+                  };
+                  const setStr = (id, s) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    if (s === undefined || s === null) return;
+                    el.value = String(s);
+                  };
+                  setNum('settings-spacing-scale', settings.spacingScale);
+                  setNum('settings-spacing-scale-number', settings.spacingScale);
+                  setNum('settings-font-scale', settings.fontScale);
+                  setNum('settings-font-scale-number', settings.fontScale);
+                  setStr('settings-base-font-weight', settings.baseFontWeight);
+                  setNum('settings-radius-md', settings.radiusMd);
+                  setNum('settings-radius-md-number', settings.radiusMd);
+                  setStr('settings-shadow-preset', settings.shadowPreset);
+                } catch (_) {
+                  /* ignore */
+                }
         // Feature toggles/flags - Read from settings.featureFlags object
         const featureFlags = settings.featureFlags || {};
         document.getElementById('enable-registration').checked = !!featureFlags.enableRegistration;
@@ -1020,10 +1179,70 @@
                     const t = document.getElementById('enable-2fa');
                     if (t) t.dispatchEvent(new Event('change'));
                   } catch (_) {}
+
+                // Cache safe, user-visible settings for shared UI (best-effort).
+                // Avoid storing sensitive settings (SMTP password, etc.) in localStorage.
+                try {
+                  const prev = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+                  const safe = {
+                    siteTitle: settings.siteTitle || prev.siteTitle || '',
+                    siteDescription: settings.siteDescription || prev.siteDescription || '',
+                    theme: settings.theme || prev.theme || '',
+                    logoUrl: settings.logoUrl || prev.logoUrl || '',
+                    faviconUrl: settings.faviconUrl || prev.faviconUrl || '',
+                    featureFlags: settings.featureFlags || prev.featureFlags || {},
+                    reduceMotion: settings.reduceMotion !== undefined ? settings.reduceMotion : (prev.reduceMotion || false),
+                    spacingScale: settings.spacingScale !== undefined ? settings.spacingScale : prev.spacingScale,
+                    fontScale: settings.fontScale !== undefined ? settings.fontScale : prev.fontScale,
+                    baseFontWeight: settings.baseFontWeight !== undefined ? settings.baseFontWeight : prev.baseFontWeight,
+                    radiusMd: settings.radiusMd !== undefined ? settings.radiusMd : prev.radiusMd,
+                    shadowPreset: settings.shadowPreset !== undefined ? settings.shadowPreset : prev.shadowPreset
+                  };
+                  localStorage.setItem('siteSettings', JSON.stringify(Object.assign({}, prev, safe)));
+                  try {
+                    window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: safe }));
+                  } catch (_) {
+                    /* ignore */
+                  }
+                } catch (_) {
+                  /* ignore */
+                }
       } catch (e) {
         showToast('Failed to load settings from server', 'error');
       }
     }
+
+    // Keep range + number inputs in sync for Interface Preferences controls
+    (function initInterfacePreferenceBindings() {
+      function bindRangeNumber(rangeId, numberId) {
+        const r = document.getElementById(rangeId);
+        const n = document.getElementById(numberId);
+        if (!r || !n) return;
+
+        const sync = (from, to) => {
+          try {
+            to.value = from.value;
+          } catch (_) {
+            /* ignore */
+          }
+        };
+
+        r.addEventListener('input', () => sync(r, n));
+        n.addEventListener('input', () => sync(n, r));
+      }
+
+      const bindAll = () => {
+        bindRangeNumber('settings-spacing-scale', 'settings-spacing-scale-number');
+        bindRangeNumber('settings-font-scale', 'settings-font-scale-number');
+        bindRangeNumber('settings-radius-md', 'settings-radius-md-number');
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindAll);
+      } else {
+        bindAll();
+      }
+    })();
 
         // Update preview (placeholder for now)
         function updatePreview() {
@@ -1170,7 +1389,13 @@
                     buttonSuccessColor: settings.buttonSuccessColor || prev.buttonSuccessColor || '',
                     logoUrl: settings.logoUrl || prev.logoUrl || '',
                     faviconUrl: settings.faviconUrl || prev.faviconUrl || '',
-                    featureFlags: settings.featureFlags || prev.featureFlags || {}
+                    featureFlags: settings.featureFlags || prev.featureFlags || {},
+                    reduceMotion: settings.reduceMotion !== undefined ? settings.reduceMotion : (prev.reduceMotion || false),
+                    spacingScale: settings.spacingScale !== undefined ? settings.spacingScale : prev.spacingScale,
+                    fontScale: settings.fontScale !== undefined ? settings.fontScale : prev.fontScale,
+                    baseFontWeight: settings.baseFontWeight !== undefined ? settings.baseFontWeight : prev.baseFontWeight,
+                    radiusMd: settings.radiusMd !== undefined ? settings.radiusMd : prev.radiusMd,
+                    shadowPreset: settings.shadowPreset !== undefined ? settings.shadowPreset : prev.shadowPreset
                   };
                   localStorage.setItem('siteSettings', JSON.stringify(Object.assign({}, prev, safe)));
                 } catch (e) {

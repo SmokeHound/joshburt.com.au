@@ -139,6 +139,21 @@ input[type="reset"],
   }
 }
 
+/* Forced Reduced Motion Support (app setting) */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+.reduce-motion .animate-spin,
+.reduce-motion .animate-pulse {
+  animation: none !important;
+}
+
 /* Focus Within - Visible Container Focus */
 .focus-within:focus-within {
   outline: 2px solid #3b82f6;

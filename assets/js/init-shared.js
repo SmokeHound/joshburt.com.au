@@ -34,6 +34,38 @@
     }
   }
 
+  function readReduceMotionFromCache() {
+    try {
+      const raw = localStorage.getItem('siteSettings');
+      if (!raw) {
+        return false;
+      }
+      const s = JSON.parse(raw);
+      return !!(s && (s.reduceMotion === true || s.reduceMotion === 'true' || s.reduceMotion === 1));
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function applyReduceMotion(enabled) {
+    try {
+      if (typeof document === 'undefined') {
+        return;
+      }
+      const on = enabled === true;
+      const root = document.documentElement;
+      const body = document.body;
+      if (root && root.classList) {
+        root.classList.toggle('reduce-motion', on);
+      }
+      if (body && body.classList) {
+        body.classList.toggle('reduce-motion', on);
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
   function applyDocumentTitle(siteTitle) {
     try {
       if (typeof document === 'undefined') {
@@ -53,6 +85,7 @@
 
   // Apply immediately from cached settings (if present)
   applyDocumentTitle(readSiteTitleFromCache());
+  applyReduceMotion(readReduceMotionFromCache());
 
   // React to settings changes (save in settings.html and init-shared cache)
   if (typeof window !== 'undefined') {
@@ -60,14 +93,21 @@
       try {
         const d = evt && evt.detail;
         applyDocumentTitle(d && (d.siteTitle || d['site-title']));
+        if (d && Object.prototype.hasOwnProperty.call(d, 'reduceMotion')) {
+          applyReduceMotion(d.reduceMotion === true);
+        } else {
+          applyReduceMotion(readReduceMotionFromCache());
+        }
       } catch (_) {
         applyDocumentTitle(readSiteTitleFromCache());
+        applyReduceMotion(readReduceMotionFromCache());
       }
     });
 
     window.addEventListener('storage', function (e) {
       if (e && e.key === 'siteSettings') {
         applyDocumentTitle(readSiteTitleFromCache());
+        applyReduceMotion(readReduceMotionFromCache());
       }
     });
   }
