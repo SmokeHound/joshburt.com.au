@@ -225,10 +225,11 @@
         info: siteSettings.infoColor || localStorage.getItem('infoColor') || null,
 
         // Non-color tokens
-        radiusMd: siteSettings.radiusMd || localStorage.getItem('radiusMd') || null
+        radiusMd: siteSettings.radiusMd || localStorage.getItem('radiusMd') || null,
+        shadowPreset: siteSettings.shadowPreset || localStorage.getItem('shadowPreset') || null
       };
     } catch (e) {
-      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null, bgPrimary: null, bgSecondary: null, bgTertiary: null, bgElevated: null, borderDefault: null, borderHover: null, borderFocus: null, textPrimary: null, textSecondary: null, textMuted: null, textOnPrimary: null, textOnSecondary: null, textOnAccent: null, textOnDanger: null, warning: null, info: null, radiusMd: null };
+      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null, bgPrimary: null, bgSecondary: null, bgTertiary: null, bgElevated: null, borderDefault: null, borderHover: null, borderFocus: null, textPrimary: null, textSecondary: null, textMuted: null, textOnPrimary: null, textOnSecondary: null, textOnAccent: null, textOnDanger: null, warning: null, info: null, radiusMd: null, shadowPreset: null };
     }
   }
 
@@ -475,6 +476,56 @@
       root.style.removeProperty('--token-radius-lg');
       root.style.removeProperty('--token-radius-xl');
     }
+
+    // Shadow presets (override token shadows)
+    const applyShadowPreset = (presetId) => {
+      const id = String(presetId || '').trim();
+      if (!id || id === 'default') {
+        root.style.removeProperty('--token-shadow-sm');
+        root.style.removeProperty('--token-shadow-md');
+        root.style.removeProperty('--token-shadow-lg');
+        root.style.removeProperty('--token-shadow-xl');
+        return;
+      }
+
+      const presets = {
+        none: {
+          sm: 'none',
+          md: 'none',
+          lg: 'none',
+          xl: 'none'
+        },
+        soft: {
+          sm: '0 1px 2px rgba(0, 0, 0, 0.03)',
+          md: '0 3px 8px rgba(0, 0, 0, 0.06)',
+          lg: '0 10px 20px rgba(0, 0, 0, 0.08)',
+          xl: '0 20px 30px rgba(0, 0, 0, 0.10)'
+        },
+        crisp: {
+          sm: '0 1px 2px rgba(0, 0, 0, 0.08)',
+          md: '0 4px 10px rgba(0, 0, 0, 0.12)',
+          lg: '0 12px 22px rgba(0, 0, 0, 0.16)',
+          xl: '0 24px 36px rgba(0, 0, 0, 0.18)'
+        },
+        deep: {
+          sm: '0 2px 4px rgba(0, 0, 0, 0.12)',
+          md: '0 8px 16px rgba(0, 0, 0, 0.18)',
+          lg: '0 16px 28px rgba(0, 0, 0, 0.22)',
+          xl: '0 28px 44px rgba(0, 0, 0, 0.26)'
+        }
+      };
+
+      const p = presets[id];
+      if (!p) {
+        return;
+      }
+      root.style.setProperty('--token-shadow-sm', p.sm);
+      root.style.setProperty('--token-shadow-md', p.md);
+      root.style.setProperty('--token-shadow-lg', p.lg);
+      root.style.setProperty('--token-shadow-xl', p.xl);
+    };
+
+    applyShadowPreset(colors.shadowPreset);
   }
 
   // Apply dark/light class to documentElement
@@ -523,7 +574,8 @@
       info: (customColors && customColors.info) || null,
 
       // Non-color tokens
-      radiusMd: (customColors && customColors.radiusMd) || null
+      radiusMd: (customColors && customColors.radiusMd) || null,
+      shadowPreset: (customColors && customColors.shadowPreset) || null
     };
 
     applyCSSVariables(colors);
@@ -577,6 +629,7 @@
         storedColors.warning,
         storedColors.info,
         storedColors.radiusMd
+        , storedColors.shadowPreset
       ].some(v => v !== null && v !== undefined && v !== '');
       const customColors = hasCustomColors ? storedColors : null;
 
@@ -687,6 +740,9 @@
           if (colors.radiusMd !== undefined && colors.radiusMd !== null) {
             siteSettings.radiusMd = colors.radiusMd;
           }
+          if (colors.shadowPreset !== undefined && colors.shadowPreset !== null) {
+            siteSettings.shadowPreset = colors.shadowPreset;
+          }
           localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
 
           // Legacy compatibility
@@ -768,6 +824,9 @@
           if (colors.radiusMd !== undefined && colors.radiusMd !== null) {
             localStorage.setItem('radiusMd', String(colors.radiusMd));
           }
+          if (colors.shadowPreset !== undefined && colors.shadowPreset !== null) {
+            localStorage.setItem('shadowPreset', String(colors.shadowPreset));
+          }
         } catch (e) {
           // Ignore storage errors
         }
@@ -815,7 +874,8 @@
           info: storedColors.info || null,
 
           // Non-color tokens
-          radiusMd: storedColors.radiusMd || null
+          radiusMd: storedColors.radiusMd || null,
+          shadowPreset: storedColors.shadowPreset || null
         }
       };
     },

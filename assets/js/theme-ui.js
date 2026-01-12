@@ -169,6 +169,8 @@
       return 8;
     })();
 
+    const shadowPresetDefault = String(customTheme.colors.shadowPreset || '').trim() || 'default';
+
     builderContainer.innerHTML = `
       <div class="card p-4 border border-gray-700 rounded-xl bg-gray-900/20">
         <div class="flex items-start justify-between gap-4 mb-4">
@@ -247,6 +249,22 @@
                 <span class="text-xs text-gray-400">px</span>
               </div>
               <div class="hidden md:block w-16 h-10 border border-gray-700/70 bg-gray-800/40" id="custom-radiusMd-preview"></div>
+            </div>
+          </div>
+
+          <div class="md:col-span-2 rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-shadowPreset" class="block text-xs font-medium text-gray-200 mb-1">Shadow Preset</label>
+            <p class="text-xs text-gray-500 mb-2">Controls global elevation shadows for cards/panels.</p>
+            <div class="flex flex-col md:flex-row gap-3 md:items-center">
+              <select id="custom-shadowPreset" class="w-full md:w-64 p-2 rounded-lg bg-gray-800/70 border border-gray-700 text-xs">
+                <option value="default" ${shadowPresetDefault === 'default' ? 'selected' : ''}>Default</option>
+                <option value="none" ${shadowPresetDefault === 'none' ? 'selected' : ''}>None</option>
+                <option value="soft" ${shadowPresetDefault === 'soft' ? 'selected' : ''}>Soft</option>
+                <option value="crisp" ${shadowPresetDefault === 'crisp' ? 'selected' : ''}>Crisp</option>
+                <option value="deep" ${shadowPresetDefault === 'deep' ? 'selected' : ''}>Deep</option>
+              </select>
+              <div class="flex-1"></div>
+              <div class="hidden md:block w-16 h-10 border border-gray-700/70 bg-gray-800/40" id="custom-shadowPreset-preview"></div>
             </div>
           </div>
 
@@ -589,6 +607,12 @@
         return `${Math.max(0, Math.min(32, n))}px`;
       })();
 
+      const shadowPreset = (() => {
+        const el = document.getElementById('custom-shadowPreset');
+        const v = el ? String(el.value || '').trim() : '';
+        return v || 'default';
+      })();
+
       const colors = {
         primary: document.getElementById('custom-primary').value,
         secondary: document.getElementById('custom-secondary').value,
@@ -617,6 +641,7 @@
         buttonSuccess: document.getElementById('custom-buttonSuccess').value,
 
         radiusMd
+        , shadowPreset
       };
 
       window.ThemeEnhanced.customBuilder.updateColors(colors);
@@ -649,6 +674,29 @@
         radiusRange.value = String(n);
         updateRadiusPreview(n);
       });
+    }
+
+    // Shadow preset preview
+    const shadowSelect = document.getElementById('custom-shadowPreset');
+    const shadowPreview = document.getElementById('custom-shadowPreset-preview');
+    const updateShadowPreview = () => {
+      if (!shadowPreview || !shadowSelect) {
+        return;
+      }
+      const id = String(shadowSelect.value || '').trim();
+      const map = {
+        default: 'var(--token-shadow-md)',
+        none: 'none',
+        soft: '0 3px 8px rgba(0, 0, 0, 0.06)',
+        crisp: '0 4px 10px rgba(0, 0, 0, 0.12)',
+        deep: '0 8px 16px rgba(0, 0, 0, 0.18)'
+      };
+      shadowPreview.style.boxShadow = map[id] || map.default;
+      shadowPreview.style.borderRadius = 'var(--token-radius-md)';
+    };
+    if (shadowSelect) {
+      updateShadowPreview();
+      shadowSelect.addEventListener('change', updateShadowPreview);
     }
 
     // Reset custom theme

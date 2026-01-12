@@ -229,6 +229,7 @@
           delete siteSettings.warningColor;
           delete siteSettings.infoColor;
           delete siteSettings.radiusMd;
+          delete siteSettings.shadowPreset;
           localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
 
           localStorage.removeItem('primaryColor');
@@ -257,6 +258,7 @@
           localStorage.removeItem('warningColor');
           localStorage.removeItem('infoColor');
           localStorage.removeItem('radiusMd');
+          localStorage.removeItem('shadowPreset');
         } catch (_) {
           // Ignore storage errors
         }
