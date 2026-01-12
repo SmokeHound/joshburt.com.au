@@ -1,3 +1,9 @@
+## [1.18.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.17.0...v1.18.0) (2026-01-12)
+
+### Features
+
+* add interface preferences for reduced motion and UI scaling options ([78fe6a8](https://github.com/SmokeHound/joshburt.com.au/commit/78fe6a8ac5816970722b7c8ee1cc69ddae9efd40))
+
 ## [1.17.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.16.0...v1.17.0) (2026-01-12)
 
 ### Features
