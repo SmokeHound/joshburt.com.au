@@ -171,6 +171,34 @@
 
     const shadowPresetDefault = String(customTheme.colors.shadowPreset || '').trim() || 'default';
 
+    const spacingScaleDefault = (() => {
+      const raw = customTheme.colors.spacingScale;
+      const n = raw === null || raw === undefined ? NaN : parseFloat(String(raw).trim());
+      if (!Number.isFinite(n)) {
+        return 1;
+      }
+      return Math.max(0.5, Math.min(1.75, n));
+    })();
+
+    const fontScaleDefault = (() => {
+      const raw = customTheme.colors.fontScale;
+      const n = raw === null || raw === undefined ? NaN : parseFloat(String(raw).trim());
+      if (!Number.isFinite(n)) {
+        return 1;
+      }
+      return Math.max(0.5, Math.min(1.75, n));
+    })();
+
+    const baseFontWeightDefault = (() => {
+      const raw = customTheme.colors.baseFontWeight;
+      const n = raw === null || raw === undefined ? NaN : parseInt(String(raw).trim(), 10);
+      if (!Number.isFinite(n)) {
+        return 400;
+      }
+      const allowed = [300, 400, 500, 600, 700];
+      return allowed.includes(n) ? n : 400;
+    })();
+
     builderContainer.innerHTML = `
       <div class="card p-4 border border-gray-700 rounded-xl bg-gray-900/20">
         <div class="flex items-start justify-between gap-4 mb-4">
@@ -265,6 +293,48 @@
               </select>
               <div class="flex-1"></div>
               <div class="hidden md:block w-16 h-10 border border-gray-700/70 bg-gray-800/40" id="custom-shadowPreset-preview"></div>
+            </div>
+          </div>
+
+          <div class="md:col-span-2 rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-spacingScale" class="block text-xs font-medium text-gray-200 mb-1">Spacing Scale</label>
+            <p class="text-xs text-gray-500 mb-2">Scales padding/margins/gaps (token spacing scale).</p>
+            <div class="flex flex-col md:flex-row gap-3 md:items-center">
+              <input type="range" id="custom-spacingScale" min="0.5" max="1.75" step="0.05" value="${spacingScaleDefault}"
+                class="w-full md:flex-1" />
+              <div class="flex items-center gap-2">
+                <input type="number" id="custom-spacingScale-number" min="0.5" max="1.75" step="0.05" value="${spacingScaleDefault}"
+                  class="w-24 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" />
+                <span class="text-xs text-gray-400">×</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:col-span-2 rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-fontScale" class="block text-xs font-medium text-gray-200 mb-1">Font Scale</label>
+            <p class="text-xs text-gray-500 mb-2">Scales overall text size (applied to body font-size).</p>
+            <div class="flex flex-col md:flex-row gap-3 md:items-center">
+              <input type="range" id="custom-fontScale" min="0.75" max="1.5" step="0.05" value="${Math.max(0.75, Math.min(1.5, fontScaleDefault))}"
+                class="w-full md:flex-1" />
+              <div class="flex items-center gap-2">
+                <input type="number" id="custom-fontScale-number" min="0.75" max="1.5" step="0.05" value="${Math.max(0.75, Math.min(1.5, fontScaleDefault))}"
+                  class="w-24 p-2 rounded-lg bg-gray-800/70 border border-gray-700 font-mono text-xs" />
+                <span class="text-xs text-gray-400">×</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:col-span-2 rounded-xl border border-gray-700/60 bg-gray-900/30 p-3">
+            <label for="custom-baseFontWeight" class="block text-xs font-medium text-gray-200 mb-1">Base Font Weight</label>
+            <p class="text-xs text-gray-500 mb-2">Sets the normal/medium/semibold/bold weight scale.</p>
+            <div class="flex flex-col md:flex-row gap-3 md:items-center">
+              <select id="custom-baseFontWeight" class="w-full md:w-64 p-2 rounded-lg bg-gray-800/70 border border-gray-700 text-xs">
+                <option value="300" ${baseFontWeightDefault === 300 ? 'selected' : ''}>Light (300)</option>
+                <option value="400" ${baseFontWeightDefault === 400 ? 'selected' : ''}>Normal (400)</option>
+                <option value="500" ${baseFontWeightDefault === 500 ? 'selected' : ''}>Medium (500)</option>
+                <option value="600" ${baseFontWeightDefault === 600 ? 'selected' : ''}>Semibold (600)</option>
+                <option value="700" ${baseFontWeightDefault === 700 ? 'selected' : ''}>Bold (700)</option>
+              </select>
             </div>
           </div>
 
@@ -613,6 +683,34 @@
         return v || 'default';
       })();
 
+      const spacingScale = (() => {
+        const el = document.getElementById('custom-spacingScale-number');
+        const n = el ? parseFloat(String(el.value || '').trim()) : NaN;
+        if (!Number.isFinite(n)) {
+          return null;
+        }
+        return Math.max(0.5, Math.min(1.75, n));
+      })();
+
+      const fontScale = (() => {
+        const el = document.getElementById('custom-fontScale-number');
+        const n = el ? parseFloat(String(el.value || '').trim()) : NaN;
+        if (!Number.isFinite(n)) {
+          return null;
+        }
+        return Math.max(0.75, Math.min(1.5, n));
+      })();
+
+      const baseFontWeight = (() => {
+        const el = document.getElementById('custom-baseFontWeight');
+        const n = el ? parseInt(String(el.value || '').trim(), 10) : NaN;
+        if (!Number.isFinite(n)) {
+          return null;
+        }
+        const allowed = [300, 400, 500, 600, 700];
+        return allowed.includes(n) ? n : null;
+      })();
+
       const colors = {
         primary: document.getElementById('custom-primary').value,
         secondary: document.getElementById('custom-secondary').value,
@@ -640,8 +738,11 @@
         buttonDanger: document.getElementById('custom-buttonDanger').value,
         buttonSuccess: document.getElementById('custom-buttonSuccess').value,
 
-        radiusMd
-        , shadowPreset
+        radiusMd,
+        shadowPreset,
+        spacingScale,
+        fontScale,
+        baseFontWeight
       };
 
       window.ThemeEnhanced.customBuilder.updateColors(colors);
@@ -697,6 +798,36 @@
     if (shadowSelect) {
       updateShadowPreview();
       shadowSelect.addEventListener('change', updateShadowPreview);
+    }
+
+    // Spacing scale sync
+    const spacingRange = document.getElementById('custom-spacingScale');
+    const spacingNumber = document.getElementById('custom-spacingScale-number');
+    if (spacingRange && spacingNumber) {
+      spacingRange.addEventListener('input', e => {
+        spacingNumber.value = e.target.value;
+      });
+      spacingNumber.addEventListener('input', e => {
+        const n = parseFloat(String(e.target.value || '').trim());
+        if (Number.isFinite(n)) {
+          spacingRange.value = String(Math.max(0.5, Math.min(1.75, n)));
+        }
+      });
+    }
+
+    // Font scale sync
+    const fontRange = document.getElementById('custom-fontScale');
+    const fontNumber = document.getElementById('custom-fontScale-number');
+    if (fontRange && fontNumber) {
+      fontRange.addEventListener('input', e => {
+        fontNumber.value = e.target.value;
+      });
+      fontNumber.addEventListener('input', e => {
+        const n = parseFloat(String(e.target.value || '').trim());
+        if (Number.isFinite(n)) {
+          fontRange.value = String(Math.max(0.75, Math.min(1.5, n)));
+        }
+      });
     }
 
     // Reset custom theme

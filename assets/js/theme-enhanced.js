@@ -230,6 +230,9 @@
           delete siteSettings.infoColor;
           delete siteSettings.radiusMd;
           delete siteSettings.shadowPreset;
+          delete siteSettings.spacingScale;
+          delete siteSettings.fontScale;
+          delete siteSettings.baseFontWeight;
           localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
 
           localStorage.removeItem('primaryColor');
@@ -259,6 +262,9 @@
           localStorage.removeItem('infoColor');
           localStorage.removeItem('radiusMd');
           localStorage.removeItem('shadowPreset');
+          localStorage.removeItem('spacingScale');
+          localStorage.removeItem('fontScale');
+          localStorage.removeItem('baseFontWeight');
         } catch (_) {
           // Ignore storage errors
         }

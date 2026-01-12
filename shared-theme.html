@@ -210,10 +210,13 @@
 
         // Non-color tokens
         radiusMd: siteSettings.radiusMd || localStorage.getItem('radiusMd') || null,
-        shadowPreset: siteSettings.shadowPreset || localStorage.getItem('shadowPreset') || null
+        shadowPreset: siteSettings.shadowPreset || localStorage.getItem('shadowPreset') || null,
+        spacingScale: siteSettings.spacingScale || localStorage.getItem('spacingScale') || null,
+        fontScale: siteSettings.fontScale || localStorage.getItem('fontScale') || null,
+        baseFontWeight: siteSettings.baseFontWeight || localStorage.getItem('baseFontWeight') || null
       };
     } catch (e) {
-      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null, bgPrimary: null, bgSecondary: null, bgTertiary: null, bgElevated: null, borderDefault: null, borderHover: null, borderFocus: null, textPrimary: null, textSecondary: null, textMuted: null, textOnPrimary: null, textOnSecondary: null, textOnAccent: null, textOnDanger: null, warning: null, info: null, radiusMd: null, shadowPreset: null };
+      return { primary: null, secondary: null, accent: null, navBg: null, navText: null, buttonPrimary: null, buttonSecondary: null, buttonDanger: null, buttonSuccess: null, bgPrimary: null, bgSecondary: null, bgTertiary: null, bgElevated: null, borderDefault: null, borderHover: null, borderFocus: null, textPrimary: null, textSecondary: null, textMuted: null, textOnPrimary: null, textOnSecondary: null, textOnAccent: null, textOnDanger: null, warning: null, info: null, radiusMd: null, shadowPreset: null, spacingScale: null, fontScale: null, baseFontWeight: null };
     }
   }
 
@@ -436,6 +439,60 @@
     };
 
     applyShadowPreset(colors.shadowPreset);
+
+    // Spacing scale (overrides spacing tokens)
+    const parseScale = (value) => {
+      if (value === null || value === undefined) return null;
+      const n = typeof value === 'number' ? value : parseFloat(String(value).trim());
+      if (!Number.isFinite(n)) return null;
+      return Math.max(0.5, Math.min(1.75, n));
+    };
+
+    const spacingScale = parseScale(colors.spacingScale);
+    if (spacingScale !== null) {
+      const base = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, x2l: 48 };
+      root.style.setProperty('--token-spacing-xs', `${Math.round(base.xs * spacingScale)}px`);
+      root.style.setProperty('--token-spacing-sm', `${Math.round(base.sm * spacingScale)}px`);
+      root.style.setProperty('--token-spacing-md', `${Math.round(base.md * spacingScale)}px`);
+      root.style.setProperty('--token-spacing-lg', `${Math.round(base.lg * spacingScale)}px`);
+      root.style.setProperty('--token-spacing-xl', `${Math.round(base.xl * spacingScale)}px`);
+      root.style.setProperty('--token-spacing-2xl', `${Math.round(base.x2l * spacingScale)}px`);
+    } else {
+      root.style.removeProperty('--token-spacing-xs');
+      root.style.removeProperty('--token-spacing-sm');
+      root.style.removeProperty('--token-spacing-md');
+      root.style.removeProperty('--token-spacing-lg');
+      root.style.removeProperty('--token-spacing-xl');
+      root.style.removeProperty('--token-spacing-2xl');
+    }
+
+    // Font scale + base weight
+    const fontScale = parseScale(colors.fontScale);
+    if (fontScale !== null) root.style.setProperty('--token-font-scale', String(fontScale));
+    else root.style.removeProperty('--token-font-scale');
+
+    const baseWeight = (() => {
+      if (colors.baseFontWeight === null || colors.baseFontWeight === undefined) return null;
+      const n = parseInt(String(colors.baseFontWeight).trim(), 10);
+      if (!Number.isFinite(n)) return null;
+      const allowed = [300, 400, 500, 600, 700];
+      return allowed.includes(n) ? n : null;
+    })();
+    if (baseWeight !== null) {
+      root.style.setProperty('--token-font-weight-normal', String(baseWeight));
+      root.style.setProperty('--token-font-weight-medium', String(Math.min(900, baseWeight + 100)));
+      root.style.setProperty('--token-font-weight-semibold', String(Math.min(900, baseWeight + 200)));
+      root.style.setProperty('--token-font-weight-bold', String(Math.min(900, baseWeight + 300)));
+    } else {
+      root.style.removeProperty('--token-font-weight-normal');
+      root.style.removeProperty('--token-font-weight-medium');
+      root.style.removeProperty('--token-font-weight-semibold');
+      root.style.removeProperty('--token-font-weight-bold');
+    }
+
+    const body = document.body;
+    if (body && fontScale !== null) body.style.fontSize = `${fontScale}em`;
+    else if (body) body.style.removeProperty('font-size');
   }
 
   // Apply dark/light class to documentElement
@@ -485,7 +542,10 @@
 
       // Non-color tokens
       radiusMd: (customColors && customColors.radiusMd) || null,
-      shadowPreset: (customColors && customColors.shadowPreset) || null
+      shadowPreset: (customColors && customColors.shadowPreset) || null,
+      spacingScale: (customColors && customColors.spacingScale) || null,
+      fontScale: (customColors && customColors.fontScale) || null,
+      baseFontWeight: (customColors && customColors.baseFontWeight) || null
     };
     
     applyCSSVariables(colors);
@@ -519,7 +579,7 @@
                               storedColors.bgPrimary || storedColors.bgSecondary || storedColors.bgTertiary || storedColors.bgElevated ||
                               storedColors.borderDefault || storedColors.borderHover || storedColors.borderFocus || storedColors.textPrimary || storedColors.textSecondary ||
               storedColors.textMuted || storedColors.textOnPrimary || storedColors.textOnSecondary || storedColors.textOnAccent || storedColors.textOnDanger || storedColors.warning || storedColors.info ||
-                  storedColors.radiusMd || storedColors.shadowPreset;
+              storedColors.radiusMd || storedColors.shadowPreset || storedColors.spacingScale || storedColors.fontScale || storedColors.baseFontWeight;
       const customColors = hasCustomColors ? storedColors : null;
       
       return applyTheme(storedTheme, customColors);
@@ -578,6 +638,9 @@
           if (colors.info) siteSettings.infoColor = colors.info;
           if (colors.radiusMd !== undefined && colors.radiusMd !== null) siteSettings.radiusMd = colors.radiusMd;
           if (colors.shadowPreset !== undefined && colors.shadowPreset !== null) siteSettings.shadowPreset = colors.shadowPreset;
+          if (colors.spacingScale !== undefined && colors.spacingScale !== null) siteSettings.spacingScale = colors.spacingScale;
+          if (colors.fontScale !== undefined && colors.fontScale !== null) siteSettings.fontScale = colors.fontScale;
+          if (colors.baseFontWeight !== undefined && colors.baseFontWeight !== null) siteSettings.baseFontWeight = colors.baseFontWeight;
           localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
           
           // Legacy compatibility
@@ -608,6 +671,9 @@
           if (colors.info) localStorage.setItem('infoColor', colors.info);
           if (colors.radiusMd !== undefined && colors.radiusMd !== null) localStorage.setItem('radiusMd', String(colors.radiusMd));
           if (colors.shadowPreset !== undefined && colors.shadowPreset !== null) localStorage.setItem('shadowPreset', String(colors.shadowPreset));
+          if (colors.spacingScale !== undefined && colors.spacingScale !== null) localStorage.setItem('spacingScale', String(colors.spacingScale));
+          if (colors.fontScale !== undefined && colors.fontScale !== null) localStorage.setItem('fontScale', String(colors.fontScale));
+          if (colors.baseFontWeight !== undefined && colors.baseFontWeight !== null) localStorage.setItem('baseFontWeight', String(colors.baseFontWeight));
         } catch (e) {
           // Ignore storage errors
         }
@@ -656,7 +722,10 @@
 
           // Non-color tokens
           radiusMd: storedColors.radiusMd || null,
-          shadowPreset: storedColors.shadowPreset || null
+          shadowPreset: storedColors.shadowPreset || null,
+          spacingScale: storedColors.spacingScale || null,
+          fontScale: storedColors.fontScale || null,
+          baseFontWeight: storedColors.baseFontWeight || null
         }
       };
     },
