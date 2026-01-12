@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.12.0...v1.13.0) (2026-01-11)
+
+### Features
+
+* add radiusMd customization option to theme settings and localStorage ([dde8cd2](https://github.com/SmokeHound/joshburt.com.au/commit/dde8cd2d2fcfd12d590de9d6036d6df4a8bb95cb))
+
 ## [1.12.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.11.0...v1.12.0) (2026-01-11)
 
 ### Features
