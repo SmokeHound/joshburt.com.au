@@ -529,8 +529,8 @@ textarea {
 }
 
 .light .sidebar {
-  background-color: #f9fafb;
-  border-right-color: #e5e7eb;
+  background-color: var(--token-nav-bg, var(--token-bg-secondary));
+  border-right-color: var(--token-border-default);
 }
 
 .light .nav-link {
