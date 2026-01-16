@@ -1,3 +1,9 @@
+## [1.20.0](https://github.com/SmokeHound/joshburt.com.au/compare/v1.19.2...v1.20.0) (2026-01-16)
+
+### Features
+
+* add theme token overrides for improved theming support ([4e171ed](https://github.com/SmokeHound/joshburt.com.au/commit/4e171ed901b1c7d0e0f12dc61a163ac220a79fc8))
+
 ## [1.19.2](https://github.com/SmokeHound/joshburt.com.au/compare/v1.19.1...v1.19.2) (2026-01-12)
 
 ### Bug Fixes
